@@ -1,0 +1,259 @@
+/*
+	Web designer: Omar Ricardo Chuman Zuñe
+	Contact: omar.chuman[at] powermas.com.pe
+	Last update: 2019/04/01
+	Description: Style Sheet that allows to establish the widths according to the reticule. Mobile First
+*/
+
+.container,
+.container-fluid {
+  width: 100%;
+  margin: auto;
+  /*background-color: #CCC; */
+}
+
+.container {
+  max-width: 1200px;
+}
+
+.item {
+  display: block;
+  padding: 16px;
+  padding: 1rem;
+  /*background-color: #234;*/
+}
+
+/* 
+	Los anchos se calculan por regla de 3
+	Mi reticula es de 12 columnas
+	Mi base de 960px
+
+	12col -----> 960px;
+	n-col -----> ???px
+	
+	( n-col * 960px ) / 12col = resultado en px
+
+	( 6col * 960px ) / 12col = 480px
+	( 1col * 960px ) / 12col = 80px
+
+	Mi reticula es de 12 columnas
+	Mi base de 100%	
+
+	( n-col * 100% ) / 12col = resultado en %
+*/
+
+.Phone_12 {
+  width: 100%;
+}
+
+.Phone_11 {
+  width: 91.66666666666667%;
+}
+
+.Phone_10 {
+  width: 83.33333333333333%;
+}
+
+.Phone_9 {
+  width: 75%;
+}
+
+.Phone_8 {
+  width: 66.66666666666667%;
+}
+
+.Phone_7 {
+  width: 58.33333333333333%;
+}
+
+.Phone_6 {
+  width: 50%;
+}
+
+.Phone_5 {
+  width: 41.66666666666667%;
+}
+
+.Phone_4 {
+  width: 33.33333333333333%;
+}
+
+.Phone_3 {
+  width: 25%;
+}
+
+.Phone_2 {
+  width: 16.66666666666667%;
+}
+
+.Phone_1 {
+  width: 8.333333333333333%;
+}
+
+@media screen and (min-width: 30em) {
+  .Small_12 {
+    width: 100%;
+  }
+
+  .Small_11 {
+    width: 91.66666666666667%;
+  }
+
+  .Small_10 {
+    width: 83.33333333333333%;
+  }
+
+  .Small_9 {
+    width: 75%;
+  }
+
+  .Small_8 {
+    width: 66.66666666666667%;
+  }
+
+  .Small_7 {
+    width: 58.33333333333333%;
+  }
+
+  .Small_6 {
+    width: 50%;
+  }
+
+  .Small_5 {
+    width: 41.66666666666667%;
+  }
+
+  .Small_4 {
+    width: 33.33333333333333%;
+  }
+
+  .Small_3 {
+    width: 25%;
+  }
+
+  .Small_2 {
+    width: 16.66666666666667%;
+  }
+
+  .Small_1 {
+    width: 8.333333333333333%;
+  }
+}
+
+@media screen and (min-width: 48em) {
+  .Medium_12 {
+    width: 100%;
+  }
+
+  .Medium_11 {
+    width: 91.66666666666667%;
+  }
+
+  .Medium_10 {
+    width: 83.33333333333333%;
+  }
+
+  .Medium_9 {
+    width: 75%;
+  }
+
+  .Medium_8 {
+    width: 66.66666666666667%;
+  }
+
+  .Medium_7 {
+    width: 58.33333333333333%;
+  }
+
+  .Medium_6 {
+    width: 50%;
+  }
+
+  .Medium_5 {
+    width: 41.66666666666667%;
+  }
+
+  .Medium_4 {
+    width: 33.33333333333333%;
+  }
+
+  .Medium_3 {
+    width: 25%;
+  }
+
+  .Medium_2 {
+    width: 16.66666666666667%;
+  }
+
+  .Medium_1 {
+    width: 8.333333333333333%;
+  }
+}
+
+@media screen and (min-width: 37em) {
+    .Tablet_6 {
+        width: 44%;
+    }
+}
+
+@media screen and (min-width: 42em) {
+    .Tablet_6 {
+        width: 45%;
+    }
+}
+
+@media screen and (min-width: 52em) {
+    .Tablet_6 {
+        width: 46%;
+    }
+}
+
+@media screen and (min-width: 64em) {
+  .Large_12 {
+    width: 100%;
+  }
+
+  .Large_11 {
+    width: 91.66666666666667%;
+  }
+
+  .Large_10 {
+    width: 83.33333333333333%;
+  }
+
+  .Large_9 {
+    width: 75%;
+  }
+
+  .Large_8 {
+    width: 66.66666666666667%;
+  }
+
+  .Large_7 {
+    width: 58.33333333333333%;
+  }
+
+  .Large_6 {
+    width: 50%;
+  }
+
+  .Large_5 {
+    width: 41.66666666666667%;
+  }
+
+  .Large_4 {
+    width: 33.33333333333333%;
+  }
+
+  .Large_3 {
+    width: 25%;
+  }
+
+  .Large_2 {
+    width: 16.66666666666667%;
+  }
+
+  .Large_1 {
+    width: 8.333333333333333%;
+  }
+}

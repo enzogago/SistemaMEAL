@@ -1,0 +1,940 @@
+﻿/*
+	Web designer: Enzo Fabricio Gago Aguirre
+	Contact: enzo.gago@powermas.com.pe
+	Last update: 2023/11/23
+	Description: Custom Style Page for Ayuda en Acción
+*/
+
+body {
+	font-family: DMMono;
+	text-align: justify;
+}
+
+/* LOGIN_VIEW */
+
+.PowerMas_ParentLogin {
+	background-color: #F87C56;
+	display: flex !important;
+}
+
+.PowerMas_Form_Contact_First_Part {
+	height: 100%;
+}
+
+.PowerMas_Form_Contact_First_Part picture{
+	padding: 1rem 2rem;
+}
+
+.PowerMas_Form_Contact_First_Part picture img{
+	width: auto; 
+	height: 50px;
+}
+
+.allvh {
+	min-height: 100vh;
+}
+
+.fixed-top {
+	padding-top: 5rem;
+}
+
+.flex-caption {
+	padding: 2%;
+	color: #116186;
+	height: 4rem;
+	background: #fff;
+	text-shadow: 1px 0px 1px rgba(255, 255, 255, 0.1);
+	line-height: 1rem;
+}
+
+.Powermas_FontTitle {
+	font-family: Bogart;
+}
+
+.PowerMas_InputLogin {
+	border: none;
+	border-bottom: 1px solid black;
+	padding: 8px 0;
+	margin: 8px 0;
+	width: 100%;
+}
+
+.PowerMas_InputLogin:focus {
+	outline: none;
+}
+
+.PowerMas_RememberMe {
+	display: flex;
+	justify-content: space-between;
+	margin: 1rem 0;
+}
+
+.PowerMas_RememberMe font:hover {
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.PowerMas_LabelError{
+	min-height: 20px;
+
+}
+
+.PowerMas_ButtomLogin {
+	width: 60%;
+	background-color: #FBC355;
+	color: black;
+	border: none;
+	padding: 10px 32px;
+	text-align: center;
+	margin: 1rem auto;
+	cursor: pointer;
+	border-radius: 12px;
+	transition: background-color 0.3s ease;
+}
+
+.PowerMas_ButtomLogin:hover {
+	background-color: #FFD479;
+}
+
+
+@media screen and (max-width: 30em) {
+	.PowerMas_Form_Contact_First_Part picture {
+		text-align: center;
+	}
+
+	.PowerMas_ButtomLogin {
+		margin: 0 auto;
+	}
+
+	.PowerMas_Form_Contact_First_Part picture img {
+		height: auto;
+	}
+
+	.PowerMas_ImageLogin img {
+		max-height: 520px;
+	}
+}
+@media screen and (min-width: 43em) {
+	.PowerMas_ButtomLogin {
+		margin: 2rem auto;
+	}
+
+	.PowerMas_ImageLogin img {
+		max-height: 525px;
+	}
+}
+
+@media screen and (min-width: 52em) {
+	.PowerMas_ImageLogin img {
+		max-height: 530px;
+	}
+}
+
+@media screen and (min-width: 64em) {
+	.PowerMas_FormLogin {
+		padding: 1rem 6rem;
+	}
+
+	.PowerMas_ButtomLogin {
+		margin: 2rem auto;
+	}
+
+	.PowerMas_ImageLogin img {
+		max-height: 560px;
+	}
+}
+
+
+.PowerMas_MainContainer {
+	background-color: #fff;
+	box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+	max-height: 560px;
+}
+
+@media only screen and (max-width: 600px) {
+	.PowerMas_ImageLogin {
+		display: none;
+	}
+}
+
+.PowerMas_ImageLogin img {
+	object-fit: cover;
+	min-height: 520px;
+}
+
+
+
+/* HOME_VIEW */
+
+.PowerMas_MainHome {
+	display: flex;
+	width: 100%;
+	height: 100vh;
+}
+
+.PowerMas_Menu {
+	background-color: #F87C56;
+	width: 20%;
+	height: 100%;
+	box-sizing: border-box;
+	overflow: hidden;
+}
+
+.PowerMas_Menu h1 {
+	color: #fff;
+}
+
+.PowerMas_MenuOptions {
+	height: 80%;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
+/* Personaliza la barra de desplazamiento */
+.PowerMas_MenuOptions::-webkit-scrollbar {
+	width: 6px;
+}
+
+.PowerMas_MenuOptions::-webkit-scrollbar-track {
+	background: #F87C56;
+}
+
+.PowerMas_MenuOptions::-webkit-scrollbar-thumb {
+	background: #888;
+}
+
+.PowerMas_MenuOptions::-webkit-scrollbar-thumb:hover {
+	background: #555;
+}
+
+.PowerMas_MainRender{
+	overflow-y: auto;
+	width: 80%;
+	background-color: #dedddd;
+	box-shadow: inset 10px 0px 10px rgba(0, 0, 0, 0.2);
+	position: relative;
+}
+.PowerMas_Content {
+	padding: 1rem 2rem;
+	width: 100%;
+}
+.PowerMas_MainRender::before{
+	content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 20%;
+    background-color: #20737b;
+	box-shadow: inset 10px 0px 10px rgba(0, 0, 0, 0.2);
+}
+.PowerMas_MainRender > div, .PowerMas_Content > div{
+	position: relative;
+}
+
+
+.PowerMas_LinkMenuContainer {
+	flex-direction: column;
+}
+
+.PowerMas_LinkMenuContainer.active-level-1 > div.PowerMas_Submenu {
+    max-height: 500px;
+	padding-left: 10px;
+}
+.PowerMas_LinkMenuContainer.active-level-2 > div.PowerMas_Submenu {
+	max-height: 500px;
+	padding-left: 10px;
+}
+.PowerMas_LinkMenuContainer.active-level-3 > div.PowerMas_Submenu {
+    max-height: 500px;
+	padding-left: 10px;
+}
+.PowerMas_LinkMenuContainer.active-level-4 > div.PowerMas_Submenu {
+	max-height: 500px;
+	padding-left: 10px;
+}
+.PowerMas_LinkMenuContainer.active-level-5 > div.PowerMas_Submenu {
+    max-height: 500px;
+	padding-left: 10px;
+}
+.PowerMas_LinkMenuContainer.active-level-6 > div.PowerMas_Submenu {
+	max-height: 500px;
+	padding-left: 10px;
+}
+
+.PowerMas_Submenu {
+	max-height: 0;
+	overflow: hidden;
+	width: 100%;
+	transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out;
+}
+
+/**/
+.PowerMas_MenuContainer a{
+	text-decoration: none;
+}
+
+
+.PowerMas_MenuOptions > div, .PowerMas_Submenu div.menu-item, .PowerMas_MenuContainer a{
+    color: #eaeaea; /* Un blanco no tan claro */
+	transition: 0.2s ease-in-out;
+}
+.PowerMas_MenuOptions > div:hover, .PowerMas_Submenu div.menu-item:hover, .PowerMas_MenuOptions a:hover {
+    color: #fff; /* Blanco puro al pasar el ratón por encima */
+	cursor: pointer;
+}
+.PowerMas_Submenu div.menu-item:hover, .PowerMas_MenuOptions a:hover, .PowerMas_MenuOptions > div .menu-item:hover{
+	background-color: #e47e5f;
+}
+
+.PowerMas_MenuOptions > div {
+	width: 100%;
+    display: flex;
+    align-items: center;
+    min-height: 45px;
+	border-bottom: 1px solid #fff;
+}
+.PowerMas_MenuOptions > div:first-child{
+	border-top: 1px solid #fff;
+}
+
+.PowerMas_MenuOptions > div .menu-item {
+	width: 100%;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+	justify-content: space-between;
+	min-height: 45px;
+	gap: 2rem;	
+	padding: 0 1rem;
+	transition: 0.2s ease-in-out;
+}
+
+.PowerMas_MenuContainer svg{
+	width: 20px;
+	height: 20px;
+	min-height: 20px;
+	min-width: 20px;
+}
+
+.PowerMas_MenuOptions > div .menu-item .menu-text {
+    display: flex;
+    align-items: center;
+	gap: 1rem;
+}
+
+.PowerMas_MenuOptions > div .arrow {
+    transition: transform 0.3s ease;
+}
+
+.PowerMas_MenuOptions div.active-level-1 > div > span {
+    transform: rotate(90deg);
+}
+.PowerMas_MenuOptions div.active-level-2 > div > span {
+    transform: rotate(90deg);
+}
+.PowerMas_MenuOptions div.active-level-3 > div > span {
+    transform: rotate(90deg);
+}
+.PowerMas_MenuOptions div.active-level-4 > div > span {
+    transform: rotate(90deg);
+}
+.PowerMas_MenuOptions div.active-level-5 > div > span {
+    transform: rotate(90deg);
+}
+.PowerMas_MenuOptions div.active-level-6 > div > span {
+    transform: rotate(90deg);
+}
+
+
+.PowerMas_Submenu > div {
+	min-height: 30px;
+}
+.PowerMas_Submenu > div a{
+	display: flex;
+	align-items: center;
+	justify-content: left;
+	gap: 1rem;
+}
+.PowerMas_Submenu > div a svg{
+	width: 13px;
+	height: 13px;
+	min-height: 13px;
+	min-width: 13px;
+}
+
+.PowerMas_MainSingleLink a{
+	width: 100%;
+	display: flex;
+	align-items: center;
+	min-height: 40px;
+	padding: 0 1rem;
+}
+
+
+.PowerMas_SingleLink{
+	display: flex;
+	gap: 1rem;
+	align-items: center;
+}
+
+.PowerMas_MenuContainer {
+	height: 75%;
+}
+
+.PowerMas_MenuBottom {
+	display: flex;
+	flex-direction: column;
+	height: 20%;
+	width: 100%;
+	background-color: #20737b;
+	
+}
+.PowerMas_MenuBottom > div{
+	display: flex;
+	flex-direction: column;
+	margin: auto 0;
+}
+.PowerMas_MenuBottom > div > div a{
+	color: #eaeaea;
+	transition: 0.2s ease-in-out;
+}
+.PowerMas_MenuBottom > div > div:hover a{
+	background-color: #277980;
+	color: #fff;
+}
+
+.PowerMas_SidebarHeader{
+	height: 25%;
+}
+/*
+	VISTA InitialHome.cshtml
+*/
+.PowerMas_ProfileContainer {
+	display: flex;
+	align-items: center;
+}
+
+.PowerMas_ProfilePicture {
+	width: 50px;
+	height: 50px;
+	border-radius: 50%;
+	background: #277980; /* Reemplaza esto con la imagen de perfil */
+	overflow: hidden;
+}
+.PowerMas_ProfilePicture img {
+    width: 100%;
+    height: auto;
+}
+
+.PowerMas_ProfileInfo  span{
+	display:block;
+}
+
+.PowerMas_MenuIcon {
+	margin-left: auto;
+	transform: rotate(90deg);
+}
+
+.PowerMas_BarContainer {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0 2rem;
+	color: #fff;
+}
+
+.PowerMas_BarContainer h2 {
+	font-family: Bogart;
+	letter-spacing: 2px;
+}
+
+.PowerMas_SearchContainer {
+	position: relative;
+	width: 100%;
+}
+.PowerMas_SearchContainer svg{
+	width: auto;
+}
+
+.PowerMas_SearchContainer input {
+	width: 100%;
+	padding: 10px 20px 10px 60px;
+	margin: 8px 0;
+	box-sizing: border-box;
+	border: none;
+	background-color: #f0f0f0;
+	color: black;
+	transition: box-shadow 0.3s ease-in-out;
+}
+
+	.PowerMas_Input:focus {
+		outline: none;
+		box-shadow: 0 0 5px rgba(81, 203, 238, 1);
+	}
+
+.PowerMas_InputIcon {
+	color: black ;
+	position: absolute;
+	left: 30px;
+	top: 20px;
+}
+
+.PowerMas_Input::-webkit-search-cancel-button {
+	-webkit-appearance: none;
+	height: 15px;
+	width: 15px;
+	background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>') no-repeat;
+	cursor: pointer;
+}
+
+.PowerMas_ResumeHome {
+	display: flex;
+	justify-content: space-between;
+	gap: 1rem;
+}
+
+.PowerMas_LeftSection {
+	background-color: #f0f0f0;
+	max-height: 330px;
+	overflow: auto;
+}
+.PowerMas_RightSection {
+	max-height: 330px;
+}
+
+.PowerMas_CheckboxContainer {
+	display: flex;
+	gap: 1rem;
+}
+
+.PowerMas_KPIRow {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	background-color: #f0f0f0;
+	padding: 1rem;
+}
+
+.PowerMas_TableHome {
+	width: 100%;
+	table-layout: fixed;
+	font-weight: lighter;
+}
+
+.PowerMas_TableHome td, th{
+	width: 20%;
+	text-align: left;
+	padding: 0.5rem;
+}
+
+.PowerMas_TableHome tr:first-child th {
+	border-bottom: 1px solid black;
+}
+
+.PowerMas_AccessCards{
+	display:flex;
+	gap: 2rem;
+}
+
+.PowerMas_AccessCard {
+	background-color: #f1f1f1;
+	display: flex;
+	flex-direction: column;
+	cursor: pointer;
+	padding: 1rem 2rem;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.PowerMas_AccessCardHeader {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	color: #fff;
+	background-color: #FBC355;
+	padding: 0.5rem 1rem;
+}
+
+.PowerMas_AccessCard p{
+	font-family: Bogart;
+}
+
+.PowerMas_AccessIndicator{
+	display:flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.PowerMas_AccessIndicator span:first-child{
+	text-align: left;
+}
+.PowerMas_AccessIndicator span:last-child {
+	text-align: right;
+}
+
+.PowerMas_RecentsSection{
+	gap: 2rem;
+	margin: 2rem 0;
+}
+
+#donutContainer {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: auto;
+	position: relative;
+}
+#counter {
+	position: absolute;
+	font-size: 20px;
+}
+
+.PowerMas_ActivitiesSection, .PowerMas_BeneficiarySection {
+	background-color: #f1f1f1;
+}
+
+.PowerMas_Icon{
+	color: #fff;
+	background-color: darkgreen;
+	border-radius: 50%;
+	text-align: center;
+}
+.PowerMas_Icon i{
+	font-size: unset;
+}
+/*	
+	VISTA NewProject.cshtml
+*/
+.PowerMas_MainNewProject {
+	padding: 0 1rem;
+	display: flex;
+	width: 100%;
+	height: 75%;
+	gap: 1rem;
+}
+
+	.PowerMas_MainNewProject h2 {
+		font-size: 1.3rem;
+		font-family: DMMono;
+		font-weight: 500;
+	}
+
+.PowerMas_ProjectInfo h2 {
+	padding: 1rem 0;
+}
+
+.PowerMas_ProjectInfo, .PowerMas_ProjectDetails {
+	width: 50%;
+	padding: 1rem 2rem;
+}
+
+.PowerMas_ProjectInfo, .PowerMas_ProjectDetails, .PowerMas_ObjectiveContainer, .PowerMas_ResultContainer {
+	display: flex;
+	flex-direction: column;
+}
+
+.PowerMas_ProjectDetails {
+	height: auto;
+	overflow-y: auto;
+}
+
+.PowerMas_NewSubproject, .PowerMas_SAPInput, .PowerMas_HeaderObjective, .PowerMas_HeaderResult {
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+}
+
+.PowerMas_MainNewProject input[type=text] {
+	border: none;
+	border-bottom: 2px solid #757575;
+}
+
+	.PowerMas_MainNewProject input[type=text]:focus {
+		outline: none;
+	}
+
+.PowerMas_MainNewProject textarea {
+	padding: 10px;
+	border: 1px solid #757575;
+	border-radius: 5px;
+}
+
+	.PowerMas_MainNewProject textarea:focus {
+		outline: none;
+	}
+
+.PowerMas_NewSubproject {
+	padding: 1rem 0;
+}
+
+.PowerMas_SAPInput, .PowerMas_ObjectiveContainer, .PowerMas_ResultContainer {
+	padding: 1.3rem 1.5rem;
+}
+
+.PowerMas_ProjectDetails textarea {
+	margin: 0 1.5rem;
+	min-height: 50px;
+}
+
+.PowerMas_ObjectiveContainer input, .PowerMas_ResultContainer input {
+	margin-top: 10px;
+}
+
+/* FOOTER_VIEW */
+
+.PowerMas_Footer {
+	display: flex;
+	justify-content: flex-end;
+	padding: 0.5rem 1rem;
+	box-shadow: 0 -5px 10px rgba(0, 0, 0, 0.1);
+}
+
+.PowerMas_FooterButtons {
+	padding: 0 3rem;
+	width: 50%;
+	display: flex;
+	justify-content: space-between;
+}
+
+.PowerMas_FooterButton {
+	width: 45%; /* Ajusta esto según el espacio que quieras entre los botones */
+	padding: 10px;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+	.PowerMas_FooterButton:first-child {
+		background-color: #757575;
+		color: white;
+	}
+
+	.PowerMas_FooterButton:last-child {
+		background-color: #FBC355;
+		color: white;
+	}
+
+.PowerMas_ImportButton {
+	background-color: #FBC355; /* Color de fondo naranja */
+	color: white; /* Texto blanco */
+	border: none; /* Sin borde */
+	padding: 10px 20px; /* Espaciado interno */
+	border-radius: 5px; /* Bordes redondeados */
+	cursor: pointer; /* Cambia el cursor a una mano cuando se pasa el ratón por encima */
+	display: flex; /* Para alinear el texto y el icono */
+	justify-content: center; /* Centra el contenido horizontalmente */
+	align-items: center; /* Centra el contenido verticalmente */
+}
+
+	.PowerMas_ImportButton span.arrow {
+		margin-left: 10px; /* Añade un espacio a la izquierda del icono */
+		transform: rotate(90deg); /* Gira el icono 90 grados */
+	}
+
+
+.PowerMas_MainNewProject i {
+	color: #757575;
+	margin-left: 1rem;
+}
+
+.PowerMas_ButtomContainer {
+	display: flex;
+	align-items: center;
+}
+
+.PowerMas_InputBudget {
+	width: 50%;
+}
+
+
+/* SATUS VIEW */
+
+
+.PowerMas_ButtonStatus {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 1rem;
+    background-color: #fccc54;
+    color: white; 
+    border: none; 
+    cursor: pointer; 
+	transition: background-color 0.3s ease;
+}
+
+.PowerMas_ButtonStatus:hover {
+    background-color: #ffd479; /* Cambia el color de fondo cuando se pasa el ratón por encima para un efecto hover */
+}
+
+.TableMainContainer{
+	background-color: #fff;
+}
+.PowerMas_TableContainer {
+	margin: 1rem 0;
+	height: 54vh;
+    max-height: 100rem;
+    overflow: auto;
+}
+
+.PowerMas_TableStatus {
+    width: 100%;
+}
+
+.PowerMas_TableStatus thead th div{
+	display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+.PowerMas_TableStatus thead th div svg {
+    height: 1em;
+    width: auto; 
+}
+
+.PowerMas_TableStatus thead th{
+	position: sticky;
+    top: 0;
+    background: white; 
+	transition: background-color 0.3s ease;
+}
+
+.PowerMas_TableStatus thead th:hover{
+	background-color: #f0f0f0;
+	cursor: pointer;
+}
+
+.PowerMas_TableStatus thead th::after{
+	content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+}
+
+.PowerMas_TableStatus td, th {
+	padding-left: 1rem;
+	width: auto;
+    word-wrap: break-word;
+	border-bottom: 1px solid #d3d3d3;
+}
+
+.PowerMas_TableStatus tbody tr{
+	background-color: white;
+	transition: background-color 0.1s ease;
+}
+
+.PowerMas_TableStatus tbody tr:hover{
+	background-color: #D3D3D3; 
+}
+
+.PowerMas_TableEmpty td{
+	border: 1px solid transparent!important;
+}
+.PowerMas_TableEmpty:hover{
+	background-color: #fff!important;
+}
+
+.PowerMas_Modal {
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.PowerMas_ModalContent {
+    background-color: #fefefe;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 60%;
+}
+
+.PowerMas_CloseModal {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.PowerMas_CloseModal:hover,
+.PowerMas_CloseModal:focus {
+	color: black;
+	text-decoration: none;
+	cursor: pointer;
+}
+.PowerMas_IconsTable{
+	width: auto;
+}
+.PowerMas_IconsTable svg{
+	width: 30px;
+	height: 30px;
+	border: 1px solid transparent;
+	transition: border 0.3s ease;
+}
+.PowerMas_IconsTable svg:first-child{
+	color: red;
+}
+.PowerMas_IconsTable svg:last-child{
+	color: rgb(175, 175, 10);
+}
+
+.PowerMas_IconsTable svg:hover{
+	border: 1px solid;
+	cursor: pointer;
+}
+
+.PowerMas_Pagination button{
+	background-color: transparent;
+	border: 1px solid transparent;
+	transition: border 0.3s ease;
+}
+
+.PowerMas_Pagination button:hover{
+	border: 1px solid black;
+	cursor: pointer;
+}
+
+
+.PowerMas_FilterStatus {
+	position: relative;
+}
+
+.PowerMas_FilterStatus input {
+	width: 100%;
+	padding: 10px 20px 10px 40px;
+	margin: 8px 0;
+	box-sizing: border-box;
+	border: none;
+	background-color: #f0f0f0;
+	color: black;
+	transition: box-shadow 0.1s ease-in-out;
+}
+
+.PowerMas_FilterStatus input:focus {
+	outline: none;
+	box-shadow: 0 0 5px rgba(81, 203, 238, 1);
+}
+
+.PowerMas_FilterStatus svg {
+	width: inherit;
+	color: black ;
+	position: absolute;
+	left: 15px;
+	top: 20px;
+}
+
+.PowerMas_FilterStatus input::-webkit-search-cancel-button {
+	-webkit-appearance: none;
+	height: 15px;
+	width: 15px;
+	background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="black"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>') no-repeat;
+	cursor: pointer;
+}
+
+
+

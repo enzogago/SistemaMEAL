@@ -1,0 +1,222 @@
+/*
+	Web designer: Omar Ricardo Chuman Zuñe
+	Contact: omar.chuman[at] powermas.com.pe
+	Last update: 2019/04/01
+	Description: Style sheet that allows you to restore HTML defaults
+*/
+
+@font-face {
+	font-family: "Bogart";
+	font-style: normal;
+	font-weight: 400;
+	src: local("Bogart Regular"), local("Bogart-Regular"),
+		url("..//fonts/Bogart/Bogart-Regular.woff2") format("woff2"),
+		url("../fonts/Bogart/Bogart-Regular.woff") format("woff"),
+		url("../fonts/Bogart/Bogart-Regular.ttf") format("truetype");
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "DMMono";
+	font-style: normal;
+	font-weight: 400;
+	src: local("DMMono Regular"), local("DMMono-Regular"), 
+		url("../fonts/DMMono/DMMono-Regular.woff2") format("woff2"), 
+		url("../fonts/DMMono/DMMono-Regular.woff") format("woff"), 
+		url("../fonts/DMMono/DMMono-Regular.ttf") format("truetype");
+	font-display: swap;
+}
+
+html {
+  -ms-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  font-family: PowerMas, sans-serif;
+  font-size: 16px;
+  -ms-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  background-color: #fff;
+  color: #000;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+*,
+*::after,
+*::before {
+  -ms-box-sizing: inherit;
+  -moz-box-sizing: inherit;
+  -webkit-box-sizing: inherit;
+  box-sizing: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  color: #eecf27;
+}
+
+a:hover {
+  color: #ccc;
+}
+
+h1 {
+  font-size: 32px;
+  font-size: 2rem;
+}
+
+h2 {
+  font-size: 28px;
+  font-size: 1.75rem;
+}
+
+h3 {
+  font-size: 24px;
+  font-size: 1.5rem;
+}
+
+h4 {
+  font-size: 20px;
+  font-size: 1.25rem;
+}
+
+h5,
+a,
+abbr,
+b,
+code,
+dfn,
+em,
+i,
+li,
+mark,
+p,
+pre,
+strong {
+  font-size: 16px;
+  font-size: 1rem;
+}
+
+h6,
+small {
+  font-size: 12px;
+  font-size: 0.75rem;
+}
+
+li {
+  /*margin-left: 16px;
+	margin-left: 1rem;*/
+  list-style-type: inherit;
+  list-style-position: inside;
+}
+
+abbr,
+dfn,
+em,
+i {
+  font-style: italic;
+}
+
+b,
+strong {
+  font-weight: bold;
+}
+
+code,
+pre {
+  font-family: monospace;
+}
+
+mark {
+  background-color: yellow;
+}
+
+hr {
+  margin: 16px auto;
+  margin: 1rem auto;
+  width: 100%;
+  border: thin solid #000;
+}
+
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+main,
+menu,
+nav,
+section,
+summary {
+  display: block;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+audio,
+canvas,
+img,
+iframe,
+picture,
+progress,
+svg,
+video {
+  display: inline-block;
+  vertical-align: baseline;
+  width: 100%;
+  max-width: 100%;
+}
+
+button,
+input,
+optgroup,
+option,
+select,
+textarea {
+  padding: 4px;
+  padding: 0.25rem;
+  font-family: inherit;
+  font-size: 16px;
+  font-size: 1rem;
+  border: thin solid #000;
+}
+
+button,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+input[type="checkbox"],
+input[type="radio"],
+label,
+select {
+  cursor: pointer;
+}
+
+*[disabled] {
+  cursor: default;
+  color: #999;
+  background-color: #ddd;
+}
+
+textarea {
+  resize: none;
+}
+
+::-moz-selection {
+  color: #fff;
+  background-color: #ccc;
+}
+
+::selection {
+  color: #fff;
+  background-color: #ccc;
+}
