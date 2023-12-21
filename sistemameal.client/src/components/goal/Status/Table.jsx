@@ -1,6 +1,6 @@
-import { useContext, useState } from 'react';
+import { useContext, useMemo, useState } from 'react';
 import { handleDelete } from './eventHandlers';
-import { FaPenNib, FaSortDown, FaSortUp, FaTrash } from 'react-icons/fa';
+import { FaPenNib, FaPlus, FaSortDown, FaSortUp, FaTrash } from 'react-icons/fa';
 import { StatusContext } from '../../../context/StatusContext';
 import styles from './styles'
 import {
@@ -11,12 +11,13 @@ import {
     getSortedRowModel, 
     getFilteredRowModel 
 } from '@tanstack/react-table'
-import SearchBar from './SearchBar';
 import Pagination from './Pagination';
 
 const Table = ({ data, openModal }) => {
     const { statusActions } = useContext(StatusContext);
     const { setEstados } = statusActions;
+    const [codigoFilter, setCodigoFilter] = useState('');
+    const [nombreFilter, setNombreFilter] = useState('');
 
     const columns = [
         {
@@ -40,41 +41,62 @@ const Table = ({ data, openModal }) => {
     ]
 
     const [sorting, setSorting] = useState([]);
-    const [filtering, setFiltering] = useState('');
+    const filteredData = useMemo(() => 
+        data.filter(item => 
+            item.estCod.includes(codigoFilter.toUpperCase()) &&
+            item.estNom.includes(nombreFilter.toUpperCase())
+        ), [data, codigoFilter, nombreFilter]
+    );
 
     const table = useReactTable({
-        data, 
+        data: filteredData,
         columns,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
         state: {
-            sorting,
-            globalFilter: filtering
+            sorting
         },
         onSortingChange: setSorting,
-        onGlobalFilterChange: setFiltering,
-        columnResizeMode: "onChange",
+        columnResizeMode: "onChange"
     })
 
     return (
         <div className='TableMainContainer Large-p2'>
-            <h1 className="center flex left Large-f1_75">Listado de estados</h1>
-            <SearchBar 
-                openModal={openModal} 
-                filtering={filtering} 
-                setFiltering={setFiltering} 
-            />
+            <div className="flex jc-space-between">
+                <h1 className="flex left Large-f1_75">Listado de estados</h1>
+                <button className='Large-p_5 PowerMas_ButtonStatus' onClick={() => openModal()}>
+                    Nuevo <FaPlus /> 
+                </button>
+            </div>
             <div className="PowerMas_TableContainer">
                 <table className="Large_12 PowerMas_TableStatus">
                     <thead>
+                        <tr>
+                            <th>
+                                <input 
+                                    type="search"
+                                    placeholder='Filtrar por Codigo'
+                                    value={codigoFilter}
+                                    onChange={e => setCodigoFilter(e.target.value)}
+                                />
+                            </th>
+                            <th>
+                                <input 
+                                    type="search"
+                                    placeholder='Filtrar por Nombre'
+                                    value={nombreFilter}
+                                    onChange={e => setNombreFilter(e.target.value)}
+                                />
+                            </th>
+                            <th></th>
+                        </tr>
                         {
                             table.getHeaderGroups().map(headerGroup => (
                                 <tr key={headerGroup.id}>
                                     {
                                         headerGroup.headers.map(header =>(
-                                            <th style={{ width: header.getSize() }} key={header.id} onClick={header.column.getToggleSortingHandler()}>
+                                            <th style={{ width: header.getSize(), position: 'relative'  }} key={header.id} onClick={header.column.getToggleSortingHandler()}>
                                                 <div>
                                                     {
                                                     flexRender(header.column.columnDef.header, header.getContext())
@@ -94,9 +116,9 @@ const Table = ({ data, openModal }) => {
                                                         header.getResizeHandler()
                                                     }
 
-                                                    style={header.column.getIsResizing() ? 
-                                                    styles.global[".resizer.isResizing"] : 
-                                                    styles.global[".resizer"]} >
+                                                    className={header.column.getIsResizing() 
+                                                    ? "resizer isResizing" 
+                                                    : "resizer"} >
                                                 </span>
 
                                                 

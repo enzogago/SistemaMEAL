@@ -7,7 +7,7 @@ import { StatusContext } from '../../../context/StatusContext';
 const Status = () => {
     // Variables State useContext
     const { statusInfo, statusActions } = useContext(StatusContext);
-    const { estados, modalVisible, estadoEditado } = statusInfo;
+    const { estados, estadoEditado } = statusInfo;
     const { setEstados, setNombreEstado, setModalVisible, setEstadoEditado } = statusActions;
     
 
@@ -19,6 +19,7 @@ const Status = () => {
     const closeModal = () => {
         setEstadoEditado(null);
         setModalVisible(false);
+        setNombreEstado("");
     };
 
     // Efecto al editar estado
@@ -59,11 +60,9 @@ const Status = () => {
                 data={estados} 
                 openModal={openModal} 
             />
-            {modalVisible && (
-                <Modal 
-                    closeModal={closeModal} 
-                />
-            )}
+            <Modal 
+                closeModal={closeModal} 
+            />
         </div>
     );
 }

@@ -42,7 +42,6 @@ const Sidebar = ({ setIsLoggedIn }) => {
                 const data = await response.json();
                 const groupData = groupByParent(data);
                 setMenuData(groupData);
-                console.log(menuData)
             } catch (error) {
                 console.error(error);
             }
