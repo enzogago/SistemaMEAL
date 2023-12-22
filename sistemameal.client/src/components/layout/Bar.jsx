@@ -1,6 +1,9 @@
 import avatar from '../../img/avatar.jpeg';
 
 const Bar = () => {
+  const user = JSON.parse(localStorage.getItem('user'));
+
+  console.log("desde bar:", user)
   return (
     <div className="PowerMas_BarContainer">
         <h2 className="Large-f1_5">¡Hola de nuevo!</h2>
@@ -9,8 +12,8 @@ const Bar = () => {
                 <img src={avatar} alt="Descripción de la imagen" />
             </div>
             <div className="PowerMas_ProfileInfo Large-p1">
-                <span className="PowerMas_Username Large-f_1">Omar Chuman</span>
-                <span className="PowerMas_UserRole Large-f_75">Coordinador</span>
+                <span className="PowerMas_Username Large-f_1">{`${user.usuNom} ${user.usuApe} `}</span>
+                <span className="PowerMas_UserRole Large-f_75">{user.cargo.carNom}</span>
             </div>
                 <div className="PowerMas_MenuIcon"> &gt; </div>
         </div>

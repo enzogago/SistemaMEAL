@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using SistemaMEAL.Modulos;
+using SistemaMEAL.Server.Modulos;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +13,7 @@ builder.Services.AddSwaggerGen();
 // Servicios para los Modulos DAO
 builder.Services.AddScoped<EstadoDAO>();
 builder.Services.AddScoped<MenuDAO>();
+builder.Services.AddScoped<UsuarioDAO>();
 
 
 // Configuracion seguridad JWT

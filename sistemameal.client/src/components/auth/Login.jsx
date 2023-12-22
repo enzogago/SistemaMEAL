@@ -1,13 +1,44 @@
+import Notiflix from 'notiflix';
 import logo from '../../img/PowerMas_LogoAyudaEnAccion.svg';
 import portadaLogin from '../../img/PowerMas_PortadaLogin.webp';
+import { AuthContext } from '../../context/AuthContext';
+import { useContext } from 'react';
 
 const Login = ({setIsLoggedIn}) => {
+    const { authActions } = useContext(AuthContext);
+    const { setUser } = authActions;
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
-        
-        setIsLoggedIn(true);
+    
+        const email = document.getElementById('txtCorreoElectronico').value;
+        const password = document.getElementById('txtPassword').value;
+    
+        const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/usuario/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email, password })
+        });
+    
+        if (!response.ok) {
+            console.error(`HTTP error! status: ${response.status}`);
+            return;
+        }
+    
+        const data = await response.json();
+        if (data.success) {
+            Notiflix.Notify.success("Usuario Autenticado Correctamente");
+            console.log("desde login: ",data.user);
+            localStorage.setItem('token', data.result);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            setIsLoggedIn(true);
+        } else {
+            Notiflix.Notify.failure(data.message);
+        }
     };
+    
 
   return (
     <section className="container-fluid allvh PowerMas_ParentLogin">

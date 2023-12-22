@@ -3,8 +3,12 @@ import Notiflix from 'notiflix';
 import Table from './Table';
 import Modal from './Modal';
 import { StatusContext } from '../../../context/StatusContext';
+import { AuthContext } from '../../../context/AuthContext';
 
 const Status = () => {
+    // Variables State AuthContext 
+    const { authActions } = useContext(AuthContext);
+    const { setIsLoggedIn } = authActions;
     // Variables State useContext
     const { statusInfo, statusActions } = useContext(StatusContext);
     const { estados, estadoEditado } = statusInfo;
@@ -37,9 +41,19 @@ const Status = () => {
         const fetchEstados = async () => {
             try {
                 Notiflix.Loading.pulse('Cargando...');
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Estado`);
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Estado`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    if(response.status == 401 || response.status == 403){
+                        const data = await response.json();
+                        Notiflix.Notify.failure(data.message);
+                        setIsLoggedIn(false);
+                    }
+                    return;
                 }
                 const data = await response.json();
                 setEstados(data);
@@ -52,6 +66,7 @@ const Status = () => {
     
         fetchEstados();
     }, []);
+    
     
 
     return (

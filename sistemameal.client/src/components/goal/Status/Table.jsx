@@ -2,7 +2,6 @@ import { useContext, useMemo, useState } from 'react';
 import { handleDelete } from './eventHandlers';
 import { FaPenNib, FaPlus, FaSortDown, FaSortUp, FaTrash } from 'react-icons/fa';
 import { StatusContext } from '../../../context/StatusContext';
-import styles from './styles'
 import {
     useReactTable, 
     getCoreRowModel, 
@@ -12,8 +11,12 @@ import {
     getFilteredRowModel 
 } from '@tanstack/react-table'
 import Pagination from './Pagination';
+import { AuthContext } from '../../../context/AuthContext';
 
 const Table = ({ data, openModal }) => {
+    const { authActions } = useContext(AuthContext);
+    const { setIsLoggedIn } = authActions;
+    //
     const { statusActions } = useContext(StatusContext);
     const { setEstados } = statusActions;
     const [codigoFilter, setCodigoFilter] = useState('');
@@ -33,7 +36,7 @@ const Table = ({ data, openModal }) => {
             accessorKey: "acciones",
             cell: ({row}) => (
                 <div className='PowerMas_IconsTable flex jc-center ai-center'>
-                    <FaTrash className='Large-p_25' onClick={() => handleDelete(row.original.estCod, setEstados)} />
+                    <FaTrash className='Large-p_25' onClick={() => handleDelete(row.original.estCod, setEstados, setIsLoggedIn)} />
                     <FaPenNib className='Large-p_25' onClick={() => openModal(row.original)} />
                 </div>
             ),

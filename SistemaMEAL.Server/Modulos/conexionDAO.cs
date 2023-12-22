@@ -1,4 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
+using System.Text;
+using System.Security.Cryptography;
 namespace SistemaMEAL.Server.Modulos
 {
     public class conexionDAO
@@ -8,8 +10,6 @@ namespace SistemaMEAL.Server.Modulos
 
         //propiedad donde retorna la conexion
         public SqlConnection getcn { get { return cn; } }
-
-      
 
     }
 }

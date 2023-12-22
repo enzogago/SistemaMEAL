@@ -53,6 +53,7 @@ const Sidebar = ({ setIsLoggedIn }) => {
     }, []);
     
     const handleLogout = () => {
+        localStorage.removeItem('token');
         setIsLoggedIn(false);
     };
     

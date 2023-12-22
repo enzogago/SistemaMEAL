@@ -353,6 +353,7 @@ body {
 	min-height: 30px;
 }
 .PowerMas_Submenu > div a{
+	width: 100%;
 	display: flex;
 	align-items: center;
 	justify-content: left;

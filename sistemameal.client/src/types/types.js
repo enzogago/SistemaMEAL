@@ -4,7 +4,8 @@ export const types = {
     setNombreEstado: '[status] Project Now',
     setEstadoEditado: '[status] Delete Project',
 
-    
+    setIsLoggedIn: '[status] Show Form',
+    setUser: '[status] Show Form',
     // showForm: '[project] Show Form',
     // getProjects: '[project] Get Projects',
     // addProject: '[project] Add Projects',
