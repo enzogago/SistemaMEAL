@@ -22,6 +22,39 @@ namespace SistemaMEAL.Server.Controllers
             _usuarios = usuarios;
         }
 
+
+        [HttpGet]
+        public dynamic Listado()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            dynamic data = rToken.result;
+            Usuario usuario = new Usuario
+            {
+                UsuAno = data.UsuAno,
+                UsuCod = data.UsuCod,
+                RolCod = data.RolCod
+
+            };
+
+            if (usuario.RolCod != "01")
+            {
+                return new
+                {
+                    success = false,
+                    message = "No tienes permisos para realizar esta acción",
+                    result = ""
+                };
+            }
+
+            var usuarios = _usuarios.Listado();
+            return Ok(usuarios);
+        }
+
+
         [HttpPost]
         [Route("login")]
         public dynamic IniciarSesion([FromBody] Object optData)
@@ -82,9 +115,10 @@ namespace SistemaMEAL.Server.Controllers
             return new
             {
                 success = true,
-                token,
+                // token,
                 result = new JwtSecurityTokenHandler().WriteToken(token),
-                user = usuario
+                user = usuario,
+                message = "Usuario autenticado correctamente"
             };
 
         }

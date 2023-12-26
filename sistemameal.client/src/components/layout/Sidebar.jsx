@@ -1,11 +1,15 @@
 import { Link } from 'react-router-dom';
-import { FaCog, FaHome, FaSignOutAlt, FaStop} from "react-icons/fa";
+import { FaCog, FaHome, FaSignOutAlt } from "react-icons/fa";
 import logo from '../../img/PowerMas_LogoAyudaEnAccionSidebar.svg';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Notiflix from 'notiflix';
 import MenuItem from './MenuItem';
+import { AuthContext } from '../../context/AuthContext';
 
 const Sidebar = ({ setIsLoggedIn }) => {
+    const { authInfo } = useContext(AuthContext);
+    const { user } = authInfo;
+
     const [menuData, setMenuData] = useState([]);
 
     const groupByParent = (menuData) => {
@@ -37,8 +41,21 @@ const Sidebar = ({ setIsLoggedIn }) => {
         const fetchMenuData = async () => {
             Notiflix.Loading.pulse('Cargando...'); // Muestra la notificación de carga
     
+            const rolCod = user.rol.rolCod; // Aquí debes implementar la lógica para obtener el rol del usuario
+            const token = localStorage.getItem('token');
+    
             try {
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Menu`); 
+                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Menu/${rolCod}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if (!response.ok) {
+                    const text = await response.text();
+                    Notiflix.Notify.failure(text);
+                    throw new Error(text);
+                }
+    
                 const data = await response.json();
                 const groupData = groupByParent(data);
                 setMenuData(groupData);
@@ -51,6 +68,7 @@ const Sidebar = ({ setIsLoggedIn }) => {
     
         fetchMenuData();
     }, []);
+    
     
     const handleLogout = () => {
         localStorage.removeItem('token');

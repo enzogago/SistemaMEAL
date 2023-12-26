@@ -1,20 +1,25 @@
 import { types } from "../types/types";
 
 export const authReducer = (state, action) => {
-    console.log('action', action);
     switch (action.type) {
         case types.setIsLoggedIn:
             return {
                 ...state,
                 isLoggedIn: action.payload
             }
+
         case types.setUser:
-            const newState = {
+            return {
                 ...state,
                 user: action.payload
-            };
-            console.log('newState', newState);
-            return newState;
+            }
+
+        case types.setUsers:
+            return {
+                ...state,
+                users: action.payload
+            }
+
         default:
             return state;
     }

@@ -1,42 +1,54 @@
+import { useContext, useState } from 'react';
+import { AuthContext } from '../../context/AuthContext';
+// Librerias
 import Notiflix from 'notiflix';
+// Source
 import logo from '../../img/PowerMas_LogoAyudaEnAccion.svg';
 import portadaLogin from '../../img/PowerMas_PortadaLogin.webp';
-import { AuthContext } from '../../context/AuthContext';
-import { useContext } from 'react';
 
-const Login = ({setIsLoggedIn}) => {
+const Login = () => {
+    // Variables State AuthContext 
     const { authActions } = useContext(AuthContext);
-    const { setUser } = authActions;
+    const { setIsLoggedIn, setUser } = authActions;
+    // States locales
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
 
     const handleLogin = async (e) => {
         e.preventDefault();
-    
-        const email = document.getElementById('txtCorreoElectronico').value;
-        const password = document.getElementById('txtPassword').value;
-    
-        const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/usuario/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ email, password })
-        });
-    
-        if (!response.ok) {
-            console.error(`HTTP error! status: ${response.status}`);
+
+        if (!email || !password) {
+            Notiflix.Notify.failure("Por favor, rellena todos los campos.");
             return;
         }
-    
-        const data = await response.json();
-        if (data.success) {
-            Notiflix.Notify.success("Usuario Autenticado Correctamente");
-            console.log("desde login: ",data.user);
-            localStorage.setItem('token', data.result);
-            localStorage.setItem('user', JSON.stringify(data.user));
-            setIsLoggedIn(true);
-        } else {
-            Notiflix.Notify.failure(data.message);
+        try {
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/usuario/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            });
+        
+            if (!response.ok) {
+                console.error(`HTTP error! status: ${response.status}`);
+                return;
+            }
+        
+            const data = await response.json();
+            if (data.success) {
+                Notiflix.Notify.success(data.message);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                localStorage.setItem('token', data.result);
+                setUser(data.user);
+                setIsLoggedIn(true);
+            } else {
+                Notiflix.Notify.failure(data.message);
+            }
+        } catch (error) {
+            console.error(`Error al hacer la solicitud: ${error}`);
         }
+       
     };
     
 
@@ -64,17 +76,44 @@ const Login = ({setIsLoggedIn}) => {
                             </p>
 
                             <form id="formulario" className="left" autoComplete="on">
-                                <input id="txtCorreoElectronico" className="block PowerMas_InputLogin" placeholder="Email" type="email" name="txtCorreoElectronico" maxLength="50" autoComplete="email" />
-                                <input id="txtPassword" className="block PowerMas_InputLogin" placeholder="Password" type="password" name="txtPassword" autoComplete="current-password" />
+                                <input
+                                    aria-label='Correo Electronico'
+                                    id="txtCorreoElectronico" 
+                                    onChange={e => setEmail(e.target.value)} 
+                                    className="block PowerMas_InputLogin" 
+                                    placeholder="Email" 
+                                    type="email" 
+                                    name="txtCorreoElectronico" 
+                                    maxLength="50" 
+                                    autoComplete="email" 
+                                />
+                                <input
+                                    aria-label="Contraseña"
+                                    id="txtPassword" 
+                                    onChange={e => setPassword(e.target.value)} 
+                                    className="block PowerMas_InputLogin" 
+                                    placeholder="Password" 
+                                    type="password" 
+                                    name="txtPassword" 
+                                    autoComplete="current-password" 
+                                />
                                 <p id="lblErrorLogin" className="PowerMas_LabelError"></p>
                                 <p className="p2 Small-p0 Small-f_75 Large-f1 Medium-f_75 PowerMas_RememberMe">
                                     <label>
-                                        <input type="checkbox" id="rememberMe" name="rememberMe" />
+                                        <input 
+                                            type="checkbox" 
+                                            id="rememberMe" 
+                                            name="rememberMe" 
+                                        />
                                         Recordar
                                     </label>
                                     <font href="#" className="">Olvidé mi contraseña</font>
                                 </p>
-                                <button id="btnAcceso" onClick={handleLogin} className="PowerMas_ButtomLogin block">
+                                <button 
+                                    id="btnAcceso" 
+                                    onClick={handleLogin} 
+                                    className="PowerMas_ButtomLogin block"
+                                >
                                     Ingresar
                                 </button>
                                 <br />

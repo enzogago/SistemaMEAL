@@ -1,20 +1,21 @@
 import { useContext, useEffect } from 'react';
-import Notiflix from 'notiflix';
-import Table from './Table';
-import Modal from './Modal';
 import { StatusContext } from '../../../context/StatusContext';
 import { AuthContext } from '../../../context/AuthContext';
+// Libraries
+import Notiflix from 'notiflix';
+// Componentes
+import Table from './Table';
+import Modal from './Modal';
 
 const Status = () => {
     // Variables State AuthContext 
     const { authActions } = useContext(AuthContext);
     const { setIsLoggedIn } = authActions;
-    // Variables State useContext
+    // Variables State statusContext
     const { statusInfo, statusActions } = useContext(StatusContext);
     const { estados, estadoEditado } = statusInfo;
     const { setEstados, setNombreEstado, setModalVisible, setEstadoEditado } = statusActions;
     
-
     // TOGGLE MODAL
     const openModal = (estado = null) => {
         setEstadoEditado(estado);

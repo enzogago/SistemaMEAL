@@ -26,32 +26,12 @@ namespace SistemaMEAL.Server.Controllers
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return Unauthorized(rToken);
-            Console.WriteLine(rToken);
 
             dynamic data = rToken.result;
             Usuario usuario = new Usuario
             {
                 UsuAno = data.UsuAno,
                 UsuCod = data.UsuCod,
-                DocIdeCod = data.DocIdeCod,
-                UsuNumDoc = data.UsuNumDoc,
-                UsuNom = data.UsuNom,
-                UsuApe = data.UsuApe,
-                UsuFecNac = data.UsuFecNac,
-                UsuSex = data.UsuSex,
-                UsuCorEle = data.UsuCorEle,
-                CarCod = data.CarCod,
-                UsuFecInc = data.UsuFecInc,
-                UsuTel = data.UsuTel,
-                UsuNomUsu = data.UsuNomUsu,
-                UsuPas = data.UsuPas,
-                UsuEst = data.UsuEst,
-                RolCod = data.RolCod,
-                UsuIng = data.UsuIng,
-                FecIng = data.FecIng,
-                UsuMod = data.UsuMod,
-                FecMod = data.FecMod,
-                EstReg = data.EstReg
             };
             if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "LISTAR ESTADO"))
             {
@@ -80,25 +60,6 @@ namespace SistemaMEAL.Server.Controllers
             {
                 UsuAno = data.UsuAno,
                 UsuCod = data.UsuCod,
-                DocIdeCod = data.DocIdeCod,
-                UsuNumDoc = data.UsuNumDoc,
-                UsuNom = data.UsuNom,
-                UsuApe = data.UsuApe,
-                UsuFecNac = data.UsuFecNac,
-                UsuSex = data.UsuSex,
-                UsuCorEle = data.UsuCorEle,
-                CarCod = data.CarCod,
-                UsuFecInc = data.UsuFecInc,
-                UsuTel = data.UsuTel,
-                UsuNomUsu = data.UsuNomUsu,
-                UsuPas = data.UsuPas,
-                UsuEst = data.UsuEst,
-                RolCod = data.RolCod,
-                UsuIng = data.UsuIng,
-                FecIng = data.FecIng,
-                UsuMod = data.UsuMod,
-                FecMod = data.FecMod,
-                EstReg = data.EstReg
             };
             if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "CREAR ESTADO"))
             {
@@ -138,25 +99,6 @@ namespace SistemaMEAL.Server.Controllers
             {
                 UsuAno = data.UsuAno,
                 UsuCod = data.UsuCod,
-                DocIdeCod = data.DocIdeCod,
-                UsuNumDoc = data.UsuNumDoc,
-                UsuNom = data.UsuNom,
-                UsuApe = data.UsuApe,
-                UsuFecNac = data.UsuFecNac,
-                UsuSex = data.UsuSex,
-                UsuCorEle = data.UsuCorEle,
-                CarCod = data.CarCod,
-                UsuFecInc = data.UsuFecInc,
-                UsuTel = data.UsuTel,
-                UsuNomUsu = data.UsuNomUsu,
-                UsuPas = data.UsuPas,
-                UsuEst = data.UsuEst,
-                RolCod = data.RolCod,
-                UsuIng = data.UsuIng,
-                FecIng = data.FecIng,
-                UsuMod = data.UsuMod,
-                FecMod = data.FecMod,
-                EstReg = data.EstReg
             };
             if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "MODIFICAR ESTADO"))
             {
@@ -198,25 +140,6 @@ namespace SistemaMEAL.Server.Controllers
             {
                 UsuAno = data.UsuAno,
                 UsuCod = data.UsuCod,
-                DocIdeCod = data.DocIdeCod,
-                UsuNumDoc = data.UsuNumDoc,
-                UsuNom = data.UsuNom,
-                UsuApe = data.UsuApe,
-                UsuFecNac = data.UsuFecNac,
-                UsuSex = data.UsuSex,
-                UsuCorEle = data.UsuCorEle,
-                CarCod = data.CarCod,
-                UsuFecInc = data.UsuFecInc,
-                UsuTel = data.UsuTel,
-                UsuNomUsu = data.UsuNomUsu,
-                UsuPas = data.UsuPas,
-                UsuEst = data.UsuEst,
-                RolCod = data.RolCod,
-                UsuIng = data.UsuIng,
-                FecIng = data.FecIng,
-                UsuMod = data.UsuMod,
-                FecMod = data.FecMod,
-                EstReg = data.EstReg
             };
             if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "ELIMINAR ESTADO"))
             {

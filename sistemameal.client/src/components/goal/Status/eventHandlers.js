@@ -39,7 +39,12 @@ export const handleSubmit = async (e, estadoEditado, nombreEstado, setEstados, s
         const contentType = response.headers.get("content-type");
         if (contentType && contentType.indexOf("application/json") !== -1) {
             const data = await response.json();
+            if (data.result) {
+                setIsLoggedIn(false);
+            }
+
             Notiflix.Notify.failure(data.message);
+            setModalVisible(false); 
             return;
         }
         
@@ -94,7 +99,12 @@ export const handleDelete = async (estCod, setEstados, setIsLoggedIn) => {
                 const contentType = response.headers.get("content-type");
                 if (contentType && contentType.indexOf("application/json") !== -1) {
                     const data = await response.json();
+                    if (data.result) {
+                        setIsLoggedIn(false);
+                    }
+                    
                     Notiflix.Notify.failure(data.message);
+                    setModalVisible(false); 
                     return;
                 }
 

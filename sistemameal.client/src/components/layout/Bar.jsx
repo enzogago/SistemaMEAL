@@ -3,7 +3,6 @@ import avatar from '../../img/avatar.jpeg';
 const Bar = () => {
   const user = JSON.parse(localStorage.getItem('user'));
 
-  console.log("desde bar:", user)
   return (
     <div className="PowerMas_BarContainer">
         <h2 className="Large-f1_5">¡Hola de nuevo!</h2>

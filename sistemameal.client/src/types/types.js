@@ -4,8 +4,9 @@ export const types = {
     setNombreEstado: '[status] Project Now',
     setEstadoEditado: '[status] Delete Project',
 
+    setUser: '[User] Agregar usuario al contexto',
+    setUsers: '[User] Agregar usuarios al contexto',
     setIsLoggedIn: '[status] Show Form',
-    setUser: '[status] Show Form',
     // showForm: '[project] Show Form',
     // getProjects: '[project] Get Projects',
     // addProject: '[project] Add Projects',

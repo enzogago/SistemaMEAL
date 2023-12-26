@@ -37,7 +37,7 @@ namespace SistemaMEAL.Server.Models
                         {
                             success = false,
                             message = "La sesión ha expirado",
-                            result = ""
+                            result = "expired"
                         };
                     }
                 }

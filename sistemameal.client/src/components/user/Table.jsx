@@ -1,7 +1,6 @@
+import { useNavigate } from 'react-router-dom';
 import { useContext, useMemo, useState } from 'react';
-import { handleDelete } from './eventHandlers';
 import { FaPenNib, FaPlus, FaSortDown, FaSortUp, FaTrash } from 'react-icons/fa';
-import { StatusContext } from '../../../context/StatusContext';
 import {
     useReactTable, 
     getCoreRowModel, 
@@ -9,49 +8,69 @@ import {
     getPaginationRowModel,
     getSortedRowModel, 
 } from '@tanstack/react-table';
-import Pagination from '../../reusable/Pagination';
-import { AuthContext } from '../../../context/AuthContext';
+import Pagination from '../reusable/Pagination';
 
-const Table = ({ data, openModal }) => {
-    // Variables State AuthContext 
-    const { authActions } = useContext(AuthContext);
-    const { setIsLoggedIn } = authActions;
-    // Variables State statusContext
-    const { statusActions } = useContext(StatusContext);
-    const { setEstados } = statusActions;
-    // States locales
+const Table = ({data}) => {
+    const navigate = useNavigate();
+
+    const [sorting, setSorting] = useState([]);
+    const [anoFilter, setAnoFilter] = useState('');
     const [codigoFilter, setCodigoFilter] = useState('');
     const [nombreFilter, setNombreFilter] = useState('');
+    const [apellidoFilter, setApelldoFilter] = useState('');
+    const [cargoFilter, setCargoFilter] = useState('');
+    const [rolFilter, setRolFilter] = useState('');
+    const [estadoFilter, setEstadoFilter] = useState('');
+    const [correoFilter, setCorreoFilter] = useState('');
+
+    const filteredData = useMemo(() => 
+        data.filter(item => 
+            item.usuAno.includes(anoFilter.toUpperCase()) &&
+            item.usuCod.includes(codigoFilter.toUpperCase()) &&
+            item.usuNom.includes(nombreFilter.toUpperCase()) &&
+            item.usuApe.includes(apellidoFilter.toUpperCase()) &&
+            item.usuCorEle.includes(correoFilter.toUpperCase()) &&
+            item.cargo.carNom.includes(cargoFilter.toUpperCase()) &&
+            item.rol.rolNom.includes(rolFilter.toUpperCase()) &&
+            item.usuEst.includes(estadoFilter.toUpperCase())
+        ), [data, codigoFilter, nombreFilter, apellidoFilter, cargoFilter, estadoFilter, correoFilter]
+    );
 
     const columns = [
         {
+            header: "Año",
+            accessorKey: "usuAno"
+        },
+        {
             header: "Código",
-            accessorKey: "estCod"
+            accessorKey: "usuCod"
         },
         {
             header: "Nombre",
-            accessorKey: "estNom"
+            accessorKey: "usuNom"
         },
         {
-            header: "Acciones",
-            accessorKey: "acciones",
-            cell: ({row}) => (
-                <div className='PowerMas_IconsTable flex jc-center ai-center'>
-                    <FaTrash className='Large-p_25' onClick={() => handleDelete(row.original.estCod, setEstados, setIsLoggedIn)} />
-                    <FaPenNib className='Large-p_25' onClick={() => openModal(row.original)} />
-                </div>
-            ),
+            header: "Apellido",
+            accessorKey: "usuApe"
+        },
+        {
+            header: "Correo",
+            accessorKey: "usuCorEle"
+        },
+        {
+            header: "Cargo",
+            accessorKey: "cargo.carNom"
+        },
+        {
+            header: "Rol",
+            accessorKey: "rol.rolNom"
+        },
+        {
+            header: "Estado",
+            accessorKey: "usuEst"
         },
     ]
-
-    const [sorting, setSorting] = useState([]);
-    const filteredData = useMemo(() => 
-        data.filter(item => 
-            item.estCod.includes(codigoFilter.toUpperCase()) &&
-            item.estNom.includes(nombreFilter.toUpperCase())
-        ), [data, codigoFilter, nombreFilter]
-    );
-
+    
     const table = useReactTable({
         data: filteredData,
         columns,
@@ -65,11 +84,15 @@ const Table = ({ data, openModal }) => {
         columnResizeMode: "onChange"
     })
 
+    const handleRowClick = (usuAno,usuCod) => {
+        navigate('/form-user');
+    };
+
     return (
         <div className='TableMainContainer Large-p2'>
             <div className="flex jc-space-between">
-                <h1 className="flex left Large-f1_75">Listado de estados</h1>
-                <button className='Large-p_5 PowerMas_ButtonStatus' onClick={() => openModal()}>
+                <h1 className="flex left Large-f1_75">Listado de usuarios</h1>
+                <button className='Large-p_5 PowerMas_ButtonStatus'>
                     Nuevo <FaPlus /> 
                 </button>
             </div>
@@ -77,6 +100,14 @@ const Table = ({ data, openModal }) => {
                 <table className="Large_12 PowerMas_TableStatus">
                     <thead>
                         <tr>
+                        <th>
+                                <input 
+                                    type="search"
+                                    placeholder='Filtrar por Año'
+                                    value={anoFilter}
+                                    onChange={e => setAnoFilter(e.target.value)}
+                                />
+                            </th>
                             <th>
                                 <input 
                                     type="search"
@@ -93,7 +124,46 @@ const Table = ({ data, openModal }) => {
                                     onChange={e => setNombreFilter(e.target.value)}
                                 />
                             </th>
-                            <th></th>
+                            <th>
+                                <input 
+                                    type="search"
+                                    placeholder='Filtrar por Apellido'
+                                    value={apellidoFilter}
+                                    onChange={e => setApelldoFilter(e.target.value)}
+                                />
+                            </th>
+                            <th>
+                                <input 
+                                    type="search"
+                                    placeholder='Filtrar por Correo'
+                                    value={correoFilter}
+                                    onChange={e => setCorreoFilter(e.target.value)}
+                                />
+                            </th>
+                            <th>
+                                <input 
+                                    type="search"
+                                    placeholder='Filtrar por Cargo'
+                                    value={cargoFilter}
+                                    onChange={e => setCargoFilter(e.target.value)}
+                                />
+                            </th>
+                            <th>
+                                <input 
+                                    type="search"
+                                    placeholder='Filtrar por Rol'
+                                    value={rolFilter}
+                                    onChange={e => setRolFilter(e.target.value)}
+                                />
+                            </th>
+                            <th>
+                                <input 
+                                    type="search"
+                                    placeholder='Filtrar por Estado'
+                                    value={estadoFilter}
+                                    onChange={e => setEstadoFilter(e.target.value)}
+                                />
+                            </th>
                         </tr>
                         {
                             table.getHeaderGroups().map(headerGroup => (
@@ -137,7 +207,7 @@ const Table = ({ data, openModal }) => {
                         {
                             table.getRowModel().rows.length > 0 ?
                                 table.getRowModel().rows.map(row => (
-                                    <tr key={row.id}>
+                                    <tr className='pointer' key={row.id} onClick={() => handleRowClick(row.original.usuAno,row.original.usuCod)}>
                                         {row.getVisibleCells().map(cell => (
                                             <td style={{ width: cell.column.getSize() }} key={cell.id}>
                                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -152,7 +222,7 @@ const Table = ({ data, openModal }) => {
             </div>
             <Pagination table={table} />
         </div>
-    );
+    )
 }
 
-export default Table;
+export default Table

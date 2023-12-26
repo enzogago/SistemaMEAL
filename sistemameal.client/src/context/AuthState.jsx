@@ -6,7 +6,8 @@ import { AuthContext } from "./AuthContext";
 const AuthState = ({ children }) => {
     const initialState = {
         isLoggedIn: false,
-        user: null, // Nuevo estado para el usuario
+        user: null,
+        users: []
     }
 
     const [state, dispatch] = useReducer(authReducer, initialState);
@@ -20,15 +21,21 @@ const AuthState = ({ children }) => {
         dispatch({ type: types.setUser, payload: user });
     }
 
+    const setUsers = (users) => {
+        dispatch({ type: types.setUsers, payload: users });
+    }
+
     // Agrupar en un solo objeto
     const authInfo = {
         isLoggedIn: state.isLoggedIn,
-        user: state.user, // Agregar el usuario al objeto authInfo
+        user: state.user,
+        users: state.users,
     };
 
     const authActions = {
         setIsLoggedIn,
-        setUser, // Agregar setUser a las acciones
+        setUser,
+        setUsers,
     };
 
     return (

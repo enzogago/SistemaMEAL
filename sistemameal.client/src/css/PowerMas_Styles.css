@@ -215,8 +215,9 @@ body {
 	position: relative;
 }
 .PowerMas_Content {
-	padding: 1rem 2rem;
+	padding: 0.5rem 2rem;
 	width: 100%;
+	height: 90%;
 }
 .PowerMas_MainRender::before{
 	content: "";
@@ -323,6 +324,12 @@ body {
     align-items: center;
 	gap: 1rem;
 	padding: 0.5rem;
+}
+.PowerMas_MenuOptions > div > div.menu-item > div.menu-text > a{
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
 }
 
 .PowerMas_MenuOptions > div .arrow {
@@ -440,6 +447,7 @@ body {
 }
 
 .PowerMas_BarContainer {
+	height: 10%;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
@@ -768,12 +776,20 @@ body {
     background-color: #fccc54; /* Cambia el color de fondo cuando se pasa el ratón por encima para un efecto hover */
 }
 
+
+.PowerMas_StatusContainer{
+	height: 100%;
+}
 .TableMainContainer{
+	height: 100%;
 	background-color: #fff;
 }
+.TableMainContainer > div:nth-child(odd){
+	height: 5%;
+}
 .PowerMas_TableContainer {
-	margin: 1rem 0;
-	height: 61vh;
+	margin: 0.5rem 0;
+	height: 90%;
     max-height: 100rem;
     overflow-y: auto;
 	overflow-x: hidden;

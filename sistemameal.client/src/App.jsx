@@ -11,19 +11,23 @@ import Layout from './components/router/Layout';
 import StatusState from './context/StatusState';
 import Monitoring from './components/goal/Monitoring';
 import Status from './components/goal/Status/Status';
+//
 import { isTokenExpired } from './components/auth/auth';
 import { AuthContext } from './context/AuthContext';
+import User from './components/user/User';
 
 const App = () => {
     const { authInfo, authActions } = useContext(AuthContext);
     const { isLoggedIn } = authInfo;
-    const { setIsLoggedIn } = authActions;
+    const { setIsLoggedIn, setUser } = authActions;
 
     // Verificar el token al cargar la aplicación
     useEffect(() => {
         const token = localStorage.getItem('token');
-        if (token && !isTokenExpired(token)) {
+        const user = localStorage.getItem('user');
+        if (user && token && !isTokenExpired(token)) {
             setIsLoggedIn(true);
+            setUser(JSON.parse(user));
         }
     }, []);
 
@@ -46,6 +50,7 @@ const App = () => {
                                             <Status />
                                         </StatusState>
                                     } />
+                                    <Route path="/user" element={<User />} />
                                     <Route path="/monitoreo" element={
                                         <StatusState>
                                             <Monitoring />
