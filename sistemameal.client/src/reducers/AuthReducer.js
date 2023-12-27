@@ -8,16 +8,16 @@ export const authReducer = (state, action) => {
                 isLoggedIn: action.payload
             }
 
-        case types.setUser:
-            return {
-                ...state,
-                user: action.payload
-            }
-
         case types.setUsers:
             return {
                 ...state,
                 users: action.payload
+            }
+
+        case types.setMenuData:
+            return {
+                ...state,
+                menuData: action.payload
             }
 
         default:

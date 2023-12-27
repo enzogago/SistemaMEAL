@@ -1,16 +1,23 @@
+// React
 import { Link } from 'react-router-dom';
-import { FaCog, FaHome, FaSignOutAlt } from "react-icons/fa";
+import {  useContext, useEffect, useState } from 'react';
+// sources
 import logo from '../../img/PowerMas_LogoAyudaEnAccionSidebar.svg';
-import { useContext, useEffect, useState } from 'react';
+// Libraries
+import { FaCog, FaHome, FaSignOutAlt } from "react-icons/fa";
 import Notiflix from 'notiflix';
+// Componentes
 import MenuItem from './MenuItem';
+// Context
 import { AuthContext } from '../../context/AuthContext';
 
-const Sidebar = ({ setIsLoggedIn }) => {
-    const { authInfo } = useContext(AuthContext);
-    const { user } = authInfo;
-
-    const [menuData, setMenuData] = useState([]);
+const Sidebar = () => {
+    // Estados del AuthContext
+    const { authInfo, authActions } = useContext(AuthContext);
+    const { setIsLoggedIn, setMenuData } = authActions;
+    const { menuData } = authInfo;
+    // Estados local - useState
+    const [ menuGroup, setMenuGroup ] = useState([])
 
     const groupByParent = (menuData) => {
         // Primero, creamos un objeto donde las claves son los códigos de los menús (menCod)
@@ -39,31 +46,41 @@ const Sidebar = ({ setIsLoggedIn }) => {
 
     useEffect(() => {
         const fetchMenuData = async () => {
-            Notiflix.Loading.pulse('Cargando...'); // Muestra la notificación de carga
-    
-            const rolCod = user.rol.rolCod; // Aquí debes implementar la lógica para obtener el rol del usuario
+            Notiflix.Loading.pulse('Cargando...');
+            // Storage
+            const user = JSON.parse(localStorage.getItem('user'));
             const token = localStorage.getItem('token');
+            const usuAno = user.usuAno;
+            const usuCod = user.usuCod;
+
     
             try {
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Menu/${rolCod}`, {
+                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Menu/${usuAno}/${usuCod}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
                 if (!response.ok) {
-                    const text = await response.text();
-                    Notiflix.Notify.failure(text);
-                    throw new Error(text);
+                    const data = await response.json();
+                    if (data.result) {
+                        setIsLoggedIn(false);
+                    }
+        
+                    Notiflix.Notify.failure(data.message);
+                    Notiflix.Loading.remove();
+                    return;
                 }
     
                 const data = await response.json();
                 const groupData = groupByParent(data);
-                setMenuData(groupData);
+                setMenuData(data);
+                setMenuGroup(groupData);
             } catch (error) {
                 console.error(error);
+                Notiflix.Loading.remove();
             }
     
-            Notiflix.Loading.remove(); // Oculta la notificación de carga
+            Notiflix.Loading.remove();
         };
     
         fetchMenuData();
@@ -74,7 +91,7 @@ const Sidebar = ({ setIsLoggedIn }) => {
         localStorage.removeItem('token');
         setIsLoggedIn(false);
     };
-    
+
     return (
         <div className="PowerMas_Menu">
             <div className="PowerMas_SidebarHeader">
@@ -91,7 +108,7 @@ const Sidebar = ({ setIsLoggedIn }) => {
                             </div>
                         </Link>
                     </div>
-                    {menuData.map((menuItem, index) => (
+                    {menuGroup.map((menuItem, index) => (
                         <MenuItem key={index} menu={menuItem} level={1} />
                     ))}
                 </div>

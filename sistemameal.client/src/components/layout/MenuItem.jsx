@@ -10,6 +10,7 @@ const MenuItem = ({ menu, level }) => {
         event.currentTarget.classList.toggle(className);
     };
     
+    
     return (
         <div className={`PowerMas_LinkMenuContainer level-${level}`} onClick={(event) => toggleActive(event, level)} key={menu.menCod}>
             <div className="menu-item">

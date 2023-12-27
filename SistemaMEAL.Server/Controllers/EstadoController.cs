@@ -32,8 +32,9 @@ namespace SistemaMEAL.Server.Controllers
             {
                 UsuAno = data.UsuAno,
                 UsuCod = data.UsuCod,
+                RolCod = data.RolCod
             };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "LISTAR ESTADO"))
+            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "LISTAR ESTADO") && usuario.RolCod != "01")
             {
                 return new
                 {
@@ -60,8 +61,9 @@ namespace SistemaMEAL.Server.Controllers
             {
                 UsuAno = data.UsuAno,
                 UsuCod = data.UsuCod,
+                RolCod = data.RolCod
             };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "CREAR ESTADO"))
+            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "CREAR ESTADO") && usuario.RolCod != "01")
             {
                 return new
                 {
@@ -99,8 +101,9 @@ namespace SistemaMEAL.Server.Controllers
             {
                 UsuAno = data.UsuAno,
                 UsuCod = data.UsuCod,
+                RolCod = data.RolCod
             };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "MODIFICAR ESTADO"))
+            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "MODIFICAR ESTADO") && usuario.RolCod != "01")
             {
                 return new
                 {
@@ -140,8 +143,9 @@ namespace SistemaMEAL.Server.Controllers
             {
                 UsuAno = data.UsuAno,
                 UsuCod = data.UsuCod,
+                RolCod = data.RolCod
             };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "ELIMINAR ESTADO"))
+            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "ELIMINAR ESTADO") && usuario.RolCod != "01")
             {
                 return new
                 {

@@ -9,7 +9,7 @@ import portadaLogin from '../../img/PowerMas_PortadaLogin.webp';
 const Login = () => {
     // Variables State AuthContext 
     const { authActions } = useContext(AuthContext);
-    const { setIsLoggedIn, setUser } = authActions;
+    const { setIsLoggedIn } = authActions;
     // States locales
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -17,10 +17,12 @@ const Login = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
 
+        // Validacion de datos ingresados
         if (!email || !password) {
             Notiflix.Notify.failure("Por favor, rellena todos los campos.");
             return;
         }
+
         try {
             const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/usuario/login`, {
                 method: 'POST',
@@ -40,7 +42,6 @@ const Login = () => {
                 Notiflix.Notify.success(data.message);
                 localStorage.setItem('user', JSON.stringify(data.user));
                 localStorage.setItem('token', data.result);
-                setUser(data.user);
                 setIsLoggedIn(true);
             } else {
                 Notiflix.Notify.failure(data.message);
@@ -125,7 +126,13 @@ const Login = () => {
                 </div>
                 <div className="item  Phone_12  Medium_5 Small_5 Large_5 Tablet_6 Large-m0 Small-m1 p0 PowerMas_ImageLogin">
                     <article>
-                        <img title="Imagen niños" src={portadaLogin} alt="Portada Login" width="auto" height="auto" />
+                        <img 
+                            title="Imagen niños" 
+                            src={portadaLogin} 
+                            alt="Portada Login" 
+                            width="auto" 
+                            height="auto" 
+                        />
                     </article>
                 </div>
             </article>

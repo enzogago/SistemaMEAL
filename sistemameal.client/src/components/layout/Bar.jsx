@@ -1,6 +1,7 @@
 import avatar from '../../img/avatar.jpeg';
 
 const Bar = () => {
+  // Storage
   const user = JSON.parse(localStorage.getItem('user'));
 
   return (

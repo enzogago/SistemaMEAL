@@ -4,9 +4,10 @@ import { handleSubmit } from './eventHandlers';
 import { AuthContext } from '../../../context/AuthContext';
 
 const Modal = ({ closeModal }) => {
+    // variables state de AuthContext
     const { authActions } = useContext(AuthContext);
     const { setIsLoggedIn } = authActions;
-    //
+    // variables state de StatusContext
     const { statusInfo, statusActions } = useContext(StatusContext);
     const { estadoEditado, nombreEstado, modalVisible } = statusInfo;
     const { setEstados, setNombreEstado, setModalVisible } = statusActions;
@@ -15,6 +16,7 @@ const Modal = ({ closeModal }) => {
         setNombreEstado(e.target.value);
     };
 
+    // Activar focus en input
     const inputRef = useRef();
     useEffect(() => {
         if (modalVisible) {

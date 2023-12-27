@@ -23,6 +23,8 @@ const Table = ({ data, openModal }) => {
     const [codigoFilter, setCodigoFilter] = useState('');
     const [nombreFilter, setNombreFilter] = useState('');
 
+
+    /* TANSTACK */
     const columns = [
         {
             header: "Código",
@@ -64,6 +66,7 @@ const Table = ({ data, openModal }) => {
         onSortingChange: setSorting,
         columnResizeMode: "onChange"
     })
+    /* END TANSTACK */
 
     return (
         <div className='TableMainContainer Large-p2'>
@@ -145,7 +148,11 @@ const Table = ({ data, openModal }) => {
                                         ))}
                                     </tr>
                                 ))
-                            : <tr className='PowerMas_TableEmpty'><td colSpan={3} className='Large-p1 center'>No se encontraron registros</td></tr>
+                            :   <tr className='PowerMas_TableEmpty'>
+                                    <td colSpan={3} className='Large-p1 center'>
+                                        No se encontraron registros
+                                    </td>
+                                </tr>
                         }
                     </tbody>
                 </table>

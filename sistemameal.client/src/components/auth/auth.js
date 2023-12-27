@@ -1,5 +1,6 @@
-import { jwtDecode } from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode'; // Librarie
 
+// Verificar si el token ha expirado
 export function isTokenExpired(token) {
     try {
         const decodedToken = jwtDecode(token);

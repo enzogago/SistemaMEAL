@@ -109,7 +109,7 @@ namespace SistemaMEAL.Server.Controllers
                     jwt.Issuer,
                     jwt.Audience,
                     claims,
-                    expires: DateTime.Now.AddMinutes(1),
+                    expires: DateTime.Now.AddMinutes(30),
                     signingCredentials: singIn
                 );
             return new

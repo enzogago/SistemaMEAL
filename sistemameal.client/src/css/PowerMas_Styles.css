@@ -1037,5 +1037,24 @@ body {
 	cursor: pointer;
 }
 
+/* REUSABLE */
+.pointer{
+	cursor: pointer;
+}
+.bg-white{
+	background-color: #fff;
+}
+/* END REUSABLE */
 
+/* CREAR/MODIFICAR USUARIO */
+.PowerMas_FormUserContainer{
+	height: 100%;
+	overflow-y: auto;
+}
+.PowerMas_FormUserContainer label{
+	display: flex;
+	flex-direction: column;
+	margin-bottom: 2rem;
+}
+/* END CREAR/MODIFICAR USUARIO */
 

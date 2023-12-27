@@ -1,25 +1,27 @@
 import { useContext, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-
+// helper
+import { isTokenExpired } from './components/auth/auth';
+// Context
+import { AuthContext } from './context/AuthContext';
 // Componentes
 import Home from './components/home/Home';
-import NewProject from './components/Project/NewProject';
 import Login from './components/auth/Login';
 import PrivateRoute from './components/router/PrivateRoute';
 import PublicRoute from './components/router/PublicRoute';
 import Layout from './components/router/Layout';
-import StatusState from './context/StatusState';
-import Monitoring from './components/goal/Monitoring';
 import Status from './components/goal/Status/Status';
-//
-import { isTokenExpired } from './components/auth/auth';
-import { AuthContext } from './context/AuthContext';
+import Monitoring from './components/goal/Monitoring';
+import NewProject from './components/Project/NewProject';
 import User from './components/user/User';
+import FormUser from './components/user/FormUser';
+
 
 const App = () => {
+    // Variables state AuthContext
     const { authInfo, authActions } = useContext(AuthContext);
-    const { isLoggedIn } = authInfo;
-    const { setIsLoggedIn, setUser } = authActions;
+    const { isLoggedIn, menuData } = authInfo;
+    const { setIsLoggedIn } = authActions;
 
     // Verificar el token al cargar la aplicación
     useEffect(() => {
@@ -27,9 +29,17 @@ const App = () => {
         const user = localStorage.getItem('user');
         if (user && token && !isTokenExpired(token)) {
             setIsLoggedIn(true);
-            setUser(JSON.parse(user));
+        } else{
+            setIsLoggedIn(false);
         }
     }, []);
+
+    const componentMap = {
+        '/user': User,
+        '/estado': Status,
+        '/new-project': NewProject,
+        '/monitoring' : Monitoring,
+    };
 
     return (
             <Router>
@@ -43,19 +53,15 @@ const App = () => {
                         <PrivateRoute isLogggedIn={isLoggedIn}> 
                             <Layout setIsLoggedIn={setIsLoggedIn}>
                                 <Routes>
-                                    <Route index element={<Home />} />
-                                    <Route path="/new-project" element={<NewProject />} />
-                                    <Route path="/estado" element={
-                                        <StatusState>
-                                            <Status />
-                                        </StatusState>
-                                    } />
-                                    <Route path="/user" element={<User />} />
-                                    <Route path="/monitoreo" element={
-                                        <StatusState>
-                                            <Monitoring />
-                                        </StatusState>
-                                    } />
+                                    {menuData.map((menu, index) => {
+                                        const Component = componentMap[menu.menRef];
+                                        return Component ? <Route path={menu.menRef} element={<Component />} key={index} /> : null;
+                                    })}
+
+                                    {menuData.some(menu => menu.menRef === '/user') && (
+                                        <Route path="form-user" element={<FormUser />} />
+                                    )}
+
 
                                     <Route path="*" element={<Home />} />
                                 </Routes>

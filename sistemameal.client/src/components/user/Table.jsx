@@ -85,14 +85,19 @@ const Table = ({data}) => {
     })
 
     const handleRowClick = (usuAno,usuCod) => {
+        const selectedUser = data.find(user => user.usuAno === usuAno && user.usuCod === usuCod);
+        navigate('/form-user', { state: { user: selectedUser } });
+    };
+    
+    const handleNewClick = () => {
         navigate('/form-user');
     };
-
+    
     return (
         <div className='TableMainContainer Large-p2'>
             <div className="flex jc-space-between">
                 <h1 className="flex left Large-f1_75">Listado de usuarios</h1>
-                <button className='Large-p_5 PowerMas_ButtonStatus'>
+                <button className='Large-p_5 PowerMas_ButtonStatus' onClick={handleNewClick}>
                     Nuevo <FaPlus /> 
                 </button>
             </div>
@@ -103,7 +108,7 @@ const Table = ({data}) => {
                         <th>
                                 <input 
                                     type="search"
-                                    placeholder='Filtrar por Año'
+                                    placeholder='Filtrar'
                                     value={anoFilter}
                                     onChange={e => setAnoFilter(e.target.value)}
                                 />
@@ -111,7 +116,7 @@ const Table = ({data}) => {
                             <th>
                                 <input 
                                     type="search"
-                                    placeholder='Filtrar por Codigo'
+                                    placeholder='Filtrar'
                                     value={codigoFilter}
                                     onChange={e => setCodigoFilter(e.target.value)}
                                 />
@@ -119,7 +124,7 @@ const Table = ({data}) => {
                             <th>
                                 <input 
                                     type="search"
-                                    placeholder='Filtrar por Nombre'
+                                    placeholder='Filtrar'
                                     value={nombreFilter}
                                     onChange={e => setNombreFilter(e.target.value)}
                                 />
@@ -127,7 +132,7 @@ const Table = ({data}) => {
                             <th>
                                 <input 
                                     type="search"
-                                    placeholder='Filtrar por Apellido'
+                                    placeholder='Filtrar'
                                     value={apellidoFilter}
                                     onChange={e => setApelldoFilter(e.target.value)}
                                 />
@@ -135,7 +140,7 @@ const Table = ({data}) => {
                             <th>
                                 <input 
                                     type="search"
-                                    placeholder='Filtrar por Correo'
+                                    placeholder='Filtrar'
                                     value={correoFilter}
                                     onChange={e => setCorreoFilter(e.target.value)}
                                 />
@@ -143,7 +148,7 @@ const Table = ({data}) => {
                             <th>
                                 <input 
                                     type="search"
-                                    placeholder='Filtrar por Cargo'
+                                    placeholder='Filtrar'
                                     value={cargoFilter}
                                     onChange={e => setCargoFilter(e.target.value)}
                                 />
@@ -151,7 +156,7 @@ const Table = ({data}) => {
                             <th>
                                 <input 
                                     type="search"
-                                    placeholder='Filtrar por Rol'
+                                    placeholder='Filtrar'
                                     value={rolFilter}
                                     onChange={e => setRolFilter(e.target.value)}
                                 />
@@ -159,7 +164,7 @@ const Table = ({data}) => {
                             <th>
                                 <input 
                                     type="search"
-                                    placeholder='Filtrar por Estado'
+                                    placeholder='Filtrar'
                                     value={estadoFilter}
                                     onChange={e => setEstadoFilter(e.target.value)}
                                 />
