@@ -12,6 +12,7 @@ namespace SistemaMEAL.Server.Models
         [Key, Column(Order = 1)]
         public String? UsuCod { get; set; }
 
+        [ForeignKey("DocumentoIdentidad")]
         public String? DocIdeCod { get; set; }
 
         public String? UsuNumDoc { get; set; }
@@ -55,5 +56,6 @@ namespace SistemaMEAL.Server.Models
         public virtual Cargo? Cargo { get; set; }
 
         public virtual Rol? Rol { get; set; }
+        public virtual DocumentoIdentidad? DocumentoIdentidad { get; set; }
     }
 }

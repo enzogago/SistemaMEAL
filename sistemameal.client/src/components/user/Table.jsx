@@ -9,6 +9,7 @@ import {
     getSortedRowModel, 
 } from '@tanstack/react-table';
 import Pagination from '../reusable/Pagination';
+import TableRow from './TableRow';
 
 const Table = ({data}) => {
     const navigate = useNavigate();
@@ -86,8 +87,27 @@ const Table = ({data}) => {
 
     const handleRowClick = (usuAno,usuCod) => {
         const selectedUser = data.find(user => user.usuAno === usuAno && user.usuCod === usuCod);
-        navigate('/form-user', { state: { user: selectedUser } });
+        const userValues = {
+            usuAno: selectedUser.usuAno,
+            usuCod: selectedUser.usuCod,
+            docIdeCod: selectedUser.docIdeCod,
+            usuNumDoc: selectedUser.usuNumDoc,
+            usuCorEle: selectedUser.usuCorEle,
+            usuNom: selectedUser.usuNom,
+            usuApe: selectedUser.usuApe,
+            usuTel: selectedUser.usuTel,
+            rolCod: selectedUser.rolCod,
+            carCod: selectedUser.carCod,
+            usuEst: selectedUser.usuEst,
+            usuFecNac: selectedUser.usuFecNac,
+            usuSex: selectedUser.usuSex,
+            usuFecInc: selectedUser.usuFecInc,
+            usuNomUsu: selectedUser.usuNomUsu,
+            usuPas: selectedUser.usuPas
+        };
+        navigate('/form-user', { state: { user: userValues } });
     };
+    
     
     const handleNewClick = () => {
         navigate('/form-user');
@@ -212,13 +232,7 @@ const Table = ({data}) => {
                         {
                             table.getRowModel().rows.length > 0 ?
                                 table.getRowModel().rows.map(row => (
-                                    <tr className='pointer' key={row.id} onClick={() => handleRowClick(row.original.usuAno,row.original.usuCod)}>
-                                        {row.getVisibleCells().map(cell => (
-                                            <td style={{ width: cell.column.getSize() }} key={cell.id}>
-                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                            </td>
-                                        ))}
-                                    </tr>
+                                    <TableRow key={row.id} row={row} handleRowClick={handleRowClick} flexRender={flexRender} />
                                 ))
                             : <tr className='PowerMas_TableEmpty'><td colSpan={3} className='Large-p1 center'>No se encontraron registros</td></tr>
                         }

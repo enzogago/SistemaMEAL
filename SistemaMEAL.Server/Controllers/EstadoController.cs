@@ -43,8 +43,8 @@ namespace SistemaMEAL.Server.Controllers
                     result = ""
                 };
             }
-
             var estados = _estados.Listado();
+            Console.WriteLine(estados);
             return Ok(estados);
         }
 

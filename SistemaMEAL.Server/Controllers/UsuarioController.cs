@@ -23,6 +23,46 @@ namespace SistemaMEAL.Server.Controllers
         }
 
 
+    [HttpPost]
+        public dynamic Insertar(Usuario usuario)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return rToken;
+
+            dynamic data = rToken.result;
+            Usuario usuarioActual = new Usuario
+            {
+                UsuAno = data.UsuAno,
+                UsuCod = data.UsuCod,
+                RolCod = data.RolCod
+            };
+            if (!_usuarios.TienePermiso(usuarioActual.UsuAno, usuarioActual.UsuCod, "CREAR USUARIO") && usuarioActual.RolCod != "01")
+            {
+                return new
+                {
+                    success = false,
+                    message = "No tienes permisos para insertar usuarios",
+                    result = ""
+                };
+            }
+
+            var (message, messageType) = _usuarios.Insertar(usuario);
+            if (messageType == "1") // Error
+            {
+                return BadRequest(message);
+            }
+            else if (messageType == "2") // Registro ya existe
+            {
+                return Conflict(message);
+            }
+            else // Registro insertado correctamente
+            {
+                return Ok(message);
+            }
+        }
+
         [HttpGet]
         public dynamic Listado()
         {

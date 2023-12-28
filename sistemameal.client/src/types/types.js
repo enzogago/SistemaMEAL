@@ -4,6 +4,7 @@ export const types = {
     setModalVisible: '[status] Validate Form',
     setNombreEstado: '[status] Project Now',
     setEstadoEditado: '[status] Delete Project',
+    resetStatus: '[status] logout',
 
     // AuthContext
     setUsers: '[auth] Agregar usuarios al contexto',

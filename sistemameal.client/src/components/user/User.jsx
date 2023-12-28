@@ -30,6 +30,7 @@ const User = () => {
                     return;
                 }
                 const data = await response.json();
+                console.log(data);
                 setUsers(data);
             } catch (error) {
                 console.error('Error:', error);

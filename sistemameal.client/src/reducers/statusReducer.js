@@ -25,6 +25,14 @@ export const statusReducer = (state, action) => {
                 ...state,
                 estadoEditado: action.payload
             }
+        
+        case types.resetStatus:
+            return {
+                estados: [],
+                modalVisible: false,
+                nombreEstado: '',
+                estadoEditado: null,
+            };
 
         default:
             return state;

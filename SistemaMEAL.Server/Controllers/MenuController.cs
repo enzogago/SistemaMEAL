@@ -20,8 +20,12 @@ namespace SistemaMEAL.Server.Controllers
         }
 
         [HttpGet]
-        public IActionResult ListadoMenu()
+        public dynamic ListadoMenu()
         {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
             var menu = _menus.ListadoMenu();
             return Ok(menu);
         }

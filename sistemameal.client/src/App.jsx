@@ -15,6 +15,8 @@ import Monitoring from './components/goal/Monitoring';
 import NewProject from './components/Project/NewProject';
 import User from './components/user/User';
 import FormUser from './components/user/FormUser';
+import MenuUser from './components/user/MenuUser';
+import PermissionUser from './components/user/PermissionUser';
 
 
 const App = () => {
@@ -50,8 +52,8 @@ const App = () => {
                         </PublicRoute>
                     } />
                     <Route path='/*' element={
-                        <PrivateRoute isLogggedIn={isLoggedIn}> 
-                            <Layout setIsLoggedIn={setIsLoggedIn}>
+                        <PrivateRoute> 
+                            <Layout>
                                 <Routes>
                                     {menuData.map((menu, index) => {
                                         const Component = componentMap[menu.menRef];
@@ -59,7 +61,11 @@ const App = () => {
                                     })}
 
                                     {menuData.some(menu => menu.menRef === '/user') && (
-                                        <Route path="form-user" element={<FormUser />} />
+                                        <>
+                                            <Route path="form-user" element={<FormUser />} />
+                                            <Route path="menu-user" element={<MenuUser />} />
+                                            <Route path="permiso-user" element={<PermissionUser />} />
+                                        </>
                                     )}
 
 

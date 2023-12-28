@@ -30,6 +30,11 @@ const StatusState = ({ children }) => {
         dispatch({ type: types.setEstadoEditado, payload: estado });
     }
 
+    const resetStatus = () => {
+        dispatch({ type: types.resetStatus });
+    }
+    
+
     // Agrupar en un solo objeto
     const statusInfo = {
         estados: state.estados,
@@ -43,6 +48,7 @@ const StatusState = ({ children }) => {
         setModalVisible,
         setNombreEstado,
         setEstadoEditado,
+        resetStatus,
     };
 
     return (

@@ -1044,11 +1044,14 @@ body {
 .bg-white{
 	background-color: #fff;
 }
+.h-100{
+	height: 100%;
+}
 /* END REUSABLE */
 
 /* CREAR/MODIFICAR USUARIO */
-.PowerMas_FormUserContainer{
-	height: 100%;
+.PowerMas_FormUserContainer form{
+	height: 95%;
 	overflow-y: auto;
 }
 .PowerMas_FormUserContainer label{
@@ -1056,5 +1059,72 @@ body {
 	flex-direction: column;
 	margin-bottom: 2rem;
 }
+.PowerMas_FormUserContainer button{
+	margin-top: 1rem;
+}
 /* END CREAR/MODIFICAR USUARIO */
 
+/* CREAR/MODIFICAR MENU-USUARIO */
+.PowerMas_MenuUserContainer > div {
+	height: 95%;
+	width: 100%;
+	overflow-y: auto;
+}
+.PowerMas_ListMenus{
+	height: 100%;
+	width: 70%;
+}
+.PowerMas_ListMenus > ul {
+	width: 100%;
+}
+.PowerMas_ListMenus > ul > li > label {
+	width: 100%;
+	justify-content: space-between;
+}
+.PowerMas_ListMenus ul{
+	list-style: none;
+}
+.PowerMas_ListMenus li{
+	margin: 0.5rem 2rem;
+}
+.PowerMas_ListMenus li label {
+	display: flex;
+	gap: 0.5rem;
+	margin-bottom: 0.5rem;
+}
+.PowerMas_ListMenus li > div{
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 0.5rem;
+}
+.PowerMas_ListMenus li div span{
+	cursor: pointer;
+}
+.PowerMas_ListMenus li div span.closed {
+    display: inline-block;
+    transform: rotate(0);
+    transition: transform 0.2s ease-in-out;
+}
+
+.PowerMas_ListMenus li div span.open {
+    display: inline-block;
+    transform: rotate(90deg);
+    transition: transform 0.2s ease-in-out;
+}
+.menu {
+    /* Estilos para el menú cuando está colapsado */
+    transition: max-height 0.2s ease-out;
+    max-height: 0;
+    overflow: hidden;
+}
+.menu.active {
+    /* Estilos para el menú cuando está expandido */
+    transition: max-height 0.2s ease-in;
+    max-height: 100vh;
+}
+
+.PowerMas_MenuUserContainer button{
+	margin-top: 1rem;
+}
+/* END CREAR/MODIFICAR MENU-USUARIO */

@@ -10,12 +10,15 @@ import Notiflix from 'notiflix';
 import MenuItem from './MenuItem';
 // Context
 import { AuthContext } from '../../context/AuthContext';
+import { StatusContext } from '../../context/StatusContext';
 
 const Sidebar = () => {
     // Estados del AuthContext
-    const { authInfo, authActions } = useContext(AuthContext);
+    const { authActions } = useContext(AuthContext);
     const { setIsLoggedIn, setMenuData } = authActions;
-    const { menuData } = authInfo;
+     // Variables State statusContext
+    const { statusActions } = useContext(StatusContext);
+    const { resetStatus } = statusActions;
     // Estados local - useState
     const [ menuGroup, setMenuGroup ] = useState([])
 
@@ -86,10 +89,11 @@ const Sidebar = () => {
         fetchMenuData();
     }, []);
     
-    
+    // Cerrar sesión
     const handleLogout = () => {
         localStorage.removeItem('token');
         setIsLoggedIn(false);
+        resetStatus();
     };
 
     return (

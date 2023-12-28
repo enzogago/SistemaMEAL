@@ -11,6 +11,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 // Servicios para los Modulos DAO
+builder.Services.AddScoped<MetaSubActividadResultadoDAO>();
+builder.Services.AddScoped<CargoDAO>();
+builder.Services.AddScoped<RolDAO>();
+builder.Services.AddScoped<DocumentoIdentidadDAO>();
 builder.Services.AddScoped<EstadoDAO>();
 builder.Services.AddScoped<MenuDAO>();
 builder.Services.AddScoped<UsuarioDAO>();
