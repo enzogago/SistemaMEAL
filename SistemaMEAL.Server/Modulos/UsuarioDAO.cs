@@ -10,64 +10,122 @@ namespace SistemaMEAL.Server.Modulos
         private conexionDAO cn = new conexionDAO();
 
 
-    public (string message, string messageType) Insertar(Usuario usuario)
-    {
-        string mensaje = "";
-        string tipoMensaje = "";
-        try
+        public (string message, string messageType) Modificar(Usuario usuario)
         {
-            cn.getcn.Open();
+            string mensaje = "";
+            string tipoMensaje = "";
+            try
+            {
+                cn.getcn.Open();
 
-            SqlCommand cmd = new SqlCommand("SP_INSERTAR_USUARIO", cn.getcn);
-            cmd.CommandType = CommandType.StoredProcedure;
+                SqlCommand cmd = new SqlCommand("SP_MODIFICAR_USUARIO", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
 
-            cmd.Parameters.AddWithValue("@P_USUANO", usuario.UsuAno);
-            cmd.Parameters.AddWithValue("@P_USUCOD", usuario.UsuCod);
-            cmd.Parameters.AddWithValue("@P_DOCIDECOD", usuario.DocIdeCod);
-            cmd.Parameters.AddWithValue("@P_USUNUMDOC", usuario.UsuNumDoc);
-            cmd.Parameters.AddWithValue("@P_USUNOM", usuario.UsuNom);
-            cmd.Parameters.AddWithValue("@P_USUAPE", usuario.UsuApe);
-            cmd.Parameters.AddWithValue("@P_USUFECNAC", usuario.UsuFecNac);
-            cmd.Parameters.AddWithValue("@P_USUSEX", usuario.UsuSex);
-            cmd.Parameters.AddWithValue("@P_USUCORELE", usuario.UsuCorEle);
-            cmd.Parameters.AddWithValue("@P_CARCOD", usuario.CarCod);
-            cmd.Parameters.AddWithValue("@P_USUFECINC", usuario.UsuFecInc);
-            cmd.Parameters.AddWithValue("@P_USUTEL", usuario.UsuTel);
-            cmd.Parameters.AddWithValue("@P_USUNOMUSU", usuario.UsuNomUsu);
-            cmd.Parameters.AddWithValue("@P_USUPAS", usuario.UsuPas);
-            cmd.Parameters.AddWithValue("@P_USUEST", usuario.UsuEst);
-            cmd.Parameters.AddWithValue("@P_ROLCOD", usuario.RolCod);
-            cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
-            cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
-            cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
-            cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
-            cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
-            cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "GAGO");
-            cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "AGUIRRE");
+                // Aquí debes agregar todos los parámetros que necesita tu procedimiento almacenado
+                cmd.Parameters.AddWithValue("@P_USUANO", usuario.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD", usuario.UsuCod);
+                cmd.Parameters.AddWithValue("@P_DOCIDECOD", usuario.DocIdeCod);
+                cmd.Parameters.AddWithValue("@P_USUNUMDOC", usuario.UsuNumDoc);
+                cmd.Parameters.AddWithValue("@P_USUNOM", usuario.UsuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE", usuario.UsuApe);
+                cmd.Parameters.AddWithValue("@P_USUFECNAC", usuario.UsuFecNac);
+                cmd.Parameters.AddWithValue("@P_USUSEX", usuario.UsuSex);
+                cmd.Parameters.AddWithValue("@P_USUCORELE", usuario.UsuCorEle);
+                cmd.Parameters.AddWithValue("@P_CARCOD", usuario.CarCod);
+                cmd.Parameters.AddWithValue("@P_USUFECINC", usuario.UsuFecInc);
+                cmd.Parameters.AddWithValue("@P_USUTEL", usuario.UsuTel);
+                cmd.Parameters.AddWithValue("@P_USUNOMUSU", usuario.UsuNomUsu);
+                cmd.Parameters.AddWithValue("@P_USUPAS", usuario.UsuPas);
+                cmd.Parameters.AddWithValue("@P_USUEST", usuario.UsuEst);
+                cmd.Parameters.AddWithValue("@P_ROLCOD", usuario.RolCod);
+                cmd.Parameters.AddWithValue("@P_USUMOD", "Usuario");
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
+                cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
+                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "GAGO");
+                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "AGUIRRE");
 
-            SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
-            pDescripcionMensaje.Direction = ParameterDirection.Output;
-            cmd.Parameters.Add(pDescripcionMensaje);
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
 
-            SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
-            pTipoMensaje.Direction = ParameterDirection.Output;
-            cmd.Parameters.Add(pTipoMensaje);
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
 
-            cmd.ExecuteNonQuery();
+                cmd.ExecuteNonQuery();
 
-            mensaje = pDescripcionMensaje.Value.ToString();
-            tipoMensaje = pTipoMensaje.Value.ToString();
+                mensaje = pDescripcionMensaje.Value.ToString();
+                tipoMensaje = pTipoMensaje.Value.ToString();
+            }
+            catch (SqlException ex)
+            {
+                mensaje = ex.Message;
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return (mensaje, tipoMensaje);
         }
-        catch (SqlException ex)
+
+        public (string message, string messageType) Insertar(Usuario usuario)
         {
-            mensaje = ex.Message;
+            string mensaje = "";
+            string tipoMensaje = "";
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_INSERTAR_USUARIO", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@P_DOCIDECOD", usuario.DocIdeCod);
+                cmd.Parameters.AddWithValue("@P_USUNUMDOC", usuario.UsuNumDoc);
+                cmd.Parameters.AddWithValue("@P_USUNOM", usuario.UsuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE", usuario.UsuApe);
+                cmd.Parameters.AddWithValue("@P_USUFECNAC", usuario.UsuFecNac);
+                cmd.Parameters.AddWithValue("@P_USUSEX", usuario.UsuSex);
+                cmd.Parameters.AddWithValue("@P_USUCORELE", usuario.UsuCorEle);
+                cmd.Parameters.AddWithValue("@P_CARCOD", usuario.CarCod);
+                cmd.Parameters.AddWithValue("@P_USUFECINC", usuario.UsuFecInc);
+                cmd.Parameters.AddWithValue("@P_USUTEL", usuario.UsuTel);
+                cmd.Parameters.AddWithValue("@P_USUNOMUSU", usuario.UsuNomUsu);
+                cmd.Parameters.AddWithValue("@P_USUPAS", usuario.UsuPas);
+                cmd.Parameters.AddWithValue("@P_USUEST", usuario.UsuEst);
+                cmd.Parameters.AddWithValue("@P_ROLCOD", usuario.RolCod);
+                cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
+                cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
+                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "GAGO");
+                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "AGUIRRE");
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+
+                cmd.ExecuteNonQuery();
+
+                mensaje = pDescripcionMensaje.Value.ToString();
+                tipoMensaje = pTipoMensaje.Value.ToString();
+            }
+            catch (SqlException ex)
+            {
+                mensaje = ex.Message;
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return (mensaje, tipoMensaje);
         }
-        finally
-        {
-            cn.getcn.Close();
-        }
-        return (mensaje, tipoMensaje);
-    }
 
         public IEnumerable<Usuario> Listado()
         {

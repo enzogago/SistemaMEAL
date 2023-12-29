@@ -20,6 +20,11 @@ export const authReducer = (state, action) => {
                 menuData: action.payload
             }
 
+        case types.setUserMaint:
+            return {
+                ...state,
+                userMaint: action.payload
+            }
         default:
             return state;
     }

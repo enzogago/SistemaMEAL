@@ -23,7 +23,7 @@ namespace SistemaMEAL.Server.Controllers
         }
 
 
-    [HttpPost]
+        [HttpPost]
         public dynamic Insertar(Usuario usuario)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
@@ -48,6 +48,17 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
+            using (SHA256 sha256Hash = SHA256.Create())
+            {
+                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(usuario.UsuPas));
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    builder.Append(bytes[i].ToString("x2"));
+                }
+                usuario.UsuPas = builder.ToString();
+            }
+
             var (message, messageType) = _usuarios.Insertar(usuario);
             if (messageType == "1") // Error
             {
@@ -62,6 +73,49 @@ namespace SistemaMEAL.Server.Controllers
                 return Ok(message);
             }
         }
+
+        [HttpPut("{usuAno}/{usuCod}")]
+        public dynamic Modificar(string usuAno, string usuCod, [FromBody] Usuario usuario)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return rToken;
+
+            dynamic data = rToken.result;
+            Usuario usuarioActual = new Usuario
+            {
+                UsuAno = data.UsuAno,
+                UsuCod = data.UsuCod,
+                RolCod = data.RolCod
+            };
+            if (!_usuarios.TienePermiso(usuarioActual.UsuAno, usuarioActual.UsuCod, "MODIFICAR USUARIO") && usuarioActual.RolCod != "01")
+            {
+                return new
+                {
+                    success = false,
+                    message = "No tienes permisos para modificar usuarios",
+                    result = ""
+                };
+            }
+
+            usuario.UsuAno = usuAno; // Asegúrate de que el año del usuario en el objeto usuario sea el correcto
+            usuario.UsuCod = usuCod; // Asegúrate de que el código del usuario en el objeto usuario sea el correcto
+            var (message, messageType) = _usuarios.Modificar(usuario);
+            if (messageType == "1") // Error
+            {
+                return BadRequest(message);
+            }
+            else if (messageType == "2") // Registro ya existe
+            {
+                return Conflict(message);
+            }
+            else // Registro modificado correctamente
+            {
+                return Ok(message);
+            }
+        }
+
 
         [HttpGet]
         public dynamic Listado()

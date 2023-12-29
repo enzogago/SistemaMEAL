@@ -10,15 +10,19 @@ import {
 } from '@tanstack/react-table';
 import Pagination from '../reusable/Pagination';
 import TableRow from './TableRow';
+import { AuthContext } from '../../context/AuthContext';
 
 const Table = ({data}) => {
     const navigate = useNavigate();
-
+    // Variables State AuthContext 
+    const { authActions } = useContext(AuthContext);
+    const { setUserMaint } = authActions;
+    // Estados locales para el filtrado
     const [sorting, setSorting] = useState([]);
     const [anoFilter, setAnoFilter] = useState('');
     const [codigoFilter, setCodigoFilter] = useState('');
     const [nombreFilter, setNombreFilter] = useState('');
-    const [apellidoFilter, setApelldoFilter] = useState('');
+    const [apellidoFilter, setApellidoFilter] = useState('');
     const [cargoFilter, setCargoFilter] = useState('');
     const [rolFilter, setRolFilter] = useState('');
     const [estadoFilter, setEstadoFilter] = useState('');
@@ -105,12 +109,14 @@ const Table = ({data}) => {
             usuNomUsu: selectedUser.usuNomUsu,
             usuPas: selectedUser.usuPas
         };
-        navigate('/form-user', { state: { user: userValues } });
+        setUserMaint(userValues);
+        navigate('/form-user');
     };
     
     
     const handleNewClick = () => {
         navigate('/form-user');
+        setUserMaint({});
     };
     
     return (
@@ -154,7 +160,7 @@ const Table = ({data}) => {
                                     type="search"
                                     placeholder='Filtrar'
                                     value={apellidoFilter}
-                                    onChange={e => setApelldoFilter(e.target.value)}
+                                    onChange={e => setApellidoFilter(e.target.value)}
                                 />
                             </th>
                             <th>

@@ -57,5 +57,7 @@ namespace SistemaMEAL.Server.Models
 
         public virtual Rol? Rol { get; set; }
         public virtual DocumentoIdentidad? DocumentoIdentidad { get; set; }
+
+
     }
 }

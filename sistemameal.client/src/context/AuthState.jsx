@@ -7,7 +7,8 @@ const AuthState = ({ children }) => {
     const initialState = {
         isLoggedIn: false,
         users: [],
-        menuData: []
+        menuData: [],
+        userMaint: {}
     }
 
     const [state, dispatch] = useReducer(authReducer, initialState);
@@ -25,17 +26,23 @@ const AuthState = ({ children }) => {
         dispatch({ type: types.setMenuData, payload: menuData });
     }
 
+    const setUserMaint = (userMaint) => {
+        dispatch({ type: types.setUserMaint, payload: userMaint });
+    }
+
     // Agrupar en un solo objeto
     const authInfo = {
         isLoggedIn: state.isLoggedIn,
         users: state.users,
         menuData: state.menuData,
+        userMaint: state.userMaint
     };
 
     const authActions = {
         setIsLoggedIn,
         setUsers,
         setMenuData,
+        setUserMaint,
     };
 
     return (

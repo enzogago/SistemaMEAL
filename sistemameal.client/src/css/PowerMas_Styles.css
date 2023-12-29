@@ -1051,13 +1051,26 @@ body {
 
 /* CREAR/MODIFICAR USUARIO */
 .PowerMas_FormUserContainer form{
-	height: 95%;
+	height: 90%;
 	overflow-y: auto;
 }
-.PowerMas_FormUserContainer label{
+.PowerMas_FormUserContainer form > label{
 	display: flex;
 	flex-direction: column;
 	margin-bottom: 2rem;
+}
+.PowerMas_FormUserContainer div.PowerMasInputSex {
+	display: flex;
+	flex-direction: column;
+	margin-bottom: 2rem;
+}
+.PowerMas_FormUserContainer div.PowerMasInputSex > div {
+	display: flex;
+	gap: 2rem;
+}
+.PowerMas_FormUserContainer div.PowerMasInputSex > div > div{
+	display: flex;
+	gap: 0.5rem;	
 }
 .PowerMas_FormUserContainer button{
 	margin-top: 1rem;
@@ -1066,12 +1079,11 @@ body {
 
 /* CREAR/MODIFICAR MENU-USUARIO */
 .PowerMas_MenuUserContainer > div {
-	height: 95%;
+	height: 90%;
 	width: 100%;
 	overflow-y: auto;
 }
 .PowerMas_ListMenus{
-	height: 100%;
 	width: 70%;
 }
 .PowerMas_ListMenus > ul {

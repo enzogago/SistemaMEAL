@@ -1,13 +1,19 @@
 import Notiflix from "notiflix";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import MenuItem from "./MenuItem";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../context/AuthContext";
 
 const MenuUser = () => {
   const navigate = useNavigate();
+  // Variables State AuthContext 
+  const { authInfo } = useContext(AuthContext);
+  const { userMaint } = authInfo;
+  // Estados locales
   const [menus, setMenus] = useState([]);
   const [openMenus, setOpenMenus] = useState({}); 
   const [checkedMenus, setCheckedMenus] = useState({});
+
 
   const groupByParent = (menuData) => {
     // Primero, creamos un objeto donde las claves son los códigos de los menús (menCod)
@@ -33,6 +39,15 @@ const MenuUser = () => {
 
     return rootMenus;
   };
+
+  useEffect(() => {
+    // Verifica si userMaint es un objeto vacío
+    if (!userMaint || Object.keys(userMaint).length === 0) {
+        // Si es un objeto vacío, redirige al usuario a Table
+        navigate('/user');
+    }
+  }, [userMaint, navigate]);
+
 
   useEffect(() => {
     const fetchMenus = async () => {
@@ -122,9 +137,9 @@ const MenuUser = () => {
 
   return (
     <div className="PowerMas_MenuUserContainer h-100 bg-white Large-p2_5">
+      <h1 className="Large-f1_25">Menú para el usuario {userMaint.usuNom} {userMaint.usuApe} con código {userMaint.usuAno}{userMaint.usuCod}</h1>
       <div>
         <div className="PowerMas_ListMenus">
-          <h1 className="Large-f1_5">Estas en permisos Menú</h1>
           <ul>
             {menus.map(menu => renderMenu(menu, 1))}
           </ul>

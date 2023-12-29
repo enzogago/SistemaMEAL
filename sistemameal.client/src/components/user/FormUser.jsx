@@ -1,11 +1,32 @@
 import Notiflix from "notiflix";
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../context/AuthContext";
+import { handleSubmit } from './eventHandlers';
+
 
 const FormUser = () => {
     const navigate = useNavigate();
-    const location = useLocation();
-    const isEditing = location.state !== null && location.state !== undefined;
+    // Variables State AuthContext 
+    const { authInfo, authActions } = useContext(AuthContext);
+    const { userMaint } = authInfo;
+    const { setUsers, setIsLoggedIn, setUserMaint } = authActions;
+    //
+    const [newPassword, setNewPassword] = useState('');
+    const [resetPassword, setResetPassword] = useState(false);
+
+    const handleNewPasswordChange = (event) => {
+        setNewPassword(event.target.value);
+    };
+    const handleResetPasswordChange = (event) => {
+        setResetPassword(event.target.checked);
+        if (!event.target.checked) {
+            // Si el usuario desmarca la casilla, borra la nueva contraseña
+            setNewPassword('');
+        }
+    };    
+    //
+    const isEditing = userMaint && Object.keys(userMaint).length > 0;
 
     const initialFormValues = {
         usuAno: '',
@@ -18,7 +39,7 @@ const FormUser = () => {
         usuTel: '',
         rolCod: '',
         carCod: '',
-        usuEst: '',
+        usuEst: 'A',
         usuFecNac: '',
         usuSex: '',
         usuFecInc: '',
@@ -34,13 +55,10 @@ const FormUser = () => {
     
     useEffect(() => {
         if (isEditing) {
-        const user = location.state.user;
-        
-        setFormValues({ ...initialFormValues, ...user });
+            setFormValues({ ...initialFormValues, ...userMaint });
         }
-    }, [isEditing, location.state]);
+    }, [isEditing, userMaint]);
 
-    // EFECTO AL CARGAR COMPONENTE GET - LISTAR ESTADOS
     useEffect(() => {
         const fetchDocumentos = async () => {
             try {
@@ -51,7 +69,6 @@ const FormUser = () => {
                         'Authorization': `Bearer ${token}`
                     }
                 });
-                console.log(response)
                 if (!response.ok) {
                     if(response.status == 401 || response.status == 403){
                         const data = await response.json();
@@ -60,7 +77,6 @@ const FormUser = () => {
                     return;
                 }
                 const data = await response.json();
-                console.log(data)
                 if (data.success == false) {
                     Notiflix.Notify.failure(data.message);
                     return;
@@ -81,7 +97,6 @@ const FormUser = () => {
                         'Authorization': `Bearer ${token}`
                     }
                 });
-                console.log(response)
                 if (!response.ok) {
                     if(response.status == 401 || response.status == 403){
                         const data = await response.json();
@@ -90,7 +105,6 @@ const FormUser = () => {
                     return;
                 }
                 const data = await response.json();
-                console.log(data)
                 if (data.success == false) {
                     Notiflix.Notify.failure(data.message);
                     return;
@@ -112,7 +126,6 @@ const FormUser = () => {
                         'Authorization': `Bearer ${token}`
                     }
                 });
-                console.log(response)
                 if (!response.ok) {
                     if(response.status == 401 || response.status == 403){
                         const data = await response.json();
@@ -121,7 +134,6 @@ const FormUser = () => {
                     return;
                 }
                 const data = await response.json();
-                console.log(data)
                 if (data.success == false) {
                     Notiflix.Notify.failure(data.message);
                     return;
@@ -139,7 +151,10 @@ const FormUser = () => {
         fetchDocumentos();
     }, []);
 
+    
+
     const handleChange = (event) => {
+        console.log(formValues);
         setFormValues({
             ...formValues,
             [event.target.name]: event.target.value
@@ -149,24 +164,34 @@ const FormUser = () => {
     const handleNext = async (event) => {
         event.preventDefault();
 
-        // Aquí puedes agregar la lógica para guardar los datos del formulario.
-        // Por ejemplo, podrías hacer una solicitud POST a tu API.
-
-        // Cuando hayas terminado, puedes usar el hook useNavigate para navegar a la siguiente página.
+        await handleSubmit(event, userMaint, formValues, setUsers, setIsLoggedIn, newPassword);
+        
         navigate('/menu-user');
     };
+    
+    
 
   return (
     <div className="PowerMas_FormUserContainer h-100 bg-white Large-p2_5">
+        <h1 className="Large-f1_5">
+            {isEditing ? 'Editar': 'Nuevo'} Usuario
+        </h1>
         <form>
-            <label>
-                Año:
-                <input type="text" name="usuAno" value={formValues.usuAno} onChange={handleChange} disabled={isEditing} />
-            </label>
-            <label>
-                Código:
-                <input type="text" name="usuCod" value={formValues.usuCod} onChange={handleChange} disabled={isEditing} />
-            </label>
+            {
+                isEditing &&
+                (
+                    <>
+                        <label>
+                            Año:
+                            <input type="text" name="usuAno" value={formValues.usuAno} onChange={handleChange} disabled={isEditing} />
+                        </label>
+                        <label>
+                            Código:
+                            <input type="text" name="usuCod" value={formValues.usuCod} onChange={handleChange} disabled={isEditing} />
+                        </label>
+                    </>
+                )
+            }
             <label>
                 Documento de identidad:
                 <select name="docIdeCod" value={formValues.docIdeCod} onChange={handleChange}>
@@ -184,6 +209,15 @@ const FormUser = () => {
                 Correo electrónico:
                 <input type="text" name="usuCorEle" value={formValues.usuCorEle} onChange={handleChange} />
             </label>
+            {
+                !isEditing &&
+                (
+                    <label>
+                        Contraseña:
+                        <input type="password" name="usuPas" value={formValues.usuPas} onChange={handleChange} />
+                    </label>
+                )
+            }
             <label>
                 Nombres:
                 <input type="text" name="usuNom" value={formValues.usuNom} onChange={handleChange} />
@@ -215,9 +249,35 @@ const FormUser = () => {
                 </select>
             </label>
             <label>
-                Estado:
-                <input type="text" name="usuEst" value={formValues.usuEst} onChange={handleChange} />
+                Fecha de nacimiento:
+                <input type="text" name="usuFecNac" value={formValues.usuFecNac} onChange={handleChange} />
             </label>
+            <div className="PowerMasInputSex">
+                Sexo:
+                <div >
+                    <div>
+                        <input type="radio" id="masculino" name="usuSex" value="M" checked={formValues.usuSex === "M"} onChange={handleChange} />
+                        <label htmlFor="masculino">Masculino</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="femenino" name="usuSex" value="F" checked={formValues.usuSex === "F"} onChange={handleChange} />
+                        <label htmlFor="femenino">Femenino</label>
+                    </div>
+                </div>
+            </div>
+            <div className="PowerMasInputSex">
+                Estado:
+                <div >
+                    <div>
+                        <input type="radio" id="activo" name="usuEst" value="A" checked={formValues.usuEst === "A"} onChange={handleChange} />
+                        <label htmlFor="activo">Activo</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="inactivo" name="usuEst" value="I" checked={formValues.usuEst === "I"} onChange={handleChange} />
+                        <label htmlFor="inactivo">Inactivo</label>
+                    </div>
+                </div>
+            </div>
         </form>
         <button onClick={handleNext}> Siguiente </button>
     </div>

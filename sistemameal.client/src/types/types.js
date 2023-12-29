@@ -10,7 +10,7 @@ export const types = {
     setUsers: '[auth] Agregar usuarios al contexto',
     setIsLoggedIn: '[auth] Show Form',
     setMenuData: '[auth] Set menu data',
-    // getProjects: '[project] Get Projects',
+    setUserMaint: '[auth] User Maintence',
     // addProject: '[project] Add Projects',
     // validateForm: '[project] Validate Form',
     // projectNow: '[project] Project Now',
