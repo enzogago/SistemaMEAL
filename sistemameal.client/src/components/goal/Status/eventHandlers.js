@@ -1,12 +1,6 @@
 import Notiflix from "notiflix";
 
-export const handleSubmit = async (e, estadoEditado, nombreEstado, setEstados, setNombreEstado, setModalVisible, setIsLoggedIn) => {
-    e.preventDefault();
-
-    if (!nombreEstado || nombreEstado.trim() === ''){
-        Notiflix.Notify.failure('El campo nombre es requerido');
-        return;
-    }
+export const handleSubmit = async (estadoEditado, nombreEstado, setEstados, setModalVisible, setIsLoggedIn) => {
 
     const estado = estadoEditado ? { EstCod: estadoEditado.estCod, EstNom: nombreEstado } : { EstNom: nombreEstado };
 
@@ -51,7 +45,6 @@ export const handleSubmit = async (e, estadoEditado, nombreEstado, setEstados, s
         const text = await response.text();
         Notiflix.Notify.success(text);
         console.log(text)
-        setNombreEstado(""); // Limpia el campo de entrada
         setModalVisible(false); // Cierra el modal
 
         // Actualiza los datos después de insertar o modificar un registro

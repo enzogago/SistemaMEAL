@@ -13,8 +13,8 @@ const Status = () => {
     const { setIsLoggedIn } = authActions;
     // Variables State statusContext
     const { statusInfo, statusActions } = useContext(StatusContext);
-    const { estados, estadoEditado } = statusInfo;
-    const { setEstados, setNombreEstado, setModalVisible, setEstadoEditado } = statusActions;
+    const { estados } = statusInfo;
+    const { setEstados, setModalVisible, setEstadoEditado } = statusActions;
     
     // TOGGLE MODAL
     const openModal = (estado = null) => {
@@ -24,17 +24,8 @@ const Status = () => {
     const closeModal = () => {
         setEstadoEditado(null);
         setModalVisible(false);
-        setNombreEstado("");
     };
 
-    // Efecto al editar estado
-    useEffect(() => {
-        if (estadoEditado) {
-            setNombreEstado(estadoEditado.estNom);
-        } else {
-            setNombreEstado("");
-        }
-    }, [estadoEditado]);
     
 
     // EFECTO AL CARGAR COMPONENTE GET - LISTAR ESTADOS

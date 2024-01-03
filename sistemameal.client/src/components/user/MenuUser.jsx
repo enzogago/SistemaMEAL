@@ -106,29 +106,26 @@ const MenuUser = () => {
   }, []);
 
   const handleCheck = useCallback((menu, isChecked) => {
-    console.log('handleCheck called');
     setCheckedMenus(prevCheckedMenus => {
-        const newCheckedMenus = { ...prevCheckedMenus, [menu.menCod]: isChecked };
-
-        // Si se está marcando el checkbox, también marca todos los menús padres.
-        let currentMenu = menu;
-        while (isChecked && currentMenu.parent) {
-            newCheckedMenus[currentMenu.parent.menCod] = isChecked;
-            currentMenu = currentMenu.parent;
-        }
-
-        // Si se está desmarcando el checkbox, también desmarca todos los submenús.
-        if (!isChecked) {
-            const uncheckSubMenus = (menu) => {
-                menu.subMenus.forEach(subMenu => {
-                    newCheckedMenus[subMenu.menCod] = false;
-                    uncheckSubMenus(subMenu);
-                });
-            };
-            uncheckSubMenus(menu);
-        }
-        console.log(checkedMenus);
-        return newCheckedMenus;
+      const newCheckedMenus = { ...prevCheckedMenus, [menu.menCod]: isChecked };
+  
+      // Si se está marcando el checkbox, también marca todos los menús padres.
+      let currentMenu = menu;
+      while (isChecked && currentMenu.parent) {
+        newCheckedMenus[currentMenu.parent.menCod] = isChecked;
+        currentMenu = currentMenu.parent;
+      }
+  
+      // Si se está marcando o desmarcando el checkbox, también marca o desmarca todos los submenús.
+      const checkSubMenus = (menu, isChecked) => {
+        menu.subMenus.forEach(subMenu => {
+          newCheckedMenus[subMenu.menCod] = isChecked;
+          checkSubMenus(subMenu, isChecked);
+        });
+      };
+      checkSubMenus(menu, isChecked);
+  
+      return newCheckedMenus;
     });
   }, []);
 

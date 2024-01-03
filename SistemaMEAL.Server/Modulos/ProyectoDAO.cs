@@ -35,7 +35,9 @@ namespace SistemaMEAL.Modulos
                     {
                         SubProAno = rd.GetString(3),
                         SubProCod = rd.GetString(4),
-                        SubProNom = rd.GetString(5)
+                        SubProNom = rd.GetString(5),
+                        ProAno = rd.GetString(6),
+                        ProCod = rd.GetString(7),
                     });
                 }
 

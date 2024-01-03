@@ -29,6 +29,14 @@ const PermissionUser = () => {
   
     return proyectos;
   };
+
+  useEffect(() => {
+    // Verifica si userMaint es un objeto vacío
+    if (!userMaint || Object.keys(userMaint).length === 0) {
+        // Si es un objeto vacío, redirige al usuario a Table
+        navigate('/user');
+    }
+  }, [userMaint, navigate]);
   
 
   // EFECTO AL CARGAR COMPONENTE GET - LISTAR PROYECTOS
@@ -90,9 +98,15 @@ const PermissionUser = () => {
         ...prevChecked,
         [item.proCod]: isChecked
       }));
+  
+      // Si se está marcando o desmarcando el checkbox, también marca o desmarca todos los subproyectos.
+      const newCheckedSubProyectos = { ...checkedSubProyectos };
+      item.subProyectos.forEach(subProyecto => {
+        newCheckedSubProyectos[subProyecto.subProCod] = isChecked;
+      });
+      setCheckedSubProyectos(newCheckedSubProyectos);
     }
   }, [checkedSubProyectos]);
-  
   
   
   const renderProyecto = (proyecto) => (

@@ -1,7 +1,7 @@
 import SubProjectItem from "./SubProjectItem";
 
 const ProjectItem = ({ proyecto, handleCheck, checkedProyectos, checkedSubProyectos }) => {
-  return (
+    return (
     <li>
         <div>
             <label>
@@ -9,7 +9,7 @@ const ProjectItem = ({ proyecto, handleCheck, checkedProyectos, checkedSubProyec
                     type="checkbox" 
                     value={proyecto.proCod} 
                     checked={!!checkedProyectos[proyecto.proCod]}
-                    onChange={(event) => handleCheck(proyecto, event.target.checked)}
+                    onChange={(event) => handleCheck(proyecto, event.target.checked, false)}
                 />
                 {proyecto.proNom}
             </label>

@@ -3,7 +3,7 @@ import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { handleSubmit } from './eventHandlers';
-
+import { useForm } from 'react-hook-form';
 
 const FormUser = () => {
     const navigate = useNavigate();
@@ -11,39 +11,46 @@ const FormUser = () => {
     const { authInfo, authActions } = useContext(AuthContext);
     const { userMaint } = authInfo;
     const { setUsers, setIsLoggedIn, setUserMaint } = authActions;
+
+    
    
     const isEditing = userMaint && Object.keys(userMaint).length > 0;
 
     const initialFormValues = {
         usuAno: '',
         usuCod: '',
-        docIdeCod: '',
+        docIdeCod: '0',
         usuNumDoc: '',
         usuCorEle: '',
         usuNom: '',
         usuApe: '',
         usuTel: '',
-        rolCod: '',
-        carCod: '',
+        rolCod: '0',
+        carCod: '0',
         usuEst: 'A',
         usuFecNac: '',
-        usuSex: '',
+        usuSex: 'M',
         usuFecInc: '',
         usuNomUsu: '',
         usuPas: ''
     };
     
 
-    const [ formValues, setFormValues ] = useState(initialFormValues);
     const [ documentos, setDocumentos ] = useState([]);
     const [ roles, setRoles ] = useState([]);
     const [ cargos, setCargos ] = useState([]);
+
+    const { register, handleSubmit: validateForm, formState: {errors}, reset, setValue, trigger, watch   } = useForm();
+    const formValues = watch();
     
     useEffect(() => {
         if (isEditing) {
-            setFormValues({ ...initialFormValues, ...userMaint });
+            reset(userMaint);
+        } else {
+            reset(initialFormValues);
         }
-    }, [isEditing, userMaint]);
+    }, [isEditing, userMaint, reset]);
+    
 
     useEffect(() => {
         const fetchDocumentos = async () => {
@@ -140,20 +147,29 @@ const FormUser = () => {
     
 
     const handleChange = (event) => {
-        console.log(formValues);
-        setFormValues({
-            ...formValues,
-            [event.target.name]: event.target.value
-        });
+        setValue(event.target.name, event.target.value);
     };
 
     const handleNext = async (event) => {
         event.preventDefault();
-
-        await handleSubmit(event, userMaint, formValues, setUsers, setIsLoggedIn, setUserMaint);
+    
+        // Activa la validación del formulario
+        const result = await trigger();
+    
+        // Verifica si el formulario es válido
+        if (!result) {
+            // Muestra un mensaje de error y detiene la ejecución de la función
+            Notiflix.Notify.failure('Por favor, corrige los errores en el formulario.');
+            return;
+        }
+    
+        // Si el formulario es válido, procede con el envío del formulario
+        await handleSubmit(event, userMaint, watch(), setUsers, setIsLoggedIn, setUserMaint);
         
         navigate('/menu-user');
     };
+    
+    
 
   return (
     <div className="PowerMas_FormUserContainer h-100 bg-white Large-p2_5">
@@ -178,63 +194,131 @@ const FormUser = () => {
             }
             <label>
                 Documento de identidad:
-                <select name="docIdeCod" value={formValues.docIdeCod} onChange={handleChange}>
+                <select 
+                    name="docIdeCod" 
+                    value={formValues.docIdeCod} 
+                    onChange={handleChange}
+                    {...register('docIdeCod', { 
+                        validate: value => value !== '0' || 'El documento de identidad es requerido' 
+                    })}
+                >
                     <option value="0">--SELECCIONE UN DOCUMENTO--</option>
                     {documentos.map(documento => (
                         <option key={documento.docIdeCod} value={documento.docIdeCod}> ({documento.docIdeAbr}) {documento.docIdeNom}</option>
                     ))}
                 </select>
+                {errors.docIdeCod && <p className='errorInput Large-p_5'>{errors.docIdeCod.message}</p>}
             </label>
             <label>
                 Número de documento:
-                <input type="text" name="usuNumDoc" value={formValues.usuNumDoc} onChange={handleChange} />
+                <input type="text" name="usuNumDoc" value={formValues.usuNumDoc} onChange={handleChange}
+                {...register('usuNumDoc', { required: 'El número de documento es requerido' })} />
+                {errors.usuNumDoc && <p className='errorInput Large-p_5'>{errors.usuNumDoc.message}</p>}
             </label>
             <label>
                 Correo electrónico:
-                <input type="text" name="usuCorEle" value={formValues.usuCorEle} onChange={handleChange} />
+                <input type="text" name="usuCorEle" value={formValues.usuCorEle} onChange={handleChange} 
+                {...register('usuCorEle', { 
+                    required: 'El correo electronico es requerido',
+                    pattern: {
+                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+                        message: 'Dirección de correo electrónico inválida',
+                    },
+                })} 
+                />
+                {errors.usuCorEle && <p className='errorInput Large-p_5'>{errors.usuCorEle.message}</p>}
             </label>
             {
                 !isEditing &&
                 (
                     <label>
                         Contraseña:
-                        <input type="password" name="usuPas" value={formValues.usuPas} onChange={handleChange} />
+                        <input type="password" name="usuPas" value={formValues.usuPas} onChange={handleChange} 
+                        {...register('usuPas', { 
+                            required: 'La contraseña es requerido',
+                            minLength: { value: 8, message: 'La contraseña debe tener minimo 8 digitos' },
+                        })} 
+                        />
+                        {errors.usuPas && <p className='errorInput Large-p_5'>{errors.usuPas.message}</p>}
                     </label>
                 )
             }
             <label>
                 Nombres:
-                <input type="text" name="usuNom" value={formValues.usuNom} onChange={handleChange} />
+                <input type="text" name="usuNom" value={formValues.usuNom} onChange={handleChange}
+                    {...register('usuNom', { 
+                        required: 'El nombre es requerido',
+                        minLength: { value: 3, message: 'El nombre debe tener minimo 3 digitos' },
+                    })} 
+                />
+                {errors.usuNom && <p className='errorInput Large-p_5'>{errors.usuNom.message}</p>}
             </label>
             <label>
                 Apellidos:
-                <input type="text" name="usuApe" value={formValues.usuApe} onChange={handleChange} />
+                <input type="text" name="usuApe" value={formValues.usuApe} onChange={handleChange}
+                {...register('usuApe', { 
+                    required: 'El Apellido es requerido',
+                        minLength: { value: 3, message: 'El apellido debe tener minimo 3 digitos' },
+                })} 
+                />
+                {errors.usuPas && <p className='errorInput Large-p_5'>{errors.usuPas.message}</p>}
             </label>
             <label>
                 Telefono:
-                <input type="text" name="usuTel" value={formValues.usuTel} onChange={handleChange} />
+                <input type="text" name="usuTel" value={formValues.usuTel} onChange={handleChange}
+                {...register('usuTel', { 
+                    required: 'La contraseña es requerido',
+                    minLength: { value: 8, message: 'La contraseña debe tener minimo 8 digitos' },
+                })} 
+                />
+                {errors.usuPas && <p className='errorInput Large-p_5'>{errors.usuPas.message}</p>}
             </label>
             <label>
                 Rol:
-                <select name="rolCod" value={formValues.rolCod} onChange={handleChange}>
+                <select 
+                    name="rolCod" 
+                    value={formValues.rolCod} 
+                    onChange={handleChange}
+                    {...register('rolCod', { 
+                        validate: value => value !== '0' || 'El rol es requerido' 
+                    })}
+                >
                     <option value="0">--SELECCIONE UN ROL--</option>
                     {roles.map(rol => (
                         <option key={rol.rolCod} value={rol.rolCod}>{rol.rolNom}</option>
                     ))}
                 </select>
+                {errors.rolCod && <p className='errorInput Large-p_5'>{errors.rolCod.message}</p>}
             </label>
             <label>
                 Cargo:
-                <select name="carCod" value={formValues.carCod} onChange={handleChange}>
+                <select 
+                    name="carCod" 
+                    value={formValues.carCod} 
+                    onChange={handleChange}
+                    {...register('carCod', { 
+                        validate: value => value !== '0' || 'El cargo es requerido' 
+                    })}
+                >
                     <option value="0">--SELECCIONE UN CARGO--</option>
                     {cargos.map(cargo => (
                         <option key={cargo.carCod} value={cargo.carCod}>{cargo.carNom}</option>
                     ))}
                 </select>
+                {errors.carCod && <p className='errorInput Large-p_5'>{errors.carCod.message}</p>}
             </label>
             <label>
                 Fecha de nacimiento:
-                <input type="text" name="usuFecNac" value={formValues.usuFecNac} onChange={handleChange} />
+                <input type="text" name="usuFecNac" value={formValues.usuFecNac} onChange={handleChange} 
+                    {...register('usuFecNac', { 
+                        required: 'La fecha de nacimiento es requerido',
+                        pattern: {
+                            value: /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/,
+                            message: 'La fecha debe estar en el formato YYYY-MM-DD',
+                          },
+                    })} 
+                />
+                {errors.usuFecNac && <p className='errorInput Large-p_5'>{errors.usuFecNac.message}</p>}
             </label>
             <div className="PowerMasInputSex">
                 Sexo:
