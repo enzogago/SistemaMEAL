@@ -10,9 +10,11 @@ const MenuUser = () => {
   const { authInfo } = useContext(AuthContext);
   const { userMaint } = authInfo;
   // Estados locales
-  const [menus, setMenus] = useState([]);
-  const [openMenus, setOpenMenus] = useState({}); 
-  const [checkedMenus, setCheckedMenus] = useState({});
+  const [ menus, setMenus ] = useState([]);
+  const [ openMenus, setOpenMenus ] = useState({}); 
+  const [ checkedMenus, setCheckedMenus] = useState({});
+  const [ currentMenus, setCurrentMenus ] = useState([]);
+  const [ allMenus, setAllMenus ] = useState([]);
 
 
   const groupByParent = (menuData) => {
@@ -54,19 +56,37 @@ const MenuUser = () => {
       try {
           Notiflix.Loading.pulse('Cargando...');
           const token = localStorage.getItem('token');
-          const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Menu`, {
+          // Obtén los menús del usuario
+          const responseUserMenus = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Menu/${userMaint.usuAno}/${userMaint.usuCod}`, {
               headers: {
                   'Authorization': `Bearer ${token}`
               }
           });
-          if (!response.ok) {
-              const data = await response.json();
-              Notiflix.Notify.failure(data.message);
-              return;
-          }
-          const data = await response.json();
-          const groupData = groupByParent(data);
+          const userMenus = await responseUserMenus.json();
+          setCurrentMenus(userMenus);
+          // Obtén todos los menús
+          const responseAllMenus = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Menu`, {
+              headers: {
+                  'Authorization': `Bearer ${token}`
+              }
+          });
+          const allMenus = await responseAllMenus.json();
+          // Marca los menús a los que el usuario tiene acceso
+          const markedMenus = allMenus.map(menu => ({
+              ...menu,
+              isChecked: userMenus.some(userMenu => userMenu.menCod === menu.menCod)
+          }));
+          const groupData = groupByParent(markedMenus);
+          console.log(markedMenus);
           setMenus(groupData);
+          console.log(menus);
+          const newCheckedMenus = userMenus.reduce((map, menu) => {
+            map[menu.menCod] = true;
+            return map;
+          }, {});
+          setCheckedMenus(newCheckedMenus);
+          setAllMenus(allMenus);
+          
       } catch (error) {
           console.error('Error:', error);
       } finally {
@@ -74,7 +94,8 @@ const MenuUser = () => {
       }
     };
     fetchMenus();
-  }, []);
+  }, [userMaint]);
+
 
   const handleToggle = useCallback((menu) => {
     console.log('handleToggle called');
@@ -106,7 +127,7 @@ const MenuUser = () => {
             };
             uncheckSubMenus(menu);
         }
-
+        console.log(checkedMenus);
         return newCheckedMenus;
     });
   }, []);
@@ -127,11 +148,68 @@ const MenuUser = () => {
 
   const handleNext = async (event) => {
     event.preventDefault();
+    // Convertir currentMenus a un objeto para facilitar la búsqueda
+    const currentMenuMap = currentMenus.reduce((map, menu) => {
+      map[menu.menCod] = menu;
+      return map;
+    }, {});
 
-    // Aquí puedes agregar la lógica para guardar los datos del formulario.
-    // Por ejemplo, podrías hacer una solicitud POST a tu API.
+    const allMenuMap = allMenus.reduce((map, menu) => {
+      map[menu.menCod] = menu;
+      return map;
+    }, {});
 
-    // Cuando hayas terminado, puedes usar el hook useNavigate para navegar a la siguiente página.
+    // Identificar los menús que se han marcado (agregados)
+    const addedMenus = Object.keys(checkedMenus)
+    .filter(menCod => checkedMenus[menCod] && !currentMenuMap[menCod])
+    .map(menCod => allMenuMap[menCod]); 
+
+    // Identificar los menús que se han desmarcado (eliminados)
+    const removedMenus = currentMenus
+      .filter(menu => !checkedMenus[menu.menCod]);
+
+    // Preparar los datos para las peticiones
+    const addedMenusData = addedMenus.map(menu => ({
+      UsuAno: userMaint.usuAno,
+      UsuCod: userMaint.usuCod,
+      MenAno: menu.menAno,
+      MenCod: menu.menCod
+    }));
+    const removedMenusData = removedMenus.map(menu => ({
+      UsuAno: userMaint.usuAno,
+      UsuCod: userMaint.usuCod,
+      MenAno: menu.menAno,
+      MenCod: menu.menCod
+    }));
+
+    const token = localStorage.getItem('token');
+    // Realizar la petición para agregar menús
+    const responseAdd = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Menu/agregar`, {
+      method: 'POST',
+      headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(addedMenusData)
+    });
+    if (!responseAdd.ok) {
+      // Manejar el error...
+    }
+
+    // Realizar la petición para eliminar menús
+    const responseRemove = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Menu/eliminar`, {
+      method: 'POST',
+      headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(removedMenusData)
+    });
+    if (!responseRemove.ok) {
+      // Manejar el error...
+    }
+    console.log('Menús agregados:', addedMenusData);
+    console.log('Menús eliminados:', removedMenusData);
     navigate('/permiso-user');
   };
 

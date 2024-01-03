@@ -9,6 +9,59 @@ namespace SistemaMEAL.Modulos
     {
         private conexionDAO cn = new conexionDAO();
 
+        public bool InsertarMenuUsuario(string usuAno, string usuCod, string menAno, string menCod)
+        {
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_INSERTAR_MENU_USUARIO", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@USUANO", usuAno);
+                cmd.Parameters.AddWithValue("@USUCOD", usuCod);
+                cmd.Parameters.AddWithValue("@MENANO", menAno);
+                cmd.Parameters.AddWithValue("@MENCOD", menCod);
+                cmd.ExecuteNonQuery();
+
+                return true;
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+        }
+
+        public bool EliminarMenuUsuario(string usuAno, string usuCod, string menAno, string menCod)
+        {
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_ELIMINAR_MENU_USUARIO", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@USUANO", usuAno);
+                cmd.Parameters.AddWithValue("@USUCOD", usuCod);
+                cmd.Parameters.AddWithValue("@MENANO", menAno);
+                cmd.Parameters.AddWithValue("@MENCOD", menCod);
+                cmd.ExecuteNonQuery();
+
+                return true;
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+        }
         public IEnumerable<Menu> ListadoMenuPorUsuario(string usuAno, string usuCod)
         {
             List<Menu> temporal = new List<Menu>();

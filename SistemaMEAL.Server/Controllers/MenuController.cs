@@ -19,6 +19,47 @@ namespace SistemaMEAL.Server.Controllers
             _usuarios = usuarios;
         }
 
+
+        [HttpPost("agregar")]
+        public IActionResult AgregarMenuUsuario([FromBody] List<MenuUsuario> menusAgregar)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            foreach (var menuUsuario in menusAgregar)
+            {
+                bool result = _menus.InsertarMenuUsuario(menuUsuario.UsuAno, menuUsuario.UsuCod, menuUsuario.MenAno, menuUsuario.MenCod);
+                if (!result)
+                {
+                    return BadRequest("Error al agregar el menú al usuario");
+                }
+            }
+
+            return Ok("Menús agregados correctamente");
+        }
+
+        [HttpPost("eliminar")]
+        public IActionResult EliminarMenuUsuario([FromBody] List<MenuUsuario> menusEliminar)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            foreach (var menuUsuario in menusEliminar)
+            {
+                bool result = _menus.EliminarMenuUsuario(menuUsuario.UsuAno, menuUsuario.UsuCod, menuUsuario.MenAno, menuUsuario.MenCod);
+                if (!result)
+                {
+                    return BadRequest("Error al eliminar el menú del usuario");
+                }
+            }
+
+            return Ok("Menús eliminados correctamente");
+        }
+
         [HttpGet]
         public dynamic ListadoMenu()
         {

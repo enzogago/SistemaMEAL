@@ -11,21 +11,7 @@ const FormUser = () => {
     const { authInfo, authActions } = useContext(AuthContext);
     const { userMaint } = authInfo;
     const { setUsers, setIsLoggedIn, setUserMaint } = authActions;
-    //
-    const [newPassword, setNewPassword] = useState('');
-    const [resetPassword, setResetPassword] = useState(false);
-
-    const handleNewPasswordChange = (event) => {
-        setNewPassword(event.target.value);
-    };
-    const handleResetPasswordChange = (event) => {
-        setResetPassword(event.target.checked);
-        if (!event.target.checked) {
-            // Si el usuario desmarca la casilla, borra la nueva contraseña
-            setNewPassword('');
-        }
-    };    
-    //
+   
     const isEditing = userMaint && Object.keys(userMaint).length > 0;
 
     const initialFormValues = {
@@ -164,12 +150,10 @@ const FormUser = () => {
     const handleNext = async (event) => {
         event.preventDefault();
 
-        await handleSubmit(event, userMaint, formValues, setUsers, setIsLoggedIn, newPassword);
+        await handleSubmit(event, userMaint, formValues, setUsers, setIsLoggedIn, setUserMaint);
         
         navigate('/menu-user');
     };
-    
-    
 
   return (
     <div className="PowerMas_FormUserContainer h-100 bg-white Large-p2_5">

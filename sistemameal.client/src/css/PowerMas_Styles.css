@@ -1140,3 +1140,24 @@ body {
 	margin-top: 1rem;
 }
 /* END CREAR/MODIFICAR MENU-USUARIO */
+
+/* CREAR/MODIFICAR PERMISO-USUARIO */
+.PowerMas_ListPermission{
+	width: 70%;
+}
+.PowerMas_ListPermission ul{
+	list-style: none;
+}
+.PowerMas_ListPermission li{
+	margin: 0.5rem 2rem;
+}
+.PowerMas_ListPermission > ul > li{
+	margin-bottom: 1.5rem;
+}
+.PowerMas_ListPermission > ul > li > div {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+/* END CREAR/MODIFICAR PERMISO-USUARIO */

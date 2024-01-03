@@ -1,6 +1,6 @@
 import Notiflix from "notiflix";
 
-export const handleSubmit = async (e, userMaint, formValues, setUsers, setIsLoggedIn) => {
+export const handleSubmit = async (e, userMaint, formValues, setUsers, setIsLoggedIn, setUserMaint) => {
     e.preventDefault();
 
     var usuario = userMaint ? { ...userMaint, ...formValues } : { ...formValues };
@@ -38,6 +38,7 @@ export const handleSubmit = async (e, userMaint, formValues, setUsers, setIsLogg
             const data = await response.json();
             if (data.result) {
                 setIsLoggedIn(false);
+                
             }
 
             Notiflix.Notify.failure(data.message);
@@ -56,6 +57,9 @@ export const handleSubmit = async (e, userMaint, formValues, setUsers, setIsLogg
         });
         const data = await updateResponse.json();
         setUsers(data);
+        console.log(data);
+        // Setear userMaint con los datos del usuario
+        setUserMaint(data[data.length - 1]);
     } catch (error) {
         console.error('Error:', error);
     }
