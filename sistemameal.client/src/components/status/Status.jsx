@@ -1,11 +1,12 @@
 import { useContext, useEffect } from 'react';
-import { StatusContext } from '../../../context/StatusContext';
-import { AuthContext } from '../../../context/AuthContext';
 // Libraries
 import Notiflix from 'notiflix';
 // Componentes
 import Table from './Table';
 import Modal from './Modal';
+// Context
+import { AuthContext } from '../../context/AuthContext';
+import { StatusContext } from '../../context/StatusContext';
 
 const Status = () => {
     // Variables State AuthContext 

@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
-import TableRow from "./TableRow"
+import { useContext, useMemo, useState } from 'react';
 import { FaPenNib, FaPlus, FaSortDown, FaSortUp, FaTrash } from 'react-icons/fa';
+import { StatusContext } from '../../context/StatusContext';
 import {
     useReactTable, 
     getCoreRowModel, 
@@ -8,89 +8,51 @@ import {
     getPaginationRowModel,
     getSortedRowModel, 
 } from '@tanstack/react-table';
-import Pagination from "../reusable/Pagination";
+import Pagination from '../reusable/Pagination';
+import { AuthContext } from '../../context/AuthContext';
+import { handleDelete } from '../reusable/helper';
 
-const Table = ({ data }) => {
-    // Supongamos que 'filters' es el estado de los filtros de la tabla
-    const [filters, setFilters] = useState({});
 
-    const uniqueValues = {};
+const Table = ({ data, openModal }) => {
+    // Variables State AuthContext 
+    const { authActions } = useContext(AuthContext);
+    const { setIsLoggedIn } = authActions;
+    // Variables State statusContext
+    const { statusActions } = useContext(StatusContext);
+    const { setFinanciadores } = statusActions;
+    // States locales
+    const [codigoFilter, setCodigoFilter] = useState('');
+    const [nombreFilter, setNombreFilter] = useState('');
 
-    const handleFilterChange = (accessorKey, value) => {
-        if (value === "") {
-            const newFilters = {...filters};
-            delete newFilters[accessorKey];
-            setFilters(newFilters);
-        } else {
-            setFilters({
-                ...filters,
-                [accessorKey]: value
-            });
-        }
-    };
-    
-
-    const [sorting, setSorting] = useState([]);
+    /* TANSTACK */
     const columns = [
         {
-            header: "Estado",
-            accessorKey: "estNom"
+            header: "Código",
+            accessorKey: "finCod"
         },
         {
-            header: "Proyecto",
-            accessorKey: "proNom"
+            header: "Nombre",
+            accessorKey: "finNom"
         },
         {
-            header: "Meta",
-            accessorKey: "metMetTec"
-        },
-        {
-            header: "Ejecucion",
-            accessorKey: "metEjeTec"
-        },
-        {
-            header: "% de Avance",
-            accessorKey: "metPorAvaTec"
-        },
-        {
-            header: "Año",
-            accessorKey: "metAnoPlaTec"
-        },
-        {
-            header: "Mes",
-            accessorKey: "metMesPlaTec"
-        },
-        {
-            header: "Subproyectos",
-            accessorKey: "subProNom"
-        },
-        {
-            header: "Activiades",
-            accessorKey: "actResNom"
-        },
-        {
-            header: "Sub Actividades",
-            accessorKey: "subActResNom"
-        },
-        {
-            header: "Resultados",
-            accessorKey: "resNom"
+            header: "Acciones",
+            accessorKey: "acciones",
+            cell: ({row}) => (
+                <div className='PowerMas_IconsTable flex jc-center ai-center'>
+                    <FaTrash className='Large-p_25' onClick={() => handleDelete('Financiador',row.original.finCod, setFinanciadores, setIsLoggedIn)} />
+                    <FaPenNib className='Large-p_25' onClick={() => openModal(row.original)} />
+                </div>
+            ),
         },
     ]
 
-    columns.forEach(column => {
-        const accessorKey = column.accessorKey;
-        uniqueValues[accessorKey] = [...new Set(data.map(item => item[accessorKey]))];
-    });
-
+    const [sorting, setSorting] = useState([]);
     const filteredData = useMemo(() => 
-    data.filter(item => 
-        Object.entries(filters).every(([key, value]) => 
-            item[key] === value
-        )
-    ), [data, filters]);
-
-    
+        data.filter(item => 
+            item.finCod.includes(codigoFilter.toUpperCase()) &&
+            item.finNom.includes(nombreFilter.toUpperCase())
+        ), [data, codigoFilter, nombreFilter]
+    );
     const table = useReactTable({
         data: filteredData,
         columns,
@@ -103,36 +65,38 @@ const Table = ({ data }) => {
         onSortingChange: setSorting,
         columnResizeMode: "onChange"
     })
-
-    const selectedColumns = ["proNom", "subProNom", "actResNom", "subActResNom", "resNom"];
+    /* END TANSTACK */
 
     return (
         <div className='TableMainContainer Large-p2'>
             <div className="flex jc-space-between">
-                <h1 className="flex left Large-f1_75">Monitoreo</h1>
-            </div>
-            <div className="PowerMas_GroupSelect">
-                {columns.filter(column => selectedColumns.includes(column.accessorKey)).map((column, index) => (
-                    <div key={column.accessorKey}>
-                        <label htmlFor={column.accessorKey}>{column.header}</label>
-                        <select 
-                            className="Large-f_75"
-                            key={index}
-                            name={column.accessorKey} 
-                            id={column.accessorKey} 
-                            onChange={event => handleFilterChange(column.accessorKey, event.target.value)}
-                        >
-                            <option value=""> Sin seleccion</option>
-                            {uniqueValues[column.accessorKey].map(value => (
-                                <option value={value} key={value}>{value}</option>
-                            ))}
-                        </select>
-                    </div>
-                ))}
+                <h1 className="flex left Large-f1_75">Listado de Financiadores</h1>
+                <button className='Large-p_5 PowerMas_ButtonStatus' onClick={() => openModal()}>
+                    Nuevo <FaPlus /> 
+                </button>
             </div>
             <div className="PowerMas_TableContainer">
-                <table className="Large_12 Large-f_75 PowerMas_TableMonitoring">
+                <table className="Large_12 PowerMas_TableStatus">
                     <thead>
+                        <tr>
+                            <th>
+                                <input 
+                                    type="search"
+                                    placeholder='Filtrar por Codigo'
+                                    value={codigoFilter}
+                                    onChange={e => setCodigoFilter(e.target.value)}
+                                />
+                            </th>
+                            <th>
+                                <input 
+                                    type="search"
+                                    placeholder='Filtrar por Nombre'
+                                    value={nombreFilter}
+                                    onChange={e => setNombreFilter(e.target.value)}
+                                />
+                            </th>
+                            <th></th>
+                        </tr>
                         {
                             table.getHeaderGroups().map(headerGroup => (
                                 <tr key={headerGroup.id}>
@@ -175,9 +139,19 @@ const Table = ({ data }) => {
                         {
                             table.getRowModel().rows.length > 0 ?
                                 table.getRowModel().rows.map(row => (
-                                    <TableRow key={row.id} row={row} flexRender={flexRender} />
+                                    <tr key={row.id}>
+                                        {row.getVisibleCells().map(cell => (
+                                            <td style={{ width: cell.column.getSize() }} key={cell.id}>
+                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                            </td>
+                                        ))}
+                                    </tr>
                                 ))
-                            : <tr className='PowerMas_TableEmpty'><td colSpan={11} className='Large-p1 center'>No se encontraron registros</td></tr>
+                            :   <tr className='PowerMas_TableEmpty'>
+                                    <td colSpan={3} className='Large-p1 center'>
+                                        No se encontraron registros
+                                    </td>
+                                </tr>
                         }
                     </tbody>
                 </table>

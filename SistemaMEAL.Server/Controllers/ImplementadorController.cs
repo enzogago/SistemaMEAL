@@ -8,14 +8,14 @@ namespace SistemaMEAL.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class RolController : ControllerBase
+    public class ImplementadorController : ControllerBase
     {
-        private readonly RolDAO _roles;
+        private readonly ImplementadorDAO _implementadores;
         private readonly UsuarioDAO _usuarios;
 
-        public RolController(RolDAO roles, UsuarioDAO usuarios)
+        public ImplementadorController(ImplementadorDAO implementadores, UsuarioDAO usuarios)
         {
-            _roles = roles;
+            _implementadores = implementadores;
             _usuarios = usuarios;
         }
 
@@ -34,22 +34,22 @@ namespace SistemaMEAL.Server.Controllers
                 UsuCod = data.UsuCod,
                 RolCod = data.RolCod
             };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "LISTAR ROL") && usuario.RolCod != "01")
+            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "LISTAR IMPLEMENTADOR") && usuario.RolCod != "01")
             {
                 return new
                 {
                     success = false,
-                    message = "No tienes permisos para listar roles",
+                    message = "No tienes permisos para listar implementadores",
                     result = ""
                 };
             }
-            var roles = _roles.Listado();
-            Console.WriteLine(roles);
-            return Ok(roles);
+            var implementadores = _implementadores.Listado();
+            Console.WriteLine(implementadores);
+            return Ok(implementadores);
         }
 
         [HttpPost]
-        public dynamic Insertar(Rol rol)
+        public dynamic Insertar(Implementador implementador)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
@@ -63,17 +63,17 @@ namespace SistemaMEAL.Server.Controllers
                 UsuCod = data.UsuCod,
                 RolCod = data.RolCod
             };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "CREAR ROL") && usuario.RolCod != "01")
+            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "CREAR IMPLEMENTADOR") && usuario.RolCod != "01")
             {
                 return new
                 {
                     success = false,
-                    message = "No tienes permisos para insertar roles",
+                    message = "No tienes permisos para insertar implementadores",
                     result = ""
                 };
             }
 
-            var (message, messageType) = _roles.Insertar(rol);
+            var (message, messageType) = _implementadores.Insertar(implementador);
             if (messageType == "1") // Error
             {
                 return BadRequest(message);
@@ -88,8 +88,8 @@ namespace SistemaMEAL.Server.Controllers
             }
         }
 
-        [HttpPut("{rolCod}")]
-        public dynamic Modificar(string rolCod, Rol rol)
+        [HttpPut("{impCod}")]
+        public dynamic Modificar(string impCod, Implementador implementador)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
@@ -103,18 +103,18 @@ namespace SistemaMEAL.Server.Controllers
                 UsuCod = data.UsuCod,
                 RolCod = data.RolCod
             };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "MODIFICAR ROL") && usuario.RolCod != "01")
+            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "MODIFICAR IMPLEMENTADOR") && usuario.RolCod != "01")
             {
                 return new
                 {
                     success = false,
-                    message = "No tienes permisos para modificar roles",
+                    message = "No tienes permisos para modificar implementadores",
                     result = ""
                 };
             }
 
-            rol.RolCod = rolCod;
-            var (message, messageType) = _roles.Modificar(rol);
+            implementador.ImpCod = impCod;
+            var (message, messageType) = _implementadores.Modificar(implementador);
             if (messageType == "1") // Error
             {
                 return BadRequest(message);
@@ -129,8 +129,9 @@ namespace SistemaMEAL.Server.Controllers
             }
         }
 
-        [HttpDelete("{rolCod}")]
-        public dynamic Eliminar(string rolCod)
+
+        [HttpDelete("{impCod}")]
+        public dynamic Eliminar(string impCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
@@ -144,17 +145,17 @@ namespace SistemaMEAL.Server.Controllers
                 UsuCod = data.UsuCod,
                 RolCod = data.RolCod
             };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "ELIMINAR ROL") && usuario.RolCod != "01")
+            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "ELIMINAR IMPLEMENTADOR") && usuario.RolCod != "01")
             {
                 return new
                 {
                     success = false,
-                    message = "No tienes permisos para eliminar roles",
+                    message = "No tienes permisos para eliminar implementadores",
                     result = ""
                 };
             }
 
-            var (message, messageType) = _roles.Eliminar(rolCod);
+            var (message, messageType) = _implementadores.Eliminar(impCod);
             if (messageType == "1") // Error
             {
                 return BadRequest(message);
@@ -168,5 +169,7 @@ namespace SistemaMEAL.Server.Controllers
                 return Ok(message);
             }
         }
+
+
     }
 }

@@ -39,7 +39,6 @@ const Login = () => {
         
             const data = await response.json();
             if (data.success) {
-                Notiflix.Notify.success(data.message);
                 localStorage.setItem('user', JSON.stringify(data.user));
                 localStorage.setItem('token', data.result);
                 setIsLoggedIn(true);

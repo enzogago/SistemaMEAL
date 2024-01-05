@@ -1,8 +1,8 @@
 import { useContext, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { StatusContext } from '../../../context/StatusContext'; // Importa el contexto
-import { handleSubmit } from './eventHandlers';
-import { AuthContext } from '../../../context/AuthContext';
+import { AuthContext } from '../../context/AuthContext';
+import { StatusContext } from '../../context/StatusContext';
+import { handleSubmit } from '../reusable/helper';
 
 const Modal = ({ closeModal }) => {
     // variables state de AuthContext
@@ -11,12 +11,15 @@ const Modal = ({ closeModal }) => {
     // variables state de StatusContext
     const { statusInfo, statusActions } = useContext(StatusContext);
     const { estadoEditado, modalVisible } = statusInfo;
-    const { setEstados, setModalVisible } = statusActions;
+    const { setCargos, setModalVisible } = statusActions;
 
     const { register, handleSubmit: validateForm, formState: { errors }, reset, setValue } = useForm();
 
     const onSubmit = (data) => {
-        handleSubmit(estadoEditado, data.nombre, setEstados, setModalVisible, setIsLoggedIn);
+        const fieldMapping = {
+            nombre: 'carNom',
+        };
+        handleSubmit('Cargo', estadoEditado, data, setCargos, setModalVisible, setIsLoggedIn, fieldMapping, 'carCod');
         reset();
     };
 
@@ -30,7 +33,7 @@ const Modal = ({ closeModal }) => {
     // Efecto al editar estado
     useEffect(() => {
         if (estadoEditado) {
-            setValue('nombre', estadoEditado.estNom);
+            setValue('nombre', estadoEditado.carNom);
         }
     }, [estadoEditado, setValue]);
     
@@ -38,12 +41,11 @@ const Modal = ({ closeModal }) => {
         closeModal();
         reset();
     };
-
     return (
         <div className={`PowerMas_Modal ${modalVisible ? 'show' : ''}`}>
             <div className="PowerMas_ModalContent">
                 <span className="PowerMas_CloseModal" onClick={closeModalAndReset}>×</span>
-                <h2 className="center">{estadoEditado ? 'Editar Estado' : 'Nuevo Estado'}</h2>
+                <h2 className="center">{estadoEditado ? 'Editar' : 'Nuevo'} Documento Identidad</h2>
                 <form className='Large-f1_25 PowerMas_FormStatus' onSubmit={validateForm(onSubmit)}>
                     <label className="block">
                         Nombre:
@@ -52,7 +54,7 @@ const Modal = ({ closeModal }) => {
                         id="nombre"
                         className="flex" 
                         type="text" 
-                        placeholder='EJM: EJECUTADO' 
+                        placeholder='EJM: DOCUMENTO' 
                         maxLength={100} 
                         name="nombre" 
                         {...register(
@@ -74,7 +76,7 @@ const Modal = ({ closeModal }) => {
                 </form>
             </div>
         </div>
-    );
+    )
 }
 
-export default Modal;
+export default Modal

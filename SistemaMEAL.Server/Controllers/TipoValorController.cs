@@ -8,14 +8,14 @@ namespace SistemaMEAL.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class RolController : ControllerBase
+    public class TipoValorController : ControllerBase
     {
-        private readonly RolDAO _roles;
+        private readonly TipoValorDAO _tipos;
         private readonly UsuarioDAO _usuarios;
 
-        public RolController(RolDAO roles, UsuarioDAO usuarios)
+        public TipoValorController(TipoValorDAO tipos, UsuarioDAO usuarios)
         {
-            _roles = roles;
+            _tipos = tipos;
             _usuarios = usuarios;
         }
 
@@ -34,22 +34,22 @@ namespace SistemaMEAL.Server.Controllers
                 UsuCod = data.UsuCod,
                 RolCod = data.RolCod
             };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "LISTAR ROL") && usuario.RolCod != "01")
+            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "LISTAR TIPO_VALOR") && usuario.RolCod != "01")
             {
                 return new
                 {
                     success = false,
-                    message = "No tienes permisos para listar roles",
+                    message = "No tienes permisos para listar tipos valor",
                     result = ""
                 };
             }
-            var roles = _roles.Listado();
-            Console.WriteLine(roles);
-            return Ok(roles);
+            var tipos = _tipos.Listado();
+            Console.WriteLine(tipos);
+            return Ok(tipos);
         }
 
         [HttpPost]
-        public dynamic Insertar(Rol rol)
+        public dynamic Insertar(TipoValor tipoValor)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
@@ -63,17 +63,17 @@ namespace SistemaMEAL.Server.Controllers
                 UsuCod = data.UsuCod,
                 RolCod = data.RolCod
             };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "CREAR ROL") && usuario.RolCod != "01")
+            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "CREAR TIPO_VALOR") && usuario.RolCod != "01")
             {
                 return new
                 {
                     success = false,
-                    message = "No tienes permisos para insertar roles",
+                    message = "No tienes permisos para insertar tipos valor",
                     result = ""
                 };
             }
 
-            var (message, messageType) = _roles.Insertar(rol);
+            var (message, messageType) = _tipos.Insertar(tipoValor);
             if (messageType == "1") // Error
             {
                 return BadRequest(message);
@@ -88,8 +88,8 @@ namespace SistemaMEAL.Server.Controllers
             }
         }
 
-        [HttpPut("{rolCod}")]
-        public dynamic Modificar(string rolCod, Rol rol)
+        [HttpPut("{tipValCod}")]
+        public dynamic Modificar(string tipValCod, TipoValor tipoValor)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
@@ -103,18 +103,18 @@ namespace SistemaMEAL.Server.Controllers
                 UsuCod = data.UsuCod,
                 RolCod = data.RolCod
             };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "MODIFICAR ROL") && usuario.RolCod != "01")
+            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "MODIFICAR TIPO_VALOR") && usuario.RolCod != "01")
             {
                 return new
                 {
                     success = false,
-                    message = "No tienes permisos para modificar roles",
+                    message = "No tienes permisos para modificar estados",
                     result = ""
                 };
             }
 
-            rol.RolCod = rolCod;
-            var (message, messageType) = _roles.Modificar(rol);
+            tipoValor.TipValCod = tipValCod; // Asegúrate de que el código del estado en el objeto estado sea el correcto
+            var (message, messageType) = _tipos.Modificar(tipoValor);
             if (messageType == "1") // Error
             {
                 return BadRequest(message);
@@ -129,8 +129,9 @@ namespace SistemaMEAL.Server.Controllers
             }
         }
 
-        [HttpDelete("{rolCod}")]
-        public dynamic Eliminar(string rolCod)
+
+        [HttpDelete("{tipValCod}")]
+        public dynamic Eliminar(string tipValCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
@@ -144,17 +145,17 @@ namespace SistemaMEAL.Server.Controllers
                 UsuCod = data.UsuCod,
                 RolCod = data.RolCod
             };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "ELIMINAR ROL") && usuario.RolCod != "01")
+            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "ELIMINAR TIPO_VALOR") && usuario.RolCod != "01")
             {
                 return new
                 {
                     success = false,
-                    message = "No tienes permisos para eliminar roles",
+                    message = "No tienes permisos para eliminar tipos valor",
                     result = ""
                 };
             }
 
-            var (message, messageType) = _roles.Eliminar(rolCod);
+            var (message, messageType) = _tipos.Eliminar(tipValCod);
             if (messageType == "1") // Error
             {
                 return BadRequest(message);
@@ -168,5 +169,7 @@ namespace SistemaMEAL.Server.Controllers
                 return Ok(message);
             }
         }
+
+
     }
 }

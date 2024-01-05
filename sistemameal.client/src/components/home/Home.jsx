@@ -1,9 +1,11 @@
 import { useEffect } from 'react';
 import drawDonut from '../../js/drawDonut';
-import { FaSearch } from 'react-icons/fa';
+import { FaReceipt, FaSearch } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 
 const Home = () => {
+    const navigate = useNavigate();
 
     useEffect(() => {
         drawDonut(60);
@@ -111,7 +113,7 @@ const Home = () => {
                 <p className="block center bold Large-f1_25">Usuarios</p>
                 <div className="PowerMas_AccessCardHeader">
                     <i className="fas fa-user Large_1"></i>
-                    <div className="PowerMas_AccessTitle Large_11 Large-f_75 center">Crear usuario</div>
+                    <div className="PowerMas_AccessTitle Large_11 Large-f_75 center" onClick={() => navigate('/form-user')}>Crear usuario</div>
                 </div>
                 <div className="PowerMas_AccessIndicator">
                     <span className="Large_6 Large-f_75">Total de usuarios</span>
@@ -156,8 +158,10 @@ const Home = () => {
             <div className="PowerMas_ActivitiesSection Large_5 Large-p2">
                 <h2 className=" Large-f1_5 Powermas_FontTitle">Actividades recientes</h2>
                 <div className="PowerMas_Article flex Large-f_75 ai-center left">
-                    <div className="PowerMas_Icon Large_2 Large-f1_5">
-                        <i className="fas fa-receipt Large-m_75"></i>
+                    <div className='PowerMas_Icon Large_2 Large-f1_5'>
+                        <div>
+                            <FaReceipt className='Large-f1_25' />
+                        </div>
                     </div>
                     <div className="PowerMas_Info Large_8 Large-m1">Omar Chuman registró 55
                         beneficiarios al indice...
@@ -168,8 +172,10 @@ const Home = () => {
                     </div>
                 </div>
                 <div className="PowerMas_Article flex Large-f_75 ai-center left">
-                    <div className="PowerMas_Icon Large_2 Large-f1_5">
-                        <i className="fas fa-receipt Large-m_75"></i>
+                    <div className='PowerMas_Icon Large_2 Large-f1_5'>
+                        <div>
+                            <FaReceipt className='Large-f1_25' />
+                        </div>
                     </div>
                     <div className="PowerMas_Info Large_8 Large-m1">
                         Omar Chuman registró 55
@@ -181,12 +187,13 @@ const Home = () => {
                     </div>
                 </div>
                 <div className="PowerMas_Article flex Large-f_75 ai-center left">
-                    <div className="PowerMas_Icon Large_2 Large-f1_5">
-                        <i className="fas fa-receipt Large-m_75"></i>
+                    <div className='PowerMas_Icon Large_2 Large-f1_5'>
+                        <div>
+                            <FaReceipt className='Large-f1_25' />
+                        </div>
                     </div>
                     <div className="PowerMas_Info Large_8 Large-m1">
-                        Omar Chuman registró 55
-                        beneficiarios al indice...
+                        Omar Chuman registró 55 beneficiarios al indice...
                     </div>
                     <div className="PowerMas_DateTime Large_2">
                         <span>04/12/2023</span>
@@ -199,7 +206,6 @@ const Home = () => {
                 <div id="map"></div>
                 <div id="legend"></div>
             </div>
-
         </div>
     </div>)
 };

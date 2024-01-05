@@ -15,7 +15,7 @@ const MenuItem = ({ menu, level }) => {
         <div className={`PowerMas_LinkMenuContainer level-${level}`} onClick={(event) => toggleActive(event, level)} key={menu.menCod}>
             <div className="menu-item">
                 <div className="menu-text">
-                    <Link to={menu.subMenus.length > 0 ? '#' : menu.menRef}>
+                    <Link to={menu.subMenus.length > 0 ? '#' : `/${menu.menRef}`}>
                         {IconName && <IconName />}
                         <span> {menu.menNom} </span>
                     </Link>

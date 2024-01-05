@@ -231,6 +231,7 @@ body {
 }
 .PowerMas_MainRender > div, .PowerMas_Content > div{
 	position: relative;
+	padding-bottom: 1rem;
 }
 
 
@@ -603,39 +604,46 @@ body {
 	background-color: #f1f1f1;
 }
 
-.PowerMas_Icon{
+.PowerMas_Icon > div{
+	width: 40px;
+	height: 40px;
 	color: #fff;
-	background-color: darkgreen;
+	background-color: #20737b;
 	border-radius: 50%;
 	text-align: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
-.PowerMas_Icon i{
-	font-size: unset;
+.PowerMas_DateTime{
+	display: flex;
+	flex-direction: column;
 }
+
 /*	
 	VISTA NewProject.cshtml
 */
+.PowerMas_FormProject > div:first-child{
+	height: 10%;
+}
 .PowerMas_MainNewProject {
 	padding: 0 1rem;
 	display: flex;
-	width: 100%;
-	height: 75%;
+	height: 80%;
 	gap: 1rem;
 }
 
-	.PowerMas_MainNewProject h2 {
-		font-size: 1.3rem;
-		font-family: DMMono;
-		font-weight: 500;
-	}
+.PowerMas_MainNewProject h2 {
+	font-family: DMMono;
+	font-weight: 500;
+}
 
 .PowerMas_ProjectInfo h2 {
 	padding: 1rem 0;
 }
 
 .PowerMas_ProjectInfo, .PowerMas_ProjectDetails {
-	width: 50%;
-	padding: 1rem 2rem;
+	padding: 0.5rem 1rem;
 }
 
 .PowerMas_ProjectInfo, .PowerMas_ProjectDetails, .PowerMas_ObjectiveContainer, .PowerMas_ResultContainer {
@@ -648,10 +656,29 @@ body {
 	overflow-y: auto;
 }
 
+.PowerMas_SubProjectItem{
+	margin-bottom: 1rem;
+	box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5);
+}
+.PowerMas_SubProjectItem div textarea{
+	width: 90%;
+	border-radius: 0;
+}
 .PowerMas_NewSubproject, .PowerMas_SAPInput, .PowerMas_HeaderObjective, .PowerMas_HeaderResult {
 	width: 100%;
 	display: flex;
 	justify-content: space-between;
+}
+
+.PowerMas_HeaderObjective > div{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 0.5rem;
+}
+.PowerMas_HeaderObjective > div svg{
+	color: #757575;
+	cursor: pointer;
 }
 
 .PowerMas_MainNewProject input[type=text] {
@@ -659,19 +686,30 @@ body {
 	border-bottom: 2px solid #757575;
 }
 
-	.PowerMas_MainNewProject input[type=text]:focus {
-		outline: none;
-	}
+.PowerMas_HeaderResult > div{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 0.5rem;
+}
+.PowerMas_HeaderResult > div svg{
+	color: #757575;
+	cursor: pointer;
+}
+
+.PowerMas_MainNewProject input[type=text]:focus {
+	outline: none;
+}
 
 .PowerMas_MainNewProject textarea {
 	padding: 10px;
 	border: 1px solid #757575;
-	border-radius: 5px;
+	border-radius: 0;
 }
 
-	.PowerMas_MainNewProject textarea:focus {
-		outline: none;
-	}
+.PowerMas_MainNewProject textarea:focus {
+	outline: none;
+}
 
 .PowerMas_NewSubproject {
 	padding: 1rem 0;
@@ -692,54 +730,66 @@ body {
 
 /* FOOTER_VIEW */
 
-.PowerMas_Footer {
+.PowerMas_FormProject > div:last-child {
+	height: 10%;
 	display: flex;
 	justify-content: flex-end;
 	padding: 0.5rem 1rem;
 	box-shadow: 0 -5px 10px rgba(0, 0, 0, 0.1);
 }
 
-.PowerMas_FooterButtons {
-	padding: 0 3rem;
+.PowerMas_FormProject > div:last-child > div {
+	padding: 0.25rem 3rem;
 	width: 50%;
 	display: flex;
 	justify-content: space-between;
 }
 
 .PowerMas_FooterButton {
-	width: 45%; /* Ajusta esto según el espacio que quieras entre los botones */
-	padding: 10px;
+	width: 45%; 
 	border: none;
 	border-radius: 5px;
 	cursor: pointer;
 }
 
-	.PowerMas_FooterButton:first-child {
-		background-color: #757575;
-		color: white;
-	}
-
-	.PowerMas_FooterButton:last-child {
-		background-color: #FBC355;
-		color: white;
-	}
-
-.PowerMas_ImportButton {
-	background-color: #FBC355; /* Color de fondo naranja */
-	color: white; /* Texto blanco */
-	border: none; /* Sin borde */
-	padding: 10px 20px; /* Espaciado interno */
-	border-radius: 5px; /* Bordes redondeados */
-	cursor: pointer; /* Cambia el cursor a una mano cuando se pasa el ratón por encima */
-	display: flex; /* Para alinear el texto y el icono */
-	justify-content: center; /* Centra el contenido horizontalmente */
-	align-items: center; /* Centra el contenido verticalmente */
+.PowerMas_FooterButton:first-child {
+	background-color: #757575;
+	color: white;
+	transition: background-color 0.3s ease;
+}
+.PowerMas_FooterButton:first-child:hover {
+	background-color: #b1b1b1;
+}
+.PowerMas_FooterButton:last-child {
+	background-color: #AFAF0A;
+	color: white;
+	transition: background-color 0.3s ease;
+}
+.PowerMas_FooterButton:last-child:hover {
+    background-color: #fccc54;
 }
 
-	.PowerMas_ImportButton span.arrow {
-		margin-left: 10px; /* Añade un espacio a la izquierda del icono */
-		transform: rotate(90deg); /* Gira el icono 90 grados */
-	}
+.PowerMas_ImportButton {
+	background-color: #AFAF0A;
+	color: white;
+	border: none; 
+	padding: 0.5rem 0.5rem; 
+	border-radius: 5px;
+	cursor: pointer;
+	display: flex;
+	justify-content: center;
+	align-items: center; 
+	transition: background-color 0.3s ease;
+}
+
+.PowerMas_ImportButton:hover {
+    background-color: #fccc54;
+}
+
+.PowerMas_ImportButton span.arrow {
+	margin-left: 10px;
+	transform: rotate(90deg); 
+}
 
 
 .PowerMas_MainNewProject i {
@@ -750,6 +800,11 @@ body {
 .PowerMas_ButtomContainer {
 	display: flex;
 	align-items: center;
+	gap: 1rem;
+}
+.PowerMas_ButtomContainer svg{
+	color: #757575;
+	cursor: pointer;
 }
 
 .PowerMas_InputBudget {
@@ -784,7 +839,7 @@ body {
 	height: 100%;
 	background-color: #fff;
 }
-.TableMainContainer > div:nth-child(odd){
+.TableMainContainer > div:first-child(){
 	height: 5%;
 }
 .PowerMas_TableContainer {
@@ -794,6 +849,19 @@ body {
     overflow-y: auto;
 	overflow-x: hidden;
 }
+.PowerMas_GroupSelect{
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+}
+.PowerMas_GroupSelect > div {
+	width: 30%;
+	text-align: start;
+}
+.PowerMas_GroupSelect select{
+	width: 100%;
+}
+
 
 .PowerMas_TableStatus {
     width: 100%;
@@ -988,6 +1056,9 @@ body {
 	cursor: pointer;
 }
 
+.PowerMas_Pagination{
+	height: 5%;
+}
 .PowerMas_Pagination button{
 	background-color: transparent;
 	border: 1px solid transparent;
@@ -1167,3 +1238,52 @@ body {
 }
 
 /* END CREAR/MODIFICAR PERMISO-USUARIO */
+
+
+/**/
+
+.PowerMas_TableMonitoring {
+    width: 100%;
+}
+
+
+.PowerMas_TableMonitoring thead tr{
+	position: sticky;
+    top: 0;
+    background-color: white; 
+	transition: background-color 0.3s ease;
+}
+
+
+.PowerMas_TableMonitoring thead tr th:hover{
+	background-color: #f0f0f0;
+	cursor: pointer;
+}
+
+.PowerMas_TableMonitoring thead tr th::after{
+	content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+	border-bottom: 1px solid #d3d3d3;
+}
+
+.PowerMas_TableMonitoring td {
+	width: auto;
+    word-wrap: break-word;
+	border-bottom: 1px solid #d3d3d3;
+}
+
+.PowerMas_TableMonitoring tbody tr{
+	background-color: white;
+	transition: background-color 0.1s ease;
+}
+
+.PowerMas_TableMonitoring tbody tr:hover{
+	background-color: #D3D3D3; 
+}
+
+.PowerMas_TableMonitoring tbody tr td{
+	padding: 0.25rem 0;
+}

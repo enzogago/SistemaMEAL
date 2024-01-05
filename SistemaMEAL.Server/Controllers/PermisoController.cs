@@ -8,14 +8,14 @@ namespace SistemaMEAL.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class RolController : ControllerBase
+    public class PermisoController : ControllerBase
     {
-        private readonly RolDAO _roles;
+        private readonly PermisoDAO _permisos;
         private readonly UsuarioDAO _usuarios;
 
-        public RolController(RolDAO roles, UsuarioDAO usuarios)
+        public PermisoController(PermisoDAO permisos, UsuarioDAO usuarios)
         {
-            _roles = roles;
+            _permisos = permisos;
             _usuarios = usuarios;
         }
 
@@ -34,22 +34,22 @@ namespace SistemaMEAL.Server.Controllers
                 UsuCod = data.UsuCod,
                 RolCod = data.RolCod
             };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "LISTAR ROL") && usuario.RolCod != "01")
+            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "LISTAR PERMISO") && usuario.RolCod != "01")
             {
                 return new
                 {
                     success = false,
-                    message = "No tienes permisos para listar roles",
+                    message = "No tienes permisos para listar permisos",
                     result = ""
                 };
             }
-            var roles = _roles.Listado();
-            Console.WriteLine(roles);
-            return Ok(roles);
+            var permisos = _permisos.Listado();
+            Console.WriteLine(permisos);
+            return Ok(permisos);
         }
 
         [HttpPost]
-        public dynamic Insertar(Rol rol)
+        public dynamic Insertar(Permiso permiso)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
@@ -63,17 +63,17 @@ namespace SistemaMEAL.Server.Controllers
                 UsuCod = data.UsuCod,
                 RolCod = data.RolCod
             };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "CREAR ROL") && usuario.RolCod != "01")
+            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "CREAR PERMISO") && usuario.RolCod != "01")
             {
                 return new
                 {
                     success = false,
-                    message = "No tienes permisos para insertar roles",
+                    message = "No tienes permisos para insertar permisos",
                     result = ""
                 };
             }
 
-            var (message, messageType) = _roles.Insertar(rol);
+            var (message, messageType) = _permisos.Insertar(permiso);
             if (messageType == "1") // Error
             {
                 return BadRequest(message);
@@ -88,8 +88,8 @@ namespace SistemaMEAL.Server.Controllers
             }
         }
 
-        [HttpPut("{rolCod}")]
-        public dynamic Modificar(string rolCod, Rol rol)
+        [HttpPut("{perCod}")]
+        public dynamic Modificar(string perCod, Permiso permiso)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
@@ -103,18 +103,18 @@ namespace SistemaMEAL.Server.Controllers
                 UsuCod = data.UsuCod,
                 RolCod = data.RolCod
             };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "MODIFICAR ROL") && usuario.RolCod != "01")
+            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "MODIFICAR PERMISO") && usuario.RolCod != "01")
             {
                 return new
                 {
                     success = false,
-                    message = "No tienes permisos para modificar roles",
+                    message = "No tienes permisos para modificar permisos",
                     result = ""
                 };
             }
 
-            rol.RolCod = rolCod;
-            var (message, messageType) = _roles.Modificar(rol);
+            permiso.PerCod = perCod; 
+            var (message, messageType) = _permisos.Modificar(permiso);
             if (messageType == "1") // Error
             {
                 return BadRequest(message);
@@ -129,8 +129,9 @@ namespace SistemaMEAL.Server.Controllers
             }
         }
 
-        [HttpDelete("{rolCod}")]
-        public dynamic Eliminar(string rolCod)
+
+        [HttpDelete("{perCod}")]
+        public dynamic Eliminar(string perCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
@@ -144,17 +145,17 @@ namespace SistemaMEAL.Server.Controllers
                 UsuCod = data.UsuCod,
                 RolCod = data.RolCod
             };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "ELIMINAR ROL") && usuario.RolCod != "01")
+            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "ELIMINAR PERMISO") && usuario.RolCod != "01")
             {
                 return new
                 {
                     success = false,
-                    message = "No tienes permisos para eliminar roles",
+                    message = "No tienes permisos para eliminar permisos",
                     result = ""
                 };
             }
 
-            var (message, messageType) = _roles.Eliminar(rolCod);
+            var (message, messageType) = _permisos.Eliminar(perCod);
             if (messageType == "1") // Error
             {
                 return BadRequest(message);
@@ -168,5 +169,7 @@ namespace SistemaMEAL.Server.Controllers
                 return Ok(message);
             }
         }
+
+
     }
 }

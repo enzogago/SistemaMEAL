@@ -49,25 +49,125 @@ namespace SistemaMEAL.Server.Controllers
             return Ok(documentos);
         }
 
-        // [HttpPost]
-        // public dynamic Insertar(DocumentoIdentidad documento)
-        // {
-        //     // Aquí puedes agregar el código para insertar un nuevo documento de identidad
-        //     // siguiendo el mismo patrón que usaste en EstadoController.
-        // }
+        [HttpPost]
+        public dynamic Insertar(DocumentoIdentidad documento)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
 
-        // [HttpPut("{docIdeCod}")]
-        // public dynamic Modificar(string docIdeCod, DocumentoIdentidad documento)
-        // {
-        //     // Aquí puedes agregar el código para modificar un documento de identidad existente
-        //     // siguiendo el mismo patrón que usaste en EstadoController.
-        // }
+            if (!rToken.success) return rToken;
 
-        // [HttpDelete("{docIdeCod}")]
-        // public dynamic Eliminar(string docIdeCod)
-        // {
-        //     // Aquí puedes agregar el código para eliminar un documento de identidad existente
-        //     // siguiendo el mismo patrón que usaste en EstadoController.
-        // }
+            dynamic data = rToken.result;
+            Usuario usuario = new Usuario
+            {
+                UsuAno = data.UsuAno,
+                UsuCod = data.UsuCod,
+                RolCod = data.RolCod
+            };
+            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "CREAR DOCUMENTO_IDENTIDAD") && usuario.RolCod != "01")
+            {
+                return new
+                {
+                    success = false,
+                    message = "No tienes permisos para insertar documentos de identidad",
+                    result = ""
+                };
+            }
+
+            var (message, messageType) = _documentos.Insertar(documento);
+            if (messageType == "1") // Error
+            {
+                return BadRequest(message);
+            }
+            else if (messageType == "2") // Registro ya existe
+            {
+                return Conflict(message);
+            }
+            else // Registro insertado correctamente
+            {
+                return Ok(message);
+            }
+        }
+
+        [HttpPut("{docIdeCod}")]
+        public dynamic Modificar(string docIdeCod, DocumentoIdentidad documento)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return rToken;
+
+            dynamic data = rToken.result;
+            Usuario usuario = new Usuario
+            {
+                UsuAno = data.UsuAno,
+                UsuCod = data.UsuCod,
+                RolCod = data.RolCod
+            };
+            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "MODIFICAR ESTADO") && usuario.RolCod != "01")
+            {
+                return new
+                {
+                    success = false,
+                    message = "No tienes permisos para modificar documentos de identidad",
+                    result = ""
+                };
+            }
+
+            documento.DocIdeCod = docIdeCod;
+            var (message, messageType) = _documentos.Modificar(documento);
+            if (messageType == "1") // Error
+            {
+                return BadRequest(message);
+            }
+            else if (messageType == "2") // Registro ya existe
+            {
+                return Conflict(message);
+            }
+            else // Registro modificado correctamente
+            {
+                return Ok(message);
+            }
+        }
+
+        [HttpDelete("{docIdeCod}")]
+        public dynamic Eliminar(string docIdeCod)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return rToken;
+
+            dynamic data = rToken.result;
+            Usuario usuario = new Usuario
+            {
+                UsuAno = data.UsuAno,
+                UsuCod = data.UsuCod,
+                RolCod = data.RolCod
+            };
+            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "ELIMINAR ESTADO") && usuario.RolCod != "01")
+            {
+                return new
+                {
+                    success = false,
+                    message = "No tienes permisos para eliminar documentos de identidad",
+                    result = ""
+                };
+            }
+
+            var (message, messageType) = _documentos.Eliminar(docIdeCod);
+            if (messageType == "1") // Error
+            {
+                return BadRequest(message);
+            }
+            else if (messageType == "2") // Registro ya existe
+            {
+                return Conflict(message);
+            }
+            else // Registro eliminado correctamente
+            {
+                return Ok(message);
+            }
+        }
     }
 }

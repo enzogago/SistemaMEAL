@@ -1,5 +1,5 @@
 const TableRow = ({ row, flexRender }) => (
-    <tr className='pointer' key={row.id}>
+    <tr key={row.id}>
         {row.getVisibleCells().map(cell => (
             <td style={{ width: cell.column.getSize() }} key={cell.id}>
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}

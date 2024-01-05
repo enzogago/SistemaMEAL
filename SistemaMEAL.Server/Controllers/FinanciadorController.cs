@@ -8,14 +8,14 @@ namespace SistemaMEAL.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class RolController : ControllerBase
+    public class FinanciadorController : ControllerBase
     {
-        private readonly RolDAO _roles;
+        private readonly FinanciadorDAO _financiadores;
         private readonly UsuarioDAO _usuarios;
 
-        public RolController(RolDAO roles, UsuarioDAO usuarios)
+        public FinanciadorController(FinanciadorDAO financiadores, UsuarioDAO usuarios)
         {
-            _roles = roles;
+            _financiadores = financiadores;
             _usuarios = usuarios;
         }
 
@@ -34,22 +34,22 @@ namespace SistemaMEAL.Server.Controllers
                 UsuCod = data.UsuCod,
                 RolCod = data.RolCod
             };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "LISTAR ROL") && usuario.RolCod != "01")
+            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "LISTAR FINANCIADOR") && usuario.RolCod != "01")
             {
                 return new
                 {
                     success = false,
-                    message = "No tienes permisos para listar roles",
+                    message = "No tienes permisos para listar financiadores",
                     result = ""
                 };
             }
-            var roles = _roles.Listado();
-            Console.WriteLine(roles);
-            return Ok(roles);
+            var financiadores = _financiadores.Listado();
+            Console.WriteLine(financiadores);
+            return Ok(financiadores);
         }
 
         [HttpPost]
-        public dynamic Insertar(Rol rol)
+        public dynamic Insertar(Financiador financiador)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
@@ -63,17 +63,17 @@ namespace SistemaMEAL.Server.Controllers
                 UsuCod = data.UsuCod,
                 RolCod = data.RolCod
             };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "CREAR ROL") && usuario.RolCod != "01")
+            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "CREAR FINANCIADOR") && usuario.RolCod != "01")
             {
                 return new
                 {
                     success = false,
-                    message = "No tienes permisos para insertar roles",
+                    message = "No tienes permisos para insertar financiadores",
                     result = ""
                 };
             }
 
-            var (message, messageType) = _roles.Insertar(rol);
+            var (message, messageType) = _financiadores.Insertar(financiador);
             if (messageType == "1") // Error
             {
                 return BadRequest(message);
@@ -88,8 +88,8 @@ namespace SistemaMEAL.Server.Controllers
             }
         }
 
-        [HttpPut("{rolCod}")]
-        public dynamic Modificar(string rolCod, Rol rol)
+        [HttpPut("{finCod}")]
+        public dynamic Modificar(string finCod, Financiador financiador)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
@@ -103,18 +103,18 @@ namespace SistemaMEAL.Server.Controllers
                 UsuCod = data.UsuCod,
                 RolCod = data.RolCod
             };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "MODIFICAR ROL") && usuario.RolCod != "01")
+            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "MODIFICAR FINANCIADOR") && usuario.RolCod != "01")
             {
                 return new
                 {
                     success = false,
-                    message = "No tienes permisos para modificar roles",
+                    message = "No tienes permisos para modificar financiadores",
                     result = ""
                 };
             }
 
-            rol.RolCod = rolCod;
-            var (message, messageType) = _roles.Modificar(rol);
+            financiador.FinCod = finCod; 
+            var (message, messageType) = _financiadores.Modificar(financiador);
             if (messageType == "1") // Error
             {
                 return BadRequest(message);
@@ -129,8 +129,9 @@ namespace SistemaMEAL.Server.Controllers
             }
         }
 
-        [HttpDelete("{rolCod}")]
-        public dynamic Eliminar(string rolCod)
+
+        [HttpDelete("{finCod}")]
+        public dynamic Eliminar(string finCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
@@ -144,17 +145,17 @@ namespace SistemaMEAL.Server.Controllers
                 UsuCod = data.UsuCod,
                 RolCod = data.RolCod
             };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "ELIMINAR ROL") && usuario.RolCod != "01")
+            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "ELIMINAR FINANCIADOR") && usuario.RolCod != "01")
             {
                 return new
                 {
                     success = false,
-                    message = "No tienes permisos para eliminar roles",
+                    message = "No tienes permisos para eliminar financiadores",
                     result = ""
                 };
             }
 
-            var (message, messageType) = _roles.Eliminar(rolCod);
+            var (message, messageType) = _financiadores.Eliminar(finCod);
             if (messageType == "1") // Error
             {
                 return BadRequest(message);
@@ -168,5 +169,7 @@ namespace SistemaMEAL.Server.Controllers
                 return Ok(message);
             }
         }
+
+
     }
 }

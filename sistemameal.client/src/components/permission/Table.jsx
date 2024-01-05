@@ -1,7 +1,6 @@
 import { useContext, useMemo, useState } from 'react';
-import { handleDelete } from './eventHandlers';
 import { FaPenNib, FaPlus, FaSortDown, FaSortUp, FaTrash } from 'react-icons/fa';
-import { StatusContext } from '../../../context/StatusContext';
+import { StatusContext } from '../../context/StatusContext';
 import {
     useReactTable, 
     getCoreRowModel, 
@@ -9,8 +8,10 @@ import {
     getPaginationRowModel,
     getSortedRowModel, 
 } from '@tanstack/react-table';
-import Pagination from '../../reusable/Pagination';
-import { AuthContext } from '../../../context/AuthContext';
+import Pagination from '../reusable/Pagination';
+import { AuthContext } from '../../context/AuthContext';
+import { handleDelete } from '../reusable/helper';
+
 
 const Table = ({ data, openModal }) => {
     // Variables State AuthContext 
@@ -18,28 +19,27 @@ const Table = ({ data, openModal }) => {
     const { setIsLoggedIn } = authActions;
     // Variables State statusContext
     const { statusActions } = useContext(StatusContext);
-    const { setEstados } = statusActions;
+    const { setPermisos } = statusActions;
     // States locales
     const [codigoFilter, setCodigoFilter] = useState('');
     const [nombreFilter, setNombreFilter] = useState('');
-
 
     /* TANSTACK */
     const columns = [
         {
             header: "Código",
-            accessorKey: "estCod"
+            accessorKey: "perCod"
         },
         {
             header: "Nombre",
-            accessorKey: "estNom"
+            accessorKey: "perNom"
         },
         {
             header: "Acciones",
             accessorKey: "acciones",
             cell: ({row}) => (
                 <div className='PowerMas_IconsTable flex jc-center ai-center'>
-                    <FaTrash className='Large-p_25' onClick={() => handleDelete(row.original.estCod, setEstados, setIsLoggedIn)} />
+                    <FaTrash className='Large-p_25' onClick={() => handleDelete('Permiso',row.original.perCod, setPermisos, setIsLoggedIn)} />
                     <FaPenNib className='Large-p_25' onClick={() => openModal(row.original)} />
                 </div>
             ),
@@ -49,11 +49,10 @@ const Table = ({ data, openModal }) => {
     const [sorting, setSorting] = useState([]);
     const filteredData = useMemo(() => 
         data.filter(item => 
-            item.estCod.includes(codigoFilter.toUpperCase()) &&
-            item.estNom.includes(nombreFilter.toUpperCase())
+            item.perCod.includes(codigoFilter.toUpperCase()) &&
+            item.perNom.includes(nombreFilter.toUpperCase())
         ), [data, codigoFilter, nombreFilter]
     );
-
     const table = useReactTable({
         data: filteredData,
         columns,
@@ -71,7 +70,7 @@ const Table = ({ data, openModal }) => {
     return (
         <div className='TableMainContainer Large-p2'>
             <div className="flex jc-space-between">
-                <h1 className="flex left Large-f1_75">Listado de estados</h1>
+                <h1 className="flex left Large-f1_75">Listado de Permisos</h1>
                 <button className='Large-p_5 PowerMas_ButtonStatus' onClick={() => openModal()}>
                     Nuevo <FaPlus /> 
                 </button>
@@ -159,7 +158,7 @@ const Table = ({ data, openModal }) => {
             </div>
             <Pagination table={table} />
         </div>
-    );
+    )
 }
 
-export default Table;
+export default Table

@@ -5,39 +5,38 @@ using SistemaMEAL.Server.Modulos;
 
 namespace SistemaMEAL.Modulos
 {
-    public class DocumentoIdentidadDAO
+    public class ImplementadorDAO
     {
         private conexionDAO cn = new conexionDAO();
 
-        public IEnumerable<DocumentoIdentidad> Listado()
+        public IEnumerable<Implementador> Listado()
         {
-            List<DocumentoIdentidad> temporal = new List<DocumentoIdentidad>();
+            List<Implementador> temporal = new List<Implementador>();
             try
             {
                 cn.getcn.Open();
 
-                SqlCommand cmd = new SqlCommand("SP_LISTAR_DOCUMENTOS_IDENTIDAD", cn.getcn);
+                SqlCommand cmd = new SqlCommand("SP_LISTAR_IMPLEMENTADORES", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 SqlDataReader rd = cmd.ExecuteReader();
                 while (rd.Read())
                 {
-                    temporal.Add(new DocumentoIdentidad()
+                    temporal.Add(new Implementador()
                     {
-                        DocIdeCod = rd.GetString(0),
-                        DocIdeNom = rd.GetString(1),
-                        DocIdeAbr = rd.GetString(2),
-                        UsuIng = rd.GetString(3),
-                        FecIng = rd.IsDBNull(4) ? (DateTime?)null : rd.GetDateTime(4),
-                        UsuMod = rd.GetString(5),
-                        FecMod = rd.IsDBNull(6) ? (DateTime?)null : rd.GetDateTime(6),
-                        EstReg = rd.GetString(7)[0],
+                        ImpCod = rd.GetString(0),
+                        ImpNom = rd.GetString(1),
+                        UsuIng = rd.GetString(2),
+                        FecIng = rd.IsDBNull(3) ? (DateTime?)null : rd.GetDateTime(3),
+                        UsuMod = rd.GetString(4),
+                        FecMod = rd.IsDBNull(5) ? (DateTime?)null : rd.GetDateTime(5),
+                        EstReg = rd.GetString(6)[0],
                     });
                 }
                 rd.Close();
             }
             catch (SqlException ex)
             {
-                temporal = new List<DocumentoIdentidad>();
+                temporal = new List<Implementador>();
                 Console.WriteLine(ex.Message);
             }
             finally
@@ -47,7 +46,7 @@ namespace SistemaMEAL.Modulos
             return temporal;
         }
 
-        public (string message, string messageType) Insertar(DocumentoIdentidad documento)
+        public (string message, string messageType) Insertar(Implementador implementador)
         {
             string mensaje = "";
             string tipoMensaje = "";
@@ -55,11 +54,10 @@ namespace SistemaMEAL.Modulos
             {
                 cn.getcn.Open();
 
-                SqlCommand cmd = new SqlCommand("SP_INSERTAR_DOCUMENTO_IDENTIDAD", cn.getcn);
+                SqlCommand cmd = new SqlCommand("SP_INSERTAR_IMPLEMENTADOR", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
 
-                cmd.Parameters.AddWithValue("@P_DOCIDENOM", documento.DocIdeNom);
-                cmd.Parameters.AddWithValue("@P_DOCIDEABR", documento.DocIdeAbr);
+                cmd.Parameters.AddWithValue("@P_IMPNOM", implementador.ImpNom);
                 cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
@@ -92,7 +90,7 @@ namespace SistemaMEAL.Modulos
             return (mensaje, tipoMensaje);
         }
 
-        public (string message, string messageType) Modificar(DocumentoIdentidad documento)
+        public (string message, string messageType) Modificar(Implementador implementador)
         {
             string mensaje = "";
             string tipoMensaje = "";
@@ -100,12 +98,11 @@ namespace SistemaMEAL.Modulos
             {
                 cn.getcn.Open();
 
-                SqlCommand cmd = new SqlCommand("SP_MODIFICAR_DOCUMENTO_IDENTIDAD", cn.getcn);
+                SqlCommand cmd = new SqlCommand("SP_MODIFICAR_IMPLEMENTADOR", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
 
-                cmd.Parameters.AddWithValue("@P_DOCIDECOD", documento.DocIdeCod);
-                cmd.Parameters.AddWithValue("@P_DOCIDENOM", documento.DocIdeNom);
-                cmd.Parameters.AddWithValue("@P_DOCIDEABR", documento.DocIdeAbr);
+                cmd.Parameters.AddWithValue("@P_IMPCOD", implementador.ImpCod);
+                cmd.Parameters.AddWithValue("@P_IMPNOM", implementador.ImpNom);
                 cmd.Parameters.AddWithValue("@P_USUMOD", "Usuario");
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
@@ -138,7 +135,7 @@ namespace SistemaMEAL.Modulos
             return (mensaje, tipoMensaje);
         }
 
-        public (string message, string messageType) Eliminar(string docIdeCod)
+        public (string message, string messageType) Eliminar(string impCod)
         {
             string mensaje = "";
             string tipoMensaje = "";
@@ -146,10 +143,10 @@ namespace SistemaMEAL.Modulos
             {
                 cn.getcn.Open();
 
-                SqlCommand cmd = new SqlCommand("SP_ELIMINAR_DOCUMENTO_IDENTIDAD", cn.getcn);
+                SqlCommand cmd = new SqlCommand("SP_ELIMINAR_IMPLEMENTADOR", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
 
-                cmd.Parameters.AddWithValue("@P_DOCIDECOD", docIdeCod);
+                cmd.Parameters.AddWithValue("@P_IMPCOD", impCod);
                 cmd.Parameters.AddWithValue("@P_USUMOD", "Usuario");
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
@@ -181,5 +178,8 @@ namespace SistemaMEAL.Modulos
             }
             return (mensaje, tipoMensaje);
         }
+
+
+
     }
 }

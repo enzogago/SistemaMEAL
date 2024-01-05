@@ -47,5 +47,126 @@ namespace SistemaMEAL.Server.Controllers
             Console.WriteLine(cargos);
             return Ok(cargos);
         }
+
+        [HttpPost]
+        public dynamic Insertar(Cargo cargo)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return rToken;
+
+            dynamic data = rToken.result;
+            Usuario usuario = new Usuario
+            {
+                UsuAno = data.UsuAno,
+                UsuCod = data.UsuCod,
+                RolCod = data.RolCod
+            };
+            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "CREAR CARGO") && usuario.RolCod != "01")
+            {
+                return new
+                {
+                    success = false,
+                    message = "No tienes permisos para insertar cargos",
+                    result = ""
+                };
+            }
+
+            var (message, messageType) = _cargos.Insertar(cargo);
+            if (messageType == "1") // Error
+            {
+                return BadRequest(message);
+            }
+            else if (messageType == "2") // Registro ya existe
+            {
+                return Conflict(message);
+            }
+            else // Registro insertado correctamente
+            {
+                return Ok(message);
+            }
+        }
+
+        [HttpPut("{carCod}")]
+        public dynamic Modificar(string carCod, Cargo cargo)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return rToken;
+
+            dynamic data = rToken.result;
+            Usuario usuario = new Usuario
+            {
+                UsuAno = data.UsuAno,
+                UsuCod = data.UsuCod,
+                RolCod = data.RolCod
+            };
+            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "MODIFICAR CARGO") && usuario.RolCod != "01")
+            {
+                return new
+                {
+                    success = false,
+                    message = "No tienes permisos para modificar cargos",
+                    result = ""
+                };
+            }
+
+            cargo.CarCod = carCod;
+            var (message, messageType) = _cargos.Modificar(cargo);
+            if (messageType == "1") // Error
+            {
+                return BadRequest(message);
+            }
+            else if (messageType == "2") // Registro ya existe
+            {
+                return Conflict(message);
+            }
+            else // Registro modificado correctamente
+            {
+                return Ok(message);
+            }
+        }
+
+        [HttpDelete("{carCod}")]
+        public dynamic Eliminar(string carCod)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return rToken;
+
+            dynamic data = rToken.result;
+            Usuario usuario = new Usuario
+            {
+                UsuAno = data.UsuAno,
+                UsuCod = data.UsuCod,
+                RolCod = data.RolCod
+            };
+            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "ELIMINAR CARGO") && usuario.RolCod != "01")
+            {
+                return new
+                {
+                    success = false,
+                    message = "No tienes permisos para eliminar cargos",
+                    result = ""
+                };
+            }
+
+            var (message, messageType) = _cargos.Eliminar(carCod);
+            if (messageType == "1") // Error
+            {
+                return BadRequest(message);
+            }
+            else if (messageType == "2") // Registro ya existe
+            {
+                return Conflict(message);
+            }
+            else // Registro eliminado correctamente
+            {
+                return Ok(message);
+            }
+        }
     }
 }
