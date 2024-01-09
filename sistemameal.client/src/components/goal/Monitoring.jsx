@@ -40,7 +40,7 @@ const Monitoring = () => {
     fetchMonitoreo();
 }, []);
   return (
-    <div className='bg-white h-100'>
+    <div className='bg-white PowerMas_MonitoringContainer'>
       <Table 
           data={monitoringData} 
       />

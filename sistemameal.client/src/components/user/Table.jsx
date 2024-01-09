@@ -240,7 +240,7 @@ const Table = ({data}) => {
                                 table.getRowModel().rows.map(row => (
                                     <TableRow key={row.id} row={row} handleRowClick={handleRowClick} flexRender={flexRender} />
                                 ))
-                            : <tr className='PowerMas_TableEmpty'><td colSpan={3} className='Large-p1 center'>No se encontraron registros</td></tr>
+                            : <tr className='PowerMas_TableEmpty'><td colSpan={8} className='Large-p1 center'>No se encontraron registros</td></tr>
                         }
                     </tbody>
                 </table>

@@ -36,8 +36,7 @@ const App = () => {
     // Verificar el token al cargar la aplicación
     useEffect(() => {
         const token = localStorage.getItem('token');
-        const user = localStorage.getItem('user');
-        if (user && token && !isTokenExpired(token)) {
+        if (token && !isTokenExpired(token)) {
             setIsLoggedIn(true);
         } else{
             setIsLoggedIn(false);

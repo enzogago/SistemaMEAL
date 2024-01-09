@@ -14,6 +14,7 @@ import { handleDelete } from '../reusable/helper';
 
 
 const Table = ({ data, openModal }) => {
+    console.log(data);
     // Variables State AuthContext 
     const { authActions } = useContext(AuthContext);
     const { setIsLoggedIn } = authActions;

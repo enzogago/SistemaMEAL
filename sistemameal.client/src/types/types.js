@@ -18,8 +18,8 @@ export const types = {
     setIsLoggedIn: '[auth] Show Form',
     setMenuData: '[auth] Set menu data',
     setUserMaint: '[auth] User Maintence',
-    // addProject: '[project] Add Projects',
-    // validateForm: '[project] Validate Form',
+    setUserLogged: '[auth] Set User Logged',
+    resetUsers: '[auth] Reset list users',
     // projectNow: '[project] Project Now',
     // deleteProject: '[project] Delete Project',
 

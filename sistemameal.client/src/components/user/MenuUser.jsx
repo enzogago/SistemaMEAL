@@ -15,32 +15,33 @@ const MenuUser = () => {
   const [ checkedMenus, setCheckedMenus] = useState({});
   const [ currentMenus, setCurrentMenus ] = useState([]);
   const [ allMenus, setAllMenus ] = useState([]);
+  const [ checkedPermissions, setCheckedPermissions ] = useState({});
+  const [ userPermissions, setUserPermissions ] = useState({});
 
 
   const groupByParent = (menuData) => {
-    // Primero, creamos un objeto donde las claves son los códigos de los menús (menCod)
-    // y los valores son los elementos del menú correspondientes.
-    const menuMap = menuData.reduce((map, item) => {
-        map[item.menCod] = { ...item, subMenus: [] };
-        return map;
-    }, {});
-
-    // Luego, recorremos menuData de nuevo para asignar cada menú a su menú padre.
+    const menuMap = {};
+    const rootMenus = [];
+  
     menuData.forEach((item) => {
-        if (item.menCodPad) {
-            const parent = menuMap[item.menCodPad];
-            if (parent) {
-                parent.subMenus.push(menuMap[item.menCod]);
-                menuMap[item.menCod].parent = parent;
-            }
+      menuMap[item.menCod] = { ...item, subMenus: [] };
+  
+      if (item.menCodPad) {
+        const parent = menuMap[item.menCodPad];
+        if (parent) {
+          parent.subMenus.push(menuMap[item.menCod]);
+          menuMap[item.menCod].parent = parent;
         }
+      }
+  
+      if (item.menAnoPad === null) {
+        rootMenus.push(menuMap[item.menCod]);
+      }
     });
-
-    // Finalmente, filtramos menuData para obtener solo los menús principales.
-    const rootMenus = menuData.filter(item => item.menAnoPad === null).map(item => menuMap[item.menCod]);
-
+  
     return rootMenus;
   };
+  
 
   useEffect(() => {
     // Verifica si userMaint es un objeto vacío
@@ -50,12 +51,39 @@ const MenuUser = () => {
     }
   }, [userMaint, navigate]);
 
+  
 
   useEffect(() => {
     const fetchMenus = async () => {
       try {
           Notiflix.Loading.pulse('Cargando...');
           const token = localStorage.getItem('token');
+          // Permisos por usuario
+          const responseUserPermissions = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Permiso/${userMaint.usuAno}/${userMaint.usuCod}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+          });
+          const userPermissions = await responseUserPermissions.json();
+          setUserPermissions(userPermissions);
+          // Obtener todos los permisos
+          const responseAllPermissions = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Permiso`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+          });
+          const allPermissions = await responseAllPermissions.json();
+          const markedPermissions = allPermissions.map(permission => ({
+            ...permission,
+            isChecked: checkedPermissions[permission.perCod] || userPermissions.some(userPermission => userPermission.perCod === permission.perCod)
+          }));
+          
+          const newCheckedPermissions = userPermissions.reduce((map, permission) => {
+            map[permission.perCod] = true;
+            return map;
+          }, {});
+          setCheckedPermissions(newCheckedPermissions);
+
           // Obtén los menús del usuario
           const responseUserMenus = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Menu/${userMaint.usuAno}/${userMaint.usuCod}`, {
               headers: {
@@ -70,16 +98,19 @@ const MenuUser = () => {
                   'Authorization': `Bearer ${token}`
               }
           });
+          // Respuesta de todos los menus disponibles en la aplicacion
           const allMenus = await responseAllMenus.json();
           // Marca los menús a los que el usuario tiene acceso
-          const markedMenus = allMenus.map(menu => ({
-              ...menu,
-              isChecked: userMenus.some(userMenu => userMenu.menCod === menu.menCod)
-          }));
+          const markedMenus = allMenus.map(menu => {
+            const menuPermissions = markedPermissions.filter(permission => permission.perRef === menu.menRef);
+            return{
+                ...menu,
+                isChecked: userMenus.some(userMenu => userMenu.menCod === menu.menCod),
+                permissions: menuPermissions
+            }
+          });
           const groupData = groupByParent(markedMenus);
-          console.log(markedMenus);
           setMenus(groupData);
-          console.log(menus);
           const newCheckedMenus = userMenus.reduce((map, menu) => {
             map[menu.menCod] = true;
             return map;
@@ -125,8 +156,20 @@ const MenuUser = () => {
       };
       checkSubMenus(menu, isChecked);
   
+      console.log(newCheckedMenus)
       return newCheckedMenus;
     });
+  }, []);
+  
+  
+  const handlePermissionCheck = useCallback((permission, isChecked) => {
+    console.log(permission)
+    setCheckedPermissions(prevCheckedPermissions => {
+        const newCheckedPermissions = {...prevCheckedPermissions, [permission.perCod]: isChecked}
+
+        return newCheckedPermissions;
+    });
+    console.log(checkedPermissions);
   }, []);
 
 
@@ -138,76 +181,127 @@ const MenuUser = () => {
         level={level} 
         handleToggle={handleToggle} 
         handleCheck={handleCheck} 
+        handlePermissionCheck={handlePermissionCheck}
         openMenus={openMenus} 
-        checkedMenus={checkedMenus} 
+        checkedMenus={checkedMenus}
+        checkedPermissions={checkedPermissions}
     />
   );
 
   const handleNext = async (event) => {
     event.preventDefault();
     // Convertir currentMenus a un objeto para facilitar la búsqueda
-    const currentMenuMap = currentMenus.reduce((map, menu) => {
-      map[menu.menCod] = menu;
-      return map;
-    }, {});
-
-    const allMenuMap = allMenus.reduce((map, menu) => {
-      map[menu.menCod] = menu;
-      return map;
-    }, {});
-
-    // Identificar los menús que se han marcado (agregados)
-    const addedMenus = Object.keys(checkedMenus)
-    .filter(menCod => checkedMenus[menCod] && !currentMenuMap[menCod])
-    .map(menCod => allMenuMap[menCod]); 
-
-    // Identificar los menús que se han desmarcado (eliminados)
-    const removedMenus = currentMenus
-      .filter(menu => !checkedMenus[menu.menCod]);
-
-    // Preparar los datos para las peticiones
-    const addedMenusData = addedMenus.map(menu => ({
-      UsuAno: userMaint.usuAno,
-      UsuCod: userMaint.usuCod,
-      MenAno: menu.menAno,
-      MenCod: menu.menCod
-    }));
-    const removedMenusData = removedMenus.map(menu => ({
-      UsuAno: userMaint.usuAno,
-      UsuCod: userMaint.usuCod,
-      MenAno: menu.menAno,
-      MenCod: menu.menCod
-    }));
-
-    const token = localStorage.getItem('token');
-    // Realizar la petición para agregar menús
-    const responseAdd = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Menu/agregar`, {
-      method: 'POST',
-      headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(addedMenusData)
-    });
-    if (!responseAdd.ok) {
-      // Manejar el error...
+    try {
+      Notiflix.Loading.pulse('Cargando...');
+      const currentMenuMap = currentMenus.reduce((map, menu) => {
+        map[menu.menCod] = menu;
+        return map;
+      }, {});
+  
+      const allMenuMap = allMenus.reduce((map, menu) => {
+        map[menu.menCod] = menu;
+        return map;
+      }, {});
+  
+      // Identificar los menús que se han marcado (agregados)
+      const addedMenus = Object.keys(checkedMenus)
+      .filter(menCod => checkedMenus[menCod] && !currentMenuMap[menCod])
+      .map(menCod => allMenuMap[menCod]); 
+  
+      // Identificar los menús que se han desmarcado (eliminados)
+      const removedMenus = currentMenus
+        .filter(menu => !checkedMenus[menu.menCod]);
+  
+      // Preparar los datos para las peticiones
+      const addedMenusData = addedMenus.map(menu => ({
+        UsuAno: userMaint.usuAno,
+        UsuCod: userMaint.usuCod,
+        MenAno: menu.menAno,
+        MenCod: menu.menCod
+      }));
+      const removedMenusData = removedMenus.map(menu => ({
+        UsuAno: userMaint.usuAno,
+        UsuCod: userMaint.usuCod,
+        MenAno: menu.menAno,
+        MenCod: menu.menCod
+      }));
+  
+      const token = localStorage.getItem('token');
+      // Realizar la petición para agregar menús
+      const responseAdd = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Menu/agregar`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(addedMenusData)
+      });
+      if (!responseAdd.ok) {
+        // Manejar el error...
+      }
+  
+      // Realizar la petición para eliminar menús
+      const responseRemove = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Menu/eliminar`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(removedMenusData)
+      });
+      if (!responseRemove.ok) {
+        // Manejar el error...
+      }
+  
+      // Identificar los permisos que se han marcado (agregados)
+      const addedPermissions = Object.keys(checkedPermissions).filter(perCod => checkedPermissions[perCod] && !userPermissions.some(userPermission => userPermission.perCod === perCod));
+  
+      // Identificar los permisos que se han desmarcado (eliminados)
+      const removedPermissions = userPermissions.filter(permission => !checkedPermissions[permission.perCod]).map(permission => permission.perCod);
+  
+      // Preparar los datos para las peticiones
+      const addedPermissionsData = addedPermissions.map(perCod => ({
+        UsuAno: userMaint.usuAno,
+        UsuCod: userMaint.usuCod,
+        PerCod: perCod
+      }));
+      const removedPermissionsData = removedPermissions.map(perCod => ({
+        UsuAno: userMaint.usuAno,
+        UsuCod: userMaint.usuCod,
+        PerCod: perCod
+      }));
+  
+      const responseAddPermissions = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Permiso/agregar`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(addedPermissionsData)
+      });
+      if (!responseAddPermissions.ok) {
+        // Manejar el error...
+      }
+  
+      // Realizar la petición para eliminar menús
+      const responseRemovePermissions = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Permiso/eliminar`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(removedPermissionsData)
+      });
+      if (!responseRemovePermissions.ok) {
+        // Manejar el error...
+      }
+    } catch (error) {
+      
+    } finally{
+      Notiflix.Loading.remove();
+      navigate('/permiso-user');
     }
 
-    // Realizar la petición para eliminar menús
-    const responseRemove = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Menu/eliminar`, {
-      method: 'POST',
-      headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(removedMenusData)
-    });
-    if (!responseRemove.ok) {
-      // Manejar el error...
-    }
-    console.log('Menús agregados:', addedMenusData);
-    console.log('Menús eliminados:', removedMenusData);
-    navigate('/permiso-user');
   };
 
   return (

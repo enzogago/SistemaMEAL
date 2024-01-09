@@ -13,7 +13,7 @@ import { AuthContext } from '../../context/AuthContext';
 import { handleDelete } from '../reusable/helper';
 
 
-const Table = ({ data, openModal }) => {
+const Table = ({ userPermissions, data, openModal }) => {
     // Variables State AuthContext 
     const { authActions } = useContext(AuthContext);
     const { setIsLoggedIn } = authActions;
@@ -24,8 +24,13 @@ const Table = ({ data, openModal }) => {
     const [codigoFilter, setCodigoFilter] = useState('');
     const [nombreFilter, setNombreFilter] = useState('');
 
+    const canCreateCargo = useMemo(() => userPermissions.some(permission => permission.perNom === "CREAR ROL"), [userPermissions]);
+    const canDeleteCargo = useMemo(() => userPermissions.some(permission => permission.perNom === "ELIMINAR ROL"), [userPermissions]);
+    const canModifyCargo = useMemo(() => userPermissions.some(permission => permission.perNom === "MODIFICAR ROL"), [userPermissions]);
+    const hasActionPermission = useMemo(() => canDeleteCargo || canModifyCargo, [canDeleteCargo, canModifyCargo]);
+
     /* TANSTACK */
-    const columns = [
+    const columns = useMemo(() => [
         {
             header: "Código",
             accessorKey: "rolCod"
@@ -34,17 +39,17 @@ const Table = ({ data, openModal }) => {
             header: "Nombre",
             accessorKey: "rolNom"
         },
-        {
+        ...(hasActionPermission ? [{
             header: "Acciones",
             accessorKey: "acciones",
             cell: ({row}) => (
                 <div className='PowerMas_IconsTable flex jc-center ai-center'>
-                    <FaTrash className='Large-p_25' onClick={() => handleDelete('Rol',row.original.rolCod, setRoles, setIsLoggedIn)} />
-                    <FaPenNib className='Large-p_25' onClick={() => openModal(row.original)} />
+                    {canDeleteCargo && <FaTrash className='Large-p_25' onClick={() => handleDelete('Rol',row.original.carCod, setRoles, setIsLoggedIn)} />}
+                    {canModifyCargo && <FaPenNib className='Large-p_25' onClick={() => openModal(row.original)} />}
                 </div>
             ),
-        },
-    ]
+    }] : [])
+    ], [canDeleteCargo, canModifyCargo, hasActionPermission]);
 
     const [sorting, setSorting] = useState([]);
     const filteredData = useMemo(() => 
@@ -71,7 +76,11 @@ const Table = ({ data, openModal }) => {
         <div className='TableMainContainer Large-p2'>
             <div className="flex jc-space-between">
                 <h1 className="flex left Large-f1_75">Listado de Roles</h1>
-                <button className='Large-p_5 PowerMas_ButtonStatus' onClick={() => openModal()}>
+                <button 
+                    className={`Large-p_5 PowerMas_ButtonStatus ${!canCreateCargo ? 'PowerMas_ButtomDisabled' : ''}`} 
+                    onClick={() => openModal()} 
+                    disabled={!(userPermissions.some(permission => permission.perNom === "CREAR ROL"))}
+                >
                     Nuevo <FaPlus /> 
                 </button>
             </div>
@@ -95,7 +104,6 @@ const Table = ({ data, openModal }) => {
                                     onChange={e => setNombreFilter(e.target.value)}
                                 />
                             </th>
-                            <th></th>
                         </tr>
                         {
                             table.getHeaderGroups().map(headerGroup => (

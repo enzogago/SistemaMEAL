@@ -38,7 +38,7 @@ namespace SistemaMEAL.Server.Controllers
                 UsuCod = data.UsuCod,
                 RolCod = data.RolCod
             };
-            if (!_usuarios.TienePermiso(usuarioActual.UsuAno, usuarioActual.UsuCod, "CREAR USUARIO") && usuarioActual.RolCod != "01")
+            if (usuarioActual.RolCod != "01")
             {
                 return new
                 {
@@ -89,7 +89,7 @@ namespace SistemaMEAL.Server.Controllers
                 UsuCod = data.UsuCod,
                 RolCod = data.RolCod
             };
-            if (!_usuarios.TienePermiso(usuarioActual.UsuAno, usuarioActual.UsuCod, "MODIFICAR USUARIO") && usuarioActual.RolCod != "01")
+            if (usuarioActual.RolCod != "01")
             {
                 return new
                 {
@@ -99,8 +99,8 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            usuario.UsuAno = usuAno; // Asegúrate de que el año del usuario en el objeto usuario sea el correcto
-            usuario.UsuCod = usuCod; // Asegúrate de que el código del usuario en el objeto usuario sea el correcto
+            usuario.UsuAno = usuAno;
+            usuario.UsuCod = usuCod;
             var (message, messageType) = _usuarios.Modificar(usuario);
             if (messageType == "1") // Error
             {
@@ -133,17 +133,16 @@ namespace SistemaMEAL.Server.Controllers
                 RolCod = data.RolCod
 
             };
-
             if (usuario.RolCod != "01")
             {
-                return new
+                return StatusCode(403, new
                 {
                     success = false,
                     message = "No tienes permisos para realizar esta acción",
                     result = ""
-                };
+                });
             }
-
+           
             var usuarios = _usuarios.Listado();
             return Ok(usuarios);
         }
@@ -216,5 +215,21 @@ namespace SistemaMEAL.Server.Controllers
             };
 
         }
+
+        [HttpGet]
+        [Route("perfil")]
+        public dynamic ValidarUsuario()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            dynamic rToken = Jwt.validarToken(identity, _usuarios);
+            Console.WriteLine("DESDE GRANDE"+rToken);
+
+            if (!rToken.success) return Unauthorized(rToken);
+            dynamic data = rToken.result;
+            Console.WriteLine(data);
+
+            return Ok(data);
+        }
+
     }
 }

@@ -24,27 +24,11 @@ namespace SistemaMEAL.Server.Controllers
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
-
+            Console.WriteLine(rToken);
             if (!rToken.success) return Unauthorized(rToken);
 
-            dynamic data = rToken.result;
-            Usuario usuario = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "LISTAR ESTADO") && usuario.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para listar estados",
-                    result = ""
-                };
-            }
             var estados = _estados.Listado();
-            Console.WriteLine(estados);
+            
             return Ok(estados);
         }
 

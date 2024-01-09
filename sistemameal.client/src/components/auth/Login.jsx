@@ -9,7 +9,7 @@ import portadaLogin from '../../img/PowerMas_PortadaLogin.webp';
 const Login = () => {
     // Variables State AuthContext 
     const { authActions } = useContext(AuthContext);
-    const { setIsLoggedIn } = authActions;
+    const { setIsLoggedIn, setUserLogged } = authActions;
     // States locales
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -39,7 +39,7 @@ const Login = () => {
         
             const data = await response.json();
             if (data.success) {
-                localStorage.setItem('user', JSON.stringify(data.user));
+                setUserLogged(data.user);
                 localStorage.setItem('token', data.result);
                 setIsLoggedIn(true);
             } else {

@@ -18,6 +18,7 @@ const Modal = ({ closeModal }) => {
     const onSubmit = (data) => {
         const fieldMapping = {
             nombre: 'perNom',
+            referencia: 'perRef',
         };
         handleSubmit('Permiso', estadoEditado, data, setPermisos, setModalVisible, setIsLoggedIn, fieldMapping, 'perCod');
         reset();
@@ -63,8 +64,8 @@ const Modal = ({ closeModal }) => {
                                 maxLength: { value: 50, message: 'El nombre no puede tener más de 50 caracteres' },
                                 minLength:  { value: 5, message: 'El nombre no puede tener menos de 5 caracteres' },
                                 pattern: {
-                                    value: /^[A-Za-zñÑ\s]+$/,
-                                    message: 'Por favor, introduce solo letras y espacios',
+                                    value: /^[A-Za-zñÑáéíóúÁÉÍÓÚ\s_]+$/,
+                                    message: 'Por favor, introduce un valor válido',
                                 },
                             }
                         )}

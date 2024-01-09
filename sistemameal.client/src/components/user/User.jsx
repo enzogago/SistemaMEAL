@@ -21,16 +21,13 @@ const User = () => {
                         'Authorization': `Bearer ${token}`
                     }
                 });
+                const data = await response.json();
                 if (!response.ok) {
                     if(response.status == 401 || response.status == 403){
-                        const data = await response.json();
                         Notiflix.Notify.failure(data.message);
-                        setIsLoggedIn(false);
                     }
                     return;
                 }
-                const data = await response.json();
-                console.log(data);
                 setUsers(data);
             } catch (error) {
                 console.error('Error:', error);

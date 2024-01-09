@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 // Libraries
 import Notiflix from 'notiflix';
 // Context
@@ -10,12 +10,15 @@ import Modal from './Modal';
 
 const Role = () => {
   // Variables State AuthContext 
-  const { authActions } = useContext(AuthContext);
+  const { authActions, authInfo } = useContext(AuthContext);
   const { setIsLoggedIn } = authActions;
+  const { userLogged } = authInfo;
   // Variables State statusContext
   const { statusInfo, statusActions } = useContext(StatusContext);
   const { roles } = statusInfo;
   const { setRoles, setModalVisible, setEstadoEditado } = statusActions;
+
+  const [ userPermissions, setUserPermissions ] = useState([])
   
   // TOGGLE MODAL
   const openModal = (estado = null) => {
@@ -33,6 +36,15 @@ const Role = () => {
         try {
             Notiflix.Loading.pulse('Cargando...');
             const token = localStorage.getItem('token');
+            //
+            const responseUserPermissions = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Permiso/${userLogged.usuAno}/${userLogged.usuCod}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const userPermissions = await responseUserPermissions.json();
+            setUserPermissions(userPermissions);
+            //
             const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Rol`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -67,6 +79,7 @@ const Role = () => {
   return (
     <div className="PowerMas_StatusContainer">
         <Table 
+            userPermissions={userPermissions}
             data={roles} 
             openModal={openModal} 
         />

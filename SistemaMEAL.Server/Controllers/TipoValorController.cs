@@ -27,22 +27,6 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            dynamic data = rToken.result;
-            Usuario usuario = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "LISTAR TIPO_VALOR") && usuario.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para listar tipos valor",
-                    result = ""
-                };
-            }
             var tipos = _tipos.Listado();
             Console.WriteLine(tipos);
             return Ok(tipos);

@@ -19,6 +19,46 @@ namespace SistemaMEAL.Server.Controllers
             _usuarios = usuarios;
         }
 
+        [HttpPost("agregar")]
+        public IActionResult AgregarPermisoUsuario([FromBody] List<PermisoUsuario> permisosAgregar)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            foreach (var permisoUsuario in permisosAgregar)
+            {
+                bool result = _permisos.InsertarPermisoUsuario(permisoUsuario.UsuAno, permisoUsuario.UsuCod, permisoUsuario.PerCod);
+                if (!result)
+                {
+                    return BadRequest("Error al agregar el permiso al usuario");
+                }
+            }
+
+            return Ok("Permisos agregados correctamente");
+        }
+
+        [HttpPost("eliminar")]
+        public IActionResult EliminarPermisoUsuario([FromBody] List<PermisoUsuario> permisosEliminar)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            foreach (var permisoUsuario in permisosEliminar)
+            {
+                bool result = _permisos.EliminarMenuUsuario(permisoUsuario.UsuAno, permisoUsuario.UsuCod, permisoUsuario.PerCod);
+                if (!result)
+                {
+                    return BadRequest("Error al eliminar el permiso del usuario");
+                }
+            }
+
+            return Ok("Permisos eliminados correctamente");
+        }
+
         [HttpGet]
         public dynamic Listado()
         {
@@ -27,25 +67,21 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            dynamic data = rToken.result;
-            Usuario usuario = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "LISTAR PERMISO") && usuario.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para listar permisos",
-                    result = ""
-                };
-            }
             var permisos = _permisos.Listado();
             Console.WriteLine(permisos);
             return Ok(permisos);
+        }
+
+        [HttpGet("{usuAno}/{usuCod}")]
+        public IActionResult ListadoPermisoPorUsuario(string usuAno, string usuCod)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var permiso = _permisos.ListadoPermisoPorUsuario(usuAno, usuCod);
+            return Ok(permiso);
         }
 
         [HttpPost]

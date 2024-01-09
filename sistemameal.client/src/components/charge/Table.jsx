@@ -1,6 +1,7 @@
 import { useContext, useMemo, useState } from 'react';
+// librerias
 import { FaPenNib, FaPlus, FaSortDown, FaSortUp, FaTrash } from 'react-icons/fa';
-import { StatusContext } from '../../context/StatusContext';
+// React Table
 import {
     useReactTable, 
     getCoreRowModel, 
@@ -8,12 +9,15 @@ import {
     getPaginationRowModel,
     getSortedRowModel, 
 } from '@tanstack/react-table';
-import Pagination from '../reusable/Pagination';
+// Contextos
 import { AuthContext } from '../../context/AuthContext';
+import { StatusContext } from '../../context/StatusContext';
+// Componentes
 import { handleDelete } from '../reusable/helper';
+import Pagination from '../reusable/Pagination';
 
-
-const Table = ({ data, openModal }) => {
+const Table = ({ userPermissions, data, openModal }) => {
+    console.log(userPermissions)
     // Variables State AuthContext 
     const { authActions } = useContext(AuthContext);
     const { setIsLoggedIn } = authActions;
@@ -24,27 +28,31 @@ const Table = ({ data, openModal }) => {
     const [codigoFilter, setCodigoFilter] = useState('');
     const [nombreFilter, setNombreFilter] = useState('');
 
+    const canCreateCargo = useMemo(() => userPermissions.some(permission => permission.perNom === "CREAR CARGO"), [userPermissions]);
+    const canDeleteCargo = useMemo(() => userPermissions.some(permission => permission.perNom === "ELIMINAR CARGO"), [userPermissions]);
+    const canModifyCargo = useMemo(() => userPermissions.some(permission => permission.perNom === "MODIFICAR CARGO"), [userPermissions]);
+    const hasActionPermission = useMemo(() => canDeleteCargo || canModifyCargo, [canDeleteCargo, canModifyCargo]);
     /* TANSTACK */
-    const columns = [
+    const columns = useMemo(() => [
         {
             header: "Código",
-            accessorKey: "carCod"
+            accessorKey: "carCod",
         },
         {
             header: "Nombre",
-            accessorKey: "carNom"
+            accessorKey: "carNom",
         },
-        {
-            header: "Acciones",
-            accessorKey: "acciones",
-            cell: ({row}) => (
-                <div className='PowerMas_IconsTable flex jc-center ai-center'>
-                    <FaTrash className='Large-p_25' onClick={() => handleDelete('Cargo',row.original.carCod, setCargos, setIsLoggedIn)} />
-                    <FaPenNib className='Large-p_25' onClick={() => openModal(row.original)} />
-                </div>
-            ),
-        },
-    ]
+            ...(hasActionPermission ? [{
+                header: "Acciones",
+                accessorKey: "acciones",
+                cell: ({row}) => (
+                    <div className='PowerMas_IconsTable flex jc-center ai-center'>
+                        {canDeleteCargo && <FaTrash className='Large-p_25' onClick={() => handleDelete('Cargo',row.original.carCod, setCargos, setIsLoggedIn)} />}
+                        {canModifyCargo && <FaPenNib className='Large-p_25' onClick={() => openModal(row.original)} />}
+                    </div>
+                ),
+        }] : [])
+    ], [canDeleteCargo, canModifyCargo, hasActionPermission]);
 
     const [sorting, setSorting] = useState([]);
     const filteredData = useMemo(() => 
@@ -71,9 +79,16 @@ const Table = ({ data, openModal }) => {
         <div className='TableMainContainer Large-p2'>
             <div className="flex jc-space-between">
                 <h1 className="flex left Large-f1_75">Listado de Cargos</h1>
-                <button className='Large-p_5 PowerMas_ButtonStatus' onClick={() => openModal()}>
-                    Nuevo <FaPlus /> 
-                </button>
+                {
+                    canCreateCargo &&
+                    <button 
+                        className={`Large-p_5 PowerMas_ButtonStatus ${!canCreateCargo ? 'PowerMas_ButtomDisabled' : ''}`} 
+                        onClick={() => openModal()} 
+                        disabled={!(userPermissions.some(permission => permission.perNom === "CREAR CARGO"))}
+                    >
+                        Nuevo <FaPlus /> 
+                    </button>
+                }
             </div>
             <div className="PowerMas_TableContainer">
                 <table className="Large_12 PowerMas_TableStatus">
@@ -95,7 +110,6 @@ const Table = ({ data, openModal }) => {
                                     onChange={e => setNombreFilter(e.target.value)}
                                 />
                             </th>
-                            <th></th>
                         </tr>
                         {
                             table.getHeaderGroups().map(headerGroup => (
@@ -141,7 +155,9 @@ const Table = ({ data, openModal }) => {
                                 table.getRowModel().rows.map(row => (
                                     <tr key={row.id}>
                                         {row.getVisibleCells().map(cell => (
-                                            <td style={{ width: cell.column.getSize() }} key={cell.id}>
+                                            <td
+                                                style={{ width: cell.column.getSize() }} 
+                                                key={cell.id}>
                                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                             </td>
                                         ))}

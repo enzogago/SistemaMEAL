@@ -14,8 +14,9 @@ import { StatusContext } from '../../context/StatusContext';
 
 const Sidebar = () => {
     // Estados del AuthContext
-    const { authActions } = useContext(AuthContext);
-    const { setIsLoggedIn, setMenuData } = authActions;
+    const { authActions, authInfo } = useContext(AuthContext);
+    const { setIsLoggedIn, setMenuData, setUsers } = authActions;
+    const { userLogged  } = authInfo;
      // Variables State statusContext
     const { statusActions } = useContext(StatusContext);
     const { resetStatus } = statusActions;
@@ -49,53 +50,55 @@ const Sidebar = () => {
 
     useEffect(() => {
         const fetchMenuData = async () => {
-            Notiflix.Loading.pulse('Cargando...');
-            // Storage
-            const user = JSON.parse(localStorage.getItem('user'));
-            const token = localStorage.getItem('token');
-            const usuAno = user.usuAno;
-            const usuCod = user.usuCod;
-
+            if (userLogged) {
+                Notiflix.Loading.pulse('Cargando...');
+                // Storage
+                const token = localStorage.getItem('token');
+                const usuAno = userLogged.usuAno;
+                const usuCod = userLogged.usuCod;
     
-            try {
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Menu/${usuAno}/${usuCod}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                if (!response.ok) {
-                    const data = await response.json();
-                    if (data.result) {
-                        setIsLoggedIn(false);
+                try {
+                    const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Menu/${usuAno}/${usuCod}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    if (!response.ok) {
+                        const data = await response.json();
+                        if (data.result) {
+                            setIsLoggedIn(false);
+                        }
+            
+                        Notiflix.Notify.failure(data.message);
+                        Notiflix.Loading.remove();
+                        return;
                     }
         
-                    Notiflix.Notify.failure(data.message);
+                    const data = await response.json();
+                    const groupData = groupByParent(data);
+                    setMenuData(data);
+                    setMenuGroup(groupData);
+                } catch (error) {
+                    console.error(error);
                     Notiflix.Loading.remove();
-                    return;
                 }
-    
-                const data = await response.json();
-                const groupData = groupByParent(data);
-                setMenuData(data);
-                setMenuGroup(groupData);
-            } catch (error) {
-                console.error(error);
-                Notiflix.Loading.remove();
             }
-    
             Notiflix.Loading.remove();
         };
     
         fetchMenuData();
-    }, []);
+    }, [userLogged]); // Añade userLogged como dependencia
+    
     
     // Cerrar sesión
     const handleLogout = () => {
         localStorage.removeItem('token');
         setIsLoggedIn(false);
         resetStatus();
+        setUsers([]);
     };
 
+    
     return (
         <div className="PowerMas_Menu">
             <div className="PowerMas_SidebarHeader">

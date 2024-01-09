@@ -107,7 +107,7 @@ const Table = ({ data }) => {
     const selectedColumns = ["proNom", "subProNom", "actResNom", "subActResNom", "resNom"];
 
     return (
-        <div className='TableMainContainer Large-p2'>
+        <div className='TableMonitoringContainer Large-p2'>
             <div className="flex jc-space-between">
                 <h1 className="flex left Large-f1_75">Monitoreo</h1>
             </div>

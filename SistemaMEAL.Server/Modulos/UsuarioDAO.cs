@@ -262,25 +262,22 @@ namespace SistemaMEAL.Server.Modulos
                     {
                         UsuAno = rd.GetString(0),
                         UsuCod = rd.GetString(1),
-                        DocIdeCod = rd.GetString(2),
-                        UsuNumDoc = rd.GetString(3),
                         UsuNom = rd.GetString(4),
                         UsuApe = rd.GetString(5),
-                        UsuFecNac = rd.GetString(6),
-                        UsuSex = rd.GetString(7)[0],
-                        UsuCorEle = rd.GetString(8),
                         CarCod = rd.GetString(9),
-                        UsuFecInc = rd.GetString(10),
-                        UsuTel = rd.GetString(11),
                         UsuNomUsu = rd.GetString(12),
-                        UsuPas = rd.GetString(13),
-                        UsuEst = rd.GetString(14)[0],
                         RolCod = rd.GetString(15),
-                        UsuIng = rd.GetString(16),
-                        FecIng = rd.IsDBNull(17) ? (DateTime?)null : rd.GetDateTime(17),
-                        UsuMod = rd.GetString(18),
-                        FecMod = rd.IsDBNull(19) ? (DateTime?)null : rd.GetDateTime(19),
-                        EstReg = rd.GetString(20)[0]
+
+                        Cargo = new Cargo()
+                        {
+                            CarNom = rd.GetString(22)
+                        },
+
+                        Rol = new Rol()
+                        {
+                            RolCod = rd.GetString(28),
+                            RolNom = rd.GetString(29)
+                        }
                     };
                 }
                 rd.Close();

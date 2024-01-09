@@ -9,6 +9,59 @@ namespace SistemaMEAL.Modulos
     {
         private conexionDAO cn = new conexionDAO();
 
+
+        public bool InsertarPermisoUsuario(string usuAno, string usuCod, string perCod)
+        {
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_INSERTAR_PERMISO_USUARIO", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@USUANO", usuAno);
+                cmd.Parameters.AddWithValue("@USUCOD", usuCod);
+                cmd.Parameters.AddWithValue("@PERCOD", perCod);
+                cmd.ExecuteNonQuery();
+
+                return true;
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+        }
+
+        public bool EliminarMenuUsuario(string usuAno, string usuCod, string perCod)
+        {
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_ELIMINAR_PERMISO_USUARIO", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@USUANO", usuAno);
+                cmd.Parameters.AddWithValue("@USUCOD", usuCod);
+                cmd.Parameters.AddWithValue("@PERCOD", perCod);
+                cmd.ExecuteNonQuery();
+
+                return true;
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+        }
+
         public IEnumerable<Permiso> Listado()
         {
             List<Permiso> temporal = new List<Permiso>();
@@ -25,11 +78,7 @@ namespace SistemaMEAL.Modulos
                     {
                         PerCod = rd.GetString(0),
                         PerNom = rd.GetString(1),
-                        UsuIng = rd.GetString(2),
-                        FecIng = rd.IsDBNull(3) ? (DateTime?)null : rd.GetDateTime(3),
-                        UsuMod = rd.GetString(4),
-                        FecMod = rd.IsDBNull(5) ? (DateTime?)null : rd.GetDateTime(5),
-                        EstReg = rd.GetString(6)[0],
+                        PerRef = rd.IsDBNull(2) ? null : rd.GetString(2),
                     });
                 }
                 rd.Close();
@@ -177,6 +226,41 @@ namespace SistemaMEAL.Modulos
                 cn.getcn.Close();
             }
             return (mensaje, tipoMensaje);
+        }
+
+        public IEnumerable<Permiso> ListadoPermisoPorUsuario(string usuAno, string usuCod)
+        {
+            List<Permiso> temporal = new List<Permiso>();
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_LISTAR_PERMISO_POR_USUARIO", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@UsuAno", usuAno);
+                cmd.Parameters.AddWithValue("@UsuCod", usuCod);
+                SqlDataReader rd = cmd.ExecuteReader();
+                while (rd.Read())
+                {
+                    temporal.Add(new Permiso()
+                    {
+                        PerCod = rd.GetString(0),
+                        PerNom = rd.GetString(1),
+                        PerRef = rd.GetString(2),
+                    });
+                }
+                rd.Close();
+            }
+            catch (SqlException ex)
+            {
+                temporal = new List<Permiso>();
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return temporal;
         }
 
 

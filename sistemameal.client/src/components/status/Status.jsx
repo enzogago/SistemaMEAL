@@ -27,8 +27,6 @@ const Status = () => {
         setModalVisible(false);
     };
 
-    
-
     // EFECTO AL CARGAR COMPONENTE GET - LISTAR ESTADOS
     useEffect(() => {
         const fetchEstados = async () => {
@@ -40,9 +38,8 @@ const Status = () => {
                         'Authorization': `Bearer ${token}`
                     }
                 });
-                console.log(response)
                 if (!response.ok) {
-                    if(response.status == 401 || response.status == 403){
+                    if(response.status == 401){
                         const data = await response.json();
                         Notiflix.Notify.failure(data.message);
                         setIsLoggedIn(false);
@@ -52,6 +49,7 @@ const Status = () => {
                 const data = await response.json();
                 console.log(data)
                 if (data.success == false) {
+                    console.log(data)
                     Notiflix.Notify.failure(data.message);
                     return;
                 }

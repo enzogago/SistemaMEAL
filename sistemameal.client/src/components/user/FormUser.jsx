@@ -204,20 +204,32 @@ const FormUser = () => {
                 >
                     <option value="0">--SELECCIONE UN DOCUMENTO--</option>
                     {documentos.map(documento => (
-                        <option key={documento.docIdeCod} value={documento.docIdeCod}> ({documento.docIdeAbr}) {documento.docIdeNom}</option>
+                        <option 
+                        key={documento.docIdeCod} 
+                        value={documento.docIdeCod}> ({documento.docIdeAbr}) {documento.docIdeNom}</option>
                     ))}
                 </select>
                 {errors.docIdeCod && <p className='errorInput Large-p_5'>{errors.docIdeCod.message}</p>}
             </label>
             <label>
                 Número de documento:
-                <input type="text" name="usuNumDoc" value={formValues.usuNumDoc} onChange={handleChange}
+                <input 
+                type="text" 
+                name="usuNumDoc" 
+                value={formValues.usuNumDoc} 
+                onChange={handleChange}
+                placeholder="Ejm: 922917351"
                 {...register('usuNumDoc', { required: 'El número de documento es requerido' })} />
                 {errors.usuNumDoc && <p className='errorInput Large-p_5'>{errors.usuNumDoc.message}</p>}
             </label>
             <label>
                 Correo electrónico:
-                <input type="text" name="usuCorEle" value={formValues.usuCorEle} onChange={handleChange} 
+                <input 
+                type="text" 
+                name="usuCorEle" 
+                value={formValues.usuCorEle} 
+                onChange={handleChange} 
+                placeholder="Ejm: correo@correo.es"
                 {...register('usuCorEle', { 
                     required: 'El correo electronico es requerido',
                     pattern: {
@@ -233,7 +245,12 @@ const FormUser = () => {
                 (
                     <label>
                         Contraseña:
-                        <input type="password" name="usuPas" value={formValues.usuPas} onChange={handleChange} 
+                        <input 
+                        type="password" 
+                        name="usuPas" 
+                        value={formValues.usuPas} 
+                        onChange={handleChange} 
+                        placeholder="Ejm: 12345678"
                         {...register('usuPas', { 
                             required: 'La contraseña es requerido',
                             minLength: { value: 8, message: 'La contraseña debe tener minimo 8 digitos' },
@@ -245,7 +262,11 @@ const FormUser = () => {
             }
             <label>
                 Nombres:
-                <input type="text" name="usuNom" value={formValues.usuNom} onChange={handleChange}
+                <input type="text" 
+                    name="usuNom" 
+                    value={formValues.usuNom} 
+                    onChange={handleChange}
+                    placeholder="Ejm: Andres"
                     {...register('usuNom', { 
                         required: 'El nombre es requerido',
                         minLength: { value: 3, message: 'El nombre debe tener minimo 3 digitos' },
@@ -255,23 +276,33 @@ const FormUser = () => {
             </label>
             <label>
                 Apellidos:
-                <input type="text" name="usuApe" value={formValues.usuApe} onChange={handleChange}
-                {...register('usuApe', { 
-                    required: 'El Apellido es requerido',
-                        minLength: { value: 3, message: 'El apellido debe tener minimo 3 digitos' },
-                })} 
+                <input 
+                    type="text" 
+                    name="usuApe" 
+                    value={formValues.usuApe} 
+                    onChange={handleChange}
+                    placeholder="Ejm: Eras"
+                    {...register('usuApe', { 
+                        required: 'El apellido es requerido',
+                            minLength: { value: 3, message: 'El apellido debe tener minimo 3 digitos' },
+                    })} 
                 />
-                {errors.usuPas && <p className='errorInput Large-p_5'>{errors.usuPas.message}</p>}
+                {errors.usuApe && <p className='errorInput Large-p_5'>{errors.usuApe.message}</p>}
             </label>
             <label>
                 Telefono:
-                <input type="text" name="usuTel" value={formValues.usuTel} onChange={handleChange}
-                {...register('usuTel', { 
-                    required: 'La contraseña es requerido',
-                    minLength: { value: 8, message: 'La contraseña debe tener minimo 8 digitos' },
-                })} 
+                <input 
+                    type="text" 
+                    name="usuTel" 
+                    value={formValues.usuTel} 
+                    onChange={handleChange}
+                    placeholder="Ejm: 922917351"
+                    {...register('usuTel', { 
+                        required: 'El número de telefono es requerido',
+                        minLength: { value: 9, message: 'El número de telefono debe tener minimo 9 digitos' },
+                    })} 
                 />
-                {errors.usuPas && <p className='errorInput Large-p_5'>{errors.usuPas.message}</p>}
+                {errors.usuTel && <p className='errorInput Large-p_5'>{errors.usuTel.message}</p>}
             </label>
             <label>
                 Rol:
@@ -309,9 +340,14 @@ const FormUser = () => {
             </label>
             <label>
                 Fecha de nacimiento:
-                <input type="text" name="usuFecNac" value={formValues.usuFecNac} onChange={handleChange} 
+                <input 
+                    type="text" 
+                    name="usuFecNac" 
+                    value={formValues.usuFecNac} 
+                    onChange={handleChange}
+                    placeholder="Ejm: 2023-03-17"
                     {...register('usuFecNac', { 
-                        required: 'La fecha de nacimiento es requerido',
+                        required: 'La Fecha de nacimiento es requerido',
                         pattern: {
                             value: /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/,
                             message: 'La fecha debe estar en el formato YYYY-MM-DD',
@@ -337,11 +373,25 @@ const FormUser = () => {
                 Estado:
                 <div >
                     <div>
-                        <input type="radio" id="activo" name="usuEst" value="A" checked={formValues.usuEst === "A"} onChange={handleChange} />
+                        <input 
+                            type="radio" 
+                            id="activo" 
+                            name="usuEst" 
+                            value="A" 
+                            checked={formValues.usuEst === "A"} 
+                            onChange={handleChange} 
+                        />
                         <label htmlFor="activo">Activo</label>
                     </div>
                     <div>
-                        <input type="radio" id="inactivo" name="usuEst" value="I" checked={formValues.usuEst === "I"} onChange={handleChange} />
+                        <input 
+                            type="radio" 
+                            id="inactivo" 
+                            name="usuEst" 
+                            value="I" 
+                            checked={formValues.usuEst === "I"} 
+                            onChange={handleChange} 
+                        />
                         <label htmlFor="inactivo">Inactivo</label>
                     </div>
                 </div>

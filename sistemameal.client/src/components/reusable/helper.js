@@ -73,7 +73,6 @@ export const handleSubmit = async (controller, objetoEditado, data, setRegistros
                 ...Object.keys(data).reduce((obj, key) => ({...obj, [fieldMapping[key]]: data[key]}), {}),
             };
 
-    console.log(objetoEditado)
     const url = objetoEditado 
                 ? `${import.meta.env.VITE_APP_API_URL}/api/${controller}/${objeto[codeField]}` 
                 : `${import.meta.env.VITE_APP_API_URL}/api/${controller}`;
