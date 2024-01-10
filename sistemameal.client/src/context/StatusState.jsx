@@ -8,14 +8,6 @@ const StatusState = ({ children }) => {
         modalVisible: false,
         nombreEstado: '',
         estadoEditado: null,
-        estados: [],
-        documentosIdentidad: [],
-        cargos: [],
-        roles: [],
-        financiadores: [],
-        implementadores: [],
-        tiposValor: [],
-        permisos: [],
     }
 
     const [state, dispatch] = useReducer(statusReducer, initialState);
@@ -37,52 +29,12 @@ const StatusState = ({ children }) => {
         dispatch({ type: types.resetStatus });
     }
     
-    const setDocumentosIdentidad = (documentosIdentidad) => {
-        dispatch({ type: types.setDocumentosIdentidad, payload: documentosIdentidad });
-    }
-    
-    const setEstados = (estados) => {
-        dispatch({ type: types.setEstados, payload: estados });
-    }
-
-    const setCargos = (cargos) => {
-        dispatch({ type: types.setCargos, payload: cargos });
-    }
-
-    const setRoles = (roles) => {
-        dispatch({ type: types.setRoles, payload: roles });
-    }
-
-    const setFinanciadores = (financiadores) => {
-        dispatch({ type: types.setFinanciadores, payload: financiadores });
-    }
-
-    const setImplementadores = (implementadores) => {
-        dispatch({ type: types.setImplementadores, payload: implementadores });
-    }
-
-    const setTiposValor = (tiposValor) => {
-        dispatch({ type: types.setTiposValor, payload: tiposValor });
-    }
-
-    const setPermisos = (permisos) => {
-        dispatch({ type: types.setPermisos, payload: permisos });
-    }
-    
 
     // Agrupar en un solo objeto
     const statusInfo = {
         modalVisible: state.modalVisible,
         nombreEstado: state.nombreEstado,
         estadoEditado: state.estadoEditado,
-        estados: state.estados,
-        documentosIdentidad: state.documentosIdentidad,
-        cargos: state.cargos,
-        roles: state.roles,
-        financiadores: state.financiadores,
-        implementadores: state.implementadores,
-        tiposValor: state.tiposValor,
-        permisos: state.permisos,
     };
 
     const statusActions = {
@@ -90,15 +42,6 @@ const StatusState = ({ children }) => {
         setNombreEstado,
         setEstadoEditado,
         resetStatus,
-        setEstados,
-        setDocumentosIdentidad,
-        setCargos,
-        setRoles,
-        setFinanciadores,
-        setImplementadores,
-        setTiposValor,
-        setPermisos,
-        
     };
 
     return (

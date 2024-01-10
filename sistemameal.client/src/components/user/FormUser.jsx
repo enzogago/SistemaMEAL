@@ -12,10 +12,8 @@ const FormUser = () => {
     const { userMaint } = authInfo;
     const { setUsers, setIsLoggedIn, setUserMaint } = authActions;
 
-    
-   
     const isEditing = userMaint && Object.keys(userMaint).length > 0;
-
+    console.log(userMaint)
     const initialFormValues = {
         usuAno: '',
         usuCod: '',
@@ -46,8 +44,11 @@ const FormUser = () => {
     useEffect(() => {
         if (isEditing) {
             reset(userMaint);
+            console.log("en editin",userMaint)
+
         } else {
             reset(initialFormValues);
+            console.log("else de editin",initialFormValues)
         }
     }, [isEditing, userMaint, reset]);
     
@@ -152,6 +153,11 @@ const FormUser = () => {
 
     const handleNext = async (event) => {
         event.preventDefault();
+
+        if (JSON.stringify(userMaint) === JSON.stringify(formValues)) {
+            Notiflix.Notify.info('No se realizó ningún cambio.');
+            return navigate('/menu-user');
+        }
     
         // Activa la validación del formulario
         const result = await trigger();
@@ -164,9 +170,9 @@ const FormUser = () => {
         }
     
         // Si el formulario es válido, procede con el envío del formulario
-        await handleSubmit(event, userMaint, watch(), setUsers, setIsLoggedIn, setUserMaint);
+        await handleSubmit(event, userMaint, watch(), setUsers, setIsLoggedIn, setUserMaint, navigate);
         
-        navigate('/menu-user');
+        
     };
     
     

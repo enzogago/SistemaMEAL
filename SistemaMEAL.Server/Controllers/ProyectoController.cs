@@ -32,5 +32,32 @@ namespace SistemaMEAL.Server.Controllers
             Console.WriteLine(proyectos);
             return Ok(proyectos);
         }
+
+        [HttpGet]
+        [Route("{usuAno}/{usuCod}")]
+        public dynamic ListarProyectosUsuario(string usuAno, string usuCod)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var proyectos = _proyectos.ListarProyectosUsuario(usuAno, usuCod);
+            return Ok(proyectos);
+        }
+
+        [HttpGet]
+        [Route("usuario/{usuAno}/{usucod}/proyecto/{proAno}/{proCod}")]
+        public dynamic ObtenerDetallesProyectoUsuario(string usuAno, string usucod, string proAno, string proCod)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var proyecto = _proyectos.ObtenerDetallesProyectoUsuario(usuAno, usucod, proAno, proCod);
+            return Ok(proyecto);
+        }
+
     }
 }

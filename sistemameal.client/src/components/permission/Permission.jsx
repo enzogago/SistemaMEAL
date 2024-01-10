@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 // Libraries
 import Notiflix from 'notiflix';
 // Context
@@ -13,9 +13,10 @@ const Permission = () => {
   const { authActions } = useContext(AuthContext);
   const { setIsLoggedIn } = authActions;
   // Variables State statusContext
-  const { statusInfo, statusActions } = useContext(StatusContext);
-  const { permisos } = statusInfo;
-  const { setPermisos, setModalVisible, setEstadoEditado } = statusActions;
+  const { statusActions } = useContext(StatusContext);
+  const { setModalVisible, setEstadoEditado } = statusActions;
+  // States locales
+  const [ permisos, setPermisos ] = useState([])
   
   // TOGGLE MODAL
   const openModal = (estado = null) => {
@@ -68,10 +69,12 @@ const Permission = () => {
     <div className="PowerMas_StatusContainer">
         <Table 
             data={permisos} 
-            openModal={openModal} 
+            openModal={openModal}
+            setPermisos={setPermisos}
         />
         <Modal 
-            closeModal={closeModal} 
+            closeModal={closeModal}
+            setPermisos={setPermisos}
         />
     </div>
   )

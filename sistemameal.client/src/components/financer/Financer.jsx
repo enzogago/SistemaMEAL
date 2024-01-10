@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 // Libraries
 import Notiflix from 'notiflix';
 // Context
@@ -12,9 +12,10 @@ const Financer = () => {
     const { authActions } = useContext(AuthContext);
     const { setIsLoggedIn } = authActions;
     // Variables State statusContext
-    const { statusInfo, statusActions } = useContext(StatusContext);
-    const { financiadores } = statusInfo;
-    const { setFinanciadores, setModalVisible, setEstadoEditado } = statusActions;
+    const { statusActions } = useContext(StatusContext);
+    const { setModalVisible, setEstadoEditado } = statusActions;
+    // States locales
+    const [ financiadores, setFinanciadores ] = useState([])
     
     // TOGGLE MODAL
     const openModal = (estado = null) => {
@@ -68,9 +69,11 @@ const Financer = () => {
             <Table 
                 data={financiadores} 
                 openModal={openModal} 
+                setFinanciadores={setFinanciadores}
             />
             <Modal 
                 closeModal={closeModal} 
+                setFinanciadores={setFinanciadores}
             />
         </div>
     )

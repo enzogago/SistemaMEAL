@@ -4,24 +4,19 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SistemaMEAL.Server.Models
 {
-   public class SubProyecto
+    public class Resultado
     {
         [Key, Column(Order = 0)]
+        public String? ResAno { get; set; }
+        [Key, Column(Order = 1)]
+        public String? ResCod { get; set; }
+        [ForeignKey("SubProyecto")]
         public String? SubProAno { get; set; }
 
-        [Key, Column(Order = 1)]
+        [ForeignKey("SubProyecto")]
         public String? SubProCod { get; set; }
-
-        [ForeignKey("Proyecto")]
-        public String? ProAno { get; set; }
-
-        [ForeignKey("Proyecto")]
-        public String? ProCod { get; set; }
-
-        public String? SubProNom { get; set; }
-
-        public String? SubProPre { get; set; }
-
+        public String? ResNom { get; set; }
+        public String? ResPre { get; set; }
         public String? UsuIng { get; set; }
 
         public DateTime? FecIng { get; set; }
@@ -31,10 +26,6 @@ namespace SistemaMEAL.Server.Models
         public DateTime? FecMod { get; set; }
 
         public char EstReg { get; set; }
-
-        public virtual Proyecto? Proyecto { get; set; }
-
-        public List<Objetivo>? Objetivo { get; set; }
-        public List<Resultado>? Resultado { get; set; }
+        public virtual SubProyecto? SubProyecto { get; set; }
     }
 }

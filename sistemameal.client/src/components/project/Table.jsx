@@ -1,7 +1,3 @@
-import { useContext, useMemo, useState } from 'react';
-// librerias
-import { FaPenNib, FaPlus, FaSortDown, FaSortUp, FaTrash } from 'react-icons/fa';
-// React Table
 import {
     useReactTable, 
     getCoreRowModel, 
@@ -9,63 +5,57 @@ import {
     getPaginationRowModel,
     getSortedRowModel, 
 } from '@tanstack/react-table';
-// Contextos
-import { AuthContext } from '../../context/AuthContext';
-// Componentes
-import { handleDelete } from '../reusable/helper';
+import { FaPenNib, FaPlus, FaSortDown, FaSortUp, FaTrash } from 'react-icons/fa';
 import Pagination from '../reusable/Pagination';
+import { useMemo, useState } from 'react';
+import TableRow from './TableRow';
 
-const Table = ({ data, openModal, setCargos }) => {
-    // Variables State AuthContext 
-    const { authActions, authInfo } = useContext(AuthContext);
-    const { setIsLoggedIn } = authActions;
-    const { userPermissions } = authInfo;
-    // States locales
+const Table = ({data = []}) => {
+    console.log(data)
+    // Estados locales para el filtrado
+    
+    const [anoFilter, setAnoFilter] = useState('');
     const [codigoFilter, setCodigoFilter] = useState('');
     const [nombreFilter, setNombreFilter] = useState('');
+    const [responsableFilter, setResponsableFilter] = useState('');
+    const [periodoFilter, setPeriodoFilter] = useState('');
 
-    /* TANSTACK */
-    const actions = {
-        add: userPermissions.some(permission => permission.perNom === "CREAR CARGO"),
-        delete: userPermissions.some(permission => permission.perNom === "ELIMINAR CARGO"),
-        edit: userPermissions.some(permission => permission.perNom === "MODIFICAR CARGO"),
-    };
-
-    const columns = useMemo(() => {
-        let baseColumns = [
-            {
-                header: "Código",
-                accessorKey: "carCod",
-            },
-            {
-                header: "Nombre",
-                accessorKey: "carNom",
-            }
-        ];
     
-        if (actions.delete || actions.edit) {
-            baseColumns.push({
-                header: "Acciones",
-                accessorKey: "acciones",
-                cell: ({row}) => (
-                    <div className='PowerMas_IconsTable flex jc-center ai-center'>
-                        {actions.delete && <FaTrash className='Large-p_25' onClick={() => handleDelete('Cargo', row.original.carCod, setCargos, setIsLoggedIn)} />}
-                        {actions.edit && <FaPenNib className='Large-p_25' onClick={() => openModal(row.original)} />}
-                    </div>
-                ),
-            });
+
+    const columns = [
+        {
+            header: "Año",
+            accessorKey: "proAno"
+        },
+        {
+            header: "Código",
+            accessorKey: "proCod"
+        },
+        {
+            header: "Nombre",
+            accessorKey: "proNom"
+        },
+        {
+            header: "Responsable",
+            accessorKey: "proRes"
+        },
+        {
+            header: "Periodo",
+            accessorKey: "proPer"
         }
-    
-        return baseColumns;
-    }, [actions]);
+    ]
 
     const [sorting, setSorting] = useState([]);
     const filteredData = useMemo(() => 
         data.filter(item => 
-            item.carCod.includes(codigoFilter.toUpperCase()) &&
-            item.carNom.includes(nombreFilter.toUpperCase())
-        ), [data, codigoFilter, nombreFilter]
+            item.proAno.includes(anoFilter.toUpperCase()) &&
+            item.proCod.includes(codigoFilter.toUpperCase()) &&
+            item.proNom.includes(nombreFilter.toUpperCase()) &&
+            item.proRes.includes(responsableFilter.toUpperCase()) &&
+            item.proPer.includes(periodoFilter.toUpperCase()) 
+        ), [data, codigoFilter, nombreFilter, responsableFilter, periodoFilter ]
     );
+    
     const table = useReactTable({
         data: filteredData,
         columns,
@@ -78,22 +68,11 @@ const Table = ({ data, openModal, setCargos }) => {
         onSortingChange: setSorting,
         columnResizeMode: "onChange"
     })
-    /* END TANSTACK */
 
     return (
         <div className='TableMainContainer Large-p2'>
             <div className="flex jc-space-between">
-                <h1 className="flex left Large-f1_75">Listado de Cargos</h1>
-                {
-                    actions.add && 
-                    <button 
-                        className='Large-p_5 PowerMas_ButtonStatus'
-                        onClick={() => openModal()} 
-                        disabled={!actions.add}
-                    >
-                        Nuevo <FaPlus /> 
-                    </button>
-                }
+                <h1 className="flex left Large-f1_75">Listado de proyectos</h1>
             </div>
             <div className="PowerMas_TableContainer">
                 <table className="Large_12 PowerMas_TableStatus">
@@ -102,7 +81,15 @@ const Table = ({ data, openModal, setCargos }) => {
                             <th>
                                 <input 
                                     type="search"
-                                    placeholder='Filtrar por Codigo'
+                                    placeholder='Filtrar'
+                                    value={anoFilter}
+                                    onChange={e => setAnoFilter(e.target.value)}
+                                />
+                            </th>
+                            <th>
+                                <input 
+                                    type="search"
+                                    placeholder='Filtrar'
                                     value={codigoFilter}
                                     onChange={e => setCodigoFilter(e.target.value)}
                                 />
@@ -110,9 +97,25 @@ const Table = ({ data, openModal, setCargos }) => {
                             <th>
                                 <input 
                                     type="search"
-                                    placeholder='Filtrar por Nombre'
+                                    placeholder='Filtrar'
                                     value={nombreFilter}
                                     onChange={e => setNombreFilter(e.target.value)}
+                                />
+                            </th>
+                            <th>
+                                <input 
+                                    type="search"
+                                    placeholder='Filtrar'
+                                    value={responsableFilter}
+                                    onChange={e => setResponsableFilter(e.target.value)}
+                                />
+                            </th>
+                            <th>
+                                <input 
+                                    type="search"
+                                    placeholder='Filtrar'
+                                    value={periodoFilter}
+                                    onChange={e => setPeriodoFilter(e.target.value)}
                                 />
                             </th>
                         </tr>
@@ -158,21 +161,9 @@ const Table = ({ data, openModal, setCargos }) => {
                         {
                             table.getRowModel().rows.length > 0 ?
                                 table.getRowModel().rows.map(row => (
-                                    <tr key={row.id}>
-                                        {row.getVisibleCells().map(cell => (
-                                            <td
-                                                style={{ width: cell.column.getSize() }} 
-                                                key={cell.id}>
-                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                            </td>
-                                        ))}
-                                    </tr>
+                                    <TableRow key={row.id} row={row} flexRender={flexRender} />
                                 ))
-                            :   <tr className='PowerMas_TableEmpty'>
-                                    <td colSpan={3} className='Large-p1 center'>
-                                        No se encontraron registros
-                                    </td>
-                                </tr>
+                            : <tr className='PowerMas_TableEmpty'><td colSpan={5} className='Large-p1 center'>No se encontraron registros</td></tr>
                         }
                     </tbody>
                 </table>

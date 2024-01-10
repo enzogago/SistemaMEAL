@@ -1,21 +1,22 @@
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 // Libraries
 import Notiflix from 'notiflix';
 // Context
 import { AuthContext } from '../../context/AuthContext';
-import { StatusContext } from '../../context/StatusContext';
 // Componentes
 import Table from './Table';
 import Modal from './Modal';
+import { StatusContext } from '../../context/StatusContext';
 
 const Implementer = () => {
   // Variables State AuthContext 
   const { authActions } = useContext(AuthContext);
   const { setIsLoggedIn } = authActions;
   // Variables State statusContext
-  const { statusInfo, statusActions } = useContext(StatusContext);
-  const { implementadores } = statusInfo;
-  const { setImplementadores, setModalVisible, setEstadoEditado } = statusActions;
+  const { statusActions } = useContext(StatusContext);
+  const { setModalVisible, setEstadoEditado } = statusActions;
+  // States locales
+  const [ implementadores, setImplementadores ] = useState([])
   
   // TOGGLE MODAL
   const openModal = (estado = null) => {
@@ -38,7 +39,6 @@ const Implementer = () => {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            console.log(response)
             if (!response.ok) {
                 if(response.status == 401 || response.status == 403){
                     const data = await response.json();
@@ -48,7 +48,6 @@ const Implementer = () => {
                 return;
             }
             const data = await response.json();
-            console.log(data)
             if (data.success == false) {
                 Notiflix.Notify.failure(data.message);
                 return;
@@ -69,9 +68,11 @@ const Implementer = () => {
         <Table 
             data={implementadores} 
             openModal={openModal} 
+            setImplementadores={setImplementadores}
         />
         <Modal 
             closeModal={closeModal} 
+            setImplementadores={setImplementadores}
         />
     </div>
   )

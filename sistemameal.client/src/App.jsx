@@ -33,15 +33,6 @@ const App = () => {
     const { isLoggedIn, menuData } = authInfo;
     const { setIsLoggedIn } = authActions;
 
-    // Verificar el token al cargar la aplicación
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (token && !isTokenExpired(token)) {
-            setIsLoggedIn(true);
-        } else{
-            setIsLoggedIn(false);
-        }
-    }, []);
 
     const componentMap = {
         'user': User,

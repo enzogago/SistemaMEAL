@@ -4,14 +4,14 @@ import { AuthContext } from '../../context/AuthContext';
 import { StatusContext } from '../../context/StatusContext';
 import { handleSubmit } from '../reusable/helper';
 
-const Modal = ({ closeModal }) => {
+const Modal = ({ closeModal, setPermisos }) => {
     // variables state de AuthContext
     const { authActions } = useContext(AuthContext);
     const { setIsLoggedIn } = authActions;
     // variables state de StatusContext
     const { statusInfo, statusActions } = useContext(StatusContext);
     const { estadoEditado, modalVisible } = statusInfo;
-    const { setPermisos, setModalVisible } = statusActions;
+    const { setModalVisible } = statusActions;
 
     const { register, handleSubmit: validateForm, formState: { errors }, reset, setValue } = useForm();
 

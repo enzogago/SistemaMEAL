@@ -13,38 +13,49 @@ import { AuthContext } from '../../context/AuthContext';
 import { handleDelete } from '../reusable/helper';
 
 
-const Table = ({ data, openModal }) => {
+const Table = ({ data, openModal, setImplementadores }) => {
     // Variables State AuthContext 
-    const { authActions } = useContext(AuthContext);
+    const { authActions, authInfo } = useContext(AuthContext);
     const { setIsLoggedIn } = authActions;
-    // Variables State statusContext
-    const { statusActions } = useContext(StatusContext);
-    const { setImplementadores } = statusActions;
+    const { userPermissions } = authInfo;
     // States locales
     const [codigoFilter, setCodigoFilter] = useState('');
     const [nombreFilter, setNombreFilter] = useState('');
-    console.log(data)
+
     /* TANSTACK */
-    const columns = [
-        {
-            header: "Código",
-            accessorKey: "impCod"
-        },
-        {
-            header: "Nombre",
-            accessorKey: "impNom"
-        },
-        {
-            header: "Acciones",
-            accessorKey: "acciones",
-            cell: ({row}) => (
-                <div className='PowerMas_IconsTable flex jc-center ai-center'>
-                    <FaTrash className='Large-p_25' onClick={() => handleDelete('Implementador',row.original.impCod, setImplementadores, setIsLoggedIn)} />
-                    <FaPenNib className='Large-p_25' onClick={() => openModal(row.original)} />
-                </div>
-            ),
-        },
-    ]
+    const actions = {
+        add: userPermissions.some(permission => permission.perNom === "CREAR IMPLEMENTADOR"),
+        delete: userPermissions.some(permission => permission.perNom === "ELIMINAR IMPLEMENTADOR"),
+        edit: userPermissions.some(permission => permission.perNom === "MODIFICAR IMPLEMENTADOR"),
+    };
+
+    const columns = useMemo(() => {
+        let baseColumns = [
+            {
+                header: "Código",
+                accessorKey: "impCod",
+            },
+            {
+                header: "Nombre",
+                accessorKey: "impNom",
+            }
+        ];
+    
+        if (actions.delete || actions.edit) {
+            baseColumns.push({
+                header: "Acciones",
+                accessorKey: "acciones",
+                cell: ({row}) => (
+                    <div className='PowerMas_IconsTable flex jc-center ai-center'>
+                        {actions.delete && <FaTrash className='Large-p_25' onClick={() => handleDelete('Implementador', row.original.impCod, setImplementadores, setIsLoggedIn)} />}
+                        {actions.edit && <FaPenNib className='Large-p_25' onClick={() => openModal(row.original)} />}
+                    </div>
+                ),
+            });
+        }
+    
+        return baseColumns;
+    }, [actions]);
 
     const [sorting, setSorting] = useState([]);
     const filteredData = useMemo(() => 
@@ -71,9 +82,16 @@ const Table = ({ data, openModal }) => {
         <div className='TableMainContainer Large-p2'>
             <div className="flex jc-space-between">
                 <h1 className="flex left Large-f1_75">Listado de Implementadores</h1>
-                <button className='Large-p_5 PowerMas_ButtonStatus' onClick={() => openModal()}>
-                    Nuevo <FaPlus /> 
-                </button>
+                {
+                    actions.add && 
+                    <button 
+                        className='Large-p_5 PowerMas_ButtonStatus'
+                        onClick={() => openModal()} 
+                        disabled={!actions.add}
+                    >
+                        Nuevo <FaPlus /> 
+                    </button>
+                }
             </div>
             <div className="PowerMas_TableContainer">
                 <table className="Large_12 PowerMas_TableStatus">

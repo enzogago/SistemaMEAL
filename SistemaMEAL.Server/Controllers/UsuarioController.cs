@@ -62,15 +62,15 @@ namespace SistemaMEAL.Server.Controllers
             var (message, messageType) = _usuarios.Insertar(usuario);
             if (messageType == "1") // Error
             {
-                return BadRequest(message);
+                return new BadRequestObjectResult(new { success = false, message = message });
             }
             else if (messageType == "2") // Registro ya existe
             {
-                return Conflict(message);
+                return new ConflictObjectResult(new { success = false, message = message });
             }
-            else // Registro insertado correctamente
+            else // Registro modificado correctamente
             {
-                return Ok(message);
+                return new OkObjectResult(new { success = true, message = message });
             }
         }
 
@@ -104,15 +104,15 @@ namespace SistemaMEAL.Server.Controllers
             var (message, messageType) = _usuarios.Modificar(usuario);
             if (messageType == "1") // Error
             {
-                return BadRequest(message);
+                return new BadRequestObjectResult(new { success = false, message = message });
             }
             else if (messageType == "2") // Registro ya existe
             {
-                return Conflict(message);
+                return new ConflictObjectResult(new { success = false, message = message });
             }
             else // Registro modificado correctamente
             {
-                return Ok(message);
+                return new OkObjectResult(new { success = true, message = message });
             }
         }
 

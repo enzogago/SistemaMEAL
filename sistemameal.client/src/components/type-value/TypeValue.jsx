@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 // Libraries
 import Notiflix from 'notiflix';
 // Context
@@ -13,9 +13,10 @@ const TypeValue = () => {
   const { authActions } = useContext(AuthContext);
   const { setIsLoggedIn } = authActions;
   // Variables State statusContext
-  const { statusInfo, statusActions } = useContext(StatusContext);
-  const { tiposValor } = statusInfo;
-  const { setTiposValor, setModalVisible, setEstadoEditado } = statusActions;
+  const { statusActions } = useContext(StatusContext);
+  const { setModalVisible, setEstadoEditado } = statusActions;
+  // States locales
+  const [ tiposValor, setTiposValor ] = useState([])
   
   // TOGGLE MODAL
   const openModal = (estado = null) => {
@@ -68,10 +69,12 @@ const TypeValue = () => {
     <div className="PowerMas_StatusContainer">
         <Table 
             data={tiposValor} 
-            openModal={openModal} 
+            openModal={openModal}
+            setTiposValor={setTiposValor}
         />
         <Modal 
-            closeModal={closeModal} 
+            closeModal={closeModal}
+            setTiposValor={setTiposValor}
         />
     </div>
   )

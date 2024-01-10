@@ -7,6 +7,7 @@ import Notiflix from "notiflix";
 const AuthState = ({ children }) => {
     // Estados locales
     const [ userLogged, setUserLogged ] = useState({})
+    const [ userPermissions, setUserPermissions ] = useState([])
 
     const validarUsuario = async () => {
         try {
@@ -33,10 +34,30 @@ const AuthState = ({ children }) => {
             console.error(`Error al hacer la solicitud: ${error}`);
         }
     };
-    
+
+    const verificarPermisos = async () => {
+        const token = localStorage.getItem('token');
+        if(!token) return;
+        // Obtenemos los permisos del usuario
+        const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Permiso/${userLogged.usuAno}/${userLogged.usuCod}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        const userPermissions = await response.json();
+        setUserPermissions(userPermissions);
+    }
+
     useEffect( () => {
         validarUsuario();
     }, []);
+    
+    useEffect( () => {
+        if (Object.keys(userLogged).length !== 0) {
+            verificarPermisos();
+        }
+    }, [userLogged]);
+    
     
     const initialState = {
         isLoggedIn: false,
@@ -74,7 +95,8 @@ const AuthState = ({ children }) => {
         users: state.users,
         menuData: state.menuData,
         userMaint: state.userMaint,
-        userLogged
+        userLogged,
+        userPermissions
     };
 
     const authActions = {
@@ -83,7 +105,8 @@ const AuthState = ({ children }) => {
         setMenuData,
         setUserMaint,
         setUserLogged,
-        resetUsers
+        setUserPermissions,
+        resetUsers,
     };
 
     return (

@@ -1,6 +1,6 @@
 import Notiflix from "notiflix";
 
-export const handleSubmit = async (e, userMaint, formValues, setUsers, setIsLoggedIn, setUserMaint) => {
+export const handleSubmit = async (e, userMaint, formValues, setUsers, setIsLoggedIn, setUserMaint, navigate) => {
     e.preventDefault();
 
     var usuario = userMaint ? { ...userMaint, ...formValues } : { ...formValues };
@@ -21,33 +21,20 @@ export const handleSubmit = async (e, userMaint, formValues, setUsers, setIsLogg
             },
             body: JSON.stringify({ ...usuario }),
         });
-        console.log("desde response: ",response)
-        if (!response.ok) {
-            const text = await response.text();
-            const messageType = text.split(":")[0];
-            if (messageType === "1") {
-                Notiflix.Notify.failure("Error durante la ejecución del procedimiento almacenado");
-            } else {
-                Notiflix.Notify.failure(text);
-            }
-            throw new Error(text);
-        }
-
-        const contentType = response.headers.get("content-type");
-        if (contentType && contentType.indexOf("application/json") !== -1) {
-            const data = await response.json();
-            if (data.result) {
-                setIsLoggedIn(false);
-                
-            }
-
-            Notiflix.Notify.failure(data.message);
-            return;
-        }
         
-        const text = await response.text();
-        Notiflix.Notify.success(text);
-        console.log(text)
+        if (!response.ok) {
+            const data = await response.json();
+            if(response.status === 409){
+                Notiflix.Notify.warning(`${data.message} ${(usuario.usuCorEle).toUpperCase()}`);
+                return;
+            } else {
+                Notiflix.Notify.failure(data.message);
+                return;
+            }
+        }
+
+        const dataSuccess = await response.json();
+        Notiflix.Notify.success(dataSuccess.message);
 
         // Actualiza los datos después de insertar o modificar un registro
         const updateResponse = await fetch(`${import.meta.env.VITE_APP_API_URL}/usuario`, {
@@ -56,10 +43,13 @@ export const handleSubmit = async (e, userMaint, formValues, setUsers, setIsLogg
             }
         });
         const data = await updateResponse.json();
-        setUsers(data);
+        if(!updateResponse.ok){
+            Notiflix.Notify.failure(data.message);
+        }
         console.log(data);
         // Setear userMaint con los datos del usuario
         setUserMaint(data[data.length - 1]);
+        navigate('/menu-user');
     } catch (error) {
         console.error('Error:', error);
     }

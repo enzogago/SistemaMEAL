@@ -13,43 +13,55 @@ import { AuthContext } from '../../context/AuthContext';
 import { handleDelete } from '../reusable/helper';
 
 
-const Table = ({ data, openModal }) => {
+const Table = ({ data, setDocumentosIdentidad, openModal }) => {
     // Variables State AuthContext 
-    const { authActions } = useContext(AuthContext);
+    const { authActions, authInfo } = useContext(AuthContext);
     const { setIsLoggedIn } = authActions;
-    // Variables State statusContext
-    const { statusActions } = useContext(StatusContext);
-    const { setDocumentosIdentidad } = statusActions;
+    const { userPermissions } = authInfo;
     // States locales
     const [codigoFilter, setCodigoFilter] = useState('');
     const [nombreFilter, setNombreFilter] = useState('');
     const [abreviaturaFilter, setAbreviaturaFilter] = useState('');
 
     /* TANSTACK */
-    const columns = [
-        {
-            header: "Código",
-            accessorKey: "docIdeCod"
-        },
-        {
-            header: "Nombre",
-            accessorKey: "docIdeNom"
-        },
-        {
-            header: "Abreviatura",
-            accessorKey: "docIdeAbr"
-        },
-        {
-            header: "Acciones",
-            accessorKey: "acciones",
-            cell: ({row}) => (
-                <div className='PowerMas_IconsTable flex jc-center ai-center'>
-                    <FaTrash className='Large-p_25' onClick={() => handleDelete('DocumentoIdentidad',row.original.docIdeCod, setDocumentosIdentidad, setIsLoggedIn)} />
-                    <FaPenNib className='Large-p_25' onClick={() => openModal(row.original)} />
-                </div>
-            ),
-        },
-    ]
+    const actions = {
+        add: userPermissions.some(permission => permission.perNom === "CREAR DOCUMENTO_IDENTIDAD"),
+        delete: userPermissions.some(permission => permission.perNom === "ELIMINAR DOCUMENTO_IDENTIDAD"),
+        edit: userPermissions.some(permission => permission.perNom === "MODIFICAR DOCUMENTO_IDENTIDAD"),
+    };
+
+    const columns = useMemo(() => {
+        let baseColumns = [
+            {
+                header: "Código",
+                accessorKey: "docIdeCod",
+            },
+            {
+                header: "Nombre",
+                accessorKey: "docIdeNom",
+            },
+            {
+                header: "Abreviatura",
+                accessorKey: "docIdeAbr",
+            }
+        ];
+    
+        if (actions.delete || actions.edit) {
+            baseColumns.push({
+                header: "Acciones",
+                accessorKey: "acciones",
+                cell: ({row}) => (
+                    <div className='PowerMas_IconsTable flex jc-center ai-center'>
+                        {actions.delete && <FaTrash className='Large-p_25' onClick={() => handleDelete('DocumentoIdentidad', row.original.docIdeCod, setDocumentosIdentidad, setIsLoggedIn)} />}
+                        {actions.edit && <FaPenNib className='Large-p_25' onClick={() => openModal(row.original)} />}
+                    </div>
+                ),
+            });
+        }
+    
+        return baseColumns;
+    }, [actions]);
+    
 
     const [sorting, setSorting] = useState([]);
     const filteredData = useMemo(() => 
@@ -72,14 +84,20 @@ const Table = ({ data, openModal }) => {
         columnResizeMode: "onChange"
     })
     /* END TANSTACK */
-
     return (
         <div className='TableMainContainer Large-p2'>
             <div className="flex jc-space-between">
                 <h1 className="flex left Large-f1_75">Listado de Documentos de Identidad</h1>
-                <button className='Large-p_5 PowerMas_ButtonStatus' onClick={() => openModal()}>
-                    Nuevo <FaPlus /> 
-                </button>
+                {
+                    actions.add && 
+                    <button 
+                        className='Large-p_5 PowerMas_ButtonStatus'
+                        onClick={() => openModal()} 
+                        disabled={!actions.add}
+                    >
+                        Nuevo <FaPlus /> 
+                    </button>
+                }
             </div>
             <div className="PowerMas_TableContainer">
                 <table className="Large_12 PowerMas_TableStatus">
@@ -109,7 +127,6 @@ const Table = ({ data, openModal }) => {
                                     onChange={e => setAbreviaturaFilter(e.target.value)}
                                 />
                             </th>
-                            <th></th>
                         </tr>
                         {
                             table.getHeaderGroups().map(headerGroup => (

@@ -1,15 +1,11 @@
-import { useContext, useEffect } from "react";
+import { useEffect, useState } from "react";
 // Libraries
 import Notiflix from 'notiflix';
 // Componentes
 import Table from "./Table"
-import { AuthContext } from "../../context/AuthContext";
 
 const User = () => {
-    // Variables State AuthContext 
-    const { authInfo, authActions } = useContext(AuthContext);
-    const { setUsers, setIsLoggedIn } = authActions;
-    const { users } = authInfo;
+    const [ usersTable, setUsersTable] = useState([])
 
     useEffect(() => {
         const fetchUsuarios = async () => {
@@ -23,12 +19,10 @@ const User = () => {
                 });
                 const data = await response.json();
                 if (!response.ok) {
-                    if(response.status == 401 || response.status == 403){
-                        Notiflix.Notify.failure(data.message);
-                    }
+                    Notiflix.Notify.failure(data.message);
                     return;
                 }
-                setUsers(data);
+                setUsersTable(data);
             } catch (error) {
                 console.error('Error:', error);
             } finally {
@@ -41,7 +35,7 @@ const User = () => {
     return (
         <div className="PowerMas_StatusContainer">
             <Table
-                data={ users }
+                data={ usersTable }
             />
         </div>
     )
