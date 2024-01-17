@@ -19,7 +19,7 @@ namespace SistemaMEAL.Server.Controllers
             _usuarios = usuarios;
         }
 
-        [HttpGet]
+       [HttpGet]
         public dynamic Listado()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
@@ -27,10 +27,12 @@ namespace SistemaMEAL.Server.Controllers
             Console.WriteLine(rToken);
             if (!rToken.success) return Unauthorized(rToken);
 
+            // Pasa los parámetros al método Listado
             var estados = _estados.Listado();
             
             return Ok(estados);
         }
+
 
         [HttpPost]
         public dynamic Insertar(Estado estado)

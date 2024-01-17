@@ -1,5 +1,5 @@
 import { useContext, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 // helper
 import { isTokenExpired } from './components/auth/auth';
 // Context
@@ -63,7 +63,11 @@ const App = () => {
                                 <Routes>
                                     {menuData.map((menu, index) => {
                                         const Component = componentMap[menu.menRef];
-                                        return Component ? <Route path={menu.menRef} element={<Component />} key={index} /> : null;
+                                        if (menu.menRef === 'new-project') {
+                                            return Component ? <Route path={`${menu.menRef}/:id?`} element={<Component />} key={index} /> : null;
+                                        } else {
+                                            return Component ? <Route path={menu.menRef} element={<Component />} key={index} /> : null;
+                                        }
                                     })}
 
                                     {menuData.some(menu => menu.menRef === 'user') && (

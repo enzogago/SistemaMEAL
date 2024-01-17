@@ -28,7 +28,7 @@ const Permission = () => {
     setModalVisible(false);
   };
 
-  // EFECTO AL CARGAR COMPONENTE GET - LISTAR ESTADOS
+  // EFECTO AL CARGAR COMPONENTE GET - LISTAR PERMISOS
   useEffect(() => {
     const fetchPermisos = async () => {
         try {

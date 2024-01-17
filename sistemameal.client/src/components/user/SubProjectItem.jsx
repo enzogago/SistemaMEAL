@@ -5,8 +5,8 @@ const SubProjectItem = ({ subProyecto, proyecto, handleCheck, checkedSubProyecto
             <input 
                 type="checkbox" 
                 value={subProyecto.subProCod} 
-                checked={!!checkedSubProyectos[subProyecto.subProCod]}
-                onChange={(event) => handleCheck(subProyecto, event.target.checked, true)}
+                checked={!!checkedSubProyectos[`${subProyecto.subProAno}-${subProyecto.subProCod}`]}
+                onChange={(event) => handleCheck(subProyecto, event.target.checked, true, proyecto)}
             />
         {subProyecto.subProNom}
         </label>

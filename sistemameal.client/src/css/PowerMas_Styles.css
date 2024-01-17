@@ -676,10 +676,7 @@ body {
 	align-items: center;
 	gap: 0.5rem;
 }
-.PowerMas_HeaderObjective > div svg{
-	color: #757575;
-	cursor: pointer;
-}
+
 
 .PowerMas_MainNewProject input[type=text] {
 	border: none;
@@ -691,10 +688,6 @@ body {
 	justify-content: center;
 	align-items: center;
 	gap: 0.5rem;
-}
-.PowerMas_HeaderResult > div svg{
-	color: #757575;
-	cursor: pointer;
 }
 
 .PowerMas_MainNewProject input[type=text]:focus {
@@ -1033,12 +1026,6 @@ body {
 	border: 1px solid transparent;
 	transition: border 0.3s ease;
 }
-.PowerMas_IconsTable svg:first-child{
-	color: red;
-}
-.PowerMas_IconsTable svg:last-child{
-	color: rgb(175, 175, 10);
-}
 
 .PowerMas_IconsTable svg:hover{
 	border: 1px solid;
@@ -1112,6 +1099,21 @@ body {
 	font-weight: bold;
 	border: 1px solid;
 	margin-top: 0px;
+}
+
+.red {
+    color: red;
+    transition: color 0.3s ease;
+}
+.red-hover:hover {
+    color: darkred;
+}
+.grey{
+	color: #757575;
+	transition: color 0.3s ease;
+}
+.grey-hover:hover{
+	color: #605f5f;
 }
 /* END REUSABLE */
 

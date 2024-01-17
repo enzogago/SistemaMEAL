@@ -30,6 +30,6 @@ namespace SistemaMEAL.Server.Models
 
         public char EstReg { get; set; }
 
-        public List<SubProyecto>? SubProyecto { get; set; }
+        public List<SubProyecto>? SubProyectos { get; set; }
     }
 }

@@ -34,7 +34,7 @@ namespace SistemaMEAL.Server.Models
 
         public virtual Proyecto? Proyecto { get; set; }
 
-        public List<Objetivo>? Objetivo { get; set; }
-        public List<Resultado>? Resultado { get; set; }
+        public List<Objetivo>? Objetivos { get; set; }
+        public List<Resultado>? Resultados { get; set; }
     }
 }

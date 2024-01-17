@@ -8,25 +8,28 @@ const ProjectItem = ({ proyecto, handleCheck, checkedProyectos, checkedSubProyec
                 <input 
                     type="checkbox" 
                     value={proyecto.proCod} 
-                    checked={!!checkedProyectos[proyecto.proCod]}
+                    checked={!!checkedProyectos[`${proyecto.proAno}-${proyecto.proCod}`]}
                     onChange={(event) => handleCheck(proyecto, event.target.checked, false)}
                 />
                 {proyecto.proNom}
             </label>
-            <span> 
-                &gt; 
-            </span>
+            {
+                proyecto.subProyectos &&
+                <span> 
+                    &gt; 
+                </span>
+            }
         </div>
         <ul>
-        {proyecto.subProyectos.map(subProyecto => (
-            <SubProjectItem 
-                key={subProyecto.subProCod} 
-                subProyecto={subProyecto} 
-                proyecto={proyecto} // pasa el proyecto padre
-                handleCheck={handleCheck} 
-                checkedSubProyectos={checkedSubProyectos} 
-            />
-        ))}
+            {proyecto.subProyectos && proyecto.subProyectos.map(subProyecto => (
+                <SubProjectItem 
+                    key={subProyecto.subProCod} 
+                    subProyecto={subProyecto} 
+                    proyecto={proyecto} 
+                    handleCheck={handleCheck} 
+                    checkedSubProyectos={checkedSubProyectos} 
+                />
+            ))}
         </ul>
     </li>
   )

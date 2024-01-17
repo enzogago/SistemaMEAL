@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Notiflix from "notiflix";
 import ProjectItem from "./ProjectItem";
 
@@ -11,24 +11,13 @@ const PermissionUser = () => {
   const { userMaint } = authInfo;
   //
   const [ proyectos, setProyectos ] = useState([]);
-  const [checkedProyectos, setCheckedProyectos] = useState({});
-  const [checkedSubProyectos, setCheckedSubProyectos] = useState({});
+  const [ checkedProyectos, setCheckedProyectos ] = useState({});
+  const [ checkedSubProyectos, setCheckedSubProyectos ] = useState({});
+  const [ addedProyectos, setAddedProyectos ] = useState({});
+  const [ addedSubProyectos, setAddedSubProyectos ] = useState({});
+  const [ removedProyectos, setRemovedProyectos ] = useState({});
+  const [ removedSubProyectos, setRemovedSubProyectos ] = useState({});
 
-  const groupByProject = (data) => {
-    const projectMap = data.reduce((map, item) => {
-      if (!map[item.proCod]) {
-        map[item.proCod] = { ...item, subProyectos: [] };
-      }
-      if (item.subProyecto && item.subProyecto.length > 0) {
-        map[item.proCod].subProyectos.push(...item.subProyecto);
-      }
-      return map;
-    }, {});
-  
-    const proyectos = Object.values(projectMap);
-  
-    return proyectos;
-  };
 
   useEffect(() => {
     // Verifica si userMaint es un objeto vacío
@@ -41,6 +30,8 @@ const PermissionUser = () => {
 
   // EFECTO AL CARGAR COMPONENTE GET - LISTAR PROYECTOS
   useEffect(() => {
+    let isCancelled = false;
+
     const fetchProyectos = async () => {
         try {
             Notiflix.Loading.pulse('Cargando...');
@@ -50,74 +41,211 @@ const PermissionUser = () => {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            console.log(response)
             if (!response.ok) {
-                if(response.status == 401 || response.status == 403){
-                    const data = await response.json();
-                    Notiflix.Notify.failure(data.message);
-                    // setIsLoggedIn(false);
-                }
-                return;
-            }
-            const data = await response.json();
-            if (data.success == false) {
+                const data = await response.json();
                 Notiflix.Notify.failure(data.message);
                 return;
             }
-            const proyectos = groupByProject(data);
-            setProyectos(proyectos);
-            console.log(proyectos);
+            const data = await response.json();
+            console.log(data)
+            if (!isCancelled) {
+                setProyectos(data);
+            }
         } catch (error) {
-            console.error('Error:', error);
+            Notiflix.Notify.failure('Ha ocurrido un error al cargar los proyectos.');
         } finally {
             Notiflix.Loading.remove();
         }
     };
 
+    const fetchProyectosAccesibles = async () => {
+      try {
+          Notiflix.Loading.pulse('Cargando...');
+          const token = localStorage.getItem('token');
+          const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Proyecto/accesibles/${userMaint.usuAno}/${userMaint.usuCod}`, {
+              headers: {
+                  'Authorization': `Bearer ${token}`
+              }
+          });
+          if (!response.ok) {
+              const data = await response.json();
+              Notiflix.Notify.failure(data.message);
+              return;
+          }
+          const data = await response.json();
+          console.log(data)
+          if (!isCancelled) {
+            let newCheckedProyectos = { ...checkedProyectos };
+            let newCheckedSubProyectos = { ...checkedSubProyectos };
+    
+            data.forEach(proyecto => {
+                newCheckedProyectos[`${proyecto.proAno}-${proyecto.proCod}`] = true;
+                if (proyecto.subProyectos) {
+                    proyecto.subProyectos.forEach(subProyecto => {
+                        newCheckedSubProyectos[`${subProyecto.subProAno}-${subProyecto.subProCod}`] = true;
+                    });
+                }
+            });
+            setCheckedProyectos(newCheckedProyectos);
+            setCheckedSubProyectos(newCheckedSubProyectos);
+          }
+      } catch (error) {
+          console.log(error)
+          Notiflix.Notify.failure('Ha ocurrido un error al cargar los proyectos accesibles.');
+      } finally {
+          Notiflix.Loading.remove();
+      }
+    };
+
     fetchProyectos();
+    fetchProyectosAccesibles();
+
+    return () => {
+        isCancelled = true;
+    };
   }, []);
 
-  
 
-  const handleCheck = useCallback((item, isChecked, isSubProyecto = false) => {
+  const handleCheck = (item, isChecked, isSubProyecto, proyecto) => {
+    let newCheckedProyectos = { ...checkedProyectos };
+    let newCheckedSubProyectos = { ...checkedSubProyectos };
+    let newAddedProyectos = { ...addedProyectos };
+    let newAddedSubProyectos = { ...addedSubProyectos };
+    let newRemovedProyectos = { ...removedProyectos };
+    let newRemovedSubProyectos = { ...removedSubProyectos };
+
     if (isSubProyecto) {
-      setCheckedSubProyectos(prevChecked => ({
-        ...prevChecked,
-        [item.subProCod]: isChecked
-      }));
-  
-      // Si se está marcando el checkbox, también marca el proyecto padre.
-      if (isChecked) {
-        setCheckedProyectos(prevChecked => ({
-          ...prevChecked,
-          [item.proCod]: isChecked
-        }));
-      }
+        newCheckedSubProyectos[`${item.subProAno}-${item.subProCod}`] = isChecked;
+        if (isChecked && !newCheckedProyectos[`${proyecto.proAno}-${proyecto.proCod}`]) {
+          newCheckedProyectos[`${proyecto.proAno}-${proyecto.proCod}`] = isChecked;
+          // Solo agrega el proyecto a newAddedProyectos si no está en newRemovedProyectos
+          if (!newRemovedProyectos[`${proyecto.proAno}-${proyecto.proCod}`]) {
+              newAddedProyectos[`${proyecto.proAno}-${proyecto.proCod}`] = proyecto;
+          }
+          delete newRemovedProyectos[`${proyecto.proAno}-${proyecto.proCod}`];
+        }
+
+        if (isChecked) {
+            // Solo agrega el subproyecto a newAddedSubProyectos si no está en newRemovedSubProyectos
+            if (!newRemovedSubProyectos[`${item.subProAno}-${item.subProCod}`]) {
+                newAddedSubProyectos[`${item.subProAno}-${item.subProCod}`] = item;
+            }
+            delete newRemovedSubProyectos[`${item.subProAno}-${item.subProCod}`];
+        } else {
+            // Solo agrega el subproyecto a newRemovedSubProyectos si no está en newAddedSubProyectos
+            if (!newAddedSubProyectos[`${item.subProAno}-${item.subProCod}`]) {
+                newRemovedSubProyectos[`${item.subProAno}-${item.subProCod}`] = item;
+            }
+            delete newAddedSubProyectos[`${item.subProAno}-${item.subProCod}`];
+        }
     } else {
-      setCheckedProyectos(prevChecked => ({
-        ...prevChecked,
-        [item.proCod]: isChecked
-      }));
-  
-      // Si se está marcando o desmarcando el checkbox, también marca o desmarca todos los subproyectos.
-      const newCheckedSubProyectos = { ...checkedSubProyectos };
-      item.subProyectos.forEach(subProyecto => {
-        newCheckedSubProyectos[subProyecto.subProCod] = isChecked;
-      });
-      setCheckedSubProyectos(newCheckedSubProyectos);
+        newCheckedProyectos[`${item.proAno}-${item.proCod}`] = isChecked;
+        if (isChecked) {
+            // Solo agrega el proyecto a newAddedProyectos si no está en newRemovedProyectos
+            if (!newRemovedProyectos[`${item.proAno}-${item.proCod}`]) {
+                newAddedProyectos[`${item.proAno}-${item.proCod}`] = item;
+            }
+            delete newRemovedProyectos[`${item.proAno}-${item.proCod}`];
+        } else {
+            // Solo agrega el proyecto a newRemovedProyectos si no está en newAddedProyectos
+            if (!newAddedProyectos[`${item.proAno}-${item.proCod}`]) {
+                newRemovedProyectos[`${item.proAno}-${item.proCod}`] = item;
+            }
+            delete newAddedProyectos[`${item.proAno}-${item.proCod}`];
+        }
+        if (item.subProyectos) {
+          item.subProyectos.forEach(subProyecto => {
+            // Solo desmarca el subproyecto si está marcado
+            if (newCheckedSubProyectos[`${subProyecto.subProAno}-${subProyecto.subProCod}`]) {
+                newCheckedSubProyectos[`${subProyecto.subProAno}-${subProyecto.subProCod}`] = isChecked;
+                if (!newAddedSubProyectos[`${subProyecto.subProAno}-${subProyecto.subProCod}`]) {
+                  newRemovedSubProyectos[`${subProyecto.subProAno}-${subProyecto.subProCod}`] = subProyecto;
+                }
+                delete newAddedSubProyectos[`${subProyecto.subProAno}-${subProyecto.subProCod}`];
+            }
+          });
+        }
     }
-  }, [checkedSubProyectos]);
-  
-  
-  const renderProyecto = (proyecto) => (
-    <ProjectItem 
-      key={proyecto.proCod} 
-      proyecto={proyecto} 
-      handleCheck={handleCheck} 
-      checkedProyectos={checkedProyectos} 
-      checkedSubProyectos={checkedSubProyectos} 
-    />
-  );
+
+    setCheckedProyectos(newCheckedProyectos);
+    setCheckedSubProyectos(newCheckedSubProyectos);
+    setAddedProyectos(newAddedProyectos);
+    setAddedSubProyectos(newAddedSubProyectos);
+    setRemovedProyectos(newRemovedProyectos);
+    setRemovedSubProyectos(newRemovedSubProyectos);
+    console.log(newAddedProyectos);
+    console.log(newAddedSubProyectos);
+    console.log(newRemovedProyectos);
+    console.log(newRemovedSubProyectos);
+  };
+
+
+  const agregarExclusiones = async (proyectos, subProyectos) => {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Proyecto/agregar-exclusiones/${userMaint.usuAno}/${userMaint.usuCod}`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            Proyectos: proyectos,
+            SubProyectos: subProyectos
+        })
+    });
+
+    if (!response.ok) {
+        const data = await response.json();
+        Notiflix.Notify.failure(data.message);
+        return;
+    }
+
+    Notiflix.Notify.success('Los permisos del usuario han sido agregados exitosamente.');
+  };
+
+  const eliminarExclusiones = async (proyectos, subProyectos) => {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Proyecto/eliminar-exclusiones/${userMaint.usuAno}/${userMaint.usuCod}`, {
+          method: 'POST',
+          headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+              Proyectos: proyectos,
+              SubProyectos: subProyectos
+          })
+      });
+
+      if (!response.ok) {
+          const data = await response.json();
+          Notiflix.Notify.failure(data.message);
+          return;
+      }
+
+      Notiflix.Notify.success('Los permisos del usuario han sido eliminados exitosamente.');
+  };
+
+
+  const handleClickaso = async () => {
+    const proyectosToAdd = Object.values(addedProyectos);
+    const subProyectosToAdd = Object.values(addedSubProyectos);
+    const proyectosToRemove = Object.values(removedProyectos);
+    const subProyectosToRemove = Object.values(removedSubProyectos);
+
+    // Ahora puedes usar estas listas para hacer tus solicitudes a la API
+    if (proyectosToAdd.length > 0 || subProyectosToAdd.length > 0) {
+      console.log(proyectosToAdd)
+      console.log(subProyectosToAdd)
+      await eliminarExclusiones(proyectosToAdd, subProyectosToAdd);
+    }
+    if (proyectosToRemove.length > 0 || subProyectosToRemove.length > 0) {
+      console.log(proyectosToRemove)
+      console.log(subProyectosToRemove)
+      await agregarExclusiones(proyectosToRemove, subProyectosToRemove);
+    }
+    navigate('/user');
+  }
 
 
   return (
@@ -126,11 +254,19 @@ const PermissionUser = () => {
       <div>
         <div className="PowerMas_ListPermission">
           <ul>
-            {proyectos.map(proyecto => renderProyecto(proyecto))}
+            {proyectos.map(proyecto => (
+              <ProjectItem 
+                  key={proyecto.proCod} 
+                  proyecto={proyecto} 
+                  handleCheck={handleCheck} 
+                  checkedProyectos={checkedProyectos} 
+                  checkedSubProyectos={checkedSubProyectos} 
+              />
+            ))}
           </ul>
         </div>
       </div>
-      <button> Siguiente </button>
+      <button onClick={handleClickaso}> Siguiente </button>
     </div>
   )
 }

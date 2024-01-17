@@ -20,6 +20,7 @@ const AuthState = ({ children }) => {
                     'Authorization': `Bearer ${token}`
                 }
             });
+            console.log(response)
             if (!response.ok) {
                     const data = await response.json();
                     console.log(data.message)

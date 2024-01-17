@@ -1,39 +1,82 @@
 import { FaPlus, FaTrash } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import Result from "./Result";
+import Objective from "./Objective";
 
-const SubProject = () => (
+const SubProject = ({subProAno, subProCod, subProNom, objetivos, resultados }) => {
+    console.log(objetivos)
+
+    const [ editObjetivos, setEditObjetivos] = useState([]);
+    const [ editResultados, setEditResultados] = useState([]);
+
+    useEffect(() => {
+        setEditObjetivos(objetivos || []);
+    }, [objetivos]);
+
+    useEffect(() => {
+        setEditResultados(resultados || []);
+    }, [resultados]);
+
+    return (
     <div className="PowerMas_SubProjectItem">
+        <div className="Large-f1_5 Large-m_5 flex jc-flex-end">
+            <FaTrash className="Large_1 pointer red red-hover" />
+        </div>
         <div className="PowerMas_SAPInput">
-            <input className="" type="text" placeholder="codigo SAP: 15465" />
-            <i className="fas fa-trash"></i>
+            <input 
+                className="" 
+                type="text" 
+                placeholder="codigo SAP: 15465" 
+            />
         </div>
         <div className="">
-            <textarea className="" defaultValue="Nombre de subproyecto 1"></textarea>
+            <textarea 
+                className="" 
+                placeholder="Nombre de subproyecto 1" 
+                defaultValue={subProNom} 
+            ></textarea>
         </div>
         <div className="PowerMas_ObjectiveContainer">
             <div className="PowerMas_HeaderObjective">
                 <h3 className="Large-f1_25">Objetivos</h3>
                 <div className="Large-f1_25">
-                    <FaPlus />
-                    <FaTrash />
+                    <FaPlus
+                        className="grey grey-hover pointer"
+                        onClick={() => setEditObjetivos(prevObjetivos => [...prevObjetivos, ''])} 
+                    />
+                    <FaTrash 
+                        className="pointer grey grey-hover"
+                    />
                 </div>
             </div>
-            <input className="" type="text"  />
-            <input className="" type="text"  />
+            {editObjetivos.map((objetivo, index) => (
+                <Objective key={index} {...objetivo} />
+            ))}
         </div>
 
         <div className="PowerMas_ResultContainer">
             <div className="PowerMas_HeaderResult">
                 <h3 className="Large-f1_25">Resultados</h3>
                 <div className="Large-f1_25">
-                    <FaPlus />
-                    <FaTrash />
+                    <FaPlus
+                        className="grey grey-hover pointer"
+                        onClick={() => setEditResultados(prevResultados => [...prevResultados, ''])} 
+                    />
+                    <FaTrash 
+                        className="pointer grey grey-hover"
+                    />
                 </div>
             </div>
-            <input className="" type="text"/>
-            <input className="" type="text" />
-            <input className="PowerMas_InputBudget" type="text" />
+            {editResultados.map((resultado, index) => (
+                <Result key={index} {...resultado} />
+            ))}
+            <input 
+                className="PowerMas_InputBudget" 
+                placeholder="Presupuesto"
+                type="text" 
+            />
         </div>
     </div>
-);
+)};
 
 export default SubProject;

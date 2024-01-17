@@ -222,7 +222,6 @@ namespace SistemaMEAL.Server.Controllers
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             dynamic rToken = Jwt.validarToken(identity, _usuarios);
-            Console.WriteLine("DESDE GRANDE"+rToken);
 
             if (!rToken.success) return Unauthorized(rToken);
             dynamic data = rToken.result;
