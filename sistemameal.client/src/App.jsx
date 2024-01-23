@@ -1,7 +1,6 @@
-import { useContext, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useContext } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 // helper
-import { isTokenExpired } from './components/auth/auth';
 // Context
 import { AuthContext } from './context/AuthContext';
 // Componentes

@@ -90,6 +90,10 @@
   width: 8.333333333333333%;
 }
 
+.Phone_0 {
+  width: 0;
+}
+
 @media screen and (min-width: 30em) {
   .Small_12 {
     width: 100%;
@@ -137,6 +141,10 @@
 
   .Small_1 {
     width: 8.333333333333333%;
+  }
+
+  .Small_0 {
+    width: 0;
   }
 }
 
@@ -187,6 +195,10 @@
 
   .Medium_1 {
     width: 8.333333333333333%;
+  }
+
+  .Medium_0 {
+    width: 0;
   }
 }
 

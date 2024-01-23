@@ -100,9 +100,9 @@ const Sidebar = () => {
 
     
     return (
-        <div className="PowerMas_Menu">
+        <div className="PowerMas_Menu Phone_2 Large-inline none">
             <div className="PowerMas_SidebarHeader">
-                <img className='Large-p2' title="Sistema MEAL Ayuda en Acción" src={logo} alt="Logo Ayuda En Accion" />
+                <img className='Large_10 Large-m1' title="Sistema MEAL Ayuda en Acción" src={logo} alt="Logo Ayuda En Accion" />
                 <h1 className="Powermas_FontTitle center Large-f2_25">Menú</h1>
             </div>
             <div className="PowerMas_MenuContainer Large-f1">

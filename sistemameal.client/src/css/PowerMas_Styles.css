@@ -7,7 +7,6 @@
 
 body {
 	font-family: DMMono;
-	text-align: justify;
 }
 
 /* LOGIN_VIEW */
@@ -174,7 +173,6 @@ body {
 
 .PowerMas_Menu {
 	background-color: #F87C56;
-	width: 20%;
 	height: 100%;
 	box-sizing: border-box;
 	overflow: hidden;
@@ -209,15 +207,13 @@ body {
 
 .PowerMas_MainRender{
 	overflow-y: auto;
-	width: 80%;
 	background-color: #dedddd;
 	box-shadow: inset 10px 0px 10px rgba(0, 0, 0, 0.2);
 	position: relative;
 }
 .PowerMas_Content {
-	padding: 0.5rem 2rem;
-	width: 100%;
-	height: 90%;
+	height: 89%;
+	border: 1px solid black;
 }
 .PowerMas_MainRender::before{
 	content: "";
@@ -231,7 +227,6 @@ body {
 }
 .PowerMas_MainRender > div, .PowerMas_Content > div{
 	position: relative;
-	padding-bottom: 1rem;
 }
 
 
@@ -419,7 +414,7 @@ body {
 	height: 25%;
 }
 /*
-	VISTA InitialHome.cshtml
+	BAR COMPONENT
 */
 .PowerMas_ProfileContainer {
 	display: flex;
@@ -434,7 +429,6 @@ body {
 	overflow: hidden;
 }
 .PowerMas_ProfilePicture img {
-    width: 100%;
     height: auto;
 }
 
@@ -443,16 +437,38 @@ body {
 }
 
 .PowerMas_MenuIcon {
-	margin-left: auto;
+	transition: transform 0.3s ease;
+}
+.PowerMas_MenuIcon--rotated {
 	transform: rotate(90deg);
 }
-
+.PowerMas_DropdownMenu {
+	display: none;
+	position: absolute;
+	top: 50px;
+	right: 35px;
+	background-color: #f9f9f9;
+	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+	z-index: 1;
+}
+  
+.PowerMas_DropdownMenu a {
+	color: black;
+	text-decoration: none;
+	display: block;
+}
+  
+.PowerMas_DropdownMenu a:hover {
+	background-color: #f1f1f1;
+}
+  
+.PowerMas_DropdownMenu--open {
+	display: block;
+}
+  
+.PowerMas_BarContainer *{
+}
 .PowerMas_BarContainer {
-	height: 10%;
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 0 2rem;
 	color: #fff;
 }
 
@@ -848,11 +864,9 @@ body {
 	gap: 1rem;
 }
 .PowerMas_GroupSelect > div {
-	width: 30%;
 	text-align: start;
 }
 .PowerMas_GroupSelect select{
-	width: 100%;
 }
 
 
@@ -1234,6 +1248,7 @@ body {
 /**/
 .PowerMas_MonitoringContainer{
 	height: 100%;
+	border: 1px solid black;
 }
 
 .TableMonitoringContainer{
@@ -1244,7 +1259,6 @@ body {
 	height: 5%;
 }
 .TableMonitoringContainer > div.PowerMas_TableContainer {
-	margin: 0.5rem 0;
 	height: 70%;
     max-height: 100rem;
     overflow-y: auto;
@@ -1294,7 +1308,7 @@ body {
 }
 
 .PowerMas_TableMonitoring tbody tr td{
-	padding: 0.25rem 0;
+	/* padding: 0.25rem 0; */
 }
 
 

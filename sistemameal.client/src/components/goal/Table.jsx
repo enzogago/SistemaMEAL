@@ -107,16 +107,16 @@ const Table = ({ data }) => {
     const selectedColumns = ["proNom", "subProNom", "actResNom", "subActResNom", "resNom"];
 
     return (
-        <div className='TableMonitoringContainer Large-p2'>
+        <div className='TableMonitoringContainer Large-p2 Medium-p1 Small-p_5'>
             <div className="flex jc-space-between">
-                <h1 className="flex left Large-f1_75">Monitoreo</h1>
+                <h1 className="flex left Large-f1_75 Medium-f1_5 Small-f1_5 ">Monitoreo</h1>
             </div>
-            <div className="PowerMas_GroupSelect">
+            <div className="PowerMas_GroupSelect Medium-p_25 Small-p_25">
                 {columns.filter(column => selectedColumns.includes(column.accessorKey)).map((column, index) => (
-                    <div key={column.accessorKey}>
-                        <label htmlFor={column.accessorKey}>{column.header}</label>
+                    <div className="Large_3 Medium_3 Phone_5" key={column.accessorKey}>
+                        <label className="Small-f1" htmlFor={column.accessorKey}>{column.header}</label>
                         <select 
-                            className="Large-f_75"
+                            className="Large-f_75 Medium-f_75 Phone_12"
                             key={index}
                             name={column.accessorKey} 
                             id={column.accessorKey} 
@@ -131,7 +131,7 @@ const Table = ({ data }) => {
                 ))}
             </div>
             <div className="PowerMas_TableContainer">
-                <table className="Large_12 Large-f_75 PowerMas_TableMonitoring">
+                <table className="Large_12 Large-f_75 Medium-f_75 PowerMas_TableMonitoring">
                     <thead>
                         {
                             table.getHeaderGroups().map(headerGroup => (
