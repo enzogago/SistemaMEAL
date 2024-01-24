@@ -77,6 +77,7 @@ const Sidebar = () => {
                     const data = await response.json();
                     const groupData = groupByParent(data);
                     setMenuData(data);
+                    console.log(data);
                     setMenuGroup(groupData);
                 } catch (error) {
                     console.error(error);

@@ -1,6 +1,5 @@
 import { useContext, useMemo, useState } from 'react';
-import { FaPenNib, FaPlus, FaSortDown, FaSortUp, FaTrash } from 'react-icons/fa';
-import { StatusContext } from '../../context/StatusContext';
+import { FaPenNib, FaPlus, FaSearch, FaSortDown, FaSortUp, FaTrash } from 'react-icons/fa';
 import {
     useReactTable, 
     getCoreRowModel, 
@@ -11,6 +10,8 @@ import {
 import Pagination from '../reusable/Pagination';
 import { AuthContext } from '../../context/AuthContext';
 import { handleDelete } from '../reusable/helper';
+import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
+import Pdf_Icon from '../../img/PowerMas_Pdf_Icon.svg';
 
 const Table = ({ data, openModal, setEstados }) => {
     // Variables State AuthContext 
@@ -18,8 +19,12 @@ const Table = ({ data, openModal, setEstados }) => {
     const { setIsLoggedIn } = authActions;
     const { userPermissions } = authInfo;
     // States locales
-    const [codigoFilter, setCodigoFilter] = useState('');
-    const [nombreFilter, setNombreFilter] = useState('');
+    const [searchFilter, setSearchFilter] = useState('');
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+
+    const toggleDropdown = () => {
+        setDropdownOpen(!dropdownOpen);
+    }
 
     /* TANSTACK */
     const actions = {
@@ -46,8 +51,8 @@ const Table = ({ data, openModal, setEstados }) => {
                 accessorKey: "acciones",
                 cell: ({row}) => (
                     <div className='PowerMas_IconsTable flex jc-center ai-center'>
-                        {actions.delete && <FaTrash className='Large-p_25' onClick={() => handleDelete('Estado', row.original.estCod, setEstados, setIsLoggedIn)} />}
                         {actions.edit && <FaPenNib className='Large-p_25' onClick={() => openModal(row.original)} />}
+                        {actions.delete && <FaTrash className='Large-p_25' onClick={() => handleDelete('Estado', row.original.estCod, setEstados, setIsLoggedIn)} />}
                     </div>
                 ),
             });
@@ -59,9 +64,9 @@ const Table = ({ data, openModal, setEstados }) => {
     const [sorting, setSorting] = useState([]);
     const filteredData = useMemo(() => 
         data.filter(item => 
-            item.estCod.includes(codigoFilter.toUpperCase()) &&
-            item.estNom.includes(nombreFilter.toUpperCase())
-        ), [data, codigoFilter, nombreFilter]
+            item.estCod.includes(searchFilter.toUpperCase()) ||
+            item.estNom.includes(searchFilter.toUpperCase())
+        ), [data, searchFilter]
     );
 
     const table = useReactTable({
@@ -77,44 +82,44 @@ const Table = ({ data, openModal, setEstados }) => {
         columnResizeMode: "onChange"
     })
     /* END TANSTACK */
-
+    
     return (
-        <div className='TableMainContainer Large-p2'>
-            <div className="flex jc-space-between">
-                <h1 className="flex left Large-f1_75">Listado de estados</h1>
-                {
-                    actions.add && 
-                    <button 
-                        className='Large-p_5 PowerMas_ButtonStatus'
-                        onClick={() => openModal()} 
-                        disabled={!actions.add}
-                    >
-                        Nuevo <FaPlus /> 
-                    </button>
-                }
+        <div className='TableMainContainer Large-p1'>
+            <div className="">
+                <h1 className="Large-f1_5">Listado de estados</h1>
+                <div className="flex ">
+                    <div className="PowerMas_Search_Container Large_6 Large-m_5">
+                        <FaSearch className="Large_1 search-icon" />
+                        <input 
+                            className='PowerMas_Input_Filter Large_12 Large-p_5'
+                            type="search"
+                            placeholder='Buscar'
+                            value={searchFilter}
+                            onChange={e => setSearchFilter(e.target.value)}
+                        />
+                    </div>
+                    {
+                        actions.add && 
+                        <button 
+                            className=' flex jc-space-between Large_3 Large-m_5 Large-p_5 PowerMas_ButtonStatus'
+                            onClick={() => openModal()} 
+                            disabled={!actions.add}
+                        >
+                            Nuevo <FaPlus className='Large_1' /> 
+                        </button>
+                    }
+                    <div className={`PowerMas_Dropdown_Export Large_3 Large-m_5 ${dropdownOpen ? 'open' : ''}`}>
+                        <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>Exportar <FaSortDown className='Large_1' /></button>
+                        <div className="PowerMas_Dropdown_Export_Content Phone_12">
+                            <a href="#" className='flex jc-space-between p_5'>Excel <img className='Large_1' src={Excel_Icon} alt="" /> </a>
+                            <a href="#" className='flex jc-space-between p_5'>PDF <img className='Large_1' src={Pdf_Icon} alt="" /></a>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div className="PowerMas_TableContainer">
                 <table className="Large_12 PowerMas_TableStatus">
                     <thead>
-                        <tr>
-                            <th>
-                                <input 
-                                    type="search"
-                                    placeholder='Filtrar por Codigo'
-                                    value={codigoFilter}
-                                    onChange={e => setCodigoFilter(e.target.value)}
-                                />
-                            </th>
-                            <th>
-                                <input 
-                                    type="search"
-                                    placeholder='Filtrar por Nombre'
-                                    value={nombreFilter}
-                                    onChange={e => setNombreFilter(e.target.value)}
-                                />
-                            </th>
-                            <th></th>
-                        </tr>
                         {
                             table.getHeaderGroups().map(headerGroup => (
                                 <tr key={headerGroup.id}>

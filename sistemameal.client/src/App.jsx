@@ -36,7 +36,6 @@ const App = () => {
     const componentMap = {
         'user': User,
         'estado': Status,
-        'new-project': FormProject,
         'monitoring' : Monitoring,
         'identity-document': IdentityDocumento,
         'role': Role,
@@ -63,12 +62,15 @@ const App = () => {
                                     {menuData.map((menu, index) => {
                                         const Component = componentMap[menu.menRef];
                                         if (menu.menRef === 'new-project') {
-                                            return Component ? <Route path={`${menu.menRef}/:id?`} element={<Component />} key={index} /> : null;
                                         } else {
                                             return Component ? <Route path={menu.menRef} element={<Component />} key={index} /> : null;
                                         }
                                     })}
-
+                                    {menuData.some(menu => menu.menRef === 'all-projects') && (
+                                        <>
+                                            <Route path="form-project/:id?" element={<FormProject />} />
+                                        </>
+                                    )}
                                     {menuData.some(menu => menu.menRef === 'user') && (
                                         <>
                                             <Route path="form-user" element={<FormUser />} />

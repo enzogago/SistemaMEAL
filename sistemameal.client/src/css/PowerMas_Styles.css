@@ -213,7 +213,6 @@ body {
 }
 .PowerMas_Content {
 	height: 89%;
-	border: 1px solid black;
 }
 .PowerMas_MainRender::before{
 	content: "";
@@ -434,6 +433,9 @@ body {
 
 .PowerMas_ProfileInfo  span{
 	display:block;
+}
+.PowerMas_Username{
+	border-bottom: 0.5px solid #f0f0f0;
 }
 
 .PowerMas_MenuIcon {
@@ -822,6 +824,58 @@ body {
 
 
 /* SATUS VIEW */
+.PowerMas_Search_Container{
+	position: relative;
+}
+.PowerMas_Search_Container svg{
+	position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.PowerMas_Input_Filter{
+	padding-left: 50px;
+	outline: none;
+	border: 1px solid #F7CEAD;
+	border-radius: 5px;
+}
+.PowerMas_Dropdown_Export {
+    position: relative;
+    display: inline-block;
+}
+.PowerMas_Dropdown_Export button{
+	background-color: #FFF7F3;
+	border: 1px solid #F7775A;
+	color: #F7775A;
+	border-radius: 5px;
+}
+.PowerMas_Dropdown_Export button:hover{
+	background-color: #FFF7F3;
+}
+
+.PowerMas_Dropdown_Export_Content {
+    position: absolute;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+	transform-origin: top;
+    transform: scaleY(0);
+    transition: transform 0.3s ease-out;
+	border: 1px solid #F7775A;
+}
+
+.PowerMas_Dropdown_Export_Content a {
+    color: black;
+    text-decoration: none;
+	background-color: #FFFFFF;
+}
+
+.PowerMas_Dropdown_Export_Content a:hover {
+    background-color: #f1f1f1;
+}
+
+.PowerMas_Dropdown_Export.open .PowerMas_Dropdown_Export_Content {
+    transform: scaleY(1);
+}
 
 
 .PowerMas_ButtonStatus {
@@ -829,18 +883,17 @@ body {
 	justify-content: space-between;
 	align-items: center;
 	gap: 1rem;
-    background-color: #AFAF0A;
+    background-color: #F7775A;
     color: white; 
     border: none; 
     cursor: pointer; 
 	transition: background-color 0.3s ease;
+	border-radius: 5px;
 }
 
 .PowerMas_ButtonStatus:hover {
-    background-color: #fccc54; /* Cambia el color de fondo cuando se pasa el ratón por encima para un efecto hover */
+    background-color: #D03F1E; /* Cambia el color de fondo cuando se pasa el ratón por encima para un efecto hover */
 }
-
-
 .PowerMas_StatusContainer{
 	height: 100%;
 }
@@ -852,8 +905,8 @@ body {
 	height: 5%;
 }
 .PowerMas_TableContainer {
-	margin: 0.5rem 0;
-	height: 90%;
+	margin: 1rem 0;
+	height: 75%;
     max-height: 100rem;
     overflow-y: auto;
 	overflow-x: hidden;
@@ -878,8 +931,8 @@ body {
 	display: flex;
     justify-content: space-between;
     align-items: center;
+	color: #F7775A;
 }
-
 
 .PowerMas_TableStatus thead th div svg {
     height: 1em;
@@ -898,12 +951,12 @@ body {
 	width: 100%;
 	border-bottom: 1px solid black;
 }
-.PowerMas_TableStatus thead tr:last-child{
+/* .PowerMas_TableStatus thead tr:last-child{
 	position: sticky;
     top: 43px;
     background: white; 
 	transition: background-color 0.3s ease;
-}
+} */
 
 
 .resizer {
@@ -952,11 +1005,13 @@ body {
 	background-color: white;
 	transition: background-color 0.1s ease;
 }
-
-.PowerMas_TableStatus tbody tr:hover{
-	background-color: #D3D3D3; 
+.PowerMas_TableStatus tbody tr td{
+	padding: 0.2rem;
 }
 
+.PowerMas_TableStatus tbody tr:hover{
+	background-color: #FDF6F2; 
+}
 
 .PowerMas_TableEmpty td{
 	border: 1px solid transparent!important;
@@ -1021,13 +1076,13 @@ body {
 }
 .PowerMas_StatusSubmit input{
 	padding: 0.5rem 1rem;
-	background-color: #AFAF0A;
+	background-color: #F7775A;
 	border: 1px solid transparent;
 	color: #ffffff;
 	transition: background-color 0.3s ease;
 }
 .PowerMas_StatusSubmit input:hover{
-	background-color: #fccc54;
+	background-color: #D03F1E;
 }
 
 
@@ -1037,12 +1092,11 @@ body {
 .PowerMas_IconsTable svg{
 	width: 30px;
 	height: 30px;
-	border: 1px solid transparent;
 	transition: border 0.3s ease;
+	color: #F7775A;
 }
 
 .PowerMas_IconsTable svg:hover{
-	border: 1px solid;
 	cursor: pointer;
 }
 
