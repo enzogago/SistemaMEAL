@@ -211,8 +211,11 @@ body {
 	box-shadow: inset 10px 0px 10px rgba(0, 0, 0, 0.2);
 	position: relative;
 }
+.todos *{
+	border: 1px solid black;
+}
 .PowerMas_Content {
-	height: 89%;
+	height: 90%;
 }
 .PowerMas_MainRender::before{
 	content: "";
@@ -471,6 +474,7 @@ body {
 .PowerMas_BarContainer *{
 }
 .PowerMas_BarContainer {
+	max-height: 10%;
 	color: #fff;
 }
 
@@ -848,9 +852,10 @@ body {
 	border: 1px solid #F7775A;
 	color: #F7775A;
 	border-radius: 5px;
+	transition: background-color 0.3s ease;
 }
 .PowerMas_Dropdown_Export button:hover{
-	background-color: #FFF7F3;
+	background-color: #ffeadf;
 }
 
 .PowerMas_Dropdown_Export_Content {
@@ -867,6 +872,8 @@ body {
     color: black;
     text-decoration: none;
 	background-color: #FFFFFF;
+	transition: background-color 0.3s ease;
+	cursor: pointer;
 }
 
 .PowerMas_Dropdown_Export_Content a:hover {
@@ -901,15 +908,18 @@ body {
 	height: 100%;
 	background-color: #fff;
 }
+.TableMainContainer h1{
+	padding: 0 0.5rem;
+}
 .TableMainContainer > div:first-child(){
 	height: 5%;
 }
 .PowerMas_TableContainer {
-	margin: 1rem 0;
 	height: 75%;
     max-height: 100rem;
     overflow-y: auto;
 	overflow-x: hidden;
+	padding: 0 0.5rem;
 }
 .PowerMas_GroupSelect{
 	display: flex;
@@ -932,6 +942,7 @@ body {
     justify-content: space-between;
     align-items: center;
 	color: #F7775A;
+	font-weight: lighter;
 }
 
 .PowerMas_TableStatus thead th div svg {
@@ -982,7 +993,7 @@ body {
 
 
 .PowerMas_TableStatus thead tr:last-child th:hover{
-	background-color: #f0f0f0;
+	/* background-color: #f0f0f0; */
 	cursor: pointer;
 }
 .PowerMas_TableStatus thead tr:last-child th::after{
@@ -1020,6 +1031,22 @@ body {
 	background-color: #fff!important;
 }
 
+.PowerMas_Modal_Form_invalid{
+	background: #fff url("../Img/PowerMas_Error.svg") no-repeat 98%   ;
+	background-size: 20px 20px;
+	border: 1px solid #ff0000!important;
+}
+.PowerMas_Modal_Form_valid {
+	background: #fff url("../Img/PowerMas_Correcto.svg") no-repeat 98% center;
+	background-size: 24px 24px;
+	border: 1px solid #00cc00!important;
+	color: #4d4d4c;
+}
+.PowerMas_Message_Invalid{
+	color: red;
+	margin-top: 3px;
+}
+  
 .PowerMas_Modal {
     display: flex;
     justify-content: center;
@@ -1056,6 +1083,7 @@ body {
     float: right;
     font-size: 28px;
     font-weight: bold;
+	transition: color 0.3s ease;
 }
 
 .PowerMas_CloseModal:hover,
@@ -1065,11 +1093,19 @@ body {
 	cursor: pointer;
 }
 .PowerMas_ModalContent h2{
+	color: #20737B;
+	border-bottom: 1px solid #372e2c96;
+	padding: 1rem;
+}
+.PowerMas_ModalContent label{
 	margin: 1rem 0;
 }
 .PowerMas_FormStatus input[type=text]{
-	margin-top: 0.25rem;
 	width: 100%;
+	border-radius: 5px;
+	padding: 0.5rem;
+	border: 2px solid #FFDED7;
+	outline: none;
 }
 .PowerMas_StatusSubmit{
 	margin-top: 1.5rem;
@@ -1080,6 +1116,7 @@ body {
 	border: 1px solid transparent;
 	color: #ffffff;
 	transition: background-color 0.3s ease;
+	border-radius: 5px;
 }
 .PowerMas_StatusSubmit input:hover{
 	background-color: #D03F1E;
@@ -1090,30 +1127,44 @@ body {
 	width: auto;
 }
 .PowerMas_IconsTable svg{
-	width: 30px;
-	height: 30px;
-	transition: border 0.3s ease;
+	width: 29px;
+	height: 29px;
 	color: #F7775A;
+	transition: color 0.2s ease;
 }
-
 .PowerMas_IconsTable svg:hover{
 	cursor: pointer;
+	color: #D03F1E;
+}
+.PowerMas_Tooltip{
+	padding: 10rem;
+	transition: opacity 0.30s ease-in-out;
 }
 
+
 .PowerMas_Pagination{
+	background-color: #FCFCFC;
 	height: 5%;
+	box-shadow: 0 -10px 10px rgba(0, 0, 0, 0.1);
 }
 .PowerMas_Pagination button{
 	background-color: transparent;
-	border: 1px solid transparent;
-	transition: border 0.3s ease;
+	transition: background-color 0.3s ease;
+	border: 1px solid #372e2c5c;
+	width: 32px;
+	height: 32px;
+	font-weight: 600;
 }
 
 .PowerMas_Pagination button:hover{
-	border: 1px solid black;
 	cursor: pointer;
+	background-color: #FFDBC0;
 }
-
+.PowerMas_Pagination select{
+	background-color: #FFF7F1;
+	border: 1px solid #F9DED7;
+	border-radius: 5px;
+}
 
 .PowerMas_FilterStatus {
 	position: relative;
@@ -1151,6 +1202,13 @@ body {
 	cursor: pointer;
 }
 
+.sort-icon {
+    color: #ff5f3c; /* color para el estado inactivo */
+}
+
+.sort-icon.active {
+    color: #ff5f3c; /* color para el estado activo */
+}
 /* REUSABLE */
 .pointer{
 	cursor: pointer;

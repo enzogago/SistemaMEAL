@@ -13,7 +13,7 @@ const Modal = ({ closeModal, setEstados }) => {
     const { estadoEditado, modalVisible } = statusInfo;
     const { setModalVisible } = statusActions;
 
-    const { register, handleSubmit: validateForm, formState: { errors }, reset, setValue } = useForm();
+    const { register, handleSubmit: validateForm, formState: { errors, dirtyFields, isSubmitted }, reset, setValue } = useForm({ mode: "onChange"});
 
     const onSubmit = (data) => {
         const fieldMapping = {
@@ -46,17 +46,18 @@ const Modal = ({ closeModal, setEstados }) => {
         <div className={`PowerMas_Modal ${modalVisible ? 'show' : ''}`}>
             <div className="PowerMas_ModalContent">
                 <span className="PowerMas_CloseModal" onClick={closeModalAndReset}>×</span>
-                <h2 className="center">{estadoEditado ? 'Editar Estado' : 'Nuevo Estado'}</h2>
+                <h2 className="center f1_5">{estadoEditado ? 'Editar Estado' : 'Nuevo Estado'}</h2>
                 <form className='Large-f1_25 PowerMas_FormStatus' onSubmit={validateForm(onSubmit)}>
-                    <label className="block">
+                    <label className="block f1">
                         Nombre:
                     </label>
                     <input 
                         id="nombre"
-                        className="flex" 
+                        className={`p1 PowerMas_Modal_Form_${dirtyFields.nombre || isSubmitted ? (errors.nombre ? 'invalid' : 'valid') : ''}`}  
                         type="text" 
                         placeholder='EJM: EJECUTADO' 
-                        maxLength={100} 
+                        maxLength={50} 
+                        autoComplete='disabled'
                         name="nombre" 
                         {...register(
                             'nombre', { 
@@ -70,7 +71,13 @@ const Modal = ({ closeModal, setEstados }) => {
                             }
                         )}
                     />
-                    {errors.nombre && <p className='errorInput Large-p_5'>{errors.nombre.message}</p>}
+                    {errors.nombre ? (
+                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.nombre.message}</p>
+                    ) : (
+                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                        Espacio reservado para el mensaje de error
+                        </p>
+                    )}
                     <div className='PowerMas_StatusSubmit flex jc-center ai-center'>
                         <input className='' type="submit" value="Guardar" />
                     </div>

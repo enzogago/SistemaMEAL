@@ -1,7 +1,7 @@
 const Pagination = ({ table }) => {
     return (
-        <div className="PowerMas_Pagination Large_12 flex column jc-space-between ai-center">
-            <div>
+        <div className="PowerMas_Pagination Large_12 flex column jc-space-between ai-center Large-p2">
+            <div className="todo">
                 <button onClick={() => table.setPageIndex(0)} disabled={!table.getCanPreviousPage()}>{"<<"}</button>
                 <button onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>{"<"}</button>
                 <button onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>{">"}</button> 
@@ -11,6 +11,7 @@ const Pagination = ({ table }) => {
                 <select 
                     value={table.options.state.pagination.pageSize} 
                     onChange={(e) => table.setPageSize(e.target.value)}
+                    className="p_5"
                 > 
                     {[10,20,30,50].map(pageSizeEl => {
                         return  <option key={ pageSizeEl } value={pageSizeEl}> 
