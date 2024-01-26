@@ -969,6 +969,10 @@ body {
 	transition: background-color 0.3s ease;
 } */
 
+.PowerMas_Input_Color {
+	height: auto;
+}
+
 
 .resizer {
     display: inline-block;

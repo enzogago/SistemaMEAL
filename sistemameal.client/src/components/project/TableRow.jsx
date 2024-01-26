@@ -10,7 +10,7 @@ const TableRow = ({ row, flexRender }) => {
         const ciphertext = CryptoJS.AES.encrypt(id, 'secret key 123').toString();
         // Codifica la cadena cifrada para que pueda ser incluida de manera segura en una URL
         const encodedCiphertext = encodeURIComponent(ciphertext);
-        navigate(`/new-project/${encodedCiphertext}`);
+        navigate(`/form-project/${encodedCiphertext}`);
     }
 
     return (

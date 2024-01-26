@@ -14,10 +14,11 @@ const Modal = ({ closeModal, setEstados }) => {
     const { setModalVisible } = statusActions;
 
     const { register, handleSubmit: validateForm, formState: { errors, dirtyFields, isSubmitted }, reset, setValue } = useForm({ mode: "onChange"});
-
+    console.log(estadoEditado)
     const onSubmit = (data) => {
         const fieldMapping = {
             nombre: 'estNom',
+            color: 'estCol'
         };
         handleSubmit('Estado', estadoEditado, data, setEstados, setModalVisible, setIsLoggedIn, fieldMapping, 'estCod');
         reset();
@@ -34,6 +35,7 @@ const Modal = ({ closeModal, setEstados }) => {
     useEffect(() => {
         if (estadoEditado) {
             setValue('nombre', estadoEditado.estNom);
+            setValue('color', estadoEditado.estCol);
         }
     }, [estadoEditado, setValue]);
     
@@ -73,6 +75,38 @@ const Modal = ({ closeModal, setEstados }) => {
                     />
                     {errors.nombre ? (
                         <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.nombre.message}</p>
+                    ) : (
+                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                        Espacio reservado para el mensaje de error
+                        </p>
+                    )}
+                    <div className='flex'>
+                        <input 
+                            id="color"
+                            className={`p1 Large_11 PowerMas_Modal_Form_${dirtyFields.color || isSubmitted ? (errors.color ? 'invalid' : 'valid') : ''}`}  
+                            type="text" 
+                            placeholder='EJM: #000000' 
+                            maxLength={50} 
+                            autoComplete='disabled'
+                            name="color" 
+                            {...register(
+                                'color', { 
+                                    required: 'El color es requerido',
+                                    pattern: {
+                                        value: /^#([0-9A-Fa-f]{6})$/,
+                                        message: 'Por favor, introduce un color en formato hexadecimal (ejemplo: #123abc)',
+                                    },
+                                }
+                            )}
+                        />
+                        <input 
+                            className='Large_1 PowerMas_Input_Color'
+                            type="color" 
+                            onChange={(e) => setValue('color', e.target.value.toUpperCase())}
+                        />
+                    </div>
+                    {errors.color ? (
+                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.color.message}</p>
                     ) : (
                         <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
                         Espacio reservado para el mensaje de error

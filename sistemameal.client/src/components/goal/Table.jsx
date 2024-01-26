@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import TableRow from "./TableRow"
-import { FaPenNib, FaPlus, FaSortDown, FaSortUp, FaTrash } from 'react-icons/fa';
+import { FaEdit, FaPenNib, FaPlus, FaRegTrashAlt, FaSearch, FaSortDown, FaSortUp, FaTrash } from 'react-icons/fa';
+import { Tooltip } from 'react-tooltip';
 import {
     useReactTable, 
     getCoreRowModel, 
@@ -9,86 +10,119 @@ import {
     getSortedRowModel, 
 } from '@tanstack/react-table';
 import Pagination from "../reusable/Pagination";
+import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
+import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
+import Pdf_Icon from '../../img/PowerMas_Pdf_Icon.svg';
 
 const Table = ({ data }) => {
-    // Supongamos que 'filters' es el estado de los filtros de la tabla
-    const [filters, setFilters] = useState({});
+    // States locales
+    const [searchFilter, setSearchFilter] = useState('');
+    const [dropdownOpen, setDropdownOpen] = useState(false);
 
-    const uniqueValues = {};
+    const toggleDropdown = () => {
+        setDropdownOpen(!dropdownOpen);
+    }
+    
+    const actions = {
+        // add: userPermissions.some(permission => permission.perNom === "CREAR ESTADO"),
+        // delete: userPermissions.some(permission => permission.perNom === "ELIMINAR ESTADO"),
+        // edit: userPermissions.some(permission => permission.perNom === "MODIFICAR ESTADO"),
+    };
+    const [sorting, setSorting] = useState([]);
+    const filteredData = useMemo(() => 
+        data.filter(item => 
+            item.estNom.includes(searchFilter.toUpperCase()) ||
+            item.proNom.includes(searchFilter.toUpperCase())
+        ), [data, searchFilter]
+    );
 
-    const handleFilterChange = (accessorKey, value) => {
-        if (value === "") {
-            const newFilters = {...filters};
-            delete newFilters[accessorKey];
-            setFilters(newFilters);
-        } else {
-            setFilters({
-                ...filters,
-                [accessorKey]: value
+    const columns = useMemo(() => {
+        let baseColumns = [
+            {
+                header: "Estado",
+                accessorKey: "estNom"
+            },
+            {
+                header: "Proyecto",
+                accessorKey: "proNom"
+            },
+            {
+                header: "Meta",
+                accessorKey: "metMetTec"
+            },
+            {
+                header: "Ejecucion",
+                accessorKey: "metEjeTec"
+            },
+            {
+                header: "% de Avance",
+                accessorKey: "metPorAvaTec"
+            },
+            {
+                header: "Año",
+                accessorKey: "metAnoPlaTec"
+            },
+            {
+                header: "Mes",
+                accessorKey: "metMesPlaTec"
+            },
+            {
+                header: "Subproyectos",
+                accessorKey: "subProNom"
+            },
+            {
+                header: "Activiades",
+                accessorKey: "actResNom"
+            },
+            {
+                header: "Sub Actividades",
+                accessorKey: "subActResNom"
+            },
+            {
+                header: "Resultados",
+                accessorKey: "resNom"
+            },
+        ];
+    
+        if (true || true) {
+            baseColumns.push({
+                header: "Acciones",
+                accessorKey: "acciones",
+                cell: ({row}) => (
+                    <div className='PowerMas_IconsTable flex jc-center ai-center'>
+                        {true && 
+                            <FaEdit 
+                                data-tooltip-id="edit-tooltip" 
+                                data-tooltip-content="Editar" 
+                                className='Large-p_25' 
+                                onClick={() => openModal(row.original)} 
+                            />
+                        }
+                        {true && 
+                            <FaRegTrashAlt 
+                                data-tooltip-id="delete-tooltip" 
+                                data-tooltip-content="Eliminar" 
+                                className='Large-p_25' 
+                                onClick={() => handleDelete('Estado', row.original.estCod, setEstados, setIsLoggedIn)} 
+                            />
+                        }
+                        <Tooltip 
+                            id="edit-tooltip"
+                            effect="solid"
+                            place='top-end'
+                        />
+                        <Tooltip 
+                            id="delete-tooltip" 
+                            effect="solid"
+                            place='top-start'
+                        />
+                    </div>
+                ),
             });
         }
-    };
     
-
-    const [sorting, setSorting] = useState([]);
-    const columns = [
-        {
-            header: "Estado",
-            accessorKey: "estNom"
-        },
-        {
-            header: "Proyecto",
-            accessorKey: "proNom"
-        },
-        {
-            header: "Meta",
-            accessorKey: "metMetTec"
-        },
-        {
-            header: "Ejecucion",
-            accessorKey: "metEjeTec"
-        },
-        {
-            header: "% de Avance",
-            accessorKey: "metPorAvaTec"
-        },
-        {
-            header: "Año",
-            accessorKey: "metAnoPlaTec"
-        },
-        {
-            header: "Mes",
-            accessorKey: "metMesPlaTec"
-        },
-        {
-            header: "Subproyectos",
-            accessorKey: "subProNom"
-        },
-        {
-            header: "Activiades",
-            accessorKey: "actResNom"
-        },
-        {
-            header: "Sub Actividades",
-            accessorKey: "subActResNom"
-        },
-        {
-            header: "Resultados",
-            accessorKey: "resNom"
-        },
-    ]
-
-    columns.forEach(column => {
-        const accessorKey = column.accessorKey;
-        uniqueValues[accessorKey] = [...new Set(data.map(item => item[accessorKey]))];
-    });
-
-    const filteredData = useMemo(() => 
-    data.filter(item => 
-        Object.entries(filters).every(([key, value]) => 
-            item[key] === value
-        )
-    ), [data, filters]);
+        return baseColumns;
+    }, [actions]);
 
     
     const table = useReactTable({
@@ -107,31 +141,41 @@ const Table = ({ data }) => {
     const selectedColumns = ["proNom", "subProNom", "actResNom", "subActResNom", "resNom"];
 
     return (
-        <div className='TableMonitoringContainer Large-p2 Medium-p1 Small-p_5'>
-            <div className="flex jc-space-between">
-                <h1 className="flex left Large-f1_75 Medium-f1_5 Small-f1_5 ">Monitoreo</h1>
-            </div>
-            <div className="PowerMas_GroupSelect Medium-p_25 Small-p_25">
-                {columns.filter(column => selectedColumns.includes(column.accessorKey)).map((column, index) => (
-                    <div className="Large_3 Medium_3 Phone_5" key={column.accessorKey}>
-                        <label className="Small-f1" htmlFor={column.accessorKey}>{column.header}</label>
-                        <select 
-                            className="Large-f_75 Medium-f_75 Phone_12"
-                            key={index}
-                            name={column.accessorKey} 
-                            id={column.accessorKey} 
-                            onChange={event => handleFilterChange(column.accessorKey, event.target.value)}
-                        >
-                            <option value=""> Sin seleccion</option>
-                            {uniqueValues[column.accessorKey].map(value => (
-                                <option value={value} key={value}>{value}</option>
-                            ))}
-                        </select>
+        <div className='TableMainContainer Large-p2 Medium-p1 Small-p_5'>
+            <div>
+                <h1 className="flex left Large-f1_5 Medium-f1_5 Small-f1_5 ">Listado de Metas</h1>
+                <div className="flex ">
+                    <div className="PowerMas_Search_Container Large_6 Large-m_5">
+                        <FaSearch className="Large_1 search-icon" />
+                        <input 
+                            className='PowerMas_Input_Filter Large_12 Large-p_5'
+                            type="search"
+                            placeholder='Buscar'
+                            value={searchFilter}
+                            onChange={e => setSearchFilter(e.target.value)}
+                        />
                     </div>
-                ))}
+                    {
+                        /*actions.add*/ true && 
+                        <button 
+                            className=' flex jc-space-between Large_3 Large-m_5 Large-p_5 PowerMas_ButtonStatus'
+                            // onClick={() => openModal()} 
+                            // disabled={!actions.add}
+                        >
+                            Nuevo <FaPlus className='Large_1' /> 
+                        </button>
+                    }
+                    <div className={`PowerMas_Dropdown_Export Large_3 Large-m_5 ${dropdownOpen  ? 'open' : ''}`}>
+                        <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>Exportar <FaSortDown className='Large_1' /></button>
+                        <div className="PowerMas_Dropdown_Export_Content Phone_12">
+                            <a  className='flex jc-space-between p_5'>Excel <img className='Large_1' src={Excel_Icon} alt="" /> </a>
+                            <a  className='flex jc-space-between p_5'>PDF <img className='Large_1' src={Pdf_Icon} alt="" /></a>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div className="PowerMas_TableContainer">
-                <table className="Large_12 Large-f_75 Medium-f_75 PowerMas_TableMonitoring">
+                <table className="Large_12 Large-f_75 Medium-f_75 PowerMas_TableStatus">
                     <thead>
                         {
                             table.getHeaderGroups().map(headerGroup => (
@@ -143,12 +187,17 @@ const Table = ({ data }) => {
                                                     {
                                                     flexRender(header.column.columnDef.header, header.getContext())
                                                     }
-                                                    {
-                                                        {
-                                                            asc: <FaSortUp />,
-                                                            desc: <FaSortDown />
-                                                        }[header.column.getIsSorted() ?? null]
-                                                    }
+                                                    <div className='flex flex-column ai-center jc-center'>
+                                                        {header.column.getIsSorted() === 'asc' ? 
+                                                            <TiArrowSortedUp className={`sort-icon active`} /> :
+                                                            header.column.getIsSorted() === 'desc' ? 
+                                                            <TiArrowSortedDown className={`sort-icon active`} /> :
+                                                            <>
+                                                                <TiArrowSortedUp className={`sort-icon`} />
+                                                                <TiArrowSortedDown className={`sort-icon`} />
+                                                            </>
+                                                        }
+                                                    </div>
                                                 </div>
                                                 <span 
                                                     onMouseDown={

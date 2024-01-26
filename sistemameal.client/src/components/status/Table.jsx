@@ -14,12 +14,11 @@ import { handleDelete } from '../reusable/helper';
 import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
 import Pdf_Icon from '../../img/PowerMas_Pdf_Icon.svg';
 import { Tooltip } from 'react-tooltip';
-import * as XLSX from 'xlsx';
-import { pdf  } from '@react-pdf/renderer';
-import TableToPDF from './TableToPDF';
 import logo from '../../img/PowerMas_LogoAyudaEnAccion.png';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 
 const Table = ({ data, openModal, setEstados }) => {
@@ -34,10 +33,10 @@ const Table = ({ data, openModal, setEstados }) => {
     const toggleDropdown = () => {
         setDropdownOpen(!dropdownOpen);
     }
-
+    console.log(userPermissions)
     /* TANSTACK */
     const actions = {
-        add: userPermissions.some(permission => permission.perNom === "CREAR ESTADO"),
+        add: userPermissions.some(permission => permission.perNom === "INSERTAR ESTADO"),
         delete: userPermissions.some(permission => permission.perNom === "ELIMINAR ESTADO"),
         edit: userPermissions.some(permission => permission.perNom === "MODIFICAR ESTADO"),
     };
@@ -51,6 +50,10 @@ const Table = ({ data, openModal, setEstados }) => {
             {
                 header: "Nombre",
                 accessorKey: "estNom",
+            },
+            {
+                header: "Color",
+                accessorKey: "estCol",
             }
         ];
     
@@ -140,21 +143,32 @@ const Table = ({ data, openModal, setEstados }) => {
         }
 
         // Añadir los encabezados
-        const headers = ['CODIGO', 'NOMBRE','USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Ajusta esto según tus necesidades
+        const headers = ['CODIGO', 'NOMBRE', 'COLOR', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Ajusta esto según tus necesidades
         const headerRow = worksheet.addRow(headers);
-        headerRow.eachCell(cell => {
-            cell.font = { bold: true };  // Esto hará que el texto de la celda sea en negrita
-            cell.fill = {  // Esto agregará un color de fondo a la celda
-                type: 'pattern',
-                pattern: 'solid',
-                fgColor: { argb: 'FFCA53' }  // Puedes cambiar este código de color ARGB según tus necesidades
-            };
+        headerRow.eachCell((cell, number) => {
+            if (number > 3) {  // Cambia el color de fondo de las dos últimas columnas
+                cell.font = { color: { argb: 'FFFFFF'}, bold: true }; 
+                cell.fill = {
+                    type: 'pattern',
+                    pattern: 'solid',
+                    fgColor: { argb: '25848F' }  // Puedes cambiar este código de color ARGB según tus necesidades
+                };
+            } else {
+                cell.font = { color: { argb: '000' }, bold: true  }; 
+                cell.fill = {  // Esto agregará un color de fondo a la celda
+                    type: 'pattern',
+                    pattern: 'solid',
+                    fgColor: { argb: 'FFCA53' }  // Puedes cambiar este código de color ARGB según tus necesidades
+                };
+            }
         });
         
       
         // Añadir los datos
         table.options.data.forEach(item => {
-            const row = worksheet.addRow([item.estCod, item.estNom, item.usuMod, item.fecMod]);  // No añadir un valor vacío aquí
+            let fecha = new Date(item.fecMod);
+
+            const row = worksheet.addRow([item.estCod, item.estNom, item.estCol, item.usuMod, fecha]);  // No añadir un valor vacío aquí
             row.eachCell(cell => {
                 cell.alignment = { 
                     vertical: 'middle',
@@ -162,14 +176,16 @@ const Table = ({ data, openModal, setEstados }) => {
                     textRotation: 'horizontal' 
                 };
             });
+            row.getCell(4).numFmt = 'dd/mm/yy hh:mm';
         });
 
         // Personalizar el ancho de las columnas
         worksheet.columns = [
             { key: 'estCod', width: 10 },
             { key: 'estNom', width: 40 },
+            { key: 'estCol', width: 20 },
             { key: 'usuMod', width: 30 },
-            { key: 'fecMod', width: 30 },
+            { key: 'fecMod', width: 20 },
         ];
         // Insertar una columna vacía al principio
         worksheet.spliceColumns(1, 0, []);
@@ -182,21 +198,6 @@ const Table = ({ data, openModal, setEstados }) => {
         titleCell.alignment = { horizontal: 'center' };
         titleCell.value = title;
         worksheet.mergeCells(`B6:${lastColumnLetter}6`);
-
-
-        // Personalizar los bordes de las celdas
-        // worksheet.eachRow((row, rowNumber) => {
-        //   row.eachCell((cell, colNumber) => {
-        //     if (cell.value) {  // Solo aplicar bordes a celdas con datos
-        //         cell.border = {
-        //           top: { style: 'thin' },
-        //           left: { style: 'thin' },
-        //           bottom: { style: 'thin' },
-        //           right: { style: 'thin' }
-        //         };
-        //     }
-        //   });
-        // });
       
         // Generar el archivo Excel
         const buffer = await workbook.xlsx.writeBuffer();
@@ -206,16 +207,73 @@ const Table = ({ data, openModal, setEstados }) => {
 
     const Export_PDF = () => {
         const savePdf = async () => {
-            const blob = await pdf(<TableToPDF data={table.options.data} />).toBlob();
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `ESTADOS_${Date.now()}.pdf`;
-            link.click();
+            const doc = new jsPDF('landscape');  // Crear una nueva instancia de jsPDF en orientación horizontal
+    
+            // Agregar la imagen
+            // Asegúrate de tener la imagen en formato base64 o en un ArrayBuffer
+            doc.addImage(logo, 'PNG', 10, 10, 60, 15);  // Ajusta las coordenadas y el tamaño según tus necesidades
+
+            doc.setFontSize(18);  // Ajusta el tamaño de la fuente según tus necesidades
+            doc.setFont('Helvetica','bold');
+            const title = 'LISTADO DE ESTADOS';  // Reemplaza esto con tu título
+            const titleWidth = doc.getStringUnitWidth(title) * doc.internal.getFontSize() / doc.internal.scaleFactor;
+            const titleX = (doc.internal.pageSize.getWidth() - titleWidth) / 2;
+            doc.text(title, titleX, 30);  // Ajusta la posición vertical según tus necesidades
+            
+            // Definir las columnas de la tabla
+            const tableColumns = ['CODIGO', 'NOMBRE', 'COLOR', 'USUARIO_MODIFICADO', 'FECHA_MODIFICADO'];
+    
+            // Definir los datos de la tabla
+            const tableData = table.options.data.map(item => {
+                // Crear un objeto Date a partir de la cadena de fecha
+                let fecha = new Date(item.fecMod);
+
+                // Formatear la fecha y hora
+                let fechaFormateada = fecha.toLocaleString('es-EC', {
+                    day: '2-digit', month: '2-digit', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
+                });
+
+                return [item.estCod, item.estNom, item.estCol, item.usuMod, fechaFormateada];
+            });
+            // Agregar la tabla al documento
+            doc.autoTable({
+                columns: tableColumns,
+                body: tableData,
+                startY: 40,
+                didDrawCell: function(data) {
+                    var col = data.column.index;
+                    if (data.section === 'head') {
+                        if (col === 3 || col === 4) {
+                            doc.setTextColor(255, 255, 255);
+                            doc.setFillColor(37, 132, 143);  // Cambia esto a tu color preferido
+                        } else {
+                            doc.setTextColor(0, 0, 0);
+                            doc.setFillColor(255, 202, 83);  // Cambia esto al color que prefieras para las otras columnas
+                        }
+                        doc.rect(data.cell.x, data.cell.y, data.cell.width, data.cell.height, 'F');
+                        doc.text(data.cell.text, data.cell.x + data.cell.width / 2, data.cell.y + data.cell.height - 3, {align: 'center'});  // Ajusta la posición vertical aquí
+                    }
+                }
+            });
+            
+            
+
+            let pageCount = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                let pageCurrent = doc.internal.getCurrentPageInfo().pageNumber;
+                doc.setFontSize(12);
+                doc.text('Página ' + String(pageCurrent) + ' de ' + String(pageCount), doc.internal.pageSize.getWidth() - 20, doc.internal.pageSize.getHeight() - 10, {align: 'center'});
+            }
+
+    
+            // Guardar el documento PDF
+            doc.save(`ESTADOS_${Date.now()}.pdf`);
         };
-        
+    
         savePdf();
-      };
+    };
     
     return (
         <div className='TableMainContainer Large-p1'>

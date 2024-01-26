@@ -8,7 +8,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     backgroundColor: '#E4E4E4',
-    padding: 30
+    padding: 30,
   },
   section: {
     margin: 10,
@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     textAlign: 'center',
     marginBottom: 30,
-    color: '#3f51b5'  // Cambia esto al color que prefieras
+    color: '#3f51b5'
   },
   image: {
     marginVertical: 15,
@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
 // Crea el documento
 const TableToPDF = ({ data }) => (
   <Document>
-    <Page size="A4 landscape" style={styles.page}>
+    <Page pageNumber={1} size="A4 landscape" style={styles.page}>
         <Image style={styles.image} src={logo} />
         <Text style={styles.title}>Listado de estados</Text>
         <View style={styles.table}>

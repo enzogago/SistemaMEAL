@@ -11,7 +11,7 @@ namespace SistemaMEAL.Modulos
     {
         private conexionDAO cn = new conexionDAO();
 
-       public IEnumerable<Estado> Listado(string? estCod = null, string? estNom = null)
+       public IEnumerable<Estado> Listado(string? estCod = null, string? estNom = null, string? estCol = null)
         {
             List<Estado> temporal = new List<Estado>();
             try
@@ -23,6 +23,7 @@ namespace SistemaMEAL.Modulos
                 // Aquí puedes agregar los parámetros necesarios para tu procedimiento almacenado
                 cmd.Parameters.AddWithValue("@P_ESTCOD", string.IsNullOrEmpty(estCod) ? (object)DBNull.Value : estCod);
                 cmd.Parameters.AddWithValue("@P_ESTNOM", string.IsNullOrEmpty(estNom) ? (object)DBNull.Value : estNom);
+                cmd.Parameters.AddWithValue("@P_ESTCOL", string.IsNullOrEmpty(estCol) ? (object)DBNull.Value : estCol);
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2024");
                 cmd.Parameters.AddWithValue("@P_USUCOD_U", "0001");
@@ -80,6 +81,7 @@ namespace SistemaMEAL.Modulos
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 cmd.Parameters.AddWithValue("@P_ESTNOM", estado.EstNom);
+                cmd.Parameters.AddWithValue("@P_ESTCOL", estado.EstCol);
                 cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
@@ -125,6 +127,7 @@ namespace SistemaMEAL.Modulos
 
                 cmd.Parameters.AddWithValue("@P_ESTCOD", estado.EstCod);
                 cmd.Parameters.AddWithValue("@P_ESTNOM", estado.EstNom);
+                cmd.Parameters.AddWithValue("@P_ESTCOL", estado.EstCol);
                 cmd.Parameters.AddWithValue("@P_USUMOD", "Usuario");
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
