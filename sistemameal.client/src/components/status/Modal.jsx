@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { AuthContext } from '../../context/AuthContext';
 import { StatusContext } from '../../context/StatusContext';
@@ -12,6 +12,8 @@ const Modal = ({ closeModal, setEstados }) => {
     const { statusInfo, statusActions } = useContext(StatusContext);
     const { estadoEditado, modalVisible } = statusInfo;
     const { setModalVisible } = statusActions;
+    
+    const [color, setColor] = useState('#000000');
 
     const { register, handleSubmit: validateForm, formState: { errors, dirtyFields, isSubmitted }, reset, setValue } = useForm({ mode: "onChange"});
     console.log(estadoEditado)
@@ -36,6 +38,7 @@ const Modal = ({ closeModal, setEstados }) => {
         if (estadoEditado) {
             setValue('nombre', estadoEditado.estNom);
             setValue('color', estadoEditado.estCol);
+            setColor(estadoEditado.estCol);
         }
     }, [estadoEditado, setValue]);
     
@@ -100,9 +103,14 @@ const Modal = ({ closeModal, setEstados }) => {
                             )}
                         />
                         <input 
-                            className='Large_1 PowerMas_Input_Color'
+                            className='Large_1 PowerMas_Input_Color pointer'
                             type="color" 
-                            onChange={(e) => setValue('color', e.target.value.toUpperCase())}
+                            value={color}
+                            onChange={(e) => {
+                                const newColor = e.target.value.toUpperCase();
+                                setValue('color', newColor);
+                                setColor(newColor);
+                            }}
                         />
                     </div>
                     {errors.color ? (

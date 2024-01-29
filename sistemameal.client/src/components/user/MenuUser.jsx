@@ -3,6 +3,7 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import MenuItem from "./MenuItem";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
+import Bar from "./Bar";
 
 const MenuUser = () => {
   const navigate = useNavigate();
@@ -41,16 +42,6 @@ const MenuUser = () => {
   
     return rootMenus;
   };
-  
-
-  useEffect(() => {
-    // Verifica si userMaint es un objeto vacío
-    if (!userMaint || Object.keys(userMaint).length === 0) {
-        // Si es un objeto vacío, redirige al usuario a Table
-        navigate('/user');
-    }
-  }, [userMaint, navigate]);
-
   
 
   useEffect(() => {
@@ -305,17 +296,31 @@ const MenuUser = () => {
   };
 
   return (
-    <div className="PowerMas_MenuUserContainer h-100 bg-white Large-p2_5">
-      <h1 className="Large-f1_25">Menú para el usuario {userMaint.usuNom} {userMaint.usuApe} con código {userMaint.usuAno}{userMaint.usuCod}</h1>
-      <div>
-        <div className="PowerMas_ListMenus">
-          <ul>
-            {menus.map(menu => renderMenu(menu, 1))}
-          </ul>
-        </div>
+    <div className="bg-white h-100 flex flex-column">
+      <div className="PowerMas_Header_Form_Beneficiarie flex ai-center p2">
+        {/* <GrFormPreviousLink className="m1 w-auto Large-f2_5 pointer" onClick={() => navigate('/user')} /> */}
+        <h1 className="flex-grow-1">Menu Usuario</h1>
+        <Bar currentStep={2} />
       </div>
-      <button onClick={handleNext}> Siguiente </button>
+      <div className="flex-grow-1 overflow-auto p1_25">
+
+      </div>
+      <div className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
+          <button onClick={() => navigate('/form-user/asds')} className="Large_5 m2">Atras</button>
+          <button onClick={() => navigate('/permiso-user/asdsa')} className="Large_5 m2">Siguiente</button>
+      </div>
     </div>
+    // <div className="PowerMas_MenuUserContainer h-100 bg-white Large-p2_5">
+    //   <h1 className="Large-f1_25">Menú para el usuario {userMaint.usuNom} {userMaint.usuApe} con código {userMaint.usuAno}{userMaint.usuCod}</h1>
+    //   <div>
+    //     <div className="PowerMas_ListMenus">
+    //       <ul>
+    //         {menus.map(menu => renderMenu(menu, 1))}
+    //       </ul>
+    //     </div>
+    //   </div>
+    //   <button onClick={handleNext}> Siguiente </button>
+    // </div>
   )
 }
 

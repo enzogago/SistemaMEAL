@@ -16,7 +16,7 @@ builder.Services.AddScoped<TipoValorDAO>();
 builder.Services.AddScoped<FinanciadorDAO>();
 builder.Services.AddScoped<ImplementadorDAO>();
 builder.Services.AddScoped<ProyectoDAO>();
-builder.Services.AddScoped<MetaSubActividadResultadoDAO>();
+builder.Services.AddScoped<MonitoreoDAO>();
 builder.Services.AddScoped<CargoDAO>();
 builder.Services.AddScoped<RolDAO>();
 builder.Services.AddScoped<DocumentoIdentidadDAO>();

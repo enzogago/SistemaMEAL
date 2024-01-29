@@ -3,6 +3,7 @@ import { AuthContext } from "../../context/AuthContext";
 import { useContext, useEffect, useState } from "react";
 import Notiflix from "notiflix";
 import ProjectItem from "./ProjectItem";
+import Bar from "./Bar";
 
 const PermissionUser = () => {
   const navigate = useNavigate();
@@ -17,16 +18,6 @@ const PermissionUser = () => {
   const [ addedSubProyectos, setAddedSubProyectos ] = useState({});
   const [ removedProyectos, setRemovedProyectos ] = useState({});
   const [ removedSubProyectos, setRemovedSubProyectos ] = useState({});
-
-
-  useEffect(() => {
-    // Verifica si userMaint es un objeto vacío
-    if (!userMaint || Object.keys(userMaint).length === 0) {
-        // Si es un objeto vacío, redirige al usuario a Table
-        navigate('/user');
-    }
-  }, [userMaint, navigate]);
-  
 
   // EFECTO AL CARGAR COMPONENTE GET - LISTAR PROYECTOS
   useEffect(() => {
@@ -249,25 +240,39 @@ const PermissionUser = () => {
 
 
   return (
-    <div className="PowerMas_MenuUserContainer h-100 bg-white Large-p2_5">
-      <h1 className="Large-f1_25">Permisos para el usuario {userMaint.usuNom} {userMaint.usuApe} con código {userMaint.usuAno}{userMaint.usuCod}</h1>
-      <div>
-        <div className="PowerMas_ListPermission">
-          <ul>
-            {proyectos.map(proyecto => (
-              <ProjectItem 
-                  key={proyecto.proCod} 
-                  proyecto={proyecto} 
-                  handleCheck={handleCheck} 
-                  checkedProyectos={checkedProyectos} 
-                  checkedSubProyectos={checkedSubProyectos} 
-              />
-            ))}
-          </ul>
-        </div>
+    <div className="bg-white h-100 flex flex-column">
+      <div className="PowerMas_Header_Form_Beneficiarie flex ai-center p2">
+        {/* <GrFormPreviousLink className="m1 w-auto Large-f2_5 pointer" onClick={() => navigate('/user')} /> */}
+        <h1 className="flex-grow-1">Permisos del Usuario</h1>
+        <Bar currentStep={3} />
       </div>
-      <button onClick={handleClickaso}> Siguiente </button>
+      <div className="flex-grow-1 overflow-auto p1_25">
+
+      </div>
+      <div className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
+          <button onClick={() => navigate('/menu-user/asdsa')} className="Large_5 m2">Atras</button>
+          <button onClick={() => navigate('/user')} className="Large_5 m2">Finalizar</button>
+      </div>
     </div>
+    // <div className="PowerMas_MenuUserContainer h-100 bg-white Large-p2_5">
+    //   <h1 className="Large-f1_25">Permisos para el usuario {userMaint.usuNom} {userMaint.usuApe} con código {userMaint.usuAno}{userMaint.usuCod}</h1>
+    //   <div>
+    //     <div className="PowerMas_ListPermission">
+    //       <ul>
+    //         {proyectos.map(proyecto => (
+    //           <ProjectItem 
+    //               key={proyecto.proCod} 
+    //               proyecto={proyecto} 
+    //               handleCheck={handleCheck} 
+    //               checkedProyectos={checkedProyectos} 
+    //               checkedSubProyectos={checkedSubProyectos} 
+    //           />
+    //         ))}
+    //       </ul>
+    //     </div>
+    //   </div>
+    //   <button onClick={handleClickaso}> Siguiente </button>
+    // </div>
   )
 }
 

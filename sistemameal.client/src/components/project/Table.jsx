@@ -1,3 +1,7 @@
+import { useContext, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Tooltip } from 'react-tooltip';
+import CryptoJS from 'crypto-js';
 import {
     useReactTable, 
     getCoreRowModel, 
@@ -5,55 +9,112 @@ import {
     getPaginationRowModel,
     getSortedRowModel, 
 } from '@tanstack/react-table';
-import { FaPenNib, FaPlus, FaSortDown, FaSortUp, FaTrash } from 'react-icons/fa';
-import Pagination from '../reusable/Pagination';
-import { useMemo, useState } from 'react';
-import TableRow from './TableRow';
+// Iconos package
+import { FaEdit, FaPlus, FaRegTrashAlt, FaSearch, FaSortDown } from 'react-icons/fa';
+import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
+import { GrNext, GrPrevious  } from "react-icons/gr";
+// Iconos source
+import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
+import Pdf_Icon from '../../img/PowerMas_Pdf_Icon.svg';
+// Funciones reusables
+import { Export_Excel_Helper, Export_PDF_Helper, handleDelete } from '../reusable/helper';
+// Componentes
+import Pagination from "../reusable/Pagination";
+import TableRow from "./TableRow"
+import { AuthContext } from "../../context/AuthContext";
+
 
 const Table = ({data = []}) => {
+    const navigate = useNavigate();
     console.log(data)
-    // Estados locales para el filtrado
-    
-    const [anoFilter, setAnoFilter] = useState('');
-    const [codigoFilter, setCodigoFilter] = useState('');
-    const [nombreFilter, setNombreFilter] = useState('');
-    const [responsableFilter, setResponsableFilter] = useState('');
-    const [periodoFilter, setPeriodoFilter] = useState('');
+    // Variables State AuthContext 
+    const { authActions, authInfo } = useContext(AuthContext);
+    const { setIsLoggedIn } = authActions;
+    const { userPermissions } = authInfo;
+    // States locales
+    const [searchFilter, setSearchFilter] = useState('');
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    // Dropdown botones Export
+    const toggleDropdown = () => {
+        setDropdownOpen(!dropdownOpen);
+    }
+    console.log(userPermissions)
+     /* TANSTACK */
+     const actions = {
+        add: userPermissions.some(permission => permission.perNom === "INSERTAR PROYECTO"),
+        delete: userPermissions.some(permission => permission.perNom === "ELIMINAR PROYECTO"),
+        edit: userPermissions.some(permission => permission.perNom === "MODIFICAR PROYECTO"),
+    };
+    const columns = useMemo(() => {
+        let baseColumns = [
+            {
+                header: "Año",
+                accessorKey: "proAno"
+            },
+            {
+                header: "Código",
+                accessorKey: "proCod"
+            },
+            {
+                header: "Nombre",
+                accessorKey: "proNom"
+            },
+            {
+                header: "Responsable",
+                accessorKey: "proRes"
+            },
+        ];
 
-    
-
-    const columns = [
-        {
-            header: "Año",
-            accessorKey: "proAno"
-        },
-        {
-            header: "Código",
-            accessorKey: "proCod"
-        },
-        {
-            header: "Nombre",
-            accessorKey: "proNom"
-        },
-        {
-            header: "Responsable",
-            accessorKey: "proRes"
-        },
-        {
-            header: "Periodo",
-            accessorKey: "proPer"
+        if (actions.delete || actions.edit) {
+            baseColumns.push({
+                header: "Acciones",
+                accessorKey: "acciones",
+                cell: ({row}) => (
+                    <div className='PowerMas_IconsTable flex jc-center ai-center'>
+                        {actions.edit && 
+                            <FaEdit 
+                                data-tooltip-id="edit-tooltip" 
+                                data-tooltip-content="Editar" 
+                                className='Large-p_25' 
+                                onClick={() => Editar_Proyecto(row)} 
+                            />
+                        }
+                        {actions.delete && 
+                            <FaRegTrashAlt 
+                                data-tooltip-id="delete-tooltip" 
+                                data-tooltip-content="Eliminar" 
+                                className='Large-p_25' 
+                                // onClick={() => handleDelete('Proyecto', row.original.estCod, setEstados, setIsLoggedIn)} 
+                            />
+                        }
+                        <Tooltip 
+                            id="edit-tooltip"
+                            effect="solid"
+                            place='top-end'
+                        />
+                        <Tooltip 
+                            id="delete-tooltip" 
+                            effect="solid"
+                            place='top-start'
+                        />
+                    </div>
+                ),
+            });
         }
-    ]
+
+        return baseColumns;
+    }, [actions]);
+        
 
     const [sorting, setSorting] = useState([]);
     const filteredData = useMemo(() => 
         data.filter(item => 
-            item.proAno.includes(anoFilter.toUpperCase()) &&
-            item.proCod.includes(codigoFilter.toUpperCase()) &&
-            item.proNom.includes(nombreFilter.toUpperCase()) &&
-            item.proRes.includes(responsableFilter.toUpperCase()) &&
-            item.proPer.includes(periodoFilter.toUpperCase()) 
-        ), [data, codigoFilter, nombreFilter, responsableFilter, periodoFilter ]
+            item.proAno.includes(searchFilter.toUpperCase()) ||
+            item.proCod.includes(searchFilter.toUpperCase()) ||
+            item.proNom.includes(searchFilter.toUpperCase()) ||
+            item.proRes.includes(searchFilter.toUpperCase()) ||
+            item.proPer.includes(searchFilter.toUpperCase()) 
+        ), [data, searchFilter]
     );
     
     const table = useReactTable({
@@ -68,88 +129,132 @@ const Table = ({data = []}) => {
         onSortingChange: setSorting,
         columnResizeMode: "onChange"
     })
+    /* END TANSTACK */
+
+    // Preparar los datos
+    const dataExport = table.options.data;  // Tus datos
+    const headers = ['AÑO', 'CODIGO', 'NOMBRE', 'RESPONSABLE', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
+    const title = 'PROYECTOS';  // El título de tu archivo
+    const properties = ['proAno', 'proCod', 'proNom', 'proRes', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
+    const format = 'a4';  // El tamaño del formato que quieres establecer para el PDF
+
+    const Export_Excel = () => {
+        // Luego puedes llamar a la función Export_Excel_Helper de esta manera:
+        Export_Excel_Helper(dataExport, headers, title, properties);
+        setDropdownOpen(false);
+    };
+
+    const Export_PDF = () => {
+        // Luego puedes llamar a la función Export_PDF_Helper de esta manera:
+        Export_PDF_Helper(dataExport, headers, title, properties, format);
+        setDropdownOpen(false);
+    };
+
+    const tableRef = useRef();  // Referencia al elemento de la tabla
+
+    const animateScroll = (element, to, duration) => {
+        const start = element.scrollLeft,
+            change = to - start,
+            increment = 20;
+        let currentTime = 0;
+    
+        const animateScroll = () => {
+            currentTime += increment;
+            const val = Math.easeInOutQuad(currentTime, start, change, duration);
+            element.scrollLeft = val;
+            if(currentTime < duration) {
+                setTimeout(animateScroll, increment);
+            }
+        };
+        animateScroll();
+    }
+    
+    Math.easeInOutQuad = function (t, b, c, d) {
+        t /= d/2;
+        if (t < 1) return c/2*t*t + b;
+        t--;
+        return -c/2 * (t*(t-2) - 1) + b;
+    };
+    
+    const scrollTable = (direction) => {
+        if (tableRef.current) {
+            const distance = tableRef.current.offsetWidth * 0.8;  // 50% del ancho de la tabla
+            const to = tableRef.current.scrollLeft + distance * direction;
+            animateScroll(tableRef.current, to, 500);
+        }
+    }
+    
+    const Editar_Proyecto = (row) => {
+        console.log(row)
+        const id = `${row.original.proAno}${row.original.proCod}`;
+        console.log(id)
+        // Encripta el ID
+        const ciphertext = CryptoJS.AES.encrypt(id, 'secret key 123').toString();
+        // Codifica la cadena cifrada para que pueda ser incluida de manera segura en una URL
+        const encodedCiphertext = encodeURIComponent(ciphertext);
+        navigate(`/form-project/${encodedCiphertext}`);
+    }
+
 
     return (
-        <div className='TableMainContainer Large-p2'>
-            <div className="flex jc-space-between">
-                <h1 className="flex left Large-f1_75">Listado de proyectos</h1>
+        <div className='TableMainContainer Large-p1 Medium-p1 Small-p_5'>
+            <div>
+                <h1 className="flex left Large-f1_5 Medium-f1_5 Small-f1_5 ">Listado de Proyectos</h1>
+                <div className="flex ">
+                    <div className="PowerMas_Search_Container Large_6 Large-m_5">
+                        <FaSearch className="Large_1 search-icon" />
+                        <input 
+                            className='PowerMas_Input_Filter Large_12 Large-p_5'
+                            type="search"
+                            placeholder='Buscar'
+                            value={searchFilter}
+                            onChange={e => setSearchFilter(e.target.value)}
+                        />
+                    </div>
+                    {
+                        actions.add && 
+                        <button 
+                            className=' flex jc-space-between Large_3 Large-m_5 Large-p_5 PowerMas_ButtonStatus'
+                            onClick={() => navigate('/form-project')}
+                            disabled={!actions.add}
+                        >
+                            Nuevo <FaPlus className='Large_1' /> 
+                        </button>
+                    }
+                    <div className={`PowerMas_Dropdown_Export Large_3 Large-m_5 ${dropdownOpen  ? 'open' : ''}`}>
+                        <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>Exportar <FaSortDown className='Large_1' /></button>
+                        <div className="PowerMas_Dropdown_Export_Content Phone_12">
+                            <a onClick={Export_Excel} className='flex jc-space-between p_5'>Excel <img className='Large_1' src={Excel_Icon} alt="" /> </a>
+                            <a onClick={Export_PDF} className='flex jc-space-between p_5'>PDF <img className='Large_1' src={Pdf_Icon} alt="" /></a>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div className="PowerMas_TableContainer">
+            <div className="PowerMas_TableContainer" ref={tableRef}>
                 <table className="Large_12 PowerMas_TableStatus">
                     <thead>
-                        <tr>
-                            <th>
-                                <input 
-                                    type="search"
-                                    placeholder='Filtrar'
-                                    value={anoFilter}
-                                    onChange={e => setAnoFilter(e.target.value)}
-                                />
-                            </th>
-                            <th>
-                                <input 
-                                    type="search"
-                                    placeholder='Filtrar'
-                                    value={codigoFilter}
-                                    onChange={e => setCodigoFilter(e.target.value)}
-                                />
-                            </th>
-                            <th>
-                                <input 
-                                    type="search"
-                                    placeholder='Filtrar'
-                                    value={nombreFilter}
-                                    onChange={e => setNombreFilter(e.target.value)}
-                                />
-                            </th>
-                            <th>
-                                <input 
-                                    type="search"
-                                    placeholder='Filtrar'
-                                    value={responsableFilter}
-                                    onChange={e => setResponsableFilter(e.target.value)}
-                                />
-                            </th>
-                            <th>
-                                <input 
-                                    type="search"
-                                    placeholder='Filtrar'
-                                    value={periodoFilter}
-                                    onChange={e => setPeriodoFilter(e.target.value)}
-                                />
-                            </th>
-                        </tr>
                         {
                             table.getHeaderGroups().map(headerGroup => (
-                                <tr key={headerGroup.id}>
+                                <tr key={headerGroup.id} className="">
                                     {
                                         headerGroup.headers.map(header =>(
-                                            <th style={{ width: header.getSize(), position: 'relative'  }} key={header.id} onClick={header.column.getToggleSortingHandler()}>
+                                            <th className="ws-nowrap" key={header.id} onClick={header.column.getToggleSortingHandler()}>
                                                 <div>
                                                     {
                                                     flexRender(header.column.columnDef.header, header.getContext())
                                                     }
-                                                    {
-                                                        {
-                                                            asc: <FaSortUp />,
-                                                            desc: <FaSortDown />
-                                                        }[header.column.getIsSorted() ?? null]
-                                                    }
+                                                    <div className='flex flex-column ai-center jc-center PowerMas_Icons_Sorter'>
+                                                        {header.column.getIsSorted() === 'asc' ? 
+                                                            <TiArrowSortedUp className={`sort-icon active`} /> :
+                                                            header.column.getIsSorted() === 'desc' ? 
+                                                            <TiArrowSortedDown className={`sort-icon active`} /> :
+                                                            <>
+                                                                <TiArrowSortedUp className={`sort-icon`} />
+                                                                <TiArrowSortedDown className={`sort-icon`} />
+                                                            </>
+                                                        }
+                                                    </div>
                                                 </div>
-                                                <span 
-                                                    onMouseDown={
-                                                        header.getResizeHandler()
-                                                    }
-                                                    onTouchStart={
-                                                        header.getResizeHandler()
-                                                    }
-
-                                                    className={header.column.getIsResizing() 
-                                                    ? "resizer isResizing" 
-                                                    : "resizer"} >
-                                                </span>
-
-                                                
                                             </th>
                                         ))
                                     }
@@ -163,10 +268,12 @@ const Table = ({data = []}) => {
                                 table.getRowModel().rows.map(row => (
                                     <TableRow key={row.id} row={row} flexRender={flexRender} />
                                 ))
-                            : <tr className='PowerMas_TableEmpty'><td colSpan={5} className='Large-p1 center'>No se encontraron registros</td></tr>
+                            : <tr className='PowerMas_TableEmpty'><td colSpan={11} className='Large-p1 center'>No se encontraron registros</td></tr>
                         }
                     </tbody>
                 </table>
+                {/* <GrPrevious className="slider" style={{left: '0'}} onClick={() => scrollTable(-1)} /> 
+                <GrNext className="slider" style={{right: '0'}} onClick={() => scrollTable(1)} />  */}
             </div>
             <Pagination table={table} />
         </div>

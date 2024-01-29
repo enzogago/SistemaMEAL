@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Result from "./Result";
 import Objective from "./Objective";
 
-const SubProject = ({subProAno, subProCod, subProNom, objetivos, resultados }) => {
+const SubProject = ({subProAno, subProCod, subProNom, subProSap, objetivos, resultados }) => {
     console.log(objetivos)
 
     const [ editObjetivos, setEditObjetivos] = useState([]);
@@ -27,6 +27,7 @@ const SubProject = ({subProAno, subProCod, subProNom, objetivos, resultados }) =
                 className="" 
                 type="text" 
                 placeholder="codigo SAP: 15465" 
+                defaultValue={subProSap}
             />
         </div>
         <div className="">

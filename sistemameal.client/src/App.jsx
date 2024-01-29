@@ -23,9 +23,10 @@ import Implementer from './components/implementer/Implementer';
 import Permission from './components/permission/Permission';
 import TypeValue from './components/type-value/TypeValue';
 import FormProject from './components/project/FormProject';
-import ProjectList from './components/project/ProjectList';
+import Projects from './components/project/Projects';
 
 import Notiflix from "notiflix";
+import FormBeneficiarie from './components/goal/beneficiarie/FormBeneficiarie';
 
 Notiflix.Loading.init({
     className: 'notiflix-loading',
@@ -131,7 +132,7 @@ const App = () => {
         'implementer': Implementer,
         'permission': Permission,
         'type-value': TypeValue,
-        "all-projects": ProjectList,
+        "projects": Projects,
     };
 
     return (
@@ -148,24 +149,23 @@ const App = () => {
                                 <Routes>
                                     {menuData.map((menu, index) => {
                                         const Component = componentMap[menu.menRef];
-                                        if (menu.menRef === 'new-project') {
-                                        } else {
-                                            return Component ? <Route path={menu.menRef} element={<Component />} key={index} /> : null;
-                                        }
+                                        return Component ? <Route path={`${menu.menRef}`} element={<Component />} key={index} /> : null;
                                     })}
-                                    {menuData.some(menu => menu.menRef === 'all-projects') && (
-                                        <>
-                                            <Route path="form-project/:id?" element={<FormProject />} />
-                                        </>
+                                    {menuData.some(menu => menu.menRef === 'projects') && (
+                                        <Route path="form-project/:id?" element={<FormProject />} />
                                     )}
                                     {menuData.some(menu => menu.menRef === 'user') && (
                                         <>
-                                            <Route path="form-user" element={<FormUser />} />
-                                            <Route path="menu-user" element={<MenuUser />} />
-                                            <Route path="permiso-user" element={<PermissionUser />} />
+                                            <Route path="form-user/:id?" element={<FormUser />} />
+                                            <Route path="menu-user/:id" element={<MenuUser />} />
+                                            <Route path="permiso-user/:id" element={<PermissionUser />} />
                                         </>
                                     )}
-
+                                    {menuData.some(menu => menu.menRef === 'monitoring') && (
+                                        <>
+                                            <Route path="form-beneficiarie/:id?" element={<FormBeneficiarie />} />
+                                        </>
+                                    )}
                                     <Route path="*" element={<Home />} />
                                 </Routes>
                             </Layout>

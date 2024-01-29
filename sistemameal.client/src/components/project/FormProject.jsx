@@ -23,7 +23,6 @@ const FormProject = () => {
     const [ project, setProject] = useState({
         proNom: '',
         proDes: '',
-        proPer: '',
         proRes: '',
         subProyectos: [{}]
     })
@@ -89,15 +88,6 @@ const FormProject = () => {
                         placeholder="Descripcion en cadenas de valor" 
                         defaultValue={project ? project.proDes : ''} 
                     ></textarea>
-                    <h2 className="Large-f1_5">
-                        Periodo
-                    </h2>
-                    <input 
-                        className="" 
-                        type="text" 
-                        placeholder="2020-2022" 
-                        defaultValue={project ? project.proPer : ''} 
-                    />
                     <h2 className="Large-f1_5">
                         Responsable
                     </h2>

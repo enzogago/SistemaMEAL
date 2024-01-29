@@ -11,7 +11,7 @@ import { StatusContext } from '../../context/StatusContext';
 const Status = () => {
     // Variables State AuthContext 
     const { authActions } = useContext(AuthContext);
-    const { setIsLoggedIn } = authActions;
+    const { setIsLoggedIn, setUserLogged } = authActions;
     // Variables State statusContext
     const { statusActions } = useContext(StatusContext);
     const { setModalVisible, setEstadoEditado } = statusActions;
@@ -39,19 +39,24 @@ const Status = () => {
                         'Authorization': `Bearer ${token}`
                     }
                 });
+                const data = await response.json();
+                console.log(response)
+                console.log(data)
                 if (!response.ok) {
                     if(response.status == 401){
-                        const data = await response.json();
                         Notiflix.Notify.failure(data.message);
+                        setUserLogged({})
+                        localStorage.removeItem('token');
                         setIsLoggedIn(false);
                     }
                     return;
                 }
-                const data = await response.json();
-                console.log(data)
                 if (data.success == false) {
                     console.log(data)
                     Notiflix.Notify.failure(data.message);
+                    setUserLogged({})
+                    localStorage.removeItem('token');
+                    setIsLoggedIn(false);
                     return;
                 }
                 setEstados(data);

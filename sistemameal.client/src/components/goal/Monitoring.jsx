@@ -10,7 +10,7 @@ const Monitoring = () => {
         try {
             Notiflix.Loading.pulse('Cargando...');
             const token = localStorage.getItem('token');
-            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/monitoreo`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -40,7 +40,7 @@ const Monitoring = () => {
     fetchMonitoreo();
 }, []);
   return (
-    <div className='bg-white PowerMas_MonitoringContainer'>
+    <div className='bg-white PowerMas_StatusContainer'>
       <Table 
           data={monitoringData} 
       />

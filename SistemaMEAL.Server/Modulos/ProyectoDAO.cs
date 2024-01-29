@@ -144,7 +144,7 @@ namespace SistemaMEAL.Modulos
 
         public IEnumerable<Proyecto> ListarProyectosUsuario(string usuAno, string usuCod)
         {
-            List<Proyecto> proyectos = new List<Proyecto>();
+             List<Proyecto> temporal = new List<Proyecto>();
             try
             {
                 cn.getcn.Open();
@@ -154,32 +154,34 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@USUANO", usuAno);
                 cmd.Parameters.AddWithValue("@USUCOD", usuCod);
 
-                SqlDataReader rd = cmd.ExecuteReader();
-                while (rd.Read())
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+                Console.WriteLine("desde jsonResult:"+jsonResult);
+                if (!reader.HasRows)
                 {
-                    Proyecto proyecto = new Proyecto()
-                    {
-                        ProAno = rd.GetString(0),
-                        ProCod = rd.GetString(1),
-                        ProNom = rd.GetString(2),
-                        ProRes = rd.GetString(3),
-                        ProPer = rd.GetString(4)
-                    };
-
-                    proyectos.Add(proyecto);
+                    jsonResult.Append("[]");
                 }
-                rd.Close();
+                else
+                {
+                    while (reader.Read())
+                    {
+                        Console.WriteLine("desde reader:"+reader.GetValue(0).ToString());
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                Console.WriteLine("desde jsonResult final:"+jsonResult);
+                // Deserializa la cadena JSON en una lista de objetos Estado
+                temporal = JsonConvert.DeserializeObject<List<Proyecto>>(jsonResult.ToString());
             }
             catch (SqlException ex)
             {
-                proyectos = new List<Proyecto>();
                 Console.WriteLine(ex.Message);
             }
             finally
             {
                 cn.getcn.Close();
             }
-            return proyectos;
+            return temporal;
         }
 
         public IEnumerable<Proyecto> ObtenerDetallesProyectoUsuario(string usuAno, string usuCod, string proAno, string proCod)
@@ -212,9 +214,8 @@ namespace SistemaMEAL.Modulos
                     }
                 }
                 Console.WriteLine("desde jsonResult final:"+jsonResult);
-                // Deserializa la cadena JSON en un objeto Proyecto
+                // Deserializa la cadena JSON en una lista de objetos Estado
                 temporal = JsonConvert.DeserializeObject<List<Proyecto>>(jsonResult.ToString());
-                Console.WriteLine(temporal);
             }
             catch (SqlException ex)
             {

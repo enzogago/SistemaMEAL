@@ -3,7 +3,7 @@ import { AuthContext } from "../../context/AuthContext";
 import Notiflix from "notiflix";
 import Table from "./Table";
 
-const ProjectList = () => {
+const projects = () => {
     // Estados del AuthContext
     const { authInfo } = useContext(AuthContext);
     const { userLogged  } = authInfo;
@@ -53,4 +53,4 @@ const ProjectList = () => {
     );
 };
 
-export default ProjectList;
+export default projects;

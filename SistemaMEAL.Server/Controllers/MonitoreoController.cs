@@ -6,14 +6,14 @@ using SistemaMEAL.Server.Modulos;
 
 namespace SistemaMEAL.Server.Controllers
 {
-     [ApiController]
-    [Route("api/monitoreo")]
-    public class MetaSubActividadResultadoController : ControllerBase
+    [ApiController]
+    [Route("api/[controller]")]
+    public class MonitoreoController : ControllerBase
     {
-        private readonly MetaSubActividadResultadoDAO _monitoreos;
+        private readonly MonitoreoDAO _monitoreos;
         private readonly UsuarioDAO _usuarios;
 
-        public MetaSubActividadResultadoController(MetaSubActividadResultadoDAO monitoreos, UsuarioDAO usuarios)
+        public MonitoreoController(MonitoreoDAO monitoreos, UsuarioDAO usuarios)
         {
             _monitoreos = monitoreos;
             _usuarios = usuarios;

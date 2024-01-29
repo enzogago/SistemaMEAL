@@ -1,17 +1,19 @@
 import { useContext, useMemo, useState } from 'react';
-import { FaPenNib, FaPlus, FaSortDown, FaSortUp, FaTrash } from 'react-icons/fa';
-import { StatusContext } from '../../context/StatusContext';
+import { Tooltip } from 'react-tooltip';
 import {
     useReactTable, 
     getCoreRowModel, 
-    flexRender, 
     getPaginationRowModel,
     getSortedRowModel, 
 } from '@tanstack/react-table';
-import Pagination from '../reusable/Pagination';
+// Iconos package
+import { FaEdit , FaRegTrashAlt } from 'react-icons/fa';
+// Context
 import { AuthContext } from '../../context/AuthContext';
-import { handleDelete } from '../reusable/helper';
-
+// Funciones reusables
+import { Export_Excel_Helper, Export_PDF_Helper, handleDelete } from '../reusable/helper';
+// Componentes
+import CustomTable from '../reusable/CustomTable';
 
 const Table = ({ data, openModal, setFinanciadores }) => {
     // Variables State AuthContext 
@@ -19,12 +21,12 @@ const Table = ({ data, openModal, setFinanciadores }) => {
     const { setIsLoggedIn } = authActions;
     const { userPermissions } = authInfo;
     // States locales
-    const [codigoFilter, setCodigoFilter] = useState('');
-    const [nombreFilter, setNombreFilter] = useState('');
+    const [searchFilter, setSearchFilter] = useState('');
+    const [dropdownOpen, setDropdownOpen] = useState(false);
 
     /* TANSTACK */
     const actions = {
-        add: userPermissions.some(permission => permission.perNom === "CREAR FINANCIADOR"),
+        add: userPermissions.some(permission => permission.perNom === "INSERTAR FINANCIADOR"),
         delete: userPermissions.some(permission => permission.perNom === "ELIMINAR FINANCIADOR"),
         edit: userPermissions.some(permission => permission.perNom === "MODIFICAR FINANCIADOR"),
     };
@@ -47,8 +49,32 @@ const Table = ({ data, openModal, setFinanciadores }) => {
                 accessorKey: "acciones",
                 cell: ({row}) => (
                     <div className='PowerMas_IconsTable flex jc-center ai-center'>
-                        {actions.delete && <FaTrash className='Large-p_25' onClick={() => handleDelete('Financiador', row.original.finCod, setFinanciadores, setIsLoggedIn)} />}
-                        {actions.edit && <FaPenNib className='Large-p_25' onClick={() => openModal(row.original)} />}
+                        {actions.edit && 
+                            <FaEdit 
+                                data-tooltip-id="edit-tooltip" 
+                                data-tooltip-content="Editar" 
+                                className='Large-p_25' 
+                                onClick={() => openModal(row.original)} 
+                            />
+                        }
+                        {actions.delete && 
+                            <FaRegTrashAlt 
+                                data-tooltip-id="delete-tooltip" 
+                                data-tooltip-content="Eliminar" 
+                                className='Large-p_25' 
+                                onClick={() => handleDelete('Financiador', row.original.finCod, setFinanciadores, setIsLoggedIn)} 
+                            />
+                        }
+                        <Tooltip 
+                            id="edit-tooltip"
+                            effect="solid"
+                            place='top-end'
+                        />
+                        <Tooltip 
+                            id="delete-tooltip" 
+                            effect="solid"
+                            place='top-start'
+                        />
                     </div>
                 ),
             });
@@ -60,9 +86,9 @@ const Table = ({ data, openModal, setFinanciadores }) => {
     const [sorting, setSorting] = useState([]);
     const filteredData = useMemo(() => 
         data.filter(item => 
-            item.finCod.includes(codigoFilter.toUpperCase()) &&
-            item.finNom.includes(nombreFilter.toUpperCase())
-        ), [data, codigoFilter, nombreFilter]
+            item.finCod.includes(searchFilter.toUpperCase()) ||
+            item.finNom.includes(searchFilter.toUpperCase())
+        ), [data, searchFilter]
     );
     const table = useReactTable({
         data: filteredData,
@@ -78,104 +104,38 @@ const Table = ({ data, openModal, setFinanciadores }) => {
     })
     /* END TANSTACK */
 
+    // Preparar los datos
+    const dataExport = table.options.data;  // Tus datos
+    const headers = ['CODIGO', 'NOMBRE', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
+    const title = 'FINANCIADORES';  // El título de tu archivo
+    const properties = ['finCod', 'finNom', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
+    const format = 'a4';  // El tamaño del formato que quieres establecer para el PDF
+
+    const Export_Excel = () => {
+        // Luego puedes llamar a la función Export_Excel_Helper de esta manera:
+        Export_Excel_Helper(dataExport, headers, title, properties);
+        setDropdownOpen(false);
+    };
+
+    const Export_PDF = () => {
+        // Luego puedes llamar a la función Export_PDF_Helper de esta manera:
+        Export_PDF_Helper(dataExport, headers, title, properties, format);
+        setDropdownOpen(false);
+    };
+
     return (
-        <div className='TableMainContainer Large-p2'>
-            <div className="flex jc-space-between">
-                <h1 className="flex left Large-f1_75">Listado de Financiadores</h1>
-                {
-                    actions.add && 
-                    <button 
-                        className='Large-p_5 PowerMas_ButtonStatus'
-                        onClick={() => openModal()} 
-                        disabled={!actions.add}
-                    >
-                        Nuevo <FaPlus /> 
-                    </button>
-                }
-            </div>
-            <div className="PowerMas_TableContainer">
-                <table className="Large_12 PowerMas_TableStatus">
-                    <thead>
-                        <tr>
-                            <th>
-                                <input 
-                                    type="search"
-                                    placeholder='Filtrar por Codigo'
-                                    value={codigoFilter}
-                                    onChange={e => setCodigoFilter(e.target.value)}
-                                />
-                            </th>
-                            <th>
-                                <input 
-                                    type="search"
-                                    placeholder='Filtrar por Nombre'
-                                    value={nombreFilter}
-                                    onChange={e => setNombreFilter(e.target.value)}
-                                />
-                            </th>
-                            <th></th>
-                        </tr>
-                        {
-                            table.getHeaderGroups().map(headerGroup => (
-                                <tr key={headerGroup.id}>
-                                    {
-                                        headerGroup.headers.map(header =>(
-                                            <th style={{ width: header.getSize(), position: 'relative'  }} key={header.id} onClick={header.column.getToggleSortingHandler()}>
-                                                <div>
-                                                    {
-                                                    flexRender(header.column.columnDef.header, header.getContext())
-                                                    }
-                                                    {
-                                                        {
-                                                            asc: <FaSortUp />,
-                                                            desc: <FaSortDown />
-                                                        }[header.column.getIsSorted() ?? null]
-                                                    }
-                                                </div>
-                                                <span 
-                                                    onMouseDown={
-                                                        header.getResizeHandler()
-                                                    }
-                                                    onTouchStart={
-                                                        header.getResizeHandler()
-                                                    }
-
-                                                    className={header.column.getIsResizing() 
-                                                    ? "resizer isResizing" 
-                                                    : "resizer"} >
-                                                </span>
-
-                                                
-                                            </th>
-                                        ))
-                                    }
-                                </tr>
-                            ))
-                        }
-                    </thead>
-                    <tbody>
-                        {
-                            table.getRowModel().rows.length > 0 ?
-                                table.getRowModel().rows.map(row => (
-                                    <tr key={row.id}>
-                                        {row.getVisibleCells().map(cell => (
-                                            <td style={{ width: cell.column.getSize() }} key={cell.id}>
-                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                            </td>
-                                        ))}
-                                    </tr>
-                                ))
-                            :   <tr className='PowerMas_TableEmpty'>
-                                    <td colSpan={3} className='Large-p1 center'>
-                                        No se encontraron registros
-                                    </td>
-                                </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-            <Pagination table={table} />
-        </div>
+        <CustomTable 
+            title="Listado de Financiadores" 
+            searchFilter={searchFilter} 
+            setSearchFilter={setSearchFilter} 
+            actions={actions} 
+            openModal={openModal} 
+            dropdownOpen={dropdownOpen} 
+            setDropdownOpen={setDropdownOpen} 
+            Export_Excel={Export_Excel} 
+            Export_PDF={Export_PDF} 
+            table={table}
+        />
     )
 }
 

@@ -2,7 +2,6 @@ import { useEffect, useReducer, useState } from "react";
 import { authReducer } from "../reducers/authReducer"; // Asegúrate de definir este reducer
 import { types } from "../types/types";
 import { AuthContext } from "./AuthContext";
-import Notiflix from "notiflix";
 
 const AuthState = ({ children }) => {
     // Estados locales

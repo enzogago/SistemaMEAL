@@ -20,7 +20,7 @@ namespace SistemaMEAL.Server.Models
 
         public String? SubProNom { get; set; }
 
-        public String? SubProPre { get; set; }
+        public String? SubProSap { get; set; }
 
         public String? UsuIng { get; set; }
 
