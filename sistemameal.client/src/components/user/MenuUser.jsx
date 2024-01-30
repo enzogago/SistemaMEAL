@@ -1,15 +1,27 @@
 import Notiflix from "notiflix";
 import { useCallback, useContext, useEffect, useState } from "react";
 import MenuItem from "./MenuItem";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import Bar from "./Bar";
+import CryptoJS from 'crypto-js';
 
 const MenuUser = () => {
   const navigate = useNavigate();
-  // Variables State AuthContext 
-  const { authInfo } = useContext(AuthContext);
-  const { userMaint } = authInfo;
+
+  const { id: safeCiphertext } = useParams();
+  console.log(safeCiphertext)
+  const ciphertext = atob(safeCiphertext);
+  // Desencripta el ID
+  const bytes  = CryptoJS.AES.decrypt(ciphertext, 'secret key 123');
+  const id = bytes.toString(CryptoJS.enc.Utf8);
+  console.log(id)
+
+  const usuAno = id.slice(0, 4);
+  const usuCod = id.slice(4);
+  
+  console.log(usuAno)
+  console.log(usuCod)
   // Estados locales
   const [ menus, setMenus ] = useState([]);
   const [ openMenus, setOpenMenus ] = useState({}); 
@@ -18,6 +30,8 @@ const MenuUser = () => {
   const [ allMenus, setAllMenus ] = useState([]);
   const [ checkedPermissions, setCheckedPermissions ] = useState({});
   const [ userPermissions, setUserPermissions ] = useState({});
+
+  const [ user, setUser ] = useState(null);
 
 
   const groupByParent = (menuData) => {
@@ -45,17 +59,42 @@ const MenuUser = () => {
   
 
   useEffect(() => {
+    const fetchUsuarios = async () => {
+      try {
+          Notiflix.Loading.pulse('Cargando...');
+          const token = localStorage.getItem('token');
+          const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/usuario/${usuAno}/${usuCod}`, {
+              headers: {
+                  'Authorization': `Bearer ${token}`
+              }
+          });
+          const data = await response.json();
+ 
+          if (!response.ok) {
+            Notiflix.Notify.failure(data.message);
+            return;
+          }
+
+          setUser(data[0])
+      } catch (error) {
+          console.error('Error:', error);
+      } finally {
+          Notiflix.Loading.remove();
+      }
+  };
+  fetchUsuarios();
     const fetchMenus = async () => {
       try {
           Notiflix.Loading.pulse('Cargando...');
           const token = localStorage.getItem('token');
           // Permisos por usuario
-          const responseUserPermissions = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Permiso/${userMaint.usuAno}/${userMaint.usuCod}`, {
+          const responseUserPermissions = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Permiso/${usuAno}/${usuCod}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
           });
           const userPermissions = await responseUserPermissions.json();
+          console.log(userPermissions)
           setUserPermissions(userPermissions);
           // Obtener todos los permisos
           const responseAllPermissions = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Permiso`, {
@@ -64,6 +103,7 @@ const MenuUser = () => {
             }
           });
           const allPermissions = await responseAllPermissions.json();
+          console.log(allPermissions)
           const markedPermissions = allPermissions.map(permission => ({
             ...permission,
             isChecked: checkedPermissions[permission.perCod] || userPermissions.some(userPermission => userPermission.perCod === permission.perCod)
@@ -76,7 +116,7 @@ const MenuUser = () => {
           setCheckedPermissions(newCheckedPermissions);
 
           // Obtén los menús del usuario
-          const responseUserMenus = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Menu/${userMaint.usuAno}/${userMaint.usuCod}`, {
+          const responseUserMenus = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Menu/${usuAno}/${usuCod}`, {
               headers: {
                   'Authorization': `Bearer ${token}`
               }
@@ -91,6 +131,7 @@ const MenuUser = () => {
           });
           // Respuesta de todos los menus disponibles en la aplicacion
           const allMenus = await responseAllMenus.json();
+          console.log(allMenus)
           // Marca los menús a los que el usuario tiene acceso
           const markedMenus = allMenus.map(menu => {
             const menuPermissions = markedPermissions.filter(permission => permission.perRef === menu.menRef);
@@ -100,6 +141,7 @@ const MenuUser = () => {
                 permissions: menuPermissions
             }
           });
+          console.log(markedMenus)
           const groupData = groupByParent(markedMenus);
           setMenus(groupData);
           const newCheckedMenus = userMenus.reduce((map, menu) => {
@@ -116,7 +158,7 @@ const MenuUser = () => {
       }
     };
     fetchMenus();
-  }, [userMaint]);
+  }, []);
 
 
   const handleToggle = useCallback((menu) => {
@@ -205,14 +247,14 @@ const MenuUser = () => {
   
       // Preparar los datos para las peticiones
       const addedMenusData = addedMenus.map(menu => ({
-        UsuAno: userMaint.usuAno,
-        UsuCod: userMaint.usuCod,
+        UsuAno: usuAno,
+        UsuCod: usuCod,
         MenAno: menu.menAno,
         MenCod: menu.menCod
       }));
       const removedMenusData = removedMenus.map(menu => ({
-        UsuAno: userMaint.usuAno,
-        UsuCod: userMaint.usuCod,
+        UsuAno: usuAno,
+        UsuCod: usuCod,
         MenAno: menu.menAno,
         MenCod: menu.menCod
       }));
@@ -252,15 +294,17 @@ const MenuUser = () => {
   
       // Preparar los datos para las peticiones
       const addedPermissionsData = addedPermissions.map(perCod => ({
-        UsuAno: userMaint.usuAno,
-        UsuCod: userMaint.usuCod,
+        UsuAno: usuAno,
+        UsuCod: usuCod,
         PerCod: perCod
       }));
       const removedPermissionsData = removedPermissions.map(perCod => ({
-        UsuAno: userMaint.usuAno,
-        UsuCod: userMaint.usuCod,
+        UsuAno: usuAno,
+        UsuCod: usuCod,
         PerCod: perCod
       }));
+      console.log(addedPermissionsData)
+      console.log(removedPermissionsData)
   
       const responseAddPermissions = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Permiso/agregar`, {
         method: 'POST',
@@ -287,40 +331,69 @@ const MenuUser = () => {
         // Manejar el error...
       }
     } catch (error) {
-      
+      console.log(error)
     } finally{
       Notiflix.Loading.remove();
-      navigate('/permiso-user');
+      navigate(`/permiso-user/${safeCiphertext}`)
     }
 
   };
 
   return (
-    <div className="bg-white h-100 flex flex-column">
-      <div className="PowerMas_Header_Form_Beneficiarie flex ai-center p2">
-        {/* <GrFormPreviousLink className="m1 w-auto Large-f2_5 pointer" onClick={() => navigate('/user')} /> */}
-        <h1 className="flex-grow-1">Menu Usuario</h1>
-        <Bar currentStep={2} />
+    <>
+      <div className="bg-white h-100 flex flex-column">
+        <div className="PowerMas_Header_Form_Beneficiarie flex ai-center p2">
+          <h1 className="flex-grow-1">Menu Usuario</h1>
+          <Bar currentStep={2} />
+        </div>
+        <div className="flex-grow-1 overflow-auto p1_25">
+        <div className="PowerMas_MenuUserContainer">
+        <div className="flex gap-1">
+          <div className="PowerMas_ListMenus Large_6">
+            <ul>
+              {menus.map(menu => renderMenu(menu, 1))}
+            </ul>
+          </div>
+          <div className="Large_6">
+            <article className="p_25">
+              <p>Usuario:</p>
+              <p>{user && user.usuNom + ' ' + user.usuApe}</p>
+            </article>
+            <hr className="PowerMas_Hr m_25" />
+            <article className="p_25">
+              <p>Documento de identidad:</p>
+              <p>{user && user.docIdeNom}</p>
+            </article>
+            <hr className="PowerMas_Hr m_25" />
+            <article className="p_25">
+              <p>Número de identidad:</p>
+              <p>{user && user.usuNumDoc}</p>
+            </article>
+            <hr className="PowerMas_Hr m_25" />
+            <article className="p_25">
+              <p>Rol:</p>
+              <p>{user && user.rolNom}</p>
+            </article>
+            <hr className="PowerMas_Hr m_25" />
+            <article className="p_25">
+              <p>Cargo:</p>
+              <p>{user && user.carNom}</p>
+            </article>
+            <hr className="PowerMas_Hr m_25" />
+            <article className="p_25">
+              <p>Estado:</p>
+              <p>{user && user.usuEst}</p>
+            </article>
+          </div>
+        </div>
+        </div>
+        </div>
+        <div className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
+            <button onClick={() => navigate(`/form-user/${safeCiphertext}`)} className="Large_5 m2">Atras</button>
+            <button onClick={handleNext} className="Large_5 m2">Siguiente</button>
+        </div>
       </div>
-      <div className="flex-grow-1 overflow-auto p1_25">
-
-      </div>
-      <div className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
-          <button onClick={() => navigate('/form-user/asds')} className="Large_5 m2">Atras</button>
-          <button onClick={() => navigate('/permiso-user/asdsa')} className="Large_5 m2">Siguiente</button>
-      </div>
-    </div>
-    // <div className="PowerMas_MenuUserContainer h-100 bg-white Large-p2_5">
-    //   <h1 className="Large-f1_25">Menú para el usuario {userMaint.usuNom} {userMaint.usuApe} con código {userMaint.usuAno}{userMaint.usuCod}</h1>
-    //   <div>
-    //     <div className="PowerMas_ListMenus">
-    //       <ul>
-    //         {menus.map(menu => renderMenu(menu, 1))}
-    //       </ul>
-    //     </div>
-    //   </div>
-    //   <button onClick={handleNext}> Siguiente </button>
-    // </div>
+    </>
   )
 }
 

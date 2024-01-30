@@ -1,101 +1,156 @@
 import Notiflix from "notiflix";
-import { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../../context/AuthContext";
+import { useEffect, useState } from "react";
 import { handleSubmit } from './eventHandlers';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from "react-router-dom";
 import CryptoJS from 'crypto-js';
-import { GrFormPreviousLink } from "react-icons/gr";
-import { FaUser } from "react-icons/fa";
-import { BiSolidUserDetail } from "react-icons/bi";
-import { FaListCheck } from "react-icons/fa6";
 import Bar from "./Bar";
 
 const FormUser = () => {
     const navigate = useNavigate();
-    // Variables State AuthContext 
-    const { authActions } = useContext(AuthContext);
-    const { setUsers, setIsLoggedIn, setUserMaint } = authActions;
-    const isEditing  = false;
-
-    const initialFormValues = {
-        usuAno: '',
-        usuCod: '',
-        docIdeCod: '0',
-        usuNumDoc: '',
-        usuCorEle: '',
-        usuNom: '',
-        usuApe: '',
-        usuTel: '',
-        rolCod: '0',
-        carCod: '0',
-        usuEst: 'A',
-        usuFecNac: '',
-        usuSex: 'M',
-        usuFecInc: '',
-        usuNomUsu: '',
-        usuPas: ''
-    };
     
+    const { id: safeCiphertext } = useParams();
+    console.log(safeCiphertext)
+    let id = '';
+    if (safeCiphertext) {
+        const ciphertext = atob(safeCiphertext);
+        // Desencripta el ID
+        const bytes  = CryptoJS.AES.decrypt(ciphertext, 'secret key 123');
+        id = bytes.toString(CryptoJS.enc.Utf8);
+        console.log(id)
+    }
+    const isEditing = id && id.length >= 5;
+
+    var usuAno;
+    var usuCod;
+    if (isEditing) {
+        usuAno = id.slice(0, 4);
+        usuCod = id.slice(4);
+    }
 
     const [ documentos, setDocumentos ] = useState([]);
     const [ roles, setRoles ] = useState([]);
     const [ cargos, setCargos ] = useState([]);
 
-    const { register, handleSubmit: validateForm, formState: {errors}, reset, setValue, trigger, watch   } = useForm();
-    const formValues = watch();
-    
+
+    const { register, handleSubmit: validateForm, formState: { errors, dirtyFields, isSubmitted }, reset, setValue } = 
+    useForm({ mode: "onChange", defaultValues: {
+        usuSex: 'M',
+        usuEst: 'A',
+    } });
+
     useEffect(() => {
-        const fetchDocumentos = async () => {
+        const fetchOptions = async () => {
+            const fetchDocumentos = async () => {
+                try {
+                    Notiflix.Loading.pulse('Cargando...');
+                    const token = localStorage.getItem('token');
+                    const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/DocumentoIdentidad`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    if (!response.ok) {
+                        if(response.status == 401 || response.status == 403){
+                            const data = await response.json();
+                            Notiflix.Notify.failure(data.message);
+                        }
+                        return;
+                    }
+                    const data = await response.json();
+                    if (data.success == false) {
+                        Notiflix.Notify.failure(data.message);
+                        return;
+                    }
+                    setDocumentos(data);
+                } catch (error) {
+                    console.error('Error:', error);
+                } finally {
+                    Notiflix.Loading.remove();
+                }
+            };
+            const fetchCargos = async () => {
+                try {
+                    Notiflix.Loading.pulse('Cargando...');
+                    const token = localStorage.getItem('token');
+                    const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Cargo`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    if (!response.ok) {
+                        if(response.status == 401 || response.status == 403){
+                            const data = await response.json();
+                            Notiflix.Notify.failure(data.message);
+                        }
+                        return;
+                    }
+                    const data = await response.json();
+                    if (data.success == false) {
+                        Notiflix.Notify.failure(data.message);
+                        return;
+                    }
+                    setCargos(data);
+                } catch (error) {
+                    console.error('Error:', error);
+                } finally {
+                    Notiflix.Loading.remove();
+                }
+            };
+    
+            const fetchRoles = async () => {
+                try {
+                    Notiflix.Loading.pulse('Cargando...');
+                    const token = localStorage.getItem('token');
+                    const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Rol`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    if (!response.ok) {
+                        if(response.status == 401 || response.status == 403){
+                            const data = await response.json();
+                            Notiflix.Notify.failure(data.message);
+                        }
+                        return;
+                    }
+                    const data = await response.json();
+                    if (data.success == false) {
+                        Notiflix.Notify.failure(data.message);
+                        return;
+                    }
+                    setRoles(data);
+                } catch (error) {
+                    console.error('Error:', error);
+                } finally {
+                    Notiflix.Loading.remove();
+                }
+            };
+    
+            fetchCargos();
+            fetchRoles();
+            fetchDocumentos();
+        }
+
+        const fetchUsuarios = async () => {
             try {
                 Notiflix.Loading.pulse('Cargando...');
                 const token = localStorage.getItem('token');
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/DocumentoIdentidad`, {
+                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/usuario/${usuAno}/${usuCod}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
-                if (!response.ok) {
-                    if(response.status == 401 || response.status == 403){
-                        const data = await response.json();
-                        Notiflix.Notify.failure(data.message);
-                    }
-                    return;
-                }
                 const data = await response.json();
-                if (data.success == false) {
+                const obj = data[0]; // accede al primer objeto en el array
+                for (const field in obj) {
+                    setValue(field, obj[field]);
+                }
+                console.log(obj)
+                if (!response.ok) {
                     Notiflix.Notify.failure(data.message);
                     return;
                 }
-                setDocumentos(data);
-            } catch (error) {
-                console.error('Error:', error);
-            } finally {
-                Notiflix.Loading.remove();
-            }
-        };
-        const fetchCargos = async () => {
-            try {
-                Notiflix.Loading.pulse('Cargando...');
-                const token = localStorage.getItem('token');
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Cargo`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                if (!response.ok) {
-                    if(response.status == 401 || response.status == 403){
-                        const data = await response.json();
-                        Notiflix.Notify.failure(data.message);
-                    }
-                    return;
-                }
-                const data = await response.json();
-                if (data.success == false) {
-                    Notiflix.Notify.failure(data.message);
-                    return;
-                }
-                setCargos(data);
             } catch (error) {
                 console.error('Error:', error);
             } finally {
@@ -103,76 +158,26 @@ const FormUser = () => {
             }
         };
 
-        const fetchRoles = async () => {
-            try {
-                Notiflix.Loading.pulse('Cargando...');
-                const token = localStorage.getItem('token');
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Rol`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                if (!response.ok) {
-                    if(response.status == 401 || response.status == 403){
-                        const data = await response.json();
-                        Notiflix.Notify.failure(data.message);
-                    }
-                    return;
-                }
-                const data = await response.json();
-                if (data.success == false) {
-                    Notiflix.Notify.failure(data.message);
-                    return;
-                }
-                setRoles(data);
-            } catch (error) {
-                console.error('Error:', error);
-            } finally {
-                Notiflix.Loading.remove();
+        fetchOptions().then(() => {
+            if(isEditing){
+                fetchUsuarios();
             }
-        };
-
-        fetchCargos();
-        fetchRoles();
-        fetchDocumentos();
+        });
+        
     }, []);
-
     
-
-    const handleChange = (event) => {
-        setValue(event.target.name, event.target.value);
-    };
-
-    const handleNext = async (event) => {
-        event.preventDefault();
-
-        if (JSON.stringify(userMaint) === JSON.stringify(formValues)) {
-            Notiflix.Notify.info('No se realizó ningún cambio.');
-            return navigate('/menu-user');
-        }
+    const handleNext = () => {
+        validateForm((data) => {
+            handleSubmit(data, isEditing, navigate, safeCiphertext);
+        })();
+    }
     
-        // Activa la validación del formulario
-        const result = await trigger();
-    
-        // Verifica si el formulario es válido
-        if (!result) {
-            // Muestra un mensaje de error y detiene la ejecución de la función
-            Notiflix.Notify.failure('Por favor, corrige los errores en el formulario.');
-            return;
-        }
-    
-        // Si el formulario es válido, procede con el envío del formulario
-        await handleSubmit(event, userMaint, watch(), setUsers, setIsLoggedIn, setUserMaint, navigate);
-    };
-    
-    
-
     return (
         <div className="bg-white h-100 flex flex-column">
             <div className="PowerMas_Header_Form_Beneficiarie flex ai-center p2">
                 {/* <GrFormPreviousLink className="m1 w-auto Large-f2_5 pointer" onClick={() => navigate('/user')} /> */}
-                <h1 className="flex-grow-1">Nuevo Usuario</h1>
-                <Bar currentStep={1} />
+                <h1 className="flex-grow-1">{isEditing ? 'Editar' : 'Nuevo'} Usuario</h1>
+                <Bar isEditing={isEditing} currentStep={1} />
             </div>
             <div className="flex-grow-1 overflow-auto p1_25">
                 <div className="">
@@ -183,8 +188,7 @@ const FormUser = () => {
                             <label htmlFor="">Documento Identidad</label>
                             <select 
                                 name="docIdeCod" 
-                                value={formValues.docIdeCod} 
-                                onChange={handleChange}
+                                className={`p1 PowerMas_Modal_Form_${dirtyFields.docIdeCod || isSubmitted ? (errors.docIdeCod ? 'invalid' : 'valid') : ''}`} 
                                 {...register('docIdeCod', { 
                                     validate: value => value !== '0' || 'El documento de identidad es requerido' 
                                 })}
@@ -196,71 +200,94 @@ const FormUser = () => {
                                     value={documento.docIdeCod}> ({documento.docIdeAbr}) {documento.docIdeNom}</option>
                                 ))}
                             </select>
-                            {errors.docIdeCod && <p className='errorInput Large-p_5'>{errors.docIdeCod.message}</p>}
+                            {errors.docIdeCod ? (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.docIdeCod.message}</p>
+                            ) : (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                Espacio reservado para el mensaje de error
+                                </p>
+                            )}
                         </div>
                         <div className="Large_6 flex flex-column p1">
-                            <label htmlFor="">Número documento</label>
-                            <input 
+                            <label htmlFor="usuNumDoc">Número documento</label>
+                            <input
+                                className={`p1 PowerMas_Modal_Form_${dirtyFields.usuNumDoc || isSubmitted ? (errors.usuNumDoc ? 'invalid' : 'valid') : ''}`} 
                                 type="text" 
-                                name="usuNumDoc" 
-                                value={formValues.usuNumDoc} 
-                                onChange={handleChange}
                                 placeholder="Ejm: 922917351"
                                 {...register('usuNumDoc', { required: 'El número de documento es requerido' })} 
                             />
-                            {errors.usuNumDoc && <p className='errorInput Large-p_5'>{errors.usuNumDoc.message}</p>}
+                            {errors.usuNumDoc ? (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.usuNumDoc.message}</p>
+                            ) : (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                Espacio reservado para el mensaje de error
+                                </p>
+                            )}
                         </div>
                         <div className="Large_6 flex flex-column p1">
-                            <label htmlFor="">Nombre</label>
-                            <input type="text" 
-                                name="usuNom" 
-                                value={formValues.usuNom} 
-                                onChange={handleChange}
+                            <label htmlFor="usuNom">Nombre</label>
+                            <input type="text"
+                                className={`p1 PowerMas_Modal_Form_${dirtyFields.usuNom || isSubmitted ? (errors.usuNom ? 'invalid' : 'valid') : ''}`} 
                                 placeholder="Ejm: Andres"
                                 {...register('usuNom', { 
                                     required: 'El nombre es requerido',
                                     minLength: { value: 3, message: 'El nombre debe tener minimo 3 digitos' },
                                 })} 
                             />
-                            {errors.usuNom && <p className='errorInput Large-p_5'>{errors.usuNom.message}</p>}
+                             {errors.usuNom ? (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.usuNom.message}</p>
+                            ) : (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                Espacio reservado para el mensaje de error
+                                </p>
+                            )}
                         </div>
                         <div className="Large_6 flex flex-column p1">
                             <label htmlFor="">Apellido</label>
                             <input 
                                 type="text" 
-                                name="usuApe" 
-                                value={formValues.usuApe} 
-                                onChange={handleChange}
+                                name="usuApe"
+                                className={`p1 PowerMas_Modal_Form_${dirtyFields.usuApe || isSubmitted ? (errors.usuApe ? 'invalid' : 'valid') : ''}`} 
                                 placeholder="Ejm: Eras"
                                 {...register('usuApe', { 
                                     required: 'El apellido es requerido',
                                         minLength: { value: 3, message: 'El apellido debe tener minimo 3 digitos' },
                                 })} 
                             />
-                            {errors.usuApe && <p className='errorInput Large-p_5'>{errors.usuApe.message}</p>}
+                             {errors.usuApe ? (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.usuApe.message}</p>
+                            ) : (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                Espacio reservado para el mensaje de error
+                                </p>
+                            )}
                         </div>
                         <div className="Large_6 flex flex-column p1">
                             <label htmlFor="">Teléfono</label>
                             <input 
                                 type="text" 
                                 name="usuTel" 
-                                value={formValues.usuTel} 
-                                onChange={handleChange}
+                                className={`p1 PowerMas_Modal_Form_${dirtyFields.usuTel || isSubmitted ? (errors.usuTel ? 'invalid' : 'valid') : ''}`} 
                                 placeholder="Ejm: 922917351"
                                 {...register('usuTel', { 
                                     required: 'El número de telefono es requerido',
                                     minLength: { value: 9, message: 'El número de telefono debe tener minimo 9 digitos' },
                                 })} 
                             />
-                            {errors.usuTel && <p className='errorInput Large-p_5'>{errors.usuTel.message}</p>}
+                            {errors.usuTel ? (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.usuTel.message}</p>
+                            ) : (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                Espacio reservado para el mensaje de error
+                                </p>
+                            )}
                         </div>
                         <div className="Large_6 flex flex-column p1">
                             <label htmlFor="">Fecha de nacimiento</label>
                                 <input 
                                     type="text" 
                                     name="usuFecNac" 
-                                    value={formValues.usuFecNac} 
-                                    onChange={handleChange}
+                                    className={`p1 PowerMas_Modal_Form_${dirtyFields.usuFecNac || isSubmitted ? (errors.usuFecNac ? 'invalid' : 'valid') : ''}`} 
                                     placeholder="Ejm: 2023-03-17"
                                     {...register('usuFecNac', { 
                                         required: 'La Fecha de nacimiento es requerido',
@@ -270,7 +297,13 @@ const FormUser = () => {
                                         },
                                     })} 
                                 />
-                            {errors.usuFecNac && <p className='errorInput Large-p_5'>{errors.usuFecNac.message}</p>}
+                                {errors.usuFecNac ? (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.usuFecNac.message}</p>
+                                ) : (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                    Espacio reservado para el mensaje de error
+                                    </p>
+                                )}
                         </div>
                     </div>
                 </div>
@@ -284,8 +317,7 @@ const FormUser = () => {
                             <input 
                                 type="text" 
                                 name="usuCorEle" 
-                                value={formValues.usuCorEle} 
-                                onChange={handleChange} 
+                                className={`p1 PowerMas_Modal_Form_${dirtyFields.usuCorEle || isSubmitted ? (errors.usuCorEle ? 'invalid' : 'valid') : ''}`} 
                                 placeholder="Ejm: correo@correo.es"
                                 {...register('usuCorEle', { 
                                     required: 'El Email es requerido',
@@ -295,7 +327,13 @@ const FormUser = () => {
                                     },
                                 })} 
                             />
-                            {errors.usuCorEle && <p className='errorInput Large-p_5'>{errors.usuCorEle.message}</p>}
+                             {errors.usuCorEle ? (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.usuCorEle.message}</p>
+                            ) : (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                Espacio reservado para el mensaje de error
+                                </p>
+                            )}
                         </div>
                         {
                             !isEditing &&
@@ -305,24 +343,28 @@ const FormUser = () => {
                                     <input 
                                         type="password" 
                                         name="usuPas" 
-                                        value={formValues.usuPas} 
-                                        onChange={handleChange} 
+                                        className={`p1 PowerMas_Modal_Form_${dirtyFields.usuPas || isSubmitted ? (errors.usuPas ? 'invalid' : 'valid') : ''}`} 
                                         placeholder="Ejm: 12345678"
                                         {...register('usuPas', { 
                                             required: 'La contraseña es requerido',
                                             minLength: { value: 8, message: 'La contraseña debe tener minimo 8 digitos' },
                                         })} 
                                     />
-                                    {errors.usuPas && <p className='errorInput Large-p_5'>{errors.usuPas.message}</p>}
+                                     {errors.usuPas ? (
+                                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.usuPas.message}</p>
+                                    ) : (
+                                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                        Espacio reservado para el mensaje de error
+                                        </p>
+                                    )}
                                 </div>
                             )
                         }
                         <div className="Large_6 flex flex-column p1">
                             <label htmlFor="">Rol</label>
                             <select 
-                                name="rolCod" 
-                                value={formValues.rolCod} 
-                                onChange={handleChange}
+                                name="rolCod"
+                                className={`p1 PowerMas_Modal_Form_${dirtyFields.rolCod || isSubmitted ? (errors.rolCod ? 'invalid' : 'valid') : ''}`}
                                 {...register('rolCod', { 
                                     validate: value => value !== '0' || 'El rol es requerido' 
                                 })}
@@ -332,14 +374,19 @@ const FormUser = () => {
                                     <option key={rol.rolCod} value={rol.rolCod}>{rol.rolNom}</option>
                                 ))}
                             </select>
-                            {errors.rolCod && <p className='errorInput Large-p_5'>{errors.rolCod.message}</p>}
+                            {errors.rolCod ? (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.rolCod.message}</p>
+                            ) : (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                Espacio reservado para el mensaje de error
+                                </p>
+                            )}
                         </div>
                         <div className="Large_6 flex flex-column p1">
                             <label htmlFor="">Cargo</label>
                             <select 
                                 name="carCod" 
-                                value={formValues.carCod} 
-                                onChange={handleChange}
+                                className={`p1 PowerMas_Modal_Form_${dirtyFields.carCod || isSubmitted ? (errors.carCod ? 'invalid' : 'valid') : ''}`}
                                 {...register('carCod', { 
                                     validate: value => value !== '0' || 'El cargo es requerido' 
                                 })}
@@ -349,17 +396,35 @@ const FormUser = () => {
                                     <option key={cargo.carCod} value={cargo.carCod}>{cargo.carNom}</option>
                                 ))}
                             </select>
-                            {errors.carCod && <p className='errorInput Large-p_5'>{errors.carCod.message}</p>}
+                            {errors.carCod ? (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.carCod.message}</p>
+                            ) : (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                Espacio reservado para el mensaje de error
+                                </p>
+                            )}
                         </div>
                         <div className="Large_6 flex flex-column p1">
                             <label htmlFor="">Género</label>
                             <div className="flex gap-1">
                                 <div className="flex gap_5">
-                                    <input type="radio" id="masculino" name="usuSex" value="M" checked={formValues.usuSex === "M"} onChange={handleChange} />
+                                    <input 
+                                        type="radio" 
+                                        id="masculino" 
+                                        name="usuSex" 
+                                        value="M" 
+                                        {...register('usuSex')}
+                                    />
                                     <label htmlFor="masculino">Masculino</label>
                                 </div>
                                 <div className="flex gap_5">
-                                    <input type="radio" id="femenino" name="usuSex" value="F" checked={formValues.usuSex === "F"} onChange={handleChange} />
+                                    <input 
+                                        type="radio" 
+                                        id="femenino" 
+                                        name="usuSex" 
+                                        value="F" 
+                                        {...register('usuSex')}
+                                    />
                                     <label htmlFor="femenino">Femenino</label>
                                 </div>
                             </div>
@@ -373,9 +438,8 @@ const FormUser = () => {
                                         type="radio" 
                                         id="activo" 
                                         name="usuEst" 
-                                        value="A" 
-                                        checked={formValues.usuEst === "A"} 
-                                        onChange={handleChange} 
+                                        value="A"
+                                        {...register('usuEst')}
                                     />
                                     <label htmlFor="activo">Activo</label>
                                 </div>
@@ -384,9 +448,8 @@ const FormUser = () => {
                                         type="radio" 
                                         id="inactivo" 
                                         name="usuEst" 
-                                        value="I" 
-                                        checked={formValues.usuEst === "I"} 
-                                        onChange={handleChange} 
+                                        value="I"
+                                        {...register('usuEst')}
                                     />
                                     <label htmlFor="inactivo">Inactivo</label>
                                 </div>
@@ -397,236 +460,9 @@ const FormUser = () => {
             </div>
             <div className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
                 <button onClick={() => navigate('/user')} className="Large_5 m2">Atras</button>
-                <button onClick={() => navigate('/menu-user/asdas')} className="Large_5 m2">Siguiente</button>
+                <button onClick={handleNext} className="Large_5 m2">Siguiente</button>
             </div>
         </div>
-    // <div className="PowerMas_FormUserContainer h-100 bg-white Large-p2_5">
-    //     <h1 className="Large-f1_5">
-    //         {isEditing ? 'Editar': 'Nuevo'} Usuario
-    //     </h1>
-    //     <form>
-    //         {
-    //             isEditing &&
-    //             (
-    //                 <>
-    //                     <label>
-    //                         Año:
-    //                         <input type="text" name="usuAno" value={formValues.usuAno} onChange={handleChange} disabled={isEditing} />
-    //                     </label>
-    //                     <label>
-    //                         Código:
-    //                         <input type="text" name="usuCod" value={formValues.usuCod} onChange={handleChange} disabled={isEditing} />
-    //                     </label>
-    //                 </>
-    //             )
-    //         }
-    //         <label>
-    //             Documento de identidad:
-    //             <select 
-    //                 name="docIdeCod" 
-    //                 value={formValues.docIdeCod} 
-    //                 onChange={handleChange}
-    //                 {...register('docIdeCod', { 
-    //                     validate: value => value !== '0' || 'El documento de identidad es requerido' 
-    //                 })}
-    //             >
-    //                 <option value="0">--SELECCIONE UN DOCUMENTO--</option>
-    //                 {documentos.map(documento => (
-    //                     <option 
-    //                     key={documento.docIdeCod} 
-    //                     value={documento.docIdeCod}> ({documento.docIdeAbr}) {documento.docIdeNom}</option>
-    //                 ))}
-    //             </select>
-    //             {errors.docIdeCod && <p className='errorInput Large-p_5'>{errors.docIdeCod.message}</p>}
-    //         </label>
-    //         <label>
-    //             Número de documento:
-    //             <input 
-    //             type="text" 
-    //             name="usuNumDoc" 
-    //             value={formValues.usuNumDoc} 
-    //             onChange={handleChange}
-    //             placeholder="Ejm: 922917351"
-    //             {...register('usuNumDoc', { required: 'El número de documento es requerido' })} />
-    //             {errors.usuNumDoc && <p className='errorInput Large-p_5'>{errors.usuNumDoc.message}</p>}
-    //         </label>
-    //         <label>
-    //             Correo electrónico:
-    //             <input 
-    //             type="text" 
-    //             name="usuCorEle" 
-    //             value={formValues.usuCorEle} 
-    //             onChange={handleChange} 
-    //             placeholder="Ejm: correo@correo.es"
-    //             {...register('usuCorEle', { 
-    //                 required: 'El correo electronico es requerido',
-    //                 pattern: {
-    //                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
-    //                     message: 'Dirección de correo electrónico inválida',
-    //                 },
-    //             })} 
-    //             />
-    //             {errors.usuCorEle && <p className='errorInput Large-p_5'>{errors.usuCorEle.message}</p>}
-    //         </label>
-    //         {
-    //             !isEditing &&
-    //             (
-    //                 <label>
-    //                     Contraseña:
-    //                     <input 
-    //                     type="password" 
-    //                     name="usuPas" 
-    //                     value={formValues.usuPas} 
-    //                     onChange={handleChange} 
-    //                     placeholder="Ejm: 12345678"
-    //                     {...register('usuPas', { 
-    //                         required: 'La contraseña es requerido',
-    //                         minLength: { value: 8, message: 'La contraseña debe tener minimo 8 digitos' },
-    //                     })} 
-    //                     />
-    //                     {errors.usuPas && <p className='errorInput Large-p_5'>{errors.usuPas.message}</p>}
-    //                 </label>
-    //             )
-    //         }
-    //         <label>
-    //             Nombres:
-    //             <input type="text" 
-    //                 name="usuNom" 
-    //                 value={formValues.usuNom} 
-    //                 onChange={handleChange}
-    //                 placeholder="Ejm: Andres"
-    //                 {...register('usuNom', { 
-    //                     required: 'El nombre es requerido',
-    //                     minLength: { value: 3, message: 'El nombre debe tener minimo 3 digitos' },
-    //                 })} 
-    //             />
-    //             {errors.usuNom && <p className='errorInput Large-p_5'>{errors.usuNom.message}</p>}
-    //         </label>
-    //         <label>
-    //             Apellidos:
-    //             <input 
-    //                 type="text" 
-    //                 name="usuApe" 
-    //                 value={formValues.usuApe} 
-    //                 onChange={handleChange}
-    //                 placeholder="Ejm: Eras"
-    //                 {...register('usuApe', { 
-    //                     required: 'El apellido es requerido',
-    //                         minLength: { value: 3, message: 'El apellido debe tener minimo 3 digitos' },
-    //                 })} 
-    //             />
-    //             {errors.usuApe && <p className='errorInput Large-p_5'>{errors.usuApe.message}</p>}
-    //         </label>
-    //         <label>
-    //             Telefono:
-    //             <input 
-    //                 type="text" 
-    //                 name="usuTel" 
-    //                 value={formValues.usuTel} 
-    //                 onChange={handleChange}
-    //                 placeholder="Ejm: 922917351"
-    //                 {...register('usuTel', { 
-    //                     required: 'El número de telefono es requerido',
-    //                     minLength: { value: 9, message: 'El número de telefono debe tener minimo 9 digitos' },
-    //                 })} 
-    //             />
-    //             {errors.usuTel && <p className='errorInput Large-p_5'>{errors.usuTel.message}</p>}
-    //         </label>
-    //         <label>
-    //             Rol:
-    //             <select 
-    //                 name="rolCod" 
-    //                 value={formValues.rolCod} 
-    //                 onChange={handleChange}
-    //                 {...register('rolCod', { 
-    //                     validate: value => value !== '0' || 'El rol es requerido' 
-    //                 })}
-    //             >
-    //                 <option value="0">--SELECCIONE UN ROL--</option>
-    //                 {roles.map(rol => (
-    //                     <option key={rol.rolCod} value={rol.rolCod}>{rol.rolNom}</option>
-    //                 ))}
-    //             </select>
-    //             {errors.rolCod && <p className='errorInput Large-p_5'>{errors.rolCod.message}</p>}
-    //         </label>
-    //         <label>
-    //             Cargo:
-    //             <select 
-    //                 name="carCod" 
-    //                 value={formValues.carCod} 
-    //                 onChange={handleChange}
-    //                 {...register('carCod', { 
-    //                     validate: value => value !== '0' || 'El cargo es requerido' 
-    //                 })}
-    //             >
-    //                 <option value="0">--SELECCIONE UN CARGO--</option>
-    //                 {cargos.map(cargo => (
-    //                     <option key={cargo.carCod} value={cargo.carCod}>{cargo.carNom}</option>
-    //                 ))}
-    //             </select>
-    //             {errors.carCod && <p className='errorInput Large-p_5'>{errors.carCod.message}</p>}
-    //         </label>
-    //         <label>
-    //             Fecha de nacimiento:
-    //             <input 
-    //                 type="text" 
-    //                 name="usuFecNac" 
-    //                 value={formValues.usuFecNac} 
-    //                 onChange={handleChange}
-    //                 placeholder="Ejm: 2023-03-17"
-    //                 {...register('usuFecNac', { 
-    //                     required: 'La Fecha de nacimiento es requerido',
-    //                     pattern: {
-    //                         value: /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/,
-    //                         message: 'La fecha debe estar en el formato YYYY-MM-DD',
-    //                       },
-    //                 })} 
-    //             />
-    //             {errors.usuFecNac && <p className='errorInput Large-p_5'>{errors.usuFecNac.message}</p>}
-    //         </label>
-    //         <div className="PowerMasInputSex">
-    //             Sexo:
-    //             <div >
-    //                 <div>
-    //                     <input type="radio" id="masculino" name="usuSex" value="M" checked={formValues.usuSex === "M"} onChange={handleChange} />
-    //                     <label htmlFor="masculino">Masculino</label>
-    //                 </div>
-    //                 <div>
-    //                     <input type="radio" id="femenino" name="usuSex" value="F" checked={formValues.usuSex === "F"} onChange={handleChange} />
-    //                     <label htmlFor="femenino">Femenino</label>
-    //                 </div>
-    //             </div>
-    //         </div>
-    //         <div className="PowerMasInputSex">
-    //             Estado:
-    //             <div >
-    //                 <div>
-    //                     <input 
-    //                         type="radio" 
-    //                         id="activo" 
-    //                         name="usuEst" 
-    //                         value="A" 
-    //                         checked={formValues.usuEst === "A"} 
-    //                         onChange={handleChange} 
-    //                     />
-    //                     <label htmlFor="activo">Activo</label>
-    //                 </div>
-    //                 <div>
-    //                     <input 
-    //                         type="radio" 
-    //                         id="inactivo" 
-    //                         name="usuEst" 
-    //                         value="I" 
-    //                         checked={formValues.usuEst === "I"} 
-    //                         onChange={handleChange} 
-    //                     />
-    //                     <label htmlFor="inactivo">Inactivo</label>
-    //                 </div>
-    //             </div>
-    //         </div>
-    //     </form>
-    //     <button onClick={handleNext}> Siguiente </button>
-    // </div>
   )
 }
 

@@ -8,6 +8,9 @@
 body {
 	font-family: DMMono;
 }
+input,select{
+	outline: none;
+}
 
 /* LOGIN_VIEW */
 
@@ -207,7 +210,8 @@ body {
 }
 
 .PowerMas_MainRender{
-	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
 	background-color: #dedddd;
 	box-shadow: inset 10px 0px 10px rgba(0, 0, 0, 0.2);
 	position: relative;
@@ -216,7 +220,9 @@ body {
 	border: 1px solid black;
 }
 .PowerMas_Content {
-	height: 90%;
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
 }
 .PowerMas_MainRender::before{
 	content: "";
@@ -904,22 +910,25 @@ body {
 }
 .PowerMas_StatusContainer{
 	height: 100%;
+	display: flex;
 }
 .TableMainContainer{
-	height: 100%;
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
 	background-color: #fff;
 }
 .TableMainContainer h1{
 	padding: 0 0.5rem;
 }
 .TableMainContainer > div:first-child(){
-	height: 5%;
 }
 .PowerMas_TableContainer {
-	height: 80%;
-    max-height: 100rem;
+	flex-grow: 1;
     overflow: auto;
 	padding: 0 0.5rem;
+	display: flex;
+	flex-direction: column;
 }
 .PowerMas_GroupSelect{
 	display: flex;
@@ -937,6 +946,7 @@ body {
 }
 
 .PowerMas_TableStatus thead th div{
+	flex-grow: 1;
 	display: flex;
     justify-content: space-between;
     align-items: center;
@@ -1325,12 +1335,12 @@ body {
 
 /* CREAR/MODIFICAR MENU-USUARIO */
 .PowerMas_MenuUserContainer > div {
-	height: 85%;
+	/* height: 85%;
 	width: 100%;
-	overflow-y: auto;
+	overflow-y: auto; */
 }
 .PowerMas_ListMenus{
-	width: 70%;
+	/* width: 70%; */
 }
 .PowerMas_ListMenus > ul {
 	width: 100%;
@@ -1343,12 +1353,12 @@ body {
 	list-style: none;
 }
 .PowerMas_ListMenus li{
-	margin: 0.5rem 2rem;
+	/* margin: 0.5rem 2rem; */
 }
 .PowerMas_ListMenus li label {
-	display: flex;
+	/* display: flex;
 	gap: 0.5rem;
-	margin-bottom: 0.5rem;
+	margin-bottom: 0.5rem; */
 }
 .PowerMas_ListMenus li > div{
 	display: flex;
@@ -1382,20 +1392,48 @@ body {
     max-height: 100vh;
 }
 
-.PowerMas_MenuUserContainer button{
-	margin-top: 1rem;
+.PowerMas_Button_Permissions{
+	background-color: #FFF5EE;
+	border: 1px solid #F7775A;
+	border-radius: 5px;
+	color: #F7775A;
 }
+.PowerMas_Menu_Dropdown{
+	background-color: #FFFAF6;
+	border: 1px solid #372e2c3e;
+}
+.PowerMas_Title_Modal_Permission{
+	color: #20737B;
+}
+.PowerMas_Button_Modal_Permission{
+	background-color: #FFF5EE;
+	border: 1px solid #F7775A;
+	border-radius: 5px;
+}
+.ReactModal__Overlay {
+	opacity: 0;
+	transition: opacity 200ms ease-in-out;
+}
+  
+.ReactModal__Overlay--after-open {
+	opacity: 1;
+}
+  
+.ReactModal__Overlay--before-close {
+	opacity: 0;
+}
+  
 /* END CREAR/MODIFICAR MENU-USUARIO */
 
 /* CREAR/MODIFICAR PERMISO-USUARIO */
 .PowerMas_ListPermission{
-	width: 70%;
+	/* width: 70%; */
 }
 .PowerMas_ListPermission ul{
 	list-style: none;
 }
 .PowerMas_ListPermission li{
-	margin: 0.5rem 2rem;
+	/* margin: 0.5rem 2rem; */
 }
 .PowerMas_ListPermission > ul > li{
 	margin-bottom: 1.5rem;
@@ -1405,6 +1443,32 @@ body {
 	justify-content: space-between;
 	align-items: center;
 }
+.PowerMas_Permission_Dropdown{
+	background-color: #FFFAF6;
+	border: 1px solid #372e2c3e;
+}
+
+.menu {
+    transform-origin: top;
+    transform: scaleY(0);
+    transition: transform 0.2s ease-out;
+}
+
+.menu.open {
+    transform: scaleY(1);
+	max-height: 500px; 
+}
+
+.arrow {
+    transition: transform 0.3s ease-out;
+}
+
+.arrow.down {
+    transform: rotate(90deg);
+}
+
+
+
 
 /* END CREAR/MODIFICAR PERMISO-USUARIO */
 

@@ -1,15 +1,24 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { useContext, useEffect, useState } from "react";
 import Notiflix from "notiflix";
 import ProjectItem from "./ProjectItem";
 import Bar from "./Bar";
+import CryptoJS from 'crypto-js';
 
 const PermissionUser = () => {
   const navigate = useNavigate();
-  // Variables State AuthContext 
-  const { authInfo } = useContext(AuthContext);
-  const { userMaint } = authInfo;
+
+  const { id: safeCiphertext } = useParams();
+  console.log(safeCiphertext)
+  const ciphertext = atob(safeCiphertext);
+  // Desencripta el ID
+  const bytes  = CryptoJS.AES.decrypt(ciphertext, 'secret key 123');
+  const id = bytes.toString(CryptoJS.enc.Utf8);
+  console.log(id)
+  const usuAno = id.slice(0, 4);
+  const usuCod = id.slice(4);
+  
   //
   const [ proyectos, setProyectos ] = useState([]);
   const [ checkedProyectos, setCheckedProyectos ] = useState({});
@@ -19,8 +28,36 @@ const PermissionUser = () => {
   const [ removedProyectos, setRemovedProyectos ] = useState({});
   const [ removedSubProyectos, setRemovedSubProyectos ] = useState({});
 
+  const [ user, setUser ] = useState(null);
+
   // EFECTO AL CARGAR COMPONENTE GET - LISTAR PROYECTOS
   useEffect(() => {
+
+    const fetchUsuarios = async () => {
+        try {
+            Notiflix.Loading.pulse('Cargando...');
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/usuario/${usuAno}/${usuCod}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const data = await response.json();
+   
+            if (!response.ok) {
+              Notiflix.Notify.failure(data.message);
+              return;
+            }
+  
+            setUser(data[0])
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            Notiflix.Loading.remove();
+        }
+    };
+    fetchUsuarios();
+
     let isCancelled = false;
 
     const fetchProyectos = async () => {
@@ -53,7 +90,7 @@ const PermissionUser = () => {
       try {
           Notiflix.Loading.pulse('Cargando...');
           const token = localStorage.getItem('token');
-          const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Proyecto/accesibles/${userMaint.usuAno}/${userMaint.usuCod}`, {
+          const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Proyecto/accesibles/${usuAno}/${usuCod}`, {
               headers: {
                   'Authorization': `Bearer ${token}`
               }
@@ -173,7 +210,7 @@ const PermissionUser = () => {
 
   const agregarExclusiones = async (proyectos, subProyectos) => {
     const token = localStorage.getItem('token');
-    const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Proyecto/agregar-exclusiones/${userMaint.usuAno}/${userMaint.usuCod}`, {
+    const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Proyecto/agregar-exclusiones/${usuAno}/${usuCod}`, {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -196,7 +233,7 @@ const PermissionUser = () => {
 
   const eliminarExclusiones = async (proyectos, subProyectos) => {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Proyecto/eliminar-exclusiones/${userMaint.usuAno}/${userMaint.usuCod}`, {
+      const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Proyecto/eliminar-exclusiones/${usuAno}/${usuCod}`, {
           method: 'POST',
           headers: {
               'Authorization': `Bearer ${token}`,
@@ -247,32 +284,58 @@ const PermissionUser = () => {
         <Bar currentStep={3} />
       </div>
       <div className="flex-grow-1 overflow-auto p1_25">
-
-      </div>
-      <div className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
-          <button onClick={() => navigate('/menu-user/asdsa')} className="Large_5 m2">Atras</button>
-          <button onClick={() => navigate('/user')} className="Large_5 m2">Finalizar</button>
-      </div>
+        <div className="flex gap-1">
+            <div className="PowerMas_ListPermission Large_6">
+                <ul>
+                    {proyectos.map(proyecto => (
+                        <ProjectItem 
+                        key={proyecto.proCod} 
+                        proyecto={proyecto} 
+                        handleCheck={handleCheck} 
+                        checkedProyectos={checkedProyectos} 
+                        checkedSubProyectos={checkedSubProyectos} 
+                        />
+                        ))}
+                </ul>
+            </div>
+            <div className="Large_6">
+            <article className="p_25">
+              <p>Usuario:</p>
+              <p>{user && user.usuNom + ' ' + user.usuApe}</p>
+            </article>
+            <hr className="PowerMas_Hr m_25" />
+            <article className="p_25">
+              <p>Documento de identidad:</p>
+              <p>{user && user.docIdeNom}</p>
+            </article>
+            <hr className="PowerMas_Hr m_25" />
+            <article className="p_25">
+              <p>Número de identidad:</p>
+              <p>{user && user.usuNumDoc}</p>
+            </article>
+            <hr className="PowerMas_Hr m_25" />
+            <article className="p_25">
+              <p>Rol:</p>
+              <p>{user && user.rolNom}</p>
+            </article>
+            <hr className="PowerMas_Hr m_25" />
+            <article className="p_25">
+              <p>Cargo:</p>
+              <p>{user && user.carNom}</p>
+            </article>
+            <hr className="PowerMas_Hr m_25" />
+            <article className="p_25">
+              <p>Estado:</p>
+              <p>{user && user.usuEst}</p>
+            </article>
+          </div>
+        </div>
     </div>
-    // <div className="PowerMas_MenuUserContainer h-100 bg-white Large-p2_5">
-    //   <h1 className="Large-f1_25">Permisos para el usuario {userMaint.usuNom} {userMaint.usuApe} con código {userMaint.usuAno}{userMaint.usuCod}</h1>
-    //   <div>
-    //     <div className="PowerMas_ListPermission">
-    //       <ul>
-    //         {proyectos.map(proyecto => (
-    //           <ProjectItem 
-    //               key={proyecto.proCod} 
-    //               proyecto={proyecto} 
-    //               handleCheck={handleCheck} 
-    //               checkedProyectos={checkedProyectos} 
-    //               checkedSubProyectos={checkedSubProyectos} 
-    //           />
-    //         ))}
-    //       </ul>
-    //     </div>
-    //   </div>
-    //   <button onClick={handleClickaso}> Siguiente </button>
-    // </div>
+    <div className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
+        <button onClick={() => navigate(`/menu-user/${safeCiphertext}`)} className="Large_5 m2">Atras</button>
+        <button onClick={handleClickaso} className="Large_5 m2">Finalizar</button>
+    </div>
+    </div>
   )
 }
 

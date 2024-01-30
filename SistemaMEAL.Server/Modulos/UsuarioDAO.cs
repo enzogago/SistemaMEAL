@@ -1,6 +1,8 @@
 ﻿using Microsoft.Data.SqlClient;
+using Newtonsoft.Json;
 using SistemaMEAL.Server.Models;
 using System.Data;
+using System.Text;
 
 namespace SistemaMEAL.Server.Modulos
 {
@@ -20,7 +22,9 @@ namespace SistemaMEAL.Server.Modulos
 
                 SqlCommand cmd = new SqlCommand("SP_MODIFICAR_USUARIO", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
-
+                Console.Write(usuario.UsuAno);
+                Console.Write(usuario.UsuCod);
+                Console.Write(usuario.UsuCorEle);
                 // Aquí debes agregar todos los parámetros que necesita tu procedimiento almacenado
                 cmd.Parameters.AddWithValue("@P_USUANO", usuario.UsuAno);
                 cmd.Parameters.AddWithValue("@P_USUCOD", usuario.UsuCod);
@@ -70,7 +74,7 @@ namespace SistemaMEAL.Server.Modulos
             return (mensaje, tipoMensaje);
         }
 
-        public (string message, string messageType) Insertar(Usuario usuario)
+        public (string? message, string? messageType) Insertar(Usuario usuario)
         {
             string mensaje = "";
             string tipoMensaje = "";
@@ -89,9 +93,9 @@ namespace SistemaMEAL.Server.Modulos
                 cmd.Parameters.AddWithValue("@P_USUSEX", usuario.UsuSex);
                 cmd.Parameters.AddWithValue("@P_USUCORELE", usuario.UsuCorEle);
                 cmd.Parameters.AddWithValue("@P_CARCOD", usuario.CarCod);
-                cmd.Parameters.AddWithValue("@P_USUFECINC", usuario.UsuFecInc);
+                cmd.Parameters.AddWithValue("@P_USUFECINC", "2023-03-17");
                 cmd.Parameters.AddWithValue("@P_USUTEL", usuario.UsuTel);
-                cmd.Parameters.AddWithValue("@P_USUNOMUSU", usuario.UsuNomUsu);
+                cmd.Parameters.AddWithValue("@P_USUNOMUSU", "EGAGO");
                 cmd.Parameters.AddWithValue("@P_USUPAS", usuario.UsuPas);
                 cmd.Parameters.AddWithValue("@P_USUEST", usuario.UsuEst);
                 cmd.Parameters.AddWithValue("@P_ROLCOD", usuario.RolCod);
@@ -127,79 +131,66 @@ namespace SistemaMEAL.Server.Modulos
             return (mensaje, tipoMensaje);
         }
 
-        public IEnumerable<Usuario> Listado()
+        public IEnumerable<Usuario> Listado(string? usuAno = null, string? usuCod = null, string? docIdeCod = null, string? usuNumDoc = null, string? usuNom = null, string? usuApe = null, string? usuFecNac = null, string? usuSex = null, string? usuCorEle = null, string? usuCarCod = null, string? usuFecInc = null, string? usuTel = null, string? usuNomUsu = null, string? usuPas = null, string? usuEst = null, string? rolCod = null)
         {
             List<Usuario> temporal = new List<Usuario>();
             try
             {
                 cn.getcn.Open();
 
-                SqlCommand cmd = new SqlCommand("SP_LISTAR_USUARIOS", cn.getcn);
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_USUARIO", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                SqlDataReader rd = cmd.ExecuteReader();
-                while (rd.Read())
+                // Aquí puedes agregar los parámetros necesarios para tu procedimiento almacenado
+                cmd.Parameters.AddWithValue("@P_USUANO", string.IsNullOrEmpty(usuAno) ? (object)DBNull.Value : usuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD", string.IsNullOrEmpty(usuCod) ? (object)DBNull.Value : usuCod);
+                cmd.Parameters.AddWithValue("@P_DOCIDECOD", string.IsNullOrEmpty(docIdeCod) ? (object)DBNull.Value : docIdeCod);
+                cmd.Parameters.AddWithValue("@P_USUNUMDOC", string.IsNullOrEmpty(usuNumDoc) ? (object)DBNull.Value : usuNumDoc);
+                cmd.Parameters.AddWithValue("@P_USUNOM", string.IsNullOrEmpty(usuNom) ? (object)DBNull.Value : usuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE", string.IsNullOrEmpty(usuApe) ? (object)DBNull.Value : usuApe);
+                cmd.Parameters.AddWithValue("@P_USUFECNAC", string.IsNullOrEmpty(usuFecNac) ? (object)DBNull.Value : usuFecNac);
+                cmd.Parameters.AddWithValue("@P_USUSEX", string.IsNullOrEmpty(usuSex) ? (object)DBNull.Value : usuSex);
+                cmd.Parameters.AddWithValue("@P_USUCORELE", string.IsNullOrEmpty(usuCorEle) ? (object)DBNull.Value : usuCorEle);
+                cmd.Parameters.AddWithValue("@P_CARCOD", string.IsNullOrEmpty(usuCarCod) ? (object)DBNull.Value : usuCarCod);
+                cmd.Parameters.AddWithValue("@P_USUFECINC", string.IsNullOrEmpty(usuFecInc) ? (object)DBNull.Value : usuFecInc);
+                cmd.Parameters.AddWithValue("@P_USUTEL", string.IsNullOrEmpty(usuTel) ? (object)DBNull.Value : usuTel);
+                cmd.Parameters.AddWithValue("@P_USUNOMUSU", string.IsNullOrEmpty(usuNomUsu) ? (object)DBNull.Value : usuNomUsu);
+                cmd.Parameters.AddWithValue("@P_USUPAS", string.IsNullOrEmpty(usuPas) ? (object)DBNull.Value : usuPas);
+                cmd.Parameters.AddWithValue("@P_USUEST", string.IsNullOrEmpty(usuEst) ? (object)DBNull.Value : usuEst);
+                cmd.Parameters.AddWithValue("@P_ROLCOD", string.IsNullOrEmpty(rolCod) ? (object)DBNull.Value : rolCod);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
+                cmd.Parameters.AddWithValue("@P_USUANO_U", "2024");
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", "0001");
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", "Juan");
+                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "Perez");
+                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "Gomez");
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (!reader.HasRows)
                 {
-                    temporal.Add(new Usuario()
-                    {
-                        UsuAno = rd.GetString(0),
-                        UsuCod = rd.GetString(1),
-                        DocIdeCod = rd.GetString(2),
-                        UsuNumDoc = rd.GetString(3),
-                        UsuNom = rd.GetString(4),
-                        UsuApe = rd.GetString(5),
-                        UsuFecNac = rd.GetString(6),
-                        UsuSex = rd.GetString(7)[0],
-                        UsuCorEle = rd.GetString(8),
-                        CarCod = rd.GetString(9),
-                        UsuFecInc = rd.GetString(10),
-                        UsuTel = rd.GetString(11),
-                        UsuNomUsu = rd.GetString(12),
-                        UsuPas = rd.GetString(13),
-                        UsuEst = rd.GetString(14)[0],
-                        RolCod = rd.GetString(15),
-                        UsuIng = rd.GetString(16),
-                        FecIng = rd.IsDBNull(17) ? (DateTime?)null : rd.GetDateTime(17),
-                        UsuMod = rd.GetString(18),
-                        FecMod = rd.IsDBNull(19) ? (DateTime?)null : rd.GetDateTime(19),
-                        EstReg = rd.GetString(20)[0],
-                        Cargo = new Cargo()
-                        {
-                            CarCod = rd.GetString(21),
-                            CarNom = rd.GetString(22),
-                            UsuIng = rd.GetString(23),
-                            FecIng = rd.IsDBNull(24) ? (DateTime?)null : rd.GetDateTime(24),
-                            UsuMod = rd.GetString(25),
-                            FecMod = rd.IsDBNull(26) ? (DateTime?)null : rd.GetDateTime(26),
-                            EstReg = rd.GetString(27)[0],
-                        },
-                        Rol = new Rol()
-                        {
-                            RolCod = rd.GetString(28),
-                            RolNom = rd.GetString(29),
-                            UsuIng = rd.GetString(30),
-                            FecIng = rd.IsDBNull(31) ? (DateTime?)null : rd.GetDateTime(31),
-                            UsuMod = rd.GetString(32),
-                            FecMod = rd.IsDBNull(33) ? (DateTime?)null : rd.GetDateTime(33),
-                            EstReg = rd.GetString(34)[0]
-                        },
-                        DocumentoIdentidad = new DocumentoIdentidad()
-                        {
-                            DocIdeCod = rd.GetString(35),
-                            DocIdeNom = rd.GetString(36),
-                            DocIdeAbr = rd.GetString(37),
-                            UsuIng = rd.GetString(38),
-                            FecIng = rd.IsDBNull(39) ? (DateTime?)null : rd.GetDateTime(39),
-                            UsuMod = rd.GetString(40),
-                            FecMod = rd.IsDBNull(41) ? (DateTime?)null : rd.GetDateTime(41),
-                            EstReg = rd.GetString(42)[0]
-                        }
-                    });
+                    jsonResult.Append("[]");
                 }
-                rd.Close();
+                else
+                {
+                    while (reader.Read())
+                    {
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                Console.WriteLine("desde jsonResult final:"+jsonResult);
+                // Deserializa la cadena JSON en una lista de objetos Usuario
+                temporal = JsonConvert.DeserializeObject<List<Usuario>>(jsonResult.ToString());
             }
             catch (SqlException ex)
             {
-                temporal = new List<Usuario>();
                 Console.WriteLine(ex.Message);
             }
             finally

@@ -7,35 +7,38 @@ const DonutChart = ({ percentage }) => {
     const radius = Math.min(width, height) / 2;
 
     useEffect(() => {
+        // Limpia el div antes de añadir el nuevo gráfico de rosquilla
+        d3.select("#chart").html("");
+    
         const color = d3.scaleOrdinal()
-            .range(["#20737B", "transparent"]); // El primer color es para el porcentaje, el segundo es transparente
-
+            .range(["#20737B", "transparent"]); 
+    
         const data = [
             { value: percentage },
             { value: 100 - percentage }
         ];
-
+    
         const pie = d3.pie()
             .value(d => d.value)
             .sort(null);
-
+    
         const arc = d3.arc()
-            .innerRadius(radius - 25)
+            .innerRadius(radius - 20)
             .outerRadius(radius);
-
+    
         const svg = d3.select("#chart")
             .append("svg")
             .attr("width", width)
             .attr("height", height)
             .append("g")
             .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-
+    
         svg.selectAll("path")
             .data(pie(data))
             .enter().append("path")
             .attr("fill", (d, i) => color(i))
             .attr("d", arc);
-
+    
         svg.append("text")
             .attr("text-anchor", "middle")
             .attr("dy", ".35em")

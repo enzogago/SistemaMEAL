@@ -60,11 +60,11 @@ const Table = ({data}) => {
             },
             {
                 header: "Cargo",
-                accessorKey: "cargo.carNom"
+                accessorKey: "carNom"
             },
             {
                 header: "Rol",
-                accessorKey: "rol.rolNom"
+                accessorKey: "rolNom"
             },
             {
                 header: "Estado",
@@ -194,13 +194,13 @@ const Table = ({data}) => {
      
      const Editar_Usuario = (row) => {
          console.log(row)
-         const id = `${row.original.proAno}${row.original.proCod}`;
+         const id = `${row.original.usuAno}${row.original.usuCod}`;
          console.log(id)
          // Encripta el ID
          const ciphertext = CryptoJS.AES.encrypt(id, 'secret key 123').toString();
          // Codifica la cadena cifrada para que pueda ser incluida de manera segura en una URL
-         const encodedCiphertext = encodeURIComponent(ciphertext);
-         navigate(`/form-user/${encodedCiphertext}`);
+         const safeCiphertext = btoa(ciphertext).replace('+', '-').replace('/', '_').replace(/=+$/, '');
+         navigate(`/form-user/${safeCiphertext}`);
      }
     
     return (

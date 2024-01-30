@@ -147,6 +147,39 @@ namespace SistemaMEAL.Server.Controllers
             return Ok(usuarios);
         }
 
+        [HttpGet]
+        [Route("{usuAno}/{usuCod}")]
+        public dynamic ObtenerUsuario(string usuAno, string usuCod)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            dynamic data = rToken.result;
+            Usuario usuario = new Usuario
+            {
+                UsuAno = data.UsuAno,
+                UsuCod = data.UsuCod,
+                RolCod = data.RolCod
+
+            };
+            if (usuario.RolCod != "01")
+            {
+                return StatusCode(403, new
+                {
+                    success = false,
+                    message = "No tienes permisos para realizar esta acción",
+                    result = ""
+                });
+            }
+           
+            var usuarios = _usuarios.Listado(usuAno, usuCod);
+            var usuarioData = usuarios.FirstOrDefault();
+            Console.WriteLine(usuarioData);
+            return Ok(usuarios);
+        }
+
 
         [HttpPost]
         [Route("login")]
@@ -202,7 +235,7 @@ namespace SistemaMEAL.Server.Controllers
                     jwt.Issuer,
                     jwt.Audience,
                     claims,
-                    expires: DateTime.Now.AddMinutes(30),
+                    expires: DateTime.Now.AddHours(30),
                     signingCredentials: singIn
                 );
             return new

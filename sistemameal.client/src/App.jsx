@@ -27,6 +27,7 @@ import Projects from './components/project/Projects';
 
 import Notiflix from "notiflix";
 import FormBeneficiarie from './components/goal/beneficiarie/FormBeneficiarie';
+import Dashboard from './components/dashboard/Dashboard';
 
 Notiflix.Loading.init({
     className: 'notiflix-loading',
@@ -133,6 +134,7 @@ const App = () => {
         'permission': Permission,
         'type-value': TypeValue,
         "projects": Projects,
+        "dashboard": Dashboard,
     };
 
     return (

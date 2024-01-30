@@ -1,14 +1,14 @@
 const SubProjectItem = ({ subProyecto, proyecto, handleCheck, checkedSubProyectos }) => {
     return (
-    <li>
+    <li className="Large-f_75 p_5 flex gap-1">
+        <input 
+            type="checkbox" 
+            value={subProyecto.subProCod} 
+            checked={!!checkedSubProyectos[`${subProyecto.subProAno}-${subProyecto.subProCod}`]}
+            onChange={(event) => handleCheck(subProyecto, event.target.checked, true, proyecto)}
+        />
         <label>
-            <input 
-                type="checkbox" 
-                value={subProyecto.subProCod} 
-                checked={!!checkedSubProyectos[`${subProyecto.subProAno}-${subProyecto.subProCod}`]}
-                onChange={(event) => handleCheck(subProyecto, event.target.checked, true, proyecto)}
-            />
-        {subProyecto.subProNom}
+            {subProyecto.subProNom}
         </label>
     </li>
   )

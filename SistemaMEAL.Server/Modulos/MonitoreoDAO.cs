@@ -50,5 +50,48 @@ namespace SistemaMEAL.Modulos
             }
             return temporal;
         }
+
+        public IEnumerable<Monitoreo> BuscarMonitoreo(string? metAno, string? metCod)
+        {
+            List<Monitoreo> temporal = new List<Monitoreo>();
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_MONITOREO", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@P_METANO", metAno);
+                cmd.Parameters.AddWithValue("@P_METCOD", metCod);
+
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+                Console.WriteLine("desde jsonResult:"+jsonResult);
+                if (!reader.HasRows)
+                {
+                    jsonResult.Append("[]");
+                }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        Console.WriteLine("desde reader:"+reader.GetValue(0).ToString());
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                Console.WriteLine("desde jsonResult final:"+jsonResult);
+                // Deserializa la cadena JSON en una lista de objetos Estado
+                temporal = JsonConvert.DeserializeObject<List<Monitoreo>>(jsonResult.ToString());
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return temporal;
+        }
     }
 }

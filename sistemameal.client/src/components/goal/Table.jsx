@@ -39,8 +39,8 @@ const Table = ({ data }) => {
         // Encripta el ID
         const ciphertext = CryptoJS.AES.encrypt(id, 'secret key 123').toString();
         // Codifica la cadena cifrada para que pueda ser incluida de manera segura en una URL
-        const encodedCiphertext = encodeURIComponent(ciphertext);
-        navigate(`/form-beneficiarie/${encodedCiphertext}`);
+        const safeCiphertext = btoa(ciphertext).replace('+', '-').replace('/', '_').replace(/=+$/, '');
+        navigate(`/form-beneficiarie/${safeCiphertext}`);
     }
     
     const actions = {
@@ -60,7 +60,9 @@ const Table = ({ data }) => {
             item.indActResNom.includes(searchFilter.toUpperCase()) ||
             item.tipInd.includes(searchFilter.toUpperCase()) ||
             item.resNom.includes(searchFilter.toUpperCase()) ||
+            item.resNum.includes(searchFilter.toUpperCase()) ||
             item.objEspNom.includes(searchFilter.toUpperCase()) || 
+            item.objEspNum.includes(searchFilter.toUpperCase()) || 
             item.objNom.includes(searchFilter.toUpperCase()) || 
             item.subProNom.includes(searchFilter.toUpperCase()) || 
             item.proNom.includes(searchFilter.toUpperCase())
@@ -122,7 +124,12 @@ const Table = ({ data }) => {
             },
             {
                 header: "Mes",
-                accessorKey: "metMesPlaTec"
+                accessorKey: "metMesPlaTec",
+                cell: ({row}) => (
+                    <div style={{textTransform: 'capitalize'}}>
+                        {new Date(2024, row.original.metMesPlaTec - 1).toLocaleString('es-ES', { month: 'long' })}
+                    </div>
+                ),
             },
             {
                 header: "Sub Actividad",
@@ -185,6 +192,14 @@ const Table = ({ data }) => {
             {
                 header: "Proyecto",
                 accessorKey: "proNom"
+            },
+            {
+                header: "Financiador",
+                accessorKey: "finNom"
+            },
+            {
+                header: "Implementador",
+                accessorKey: "impNom"
             },
         ];
 
@@ -297,7 +312,7 @@ const Table = ({ data }) => {
     }
     
     return (
-        <div className='TableMainContainer Large-p1 Medium-p1 Small-p_5'>
+        <div className='TableMainContainer Large-p1 Medium-p1 Small-p_5 h-100 overflow-auto'>
             <div>
                 <h1 className="flex left Large-f1_5 Medium-f1_5 Small-f1_5 ">Listado de Metas</h1>
                 <div className="flex ">

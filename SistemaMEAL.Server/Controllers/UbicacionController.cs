@@ -8,43 +8,45 @@ namespace SistemaMEAL.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class MonitoreoController : ControllerBase
+    public class UbicacionController : ControllerBase
     {
-        private readonly MonitoreoDAO _monitoreos;
+        private readonly UbicacionDAO _ubicaciones;
         private readonly UsuarioDAO _usuarios;
 
-        public MonitoreoController(MonitoreoDAO monitoreos, UsuarioDAO usuarios)
+        public UbicacionController(UbicacionDAO ubicaciones, UsuarioDAO usuarios)
         {
-            _monitoreos = monitoreos;
+            _ubicaciones = ubicaciones;
             _usuarios = usuarios;
         }
 
         [HttpGet]
-        public dynamic Listado()
+        public dynamic ListadoPaises()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var monitoreos = _monitoreos.Listado();
-            Console.WriteLine(monitoreos);
-            return Ok(monitoreos);
+            var paises = _ubicaciones.ListadoPaises();
+            Console.WriteLine(paises);
+            return Ok(paises);
         }
 
-        [HttpGet]
-        [Route("{metAno}/{metCod}")]
-        public dynamic BuscarMonitoreo(string metAno, string metCod)
+
+        [HttpGet("{ubiAno}/{ubiCod}")]
+        public dynamic ListadoJerarquiaUbicacion(string ubiAno, string ubiCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var monitoreos = _monitoreos.BuscarMonitoreo(metAno,metCod);
-            var monitoreo = monitoreos.FirstOrDefault();
-            return Ok(monitoreo);
+            var ubicaciones = _ubicaciones.ListadoJerarquiaUbicacion(ubiAno, ubiCod);
+            Console.WriteLine(ubicaciones);
+            return Ok(ubicaciones);
         }
+
+
     }
 
 }

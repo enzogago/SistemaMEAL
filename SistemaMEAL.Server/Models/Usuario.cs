@@ -14,6 +14,8 @@ namespace SistemaMEAL.Server.Models
 
         [ForeignKey("DocumentoIdentidad")]
         public String? DocIdeCod { get; set; }
+        public String? DocIdeNom { get; set; }
+        public String? DocIdeAbr { get; set; }
 
         public String? UsuNumDoc { get; set; }
 
@@ -29,6 +31,7 @@ namespace SistemaMEAL.Server.Models
 
         [ForeignKey("Cargo")]
         public String? CarCod { get; set; }
+        public String? CarNom { get; set; }
 
         public String? UsuFecInc { get; set; }
 
@@ -42,6 +45,7 @@ namespace SistemaMEAL.Server.Models
 
         [ForeignKey("Rol")]
         public String? RolCod { get; set; }
+        public String? RolNom { get; set; }
 
         public String? UsuIng { get; set; }
 

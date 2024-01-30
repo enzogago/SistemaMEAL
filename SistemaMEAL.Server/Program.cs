@@ -11,6 +11,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 // Servicios para los Modulos DAO
+builder.Services.AddScoped<UbicacionDAO>();
 builder.Services.AddScoped<PermisoDAO>();
 builder.Services.AddScoped<TipoValorDAO>();
 builder.Services.AddScoped<FinanciadorDAO>();

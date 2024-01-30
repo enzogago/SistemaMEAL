@@ -1,17 +1,12 @@
 import Notiflix from "notiflix";
+import CryptoJS from 'crypto-js';
 
-export const handleSubmit = async (e, userMaint, formValues, setUsers, setIsLoggedIn, setUserMaint, navigate) => {
-    e.preventDefault();
-
-    var usuario = userMaint ? { ...userMaint, ...formValues } : { ...formValues };
-    const isEditing = Object.keys(userMaint).length > 0;
-
-    const url = isEditing ? `${import.meta.env.VITE_APP_API_URL}/usuario/${usuario.usuAno}/${usuario.usuCod}` : `${import.meta.env.VITE_APP_API_URL}/usuario`;
+export const handleSubmit = async (data, isEditing, navigate, safeCiphertext) => {
+    const url = isEditing ? `${import.meta.env.VITE_APP_API_URL}/usuario/${data.usuAno}/${data.usuCod}` : `${import.meta.env.VITE_APP_API_URL}/usuario`;
     const method = isEditing ? 'PUT' : 'POST';
 
-
     const token = localStorage.getItem('token');
-
+    console.log(method)
     try {
         const response = await fetch(url, {
             method: method,
@@ -19,37 +14,51 @@ export const handleSubmit = async (e, userMaint, formValues, setUsers, setIsLogg
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ ...usuario }),
+            body: JSON.stringify(data),
         });
         
         if (!response.ok) {
-            const data = await response.json();
+            const errorData = await response.json();
             if(response.status === 409){
-                Notiflix.Notify.warning(`${data.message} ${(usuario.usuCorEle).toUpperCase()}`);
+                Notiflix.Notify.warning(`${errorData.message} ${(data.usuCorEle).toUpperCase()}`);
+                console.log(errorData.message)
                 return;
             } else {
-                Notiflix.Notify.failure(data.message);
+                Notiflix.Notify.failure(errorData.message);
+                console.log(errorData.message)
                 return;
             }
         }
 
-        const dataSuccess = await response.json();
-        Notiflix.Notify.success(dataSuccess.message);
-
+        const successData = await response.json();
+        Notiflix.Notify.success(successData.message);
+        console.log(successData)
         // Actualiza los datos después de insertar o modificar un registro
         const updateResponse = await fetch(`${import.meta.env.VITE_APP_API_URL}/usuario`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
         });
-        const data = await updateResponse.json();
+        const updateData = await updateResponse.json();
         if(!updateResponse.ok){
-            Notiflix.Notify.failure(data.message);
+            Notiflix.Notify.failure(updateData.message);
+            console.log(updateData.message)
         }
-        console.log(data);
-        // Setear userMaint con los datos del usuario
-        setUserMaint(data[data.length - 1]);
-        navigate('/menu-user');
+        console.log(updateData);
+
+        // Si se está creando un nuevo usuario, obtén el usuAno y usuCod del último usuario
+        if (!isEditing) {
+            const lastUser = updateData[updateData.length - 1];
+            const { usuAno, usuCod } = lastUser;
+            const id = `${usuAno}${usuCod}`;
+            // Encripta el ID
+            const ciphertext = CryptoJS.AES.encrypt(id, 'secret key 123').toString();
+            // Codifica la cadena cifrada para que pueda ser incluida de manera segura en una URL
+            const safeCiphertext = btoa(ciphertext).replace('+', '-').replace('/', '_').replace(/=+$/, '');
+            navigate(`/menu-user/${safeCiphertext}`);
+        } else {
+            navigate(`/menu-user/${safeCiphertext}`);
+        }
     } catch (error) {
         console.error('Error:', error);
     }
