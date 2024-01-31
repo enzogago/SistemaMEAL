@@ -5,6 +5,7 @@ import DonutChart from "../../reusable/DonutChart";
 import { useEffect, useState } from "react";
 import Notiflix from "notiflix";
 import { useForm } from 'react-hook-form';
+import { handleSubmit } from "./eventHandlers";
 
 const FormBeneficiarie = () => {
     const navigate = useNavigate();
@@ -165,41 +166,42 @@ const FormBeneficiarie = () => {
     };
 
     const Registrar_Beneficiario = () => {
-        // Verifica que el select de país tenga una opción válida seleccionada
-        const paisSelectElement = document.querySelector(`select[name=select0]`);
-        if (!paisSelectElement || paisSelectElement.value === '0') {
-            console.error('El select de país no tiene una opción válida seleccionada.');
-            // paisSelectElement.classList.remove('PowerMas_Modal_Form_valid');
-            // paisSelectElement.classList.add('PowerMas_Modal_Form_invalid');
-            return;
-        } else {
-            paisSelectElement.classList.remove('PowerMas_Modal_Form_invalid');
-            paisSelectElement.classList.add('PowerMas_Modal_Form_valid');
-        }
-    
-        // Verifica que todos los selects tengan una opción válida seleccionada
-        for (let i = 1; i < selects.length; i++) {
-            const selectElement = document.querySelector(`select[name=select${i}]`);
-            if (selectElement && selectElement.value === '0') {
-                console.error(`El select ${i} no tiene una opción válida seleccionada.`);
-                selectElement.classList.remove('PowerMas_Modal_Form_valid');
-                selectElement.classList.add('PowerMas_Modal_Form_invalid');
+        validateForm((data) => {
+            // Verifica que el select de país tenga una opción válida seleccionada
+            const paisSelectElement = document.querySelector(`select[name=select0]`);
+            if (!paisSelectElement || paisSelectElement.value === '0') {
+                console.error('El select de país no tiene una opción válida seleccionada.');
+                // paisSelectElement.classList.remove('PowerMas_Modal_Form_valid');
+                // paisSelectElement.classList.add('PowerMas_Modal_Form_invalid');
                 return;
             } else {
-                selectElement.classList.remove('PowerMas_Modal_Form_invalid');
-                selectElement.classList.add('PowerMas_Modal_Form_valid');
+                paisSelectElement.classList.remove('PowerMas_Modal_Form_invalid');
+                paisSelectElement.classList.add('PowerMas_Modal_Form_valid');
             }
-        }
-    
-        // Obtiene el ubiAno y ubiCod del último select
-        const lastSelectElement = document.querySelector(`select[name=select${selects.length - 1}]`);
-        const lastSelect = JSON.parse(lastSelectElement.value);
-        const ubiAno = lastSelect.ubiAno;
-        const ubiCod = lastSelect.ubiCod;
-        console.log(ubiAno, ubiCod);
-    
-        validateForm((data) => {
+        
+            // Verifica que todos los selects tengan una opción válida seleccionada
+            for (let i = 1; i < selects.length; i++) {
+                const selectElement = document.querySelector(`select[name=select${i}]`);
+                if (selectElement && selectElement.value === '0') {
+                    console.error(`El select ${i} no tiene una opción válida seleccionada.`);
+                    selectElement.classList.remove('PowerMas_Modal_Form_valid');
+                    selectElement.classList.add('PowerMas_Modal_Form_invalid');
+                    return;
+                } else {
+                    selectElement.classList.remove('PowerMas_Modal_Form_invalid');
+                    selectElement.classList.add('PowerMas_Modal_Form_valid');
+                }
+            }
+        
+            // Obtiene el ubiAno y ubiCod del último select
+            const lastSelectElement = document.querySelector(`select[name=select${selects.length - 1}]`);
+            const lastSelect = JSON.parse(lastSelectElement.value);
+            const ubiAno = lastSelect.ubiAno;
+            const ubiCod = lastSelect.ubiCod;
+            console.log(ubiAno, ubiCod);
+
             console.log(data);
+            handleSubmit(data, reset);
         })();
     };
     
@@ -307,15 +309,26 @@ const FormBeneficiarie = () => {
                                     Sexo:
                                 </label>
                                 <div className="flex gap-1">
-                                    <div className="gap_5">
-                                        <input type="radio" id="opcion1" name="opciones" value="opcion1" />
-                                        <label htmlFor="opcion1">Masculino</label>
+                                    <div className="flex gap_5">
+                                        <input 
+                                            type="radio" 
+                                            id="masculino" 
+                                            name="benSex" 
+                                            value="M" 
+                                            {...register('benSex')}
+                                        />
+                                        <label htmlFor="masculino">Masculino</label>
                                     </div>
-                                    <div>
-                                        <input type="radio" id="opcion2" name="opciones" value="opcion2" />
-                                        <label htmlFor="opcion2">Femenino</label>
+                                    <div className="flex gap_5">
+                                        <input 
+                                            type="radio" 
+                                            id="femenino" 
+                                            name="benSex" 
+                                            value="F" 
+                                            {...register('benSex')}
+                                        />
+                                        <label htmlFor="femenino">Femenino</label>
                                     </div>
-          
                                 </div>
                             </div>
                             <div className="m_75">

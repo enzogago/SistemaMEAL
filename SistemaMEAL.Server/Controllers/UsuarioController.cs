@@ -176,8 +176,7 @@ namespace SistemaMEAL.Server.Controllers
            
             var usuarios = _usuarios.Listado(usuAno, usuCod);
             var usuarioData = usuarios.FirstOrDefault();
-            Console.WriteLine(usuarioData);
-            return Ok(usuarios);
+            return Ok(usuarioData);
         }
 
 

@@ -205,10 +205,25 @@ export const Export_Excel_Helper = async (data, headers, title, properties) => {
     });
     
   
+    // Encuentra el índice de 'fecMod' en el array de propiedades
+    const fecModIndex = properties.findIndex(prop => prop === 'fecMod');
+
+    // Encuentra el índice de 'metPorAvaTec' en el array de propiedades
+    const metPorAvaTecIndex = properties.findIndex(prop => prop === 'metPorAvaTec');
+
     // Añadir los datos
     data.forEach(item => {
         let fecha = new Date(item.fecMod);
-        const rowData = properties.map(prop => prop === 'fecMod' ? fecha : item[prop]);
+        const rowData = properties.map(prop => {
+            if (prop === 'fecMod') {
+                return fecha;
+            } else if (prop === 'metPorAvaTec') {
+                // Convierte el número a una fracción decimal antes de escribirlo en la celda
+                return item[prop] / 100;
+            } else {
+                return item[prop];
+            }
+        });
         const row = worksheet.addRow(rowData);
         row.eachCell(cell => {
             cell.alignment = { 
@@ -217,8 +232,16 @@ export const Export_Excel_Helper = async (data, headers, title, properties) => {
                 textRotation: 'horizontal' 
             };
         });
-        row.getCell(4).numFmt = 'dd/mm/yy hh:mm';
+        // Aplica el formato de fecha a la celda correspondiente
+        if (fecModIndex !== -1) {
+            row.getCell(fecModIndex + 1).numFmt = 'dd/mm/yy hh:mm';
+        }
+        // Aplica el formato de porcentaje a la celda correspondiente
+        if (metPorAvaTecIndex !== -1) {
+            row.getCell(metPorAvaTecIndex + 1).numFmt = '0.00%';
+        }
     });
+
 
     // Personalizar el ancho de las columnas
     worksheet.columns.forEach(column => {

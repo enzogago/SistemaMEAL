@@ -1,8 +1,7 @@
 import Notiflix from "notiflix";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import MenuItem from "./MenuItem";
 import { useNavigate, useParams } from "react-router-dom";
-import { AuthContext } from "../../context/AuthContext";
 import Bar from "./Bar";
 import CryptoJS from 'crypto-js';
 
@@ -59,104 +58,122 @@ const MenuUser = () => {
   
 
   useEffect(() => {
-    const fetchUsuarios = async () => {
-      try {
-          Notiflix.Loading.pulse('Cargando...');
-          const token = localStorage.getItem('token');
-          const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/usuario/${usuAno}/${usuCod}`, {
-              headers: {
-                  'Authorization': `Bearer ${token}`
-              }
-          });
-          const data = await response.json();
- 
-          if (!response.ok) {
-            Notiflix.Notify.failure(data.message);
-            return;
-          }
+    let activeRequests = 0;
 
-          setUser(data[0])
-      } catch (error) {
-          console.error('Error:', error);
-      } finally {
-          Notiflix.Loading.remove();
+    const startRequest = () => {
+      if (activeRequests === 0) {
+        Notiflix.Loading.pulse('Cargando...');
       }
-  };
-  fetchUsuarios();
-    const fetchMenus = async () => {
-      try {
-          Notiflix.Loading.pulse('Cargando...');
-          const token = localStorage.getItem('token');
-          // Permisos por usuario
-          const responseUserPermissions = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Permiso/${usuAno}/${usuCod}`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-          });
-          const userPermissions = await responseUserPermissions.json();
-          console.log(userPermissions)
-          setUserPermissions(userPermissions);
-          // Obtener todos los permisos
-          const responseAllPermissions = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Permiso`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-          });
-          const allPermissions = await responseAllPermissions.json();
-          console.log(allPermissions)
-          const markedPermissions = allPermissions.map(permission => ({
-            ...permission,
-            isChecked: checkedPermissions[permission.perCod] || userPermissions.some(userPermission => userPermission.perCod === permission.perCod)
-          }));
-          
-          const newCheckedPermissions = userPermissions.reduce((map, permission) => {
-            map[permission.perCod] = true;
-            return map;
-          }, {});
-          setCheckedPermissions(newCheckedPermissions);
+      activeRequests++;
+    };
 
-          // Obtén los menús del usuario
-          const responseUserMenus = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Menu/${usuAno}/${usuCod}`, {
-              headers: {
-                  'Authorization': `Bearer ${token}`
-              }
-          });
-          const userMenus = await responseUserMenus.json();
-          setCurrentMenus(userMenus);
-          // Obtén todos los menús
-          const responseAllMenus = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Menu`, {
-              headers: {
-                  'Authorization': `Bearer ${token}`
-              }
-          });
-          // Respuesta de todos los menus disponibles en la aplicacion
-          const allMenus = await responseAllMenus.json();
-          console.log(allMenus)
-          // Marca los menús a los que el usuario tiene acceso
-          const markedMenus = allMenus.map(menu => {
-            const menuPermissions = markedPermissions.filter(permission => permission.perRef === menu.menRef);
-            return{
-                ...menu,
-                isChecked: userMenus.some(userMenu => userMenu.menCod === menu.menCod),
-                permissions: menuPermissions
-            }
-          });
-          console.log(markedMenus)
-          const groupData = groupByParent(markedMenus);
-          setMenus(groupData);
-          const newCheckedMenus = userMenus.reduce((map, menu) => {
-            map[menu.menCod] = true;
-            return map;
-          }, {});
-          setCheckedMenus(newCheckedMenus);
-          setAllMenus(allMenus);
-          
-      } catch (error) {
-          console.error('Error:', error);
-      } finally {
-          Notiflix.Loading.remove();
+    const endRequest = () => {
+      activeRequests--;
+      if (activeRequests === 0) {
+        Notiflix.Loading.remove();
       }
     };
+
+    const fetchUsuario = async () => {
+      try {
+        startRequest();
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/usuario/${usuAno}/${usuCod}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        const data = await response.json();
+ 
+        if (!response.ok) {
+          Notiflix.Notify.failure(data.message);
+          return;
+        }
+
+        setUser(data)
+      } catch (error) {
+        console.error('Error:', error);
+      } finally {
+        endRequest();
+      }
+    };
+
+    const fetchMenus = async () => {
+      try {
+        startRequest();
+        const token = localStorage.getItem('token');
+        // Permisos por usuario
+        const responseUserPermissions = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Permiso/${usuAno}/${usuCod}`, {
+          headers: {
+              'Authorization': `Bearer ${token}`
+          }
+        });
+        const userPermissions = await responseUserPermissions.json();
+        console.log(userPermissions)
+        setUserPermissions(userPermissions);
+        // Obtener todos los permisos
+        const responseAllPermissions = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Permiso`, {
+          headers: {
+              'Authorization': `Bearer ${token}`
+          }
+        });
+        const allPermissions = await responseAllPermissions.json();
+        console.log(allPermissions)
+        const markedPermissions = allPermissions.map(permission => ({
+          ...permission,
+          isChecked: checkedPermissions[permission.perCod] || userPermissions.some(userPermission => userPermission.perCod === permission.perCod)
+        }));
+          
+        const newCheckedPermissions = userPermissions.reduce((map, permission) => {
+          map[permission.perCod] = true;
+          return map;
+        }, {});
+        setCheckedPermissions(newCheckedPermissions);
+
+        // Obtén los menús del usuario
+        const responseUserMenus = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Menu/${usuAno}/${usuCod}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        const userMenus = await responseUserMenus.json();
+        setCurrentMenus(userMenus);
+        // Obtén todos los menús
+        const responseAllMenus = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Menu`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        // Respuesta de todos los menus disponibles en la aplicacion
+        const allMenus = await responseAllMenus.json();
+        console.log(allMenus)
+        // Marca los menús a los que el usuario tiene acceso
+        const markedMenus = allMenus.map(menu => {
+          const menuPermissions = markedPermissions.filter(permission => permission.perRef === menu.menRef);
+          return{
+              ...menu,
+              isChecked: userMenus.some(userMenu => userMenu.menCod === menu.menCod),
+              permissions: menuPermissions
+          }
+        });
+        console.log(markedMenus)
+        const groupData = groupByParent(markedMenus);
+        setMenus(groupData);
+        const newCheckedMenus = userMenus.reduce((map, menu) => {
+          map[menu.menCod] = true;
+          return map;
+        }, {});
+        setCheckedMenus(newCheckedMenus);
+        setAllMenus(allMenus);
+          
+      } catch (error) {
+        console.error('Error:', error);
+      } finally {
+        endRequest();
+      }
+    };
+
+    fetchUsuario();
     fetchMenus();
   }, []);
 
@@ -330,6 +347,7 @@ const MenuUser = () => {
       if (!responseRemovePermissions.ok) {
         // Manejar el error...
       }
+      Notiflix.Notify.success("Menus actualizados correctamente")
     } catch (error) {
       console.log(error)
     } finally{

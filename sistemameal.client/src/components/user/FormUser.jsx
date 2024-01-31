@@ -10,14 +10,12 @@ const FormUser = () => {
     const navigate = useNavigate();
     
     const { id: safeCiphertext } = useParams();
-    console.log(safeCiphertext)
     let id = '';
     if (safeCiphertext) {
         const ciphertext = atob(safeCiphertext);
         // Desencripta el ID
         const bytes  = CryptoJS.AES.decrypt(ciphertext, 'secret key 123');
         id = bytes.toString(CryptoJS.enc.Utf8);
-        console.log(id)
     }
     const isEditing = id && id.length >= 5;
 
@@ -142,11 +140,9 @@ const FormUser = () => {
                     }
                 });
                 const data = await response.json();
-                const obj = data[0]; // accede al primer objeto en el array
-                for (const field in obj) {
-                    setValue(field, obj[field]);
+                for (const field in data) {
+                    setValue(field, data[field]);
                 }
-                console.log(obj)
                 if (!response.ok) {
                     Notiflix.Notify.failure(data.message);
                     return;
@@ -405,7 +401,7 @@ const FormUser = () => {
                             )}
                         </div>
                         <div className="Large_6 flex flex-column p1">
-                            <label htmlFor="">Género</label>
+                            <label htmlFor="">Sexo</label>
                             <div className="flex gap-1">
                                 <div className="flex gap_5">
                                     <input 

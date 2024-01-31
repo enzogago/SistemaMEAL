@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 // helper
 // Context
 import { AuthContext } from './context/AuthContext';
@@ -9,7 +9,7 @@ import Login from './components/auth/Login';
 import PrivateRoute from './components/router/PrivateRoute';
 import PublicRoute from './components/router/PublicRoute';
 import Layout from './components/router/Layout';
-import Monitoring from './components/goal/Monitoring';
+import Monitoring from './components/monitoring/Monitoring';
 import User from './components/user/User';
 import FormUser from './components/user/FormUser';
 import MenuUser from './components/user/MenuUser';
@@ -24,11 +24,11 @@ import Permission from './components/permission/Permission';
 import TypeValue from './components/type-value/TypeValue';
 import FormProject from './components/project/FormProject';
 import Projects from './components/project/Projects';
+import FormBeneficiarie from './components/monitoring/beneficiarie/FormBeneficiarie';
+import Dashboard from './components/dashboard/Dashboard';
+import FormGoal from './components/monitoring/goal/FormGoal';
 
 import Notiflix from "notiflix";
-import FormBeneficiarie from './components/goal/beneficiarie/FormBeneficiarie';
-import Dashboard from './components/dashboard/Dashboard';
-
 Notiflix.Loading.init({
     className: 'notiflix-loading',
     zindex: 4000,
@@ -149,6 +149,7 @@ const App = () => {
                         <PrivateRoute> 
                             <Layout>
                                 <Routes>
+                                    <Route index element={<Home />} />
                                     {menuData.map((menu, index) => {
                                         const Component = componentMap[menu.menRef];
                                         return Component ? <Route path={`${menu.menRef}`} element={<Component />} key={index} /> : null;
@@ -165,10 +166,11 @@ const App = () => {
                                     )}
                                     {menuData.some(menu => menu.menRef === 'monitoring') && (
                                         <>
-                                            <Route path="form-beneficiarie/:id?" element={<FormBeneficiarie />} />
+                                            <Route path="form-beneficiarie/:id" element={<FormBeneficiarie />} />
+                                            <Route path="form-goal/:id?" element={<FormGoal />} />
                                         </>
                                     )}
-                                    <Route path="*" element={<Home />} />
+                                    <Route path="*" element={<Navigate to='/' />} />
                                 </Routes>
                             </Layout>
                         </PrivateRoute>

@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useContext, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Tooltip } from 'react-tooltip';
 import CryptoJS from 'crypto-js';
@@ -21,9 +21,15 @@ import { Export_Excel_Helper, Export_PDF_Helper, handleDelete } from '../reusabl
 // Componentes
 import Pagination from "../reusable/Pagination";
 import TableRow from "./TableRow"
+// Context
+import { AuthContext } from "../../context/AuthContext";
 
 const Table = ({ data }) => {
     const navigate = useNavigate();
+    // Variables State AuthContext 
+    const { authActions, authInfo } = useContext(AuthContext);
+    const { setIsLoggedIn } = authActions;
+    const { userPermissions } = authInfo;
     // States locales
     const [searchFilter, setSearchFilter] = useState('');
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -44,11 +50,16 @@ const Table = ({ data }) => {
     }
     
     const actions = {
-        // add: userPermissions.some(permission => permission.perNom === "CREAR META"),
-        // delete: userPermissions.some(permission => permission.perNom === "ELIMINAR META"),
-        // edit: userPermissions.some(permission => permission.perNom === "MODIFICAR META"),
+        add: userPermissions.some(permission => permission.perNom === "INSERTAR META"),
+        delete: userPermissions.some(permission => permission.perNom === "ELIMINAR META"),
+        edit: userPermissions.some(permission => permission.perNom === "MODIFICAR META"),
     };
     const [sorting, setSorting] = useState([]);
+    // Añade una nueva propiedad 'metMesPlaTecNombre' a cada objeto de tus datos
+    data.forEach(item => {
+        item.metMesPlaTecNombre = new Date(2024, item.metMesPlaTec - 1).toLocaleString('es-ES', { month: 'long' });
+    });
+
     const filteredData = useMemo(() => 
         data.filter(item => 
             item.estNom.includes(searchFilter.toUpperCase()) ||
@@ -56,7 +67,7 @@ const Table = ({ data }) => {
             item.metEjeTec.includes(searchFilter.toUpperCase()) ||
             item.metPorAvaTec.includes(searchFilter.toUpperCase()) ||
             item.metAnoPlaTec.includes(searchFilter.toUpperCase()) ||
-            item.metMesPlaTec.includes(searchFilter.toUpperCase()) ||
+            item.metMesPlaTecNombre.toUpperCase().includes(searchFilter.toUpperCase()) || // Usa la nueva propiedad para el filtrado
             item.indActResNom.includes(searchFilter.toUpperCase()) ||
             item.tipInd.includes(searchFilter.toUpperCase()) ||
             item.resNom.includes(searchFilter.toUpperCase()) ||
@@ -68,6 +79,7 @@ const Table = ({ data }) => {
             item.proNom.includes(searchFilter.toUpperCase())
         ), [data, searchFilter]
     );
+
 
     function darkenColor(color, percent) {
         const num = parseInt(color.replace("#",""), 16),
@@ -85,7 +97,7 @@ const Table = ({ data }) => {
                 header: "Estado",
                 accessorKey: "estNom",
                 cell: ({row}) => (
-                    <div style={{ color: row.original.estCol }}>
+                    <div className="bold" style={{ color: row.original.estCol, whiteSpace: 'nowrap' }}>
                         {row.original.estNom}
                     </div>
                 ),
@@ -93,22 +105,40 @@ const Table = ({ data }) => {
             {
                 header: "Meta",
                 accessorKey: "metMetTec",
+                cell: ({row}) => {
+                    // Convierte el número a una cadena y añade las comas de miles
+                    const formattedNumber = Number(row.original.metMetTec).toLocaleString();
+                    return (
+                        <div className="center">
+                            {formattedNumber}
+                        </div>
+                    );
+                },
             },
             {
                 header: "Ejecucion",
-                accessorKey: "metEjeTec"
-            },
+                accessorKey: "metEjeTec",
+                cell: ({row}) => {
+                    // Convierte el número a una cadena y añade las comas de miles
+                    const formattedNumber = Number(row.original.metEjeTec).toLocaleString();
+                    return (
+                        <div className="center">
+                            {formattedNumber}
+                        </div>
+                    );
+                },
+            }, 
             {
                 header: "% de Avance",
                 accessorKey: "metPorAvaTec",
                 cell: ({row}) => (
-                    <div className="flex gap_5">
-                        <div style={{color: row.original.estCol, textDecoration: 'underline'}}>
+                    <div className="flex flex-column">
+                        <div className="bold" style={{color: row.original.estCol, textDecoration: ''}}>
                             {row.original.metPorAvaTec}%
                         </div>
                         <div 
                             className="progress-bar"
-                            style={{backgroundColor: darkenColor(row.original.estCol, 80), border: `1px solid ${row.original.estCol}`}}
+                            style={{backgroundColor: '#d3d3d3', border: `0px solid ${row.original.estCol}`}}
                         >
                             <div 
                                 className="progress-bar-fill" 
@@ -124,10 +154,10 @@ const Table = ({ data }) => {
             },
             {
                 header: "Mes",
-                accessorKey: "metMesPlaTec",
+                accessorKey: "metMesPlaTecNombre", // Usa la nueva propiedad como accessorKey
                 cell: ({row}) => (
                     <div style={{textTransform: 'capitalize'}}>
-                        {new Date(2024, row.original.metMesPlaTec - 1).toLocaleString('es-ES', { month: 'long' })}
+                        {row.original.metMesPlaTecNombre}
                     </div>
                 ),
             },
@@ -138,7 +168,24 @@ const Table = ({ data }) => {
             {
                 header: "Indicador",
                 accessorKey: "indActResNom",
-                
+                cell: ({row}) => {
+                    const text = row.original.indActResNom;
+                    const shortText = text.length > 50 ? text.substring(0, 50) + '...' : text;
+                    return (
+                        <div>
+                            <span 
+                                data-tooltip-id="info-tooltip" 
+                                data-tooltip-content={text} 
+                            >{shortText}</span>
+                            <Tooltip 
+                                id="info-tooltip"
+                                effect="solid"
+                                place='bottom-start'
+                                className="tooltip"
+                            />
+                        </div>
+                    );
+                },
             },
             {
                 header: "Tipo Inidicador",
@@ -161,29 +208,68 @@ const Table = ({ data }) => {
             {
                 header: "Resultado",
                 accessorKey: "resNom",
-                cell: ({row}) => (
-                    <div>
-                        {row.original.resNum} - {row.original.resNom}
-                    </div>
-                ),
+                cell: ({row}) => {
+                    const text = row.original.resNum + ' - ' + row.original.resNom;
+                    const shortText = text.length > 60 ? text.substring(0, 60) + '...' : text;
+                    return (
+                        <div>
+                            <span 
+                                data-tooltip-id="info-tooltip" 
+                                data-tooltip-content={text} 
+                            >{shortText}</span>
+                            <Tooltip 
+                                id="info-tooltip"
+                                effect="solid"
+                                place='bottom-start'
+                                className="tooltip"
+                            />
+                        </div>
+                    );
+                },
             },
             {
                 header: "Objetivo Especifico",
                 accessorKey: "objEspNom",
-                cell: ({row}) => (
-                    <div>
-                        {row.original.objEspNum} - {row.original.objEspNom}
-                    </div>
-                ),
+                cell: ({row}) => {
+                    const text = row.original.objEspNum + ' - ' + row.original.objEspNom;
+                    const shortText = text.length > 60 ? text.substring(0, 60) + '...' : text;
+                    return (
+                        <div>
+                            <span 
+                                data-tooltip-id="info-tooltip" 
+                                data-tooltip-content={text} 
+                            >{shortText}</span>
+                            <Tooltip 
+                                id="info-tooltip"
+                                effect="solid"
+                                place='bottom-start'
+                                className="tooltip"
+                            />
+                        </div>
+                    );
+                },
             },
             {
                 header: "Objetivo",
                 accessorKey: "objNom",
-                cell: ({row}) => (
-                    <div>
-                        {row.original.objNum} - {row.original.objNom}
-                    </div>
-                ),
+                cell: ({row}) => {
+                    const text = row.original.objNum + ' - ' + row.original.objNom;
+                    const shortText = text.length > 60 ? text.substring(0, 60) + '...' : text;
+                    return (
+                        <div>
+                            <span 
+                                data-tooltip-id="info-tooltip" 
+                                data-tooltip-content={text} 
+                            >{shortText}</span>
+                            <Tooltip 
+                                id="info-tooltip"
+                                effect="solid"
+                                place='bottom-start'
+                                className="tooltip"
+                            />
+                        </div>
+                    );
+                },
             },
             {
                 header: "Subproyecto",
@@ -207,13 +293,13 @@ const Table = ({ data }) => {
             data.some(item => item[column.accessorKey] !== null)
         );
     
-        if (true || true) {
+        if (actions.edit || actions.delete) {
             baseColumns.push({
                 header: "Acciones",
                 accessorKey: "acciones",
                 cell: ({row}) => (
                     <div className='PowerMas_IconsTable flex jc-center ai-center'>
-                        {true && 
+                        {actions.edit && 
                             <FaEdit 
                                 data-tooltip-id="edit-tooltip" 
                                 data-tooltip-content="Editar" 
@@ -221,7 +307,7 @@ const Table = ({ data }) => {
                                 onClick={() => openModal(row.original)} 
                             />
                         }
-                        {true && 
+                        {actions.delete && 
                             <FaRegTrashAlt 
                                 data-tooltip-id="delete-tooltip" 
                                 data-tooltip-content="Eliminar" 
@@ -327,11 +413,10 @@ const Table = ({ data }) => {
                         />
                     </div>
                     {
-                        /*actions.add*/ true && 
+                        actions.add && 
                         <button 
                             className=' flex jc-space-between Large_3 Large-m_5 Large-p_5 PowerMas_ButtonStatus'
-                            // onClick={() => openModal()} 
-                            // disabled={!actions.add}
+                            onClick={() => navigate('/form-goal')} 
                         >
                             Nuevo <FaPlus className='Large_1' /> 
                         </button>

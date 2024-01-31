@@ -1,4 +1,4 @@
-import { useContext, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Tooltip } from 'react-tooltip';
 import CryptoJS from 'crypto-js';
@@ -12,8 +12,7 @@ import {
 // Iconos package
 import { FaEdit, FaPlus, FaRegTrashAlt, FaSearch, FaSortDown } from 'react-icons/fa';
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
-import { GrNext, GrPrevious  } from "react-icons/gr";
-// Iconos source
+    // Iconos source
 import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
 import Pdf_Icon from '../../img/PowerMas_Pdf_Icon.svg';
 // Funciones reusables
@@ -21,13 +20,9 @@ import { Export_Excel_Helper, Export_PDF_Helper, handleDelete } from '../reusabl
 // Componentes
 import Pagination from "../reusable/Pagination";
 import TableRow from "./TableRow"
-import { AuthContext } from "../../context/AuthContext";
 
 const Table = ({data}) => {
     const navigate = useNavigate();
-    // Variables State AuthContext 
-    const { authActions } = useContext(AuthContext);
-    const { setUserMaint } = authActions;
     // States locales
     const [searchFilter, setSearchFilter] = useState('');
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -141,9 +136,9 @@ const Table = ({data}) => {
 
      // Preparar los datos
      const dataExport = table.options.data;  // Tus datos
-     const headers = ['AÑO', 'CODIGO', 'NOMBRE', 'RESPONSABLE', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
+     const headers = ['AÑO', 'CODIGO', 'NOMBRE', 'APELLIDO', 'CARGO', 'ROL', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
      const title = 'PROYECTOS';  // El título de tu archivo
-     const properties = ['proAno', 'proCod', 'proNom', 'proRes', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
+     const properties = ['usuAno', 'usuCod', 'usuNom', 'usuApe', 'carNom', 'rolNom', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
      const format = 'a4';  // El tamaño del formato que quieres establecer para el PDF
  
      const Export_Excel = () => {
@@ -158,50 +153,50 @@ const Table = ({data}) => {
          setDropdownOpen(false);
      };
  
-     const tableRef = useRef();  // Referencia al elemento de la tabla
+    const tableRef = useRef();  // Referencia al elemento de la tabla
  
-     const animateScroll = (element, to, duration) => {
-         const start = element.scrollLeft,
-             change = to - start,
-             increment = 20;
-         let currentTime = 0;
+    const animateScroll = (element, to, duration) => {
+        const start = element.scrollLeft,
+            change = to - start,
+            increment = 20;
+        let currentTime = 0;
+    
+        const animateScroll = () => {
+            currentTime += increment;
+            const val = Math.easeInOutQuad(currentTime, start, change, duration);
+            element.scrollLeft = val;
+            if(currentTime < duration) {
+                setTimeout(animateScroll, increment);
+            }
+        };
+        animateScroll();
+    }
      
-         const animateScroll = () => {
-             currentTime += increment;
-             const val = Math.easeInOutQuad(currentTime, start, change, duration);
-             element.scrollLeft = val;
-             if(currentTime < duration) {
-                 setTimeout(animateScroll, increment);
-             }
-         };
-         animateScroll();
-     }
+    Math.easeInOutQuad = function (t, b, c, d) {
+        t /= d/2;
+        if (t < 1) return c/2*t*t + b;
+        t--;
+        return -c/2 * (t*(t-2) - 1) + b;
+    };
      
-     Math.easeInOutQuad = function (t, b, c, d) {
-         t /= d/2;
-         if (t < 1) return c/2*t*t + b;
-         t--;
-         return -c/2 * (t*(t-2) - 1) + b;
-     };
+    const scrollTable = (direction) => {
+        if (tableRef.current) {
+            const distance = tableRef.current.offsetWidth * 0.8;  // 50% del ancho de la tabla
+            const to = tableRef.current.scrollLeft + distance * direction;
+            animateScroll(tableRef.current, to, 500);
+        }
+    }
      
-     const scrollTable = (direction) => {
-         if (tableRef.current) {
-             const distance = tableRef.current.offsetWidth * 0.8;  // 50% del ancho de la tabla
-             const to = tableRef.current.scrollLeft + distance * direction;
-             animateScroll(tableRef.current, to, 500);
-         }
-     }
-     
-     const Editar_Usuario = (row) => {
-         console.log(row)
-         const id = `${row.original.usuAno}${row.original.usuCod}`;
-         console.log(id)
-         // Encripta el ID
-         const ciphertext = CryptoJS.AES.encrypt(id, 'secret key 123').toString();
-         // Codifica la cadena cifrada para que pueda ser incluida de manera segura en una URL
-         const safeCiphertext = btoa(ciphertext).replace('+', '-').replace('/', '_').replace(/=+$/, '');
-         navigate(`/form-user/${safeCiphertext}`);
-     }
+    const Editar_Usuario = (row) => {
+        console.log(row)
+        const id = `${row.original.usuAno}${row.original.usuCod}`;
+        console.log(id)
+        // Encripta el ID
+        const ciphertext = CryptoJS.AES.encrypt(id, 'secret key 123').toString();
+        // Codifica la cadena cifrada para que pueda ser incluida de manera segura en una URL
+        const safeCiphertext = btoa(ciphertext).replace('+', '-').replace('/', '_').replace(/=+$/, '');
+        navigate(`/form-user/${safeCiphertext}`);
+    }
     
     return (
         <div className='TableMainContainer Large-p1 Medium-p1 Small-p_5'>

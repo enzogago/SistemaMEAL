@@ -34,7 +34,7 @@ const MenuItem = ({ menu, level, handleToggle, handleCheck, openMenus, checkedMe
                 }
                 {level === 1 && (menu.subMenus.length > 0) &&
                 <span 
-                    className={`p_25 bold round ${openMenus[menu.menCod] ? 'open' : 'closed'}`}
+                    className={`p_25 bold round ${openMenus[menu.menCod] ? 'open-user' : 'closed'}`}
                     onClick={level === 1 ? () => handleToggle(menu) : null}
                 > 
                     &gt; 

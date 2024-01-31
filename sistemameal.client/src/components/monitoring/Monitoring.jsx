@@ -15,7 +15,6 @@ const Monitoring = () => {
                         'Authorization': `Bearer ${token}`
                     }
                 });
-                console.log(response)
                 if (!response.ok) {
                     if(response.status == 401 || response.status == 403){
                         const data = await response.json();
@@ -24,7 +23,6 @@ const Monitoring = () => {
                     return;
                 }
                 const data = await response.json();
-                console.log(data)
                 if (data.success == false) {
                     Notiflix.Notify.failure(data.message);
                     return;

@@ -101,12 +101,12 @@ const Sidebar = () => {
 
     
     return (
-        <div className="PowerMas_Menu Phone_2 Large-inline none">
+        <div className="PowerMas_Menu Phone_2 flex flex-column">
             <div className="PowerMas_SidebarHeader">
                 <img className='Large_10 Large-m1' title="Sistema MEAL Ayuda en Acción" src={logo} alt="Logo Ayuda En Accion" />
                 <h1 className="Powermas_FontTitle center Large-f2_25">Menú</h1>
             </div>
-            <div className="PowerMas_MenuContainer Large-f1">
+            <div className="PowerMas_MenuContainer Large-f1 flex-grow-1">
                 <div className="PowerMas_MenuOptions">
                     <div className='PowerMas_MainSingleLink'>
                         <Link to='/'>
@@ -120,26 +120,17 @@ const Sidebar = () => {
                         <MenuItem key={index} menu={menuItem} level={1} />
                     ))}
                 </div>
-                <div className="PowerMas_MenuBottom">
-                    <div>
-                        <div className='PowerMas_MainSingleLink'>
-                            <Link to='/'>
-                                <div className="PowerMas_SingleLink">
-                                    <FaCog />
-                                    <span> Configuración </span>
-                                </div>
-                            </Link>
-                        </div>
-                        <div className='PowerMas_MainSingleLink'>
-                            <Link to='/' onClick={handleLogout}>
-                                <div className="PowerMas_SingleLink">
-                                    <FaSignOutAlt />
-                                    <span> Cerrar Sesión </span>
-                                </div>
-                            </Link>
-                        </div>
-                    </div>
-                </div>
+            </div>
+            <div className="PowerMas_MenuBottom center p1">
+                <article className='p_5'>
+                    <p className='Large-f1_25'>Sistema MEAL</p>
+                    <p>Version 0.0.1</p>
+                </article>
+                <hr className='p0 m0' style={{ border: '1px solid #fff'}} />  
+                <article className='p_5'>
+                    <p>31 de Enero del 2024</p>
+                    <p>05:20 PM</p>
+                </article>                   
             </div>
         </div>)
 };

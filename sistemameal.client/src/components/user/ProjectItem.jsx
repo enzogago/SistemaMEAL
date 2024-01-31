@@ -2,11 +2,11 @@ import { useState } from 'react';
 import SubProjectItem from "./SubProjectItem";
 
 const ProjectItem = ({ proyecto, handleCheck, checkedProyectos, checkedSubProyectos }) => {
-    const [isOpen, setIsOpen] = useState(false);
+    const [ isOpen, setIsOpen] = useState(false);
 
     const handleToggle = () => {
         setIsOpen(!isOpen);
-    };
+    }
 
     return (
         <li className="PowerMas_Permission_Dropdown" >
@@ -25,14 +25,14 @@ const ProjectItem = ({ proyecto, handleCheck, checkedProyectos, checkedSubProyec
                 {
                     proyecto.subProyectos &&
                     <span 
-                        className={`pointer round p_25 bold arrow ${isOpen ? 'down' : 'right'}`} 
+                        className={`pointer round p_25 bold ${isOpen && 'open-user'}`}
                         onClick={handleToggle}
                     > 
                         &gt;
                     </span>
                 }
             </div>
-            <div className={`PowerMas_Permission_Dropdown ${isOpen ? 'menu open' : 'menu'}`}>
+            <div className={`PowerMas_Permission_Dropdown menu ${isOpen && 'active'}`}>
                 {proyecto.subProyectos && proyecto.subProyectos.map(subProyecto => (
                     <SubProjectItem 
                         key={subProyecto.subProCod} 

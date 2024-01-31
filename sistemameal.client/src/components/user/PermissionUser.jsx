@@ -7,131 +7,146 @@ import Bar from "./Bar";
 import CryptoJS from 'crypto-js';
 
 const PermissionUser = () => {
-  const navigate = useNavigate();
+    const navigate = useNavigate();
 
-  const { id: safeCiphertext } = useParams();
-  console.log(safeCiphertext)
-  const ciphertext = atob(safeCiphertext);
-  // Desencripta el ID
-  const bytes  = CryptoJS.AES.decrypt(ciphertext, 'secret key 123');
-  const id = bytes.toString(CryptoJS.enc.Utf8);
-  console.log(id)
-  const usuAno = id.slice(0, 4);
-  const usuCod = id.slice(4);
-  
-  //
-  const [ proyectos, setProyectos ] = useState([]);
-  const [ checkedProyectos, setCheckedProyectos ] = useState({});
-  const [ checkedSubProyectos, setCheckedSubProyectos ] = useState({});
-  const [ addedProyectos, setAddedProyectos ] = useState({});
-  const [ addedSubProyectos, setAddedSubProyectos ] = useState({});
-  const [ removedProyectos, setRemovedProyectos ] = useState({});
-  const [ removedSubProyectos, setRemovedSubProyectos ] = useState({});
+    const { id: safeCiphertext } = useParams();
+    console.log(safeCiphertext)
+    const ciphertext = atob(safeCiphertext);
+    // Desencripta el ID
+    const bytes  = CryptoJS.AES.decrypt(ciphertext, 'secret key 123');
+    const id = bytes.toString(CryptoJS.enc.Utf8);
+    console.log(id)
+    const usuAno = id.slice(0, 4);
+    const usuCod = id.slice(4);
+    
+    //
+    const [ proyectos, setProyectos ] = useState([]);
+    const [ checkedProyectos, setCheckedProyectos ] = useState({});
+    const [ checkedSubProyectos, setCheckedSubProyectos ] = useState({});
+    const [ addedProyectos, setAddedProyectos ] = useState({});
+    const [ addedSubProyectos, setAddedSubProyectos ] = useState({});
+    const [ removedProyectos, setRemovedProyectos ] = useState({});
+    const [ removedSubProyectos, setRemovedSubProyectos ] = useState({});
 
-  const [ user, setUser ] = useState(null);
+    const [ user, setUser ] = useState(null);
 
-  // EFECTO AL CARGAR COMPONENTE GET - LISTAR PROYECTOS
-  useEffect(() => {
+    // EFECTO AL CARGAR COMPONENTE GET - LISTAR PROYECTOS
+    useEffect(() => {
+        let activeRequests = 0;
 
-    const fetchUsuarios = async () => {
-        try {
-            Notiflix.Loading.pulse('Cargando...');
-            const token = localStorage.getItem('token');
-            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/usuario/${usuAno}/${usuCod}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            const data = await response.json();
-   
-            if (!response.ok) {
-              Notiflix.Notify.failure(data.message);
-              return;
+        const startRequest = () => {
+            if (activeRequests === 0) {
+                Notiflix.Loading.pulse('Cargando...');
             }
-  
-            setUser(data[0])
-        } catch (error) {
-            console.error('Error:', error);
-        } finally {
-            Notiflix.Loading.remove();
-        }
-    };
-    fetchUsuarios();
+            activeRequests++;
+        };
 
-    let isCancelled = false;
+        const endRequest = () => {
+            activeRequests--;
+            if (activeRequests === 0) {
+                Notiflix.Loading.remove();
+            }
+        };
 
-    const fetchProyectos = async () => {
-        try {
-            Notiflix.Loading.pulse('Cargando...');
-            const token = localStorage.getItem('token');
-            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Proyecto`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            if (!response.ok) {
+        const fetchUsuarios = async () => {
+            try {
+                startRequest();
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/usuario/${usuAno}/${usuCod}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
                 const data = await response.json();
+    
+                if (!response.ok) {
                 Notiflix.Notify.failure(data.message);
                 return;
-            }
-            const data = await response.json();
-            console.log(data)
-            if (!isCancelled) {
-                setProyectos(data);
-            }
-        } catch (error) {
-            Notiflix.Notify.failure('Ha ocurrido un error al cargar los proyectos.');
-        } finally {
-            Notiflix.Loading.remove();
-        }
-    };
-
-    const fetchProyectosAccesibles = async () => {
-      try {
-          Notiflix.Loading.pulse('Cargando...');
-          const token = localStorage.getItem('token');
-          const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Proyecto/accesibles/${usuAno}/${usuCod}`, {
-              headers: {
-                  'Authorization': `Bearer ${token}`
-              }
-          });
-          if (!response.ok) {
-              const data = await response.json();
-              Notiflix.Notify.failure(data.message);
-              return;
-          }
-          const data = await response.json();
-          console.log(data)
-          if (!isCancelled) {
-            let newCheckedProyectos = { ...checkedProyectos };
-            let newCheckedSubProyectos = { ...checkedSubProyectos };
-    
-            data.forEach(proyecto => {
-                newCheckedProyectos[`${proyecto.proAno}-${proyecto.proCod}`] = true;
-                if (proyecto.subProyectos) {
-                    proyecto.subProyectos.forEach(subProyecto => {
-                        newCheckedSubProyectos[`${subProyecto.subProAno}-${subProyecto.subProCod}`] = true;
-                    });
                 }
-            });
-            setCheckedProyectos(newCheckedProyectos);
-            setCheckedSubProyectos(newCheckedSubProyectos);
-          }
-      } catch (error) {
-          console.log(error)
-          Notiflix.Notify.failure('Ha ocurrido un error al cargar los proyectos accesibles.');
-      } finally {
-          Notiflix.Loading.remove();
-      }
-    };
+    
+                setUser(data)
+            } catch (error) {
+                console.error('Error:', error);
+            } finally {
+                endRequest();
+            }
+        };
 
-    fetchProyectos();
-    fetchProyectosAccesibles();
+        let isCancelled = false;
 
-    return () => {
-        isCancelled = true;
-    };
-  }, []);
+        const fetchProyectos = async () => {
+            try {
+                startRequest();
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Proyecto`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if (!response.ok) {
+                    const data = await response.json();
+                    Notiflix.Notify.failure(data.message);
+                    return;
+                }
+                const data = await response.json();
+                console.log(data)
+                if (!isCancelled) {
+                    setProyectos(data);
+                }
+            } catch (error) {
+                Notiflix.Notify.failure('Ha ocurrido un error al cargar los proyectos.');
+            } finally {
+                endRequest();
+            }
+        };
+
+        const fetchProyectosAccesibles = async () => {
+            try {
+                startRequest();
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Proyecto/accesibles/${usuAno}/${usuCod}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if (!response.ok) {
+                    const data = await response.json();
+                    Notiflix.Notify.failure(data.message);
+                    return;
+                }
+                const data = await response.json();
+                console.log(data)
+                if (!isCancelled) {
+                    let newCheckedProyectos = { ...checkedProyectos };
+                    let newCheckedSubProyectos = { ...checkedSubProyectos };
+
+                    data.forEach(proyecto => {
+                        newCheckedProyectos[`${proyecto.proAno}-${proyecto.proCod}`] = true;
+                        if (proyecto.subProyectos) {
+                            proyecto.subProyectos.forEach(subProyecto => {
+                                newCheckedSubProyectos[`${subProyecto.subProAno}-${subProyecto.subProCod}`] = true;
+                            });
+                        }
+                    });
+                    setCheckedProyectos(newCheckedProyectos);
+                    setCheckedSubProyectos(newCheckedSubProyectos);
+                }
+            } catch (error) {
+                console.log(error)
+                Notiflix.Notify.failure('Ha ocurrido un error al cargar los proyectos accesibles.');
+            } finally {
+                endRequest();
+            }
+        };
+
+        fetchUsuarios();
+        fetchProyectos();
+        fetchProyectosAccesibles();
+
+        return () => {
+            isCancelled = true;
+        };
+    }, []);
 
 
   const handleCheck = (item, isChecked, isSubProyecto, proyecto) => {
@@ -227,8 +242,6 @@ const PermissionUser = () => {
         Notiflix.Notify.failure(data.message);
         return;
     }
-
-    Notiflix.Notify.success('Los permisos del usuario han sido agregados exitosamente.');
   };
 
   const eliminarExclusiones = async (proyectos, subProyectos) => {
@@ -250,8 +263,6 @@ const PermissionUser = () => {
           Notiflix.Notify.failure(data.message);
           return;
       }
-
-      Notiflix.Notify.success('Los permisos del usuario han sido eliminados exitosamente.');
   };
 
 
@@ -272,6 +283,7 @@ const PermissionUser = () => {
       console.log(subProyectosToRemove)
       await agregarExclusiones(proyectosToRemove, subProyectosToRemove);
     }
+    Notiflix.Notify.success("Permisos actualizados correctamente")
     navigate('/user');
   }
 
@@ -289,13 +301,13 @@ const PermissionUser = () => {
                 <ul>
                     {proyectos.map(proyecto => (
                         <ProjectItem 
-                        key={proyecto.proCod} 
-                        proyecto={proyecto} 
-                        handleCheck={handleCheck} 
-                        checkedProyectos={checkedProyectos} 
-                        checkedSubProyectos={checkedSubProyectos} 
+                            key={proyecto.proCod} 
+                            proyecto={proyecto} 
+                            handleCheck={handleCheck} 
+                            checkedProyectos={checkedProyectos} 
+                            checkedSubProyectos={checkedSubProyectos} 
                         />
-                        ))}
+                    ))}
                 </ul>
             </div>
             <div className="Large_6">
