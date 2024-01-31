@@ -98,7 +98,7 @@ const Table = ({ data }) => {
                 accessorKey: "estNom",
                 cell: ({row}) => (
                     <div className="bold" style={{ color: row.original.estCol, whiteSpace: 'nowrap' }}>
-                        {row.original.estNom}
+                        {row.original.estNom.charAt(0).toUpperCase() + row.original.estNom.slice(1).toLowerCase()}
                     </div>
                 ),
             },
@@ -169,8 +169,15 @@ const Table = ({ data }) => {
                 header: "Indicador",
                 accessorKey: "indActResNom",
                 cell: ({row}) => {
-                    const text = row.original.indActResNom;
-                    const shortText = text.length > 50 ? text.substring(0, 50) + '...' : text;
+                    let text = row.original.indActResNom;
+                    let shortText = text.length > 50 ? text.substring(0, 50) + '...' : text;
+                    // Divide el texto en el identificador y el texto descriptivo
+                    const [identifier, ...descriptionParts] = shortText.split(' - ');
+                    let description = descriptionParts.join(' - ');
+                    // Capitaliza la primera letra y convierte el resto a minúsculas
+                    description = description.charAt(0).toUpperCase() + description.slice(1).toLowerCase();
+                    // Combina el identificador y la descripción
+                    shortText = `${identifier} - ${description}`;
                     return (
                         <div>
                             <span 
@@ -209,7 +216,7 @@ const Table = ({ data }) => {
                 header: "Resultado",
                 accessorKey: "resNom",
                 cell: ({row}) => {
-                    const text = row.original.resNum + ' - ' + row.original.resNom;
+                    const text = row.original.resNum + ' - ' + row.original.resNom.charAt(0).toUpperCase() + row.original.resNom.slice(1).toLowerCase();
                     const shortText = text.length > 60 ? text.substring(0, 60) + '...' : text;
                     return (
                         <div>
@@ -231,7 +238,7 @@ const Table = ({ data }) => {
                 header: "Objetivo Especifico",
                 accessorKey: "objEspNom",
                 cell: ({row}) => {
-                    const text = row.original.objEspNum + ' - ' + row.original.objEspNom;
+                    const text = row.original.objEspNum + ' - ' + row.original.objEspNom.charAt(0).toUpperCase() + row.original.objEspNom.slice(1).toLowerCase();
                     const shortText = text.length > 60 ? text.substring(0, 60) + '...' : text;
                     return (
                         <div>
@@ -253,7 +260,7 @@ const Table = ({ data }) => {
                 header: "Objetivo",
                 accessorKey: "objNom",
                 cell: ({row}) => {
-                    const text = row.original.objNum + ' - ' + row.original.objNom;
+                    const text = row.original.objNum + ' - ' + row.original.objNom.charAt(0).toUpperCase() + row.original.objNom.slice(1).toLowerCase();
                     const shortText = text.length > 60 ? text.substring(0, 60) + '...' : text;
                     return (
                         <div>

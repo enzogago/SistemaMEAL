@@ -63,7 +63,7 @@ const Table = ({ data }) => {
                 accessorKey: "estNom",
                 cell: ({row}) => (
                     <div className="bold" style={{ color: row.original.estCol }}>
-                        {row.original.estNom}
+                        {row.original.estNom.charAt(0).toUpperCase() + row.original.estNom.slice(1).toLowerCase()}
                     </div>
                 ),
             },
@@ -71,11 +71,18 @@ const Table = ({ data }) => {
                 header: "Indicador",
                 accessorKey: "indActResNom",
                 cell: ({row}) => {
-                    const text = row.original.indActResNom;
-                    const shortText = text.length > 40 ? text.substring(0, 40) + '...' : text;
+                    let text = row.original.indActResNom;
+                    let shortText = text.length > 40 ? text.substring(0, 40) + '...' : text;
+                    // Divide el texto en el identificador y el texto descriptivo
+                    const [identifier, ...descriptionParts] = shortText.split(' - ');
+                    let description = descriptionParts.join(' - ');
+                    // Capitaliza la primera letra y convierte el resto a minúsculas
+                    description = description.charAt(0).toUpperCase() + description.slice(1).toLowerCase();
+                    // Combina el identificador y la descripción
+                    shortText = `${identifier} - ${description}`;
                     return (
                         <div>
-                            <span 
+                            <span
                                 data-tooltip-id="info-tooltip" 
                                 data-tooltip-content={text} 
                             >{shortText}</span>
