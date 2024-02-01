@@ -17,7 +17,7 @@ const Bar = () => {
   };
   
   return (
-    <div className="PowerMas_BarContainer flex ai-center jc-space-between m_5">
+    <div className="PowerMas_BarContainer flex ai-center jc-space-between p_5">
         <h2 className="Large-f2 Medium-f1_5 Small-f1">¡Hola de nuevo!</h2>
         <div className="PowerMas_ProfileContainer">
             <div className="PowerMas_ProfilePicture">

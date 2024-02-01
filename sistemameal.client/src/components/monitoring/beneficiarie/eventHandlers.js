@@ -29,6 +29,7 @@ export const handleSubmit = async (data, reset) => {
         Notiflix.Notify.success(successData.message);
         reset();
         console.log(successData)
+        return { benAno: successData.benAno, benCod: successData.benCod };
         // Actualiza los datos después de insertar o modificar un registro
         // const updateResponse = await fetch(`${import.meta.env.VITE_APP_API_URL}/usuario`, {
         //     headers: {

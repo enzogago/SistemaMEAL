@@ -11,10 +11,12 @@ namespace SistemaMEAL.Server.Modulos
     {
         private conexionDAO cn = new conexionDAO();
 
-        public (string? message, string? messageType) Insertar(Beneficiario beneficiario)
+        public (string? benAnoOut,string? benCodOut,string? message, string? messageType) Insertar(Beneficiario beneficiario)
         {
             string? mensaje = "";
             string? tipoMensaje = "";
+            string? benAnoOut = "";
+            string? benCodOut = "";
             try
             {
                 cn.getcn.Open();
@@ -46,8 +48,18 @@ namespace SistemaMEAL.Server.Modulos
                 pTipoMensaje.Direction = ParameterDirection.Output;
                 cmd.Parameters.Add(pTipoMensaje);
 
+                SqlParameter pBenAno = new SqlParameter("@P_BENANO_OUT", SqlDbType.NVarChar, 4);
+                pBenAno.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pBenAno);
+
+                SqlParameter pBenCod = new SqlParameter("@P_BENCOD_OUT", SqlDbType.Char, 6);
+                pBenCod.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pBenCod);
+
                 cmd.ExecuteNonQuery();
 
+                benAnoOut = pBenAno.Value.ToString();
+                benCodOut = pBenCod.Value.ToString();
                 mensaje = pDescripcionMensaje.Value.ToString();
                 tipoMensaje = pTipoMensaje.Value.ToString();
             }
@@ -60,7 +72,7 @@ namespace SistemaMEAL.Server.Modulos
             {
                 cn.getcn.Close();
             }
-            return (mensaje, tipoMensaje);
+            return (benAnoOut, benCodOut, mensaje, tipoMensaje);
         }
     }
 }

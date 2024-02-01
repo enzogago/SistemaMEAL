@@ -23,7 +23,7 @@ const DonutChart = ({ percentage }) => {
             .sort(null);
     
         const arc = d3.arc()
-            .innerRadius(radius - 20)
+            .innerRadius(radius - 14)
             .outerRadius(radius);
     
         const svg = d3.select("#chart")
@@ -46,7 +46,7 @@ const DonutChart = ({ percentage }) => {
             .text(percentage + "%");
     }, [percentage]);
 
-    return <div className='Large_3 Large-f2' id="chart"></div>;
+    return <div className='Large_3 Large-f1_5' id="chart"></div>;
 };
 
 export default DonutChart;

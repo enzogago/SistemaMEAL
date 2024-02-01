@@ -16,7 +16,7 @@ import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
 import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
 import Pdf_Icon from '../../img/PowerMas_Pdf_Icon.svg';
 // Funciones reusables
-import { Export_Excel_Helper, Export_PDF_Helper, handleDelete } from '../reusable/helper';
+import { Export_Excel_Helper, Export_PDF_Helper } from '../reusable/helper';
 // Componentes
 import Pagination from "../reusable/Pagination";
 import TableRow from "./TableRow"
@@ -34,32 +34,73 @@ const Table = ({data}) => {
     const columns = useMemo(() => { 
         let baseColumns = [
             {
-                header: "Año",
-                accessorKey: "usuAno"
-            },
-            {
                 header: "Código",
-                accessorKey: "usuCod"
+                accessorKey: "usuCod",
+                cell: ({row}) => (
+                    <div className="">
+                        {row.original.usuAno + row.original.usuCod}
+                    </div>
+                ),
             },
             {
                 header: "Nombre",
-                accessorKey: "usuNom"
+                accessorKey: "usuNom",
+                cell: ({row}) => {
+                    const text = row.original.usuNom.toLowerCase();
+                    return (
+                        <div style={{textTransform: 'capitalize'}}>
+                            {text}
+                        </div>
+                    )
+                }
             },
             {
                 header: "Apellido",
-                accessorKey: "usuApe"
+                accessorKey: "usuApe",
+                cell: ({row}) => {
+                    const text = row.original.usuApe.toLowerCase();
+                    return (
+                        <div style={{textTransform: 'capitalize'}}>
+                            {text}
+                        </div>
+                    )
+                }
             },
             {
                 header: "Correo",
-                accessorKey: "usuCorEle"
+                accessorKey: "usuCorEle",
+                cell: ({row}) => {
+                    const text = row.original.usuCorEle.toLowerCase();
+                    return (
+                        <div>
+                            {text}
+                        </div>
+                    )
+                }
             },
             {
                 header: "Cargo",
-                accessorKey: "carNom"
+                accessorKey: "carNom",
+                cell: ({row}) => {
+                    const text = row.original.carNom.charAt(0).toUpperCase() + row.original.carNom.slice(1).toLowerCase();
+                    return (
+                        <div>
+                            {text}
+                        </div>
+                    )
+                }
             },
             {
                 header: "Rol",
-                accessorKey: "rolNom"
+                accessorKey: "rolNom",
+                cell: ({row}) => {
+                    const text = row.original.rolNom.charAt(0).toUpperCase() + row.original.rolNom.slice(1).toLowerCase();
+                    return (
+                        <div>
+                            {text}
+                        </div>
+                    )
+                }
             },
             {
                 header: "Estado",
@@ -89,16 +130,6 @@ const Table = ({data}) => {
                                 // onClick={() => handleDelete('Proyecto', row.original.estCod, setEstados, setIsLoggedIn)} 
                             />
                         }
-                        <Tooltip 
-                            id="edit-tooltip"
-                            effect="solid"
-                            place='top-end'
-                        />
-                        <Tooltip 
-                            id="delete-tooltip" 
-                            effect="solid"
-                            place='top-start'
-                        />
                     </div>
                 ),
             });
@@ -269,9 +300,17 @@ const Table = ({data}) => {
                             : <tr className='PowerMas_TableEmpty'><td colSpan={11} className='Large-p1 center'>No se encontraron registros</td></tr>
                         }
                     </tbody>
+                    <Tooltip 
+                        id="edit-tooltip"
+                        effect="solid"
+                        place='top-end'
+                    />
+                    <Tooltip 
+                        id="delete-tooltip" 
+                        effect="solid"
+                        place='top-start'
+                    />
                 </table>
-                {/* <GrPrevious className="slider" style={{left: '0'}} onClick={() => scrollTable(-1)} /> 
-                <GrNext className="slider" style={{right: '0'}} onClick={() => scrollTable(1)} />  */}
             </div>
             <Pagination table={table} />
         </div>

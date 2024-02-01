@@ -169,34 +169,29 @@ const Table = ({ data }) => {
                 header: "Indicador",
                 accessorKey: "indActResNom",
                 cell: ({row}) => {
-                    let text = row.original.indActResNom;
-                    let shortText = text.length > 50 ? text.substring(0, 50) + '...' : text;
-                    // Divide el texto en el identificador y el texto descriptivo
-                    const [identifier, ...descriptionParts] = shortText.split(' - ');
-                    let description = descriptionParts.join(' - ');
-                    // Capitaliza la primera letra y convierte el resto a minúsculas
-                    description = description.charAt(0).toUpperCase() + description.slice(1).toLowerCase();
-                    // Combina el identificador y la descripción
-                    shortText = `${identifier} - ${description}`;
+                    const text = row.original.indActResNum + ' - ' + row.original.indActResNom.charAt(0).toUpperCase() + row.original.indActResNom.slice(1).toLowerCase();
+                    const shortText = text.length > 50 ? text.substring(0, 50) + '...' : text;
                     return (
                         <div>
                             <span 
                                 data-tooltip-id="info-tooltip" 
                                 data-tooltip-content={text} 
                             >{shortText}</span>
-                            <Tooltip 
-                                id="info-tooltip"
-                                effect="solid"
-                                place='bottom-start'
-                                className="tooltip"
-                            />
                         </div>
                     );
                 },
             },
             {
                 header: "Tipo Inidicador",
-                accessorKey: "tipInd"
+                accessorKey: "tipInd",
+                cell: ({row}) => {
+                    const text = row.original.tipInd.charAt(0).toUpperCase() + row.original.tipInd.slice(1).toLowerCase();
+                    return (
+                        <div>
+                            {text}
+                        </div>
+                    )
+                },
             },
             {
                 header: "Beneficiario",
@@ -224,12 +219,6 @@ const Table = ({ data }) => {
                                 data-tooltip-id="info-tooltip" 
                                 data-tooltip-content={text} 
                             >{shortText}</span>
-                            <Tooltip 
-                                id="info-tooltip"
-                                effect="solid"
-                                place='bottom-start'
-                                className="tooltip"
-                            />
                         </div>
                     );
                 },
@@ -246,12 +235,6 @@ const Table = ({ data }) => {
                                 data-tooltip-id="info-tooltip" 
                                 data-tooltip-content={text} 
                             >{shortText}</span>
-                            <Tooltip 
-                                id="info-tooltip"
-                                effect="solid"
-                                place='bottom-start'
-                                className="tooltip"
-                            />
                         </div>
                     );
                 },
@@ -268,12 +251,6 @@ const Table = ({ data }) => {
                                 data-tooltip-id="info-tooltip" 
                                 data-tooltip-content={text} 
                             >{shortText}</span>
-                            <Tooltip 
-                                id="info-tooltip"
-                                effect="solid"
-                                place='bottom-start'
-                                className="tooltip"
-                            />
                         </div>
                     );
                 },
@@ -322,16 +299,6 @@ const Table = ({ data }) => {
                                 onClick={() => handleDelete('Estado', row.original.estCod, setEstados, setIsLoggedIn)} 
                             />
                         }
-                        <Tooltip 
-                            id="edit-tooltip"
-                            effect="solid"
-                            place='top-end'
-                        />
-                        <Tooltip 
-                            id="delete-tooltip" 
-                            effect="solid"
-                            place='top-start'
-                        />
                     </div>
                 ),
             });
@@ -478,6 +445,22 @@ const Table = ({ data }) => {
                             : <tr className='PowerMas_TableEmpty'><td colSpan={11} className='Large-p1 center'>No se encontraron registros</td></tr>
                         }
                     </tbody>
+                    <Tooltip 
+                        id="info-tooltip"
+                        effect="solid"
+                        place='bottom-start'
+                        className="tooltip"
+                    />
+                    <Tooltip 
+                        id="edit-tooltip"
+                        effect="solid"
+                        place='top-end'
+                    />
+                    <Tooltip 
+                        id="delete-tooltip" 
+                        effect="solid"
+                        place='top-start'
+                    />
                 </table>
                 <GrPrevious className="slider" style={{left: '0'}} onClick={() => scrollTable(-1)} /> 
                 <GrNext className="slider" style={{right: '0'}} onClick={() => scrollTable(1)} /> 

@@ -165,8 +165,8 @@ const FormBeneficiarie = () => {
         }
     };
 
-    const Registrar_Beneficiario = () => {
-        validateForm((data) => {
+    const Registrar_Beneficiario =  () => {
+        validateForm( async (data) => {
             // Verifica que el select de país tenga una opción válida seleccionada
             const paisSelectElement = document.querySelector(`select[name=select0]`);
             if (!paisSelectElement || paisSelectElement.value === '0') {
@@ -201,14 +201,58 @@ const FormBeneficiarie = () => {
             console.log(ubiAno, ubiCod);
 
             console.log(data);
-            handleSubmit(data, reset);
+            const beneficiario = await handleSubmit(data, reset);
+            if (beneficiario) {
+                // Ahora tienes los identificadores del beneficiario y puedes usarlos en la siguiente llamada a la API
+                data.metAno = metAno;
+                data.metCod = metCod;
+                data.benAno = beneficiario.benAno;
+                data.benCod = beneficiario.benCod;
+                data.ubiAno = '2023';
+                data.ubiCod = '000001';
+                handleSubmitMeta(data);
+            }
         })();
     };
     
+    const handleSubmitMeta = async (data) => {
+        try {
+            const token = localStorage.getItem('token');
+            
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(data),
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                if(response.status === 409){
+                    Notiflix.Notify.warning(`${errorData.message}`);
+                    console.log(errorData.message)
+                    return;
+                } else {
+                    Notiflix.Notify.failure(errorData.message);
+                    console.log(errorData.message)
+                    return;
+                }
+            }
     
+            const successData = await response.json();
+            Notiflix.Notify.success(successData.message);
+            console.log(successData)
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+    
+        }
+    }
 
     return (
-        <div className="bg-white h-100 flex flex-column">
+        <div className="PowerMas_StatusContainer bg-white h-100 flex flex-column">
             <div className="PowerMas_Header_Form_Beneficiarie flex ai-center p_25">
                 <GrFormPreviousLink className="m1 w-auto Large-f2_5 pointer" onClick={() => navigate('/monitoring')} />
                 <h1 className="">Nuevo Beneficiario</h1>
@@ -228,7 +272,7 @@ const FormBeneficiarie = () => {
                                         validate: value => value !== '0' || 'El documento de identidad es requerido' 
                                     })}
                                 >
-                                    <option value="0">--SELECCIONE UN DOCUMENTO--</option>
+                                    <option value="0">Documento Identidad</option>
                                     {documentos.map(documento => (
                                         <option 
                                             key={documento.docIdeCod} 
@@ -362,7 +406,7 @@ const FormBeneficiarie = () => {
                                     onChange={handleCountryChange}
  
                                 >
-                                    <option value="0">--SELECCIONE UN PAIS--</option>
+                                    <option value="0">--Seleccione País--</option>
                                     {paises.map(pais => (
                                         <option 
                                             key={pais.ubiCod} 
@@ -385,7 +429,7 @@ const FormBeneficiarie = () => {
                                         onChange={(event) => handleCountryChange(event, index)} 
                                         className="block Phone_12"
                                     >
-                                        <option value="0">--SELECCIONE UN {options[0].ubiTip}--</option>
+                                        <option style={{textTransform: 'capitalize'}} value="0">--Seleccione {options[0].ubiTip.toLowerCase()}--</option>
                                         {options.map(option => (
                                             <option key={option.ubiCod} value={JSON.stringify({ ubiCod: option.ubiCod, ubiAno: option.ubiAno })}>
                                                 {option.ubiNom}
@@ -456,27 +500,27 @@ const FormBeneficiarie = () => {
                         <br />
                         <div>
                             <article>
-                                <h3 className="Large-f1_25 m_5">{metaData && metaData.tipInd}</h3>
-                                <p className="m_5">{metaData && metaData.indActResNom}</p>
+                                <h3 className="Large-f1_25 m_5" style={{textTransform: 'capitalize'}}>{metaData && metaData.tipInd.toLowerCase()}</h3>
+                                <p className="m_5">{metaData && metaData.indActResNum + ' - ' + metaData.indActResNom}</p>
                             </article>
                             <article>
-                                <h3 className="Large-f1_25 m_5"> RESULTADO </h3>
+                                <h3 className="Large-f1_25 m_5"> Resultado </h3>
                                 <p className="m_5">{metaData && metaData.resNum + ' - ' + metaData.resNom}</p>
                             </article>
                             <article>
-                                <h3 className="Large-f1_25 m_5">OBJETIVO ESPECIFICO</h3>
+                                <h3 className="Large-f1_25 m_5">Objetivo Específico</h3>
                                 <p className="m_5">{metaData && metaData.objEspNum + ' - ' + metaData.objEspNom}</p>
                             </article>
                             <article>
-                                <h3 className="Large-f1_25 m_5">OBJETIVO</h3>
+                                <h3 className="Large-f1_25 m_5">Objetivo</h3>
                                 <p className="m_5">{metaData && metaData.objNum + ' - ' + metaData.objNom}</p>
                             </article>
                             <article>
-                                <h3 className="Large-f1_25 m_5"> SUBPROYECTO </h3>
+                                <h3 className="Large-f1_25 m_5"> Subproyecto </h3>
                                 <p className="m_5">{metaData && metaData.subProNom}</p>
                             </article>
                             <article>
-                                <h3 className="Large-f1_25 m_5">PROYECTO</h3>
+                                <h3 className="Large-f1_25 m_5">Proyecto</h3>
                                 <p className="m_5">{metaData && metaData.proNom}</p>
                             </article>
                         </div>

@@ -28,6 +28,7 @@ const Monitoring = () => {
                     return;
                 }
                 setMonitoringData(data);
+                console.log(data)
             } catch (error) {
                 console.error('Error:', error);
             } finally {
@@ -40,9 +41,9 @@ const Monitoring = () => {
 
     return (
         <div className='bg-white PowerMas_StatusContainer'>
-        <Table 
-            data={monitoringData} 
-        />
+            <Table 
+                data={monitoringData} 
+            />
         </div>
     )
 }

@@ -16,7 +16,7 @@ const Sidebar = () => {
     // Estados del AuthContext
     const { authActions, authInfo } = useContext(AuthContext);
     const { setIsLoggedIn, setMenuData, setUsers } = authActions;
-    const { userLogged  } = authInfo;
+    const { userLogged, menuData  } = authInfo;
      // Variables State statusContext
     const { statusActions } = useContext(StatusContext);
     const { resetStatus } = statusActions;
@@ -75,10 +75,8 @@ const Sidebar = () => {
                     }
         
                     const data = await response.json();
-                    const groupData = groupByParent(data);
                     setMenuData(data);
                     console.log(data);
-                    setMenuGroup(groupData);
                 } catch (error) {
                     console.error(error);
                     Notiflix.Loading.remove();
@@ -88,7 +86,15 @@ const Sidebar = () => {
         };
     
         fetchMenuData();
-    }, [userLogged]); // Añade userLogged como dependencia
+    }, [userLogged]);
+
+    useEffect(() => {
+        if (menuData.length > 0) {
+            const groupData = groupByParent(menuData);
+            setMenuGroup(groupData);
+            console.log(menuGroup)
+        }
+    }, [menuData]);
     
     
     // Cerrar sesión
@@ -106,8 +112,8 @@ const Sidebar = () => {
                 <img className='Large_10 Large-m1' title="Sistema MEAL Ayuda en Acción" src={logo} alt="Logo Ayuda En Accion" />
                 <h1 className="Powermas_FontTitle center Large-f2_25">Menú</h1>
             </div>
-            <div className="PowerMas_MenuContainer Large-f1 flex-grow-1">
-                <div className="PowerMas_MenuOptions">
+            <div className="PowerMas_MenuContainer Large-f1 flex-grow-1 overflow-auto">
+                <div className="PowerMas_MenuOptions overflow-auto">
                     <div className='PowerMas_MainSingleLink'>
                         <Link to='/'>
                             <div className="PowerMas_SingleLink Large-f1">
@@ -123,13 +129,13 @@ const Sidebar = () => {
             </div>
             <div className="PowerMas_MenuBottom center p1">
                 <article className='p_5'>
-                    <p className='Large-f1_25'>Sistema MEAL</p>
-                    <p>Version 0.0.1</p>
+                    <p>Sistema MEAL</p>
+                    <p className='Large-f_75'>Version 0.0.1</p>
                 </article>
                 <hr className='p0 m0' style={{ border: '1px solid #fff'}} />  
                 <article className='p_5'>
-                    <p>31 de Enero del 2024</p>
-                    <p>05:20 PM</p>
+                    <p className='Large-f_75'>31 de Enero del 2024</p>
+                    <p className='Large-f_75'>05:20 PM</p>
                 </article>                   
             </div>
         </div>)

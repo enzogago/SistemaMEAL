@@ -13,7 +13,7 @@ namespace SistemaMEAL.Modulos
 
         public IEnumerable<Monitoreo> Listado()
         {
-            List<Monitoreo> temporal = new List<Monitoreo>();
+            List<Monitoreo>? temporal = new List<Monitoreo>();
             try
             {
                 cn.getcn.Open();
@@ -53,7 +53,7 @@ namespace SistemaMEAL.Modulos
 
         public IEnumerable<Monitoreo> BuscarMonitoreo(string? metAno, string? metCod)
         {
-            List<Monitoreo> temporal = new List<Monitoreo>();
+            List<Monitoreo>? temporal = new List<Monitoreo>();
             try
             {
                 cn.getcn.Open();
@@ -92,6 +92,41 @@ namespace SistemaMEAL.Modulos
                 cn.getcn.Close();
             }
             return temporal;
+        }
+        
+        public (string? message, string? messageType) InsertarMetaBeneficiario(MetaBeneficiario metaBeneficiario)
+        {
+            string? mensaje = "";
+            string? tipoMensaje = "";
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_INSERTAR_META_BENEFICIARIO", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@P_METANO", metaBeneficiario.MetAno);
+                cmd.Parameters.AddWithValue("@P_METCOD", metaBeneficiario.MetCod);
+                cmd.Parameters.AddWithValue("@P_BENANO", metaBeneficiario.BenAno);
+                cmd.Parameters.AddWithValue("@P_BENCOD", metaBeneficiario.BenCod);
+                cmd.Parameters.AddWithValue("@P_UBIANO", metaBeneficiario.UbiAno);
+                cmd.Parameters.AddWithValue("@P_UBICOD", metaBeneficiario.UbiCod);
+
+                cmd.ExecuteNonQuery();
+
+                mensaje = "Excelente";
+                tipoMensaje = "3";
+            }
+            catch (SqlException ex)
+            {
+                mensaje = ex.Message;
+                tipoMensaje = "1";
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return (mensaje, tipoMensaje);
         }
     }
 }

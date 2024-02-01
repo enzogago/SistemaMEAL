@@ -7,7 +7,7 @@ const Layout = ({ children }) => {
         <Sidebar />
         <div className="PowerMas_MainRender Large_10 Phone_12">
             <Bar />
-            <section className="PowerMas_Content Large-p_5 Medium-p1 Phone_12 overflow-auto">
+            <section className="PowerMas_Content Phone_12 overflow-auto">
                 {children}
             </section>
         </div>

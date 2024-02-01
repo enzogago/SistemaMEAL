@@ -48,7 +48,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _beneficiarios.Insertar(beneficiario);
+            var (benAno, benCod, message, messageType) = _beneficiarios.Insertar(beneficiario);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message = message });
@@ -59,7 +59,7 @@ namespace SistemaMEAL.Server.Controllers
             }
             else // Registro modificado correctamente
             {
-                return new OkObjectResult(new { success = true, message = message });
+                return new OkObjectResult(new { benAno = benAno, benCod = benCod, success = true, message = message });
             }
         }
 

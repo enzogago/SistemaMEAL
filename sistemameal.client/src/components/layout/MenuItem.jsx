@@ -13,14 +13,12 @@ const MenuItem = ({ menu, level }) => {
     
     return (
         <div className={`PowerMas_LinkMenuContainer level-${level}`} onClick={(event) => toggleActive(event, level)} key={menu.menCod}>
-            <div className="menu-item">
-                <div className="menu-text">
-                    <Link to={menu.subMenus.length > 0 ? '#' : `/${menu.menRef}`}>
-                        {IconName && <IconName />}
-                        <span> {menu.menNom} </span>
-                    </Link>
-                </div>
-                {menu.subMenus.length > 0 && <span className="arrow"> &gt; </span>}
+            <div className="Phone_12 flex ai-center overflow-hidden">
+                <Link className="menu-item flex ai-center flex-grow-1 gap-1" to={menu.subMenus.length > 0 ? '#' : `/${menu.menRef}`}>
+                    {IconName && <IconName style={{marginLeft: '1rem'}} />}
+                    <span> {menu.menNom} </span>
+                </Link>
+                {menu.subMenus.length > 0 && <span className="arrow Large_1"> &gt; </span>}
             </div>
             <div className="PowerMas_Submenu">
                 {menu.subMenus.map((subMenu, index) => (

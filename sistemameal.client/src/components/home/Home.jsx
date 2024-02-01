@@ -45,13 +45,13 @@ const Home = () => {
     }, []);
 
     return(
-    <div>
-        <div className="PowerMas_SearchContainer">
+    <>
+        <div className="PowerMas_SearchContainer flex ai-center">
             <FaSearch className='PowerMas_InputIcon'/>
-            <input className="PowerMas_Input" type="search" placeholder="" />
+            <input className="PowerMas_Input Phone_12 p_75" type="search" placeholder="" />
         </div>
 
-        <div className="PowerMas_ResumeHome">
+        <div className="PowerMas_ResumeHome m1">
             <div className="PowerMas_LeftSection Large_8 bg-white">
                 {monitoringData.length > 0 ? <Table data={monitoringData} /> : <p>Cargando datos...</p>}
             </div>
@@ -71,7 +71,7 @@ const Home = () => {
                 </div>
             </div>
         </div>
-        <div className='PowerMas_Direct_Access bg-white Large-p1'>
+        <div className='PowerMas_Direct_Access bg-white Large-p1 m1'>
             <h2 className="block center Large-p_5 Powermas_FontTitle">Accesos directos</h2>
             <div className="PowerMas_AccessCards">
                 <div className="PowerMas_AccessCard Large_3">
@@ -120,7 +120,7 @@ const Home = () => {
                 </div>
             </div>
         </div>
-        <div className="PowerMas_RecentsSection Large_12 flex">
+        <div className="PowerMas_RecentsSection flex m1">
             <div className="PowerMas_ActivitiesSection Large_5 Large-p2">
                 <h2 className=" Large-f1_5 Powermas_FontTitle">Actividades recientes</h2>
                 <div className="PowerMas_Article flex Large-f_75 ai-center left">
@@ -175,7 +175,7 @@ const Home = () => {
                 <div id="legend"></div>
             </div>
         </div>
-    </div>)
+    </>)
 };
 
 export default Home;

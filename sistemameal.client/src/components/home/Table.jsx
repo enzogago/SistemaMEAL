@@ -71,27 +71,14 @@ const Table = ({ data }) => {
                 header: "Indicador",
                 accessorKey: "indActResNom",
                 cell: ({row}) => {
-                    let text = row.original.indActResNom;
+                    let text = row.original.indActResNum + row.original.indActResNom.charAt(0).toUpperCase() + ' - ' + row.original.indActResNom.slice(1).toLowerCase()
                     let shortText = text.length > 40 ? text.substring(0, 40) + '...' : text;
-                    // Divide el texto en el identificador y el texto descriptivo
-                    const [identifier, ...descriptionParts] = shortText.split(' - ');
-                    let description = descriptionParts.join(' - ');
-                    // Capitaliza la primera letra y convierte el resto a minúsculas
-                    description = description.charAt(0).toUpperCase() + description.slice(1).toLowerCase();
-                    // Combina el identificador y la descripción
-                    shortText = `${identifier} - ${description}`;
                     return (
                         <div>
                             <span
                                 data-tooltip-id="info-tooltip" 
                                 data-tooltip-content={text} 
                             >{shortText}</span>
-                            <Tooltip 
-                                id="info-tooltip"
-                                effect="solid"
-                                place='bottom-start'
-                                className="tooltip"
-                            />
                         </div>
                     );
                 },
@@ -222,6 +209,12 @@ const Table = ({ data }) => {
                             : <tr className='PowerMas_TableEmpty'><td colSpan={5} className='Large-p1 center'>No se encontraron registros</td></tr>
                         }
                     </tbody>
+                <Tooltip 
+                    id="info-tooltip"
+                    effect="solid"
+                    place='bottom-start'
+                    className="tooltip"
+                />
                 </table>
             </div>
         </div>

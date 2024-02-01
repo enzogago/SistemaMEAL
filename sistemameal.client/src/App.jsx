@@ -170,7 +170,7 @@ const App = () => {
                                             <Route path="form-goal/:id?" element={<FormGoal />} />
                                         </>
                                     )}
-                                    <Route path="*" element={<Navigate to='/' />} />
+                                    <Route path="*" element={<Home />} />
                                 </Routes>
                             </Layout>
                         </PrivateRoute>

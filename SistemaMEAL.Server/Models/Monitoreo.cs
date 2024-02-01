@@ -32,6 +32,7 @@ namespace SistemaMEAL.Server.Models
 
         public String? IndActResAno { get; set; }
         public String? IndActResCod { get; set; }
+        public String? IndActResNum { get; set; }
         public String? IndActResNom { get; set; }
 
         public String? SubActResAno { get; set; }
