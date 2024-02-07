@@ -15,33 +15,35 @@ import { Export_Excel_Helper, Export_PDF_Helper, handleDelete } from '../reusabl
 // Componentes
 import CustomTable from '../reusable/CustomTable';
 
-
-
-const Table = ({ data, openModal, setTiposValor }) => {
-     // Variables State AuthContext 
-     const { authActions, authInfo } = useContext(AuthContext);
-     const { setIsLoggedIn } = authActions;
-     const { userPermissions } = authInfo;
+const Table = ({ data, openModal, setData }) => {
+    // Variables State AuthContext 
+    const { authActions, authInfo } = useContext(AuthContext);
+    const { setIsLoggedIn } = authActions;
+    const { userPermissions } = authInfo;
     // States locales
     const [searchFilter, setSearchFilter] = useState('');
     const [dropdownOpen, setDropdownOpen] = useState(false);
 
     /* TANSTACK */
     const actions = {
-        add: userPermissions.some(permission => permission.perNom === "INSERTAR TIPO_VALOR"),
-        delete: userPermissions.some(permission => permission.perNom === "ELIMINAR TIPO_VALOR"),
-        edit: userPermissions.some(permission => permission.perNom === "MODIFICAR TIPO_VALOR"),
+        add: userPermissions.some(permission => permission.perNom === "INSERTAR UNIDAD"),
+        delete: userPermissions.some(permission => permission.perNom === "ELIMINAR UNIDAD"),
+        edit: userPermissions.some(permission => permission.perNom === "MODIFICAR UNIDAD"),
     };
 
     const columns = useMemo(() => {
         let baseColumns = [
             {
-                header: "Código",
-                accessorKey: "tipValCod",
+                header: "Codigo",
+                accessorKey: "uniCod",
             },
             {
                 header: "Nombre",
-                accessorKey: "tipValNom",
+                accessorKey: "uniNom",
+            },
+            {
+                header: "Involucra",
+                accessorKey: "uniInvPer",
             }
         ];
     
@@ -64,7 +66,7 @@ const Table = ({ data, openModal, setTiposValor }) => {
                                 data-tooltip-id="delete-tooltip" 
                                 data-tooltip-content="Eliminar" 
                                 className='Large-p_25' 
-                                onClick={() => handleDelete('TiposValor', row.original.tipValCod, setTiposValor, setIsLoggedIn)} 
+                                onClick={() => handleDelete('Unidad', row.original.uniCod, setData, setIsLoggedIn)} 
                             />
                         }
                         <Tooltip 
@@ -88,10 +90,12 @@ const Table = ({ data, openModal, setTiposValor }) => {
     const [sorting, setSorting] = useState([]);
     const filteredData = useMemo(() => 
         data.filter(item => 
-            item.tipValCod.includes(searchFilter.toUpperCase()) ||
-            item.tipValNom.includes(searchFilter.toUpperCase())
+            item.uniCod.includes(searchFilter.toUpperCase()) ||
+            item.uniNom.includes(searchFilter.toUpperCase()) ||
+            item.uniInvPer.includes(searchFilter.toUpperCase())
         ), [data, searchFilter]
     );
+
     const table = useReactTable({
         data: filteredData,
         columns,
@@ -108,9 +112,9 @@ const Table = ({ data, openModal, setTiposValor }) => {
 
     // Preparar los datos
     const dataExport = table.options.data;  // Tus datos
-    const headers = ['CODIGO', 'NOMBRE', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
-    const title = 'TIPOS_VALOR';  // El título de tu archivo
-    const properties = ['tipValCod', 'tipValNom', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
+    const headers = ['CODIGO', 'NOMBRE', 'INVOLUCRA', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
+    const title = 'UNIDADES';  // El título de tu archivo
+    const properties = ['uniCod', 'uniNom', 'uniInvPer', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
     const format = 'a4';  // El tamaño del formato que quieres establecer para el PDF
 
     const Export_Excel = () => {
@@ -125,10 +129,10 @@ const Table = ({ data, openModal, setTiposValor }) => {
         setDropdownOpen(false);
     };
 
-
+    
     return (
         <CustomTable 
-            title="Listado de Tipos Valor" 
+            title="Listado de Unidades" 
             searchFilter={searchFilter} 
             setSearchFilter={setSearchFilter} 
             actions={actions} 
@@ -139,7 +143,7 @@ const Table = ({ data, openModal, setTiposValor }) => {
             Export_PDF={Export_PDF} 
             table={table}
         />
-    )
+    );
 }
 
-export default Table
+export default Table;

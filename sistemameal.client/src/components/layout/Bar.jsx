@@ -35,9 +35,9 @@ const Bar = () => {
             </div>
             {isOpen && (
                  <div className={`Phone_2 PowerMas_DropdownMenu ${isOpen ? 'PowerMas_DropdownMenu--open' : ''}`}>
-                 <Link className='p_75' to="/configurar">Configuración</Link>
-                 <Link className='p_75' to="/cerrar-sesion">Cerrar sesión</Link>
-             </div>
+                    <Link className='p_75' to="/configurar">Configuración</Link>
+                    <Link className='p_75' to="/login">Cerrar sesión</Link>
+                </div>
             )}
         </div>
     </div>

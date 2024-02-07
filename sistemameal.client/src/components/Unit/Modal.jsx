@@ -17,9 +17,10 @@ const Modal = ({ closeModal, setData }) => {
 
     const onSubmit = (data) => {
         const fieldMapping = {
-            nombre: 'carNom',
+            nombre: 'uniNom',
+            involucra: 'uniInvPer',
         };
-        handleSubmit('Cargo', estadoEditado, data, setData, setModalVisible, setIsLoggedIn, fieldMapping, 'carCod');
+        handleSubmit('Unidad', estadoEditado, data, setData, setModalVisible, setIsLoggedIn, fieldMapping, 'uniCod');
         reset();
     };
 
@@ -33,7 +34,8 @@ const Modal = ({ closeModal, setData }) => {
     // Efecto al editar estado
     useEffect(() => {
         if (estadoEditado) {
-            setValue('nombre', estadoEditado.carNom);
+            setValue('nombre', estadoEditado.uniNom);
+            setValue('involucra', estadoEditado.uniInvPer);
         }
     }, [estadoEditado, setValue]);
     
@@ -45,9 +47,9 @@ const Modal = ({ closeModal, setData }) => {
         <div className={`PowerMas_Modal ${modalVisible ? 'show' : ''}`}>
             <div className="PowerMas_ModalContent">
                 <span className="PowerMas_CloseModal" onClick={closeModalAndReset}>×</span>
-                <h2 className="center">{estadoEditado ? 'Editar' : 'Nuevo'} Cargo</h2>
+                <h2 className="center">{estadoEditado ? 'Editar' : 'Nuevo'} Unidad</h2>
                 <form className='Large-f1_25 PowerMas_FormStatus' onSubmit={validateForm(onSubmit)}>
-                    <label className="block">
+                    <label htmlFor='nombre' className="block">
                         Nombre:
                     </label>
                     <input 
@@ -70,6 +72,29 @@ const Modal = ({ closeModal, setData }) => {
                         )}
                     />
                     {errors.nombre && <p className='errorInput Large-p_5'>{errors.nombre.message}</p>}
+                    <label htmlFor='involucra' className="block">
+                        Involucra Persona:
+                    </label>
+                    <input 
+                        id="involucra"
+                        className="flex" 
+                        type="text" 
+                        placeholder='EJM: DOCUMENTO' 
+                        maxLength={100} 
+                        name="involucra" 
+                        {...register(
+                            'involucra', { 
+                                required: 'involucra es requerido',
+                                maxLength: { value: 50, message: 'involucra no puede tener más de 50 caracteres' },
+                                minLength:  { value: 5, message: 'involucra no puede tener menos de 5 caracteres' },
+                                pattern: {
+                                    value: /^[A-Za-zñÑ\s]+$/,
+                                    message: 'Por favor, introduce solo letras y espacios',
+                                },
+                            }
+                        )}
+                    />
+                    {errors.involucra && <p className='errorInput Large-p_5'>{errors.involucra.message}</p>}
                     <div className='PowerMas_StatusSubmit flex jc-center ai-center'>
                         <input className='' type="submit" value="Guardar" />
                     </div>

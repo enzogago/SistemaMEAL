@@ -181,9 +181,9 @@ const FormUser = () => {
                     <br />
                     <div className="PowerMas_Form_User_Card flex flex-wrap p1">
                         <div className="Large_6 flex flex-column p1">
-                            <label htmlFor="">Documento Identidad</label>
+                            <label htmlFor="docIdeCod">Documento Identidad</label>
                             <select 
-                                name="docIdeCod" 
+                                id="docIdeCod" 
                                 className={`p1 PowerMas_Modal_Form_${dirtyFields.docIdeCod || isSubmitted ? (errors.docIdeCod ? 'invalid' : 'valid') : ''}`} 
                                 {...register('docIdeCod', { 
                                     validate: value => value !== '0' || 'El documento de identidad es requerido' 
@@ -192,8 +192,9 @@ const FormUser = () => {
                                 <option value="0">--SELECCIONE UN DOCUMENTO--</option>
                                 {documentos.map(documento => (
                                     <option 
-                                    key={documento.docIdeCod} 
-                                    value={documento.docIdeCod}> ({documento.docIdeAbr}) {documento.docIdeNom}</option>
+                                        key={documento.docIdeCod} 
+                                        value={documento.docIdeCod}> ({documento.docIdeAbr}) {documento.docIdeNom}
+                                    </option>
                                 ))}
                             </select>
                             {errors.docIdeCod ? (
@@ -207,6 +208,7 @@ const FormUser = () => {
                         <div className="Large_6 flex flex-column p1">
                             <label htmlFor="usuNumDoc">Número documento</label>
                             <input
+                                id="usuNumDoc"
                                 className={`p1 PowerMas_Modal_Form_${dirtyFields.usuNumDoc || isSubmitted ? (errors.usuNumDoc ? 'invalid' : 'valid') : ''}`} 
                                 type="text" 
                                 placeholder="Ejm: 922917351"
@@ -223,6 +225,7 @@ const FormUser = () => {
                         <div className="Large_6 flex flex-column p1">
                             <label htmlFor="usuNom">Nombre</label>
                             <input type="text"
+                                id="usuNom"
                                 className={`p1 PowerMas_Modal_Form_${dirtyFields.usuNom || isSubmitted ? (errors.usuNom ? 'invalid' : 'valid') : ''}`} 
                                 placeholder="Ejm: Andres"
                                 {...register('usuNom', { 
@@ -239,10 +242,10 @@ const FormUser = () => {
                             )}
                         </div>
                         <div className="Large_6 flex flex-column p1">
-                            <label htmlFor="">Apellido</label>
+                            <label htmlFor="usuApe">Apellido</label>
                             <input 
                                 type="text" 
-                                name="usuApe"
+                                id="usuApe"
                                 className={`p1 PowerMas_Modal_Form_${dirtyFields.usuApe || isSubmitted ? (errors.usuApe ? 'invalid' : 'valid') : ''}`} 
                                 placeholder="Ejm: Eras"
                                 {...register('usuApe', { 
@@ -259,10 +262,10 @@ const FormUser = () => {
                             )}
                         </div>
                         <div className="Large_6 flex flex-column p1">
-                            <label htmlFor="">Teléfono</label>
+                            <label htmlFor="usuTel">Teléfono</label>
                             <input 
                                 type="text" 
-                                name="usuTel" 
+                                id="usuTel" 
                                 className={`p1 PowerMas_Modal_Form_${dirtyFields.usuTel || isSubmitted ? (errors.usuTel ? 'invalid' : 'valid') : ''}`} 
                                 placeholder="Ejm: 922917351"
                                 {...register('usuTel', { 
@@ -279,10 +282,10 @@ const FormUser = () => {
                             )}
                         </div>
                         <div className="Large_6 flex flex-column p1">
-                            <label htmlFor="">Fecha de nacimiento</label>
+                            <label htmlFor="usuFecNac">Fecha de nacimiento</label>
                                 <input 
                                     type="text" 
-                                    name="usuFecNac" 
+                                    id="usuFecNac" 
                                     className={`p1 PowerMas_Modal_Form_${dirtyFields.usuFecNac || isSubmitted ? (errors.usuFecNac ? 'invalid' : 'valid') : ''}`} 
                                     placeholder="Ejm: 2023-03-17"
                                     {...register('usuFecNac', { 
@@ -309,10 +312,10 @@ const FormUser = () => {
                     <br />
                     <div className="PowerMas_Form_User_Card p1 flex flex-wrap">
                         <div className="Large_6 flex flex-column p1">
-                            <label htmlFor="">Email</label>
+                            <label htmlFor="usuCorEle">Email</label>
                             <input 
                                 type="text" 
-                                name="usuCorEle" 
+                                id="usuCorEle" 
                                 className={`p1 PowerMas_Modal_Form_${dirtyFields.usuCorEle || isSubmitted ? (errors.usuCorEle ? 'invalid' : 'valid') : ''}`} 
                                 placeholder="Ejm: correo@correo.es"
                                 {...register('usuCorEle', { 
@@ -335,10 +338,10 @@ const FormUser = () => {
                             !isEditing &&
                             (
                                 <div className="Large_6 flex flex-column p1">
-                                    <label htmlFor="">Contraseña</label>
+                                    <label htmlFor="usuPas">Contraseña</label>
                                     <input 
                                         type="password" 
-                                        name="usuPas" 
+                                        id="usuPas" 
                                         className={`p1 PowerMas_Modal_Form_${dirtyFields.usuPas || isSubmitted ? (errors.usuPas ? 'invalid' : 'valid') : ''}`} 
                                         placeholder="Ejm: 12345678"
                                         {...register('usuPas', { 
@@ -357,9 +360,9 @@ const FormUser = () => {
                             )
                         }
                         <div className="Large_6 flex flex-column p1">
-                            <label htmlFor="">Rol</label>
+                            <label htmlFor="rolCod">Rol</label>
                             <select 
-                                name="rolCod"
+                                id="rolCod"
                                 className={`p1 PowerMas_Modal_Form_${dirtyFields.rolCod || isSubmitted ? (errors.rolCod ? 'invalid' : 'valid') : ''}`}
                                 {...register('rolCod', { 
                                     validate: value => value !== '0' || 'El rol es requerido' 
@@ -379,9 +382,9 @@ const FormUser = () => {
                             )}
                         </div>
                         <div className="Large_6 flex flex-column p1">
-                            <label htmlFor="">Cargo</label>
+                            <label htmlFor="carCod">Cargo</label>
                             <select 
-                                name="carCod" 
+                                id="carCod" 
                                 className={`p1 PowerMas_Modal_Form_${dirtyFields.carCod || isSubmitted ? (errors.carCod ? 'invalid' : 'valid') : ''}`}
                                 {...register('carCod', { 
                                     validate: value => value !== '0' || 'El cargo es requerido' 

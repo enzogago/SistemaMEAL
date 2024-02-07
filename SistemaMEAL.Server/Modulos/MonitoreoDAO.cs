@@ -4,6 +4,7 @@ using SistemaMEAL.Server.Models;
 using SistemaMEAL.Server.Modulos;
 using Newtonsoft.Json;
 using System.Text;
+using System.Transactions;
 
 namespace SistemaMEAL.Modulos
 {
@@ -93,15 +94,125 @@ namespace SistemaMEAL.Modulos
             }
             return temporal;
         }
+
+        public IEnumerable<Monitoreo> ListarIndicadorActividad(string? proAno, string? proCod)
+        {
+            List<Monitoreo>? temporal = new List<Monitoreo>();
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_LISTAR_INDICADORES_ACTIVIDADES", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@P_PROANO", proAno);
+                cmd.Parameters.AddWithValue("@P_PROCOD", proCod);
+
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+                Console.WriteLine("desde jsonResult:"+jsonResult);
+                if (!reader.HasRows)
+                {
+                    jsonResult.Append("[]");
+                }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        Console.WriteLine("desde reader:"+reader.GetValue(0).ToString());
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                Console.WriteLine("desde jsonResult final:"+jsonResult);
+                // Deserializa la cadena JSON en una lista de objetos Estado
+                temporal = JsonConvert.DeserializeObject<List<Monitoreo>>(jsonResult.ToString());
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return temporal;
+        }
         
+
+
+
+        public (string? benAnoOut,string? benCodOut,string? message, string? messageType) InsertarBeneficiario(Beneficiario beneficiario)
+        {
+            string? mensaje = "";
+            string? tipoMensaje = "";
+            string? benAnoOut = "";
+            string? benCodOut = "";
+            try
+            {
+
+                SqlCommand cmd = new SqlCommand("SP_INSERTAR_BENEFICIARIO", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@P_BENNOM", beneficiario.BenNom);
+                cmd.Parameters.AddWithValue("@P_BENAPE", beneficiario.BenApe);
+                cmd.Parameters.AddWithValue("@P_BENNOMAPO", beneficiario.BenNomApo);
+                cmd.Parameters.AddWithValue("@P_BENAPEAPO", beneficiario.BenApeApo);
+                cmd.Parameters.AddWithValue("@P_BENFECNAC", beneficiario.BenFecNac);
+                cmd.Parameters.AddWithValue("@P_BENSEX", beneficiario.BenSex);
+                cmd.Parameters.AddWithValue("@P_GENCOD", beneficiario.GenCod);
+                cmd.Parameters.AddWithValue("@P_NACCOD", "01"); //
+                cmd.Parameters.AddWithValue("@P_BENCORELE", beneficiario.BenCorEle);
+                cmd.Parameters.AddWithValue("@P_BENTEL", beneficiario.BenTel);
+                cmd.Parameters.AddWithValue("@P_BENTELCON", beneficiario.BenTelCon);
+                cmd.Parameters.AddWithValue("@P_BENCODUNI", beneficiario.BenCodUni);
+                cmd.Parameters.AddWithValue("@P_BENFECREG", "2024-02-06");
+                cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
+                cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
+                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "GAGO");
+                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "AGUIRRE");
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+
+                SqlParameter pBenAno = new SqlParameter("@P_BENANO_OUT", SqlDbType.NVarChar, 4);
+                pBenAno.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pBenAno);
+
+                SqlParameter pBenCod = new SqlParameter("@P_BENCOD_OUT", SqlDbType.Char, 6);
+                pBenCod.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pBenCod);
+
+                cmd.ExecuteNonQuery();
+
+                benAnoOut = pBenAno.Value.ToString();
+                benCodOut = pBenCod.Value.ToString();
+                mensaje = pDescripcionMensaje.Value.ToString();
+                tipoMensaje = pTipoMensaje.Value.ToString();
+            }
+            catch (SqlException ex)
+            {
+                mensaje = ex.Message;
+                tipoMensaje = "1";
+            }
+            finally
+            {
+            }
+            return (benAnoOut, benCodOut, mensaje, tipoMensaje);
+        }
         public (string? message, string? messageType) InsertarMetaBeneficiario(MetaBeneficiario metaBeneficiario)
         {
             string? mensaje = "";
             string? tipoMensaje = "";
             try
             {
-                cn.getcn.Open();
-
                 SqlCommand cmd = new SqlCommand("SP_INSERTAR_META_BENEFICIARIO", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
 
@@ -111,11 +222,26 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_BENCOD", metaBeneficiario.BenCod);
                 cmd.Parameters.AddWithValue("@P_UBIANO", metaBeneficiario.UbiAno);
                 cmd.Parameters.AddWithValue("@P_UBICOD", metaBeneficiario.UbiCod);
+                cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
+                cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
+                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "GAGO");
+                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "AGUIRRE");
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
 
                 cmd.ExecuteNonQuery();
 
-                mensaje = "Excelente";
-                tipoMensaje = "3";
+                mensaje = pDescripcionMensaje.Value.ToString();
+                tipoMensaje = pTipoMensaje.Value.ToString();
             }
             catch (SqlException ex)
             {
@@ -124,9 +250,66 @@ namespace SistemaMEAL.Modulos
             }
             finally
             {
-                cn.getcn.Close();
             }
             return (mensaje, tipoMensaje);
         }
+
+
+       public (string? message, string? messageType) InsertarBeneficiarioMonitoreo(Beneficiario beneficiario, MetaBeneficiario metaBeneficiario)
+        {
+            string? mensaje = "";
+            string? tipoMensaje = "";
+
+            // Crea el TransactionScope en el que se ejecutarán los comandos, garantizando
+            // que ambos comandos se confirmarán o revertirán como una sola unidad de trabajo.
+            using (TransactionScope scope = new TransactionScope())
+            {
+                using (SqlConnection connection = cn.getcn)
+                {
+                    try
+                    {
+                        if (connection.State == ConnectionState.Closed)
+                        {
+                            connection.Open();
+                        }
+
+                        // Inserta el beneficiario
+                        var resultBeneficiario = InsertarBeneficiario(beneficiario);
+                        if (resultBeneficiario.messageType != "3")
+                        {
+                            throw new Exception(resultBeneficiario.message);
+                        }
+
+                        // Actualiza el MetaBeneficiario con los IDs del beneficiario insertado
+                        metaBeneficiario.BenAno = resultBeneficiario.benAnoOut;
+                        metaBeneficiario.BenCod = resultBeneficiario.benCodOut;
+
+                        // Inserta el MetaBeneficiario
+                        var resultMetaBeneficiario = InsertarMetaBeneficiario(metaBeneficiario);
+                        if (resultMetaBeneficiario.messageType != "3")
+                        {
+                            throw new Exception(resultMetaBeneficiario.message);
+                        }
+
+                        // Si ambas operaciones fueron exitosas, confirma la transacción
+                        scope.Complete();
+                        mensaje = resultBeneficiario.message;
+                        tipoMensaje = "3";
+                    }
+                    catch (Exception ex)
+                    {
+                        // Si alguna operación falló, la transacción se revierte.
+                        mensaje = ex.Message;
+                        tipoMensaje = "1";
+                        Console.WriteLine("ENTRANDO EN CATCH DENTRO");
+                        Console.WriteLine(ex);
+                    }
+                }
+            }
+
+            return (mensaje, tipoMensaje);
+        }
+
+
     }
 }

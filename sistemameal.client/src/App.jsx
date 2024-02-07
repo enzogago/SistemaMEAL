@@ -29,6 +29,9 @@ import Dashboard from './components/dashboard/Dashboard';
 import FormGoal from './components/monitoring/goal/FormGoal';
 
 import Notiflix from "notiflix";
+import Gender from './components/gender/Gender';
+import Nationality from './components/Nationality.jsx/Nationality';
+import Unit from './components/Unit/Unit';
 Notiflix.Loading.init({
     className: 'notiflix-loading',
     zindex: 4000,
@@ -135,6 +138,9 @@ const App = () => {
         'type-value': TypeValue,
         "projects": Projects,
         "dashboard": Dashboard,
+        "gender": Gender,
+        "nationality": Nationality,
+        "unit": Unit,
     };
 
     return (

@@ -17,9 +17,9 @@ const Modal = ({ closeModal, setData }) => {
 
     const onSubmit = (data) => {
         const fieldMapping = {
-            nombre: 'carNom',
+            nombre: 'nacNom',
         };
-        handleSubmit('Cargo', estadoEditado, data, setData, setModalVisible, setIsLoggedIn, fieldMapping, 'carCod');
+        handleSubmit('Nacionalidad', estadoEditado, data, setData, setModalVisible, setIsLoggedIn, fieldMapping, 'nacCod');
         reset();
     };
 
@@ -33,7 +33,7 @@ const Modal = ({ closeModal, setData }) => {
     // Efecto al editar estado
     useEffect(() => {
         if (estadoEditado) {
-            setValue('nombre', estadoEditado.carNom);
+            setValue('nombre', estadoEditado.nacNom);
         }
     }, [estadoEditado, setValue]);
     
@@ -45,7 +45,7 @@ const Modal = ({ closeModal, setData }) => {
         <div className={`PowerMas_Modal ${modalVisible ? 'show' : ''}`}>
             <div className="PowerMas_ModalContent">
                 <span className="PowerMas_CloseModal" onClick={closeModalAndReset}>×</span>
-                <h2 className="center">{estadoEditado ? 'Editar' : 'Nuevo'} Cargo</h2>
+                <h2 className="center">{estadoEditado ? 'Editar' : 'Nuevo'} Nacionalidad</h2>
                 <form className='Large-f1_25 PowerMas_FormStatus' onSubmit={validateForm(onSubmit)}>
                     <label className="block">
                         Nombre:

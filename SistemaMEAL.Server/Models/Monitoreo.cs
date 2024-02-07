@@ -59,6 +59,9 @@ namespace SistemaMEAL.Server.Models
 
         public String? FinCod { get; set; }
         public String? FinNom { get; set; }
+        public String? UniCod { get; set; }
+        public String? UniNom { get; set; }
+        public String? UniInvPer { get; set; }
 
         public String? ImpCod { get; set; }
         public String? ImpNom { get; set; }

@@ -20,6 +20,19 @@ namespace SistemaMEAL.Server.Controllers
             _usuarios = usuarios;
         }
 
+        [HttpGet]
+        public dynamic Listado()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var data = _proyectos.Listado();
+            Console.WriteLine(data);
+            return Ok(data);
+        }
+
         [HttpPost("agregar-exclusiones/{usuAno}/{usuCod}")]
         public IActionResult AgregarExclusiones([FromBody] ModificarExclusionesRequest request, string usuAno, string usuCod)
         {
@@ -76,18 +89,18 @@ namespace SistemaMEAL.Server.Controllers
         }
 
 
-        [HttpGet]
-        public dynamic Listado()
-        {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+        // [HttpGet]
+        // public dynamic Listado()
+        // {
+        //     var identity = HttpContext.User.Identity as ClaimsIdentity;
+        //     var rToken = Jwt.validarToken(identity, _usuarios);
 
-            if (!rToken.success) return Unauthorized(rToken);
+        //     if (!rToken.success) return Unauthorized(rToken);
 
-            var proyectos = _proyectos.Listado();
-            Console.WriteLine(proyectos);
-            return Ok(proyectos);
-        }
+        //     var proyectos = _proyectos.Listado();
+        //     Console.WriteLine(proyectos);
+        //     return Ok(proyectos);
+        // }
 
         [HttpGet]
         [Route("{usuAno}/{usuCod}")]

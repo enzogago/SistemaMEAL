@@ -46,8 +46,21 @@ namespace SistemaMEAL.Server.Controllers
             return Ok(monitoreo);
         }
 
+        [HttpGet]
+        [Route("autocomplete/{proAno}/{proCod}")]
+        public dynamic ListarIndicadorActividad(string proAno, string proCod)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var data = _monitoreos.ListarIndicadorActividad(proAno,proCod);
+            return Ok(data);
+        }
+
         [HttpPost]
-        public dynamic Insertar(MetaBeneficiario metaBeneficiario)
+        public dynamic Insertar(BeneficiarioMonitoreo beneficiarioMonitoreo)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
@@ -70,8 +83,7 @@ namespace SistemaMEAL.Server.Controllers
                     result = ""
                 };
             }
-
-            var (message, messageType) = _monitoreos.InsertarMetaBeneficiario(metaBeneficiario);
+            var (message, messageType) = _monitoreos.InsertarBeneficiarioMonitoreo(beneficiarioMonitoreo.Beneficiario, beneficiarioMonitoreo.MetaBeneficiario);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message = message });
@@ -85,6 +97,7 @@ namespace SistemaMEAL.Server.Controllers
                 return new OkObjectResult(new { success = true, message = message });
             }
         }
+
     }
 
 }

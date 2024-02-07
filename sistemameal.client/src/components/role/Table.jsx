@@ -15,7 +15,7 @@ import { Export_Excel_Helper, Export_PDF_Helper, handleDelete } from '../reusabl
 // Componentes
 import CustomTable from '../reusable/CustomTable';
 
-const Table = ({ data, openModal, setRoles }) => {
+const Table = ({ data, openModal, setData }) => {
     // Variables State AuthContext 
     const { authActions, authInfo } = useContext(AuthContext);
     const { setIsLoggedIn } = authActions;
@@ -23,6 +23,7 @@ const Table = ({ data, openModal, setRoles }) => {
     // States locales
     const [searchFilter, setSearchFilter] = useState('');
     const [dropdownOpen, setDropdownOpen] = useState(false);
+
     /* TANSTACK */
     const actions = {
         add: userPermissions.some(permission => permission.perNom === "INSERTAR ROL"),
@@ -33,13 +34,13 @@ const Table = ({ data, openModal, setRoles }) => {
     const columns = useMemo(() => {
         let baseColumns = [
             {
-                header: "Código",
+                header: "Codigo",
                 accessorKey: "rolCod",
             },
             {
                 header: "Nombre",
                 accessorKey: "rolNom",
-            }
+            },
         ];
     
         if (actions.delete || actions.edit) {
@@ -48,8 +49,32 @@ const Table = ({ data, openModal, setRoles }) => {
                 accessorKey: "acciones",
                 cell: ({row}) => (
                     <div className='PowerMas_IconsTable flex jc-center ai-center'>
-                        {actions.delete && <FaTrash className='Large-p_25' onClick={() => handleDelete('Rol', row.original.rolCod, setRoles, setIsLoggedIn)} />}
-                        {actions.edit && <FaPenNib className='Large-p_25' onClick={() => openModal(row.original)} />}
+                        {actions.edit && 
+                            <FaEdit 
+                                data-tooltip-id="edit-tooltip" 
+                                data-tooltip-content="Editar" 
+                                className='Large-p_25' 
+                                onClick={() => openModal(row.original)} 
+                            />
+                        }
+                        {actions.delete && 
+                            <FaRegTrashAlt 
+                                data-tooltip-id="delete-tooltip" 
+                                data-tooltip-content="Eliminar" 
+                                className='Large-p_25' 
+                                onClick={() => handleDelete('Rol', row.original.rolCod, setData, setIsLoggedIn)} 
+                            />
+                        }
+                        <Tooltip 
+                            id="edit-tooltip"
+                            effect="solid"
+                            place='top-end'
+                        />
+                        <Tooltip 
+                            id="delete-tooltip" 
+                            effect="solid"
+                            place='top-start'
+                        />
                     </div>
                 ),
             });
@@ -62,9 +87,10 @@ const Table = ({ data, openModal, setRoles }) => {
     const filteredData = useMemo(() => 
         data.filter(item => 
             item.rolCod.includes(searchFilter.toUpperCase()) ||
-            item.rolNom.includes(searchFilter.toUpperCase())
+            item.rolNom.includes(searchFilter.toUpperCase()) 
         ), [data, searchFilter]
     );
+
     const table = useReactTable({
         data: filteredData,
         columns,
@@ -83,7 +109,7 @@ const Table = ({ data, openModal, setRoles }) => {
     const dataExport = table.options.data;  // Tus datos
     const headers = ['CODIGO', 'NOMBRE', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
     const title = 'ROLES';  // El título de tu archivo
-    const properties = ['rolCod', 'rolNom', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
+    const properties = ['rolCod', 'rolnom', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
     const format = 'a4';  // El tamaño del formato que quieres establecer para el PDF
 
     const Export_Excel = () => {
@@ -98,6 +124,7 @@ const Table = ({ data, openModal, setRoles }) => {
         setDropdownOpen(false);
     };
 
+    
     return (
         <CustomTable 
             title="Listado de Roles" 
@@ -111,7 +138,7 @@ const Table = ({ data, openModal, setRoles }) => {
             Export_PDF={Export_PDF} 
             table={table}
         />
-    )
+    );
 }
 
-export default Table
+export default Table;

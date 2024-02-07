@@ -24,14 +24,18 @@ namespace SistemaMEAL.Server.Modulos
                 SqlCommand cmd = new SqlCommand("SP_INSERTAR_BENEFICIARIO", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
 
-                cmd.Parameters.AddWithValue("@P_DOCIDECOD", beneficiario.DocIdeCod);
-                cmd.Parameters.AddWithValue("@P_BENNUMDOC", beneficiario.BenNumDoc);
                 cmd.Parameters.AddWithValue("@P_BENNOM", beneficiario.BenNom);
                 cmd.Parameters.AddWithValue("@P_BENAPE", beneficiario.BenApe);
+                cmd.Parameters.AddWithValue("@P_BENNOMAPO", beneficiario.BenNom); //
+                cmd.Parameters.AddWithValue("@P_BENAPEAPO", beneficiario.BenApe); //
                 cmd.Parameters.AddWithValue("@P_BENFECNAC", beneficiario.BenFecNac);
                 cmd.Parameters.AddWithValue("@P_BENSEX", beneficiario.BenSex);
-                // cmd.Parameters.AddWithValue("@P_BENCORELE", beneficiario.BenCorEle);
-                // cmd.Parameters.AddWithValue("@P_BENTEL", beneficiario.BenTel);
+                cmd.Parameters.AddWithValue("@P_GENCOD", beneficiario.GenCod);
+                cmd.Parameters.AddWithValue("@P_NACCOD", "01"); //
+                cmd.Parameters.AddWithValue("@P_BENCORELE", beneficiario.BenCorEle);
+                cmd.Parameters.AddWithValue("@P_BENTEL", beneficiario.BenTel);
+                cmd.Parameters.AddWithValue("@P_BENTELCON", beneficiario.BenTel); //
+                cmd.Parameters.AddWithValue("@P_BENFECREG", "2024-02-06");
                 cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");

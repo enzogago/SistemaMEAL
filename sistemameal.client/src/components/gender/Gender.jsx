@@ -1,23 +1,23 @@
 import { useContext, useEffect, useState } from 'react';
 // Libraries
 import Notiflix from 'notiflix';
-// Context
-import { AuthContext } from '../../context/AuthContext';
-import { StatusContext } from '../../context/StatusContext';
 // Componentes
 import Table from './Table';
 import Modal from './Modal';
+// Context
+import { AuthContext } from '../../context/AuthContext';
+import { StatusContext } from '../../context/StatusContext';
 
-const Charge = () => {
+const Gender = () => {
     // Variables State AuthContext 
     const { authActions } = useContext(AuthContext);
-    const { setIsLoggedIn } = authActions;
+    const { setIsLoggedIn, setUserLogged } = authActions;
     // Variables State statusContext
     const { statusActions } = useContext(StatusContext);
     const { setModalVisible, setEstadoEditado } = statusActions;
     // States locales
     const [ data, setData ] = useState([])
-  
+    
     // TOGGLE MODAL
     const openModal = (estado = null) => {
         setEstadoEditado(estado);
@@ -28,32 +28,35 @@ const Charge = () => {
         setModalVisible(false);
     };
 
-  
     // EFECTO AL CARGAR COMPONENTE GET - LISTAR ESTADOS
     useEffect(() => {
-        const fetchCargos = async () => {
+        const fetchData = async () => {
             try {
                 Notiflix.Loading.pulse('Cargando...');
-                // Valores del storage
                 const token = localStorage.getItem('token');
-                
-                // Obtenemos los cargos
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Cargo`, {
+                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Genero`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
+                const data = await response.json();
+                console.log(response)
+                console.log(data)
                 if (!response.ok) {
-                    if(response.status == 401 || response.status == 403){
-                        const data = await response.json();
+                    if(response.status == 401){
                         Notiflix.Notify.failure(data.message);
+                        setUserLogged({})
+                        localStorage.removeItem('token');
                         setIsLoggedIn(false);
                     }
                     return;
                 }
-                const data = await response.json();
                 if (data.success == false) {
+                    console.log(data)
                     Notiflix.Notify.failure(data.message);
+                    setUserLogged({})
+                    localStorage.removeItem('token');
+                    setIsLoggedIn(false);
                     return;
                 }
                 setData(data);
@@ -63,23 +66,25 @@ const Charge = () => {
                 Notiflix.Loading.remove();
             }
         };
-
-        fetchCargos();
+    
+        fetchData();
     }, []);
+    
+    
 
     return (
         <div className="PowerMas_StatusContainer">
-            <Table
+            <Table 
                 data={data} 
-                openModal={openModal} 
+                openModal={openModal}
                 setData={setData}
             />
             <Modal 
-                closeModal={closeModal} 
+                closeModal={closeModal}
                 setData={setData}
             />
         </div>
-    )
+    );
 }
 
-export default Charge
+export default Gender;

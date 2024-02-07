@@ -15,7 +15,7 @@ import { Export_Excel_Helper, Export_PDF_Helper, handleDelete } from '../reusabl
 // Componentes
 import CustomTable from '../reusable/CustomTable';
 
-const Table = ({ data, openModal, setCargos }) => {
+const Table = ({ data, openModal, setData }) => {
     // Variables State AuthContext 
     const { authActions, authInfo } = useContext(AuthContext);
     const { setIsLoggedIn } = authActions;
@@ -34,13 +34,13 @@ const Table = ({ data, openModal, setCargos }) => {
     const columns = useMemo(() => {
         let baseColumns = [
             {
-                header: "Código",
+                header: "Codigo",
                 accessorKey: "carCod",
             },
             {
                 header: "Nombre",
                 accessorKey: "carNom",
-            }
+            },
         ];
     
         if (actions.delete || actions.edit) {
@@ -49,8 +49,32 @@ const Table = ({ data, openModal, setCargos }) => {
                 accessorKey: "acciones",
                 cell: ({row}) => (
                     <div className='PowerMas_IconsTable flex jc-center ai-center'>
-                        {actions.delete && <FaTrash className='Large-p_25' onClick={() => handleDelete('Cargo', row.original.carCod, setCargos, setIsLoggedIn)} />}
-                        {actions.edit && <FaPenNib className='Large-p_25' onClick={() => openModal(row.original)} />}
+                        {actions.edit && 
+                            <FaEdit 
+                                data-tooltip-id="edit-tooltip" 
+                                data-tooltip-content="Editar" 
+                                className='Large-p_25' 
+                                onClick={() => openModal(row.original)} 
+                            />
+                        }
+                        {actions.delete && 
+                            <FaRegTrashAlt 
+                                data-tooltip-id="delete-tooltip" 
+                                data-tooltip-content="Eliminar" 
+                                className='Large-p_25' 
+                                onClick={() => handleDelete('Cargo', row.original.carCod, setData, setIsLoggedIn)} 
+                            />
+                        }
+                        <Tooltip 
+                            id="edit-tooltip"
+                            effect="solid"
+                            place='top-end'
+                        />
+                        <Tooltip 
+                            id="delete-tooltip" 
+                            effect="solid"
+                            place='top-start'
+                        />
                     </div>
                 ),
             });
@@ -63,9 +87,10 @@ const Table = ({ data, openModal, setCargos }) => {
     const filteredData = useMemo(() => 
         data.filter(item => 
             item.carCod.includes(searchFilter.toUpperCase()) ||
-            item.carNom.includes(searchFilter.toUpperCase())
+            item.carNom.includes(searchFilter.toUpperCase()) 
         ), [data, searchFilter]
     );
+
     const table = useReactTable({
         data: filteredData,
         columns,
@@ -99,7 +124,7 @@ const Table = ({ data, openModal, setCargos }) => {
         setDropdownOpen(false);
     };
 
-
+    
     return (
         <CustomTable 
             title="Listado de Cargos" 
@@ -113,7 +138,7 @@ const Table = ({ data, openModal, setCargos }) => {
             Export_PDF={Export_PDF} 
             table={table}
         />
-    )
+    );
 }
 
-export default Table
+export default Table;

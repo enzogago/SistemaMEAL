@@ -1,13 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace SistemaMEAL.Server.Models
 {
-    public class Cargo
+    public class Genero
     {
         [Key]
-        public String? CarCod { get; set; }
+        public String? GenCod { get; set; }
 
-        public String? CarNom { get; set; }
+        public String? GenNom { get; set; }
 
         public String? UsuIng { get; set; }
 

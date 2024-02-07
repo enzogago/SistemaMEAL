@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using SistemaMEAL.Modulos;
+using SistemaMEAL.Server.Models;
 using SistemaMEAL.Server.Modulos;
 using System.Text;
 
@@ -11,6 +12,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 // Servicios para los Modulos DAO
+builder.Services.AddScoped<NacionalidadDAO>();
+builder.Services.AddScoped<UnidadDAO>();
+builder.Services.AddScoped<GeneroDAO>();
 builder.Services.AddScoped<BeneficiarioDAO>();
 builder.Services.AddScoped<UbicacionDAO>();
 builder.Services.AddScoped<PermisoDAO>();

@@ -8,7 +8,7 @@ import { StatusContext } from '../../context/StatusContext';
 import Table from './Table';
 import Modal from './Modal';
 
-const Charge = () => {
+const Nationality = () => {
     // Variables State AuthContext 
     const { authActions } = useContext(AuthContext);
     const { setIsLoggedIn } = authActions;
@@ -31,14 +31,14 @@ const Charge = () => {
   
     // EFECTO AL CARGAR COMPONENTE GET - LISTAR ESTADOS
     useEffect(() => {
-        const fetchCargos = async () => {
+        const fetchData = async () => {
             try {
                 Notiflix.Loading.pulse('Cargando...');
                 // Valores del storage
                 const token = localStorage.getItem('token');
                 
                 // Obtenemos los cargos
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Cargo`, {
+                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Nacionalidad`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -64,7 +64,7 @@ const Charge = () => {
             }
         };
 
-        fetchCargos();
+        fetchData();
     }, []);
 
     return (
@@ -82,4 +82,4 @@ const Charge = () => {
     )
 }
 
-export default Charge
+export default Nationality

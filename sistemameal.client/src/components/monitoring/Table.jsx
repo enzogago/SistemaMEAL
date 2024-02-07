@@ -31,12 +31,37 @@ const Table = ({ data }) => {
     const { setIsLoggedIn } = authActions;
     const { userPermissions } = authInfo;
     // States locales
-    const [searchFilter, setSearchFilter] = useState('');
+    const [searchTags, setSearchTags] = useState([]);
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const searchInputRef = useRef('');
+    const [isInputEmpty, setIsInputEmpty] = useState(true);
+    const [inputValue, setInputValue] = useState('');
+
 
     // Dropdown botones Export
     const toggleDropdown = () => {
         setDropdownOpen(!dropdownOpen);
+    }
+
+    // Añade una nueva etiqueta al presionar Enter
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter' && inputValue && !searchTags.includes(inputValue)) {
+            setSearchTags(prevTags => [...prevTags, inputValue]);
+            setInputValue('');  // borra el valor del input
+            setIsInputEmpty(true);
+        } else if (e.key === 'Backspace' && isInputEmpty && searchTags.length > 0) {
+            setSearchTags(prevTags => prevTags.slice(0, -1));
+        }
+    }
+
+    const handleInputChange = (e) => {
+        setInputValue(e.target.value);  // actualiza el valor del input
+        setIsInputEmpty(e.target.value === '');
+    }
+
+    // Elimina una etiqueta
+    const removeTag = (tag) => {
+        setSearchTags(searchTags.filter(t => t !== tag));
     }
 
     const Register_Beneficiarie = (row) => {
@@ -60,36 +85,30 @@ const Table = ({ data }) => {
         item.metMesPlaTecNombre = new Date(2024, item.metMesPlaTec - 1).toLocaleString('es-ES', { month: 'long' });
     });
 
+
+    // Filtra los datos por todas las etiquetas
     const filteredData = useMemo(() => 
         data.filter(item => 
-            item.estNom.includes(searchFilter.toUpperCase()) ||
-            item.metMetTec.includes(searchFilter.toUpperCase()) ||
-            item.metEjeTec.includes(searchFilter.toUpperCase()) ||
-            item.metPorAvaTec.includes(searchFilter.toUpperCase()) ||
-            item.metAnoPlaTec.includes(searchFilter.toUpperCase()) ||
-            item.metMesPlaTecNombre.toUpperCase().includes(searchFilter.toUpperCase()) || // Usa la nueva propiedad para el filtrado
-            item.indActResNom.includes(searchFilter.toUpperCase()) ||
-            item.tipInd.includes(searchFilter.toUpperCase()) ||
-            item.resNom.includes(searchFilter.toUpperCase()) ||
-            item.resNum.includes(searchFilter.toUpperCase()) ||
-            item.objEspNom.includes(searchFilter.toUpperCase()) || 
-            item.objEspNum.includes(searchFilter.toUpperCase()) || 
-            item.objNom.includes(searchFilter.toUpperCase()) || 
-            item.subProNom.includes(searchFilter.toUpperCase()) || 
-            item.proNom.includes(searchFilter.toUpperCase())
-        ), [data, searchFilter]
+            searchTags.every(tag => 
+                item.estNom.includes(tag.toUpperCase()) ||
+                item.metMetTec.includes(tag.toUpperCase()) ||
+                item.metEjeTec.includes(tag.toUpperCase()) ||
+                item.metPorAvaTec.includes(tag.toUpperCase()) ||
+                item.metAnoPlaTec.includes(tag.toUpperCase()) ||
+                item.metMesPlaTecNombre.toUpperCase().includes(tag.toUpperCase()) ||
+                item.indActResNum.includes(tag.toUpperCase()) ||
+                item.indActResNom.includes(tag.toUpperCase()) ||
+                item.tipInd.includes(tag.toUpperCase()) ||
+                item.resNom.includes(tag.toUpperCase()) ||
+                item.resNum.includes(tag.toUpperCase()) ||
+                item.objEspNom.includes(tag.toUpperCase()) || 
+                item.objEspNum.includes(tag.toUpperCase()) || 
+                item.objNom.includes(tag.toUpperCase()) || 
+                item.subProNom.includes(tag.toUpperCase()) || 
+                item.proNom.includes(tag.toUpperCase())
+            )
+        ), [data, searchTags]
     );
-
-
-    function darkenColor(color, percent) {
-        const num = parseInt(color.replace("#",""), 16),
-              amt = Math.round(2.55 * percent),
-              R = (num >> 16) + amt,
-              B = ((num >> 8) & 0x00FF) + amt,
-              G = (num & 0x0000FF) + amt;
-        return "#" + (0x1000000 + (R<255?R<1?0:R:255)*0x10000 + (B<255?B<1?0:B:255)*0x100 + (G<255?G<1?0:G:255)).toString(16).slice(1);
-    }
-    
 
     const columns = useMemo(() => {
         let baseColumns = [
@@ -194,18 +213,30 @@ const Table = ({ data }) => {
                 },
             },
             {
-                header: "Beneficiario",
-                accessorKey: "beneficiario",
-                cell: ({row}) => (
-                    <div className="flex jc-center ai-center">
-                        <button  
-                            className="PowerMas_Add_Beneficiarie f_75 p_25" 
-                            onClick={() => Register_Beneficiarie(row)}
-                        >
-                            Añadir
-                        </button>
-                    </div>
-                ),
+                header: "Añadir",
+                accessorKey: "añadir",
+                cell: ({row}) => {
+                    console.log(row)
+                    return (
+                        row.original.uniInvPer === 'S' ?
+                        <div className="flex jc-center ai-center">
+                            <button  
+                                className="PowerMas_Add_Beneficiarie f_75 p_25" 
+                                onClick={() => Register_Beneficiarie(row)}
+                            >
+                                Beneficiario
+                            </button>
+                        </div>
+                        :
+                        <div className="flex jc-center ai-center">
+                            <button  
+                                className="PowerMas_Add_Beneficiarie f_75 p_25" 
+                            >
+                                Ejecución
+                            </button>
+                        </div>
+                    )
+                }
             },
             {
                 header: "Resultado",
@@ -377,14 +408,27 @@ const Table = ({ data }) => {
                 <h1 className="flex left Large-f1_5 Medium-f1_5 Small-f1_5 ">Listado de Metas</h1>
                 <div className="flex ">
                     <div className="PowerMas_Search_Container Large_6 Large-m_5">
-                        <FaSearch className="Large_1 search-icon" />
-                        <input 
-                            className='PowerMas_Input_Filter Large_12 Large-p_5'
-                            type="search"
-                            placeholder='Buscar'
-                            value={searchFilter}
-                            onChange={e => setSearchFilter(e.target.value)}
-                        />
+                        <div className="PowerMas_Input_Filter_Container flex">
+                            <div className="flex ai-center">
+                                {searchTags.map(tag => (
+                                    <span key={tag} className="PowerMas_InputTag flex">
+                                        <span className="f_75 flex ai-center">{tag}</span>
+                                        <button className="f_75" onClick={() => removeTag(tag)}>x</button>
+                                    </span>
+                                ))}
+                            </div>
+                            <div className="Phone_12 relative">
+                                <FaSearch className="Large_1 search-icon" />
+                                <input 
+                                    className='PowerMas_Input_Filter Large_12 Large-p_5'
+                                    type="search"
+                                    placeholder='Buscar'
+                                    onChange={handleInputChange}
+                                    onKeyDown={handleKeyDown}
+                                    value={inputValue}
+                                />
+                            </div>
+                        </div>
                     </div>
                     {
                         actions.add && 

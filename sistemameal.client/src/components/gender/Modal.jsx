@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { AuthContext } from '../../context/AuthContext';
 import { StatusContext } from '../../context/StatusContext';
@@ -13,13 +13,13 @@ const Modal = ({ closeModal, setData }) => {
     const { estadoEditado, modalVisible } = statusInfo;
     const { setModalVisible } = statusActions;
 
-    const { register, handleSubmit: validateForm, formState: { errors }, reset, setValue } = useForm();
-
+    const { register, handleSubmit: validateForm, formState: { errors, dirtyFields, isSubmitted }, reset, setValue } = useForm({ mode: "onChange"});
+    console.log(estadoEditado)
     const onSubmit = (data) => {
         const fieldMapping = {
-            nombre: 'carNom',
+            nombre: 'genNom',
         };
-        handleSubmit('Cargo', estadoEditado, data, setData, setModalVisible, setIsLoggedIn, fieldMapping, 'carCod');
+        handleSubmit('Genero', estadoEditado, data, setData, setModalVisible, setIsLoggedIn, fieldMapping, 'genCod');
         reset();
     };
 
@@ -33,7 +33,7 @@ const Modal = ({ closeModal, setData }) => {
     // Efecto al editar estado
     useEffect(() => {
         if (estadoEditado) {
-            setValue('nombre', estadoEditado.carNom);
+            setValue('nombre', estadoEditado.genNom);
         }
     }, [estadoEditado, setValue]);
     
@@ -41,21 +41,23 @@ const Modal = ({ closeModal, setData }) => {
         closeModal();
         reset();
     };
+
     return (
         <div className={`PowerMas_Modal ${modalVisible ? 'show' : ''}`}>
             <div className="PowerMas_ModalContent">
                 <span className="PowerMas_CloseModal" onClick={closeModalAndReset}>×</span>
-                <h2 className="center">{estadoEditado ? 'Editar' : 'Nuevo'} Cargo</h2>
+                <h2 className="center f1_5">{estadoEditado ? 'Editar Genero' : 'Nuevo Genero'}</h2>
                 <form className='Large-f1_25 PowerMas_FormStatus' onSubmit={validateForm(onSubmit)}>
-                    <label className="block">
+                    <label className="block f1">
                         Nombre:
                     </label>
                     <input 
                         id="nombre"
-                        className="flex" 
+                        className={`p1 PowerMas_Modal_Form_${dirtyFields.nombre || isSubmitted ? (errors.nombre ? 'invalid' : 'valid') : ''}`}  
                         type="text" 
-                        placeholder='EJM: DOCUMENTO' 
-                        maxLength={100} 
+                        placeholder='EJM: EJECUTADO' 
+                        maxLength={50} 
+                        autoComplete='disabled'
                         name="nombre" 
                         {...register(
                             'nombre', { 
@@ -69,14 +71,20 @@ const Modal = ({ closeModal, setData }) => {
                             }
                         )}
                     />
-                    {errors.nombre && <p className='errorInput Large-p_5'>{errors.nombre.message}</p>}
+                    {errors.nombre ? (
+                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.nombre.message}</p>
+                    ) : (
+                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                        Espacio reservado para el mensaje de error
+                        </p>
+                    )}
                     <div className='PowerMas_StatusSubmit flex jc-center ai-center'>
                         <input className='' type="submit" value="Guardar" />
                     </div>
                 </form>
             </div>
         </div>
-    )
+    );
 }
 
-export default Modal
+export default Modal;

@@ -71,7 +71,7 @@ const Table = ({ data }) => {
                 header: "Indicador",
                 accessorKey: "indActResNom",
                 cell: ({row}) => {
-                    let text = row.original.indActResNum + row.original.indActResNom.charAt(0).toUpperCase() + ' - ' + row.original.indActResNom.slice(1).toLowerCase()
+                    let text = row.original.indActResNum + ' - ' + row.original.indActResNom.charAt(0).toUpperCase()  + row.original.indActResNom.slice(1).toLowerCase()
                     let shortText = text.length > 40 ? text.substring(0, 40) + '...' : text;
                     return (
                         <div>

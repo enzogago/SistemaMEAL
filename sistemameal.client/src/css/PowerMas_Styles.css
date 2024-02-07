@@ -9,7 +9,7 @@
 body {
 	font-family: DMMono;
 }
-input,select{
+input[type=text]{
 	outline: none;
 }
 
@@ -409,7 +409,7 @@ input,select{
 	right: 35px;
 	background-color: #f9f9f9;
 	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-	z-index: 1;
+	z-index: 100;
 }
   
 .PowerMas_DropdownMenu a {
@@ -786,7 +786,20 @@ input,select{
 
 
 /* SATUS VIEW */
+.PowerMas_InputTag{
+	border: 1px solid blueviolet;
+	background-color: rgb(185, 154, 213);
+	color: #fff;
+	margin-left: 5px;
+}
+.PowerMas_InputTag button{
+	border: none;
+	background-color: transparent;
+	color: #fff;
+}
 .PowerMas_Search_Container{
+	border: 1px solid #F7CEAD;
+	border-radius: 5px;
 	position: relative;
 }
 .PowerMas_Search_Container svg{
@@ -795,11 +808,19 @@ input,select{
     top: 50%;
     transform: translateY(-50%);
 }
-.PowerMas_Input_Filter{
-	padding-left: 50px;
-	outline: none;
+.PowerMas_Input_Filter_Container{
 	border: 1px solid #F7CEAD;
 	border-radius: 5px;
+	flex-wrap: nowrap;
+	overflow-x: auto;
+	scrollbar-width: thin;
+}
+.PowerMas_Input_Filter{
+	padding-left: 45px;
+	outline: none;
+	border: none;
+	border-radius: 5px;
+	min-width: 30%;
 }
 .PowerMas_Dropdown_Export {
     position: relative;
@@ -1214,6 +1235,9 @@ input,select{
 	cursor: pointer;
 	font-weight: bold;
 }
+.relative{
+	position: relative;
+}
 /* END REUSABLE */
 
 /* CREAR/MODIFICAR USUARIO */
@@ -1385,7 +1409,7 @@ input,select{
 }
 
 .progress-bar-fill {
-    height: 4px;
+    height: 5px;
     border-radius: 2px;
     width: 0;
     transition: width 0.5s ease-in-out;
@@ -1420,7 +1444,7 @@ input,select{
 .PowerMas_Header_Form_Beneficiarie{
 	border-bottom: 1px solid #372e2c3d;
 }
-.PowerMas_Content_Form_Beneficiarie form{
+.PowerMas_Content_Form_Beneficiarie_Card{
 	background-color: #FFFAF6;
 	border: 1px solid #372e2c3d;
 }
@@ -1469,3 +1493,44 @@ input,select{
 	border-bottom: 1px solid #372e2c50;
 }
 /* FIN FORM BENEFICIARIO */
+
+/* INICIO FORM META */
+.PowerMas_Form_Goal{
+	background-color: #FFE8D9;
+	border: 1px solid #F7775A;
+	border-radius: 5px;
+}
+.PowerMas_Info_Goal{
+	background-color: #FFFAF6;
+	border: 1px solid #372e2c3d;
+	border-radius: 5px;
+}
+.PowerMas_Autocomplete {
+    position: relative;
+}
+
+.PowerMas_Autocomplete_Options{
+    position: absolute;
+    background-color: white;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    max-height: 200px;
+    overflow-y: auto;
+    width: 100%;
+    z-index: 1000;
+}
+
+.PowerMas_Autocomplete_Option {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.PowerMas_Autocomplete_Option:hover {
+    background-color: #f0f0f0;
+}
+
+
+/* FIN FORM META */
+
