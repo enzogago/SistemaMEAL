@@ -20,6 +20,7 @@ const Table = ({ data, openModal, setData }) => {
     const { authActions, authInfo } = useContext(AuthContext);
     const { setIsLoggedIn } = authActions;
     const { userPermissions } = authInfo;
+    console.log(userPermissions)
     // States locales
     const [searchFilter, setSearchFilter] = useState('');
     const [dropdownOpen, setDropdownOpen] = useState(false);

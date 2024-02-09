@@ -32,11 +32,57 @@ const FormBeneficiarie = () => {
     const [ esMenorDeEdad, setEsMenorDeEdad ] = useState(false);
 
     //
-    const { register, watch, handleSubmit: validateForm, formState: { errors, dirtyFields, isSubmitted }, reset } = 
-    useForm({ mode: "onChange"});
-    const fechaNacimiento = watch('benFecNac');
+    const { register, watch, handleSubmit: validateForm, formState: { errors, dirtyFields, isSubmitted }, reset, setValue } = 
+    useForm({ mode: "onChange", defaultValues: {benNomApo: '', benApeApo: ''}});
+
+    const pais = watch('pais');
+
+    useEffect(() => {
+        if (pais) {
+            if (pais === '0') {
+                setSelects([]);
+                return;
+            }
+            console.log(pais)
+            handleCountryChange(pais);
+        }
+    }, [pais]);
+
+    
+    
+
+
 
     const { register: register2, handleSubmit: validateForm2, formState: { errors: errors2,dirtyFields: dirtyFields2, isSubmitted: isSubmitted2  }, reset: reset2 } = useForm({ mode: "onChange"});
+
+    // Observa los cambios en el campo 'benFecNac'
+    const fechaNacimiento = watch('benFecNac');
+
+    useEffect(() => {
+        if (fechaNacimiento) {
+            // Remueve cualquier guión existente
+            let cleanFecha = fechaNacimiento.replace(/-/g, '');
+            
+            // Inserta los guiones después del año y el mes
+            if (cleanFecha.length >= 4) {
+                cleanFecha = cleanFecha.slice(0, 4) + '-' + cleanFecha.slice(4);
+            }
+            if (cleanFecha.length >= 7) {
+                cleanFecha = cleanFecha.slice(0, 7) + '-' + cleanFecha.slice(7);
+            }
+            
+            // Si el usuario borra los dígitos de la fecha, también borra los guiones
+            if (cleanFecha.length <= 5) {
+                cleanFecha = cleanFecha.slice(0, 4);
+            }
+            if (cleanFecha.length <= 8) {
+                cleanFecha = cleanFecha.slice(0, 7);
+            }
+            
+            // Actualiza el valor del campo con los guiones insertados
+            setValue('benFecNac', cleanFecha);
+        }
+    }, [fechaNacimiento]);
 
     useEffect(() => {
         if (fechaNacimiento) {
@@ -226,16 +272,16 @@ const FormBeneficiarie = () => {
     
 
 
-    const handleCountryChange = async (event, index) => {
-        const selectedCountry = JSON.parse(event.target.value);
+    const handleCountryChange = async (ubicacion, index) => {
+        const selectedCountry = JSON.parse(ubicacion);
         console.log(selectedCountry.ubiAno, selectedCountry.ubiCod);
-        if (event.target.value === '0') {
+        if (ubicacion === '0') {
             console.log("entramos")
             setSelects(prevSelects => prevSelects.slice(0, index + 1));  // Reinicia los selects por debajo del nivel actual
             console.log(selects)
             return;
         }
-    
+
         try {
             setCargando(true);
             const token = localStorage.getItem('token');
@@ -268,22 +314,11 @@ const FormBeneficiarie = () => {
         }
     };
 
+
     const Registrar_Beneficiario =  () => {
-        validateForm( async (data) => {
-            // Verifica que el select de país tenga una opción válida seleccionada
-            const paisSelectElement = document.querySelector(`select[name=select0]`);
-            if (!paisSelectElement || paisSelectElement.value === '0') {
-                console.error('El select de país no tiene una opción válida seleccionada.');
-                // paisSelectElement.classList.remove('PowerMas_Modal_Form_valid');
-                // paisSelectElement.classList.add('PowerMas_Modal_Form_invalid');
-                return;
-            } else {
-                paisSelectElement.classList.remove('PowerMas_Modal_Form_invalid');
-                paisSelectElement.classList.add('PowerMas_Modal_Form_valid');
-            }
-        
+        validateForm( (data) => {
             // Verifica que todos los selects tengan una opción válida seleccionada
-            for (let i = 1; i < selects.length; i++) {
+            for (let i = 0; i < selects.length; i++) {
                 const selectElement = document.querySelector(`select[name=select${i}]`);
                 if (selectElement && selectElement.value === '0') {
                     console.error(`El select ${i} no tiene una opción válida seleccionada.`);
@@ -307,7 +342,7 @@ const FormBeneficiarie = () => {
             if (documentosAgregados.length === 0) {
                 Notiflix.Notify.failure('Debe agregar al menos un documento.');
                 return;
-        }
+            }
 
             // Encuentra el primer documento con código 01
             let documentoCodUni = documentosAgregados.find(doc => doc.docIdeCod === '01');
@@ -381,7 +416,9 @@ const FormBeneficiarie = () => {
                 benNomApo: '',
                 benSex: '',
                 benTel: '',
+                benTelCon: '',
                 genCod: '0',
+                pais: '0',
             });
             reset2({
                 benNumDoc: '',
@@ -389,7 +426,6 @@ const FormBeneficiarie = () => {
             });
             setSelects([]);
             setDocumentosAgregados([])
-            setSelectedCountry('0');
         } catch (error) {
             console.error('Error:', error);
         } finally {
@@ -594,11 +630,17 @@ const FormBeneficiarie = () => {
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benFecNac || isSubmitted ? (errors.benFecNac ? 'invalid' : 'valid') : ''}`} 
                                     placeholder="2003-03-17"
                                     autoComplete="disabled"
+                                    maxLength={10}
+                                    onKeyDown={(event) => {
+                                        if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
+                                            event.preventDefault();
+                                        }
+                                    }}
                                     {...register('benFecNac', { 
                                         required: 'La Fecha de nacimiento es requerido',
                                         pattern: {
                                             value: /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/,
-                                            message: 'La fecha debe estar en el formato YYYY-MM-DD',
+                                            message: 'Ingrese una fecha valida y en formato YYYY-MM-DD',
                                         },
                                     })} 
                                 />
@@ -613,7 +655,7 @@ const FormBeneficiarie = () => {
                            
                             <div className="m_75">
                                 <label htmlFor="benCorEle" className="">
-                                    Correo Electronico
+                                    Email
                                 </label>
                                 <input 
                                     type="text" 
@@ -623,6 +665,10 @@ const FormBeneficiarie = () => {
                                     autoComplete="disabled"
                                     {...register('benCorEle', { 
                                         required: 'El correo es requerida',
+                                        pattern: {
+                                            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+                                            message: 'Dirección de correo electrónico inválida',
+                                        },
                                     })} 
                                 />
                                 {errors.benCorEle ? (
@@ -640,13 +686,23 @@ const FormBeneficiarie = () => {
                                 <input 
                                     type="text" 
                                     id="benTel"
-                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benTel || isSubmitted ? (errors.benCorEle ? 'invalid' : 'valid') : ''}`} 
+                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benTel || isSubmitted ? (errors.benTel ? 'invalid' : 'valid') : ''}`} 
                                     placeholder="907078329"
                                     autoComplete="disabled"
+                                    maxLength={10}
+                                    onKeyDown={(event) => {
+                                        if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
+                                            event.preventDefault();
+                                        }
+                                    }}
                                     {...register('benTel', { 
                                         required: 'El número de telefono es requerido',
                                         minLength: { value: 9, message: 'El número debe tener minimo 9 digitos' },
                                         maxLength: { value: 10, message: 'El número debe tener minimo 10 digitos' },
+                                        pattern: {
+                                            value: /^[0-9]*$/,
+                                            message: 'Solo se aceptan numeros'
+                                        }
                                     })} 
                                 />
                                 {errors.benTel ? (
@@ -664,13 +720,23 @@ const FormBeneficiarie = () => {
                                 <input 
                                     type="text" 
                                     id="benTelCon"
-                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benTelCon || isSubmitted ? (errors.benCorEle ? 'invalid' : 'valid') : ''}`} 
+                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benTelCon || isSubmitted ? (errors.benTelCon ? 'invalid' : 'valid') : ''}`} 
                                     placeholder="907078329"
                                     autoComplete="disabled"
+                                    maxLength={10}
+                                    onKeyDown={(event) => {
+                                        if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
+                                            event.preventDefault();
+                                        }
+                                    }}
                                     {...register('benTelCon', { 
                                         required: 'El número de telefono es requerido',
                                         minLength: { value: 9, message: 'El número debe tener minimo 9 digitos' },
                                         maxLength: { value: 10, message: 'El número debe tener minimo 10 digitos' },
+                                        pattern: {
+                                            value: /^[0-9]*$/,
+                                            message: 'Solo se aceptan numeros'
+                                        }
                                     })} 
                                 />
                                 {errors.benTelCon ? (
@@ -741,18 +807,15 @@ const FormBeneficiarie = () => {
                         <h2>Datos de Ubicación</h2>
                         <div className="PowerMas_Content_Form_Beneficiarie_Card Large-p_75">
                             <div className="m_75">
-                                <label htmlFor="ubiCod" className="">
+                                <label htmlFor="pais" className="">
                                     Pais:
                                 </label>
                                 <select 
-                                    className="block Phone_12"
-                                    id="ubiCod" 
-                                    value={selectedCountry}
-                                    onChange={(event) => {
-                                        setSelectedCountry(event.target.value);
-                                        handleCountryChange(event);
-                                    }}
- 
+                                    id="pais"
+                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.pais || isSubmitted ? (errors.pais ? 'invalid' : 'valid') : ''}`} 
+                                    {...register('pais', { 
+                                        validate: value => value !== '0' || 'El dcoumento de identidad es requerido' 
+                                    })}
                                 >
                                     <option value="0">--Seleccione País--</option>
                                     {paises.map(pais => (
@@ -764,6 +827,13 @@ const FormBeneficiarie = () => {
                                         </option>
                                     ))}
                                 </select>
+                                {errors.pais ? (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.pais.message}</p>
+                                ) : (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                        Espacio reservado para el mensaje de error
+                                    </p>
+                                )}
                             </div>
                             
                             {selects.map((options, index) => (
@@ -775,7 +845,7 @@ const FormBeneficiarie = () => {
                                         id={index}
                                         key={index} 
                                         name={`select${index}`} 
-                                        onChange={(event) => handleCountryChange(event, index)} 
+                                        onChange={(event) => handleCountryChange(event.target.value, index)} 
                                         className="block Phone_12"
                                     >
                                         <option style={{textTransform: 'capitalize'}} value="0">--Seleccione {options[0].ubiTip.toLowerCase()}--</option>
@@ -800,7 +870,7 @@ const FormBeneficiarie = () => {
                             <p className="p_5 Phone_4">Saldo: <span>{metaData && (metaData.metMetTec - metaData.metEjeTec)}</span></p>
                         </div>
                         <br />
-                        <div className="PowerMas_Info_Form_Beneficiarie_Progress flex ai-center jc-space-around p1">
+                        <div className="PowerMas_Info_Form_Beneficiarie_Progress flex ai-center jc-space-around p1 ">
                             <h2 className="Large-f2 Large_8 Medium_8">Nos encontramos en un Avance de:</h2>
                             <DonutChart percentage={metaData ? metaData.metPorAvaTec : 0} />
                         </div>

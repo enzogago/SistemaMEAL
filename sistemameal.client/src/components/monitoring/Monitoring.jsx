@@ -10,7 +10,7 @@ const Monitoring = () => {
             try {
                 Notiflix.Loading.pulse('Cargando...');
                 const token = localStorage.getItem('token');
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo`, {
+                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/Filter`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

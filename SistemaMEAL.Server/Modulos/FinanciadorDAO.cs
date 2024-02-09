@@ -46,10 +46,10 @@ namespace SistemaMEAL.Modulos
             return temporal;
         }
 
-        public (string message, string messageType) Insertar(Financiador financiador)
+        public (string? message, string? messageType) Insertar(Financiador financiador)
         {
-            string mensaje = "";
-            string tipoMensaje = "";
+            string? mensaje = "";
+            string? tipoMensaje = "";
             try
             {
                 cn.getcn.Open();
@@ -90,10 +90,10 @@ namespace SistemaMEAL.Modulos
             return (mensaje, tipoMensaje);
         }
 
-        public (string message, string messageType) Modificar(Financiador financiador)
+        public (string? message, string? messageType) Modificar(Financiador financiador)
         {
-            string mensaje = "";
-            string tipoMensaje = "";
+            string? mensaje = "";
+            string? tipoMensaje = "";
             try
             {
                 cn.getcn.Open();
@@ -135,10 +135,10 @@ namespace SistemaMEAL.Modulos
             return (mensaje, tipoMensaje);
         }
 
-        public (string message, string messageType) Eliminar(string finCod)
+        public (string? message, string? messageType) Eliminar(string finCod)
         {
-            string mensaje = "";
-            string tipoMensaje = "";
+            string? mensaje = "";
+            string? tipoMensaje = "";
             try
             {
                 cn.getcn.Open();

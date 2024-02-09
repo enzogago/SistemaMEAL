@@ -29,6 +29,7 @@ const FormUser = () => {
     const [ documentos, setDocumentos ] = useState([]);
     const [ roles, setRoles ] = useState([]);
     const [ cargos, setCargos ] = useState([]);
+    const [initialValues, setInitialValues] = useState(null);
 
 
     const { register, handleSubmit: validateForm, formState: { errors, dirtyFields, isSubmitted }, reset, setValue } = 
@@ -140,13 +141,12 @@ const FormUser = () => {
                     }
                 });
                 const data = await response.json();
-                for (const field in data) {
-                    setValue(field, data[field]);
-                }
                 if (!response.ok) {
                     Notiflix.Notify.failure(data.message);
                     return;
                 }
+                reset(data);
+                setInitialValues(data);
             } catch (error) {
                 console.error('Error:', error);
             } finally {
@@ -164,7 +164,13 @@ const FormUser = () => {
     
     const handleNext = () => {
         validateForm((data) => {
-            handleSubmit(data, isEditing, navigate, safeCiphertext);
+            const hasChanged = Object.keys(data).some(key => data[key] !== initialValues[key]);
+            if (hasChanged) {
+                handleSubmit(data, isEditing, navigate, safeCiphertext);
+            } else {
+                Notiflix.Notify.info("No se realizaron cambios");
+                navigate(`/menu-user/${safeCiphertext}`);
+            }
         })();
     }
     

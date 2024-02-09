@@ -3,18 +3,27 @@ import { FaGlobeAsia, FaPersonBooth, FaRProject, FaReceipt, FaSearch, FaUser } f
 import { Link, useNavigate } from 'react-router-dom';
 import Notiflix from 'notiflix';
 import Table from './Table';
+import DonutChart from '../reusable/DonutChart';
 
 
 const Home = () => {
     const navigate = useNavigate();
     const [ monitoringData, setMonitoringData] = useState([])
+    const [searchTags, setSearchTags] = useState([]);
+    const [isInputEmpty, setIsInputEmpty] = useState(true);
+    const [inputValue, setInputValue] = useState('');
+    const [totalBeneficiarios, setTotalBeneficiarios] = useState(0);
+    const [totalAtenciones, setTotalAtenciones] = useState(0);
+    const [avanceTecnico, setAvanceTecnico] = useState(0);
+
     // EFECTO AL CARGAR COMPONENTE GET - LISTAR ESTADOS
     useEffect(() => {
         const fetchMonitoreo = async () => {
+            setMonitoringData(null); 
             try {
                 Notiflix.Loading.pulse('Cargando...');
                 const token = localStorage.getItem('token');
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo`, {
+                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/Filter/${searchTags.join(',')}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -34,40 +43,112 @@ const Home = () => {
                     return;
                 }
                 setMonitoringData(data);
+                const totalMeta = data.reduce((sum, item) => sum + Number(item.metMetTec), 0);
+                const totalAtenciones = data.reduce((sum, item) => sum + Number(item.metEjeTec), 0);
+                const porcentaje = totalMeta !== 0 ? (totalAtenciones / totalMeta) * 100 : 0;
+                setTotalAtenciones(totalAtenciones);
+                setAvanceTecnico(porcentaje.toFixed(2));
+            } catch (error) {
+                console.error('Error:', error);
+                setMonitoringData([]); 
+            } finally {
+                Notiflix.Loading.remove();
+            }
+        };
+
+        const fetchBeneficiariosCount = async () => {
+            try {
+                Notiflix.Loading.pulse('Cargando...');
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/BeneficiariosCount/${searchTags.join(',')}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if (!response.ok) {
+                    if(response.status == 401 || response.status == 403){
+                        const data = await response.json();
+                        Notiflix.Notify.failure(data.message);
+                    }
+                    return;
+                }
+                const count = await response.json();
+                setTotalBeneficiarios(count);
             } catch (error) {
                 console.error('Error:', error);
             } finally {
                 Notiflix.Loading.remove();
             }
         };
-
+    
         fetchMonitoreo();
-    }, []);
+        fetchBeneficiariosCount();
+    }, [searchTags]);
+
+    // Añade una nueva etiqueta al presionar Enter
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter' && inputValue && !searchTags.includes(inputValue)) {
+            setSearchTags(prevTags => [...prevTags, inputValue]);
+            setInputValue('');  // borra el valor del input
+            setIsInputEmpty(true);
+        } else if (e.key === 'Backspace' && isInputEmpty && searchTags.length > 0) {
+            setSearchTags(prevTags => prevTags.slice(0, -1));
+        }
+    }
+
+    const handleInputChange = (e) => {
+        setInputValue(e.target.value);  // actualiza el valor del input
+        setIsInputEmpty(e.target.value === '');
+    }
+
+    // Elimina una etiqueta
+    const removeTag = (tag) => {
+        setSearchTags(searchTags.filter(t => t !== tag));
+    }
 
     return(
     <>
-        <div className="PowerMas_SearchContainer flex ai-center">
-            <FaSearch className='PowerMas_InputIcon'/>
-            <input className="PowerMas_Input Phone_12 p_75" type="search" placeholder="" />
+        <div className="PowerMas_Search_Container_Home">
+            <div className="PowerMas_Input_Filter_Container flex">
+                <div className="flex ai-center">
+                    {searchTags.map(tag => (
+                        <span key={tag} className="PowerMas_InputTag flex">
+                            <span className="f_75 flex ai-center">{tag}</span>
+                            <button className="f_75" onClick={() => removeTag(tag)}>x</button>
+                        </span>
+                    ))}
+                </div>
+                <div className="Phone_12 relative">
+                    <FaSearch className="search-icon" />
+                    <input 
+                        className='PowerMas_Input_Filter Large_12 Large-p_5'
+                        type="search"
+                        placeholder='Buscar'
+                        onChange={handleInputChange}
+                        onKeyDown={handleKeyDown}
+                        value={inputValue}
+                    />
+                </div>
+            </div>
         </div>
 
-        <div className="PowerMas_ResumeHome m1">
-            <div className="PowerMas_LeftSection Large_8 bg-white">
-                {monitoringData.length > 0 ? <Table data={monitoringData} /> : <p>Cargando datos...</p>}
+        <div className="PowerMas_ResumeHome m1 flex flex-space-between Small-flex-column Medium-flex-row">
+            <div className="PowerMas_LeftSection Large_8 Phone_12 bg-white">
+                {monitoringData ? <Table data={monitoringData} /> : <p>Cargando datos...</p>}
             </div>
-            <div className="PowerMas_RightSection Large_4 bg-white">
+            <div className="PowerMas_RightSection Large_4 Phone_12 bg-white">
                 <h2 className="Large-m_75 Large-f1_5 Powermas_FontTitle">Principales KPI</h2>
                 <div className="PowerMas_KPIRow Large-m_75 Large-f1_25 Large-p1">
                     <span className="bold Powermas_FontTitle">Atenciones</span>
-                    <span>8,617</span>
+                    <span>{totalAtenciones.toLocaleString()}</span>
                 </div>
                 <div className="PowerMas_KPIRow Large-m_75 Large-f1_25 Large-p1">
                     <span className="bold Powermas_FontTitle">Beneficiarios</span>
-                    <span>4,814</span>
+                    <span>{totalBeneficiarios.toLocaleString()}</span>
                 </div>
-                <div className="PowerMas_KPIRow Large-m_75 Large-f1_25 Large-p1">
+                <div className="PowerMas_KPIRow flex-column Large-m_75 Large-f1_25 Large-p1">
                     <span className="bold Powermas_FontTitle">Avance Técnico</span>
-
+                    <DonutChart percentage={avanceTecnico} />
                 </div>
             </div>
         </div>
@@ -120,9 +201,9 @@ const Home = () => {
                 </div>
             </div>
         </div>
-        <div className="PowerMas_RecentsSection flex m1">
-            <div className="PowerMas_ActivitiesSection Large_5 Large-p2">
-                <h2 className=" Large-f1_5 Powermas_FontTitle">Actividades recientes</h2>
+        <div className="PowerMas_RecentsSection flex Medium-flex-row Small-flex-column m1">
+            <div className="PowerMas_ActivitiesSection Large_5 Medium_5 Phone_12 Large-p2">
+                <h2 className="Large-f1_5 Powermas_FontTitle">Actividades recientes</h2>
                 <div className="PowerMas_Article flex Large-f_75 ai-center left">
                     <div className='PowerMas_Icon Large_2 Large-f1_5'>
                         <div>
@@ -169,7 +250,7 @@ const Home = () => {
                     </div>
                 </div>
             </div>
-            <div className="PowerMas_BeneficiarySection Large_7 Large-p1">
+            <div className="PowerMas_BeneficiarySection Large_7 Medium_7 Phone_12 Large-p1">
                 <h2 className="Large-m1 Large-f1_5 Powermas_FontTitle">Beneficiarios por ciudad</h2>
                 <div id="map"></div>
                 <div id="legend"></div>

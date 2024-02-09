@@ -20,17 +20,31 @@ namespace SistemaMEAL.Server.Controllers
         }
 
         [HttpGet]
-        public dynamic Listado()
+        [Route("Filter/{tags?}")]
+        public dynamic Listado(string? tags = null)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var monitoreos = _monitoreos.Listado();
-            Console.WriteLine(monitoreos);
+            var monitoreos = _monitoreos.Listado(tags);
             return Ok(monitoreos);
         }
+
+        [HttpGet]
+        [Route("BeneficiariosCount/{tags?}")]
+        public dynamic GetBeneficiariosCount(string? tags = null)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            int count = _monitoreos.GetBeneficiariosCount(tags);
+            return Ok(count);
+        }
+
 
         [HttpGet]
         [Route("{metAno}/{metCod}")]
@@ -56,6 +70,20 @@ namespace SistemaMEAL.Server.Controllers
             if (!rToken.success) return Unauthorized(rToken);
 
             var data = _monitoreos.ListarIndicadorActividad(proAno,proCod);
+            return Ok(data);
+        }
+
+        [HttpGet]
+        [Route("jerarquia/{indActResAno}/{indActResCod}/{tipInd}")]
+        public dynamic ObtenerJerarquia(string indActResAno, string indActResCod,string tipInd)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            // if (!rToken.success) return Unauthorized(rToken);
+
+            var jerarquia = _monitoreos.ObtenerJerarquia(indActResAno,indActResCod,tipInd);
+            var data = jerarquia.FirstOrDefault();
             return Ok(data);
         }
 

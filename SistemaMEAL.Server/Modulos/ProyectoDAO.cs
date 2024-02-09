@@ -27,7 +27,6 @@ namespace SistemaMEAL.Modulos
                 DataTable dtProyectos = new DataTable();
                 dtProyectos.Columns.Add("PROANO", typeof(string));
                 dtProyectos.Columns.Add("PROCOD", typeof(string));
-                Console.WriteLine("Número de columnas en dtProyectos: " + dtProyectos.Columns.Count);
                 foreach (var proyecto in proyectos)
                 {
                     dtProyectos.Rows.Add(proyecto.ProAno, proyecto.ProCod);
@@ -38,7 +37,6 @@ namespace SistemaMEAL.Modulos
 
                 // Crea una tabla de valores para los subproyectos
                 DataTable dtSubProyectos = new DataTable();
-                Console.WriteLine(dtSubProyectos);
                 dtSubProyectos.Columns.Add("SUBPROANO", typeof(string));
                 dtSubProyectos.Columns.Add("SUBPROCOD", typeof(string));
                 foreach (var subProyecto in subProyectos)
@@ -65,7 +63,7 @@ namespace SistemaMEAL.Modulos
 
         public IEnumerable<Proyecto> ListadoAccesibles(string usuAno, string usuCod)
         {
-            List<Proyecto> temporal = new List<Proyecto>();
+            List<Proyecto>? temporal = new List<Proyecto>();
             try
             {
                 cn.getcn.Open();
@@ -100,51 +98,12 @@ namespace SistemaMEAL.Modulos
             {
                 cn.getcn.Close();
             }
-            return temporal;
+            return temporal?? new List<Proyecto>();
         }
-
-
-        // public IEnumerable<Proyecto> Listado()
-        // {
-        //     List<Proyecto> temporal = new List<Proyecto>();
-        //     try
-        //     {
-        //         cn.getcn.Open();
-
-        //         SqlCommand cmd = new SqlCommand("SP_LISTAR_SUBPROYECTO_PROYECTO", cn.getcn);
-        //         cmd.CommandType = CommandType.StoredProcedure;
-
-        //         StringBuilder jsonResult = new StringBuilder();
-        //         SqlDataReader reader = cmd.ExecuteReader();
-        //         if (!reader.HasRows)
-        //         {
-        //             jsonResult.Append("[]");
-        //         }
-        //         else
-        //         {
-        //             while (reader.Read())
-        //             {
-        //                 jsonResult.Append(reader.GetValue(0).ToString());
-        //             }
-        //         }
-
-        //         // Deserializa la cadena JSON en un objeto Proyecto
-        //         temporal = JsonConvert.DeserializeObject<List<Proyecto>>(jsonResult.ToString());
-        //     }
-        //     catch (SqlException ex)
-        //     {
-        //         Console.WriteLine(ex.Message);
-        //     }
-        //     finally
-        //     {
-        //         cn.getcn.Close();
-        //     }
-        //     return temporal;
-        // }
 
         public IEnumerable<Proyecto> ListarProyectosUsuario(string usuAno, string usuCod)
         {
-             List<Proyecto> temporal = new List<Proyecto>();
+             List<Proyecto>? temporal = new List<Proyecto>();
             try
             {
                 cn.getcn.Open();
@@ -156,7 +115,6 @@ namespace SistemaMEAL.Modulos
 
                 StringBuilder jsonResult = new StringBuilder();
                 SqlDataReader reader = cmd.ExecuteReader();
-                Console.WriteLine("desde jsonResult:"+jsonResult);
                 if (!reader.HasRows)
                 {
                     jsonResult.Append("[]");
@@ -165,11 +123,9 @@ namespace SistemaMEAL.Modulos
                 {
                     while (reader.Read())
                     {
-                        Console.WriteLine("desde reader:"+reader.GetValue(0).ToString());
                         jsonResult.Append(reader.GetValue(0).ToString());
                     }
                 }
-                Console.WriteLine("desde jsonResult final:"+jsonResult);
                 // Deserializa la cadena JSON en una lista de objetos Estado
                 temporal = JsonConvert.DeserializeObject<List<Proyecto>>(jsonResult.ToString());
             }
@@ -181,12 +137,12 @@ namespace SistemaMEAL.Modulos
             {
                 cn.getcn.Close();
             }
-            return temporal;
+            return temporal?? new List<Proyecto>();
         }
 
         public IEnumerable<Proyecto> ObtenerDetallesProyectoUsuario(string usuAno, string usuCod, string proAno, string proCod)
         {
-            List<Proyecto> temporal = new List<Proyecto>();
+            List<Proyecto>? temporal = new List<Proyecto>();
             try
             {
                 cn.getcn.Open();
@@ -200,7 +156,6 @@ namespace SistemaMEAL.Modulos
 
                 StringBuilder jsonResult = new StringBuilder();
                 SqlDataReader reader = cmd.ExecuteReader();
-                Console.WriteLine("desde jsonResult:"+jsonResult);
                 if (!reader.HasRows)
                 {
                     jsonResult.Append("[]");
@@ -209,11 +164,9 @@ namespace SistemaMEAL.Modulos
                 {
                     while (reader.Read())
                     {
-                        Console.WriteLine("desde reader:"+reader.GetValue(0).ToString());
                         jsonResult.Append(reader.GetValue(0).ToString());
                     }
                 }
-                Console.WriteLine("desde jsonResult final:"+jsonResult);
                 // Deserializa la cadena JSON en una lista de objetos Estado
                 temporal = JsonConvert.DeserializeObject<List<Proyecto>>(jsonResult.ToString());
             }
@@ -225,12 +178,12 @@ namespace SistemaMEAL.Modulos
             {
                 cn.getcn.Close();
             }
-            return temporal;
+            return temporal?? new List<Proyecto>();
         }
 
         public IEnumerable<Proyecto> Listado(string? proAno = null, string? proCod = null, string? proNom = null, string? proDes = null, string? proRes = null, string? proPerAnoIni = null, string? proPerMesIni = null, string? proPerAnoFin = null, string? proPerMesFin = null)
         {
-            List<Proyecto> temporal = new List<Proyecto>();
+            List<Proyecto>? temporal = new List<Proyecto>();
             try
             {
                 cn.getcn.Open();
@@ -264,7 +217,6 @@ namespace SistemaMEAL.Modulos
 
                 StringBuilder jsonResult = new StringBuilder();
                 SqlDataReader reader = cmd.ExecuteReader();
-                Console.WriteLine("desde jsonResult:"+jsonResult);
                 if (!reader.HasRows)
                 {
                     jsonResult.Append("[]");
@@ -273,11 +225,9 @@ namespace SistemaMEAL.Modulos
                 {
                     while (reader.Read())
                     {
-                        Console.WriteLine("desde reader:"+reader.GetValue(0).ToString());
                         jsonResult.Append(reader.GetValue(0).ToString());
                     }
                 }
-                Console.WriteLine("desde jsonResult final:"+jsonResult);
                 // Deserializa la cadena JSON en una lista de objetos Estado
                 temporal = JsonConvert.DeserializeObject<List<Proyecto>>(jsonResult.ToString());
             }
@@ -289,7 +239,7 @@ namespace SistemaMEAL.Modulos
             {
                 cn.getcn.Close();
             }
-            return temporal;
+            return temporal?? new List<Proyecto>();
         }
 
 

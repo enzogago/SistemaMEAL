@@ -95,10 +95,10 @@ namespace SistemaMEAL.Modulos
             return temporal;
         }
 
-        public (string message, string messageType) Insertar(Permiso permiso)
+        public (string? message, string? messageType) Insertar(Permiso permiso)
         {
-            string mensaje = "";
-            string tipoMensaje = "";
+            string? mensaje = "";
+            string? tipoMensaje = "";
             try
             {
                 cn.getcn.Open();
@@ -139,10 +139,10 @@ namespace SistemaMEAL.Modulos
             return (mensaje, tipoMensaje);
         }
 
-        public (string message, string messageType) Modificar(Permiso permiso)
+        public (string? message, string? messageType) Modificar(Permiso permiso)
         {
-            string mensaje = "";
-            string tipoMensaje = "";
+            string? mensaje = "";
+            string? tipoMensaje = "";
             try
             {
                 cn.getcn.Open();
@@ -184,10 +184,10 @@ namespace SistemaMEAL.Modulos
             return (mensaje, tipoMensaje);
         }
 
-        public (string message, string messageType) Eliminar(string perCod)
+        public (string? message, string? messageType) Eliminar(string perCod)
         {
-            string mensaje = "";
-            string tipoMensaje = "";
+            string? mensaje = "";
+            string? tipoMensaje = "";
             try
             {
                 cn.getcn.Open();

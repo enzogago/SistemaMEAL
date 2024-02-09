@@ -13,7 +13,7 @@ namespace SistemaMEAL.Modulos
 
         public IEnumerable<Rol> Listado(string? rolCod = null, string? rolNom = null, string? rolPer = null)
         {
-            List<Rol> temporal = new List<Rol>();
+            List<Rol>? temporal = new List<Rol>();
             try
             {
                 cn.getcn.Open();
@@ -66,13 +66,13 @@ namespace SistemaMEAL.Modulos
             {
                 cn.getcn.Close();
             }
-            return temporal;
+            return temporal?? new List<Rol>();
         }
 
-        public (string message, string messageType) Insertar(Rol rol)
+        public (string? message, string? messageType) Insertar(Rol rol)
         {
-            string mensaje = "";
-            string tipoMensaje = "";
+            string? mensaje = "";
+            string? tipoMensaje = "";
             try
             {
                 cn.getcn.Open();
@@ -113,10 +113,10 @@ namespace SistemaMEAL.Modulos
             return (mensaje, tipoMensaje);
         }
 
-        public (string message, string messageType) Modificar(Rol rol)
+        public (string? message, string? messageType) Modificar(Rol rol)
         {
-            string mensaje = "";
-            string tipoMensaje = "";
+            string? mensaje = "";
+            string? tipoMensaje = "";
             try
             {
                 cn.getcn.Open();
@@ -158,10 +158,10 @@ namespace SistemaMEAL.Modulos
             return (mensaje, tipoMensaje);
         }
 
-        public (string message, string messageType) Eliminar(string rolCod)
+        public (string? message, string? messageType) Eliminar(string rolCod)
         {
-            string mensaje = "";
-            string tipoMensaje = "";
+            string? mensaje = "";
+            string? tipoMensaje = "";
             try
             {
                 cn.getcn.Open();

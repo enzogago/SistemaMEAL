@@ -33,23 +33,9 @@ export const handleSubmit = async (data, isEditing, navigate, safeCiphertext) =>
         const successData = await response.json();
         Notiflix.Notify.success(successData.message);
         console.log(successData)
-        // Actualiza los datos después de insertar o modificar un registro
-        const updateResponse = await fetch(`${import.meta.env.VITE_APP_API_URL}/usuario`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-        const updateData = await updateResponse.json();
-        if(!updateResponse.ok){
-            Notiflix.Notify.failure(updateData.message);
-            console.log(updateData.message)
-        }
-        console.log(updateData);
-
         // Si se está creando un nuevo usuario, obtén el usuAno y usuCod del último usuario
         if (!isEditing) {
-            const lastUser = updateData[updateData.length - 1];
-            const { usuAno, usuCod } = lastUser;
+            const { usuAno, usuCod } = successData;
             const id = `${usuAno}${usuCod}`;
             // Encripta el ID
             const ciphertext = CryptoJS.AES.encrypt(id, 'secret key 123').toString();

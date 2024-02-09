@@ -13,7 +13,7 @@ namespace SistemaMEAL.Modulos
 
         public IEnumerable<Nacionalidad> Listado(string? nacCod = null, string? nacNom = null)
         {
-            List<Nacionalidad> temporal = new List<Nacionalidad>();
+            List<Nacionalidad>? temporal = new List<Nacionalidad>();
             try
             {
                 cn.getcn.Open();
@@ -65,13 +65,13 @@ namespace SistemaMEAL.Modulos
             {
                 cn.getcn.Close();
             }
-            return temporal;
+            return temporal?? new List<Nacionalidad>();
         }
 
-        public (string message, string messageType) Insertar(Nacionalidad nacionalidad)
+        public (string? message, string? messageType) Insertar(Nacionalidad nacionalidad)
         {
-            string mensaje = "";
-            string tipoMensaje = "";
+            string? mensaje = "";
+            string? tipoMensaje = "";
             try
             {
                 cn.getcn.Open();
@@ -112,10 +112,10 @@ namespace SistemaMEAL.Modulos
             return (mensaje, tipoMensaje);
         }
 
-        public (string message, string messageType) Modificar(Nacionalidad nacionalidad)
+        public (string? message, string? messageType) Modificar(Nacionalidad nacionalidad)
         {
-            string mensaje = "";
-            string tipoMensaje = "";
+            string? mensaje = "";
+            string? tipoMensaje = "";
             try
             {
                 cn.getcn.Open();
@@ -157,10 +157,10 @@ namespace SistemaMEAL.Modulos
             return (mensaje, tipoMensaje);
         }
 
-        public (string message, string messageType) Eliminar(string nacCod)
+        public (string? message, string? messageType) Eliminar(string nacCod)
         {
-            string mensaje = "";
-            string tipoMensaje = "";
+            string? mensaje = "";
+            string? tipoMensaje = "";
             try
             {
                 cn.getcn.Open();

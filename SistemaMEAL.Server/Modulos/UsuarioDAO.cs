@@ -12,10 +12,10 @@ namespace SistemaMEAL.Server.Modulos
         private conexionDAO cn = new conexionDAO();
 
 
-        public (string message, string messageType) Modificar(Usuario usuario)
+        public (string? message, string? messageType) Modificar(Usuario usuario)
         {
-            string mensaje = "";
-            string tipoMensaje = "";
+            string? mensaje = "";
+            string? tipoMensaje = "";
             try
             {
                 cn.getcn.Open();
@@ -74,10 +74,12 @@ namespace SistemaMEAL.Server.Modulos
             return (mensaje, tipoMensaje);
         }
 
-        public (string? message, string? messageType) Insertar(Usuario usuario)
+        public (string? message, string? messageType, string? usuAnoOut, string? usuCodOut) Insertar(Usuario usuario)
         {
-            string mensaje = "";
-            string tipoMensaje = "";
+            string? mensaje = "";
+            string? tipoMensaje = "";
+            string? usuAnoOut = "";
+            string? usuCodOut = "";
             try
             {
                 cn.getcn.Open();
@@ -115,8 +117,18 @@ namespace SistemaMEAL.Server.Modulos
                 pTipoMensaje.Direction = ParameterDirection.Output;
                 cmd.Parameters.Add(pTipoMensaje);
 
+                SqlParameter pUsuAno = new SqlParameter("@P_USUANO_OUT", SqlDbType.NVarChar, 4);
+                pUsuAno.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pUsuAno);
+
+                SqlParameter pUsuCod = new SqlParameter("@P_USUCOD_OUT", SqlDbType.Char, 6);
+                pUsuCod.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pUsuCod);
+
                 cmd.ExecuteNonQuery();
 
+                usuAnoOut = pUsuAno.Value.ToString();
+                usuCodOut = pUsuCod.Value.ToString();
                 mensaje = pDescripcionMensaje.Value.ToString();
                 tipoMensaje = pTipoMensaje.Value.ToString();
             }
@@ -128,12 +140,12 @@ namespace SistemaMEAL.Server.Modulos
             {
                 cn.getcn.Close();
             }
-            return (mensaje, tipoMensaje);
+            return (usuAnoOut, usuCodOut, mensaje, tipoMensaje);
         }
 
         public IEnumerable<Usuario> Listado(string? usuAno = null, string? usuCod = null, string? docIdeCod = null, string? usuNumDoc = null, string? usuNom = null, string? usuApe = null, string? usuFecNac = null, string? usuSex = null, string? usuCorEle = null, string? usuCarCod = null, string? usuFecInc = null, string? usuTel = null, string? usuNomUsu = null, string? usuPas = null, string? usuEst = null, string? rolCod = null)
         {
-            List<Usuario> temporal = new List<Usuario>();
+            List<Usuario>? temporal = new List<Usuario>();
             try
             {
                 cn.getcn.Open();
@@ -185,7 +197,6 @@ namespace SistemaMEAL.Server.Modulos
                         jsonResult.Append(reader.GetValue(0).ToString());
                     }
                 }
-                Console.WriteLine("desde jsonResult final:"+jsonResult);
                 // Deserializa la cadena JSON en una lista de objetos Usuario
                 temporal = JsonConvert.DeserializeObject<List<Usuario>>(jsonResult.ToString());
             }
@@ -197,7 +208,7 @@ namespace SistemaMEAL.Server.Modulos
             {
                 cn.getcn.Close();
             }
-            return temporal;
+            return temporal?? new List<Usuario>();
         }
 
         public bool TienePermiso(string usuAno, string usuCod, string perNom)
@@ -235,7 +246,7 @@ namespace SistemaMEAL.Server.Modulos
 
         public Usuario BuscarUsuario(string ano, string cod)
         {
-            Usuario usuario = null;
+            Usuario? usuario = null;
 
             try
             {
@@ -282,12 +293,12 @@ namespace SistemaMEAL.Server.Modulos
                 cn.getcn.Close();
             }
 
-            return usuario;
+            return usuario?? new Usuario();
         }
 
         public Usuario ValidarUsuario(string email, string password)
         {
-            Usuario usuario = null;
+            Usuario? usuario = null;
 
             try
             {
@@ -332,7 +343,7 @@ namespace SistemaMEAL.Server.Modulos
                 cn.getcn.Close();
             }
 
-            return usuario;
+            return usuario?? new Usuario();
         }
 
 

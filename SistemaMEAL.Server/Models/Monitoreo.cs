@@ -34,6 +34,8 @@ namespace SistemaMEAL.Server.Models
         public String? IndActResCod { get; set; }
         public String? IndActResNum { get; set; }
         public String? IndActResNom { get; set; }
+        public String? TipValCod { get; set; }
+        public String? TipValNom { get; set; }
 
         public String? SubActResAno { get; set; }
         public String? SubActResCod { get; set; }
@@ -55,7 +57,7 @@ namespace SistemaMEAL.Server.Models
         public String? MetAnoPlaTec { get; set; }
         public String? MetMesPlaPre { get; set; }
         public String? MetAnoPlaPre { get; set; }
-        public String? TipValCod { get; set; }
+        
 
         public String? FinCod { get; set; }
         public String? FinNom { get; set; }

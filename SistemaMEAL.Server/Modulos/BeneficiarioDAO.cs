@@ -1,8 +1,6 @@
 using Microsoft.Data.SqlClient;
-using Newtonsoft.Json;
 using SistemaMEAL.Server.Models;
 using System.Data;
-using System.Text;
 
 namespace SistemaMEAL.Server.Modulos
 {

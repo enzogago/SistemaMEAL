@@ -59,7 +59,7 @@ namespace SistemaMEAL.Server.Controllers
                 usuario.UsuPas = builder.ToString();
             }
 
-            var (message, messageType) = _usuarios.Insertar(usuario);
+            var (usuAno, usuCod, message, messageType) = _usuarios.Insertar(usuario);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message = message });
@@ -70,7 +70,7 @@ namespace SistemaMEAL.Server.Controllers
             }
             else // Registro modificado correctamente
             {
-                return new OkObjectResult(new { success = true, message = message });
+                return new OkObjectResult(new { usuAno, usuCod, success = true, message = message });
             }
         }
 

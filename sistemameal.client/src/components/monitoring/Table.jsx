@@ -110,6 +110,17 @@ const Table = ({ data }) => {
         ), [data, searchTags]
     );
 
+    const Editar_Meta = (row) => {
+        console.log(row)
+        const id = `${row.original.usuAno}${row.original.usuCod}`;
+        console.log(id)
+        // Encripta el ID
+        const ciphertext = CryptoJS.AES.encrypt(id, 'secret key 123').toString();
+        // Codifica la cadena cifrada para que pueda ser incluida de manera segura en una URL
+        const safeCiphertext = btoa(ciphertext).replace('+', '-').replace('/', '_').replace(/=+$/, '');
+        navigate(`/form-goal/${safeCiphertext}`);
+    }
+
     const columns = useMemo(() => {
         let baseColumns = [
             {
@@ -191,12 +202,12 @@ const Table = ({ data }) => {
                     const text = row.original.indActResNum + ' - ' + row.original.indActResNom.charAt(0).toUpperCase() + row.original.indActResNom.slice(1).toLowerCase();
                     const shortText = text.length > 50 ? text.substring(0, 50) + '...' : text;
                     return (
-                        <div>
+                        <>
                             <span 
                                 data-tooltip-id="info-tooltip" 
                                 data-tooltip-content={text} 
                             >{shortText}</span>
-                        </div>
+                        </>
                     );
                 },
             },
@@ -206,9 +217,9 @@ const Table = ({ data }) => {
                 cell: ({row}) => {
                     const text = row.original.tipInd.charAt(0).toUpperCase() + row.original.tipInd.slice(1).toLowerCase();
                     return (
-                        <div>
+                        <>
                             {text}
-                        </div>
+                        </>
                     )
                 },
             },
@@ -216,7 +227,6 @@ const Table = ({ data }) => {
                 header: "Añadir",
                 accessorKey: "añadir",
                 cell: ({row}) => {
-                    console.log(row)
                     return (
                         row.original.uniInvPer === 'S' ?
                         <div className="flex jc-center ai-center">
@@ -245,12 +255,12 @@ const Table = ({ data }) => {
                     const text = row.original.resNum + ' - ' + row.original.resNom.charAt(0).toUpperCase() + row.original.resNom.slice(1).toLowerCase();
                     const shortText = text.length > 60 ? text.substring(0, 60) + '...' : text;
                     return (
-                        <div>
+                        <>
                             <span 
                                 data-tooltip-id="info-tooltip" 
                                 data-tooltip-content={text} 
                             >{shortText}</span>
-                        </div>
+                        </>
                     );
                 },
             },
@@ -261,12 +271,12 @@ const Table = ({ data }) => {
                     const text = row.original.objEspNum + ' - ' + row.original.objEspNom.charAt(0).toUpperCase() + row.original.objEspNom.slice(1).toLowerCase();
                     const shortText = text.length > 60 ? text.substring(0, 60) + '...' : text;
                     return (
-                        <div>
+                        <>
                             <span 
                                 data-tooltip-id="info-tooltip" 
                                 data-tooltip-content={text} 
                             >{shortText}</span>
-                        </div>
+                        </>
                     );
                 },
             },
@@ -277,12 +287,12 @@ const Table = ({ data }) => {
                     const text = row.original.objNum + ' - ' + row.original.objNom.charAt(0).toUpperCase() + row.original.objNom.slice(1).toLowerCase();
                     const shortText = text.length > 60 ? text.substring(0, 60) + '...' : text;
                     return (
-                        <div>
+                        <>
                             <span 
                                 data-tooltip-id="info-tooltip" 
                                 data-tooltip-content={text} 
                             >{shortText}</span>
-                        </div>
+                        </>
                     );
                 },
             },
@@ -307,6 +317,7 @@ const Table = ({ data }) => {
         baseColumns = baseColumns.filter(column => 
             data.some(item => item[column.accessorKey] !== null)
         );
+        
     
         if (actions.edit || actions.delete) {
             baseColumns.push({
@@ -319,7 +330,7 @@ const Table = ({ data }) => {
                                 data-tooltip-id="edit-tooltip" 
                                 data-tooltip-content="Editar" 
                                 className='Large-p_25' 
-                                onClick={() => openModal(row.original)} 
+                                onClick={() => Editar_Meta(row)} 
                             />
                         }
                         {actions.delete && 
@@ -489,23 +500,23 @@ const Table = ({ data }) => {
                             : <tr className='PowerMas_TableEmpty'><td colSpan={11} className='Large-p1 center'>No se encontraron registros</td></tr>
                         }
                     </tbody>
-                    <Tooltip 
-                        id="info-tooltip"
-                        effect="solid"
-                        place='bottom-start'
-                        className="tooltip"
-                    />
-                    <Tooltip 
-                        id="edit-tooltip"
-                        effect="solid"
-                        place='top-end'
-                    />
-                    <Tooltip 
-                        id="delete-tooltip" 
-                        effect="solid"
-                        place='top-start'
-                    />
                 </table>
+                <Tooltip 
+                    id="info-tooltip"
+                    effect="solid"
+                    place='bottom-start'
+                    className="tooltip"
+                />
+                <Tooltip 
+                    id="edit-tooltip"
+                    effect="solid"
+                    place='top-end'
+                />
+                <Tooltip 
+                    id="delete-tooltip" 
+                    effect="solid"
+                    place='top-start'
+                />
                 <GrPrevious className="slider" style={{left: '0'}} onClick={() => scrollTable(-1)} /> 
                 <GrNext className="slider" style={{right: '0'}} onClick={() => scrollTable(1)} /> 
             </div>

@@ -16,7 +16,7 @@ const MenuItem = ({ menu, level }) => {
             <div className="Phone_12 flex ai-center overflow-hidden">
                 <Link className="menu-item flex ai-center flex-grow-1 gap-1" to={menu.subMenus.length > 0 ? '#' : `/${menu.menRef}`}>
                     {IconName && <IconName style={{marginLeft: '1rem'}} />}
-                    <span> {menu.menNom} </span>
+                    <span className="Large-f1 Medium-f_75 Small-f_75"> {menu.menNom} </span>
                 </Link>
                 {menu.subMenus.length > 0 && <span className="arrow Large_1"> &gt; </span>}
             </div>

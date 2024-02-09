@@ -46,10 +46,10 @@ namespace SistemaMEAL.Modulos
             return temporal;
         }
 
-        public (string message, string messageType) Insertar(Cargo cargo)
+        public (string? message, string? messageType) Insertar(Cargo cargo)
         {
-            string mensaje = "";
-            string tipoMensaje = "";
+            string? mensaje = "";
+            string? tipoMensaje = "";
             try
             {
                 cn.getcn.Open();
@@ -90,10 +90,10 @@ namespace SistemaMEAL.Modulos
             return (mensaje, tipoMensaje);
         }
 
-        public (string message, string messageType) Modificar(Cargo cargo)
+        public (string? message, string? messageType) Modificar(Cargo cargo)
         {
-            string mensaje = "";
-            string tipoMensaje = "";
+            string? mensaje = "";
+            string? tipoMensaje = "";
             try
             {
                 cn.getcn.Open();
@@ -135,10 +135,10 @@ namespace SistemaMEAL.Modulos
             return (mensaje, tipoMensaje);
         }
 
-        public (string message, string messageType) Eliminar(string carCod)
+        public (string? message, string? messageType) Eliminar(string carCod)
         {
-            string mensaje = "";
-            string tipoMensaje = "";
+            string? mensaje = "";
+            string? tipoMensaje = "";
             try
             {
                 cn.getcn.Open();
