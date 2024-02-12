@@ -16,7 +16,6 @@ const Modal = ({ closeModal, setEstados }) => {
     const [color, setColor] = useState('#000000');
 
     const { register, handleSubmit: validateForm, formState: { errors, dirtyFields, isSubmitted }, reset, setValue } = useForm({ mode: "onChange"});
-    console.log(estadoEditado)
     const onSubmit = (data) => {
         const fieldMapping = {
             nombre: 'estNom',

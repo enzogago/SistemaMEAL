@@ -6,35 +6,7 @@ import { saveAs } from 'file-saver';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
-Notiflix.Confirm.init({
-    className: 'notiflix-confirm',
-    width: '300px',
-    zindex: 4003,
-    position: 'center',
-    distance: '10px',
-    backgroundColor: '#FFFFFF',
-    borderRadius: '5px',
-    backOverlay: true,
-    backOverlayColor: 'rgba(0,0,0,0.5)',
-    rtl: false,
-    fontFamily: 'DMono',
-    cssAnimation: true,
-    cssAnimationDuration: 300,
-    cssAnimationStyle: 'fade',
-    plainText: true,
-    titleColor: '#EC5251',
-    titleFontSize: '1.25rem',
-    titleMaxLength: 34,
-    messageColor: '#1e1e1e',
-    messageFontSize: '1rem',
-    messageMaxLength: 110,
-    buttonsFontSize: '1rem',
-    buttonsMaxLength: 34,
-    okButtonColor: '#f8f8f8',
-    okButtonBackground: '#EC5251',
-    cancelButtonColor: '#000',
-    cancelButtonBackground: '#FFF7F3',
-});
+
 
 export const handleDelete = async (controller, codigo, setRegistros, setIsLoggedIn) => {
     Notiflix.Confirm.show(

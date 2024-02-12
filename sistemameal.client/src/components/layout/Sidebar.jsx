@@ -77,7 +77,6 @@ const Sidebar = () => {
         
                     const data = await response.json();
                     setMenuData(data);
-                    console.log(data);
                 } catch (error) {
                     console.error(error);
                     Notiflix.Loading.remove();
@@ -93,7 +92,6 @@ const Sidebar = () => {
         if (menuData.length > 0) {
             const groupData = groupByParent(menuData);
             setMenuGroup(groupData);
-            console.log(menuGroup)
         }
     }, [menuData]);
     

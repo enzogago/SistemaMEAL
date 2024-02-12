@@ -1,11 +1,18 @@
 import { Navigate } from 'react-router-dom'
-import { cloneElement } from 'react';
+import { useContext } from 'react';
+import { AuthContext } from '../../context/AuthContext';
 
-const PublicRoute = ({ setIsLoggedIn, children }) => {
-    const token = localStorage.getItem('token');
+const PublicRoute = ({ children }) => {
+    // Variables State AuthContext 
+    const { authInfo } = useContext(AuthContext);
+    const { userLogged } = authInfo;
 
     return (
-        token ? <Navigate to='/' /> : cloneElement(children, { setIsLoggedIn })
+        <>
+            {
+                Object.keys(userLogged).length > 0 ? <Navigate to='/' /> : children
+            }
+        </>
     );
 };
 

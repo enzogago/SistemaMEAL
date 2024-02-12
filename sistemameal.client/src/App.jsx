@@ -1,6 +1,7 @@
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-// helper
+// Notiflix Configuracion estilos
+import './js/notiflixConfig';
 // Context
 import { AuthContext } from './context/AuthContext';
 // Componentes
@@ -27,103 +28,15 @@ import Projects from './components/project/Projects';
 import FormBeneficiarie from './components/monitoring/beneficiarie/FormBeneficiarie';
 import Dashboard from './components/dashboard/Dashboard';
 import FormGoal from './components/monitoring/goal/FormGoal';
-
-import Notiflix from "notiflix";
 import Gender from './components/gender/Gender';
 import Nationality from './components/Nationality.jsx/Nationality';
 import Unit from './components/Unit/Unit';
-Notiflix.Loading.init({
-    className: 'notiflix-loading',
-    zindex: 4000,
-    backgroundColor: 'rgba(0,0,0,0.8)',
-    rtl: false,
-    fontFamily: 'Quicksand',
-    cssAnimation: true,
-    cssAnimationDuration: 400,
-    clickToClose: false,
-    customSvgUrl: null,
-    customSvgCode: null,
-    svgSize: '80px',
-    svgColor: '#20737B',
-    messageID: 'NotiflixLoadingMessage',
-    messageFontSize: '15px',
-    messageMaxLength: 34,
-    messageColor: '#dcdcdc',
-});
-
-Notiflix.Notify.init({
-    width: '280px',
-    position: 'right-bottom',
-    distance: '10px',
-    opacity: 1,
-    borderRadius: '5px',
-    rtl: false,
-    timeout: 3000,
-    messageMaxLength: 110,
-    backOverlay: false,
-    backOverlayColor: 'rgba(0,0,0,0.5)',
-    plainText: true,
-    showOnlyTheLastOne: false,
-    clickToClose: false,
-    pauseOnHover: true,
-    ID: 'NotiflixNotify',
-    className: 'notiflix-notify',
-    zindex: 4001,
-    fontFamily: 'DMono',
-    fontSize: '13px',
-    cssAnimation: true,
-    cssAnimationDuration: 400,
-    cssAnimationStyle: 'from-right',
-    closeButton: false,
-    useIcon: true,
-    useFontAwesome: false,
-    fontAwesomeIconStyle: 'basic',
-    fontAwesomeIconSize: '34px',
-    success: {
-    background: '#20737B',
-    textColor: '#fff',
-    childClassName: 'notiflix-notify-success',
-    notiflixIconColor: '#fff',
-    fontAwesomeClassName: 'fas fa-check-circle',
-    fontAwesomeIconColor: 'rgba(0,0,0,0.2)',
-    backOverlayColor: 'rgba(50,198,130,0.2)',
-    },
-    failure: {
-    background: '#FBC355',
-    textColor: '#000',
-    childClassName: 'notiflix-notify-failure',
-    notiflixIconColor: '#000',
-    fontAwesomeClassName: 'fas fa-times-circle',
-    fontAwesomeIconColor: 'rgba(0,0,0,0.2)',
-    backOverlayColor: 'rgba(255,85,73,0.2)',
-    },
-    warning: {
-    background: '#eebf31',
-    textColor: '#fff',
-    childClassName: 'notiflix-notify-warning',
-    notiflixIconColor: 'rgba(0,0,0,0.2)',
-    fontAwesomeClassName: 'fas fa-exclamation-circle',
-    fontAwesomeIconColor: 'rgba(0,0,0,0.2)',
-    backOverlayColor: 'rgba(238,191,49,0.2)',
-    },
-    info: {
-    background: '#26c0d3',
-    textColor: '#fff',
-    childClassName: 'notiflix-notify-info',
-    notiflixIconColor: 'rgba(0,0,0,0.2)',
-    fontAwesomeClassName: 'fas fa-info-circle',
-    fontAwesomeIconColor: 'rgba(0,0,0,0.2)',
-    backOverlayColor: 'rgba(38,192,211,0.2)',
-    },
-});
-
+import NotFound from './components/NotFound';
 
 const App = () => {
     // Variables state AuthContext
-    const { authInfo, authActions } = useContext(AuthContext);
-    const { isLoggedIn, menuData } = authInfo;
-    const { setIsLoggedIn } = authActions;
-
+    const { authInfo } = useContext(AuthContext);
+    const { menuData } = authInfo;
 
     const componentMap = {
         'user': User,
@@ -147,11 +60,11 @@ const App = () => {
             <Router>
                 <Routes>
                     <Route path='/login' element={
-                        <PublicRoute isLogggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}>
+                        <PublicRoute>
                             <Login />
                         </PublicRoute>
                     } />
-                    <Route path='/*' element={
+                    <Route path='*' element={
                         <PrivateRoute> 
                             <Layout>
                                 <Routes>
@@ -176,7 +89,7 @@ const App = () => {
                                             <Route path="form-goal/:id?" element={<FormGoal />} />
                                         </>
                                     )}
-                                    <Route path="*" element={<Home />} />
+                                    <Route path="*" element={<NotFound />} />
                                 </Routes>
                             </Layout>
                         </PrivateRoute>

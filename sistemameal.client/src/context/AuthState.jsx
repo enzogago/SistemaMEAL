@@ -7,6 +7,13 @@ const AuthState = ({ children }) => {
     // Estados locales
     const [ userLogged, setUserLogged ] = useState({})
     const [ userPermissions, setUserPermissions ] = useState([])
+    const [ cargando, setCargando ] = useState(true)
+    const [ isLoading, setIsLoading ] = useState(true);
+
+    useEffect(() => {
+        validarUsuario().finally(() => setIsLoading(false));
+    }, []);
+
 
     const validarUsuario = async () => {
         try {
@@ -19,10 +26,8 @@ const AuthState = ({ children }) => {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            console.log(response)
             if (!response.ok) {
                     const data = await response.json();
-                    console.log(data.message)
                     setIsLoggedIn(false);
                     setUserLogged({})
                     localStorage.removeItem('token');
@@ -32,6 +37,8 @@ const AuthState = ({ children }) => {
             }
         } catch (error) {
             console.error(`Error al hacer la solicitud: ${error}`);
+        } finally {
+            setCargando(false);
         }
     };
 
@@ -96,7 +103,9 @@ const AuthState = ({ children }) => {
         menuData: state.menuData,
         userMaint: state.userMaint,
         userLogged,
-        userPermissions
+        userPermissions,
+        cargando,
+        isLoading
     };
 
     const authActions = {

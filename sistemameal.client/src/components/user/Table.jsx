@@ -146,8 +146,8 @@ const Table = ({data}) => {
         item.usuNom.includes(searchFilter.toUpperCase()) ||
         item.usuApe.includes(searchFilter.toUpperCase()) ||
         item.usuCorEle.includes(searchFilter.toUpperCase()) ||
-        item.cargo.carNom.includes(searchFilter.toUpperCase()) ||
-        item.rol.rolNom.includes(searchFilter.toUpperCase()) ||
+        item.carNom.includes(searchFilter.toUpperCase()) ||
+        item.rolNom.includes(searchFilter.toUpperCase()) ||
         item.usuEst.includes(searchFilter.toUpperCase())
     ), [data, searchFilter]
 );
