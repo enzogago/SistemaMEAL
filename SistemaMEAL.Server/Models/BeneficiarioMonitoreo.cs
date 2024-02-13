@@ -6,5 +6,7 @@ namespace SistemaMEAL.Server.Models
     {
         public Beneficiario? Beneficiario { get; set; }
         public MetaBeneficiario? MetaBeneficiario { get; set; }
+        public List<DocumentoBeneficiario>? DocumentoBeneficiario { get; set; }
+
     }
 }

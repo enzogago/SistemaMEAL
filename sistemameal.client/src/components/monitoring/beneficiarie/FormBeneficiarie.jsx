@@ -21,7 +21,6 @@ const FormBeneficiarie = () => {
 
     // Estados locales
     const [ documentos, setDocumentos ] = useState([]);
-    const [ selectedCountry, setSelectedCountry ] = useState('0');
     const [ paises, setPaises ] = useState([]);
     const [ generos, setGeneros ] = useState([]);
     const [ metaData, setMetaData] = useState(null);
@@ -30,6 +29,9 @@ const FormBeneficiarie = () => {
     const [ documentosAgregados, setDocumentosAgregados ] = useState([]);
     const [ modalIsOpen, setModalIsOpen ] = useState(false);
     const [ esMenorDeEdad, setEsMenorDeEdad ] = useState(false);
+    const [ mostrarAgregarDocumento, setMostrarAgregarDocumento ] = useState(false);
+    const [accionActual, setAccionActual] = useState('buscar');
+
 
     //
     const { register, watch, handleSubmit: validateForm, formState: { errors, dirtyFields, isSubmitted }, reset, setValue } = 
@@ -48,12 +50,81 @@ const FormBeneficiarie = () => {
         }
     }, [pais]);
 
+
+    const { register: register2, watch: watch2, handleSubmit: validateForm2, formState: { errors: errors2,dirtyFields: dirtyFields2, isSubmitted: isSubmitted2  }, reset: reset2, trigger: trigger2 } = useForm({ mode: "onChange"});
+
+    // Actualiza la acción actual antes de enviar el formulario
+    const buscarBeneficiarioDocumento = async(data) => {
+        const token = localStorage.getItem('token');
+        Notiflix.Loading.pulse('Cargando...');
+        
+        try {
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Beneficiario/documento/${data.docIdeCod}/${data.docIdeBenNum}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            console.log(response)
+            const data = await response.json();
+            if (!response.ok) {
+                Notiflix.Notify.failure(data.message);
+                return;
+            }
+            console.log(data);
+        } catch (error) {
+            console.error('Error:', error);
+            setMostrarAgregarDocumento(true);
+            setAccionActual('agregar')
+        } finally {
+            Notiflix.Loading.remove();
+        }
+    };
+
+    const Agregar_Documento = () => {
+        validateForm2(onSubmit)();
+    };
+
+
+    const onSubmit = async(data) => {
+        if (accionActual === 'buscar') {
+            buscarBeneficiarioDocumento(data)
+        } else if (accionActual === 'agregar') {
+            // Verificar si el documento ya existe en la lista
+            const documentoExistente = documentosAgregados.find(doc => doc.docIdeCod === data.docIdeCod);
+            if (documentoExistente) {
+                // Si el documento ya existe, mostrar un mensaje y no agregarlo
+                Notiflix.Notify.failure(`Este tipo de documento ya ha sido agregado.`);
+                return;
+            }
+        
+            // Encuentra el documento completo en el array 'documentos'
+            const documentoCompleto = documentos.find(doc => doc.docIdeCod === data.docIdeCod);
+        
+            // Si el documento no existe, agregarlo a la lista
+            setDocumentosAgregados([...documentosAgregados, { 
+                docIdeCod: data.docIdeCod, 
+                docIdeNom: documentoCompleto.docIdeNom,  // Agrega el nombre del documento
+                docIdeAbr: documentoCompleto.docIdeAbr,  // Agrega el nombre del documento
+                docIdeBenNum: data.docIdeBenNum 
+            }]);
+        
+            Notiflix.Notify.success("Documento de Identidad agregado")
+            setModalIsOpen(true)
+            // Resetear los campos
+            reset2({
+                docIdeBenNum: '',
+                docIdeCod: '0',
+            });
+        }
+        
+    };
+
     
-    
 
+    // Observa los cambios en los campos 'docIdeBenNum' y 'docIdeCod'
+    const docIdeBenNum = watch2('docIdeBenNum');
+    const docIdeCod = watch2('docIdeCod');
 
-
-    const { register: register2, handleSubmit: validateForm2, formState: { errors: errors2,dirtyFields: dirtyFields2, isSubmitted: isSubmitted2  }, reset: reset2 } = useForm({ mode: "onChange"});
 
     // Observa los cambios en el campo 'benFecNac'
     const fechaNacimiento = watch('benFecNac');
@@ -104,36 +175,7 @@ const FormBeneficiarie = () => {
         }
     }, [fechaNacimiento]);
     
-
     
-    const Agregar_Documento = (data) => {
-        // Verificar si el documento ya existe en la lista
-        const documentoExistente = documentosAgregados.find(doc => doc.docIdeCod === data.docIdeCod);
-        if (documentoExistente) {
-            // Si el documento ya existe, mostrar un mensaje y no agregarlo
-            Notiflix.Notify.failure(`Este tipo de documento ya ha sido agregado.`);
-            return;
-        }
-    
-        // Encuentra el documento completo en el array 'documentos'
-        const documentoCompleto = documentos.find(doc => doc.docIdeCod === data.docIdeCod);
-    
-        // Si el documento no existe, agregarlo a la lista
-        setDocumentosAgregados([...documentosAgregados, { 
-            docIdeCod: data.docIdeCod, 
-            docIdeNom: documentoCompleto.docIdeNom,  // Agrega el nombre del documento
-            docIdeAbr: documentoCompleto.docIdeAbr,  // Agrega el nombre del documento
-            benNumDoc: data.benNumDoc 
-        }]);
-    
-        Notiflix.Notify.success("Documento de Identidad agregado")
-        setModalIsOpen(true)
-        // Resetear los campos
-        reset2({
-            benNumDoc: '',
-            docIdeCod: '0',
-        });
-    };
     
     
 
@@ -358,7 +400,7 @@ const FormBeneficiarie = () => {
             }
 
             // Usa el benNumDoc del documento encontrado como benCodUni
-            const benCodUni = documentoCodUni.benNumDoc;
+            const benCodUni = documentoCodUni.docIdeBenNum;
 
             let beneficiarioMonitoreo = {
                 Beneficiario: { ...data, benCodUni },
@@ -368,7 +410,7 @@ const FormBeneficiarie = () => {
                     ubiAno,
                     ubiCod,
                 },
-                Documentos: documentosAgregados
+                DocumentoBeneficiario: documentosAgregados
             }
             console.log(beneficiarioMonitoreo)
             handleSubmitMetaBeneficiario(beneficiarioMonitoreo);
@@ -421,7 +463,7 @@ const FormBeneficiarie = () => {
                 pais: '0',
             });
             reset2({
-                benNumDoc: '',
+                docIdeBenNum: '',
                 docIdeCod: '0',
             });
             setSelects([]);
@@ -444,7 +486,7 @@ const FormBeneficiarie = () => {
                     <div className="Large_6 m1 overflow-auto">
                         <h2>Datos Personales</h2>
                         <div className="PowerMas_Content_Form_Beneficiarie_Card Large-p_75">
-                            <form onSubmit={validateForm2(Agregar_Documento)}>
+                            <form onSubmit={validateForm2(onSubmit)}>
                                 <div className="m_75">
                                     <label htmlFor="docIdeCod" className="">
                                         Tipo de documento:
@@ -473,12 +515,12 @@ const FormBeneficiarie = () => {
                                     )}
                                 </div>
                                 <div className="m_75">
-                                    <label htmlFor="benNumDoc" className="">
+                                    <label htmlFor="docIdeBenNum" className="">
                                         Numero de documento:
                                     </label>
                                     <input
-                                        id="benNumDoc"
-                                        className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields2.benNumDoc || isSubmitted2 ? (errors2.benNumDoc ? 'invalid' : 'valid') : ''}`} 
+                                        id="docIdeBenNum"
+                                        className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields2.docIdeBenNum || isSubmitted2 ? (errors2.docIdeBenNum ? 'invalid' : 'valid') : ''}`} 
                                         type="text" 
                                         placeholder="74301932"
                                         autoComplete="disabled"
@@ -488,7 +530,7 @@ const FormBeneficiarie = () => {
                                                 event.preventDefault();
                                             }
                                         }}
-                                        {...register2('benNumDoc', { 
+                                        {...register2('docIdeBenNum', { 
                                             required: 'El número de documento es requerido',
                                             minLength: {
                                                 value: 6,
@@ -504,8 +546,8 @@ const FormBeneficiarie = () => {
                                             }
                                         })}
                                     />
-                                    {errors2.benNumDoc ? (
-                                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors2.benNumDoc.message}</p>
+                                    {errors2.docIdeBenNum ? (
+                                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors2.docIdeBenNum.message}</p>
                                     ) : (
                                         <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
                                         Espacio reservado para el mensaje de error
@@ -513,9 +555,17 @@ const FormBeneficiarie = () => {
                                     )}
                                 </div>
                                 <div className="m_75 flex jc-space-between">
-                                    <button type="submit">Agregar documento</button>
-                                    <button type="button" onClick={abrirModal}>Ver documentos agregados</button>
+                                {
+                                    mostrarAgregarDocumento ? 
+                                        <>
+                                            <button type="submit">Agregar documento</button>
+                                            <button type="button" onClick={abrirModal}>Ver documentos agregados</button>
+                                        </>
+                                        :
+                                        <button type="submit">Buscar</button>
+                                }
                                 </div>
+
                             </form>
 
 
@@ -943,7 +993,7 @@ const FormBeneficiarie = () => {
                         {documentosAgregados.map((documento, index) => (
                             <tr key={index}>
                                 <td>{documento.docIdeAbr} - {documento.docIdeNom}</td>
-                                <td className="center">{documento.benNumDoc}</td>
+                                <td className="center">{documento.docIdeBenNum}</td>
                             </tr>
                         ))}
                     </tbody>

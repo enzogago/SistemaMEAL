@@ -4,6 +4,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import Notiflix from 'notiflix';
 import Table from './Table';
 import DonutChart from '../reusable/DonutChart';
+import Paises from '../maps/Paises';
+import Ecuador from '../maps/Ecuador';
+import Peru from '../maps/Peru';
+import Colombia from '../maps/Colombia';
 
 
 const Home = () => {
@@ -251,9 +255,15 @@ const Home = () => {
                 </div>
             </div>
             <div className="PowerMas_BeneficiarySection Large_7 Medium_7 Phone_12 Large-p1">
-                <h2 className="Large-m1 Large-f1_5 Powermas_FontTitle">Beneficiarios por ciudad</h2>
-                <div id="map"></div>
-                <div id="legend"></div>
+                <div className='flex'>
+                    <article className='Phone_4'>
+                        <h2 className="Large-m1 Large-f1_5 Powermas_FontTitle">Beneficiarios por</h2>
+                        asda
+                    </article>
+                    <div className='Phone_8'>
+                        <Paises />
+                    </div>
+                </div>
             </div>
         </div>
     </>)

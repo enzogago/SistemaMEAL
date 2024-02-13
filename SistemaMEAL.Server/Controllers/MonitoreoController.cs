@@ -111,7 +111,7 @@ namespace SistemaMEAL.Server.Controllers
                     result = ""
                 };
             }
-            var (message, messageType) = _monitoreos.InsertarBeneficiarioMonitoreo(beneficiarioMonitoreo.Beneficiario, beneficiarioMonitoreo.MetaBeneficiario);
+            var (message, messageType) = _monitoreos.InsertarBeneficiarioMonitoreo(beneficiarioMonitoreo.Beneficiario, beneficiarioMonitoreo.MetaBeneficiario, beneficiarioMonitoreo.DocumentoBeneficiario);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message = message });

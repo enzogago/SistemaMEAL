@@ -314,14 +314,57 @@ namespace SistemaMEAL.Modulos
             return (mensaje, tipoMensaje);
         }
 
+        public (string? message, string? messageType) InsertarDocumentoBeneficiario(DocumentoBeneficiario documentoBeneficiario)
+        {
+            string? mensaje = "";
+            string? tipoMensaje = "";
+            try
+            {
+                SqlCommand cmd = new SqlCommand("SP_INSERTAR_DOCUMENTO_IDENTIDAD_BENEFICIARIO", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
 
-       public (string? message, string? messageType) InsertarBeneficiarioMonitoreo(Beneficiario beneficiario, MetaBeneficiario metaBeneficiario)
+                cmd.Parameters.AddWithValue("@P_DOCIDECOD", documentoBeneficiario.DocIdeCod);
+                cmd.Parameters.AddWithValue("@P_BENANO", documentoBeneficiario.BenAno);
+                cmd.Parameters.AddWithValue("@P_BENCOD", documentoBeneficiario.BenCod);
+                cmd.Parameters.AddWithValue("@P_DOCIDEBENNUM", documentoBeneficiario.DocIdeBenNum);
+                cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
+                cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
+                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "GAGO");
+                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "AGUIRRE");
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+
+                cmd.ExecuteNonQuery();
+
+                mensaje = pDescripcionMensaje.Value.ToString();
+                tipoMensaje = pTipoMensaje.Value.ToString();
+            }
+            catch (SqlException ex)
+            {
+                mensaje = ex.Message;
+                tipoMensaje = "1";
+            }
+            finally
+            {
+            }
+            return (mensaje, tipoMensaje);
+        }
+
+
+        public (string? message, string? messageType) InsertarBeneficiarioMonitoreo(Beneficiario beneficiario, MetaBeneficiario metaBeneficiario, List<DocumentoBeneficiario> documentosBeneficiario)
         {
             string? mensaje = "";
             string? tipoMensaje = "";
 
-            // Crea el TransactionScope en el que se ejecutarán los comandos, garantizando
-            // que ambos comandos se confirmarán o revertirán como una sola unidad de trabajo.
             using (TransactionScope scope = new TransactionScope())
             {
                 using (SqlConnection connection = cn.getcn)
@@ -351,7 +394,22 @@ namespace SistemaMEAL.Modulos
                             throw new Exception(resultMetaBeneficiario.message);
                         }
 
-                        // Si ambas operaciones fueron exitosas, confirma la transacción
+                        // Inserta cada DocumentoBeneficiario
+                        foreach (var documento in documentosBeneficiario)
+                        {
+                            // Actualiza el DocumentoBeneficiario con los IDs del beneficiario insertado
+                            documento.BenAno = resultBeneficiario.benAnoOut;
+                            documento.BenCod = resultBeneficiario.benCodOut;
+
+                            // Inserta el DocumentoBeneficiario
+                            var resultDocumentoBeneficiario = InsertarDocumentoBeneficiario(documento);
+                            if (resultDocumentoBeneficiario.messageType != "3")
+                            {
+                                throw new Exception(resultDocumentoBeneficiario.message);
+                            }
+                        }
+
+                        // Si todas las operaciones fueron exitosas, confirma la transacción
                         scope.Complete();
                         mensaje = resultBeneficiario.message;
                         tipoMensaje = "3";
@@ -368,6 +426,7 @@ namespace SistemaMEAL.Modulos
 
             return (mensaje, tipoMensaje);
         }
+
 
 
 
