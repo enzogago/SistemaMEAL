@@ -9,12 +9,31 @@
 body {
 	font-family: DMMono;
 }
-input[type=text]{
+input[type=text], select{
 	outline: none;
 }
 input,select{
 	border-radius: 5px;
+	margin-top: 5px;
+	transition: border 0.2s;
 }
+select option {
+    background-color: #fff;
+	color: #000;
+}
+input:focus,select:focus{
+	border: 1px solid #F7775A!important;
+	box-shadow: 0px 3px 10px rgba(247, 119, 90, 0.3);
+}
+input:disabled,select:disabled{
+	background-color: #fff!important;
+	border: 1px solid #B7B7B7;
+	
+}
+input::placeholder,select::placeholder{
+	color: #B7B7B7;
+}
+
 *[disabled] {
     cursor: default;
     color: #999;
@@ -67,7 +86,7 @@ input,select{
 	padding: 8px 0;
 	margin: 8px 0;
 	width: 100%;
-	border-radius: 5px;
+	border-radius: 0;
 }
 
 .PowerMas_InputLogin:focus {
@@ -178,12 +197,11 @@ input,select{
 /* HOME_VIEW */
 
 .PowerMas_Search_Container_Home{
-	border-radius: 5px;
 	position: sticky;
 	top: 0;
 	z-index: 99;
 	box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5);
-	background-color: #fff;
+	background-color: #dedddd;
 }
 .PowerMas_Search_Container_Home svg{
 	position: absolute;
@@ -422,11 +440,27 @@ input,select{
     height: auto;
 }
 
+.PowerMas_ProfilePicture2 {
+	position: relative;
+	width: 75px;
+	height: 75px;
+	border-radius: 50%;
+	background: #277980; /* Reemplaza esto con la imagen de perfil */
+	overflow: hidden;
+}
+.PowerMas_ProfilePicture2 img {
+    height: auto;
+}
+
+
+.PowerMas_ProfileInfo{
+	display: flex;
+}
+.PowerMas_Profile_Name{
+	background-color: #7575750c;
+}
 .PowerMas_ProfileInfo  span{
 	display:block;
-}
-.PowerMas_Username{
-	border-bottom: 0.5px solid #f0f0f0;
 }
 
 .PowerMas_MenuIcon {
@@ -436,6 +470,7 @@ input,select{
 	transform: rotate(90deg);
 }
 .PowerMas_DropdownMenu {
+	overflow: hidden;
 	display: none;
 	position: absolute;
 	top: 50px;
@@ -443,12 +478,12 @@ input,select{
 	background-color: #f9f9f9;
 	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
 	z-index: 100;
+	border-radius: 5px;
 }
   
 .PowerMas_DropdownMenu a {
-	color: black;
+	color: #757575;
 	text-decoration: none;
-	display: block;
 }
   
 .PowerMas_DropdownMenu a:hover {
@@ -838,7 +873,6 @@ input,select{
     transform: translateY(-50%);
 }
 .PowerMas_Input_Filter_Container{
-	border: 1px solid #F7CEAD;
 	border-radius: 5px;
 	flex-wrap: nowrap;
 	overflow-x: auto;
@@ -847,9 +881,9 @@ input,select{
 .PowerMas_Input_Filter{
 	padding-left: 45px;
 	outline: none;
-	border: none;
-	border-radius: 5px;
+	border: 1px solid transparent;
 	min-width: 30%;
+	margin: 0;
 }
 .PowerMas_Dropdown_Export {
     position: relative;
@@ -1043,20 +1077,28 @@ input,select{
 .PowerMas_Modal_Form_invalid{
 	background: #fff url("../Img/PowerMas_Error.svg") no-repeat 98%   ;
 	background-size: 20px 20px;
-	border: 1px solid #ff0000!important;
+	border: 1px solid #E5554F!important;
 }
 .PowerMas_Modal_Form_valid {
 	background: #fff url("../Img/PowerMas_Correcto.svg") no-repeat 98% center;
 	background-size: 24px 24px;
-	border: 1px solid #00cc00!important;
-	color: #4d4d4c;
+	border: 1px solid #25848F!important;
+}
+.PowerMas_Modal_Form_Calendar_Enable {
+	background: #fff url("../Img/CalendarEnable.svg") no-repeat 98% center;
+	background-size: 24px 24px;
+}
+.PowerMas_Modal_Form_Calendar_Disabled {
+	background: #fff url("../Img/CalendarDisabled.svg") no-repeat 98% center;
+	background-size: 24px 24px;
 }
 .PowerMas_Message_Invalid{
-	color: red;
+	color: #E5554F;
 	margin-top: 3px;
 }
   
 .PowerMas_Modal {
+	z-index: 1000;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1072,8 +1114,8 @@ input,select{
     transition: visibility 0s linear 0.5s, opacity 0.5s 0s, transform 0.5s;
 }
 .PowerMas_ModalContent {
-    width: 90%;
-    max-width: 400px;
+	min-width: 30%;
+    max-width: 50%;
     background-color: #fff;
     padding: 20px;
     border-radius: 4px;
@@ -1101,15 +1143,16 @@ input,select{
 	text-decoration: none;
 	cursor: pointer;
 }
-.PowerMas_ModalContent h2{
+.PowerMas_ModalContent > h2{
 	color: #20737B;
 	border-bottom: 1px solid #372e2c96;
 	padding: 1rem;
+	margin-bottom: 10px;
 }
-.PowerMas_ModalContent label{
+.PowerMas_ModalContent > label{
 	margin: 1rem 0;
 }
-.PowerMas_FormStatus input[type=text]{
+.PowerMas_FormStatus input[type=text],.PowerMas_FormStatus input[type=password]{
 	width: 100%;
 	border-radius: 5px;
 	padding: 0.5rem;
@@ -1119,7 +1162,7 @@ input,select{
 .PowerMas_StatusSubmit{
 	margin-top: 1.5rem;
 }
-.PowerMas_StatusSubmit input{
+.PowerMas_StatusSubmit input, .PowerMas_StatusSubmit button{
 	padding: 0.5rem 1rem;
 	background-color: #F7775A;
 	border: 1px solid transparent;
@@ -1127,10 +1170,16 @@ input,select{
 	transition: background-color 0.3s ease;
 	border-radius: 5px;
 }
-.PowerMas_StatusSubmit input:hover{
+.PowerMas_StatusSubmit input:hover, .PowerMas_StatusSubmit button:hover{
 	background-color: #D03F1E;
 }
-
+.PowerMas_SidebarHeader{
+	padding-bottom: 15px;
+	/* border-bottom: 1px solid #372e2c96; */
+}
+.PowerMas_SidebarHeader > h2{
+	color: #20737B;
+}
 
 .PowerMas_IconsTable{
 	width: auto;
@@ -1267,6 +1316,22 @@ input,select{
 .relative{
 	position: relative;
 }
+.color-black{
+	color: #000;
+}
+
+.PowerMas_Buttom_Primary{
+	background-color: #F7775A;
+	color: #F6E3D6;
+	border-radius: 5px;
+	border: 1px solid;
+}
+.PowerMas_Buttom_Secondary{
+	background-color: #FFFDFD;
+	color: #F7775A;
+	border-radius: 5px;
+	border: 1px solid;
+}
 /* END REUSABLE */
 
 /* CREAR/MODIFICAR USUARIO */
@@ -1304,7 +1369,6 @@ input,select{
 	color: #F7775A;
 }
 .PowerMas_Form_User_Card{
-	background-color: #FFFAF6;
 	border: 1px solid #372e2c60;
 	border-radius: 5px;
 }
@@ -1474,8 +1538,8 @@ input,select{
 	border-bottom: 1px solid #372e2c3d;
 }
 .PowerMas_Content_Form_Beneficiarie_Card{
-	background-color: #FFFAF6;
 	border: 1px solid #372e2c3d;
+	border-radius: 5px;
 }
 .PowerMas_Buttoms_Form_Beneficiarie{
 	background-color: FFFDFD;
@@ -1485,34 +1549,27 @@ input,select{
 	border-radius: 5px;
 	border: 1px solid;
 }
-.PowerMas_Buttoms_Form_Beneficiarie button:first-child{
-	background-color: #F7775A;
-	color: #F6E3D6;
-}
-.PowerMas_Buttoms_Form_Beneficiarie button:last-child{
-	background-color: #FFFDFD;
-	color: #F7775A;
-}
+
 .PowerMas_Content_Form_Beneficiarie form input, 
 .PowerMas_Content_Form_Beneficiarie form select{
 	background-color: transparent;
 	border: 1px solid #372e2c4f;
 }
 .PowerMas_Info_Form_Beneficiarie{
-	background-color: #FFE8D9;
-	border: 1px solid #F7775A;
+	background-color: #f7f7f7;
+	border: 1px solid #cfcfcf;
 	border-radius: 5px;
 }
 .PowerMas_Info_Form_Beneficiarie > div > p{
-	background-color: #FFF5EE;
-	color: #F7775A;
-	border: 1px solid #F7775A;
+	background-color: #F3F3F3;
+	color: #000;
+	border: 1px solid #CFCFCF;
 	border-radius: 5px;
 }
 .PowerMas_Info_Form_Beneficiarie_Progress{
-	background-color: #FFF5EE;
+	background-color: #F3F3F3;
 	color: #F7775A;
-	border: 1px solid #F7775A;
+	border: 1px solid #CFCFCF;
 	border-radius: 5px;
 }
 .PowerMas_Info_Form_Beneficiarie_Progress h2{
@@ -1520,6 +1577,10 @@ input,select{
 }
 .PowerMas_Info_Form_Beneficiarie article{
 	border-bottom: 1px solid #372e2c50;
+}
+
+.PowerMas_Info_Form_Beneficiarie article > p{
+	color: #7E7D7D;
 }
 /* FIN FORM BENEFICIARIO */
 
@@ -1530,7 +1591,6 @@ input,select{
 	border-radius: 5px;
 }
 .PowerMas_Info_Goal{
-	background-color: #FFFAF6;
 	border: 1px solid #372e2c3d;
 	border-radius: 5px;
 }
@@ -1570,3 +1630,49 @@ input,select{
 	border-radius: 4px;
 	font-size: 12px;
   }
+
+
+
+
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    cursor: pointer;
+}
+
+.options-menu {
+    position: absolute;
+    /* Ajusta estos valores según tus necesidades */
+    right: 0;
+    top: 0;
+    background-color: white;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+}
+
+.options-menu button {
+	color: #757575;
+	text-decoration: none;
+	background-color: #fff;
+	border: none;
+}
+  
+.options-menu button:hover {
+	background-color: #f1f1f1;
+}
+
+.PowerMas_Info_Profile{
+	background-color: #FFE8D9;
+	border: 1px solid #F7775A;
+	border-radius: 5px;
+}

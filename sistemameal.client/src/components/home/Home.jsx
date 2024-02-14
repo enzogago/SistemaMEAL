@@ -19,6 +19,7 @@ const Home = () => {
     const [totalBeneficiarios, setTotalBeneficiarios] = useState(0);
     const [totalAtenciones, setTotalAtenciones] = useState(0);
     const [avanceTecnico, setAvanceTecnico] = useState(0);
+    
 
     // EFECTO AL CARGAR COMPONENTE GET - LISTAR ESTADOS
     useEffect(() => {
@@ -112,7 +113,7 @@ const Home = () => {
 
     return(
     <>
-        <div className="PowerMas_Search_Container_Home">
+        <div className="PowerMas_Search_Container_Home  p1">
             <div className="PowerMas_Input_Filter_Container flex">
                 <div className="flex ai-center">
                     {searchTags.map(tag => (
@@ -256,17 +257,19 @@ const Home = () => {
             </div>
             <div className="PowerMas_BeneficiarySection Large_7 Medium_7 Phone_12 Large-p1">
                 <div className='flex'>
-                    <article className='Phone_4'>
+                    <article className='Phone_5'>
                         <h2 className="Large-m1 Large-f1_5 Powermas_FontTitle">Beneficiarios por</h2>
                         asda
                     </article>
-                    <div className='Phone_8 todos'>
+                    <div className='Phone_7 todos'>
                         <Paises />
                     </div>
                 </div>
             </div>
         </div>
-    </>)
+            
+        </>
+    )
 };
 
 export default Home;

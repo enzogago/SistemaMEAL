@@ -16,11 +16,11 @@ const CustomTable = ({ title, searchFilter, setSearchFilter, actions, openModal,
         <div className='TableMainContainer Large-p1'>
             <div className="">
                 <h1 className="Large-f1_5">{title}</h1>
-                <div className="flex ">
+                <div className="flex">
                     <div className="PowerMas_Search_Container Large_6 Large-m_5">
                         <FaSearch className="Large_1 search-icon" />
                         <input 
-                            className='PowerMas_Input_Filter Large_12 Large-p_5'
+                            className='PowerMas_Input_Filter Large_12 p_5'
                             type="search"
                             placeholder='Buscar'
                             value={searchFilter}

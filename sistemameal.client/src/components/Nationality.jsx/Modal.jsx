@@ -59,7 +59,7 @@ const Modal = ({ closeModal, setData }) => {
             <div className="PowerMas_ModalContent">
                 <span className="PowerMas_CloseModal" onClick={closeModalAndReset}>×</span>
                 <h2 className="center">{estadoEditado ? 'Editar' : 'Nuevo'} Nacionalidad</h2>
-                <form className='Large-f1_25 PowerMas_FormStatus' onSubmit={validateForm(onSubmit)}>
+                <form className='Large-f1 PowerMas_FormStatus' onSubmit={validateForm(onSubmit)}>
                     <label htmlFor='nombre' className="block">
                         Nombre:
                     </label>

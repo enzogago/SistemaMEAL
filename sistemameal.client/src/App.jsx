@@ -25,7 +25,6 @@ import Permission from './components/permission/Permission';
 import TypeValue from './components/type-value/TypeValue';
 import FormProject from './components/project/FormProject';
 import Projects from './components/project/Projects';
-import FormBeneficiarie from './components/monitoring/beneficiarie/FormBeneficiarie';
 import Dashboard from './components/dashboard/Dashboard';
 import FormGoal from './components/monitoring/goal/FormGoal';
 import Gender from './components/gender/Gender';
@@ -33,6 +32,9 @@ import Nationality from './components/Nationality.jsx/Nationality';
 import Unit from './components/Unit/Unit';
 import NotFound from './components/NotFound';
 import Beneficiarie from './components/beneficiarie/Beneficiarie';
+import FormGoalBeneficiarie from './components/monitoring/beneficiarie/FormGoalBeneficiarie';
+import FormBeneficiarie from './components/beneficiarie/FormBeneficiarie';
+import FormProfile from './components/profile/FormProfile';
 
 const App = () => {
     // Variables state AuthContext
@@ -78,6 +80,9 @@ const App = () => {
                                     {menuData.some(menu => menu.menRef === 'projects') && (
                                         <Route path="form-project/:id?" element={<FormProject />} />
                                     )}
+                                    {menuData.some(menu => menu.menRef === 'beneficiarie') && (
+                                        <Route path="form-beneficiarie/:id?" element={<FormBeneficiarie />} />
+                                        )}
                                     {menuData.some(menu => menu.menRef === 'user') && (
                                         <>
                                             <Route path="form-user/:id?" element={<FormUser />} />
@@ -87,10 +92,11 @@ const App = () => {
                                     )}
                                     {menuData.some(menu => menu.menRef === 'monitoring') && (
                                         <>
-                                            <Route path="form-beneficiarie/:id" element={<FormBeneficiarie />} />
+                                            <Route path="form-goal-beneficiarie/:id" element={<FormGoalBeneficiarie />} />
                                             <Route path="form-goal/:id?" element={<FormGoal />} />
                                         </>
                                     )}
+                                    <Route path="form-profile/:id" element={<FormProfile />} />
                                     <Route path="*" element={<NotFound />} />
                                 </Routes>
                             </Layout>

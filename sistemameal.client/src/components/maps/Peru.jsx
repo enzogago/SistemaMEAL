@@ -17,8 +17,8 @@ const Peru = () => {
         const height = svg.node().getBoundingClientRect().height;
 
         const projection = d3.geoMercator()
-            .center([-81.1000, -5])
-            .scale(1800)
+            .center([-86.1000, -3])
+            .scale(1500)
             .translate([width / 2, height / 2]);
 
         const path = d3.geoPath().projection(projection);

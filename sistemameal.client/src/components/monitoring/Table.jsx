@@ -71,7 +71,7 @@ const Table = ({ data }) => {
         const ciphertext = CryptoJS.AES.encrypt(id, 'secret key 123').toString();
         // Codifica la cadena cifrada para que pueda ser incluida de manera segura en una URL
         const safeCiphertext = btoa(ciphertext).replace('+', '-').replace('/', '_').replace(/=+$/, '');
-        navigate(`/form-beneficiarie/${safeCiphertext}`);
+        navigate(`/form-goal-beneficiarie/${safeCiphertext}`);
     }
     
     const actions = {

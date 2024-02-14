@@ -8,8 +8,7 @@ import Notiflix from "notiflix";
 import { useForm } from 'react-hook-form';
 import TableForm from "./TableForm";
 
-
-const FormBeneficiarie = () => {
+const FormGoalBeneficiarie = () => {
     const navigate = useNavigate();
     const { id: safeCiphertext } = useParams();
     // Reemplaza los caracteres a su representación original en base64 y decodifica la cadena
@@ -31,10 +30,14 @@ const FormBeneficiarie = () => {
     const [ modalIsOpen, setModalIsOpen ] = useState(false);
     const [ esMenorDeEdad, setEsMenorDeEdad ] = useState(false);
     const [ mostrarAgregarDocumento, setMostrarAgregarDocumento ] = useState(false);
-    const [accionActual, setAccionActual] = useState('buscar');
-    const [mostrarTabla, setMostrarTabla] = useState(false);
-    const [updateData, setUpdateData] = useState(false);
-    const [data, setdata] = useState([])
+    const [ accionActual, setAccionActual] = useState('buscar');
+    const [ mostrarTabla, setMostrarTabla] = useState(false);
+    const [ updateData, setUpdateData] = useState(false);
+    const [ data, setdata] = useState([])
+    const [fieldsDisabled, setFieldsDisabled] = useState(true);
+    const [showSearchButton, setShowSearchButton] = useState(true);
+
+
     useEffect(() => {
         const fetchano = async () => {
             try {
@@ -89,38 +92,40 @@ const FormBeneficiarie = () => {
     const { register: register2, watch: watch2, handleSubmit: validateForm2, formState: { errors: errors2,dirtyFields: dirtyFields2, isSubmitted: isSubmitted2  }, reset: reset2, trigger: trigger2 } = useForm({ mode: "onChange"});
 
     // Actualiza la acción actual antes de enviar el formulario
-    const buscarBeneficiarioDocumento = async(data) => {
+    const buscarBeneficiarioDocumento = async (info) => {
         const token = localStorage.getItem('token');
         Notiflix.Loading.pulse('Cargando...');
         
         try {
-            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Beneficiario/documento/${data.docIdeCod}/${data.docIdeBenNum}`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Beneficiario/documento/${info.docIdeCod}/${info.docIdeBenNum}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
             console.log(response)
+            if(response.status === 204){
+                setMostrarAgregarDocumento(true);
+                setAccionActual('agregar')
+                setFieldsDisabled(false);
+                return;
+            }
             const data = await response.json();
             if (!response.ok) {
                 Notiflix.Notify.failure(data.message);
                 return;
             }
+            reset(data);
+            setShowSearchButton(false);
             console.log(data);
         } catch (error) {
             console.error('Error:', error);
-            setMostrarAgregarDocumento(true);
-            setAccionActual('agregar')
         } finally {
             Notiflix.Loading.remove();
         }
     };
 
-    const Agregar_Documento = () => {
-        validateForm2(onSubmit)();
-    };
-
-
     const onSubmit = async(data) => {
+        console.log(data)
         if (accionActual === 'buscar') {
             buscarBeneficiarioDocumento(data)
         } else if (accionActual === 'agregar') {
@@ -159,7 +164,6 @@ const FormBeneficiarie = () => {
     // Observa los cambios en los campos 'docIdeBenNum' y 'docIdeCod'
     const docIdeBenNum = watch2('docIdeBenNum');
     const docIdeCod = watch2('docIdeCod');
-
 
     // Observa los cambios en el campo 'benFecNac'
     const fechaNacimiento = watch('benFecNac');
@@ -451,6 +455,16 @@ const FormBeneficiarie = () => {
             handleSubmitMetaBeneficiario(beneficiarioMonitoreo);
         })();
     };
+
+    const handleReset = () => {
+        reset();  // Resetea todos los campos del formulario
+        reset2();  // Resetea todos los campos del segundo formulario
+        setDocumentosAgregados([]);  // Vacía la lista de documentos agregados
+        setSelects([]);  // Vacía la lista de selects
+        setShowSearchButton(true);  // Muestra el botón de búsqueda
+        setFieldsDisabled(true);  // Deshabilita los campos del formulario
+        // ... resetea cualquier otro estado que necesites ...
+    };
     
     
     const handleSubmitMetaBeneficiario = async (data) => {
@@ -511,17 +525,19 @@ const FormBeneficiarie = () => {
         }
     };
 
+    const selectedValue = watch('genCod', '0');
+    const selectedDocumentValue = watch2('docIdeCod', '0');
 
     return (
         <div className="PowerMas_StatusContainer bg-white h-100 flex flex-column">
             <div className="PowerMas_Header_Form_Beneficiarie flex ai-center p_25">
                 <GrFormPreviousLink className="m1 w-auto Large-f2_5 pointer" onClick={() => navigate('/monitoring')} />
-                <h1 className="">Nuevo Beneficiario</h1>
+                <h1 className="f1_75">Nuevo Beneficiario</h1>
             </div>
             <div className="PowerMas_Content_Form_Beneficiarie overflow-auto flex-grow-1 flex">
-                    <div className="Large_6 m1 overflow-auto">
-                        <h2>Datos Personales</h2>
+                    <div className="Large_6 m1 overflow-auto flex flex-column gap-1">
                         <div className="PowerMas_Content_Form_Beneficiarie_Card Large-p_75">
+                            <h2 className="f1_25">Datos Personales</h2>
                             <form onSubmit={validateForm2(onSubmit)}>
                                 <div className="m_75">
                                     <label htmlFor="docIdeCod" className="">
@@ -530,15 +546,16 @@ const FormBeneficiarie = () => {
                                     <select 
                                         id="docIdeCod" 
                                         className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields2.docIdeCod || isSubmitted2 ? (errors2.docIdeCod ? 'invalid' : 'valid') : ''}`} 
+                                        style={{ color: selectedDocumentValue === '0' ? '#372e2c60' : '#000', textTransform: 'capitalize'}}
                                         {...register2('docIdeCod', { 
                                             validate: value => value !== '0' || 'El dcoumento de identidad es requerido' 
                                         })}
                                     >
-                                        <option value="0">--Seleccione Dcoumento Identidad--</option>
+                                        <option value="0">--Seleccione Documento Identidad--</option>
                                         {documentos.map(documento => (
-                                            <option 
+                                            <option
                                                 key={documento.docIdeCod} 
-                                                value={documento.docIdeCod}> ({documento.docIdeAbr}) {documento.docIdeNom}
+                                                value={documento.docIdeCod}> ({documento.docIdeAbr}) {documento.docIdeNom.toLowerCase()}
                                             </option>
                                         ))}
                                     </select>
@@ -590,15 +607,15 @@ const FormBeneficiarie = () => {
                                         </p>
                                     )}
                                 </div>
-                                <div className="m_75 flex jc-space-between">
+                                <div className="m_75 flex jc-center">
                                 {
                                     mostrarAgregarDocumento ? 
-                                        <>
-                                            <button type="submit">Agregar documento</button>
-                                            <button type="button" onClick={abrirModal}>Ver documentos agregados</button>
-                                        </>
+                                        <div className="flex gap-1 Large_12" >
+                                            <button className="PowerMas_Buttom_Primary Large_6" type="submit">Agregar Documento</button>
+                                            <button className="PowerMas_Buttom_Secondary Large_6" type="button" onClick={abrirModal}>Ver Documentos</button>
+                                        </div>
                                         :
-                                        <button type="submit">Buscar</button>
+                                        showSearchButton && <button className="PowerMas_Buttom_Primary Large_5" type="submit">Buscar</button>
                                 }
                                 </div>
 
@@ -606,7 +623,7 @@ const FormBeneficiarie = () => {
 
 
                             <div className="m_75">
-                                <label htmlFor="benNom" className="">
+                                <label htmlFor="benNom" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
                                     Nombre
                                 </label>
                                 <input type="text"
@@ -614,6 +631,7 @@ const FormBeneficiarie = () => {
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benNom || isSubmitted ? (errors.benNom ? 'invalid' : 'valid') : ''}`} 
                                     placeholder="Enzo Fabricio"
                                     autoComplete="disabled"
+                                    disabled={fieldsDisabled}
                                     {...register('benNom', { 
                                         required: 'El nombre es requerido',
                                         minLength: { value: 3, message: 'El nombre debe tener minimo 3 digitos' },
@@ -628,7 +646,7 @@ const FormBeneficiarie = () => {
                                 )}
                             </div>
                             <div className="m_75">
-                                <label htmlFor="benApe" className="">
+                                <label htmlFor="benApe" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
                                     Apellido
                                 </label>
                                 <input 
@@ -637,6 +655,7 @@ const FormBeneficiarie = () => {
                                     autoComplete="disabled"
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benApe || isSubmitted ? (errors.benApe ? 'invalid' : 'valid') : ''}`} 
                                     placeholder="Gago Aguirre"
+                                    disabled={fieldsDisabled}
                                     {...register('benApe', { 
                                         required: 'El apellido es requerido',
                                             minLength: { value: 3, message: 'El apellido debe tener minimo 3 digitos' },
@@ -651,7 +670,7 @@ const FormBeneficiarie = () => {
                                 )}
                             </div>
                             <div className="m_75">
-                                <label htmlFor="masculino" className="">
+                                <label htmlFor="masculino" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
                                     Sexo:
                                 </label>
                                 <div className="flex gap-1">
@@ -660,29 +679,40 @@ const FormBeneficiarie = () => {
                                             type="radio" 
                                             id="masculino" 
                                             name="benSex" 
+                                            disabled={fieldsDisabled}
                                             value="M" 
-                                            {...register('benSex')}
+                                            {...register('benSex', { required: 'Por favor, selecciona una opción' })}
                                         />
-                                        <label htmlFor="masculino">Masculino</label>
+                                        <label htmlFor="masculino" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} >Masculino</label>
                                     </div>
                                     <div className="flex gap_5">
                                         <input 
                                             type="radio" 
                                             id="femenino" 
                                             name="benSex" 
+                                            disabled={fieldsDisabled}
                                             value="F" 
-                                            {...register('benSex')}
+                                            {...register('benSex', { required: 'Por favor, selecciona una opción' })}
                                         />
-                                        <label htmlFor="femenino">Femenino</label>
+                                        <label style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} htmlFor="femenino">Femenino</label>
                                     </div>
                                 </div>
+                                {errors.benSex ? (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.benSex.message}</p>
+                                ) : (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                        Espacio reservado para el mensaje de error
+                                    </p>
+                                )}
                             </div>
                             <div className="m_75">
-                                <label htmlFor="genCod" className="">
+                                <label htmlFor="genCod" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
                                     Género:
                                 </label>
                                 <select 
                                     id="genCod" 
+                                    disabled={fieldsDisabled}
+                                    style={{ color: selectedValue === '0' ? '#372e2c60' : '#000000' }}
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.genCod || isSubmitted ? (errors.genCod ? 'invalid' : 'valid') : ''}`} 
                                     {...register('genCod', { 
                                         validate: value => value !== '0' || 'El género de identidad es requerido' 
@@ -707,16 +737,17 @@ const FormBeneficiarie = () => {
                                 )}
                             </div>
                             <div className="m_75">
-                                <label htmlFor="benFecNac" className="">
+                                <label htmlFor="benFecNac" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
                                     Fecha de nacimiento:
                                 </label>
                                 <input 
                                     type="text" 
                                     id="benFecNac"
-                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benFecNac || isSubmitted ? (errors.benFecNac ? 'invalid' : 'valid') : ''}`} 
+                                    className={`PowerMas_Modal_Form_Calendar_${fieldsDisabled ? 'Disabled': 'Enable'} block Phone_12 PowerMas_Modal_Form_${dirtyFields.benFecNac || isSubmitted ? (errors.benFecNac ? 'invalid' : 'valid') : ''}`} 
                                     placeholder="2003-03-17"
                                     autoComplete="disabled"
                                     maxLength={10}
+                                    disabled={fieldsDisabled}
                                     onKeyDown={(event) => {
                                         if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
                                             event.preventDefault();
@@ -740,7 +771,7 @@ const FormBeneficiarie = () => {
                             </div>
                            
                             <div className="m_75">
-                                <label htmlFor="benCorEle" className="">
+                                <label htmlFor="benCorEle" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
                                     Email
                                 </label>
                                 <input 
@@ -748,6 +779,7 @@ const FormBeneficiarie = () => {
                                     id="benCorEle"
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benCorEle || isSubmitted ? (errors.benCorEle ? 'invalid' : 'valid') : ''}`} 
                                     placeholder="correo@correo.com"
+                                    disabled={fieldsDisabled}
                                     autoComplete="disabled"
                                     {...register('benCorEle', { 
                                         required: 'El correo es requerida',
@@ -766,7 +798,7 @@ const FormBeneficiarie = () => {
                                 )}
                             </div>
                             <div className="m_75">
-                                <label htmlFor="benTel" className="">
+                                <label htmlFor="benTel" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
                                     Numero de telefono
                                 </label>
                                 <input 
@@ -776,6 +808,7 @@ const FormBeneficiarie = () => {
                                     placeholder="907078329"
                                     autoComplete="disabled"
                                     maxLength={10}
+                                    disabled={fieldsDisabled}
                                     onKeyDown={(event) => {
                                         if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
                                             event.preventDefault();
@@ -800,7 +833,7 @@ const FormBeneficiarie = () => {
                                 )}
                             </div>
                             <div className="m_75">
-                                <label htmlFor="benTelCon" className="">
+                                <label htmlFor="benTelCon" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
                                     Telefono de contacto
                                 </label>
                                 <input 
@@ -810,6 +843,7 @@ const FormBeneficiarie = () => {
                                     placeholder="907078329"
                                     autoComplete="disabled"
                                     maxLength={10}
+                                    disabled={fieldsDisabled}
                                     onKeyDown={(event) => {
                                         if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
                                             event.preventDefault();
@@ -837,11 +871,11 @@ const FormBeneficiarie = () => {
                         {
                             esMenorDeEdad && 
                             <>
-                                <h2>Datos de Autorización</h2>
-                                <p className="f_75">Si el beneficiario es menor de edad se deben introducir los datos de la persona que autoriza el uso de su información.</p>
                                 <div className="PowerMas_Content_Form_Beneficiarie_Card Large-p_75">
+                                    <h2 className="f1_25">Datos de Autorización</h2>
+                                    <p className="f_75">Si el beneficiario es menor de edad se deben introducir los datos de la persona que autoriza el uso de su información.</p>
                                     <div className="m_75">
-                                        <label htmlFor="benNomApo" className="">
+                                        <label htmlFor="benNomApo" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
                                             Nombre Apoderado
                                         </label>
                                         <input 
@@ -850,6 +884,7 @@ const FormBeneficiarie = () => {
                                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benNomApo || isSubmitted ? (errors.benNomApo ? 'invalid' : 'valid') : ''}`} 
                                             placeholder="Enzo Fabricio"
                                             autoComplete="disabled"
+                                            disabled={fieldsDisabled}
                                             {...register('benNomApo', { 
                                                 required: 'El nombre del apoderado es requerido',
                                                 minLength: { value: 3, message: 'El nombre debe tener minimo 3 digitos' },
@@ -864,7 +899,7 @@ const FormBeneficiarie = () => {
                                         )}
                                     </div>
                                     <div className="m_75">
-                                        <label htmlFor="benApeApo" className="">
+                                        <label htmlFor="benApeApo" style={{color: `${fieldsDisabled ? '#372e2c': '#000'}`}} className="">
                                             Apellido Apoderado
                                         </label>
                                         <input 
@@ -873,6 +908,7 @@ const FormBeneficiarie = () => {
                                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benApeApo || isSubmitted ? (errors.benApeApo ? 'invalid' : 'valid') : ''}`} 
                                             placeholder="Gago Aguirre"
                                             autoComplete="disabled"
+                                            disabled={fieldsDisabled}
                                             {...register('benApeApo', { 
                                                 required: 'El nombre del apoderado es requerido',
                                                 minLength: { value: 3, message: 'El nombre debe tener minimo 3 digitos' },
@@ -890,8 +926,8 @@ const FormBeneficiarie = () => {
                             </>
                         }
                        
-                        <h2>Datos de Ubicación</h2>
                         <div className="PowerMas_Content_Form_Beneficiarie_Card Large-p_75">
+                            <h2 className="f1_25">Datos de Ubicación</h2>
                             <div className="m_75">
                                 <label htmlFor="pais" className="">
                                     Pais:
@@ -972,27 +1008,27 @@ const FormBeneficiarie = () => {
                                 <br />
                                 <div>
                                     <article>
-                                        <h3 className="Large-f1_25 m_5" style={{textTransform: 'capitalize'}}>{metaData && metaData.tipInd.toLowerCase()}</h3>
+                                        <h3 className="Large-f1 m_5" style={{textTransform: 'capitalize'}}>{metaData && metaData.tipInd.toLowerCase()}</h3>
                                         <p className="m_5">{metaData && metaData.indActResNum + ' - ' + metaData.indActResNom.charAt(0).toUpperCase() + metaData.indActResNom.slice(1).toLowerCase()}</p>
                                     </article>
                                     <article>
-                                        <h3 className="Large-f1_25 m_5"> Resultado </h3>
+                                        <h3 className="Large-f1 m_5"> Resultado </h3>
                                         <p className="m_5">{metaData && metaData.resNum + ' - ' + metaData.resNom.charAt(0).toUpperCase() + metaData.indActResNom.slice(1).toLowerCase()}</p>
                                     </article>
                                     <article>
-                                        <h3 className="Large-f1_25 m_5">Objetivo Específico</h3>
+                                        <h3 className="Large-f1 m_5">Objetivo Específico</h3>
                                         <p className="m_5">{metaData && metaData.objEspNum + ' - ' + metaData.objEspNom.charAt(0).toUpperCase() + metaData.objEspNom.slice(1).toLowerCase()}</p>
                                     </article>
                                     <article>
-                                        <h3 className="Large-f1_25 m_5">Objetivo</h3>
+                                        <h3 className="Large-f1 m_5">Objetivo</h3>
                                         <p className="m_5">{metaData && metaData.objNum + ' - ' + metaData.objNom.charAt(0).toUpperCase() + metaData.objNom.slice(1).toLowerCase()}</p>
                                     </article>
                                     <article>
-                                        <h3 className="Large-f1_25 m_5"> Subproyecto </h3>
+                                        <h3 className="Large-f1 m_5"> Subproyecto </h3>
                                         <p className="m_5">{metaData && metaData.subProNom}</p>
                                     </article>
                                     <article>
-                                        <h3 className="Large-f1_25 m_5">Proyecto</h3>
+                                        <h3 className="Large-f1 m_5">Proyecto</h3>
                                         <p className="m_5">{metaData && metaData.proNom}</p>
                                     </article>
                                 </div>
@@ -1001,9 +1037,9 @@ const FormBeneficiarie = () => {
                         
                     </div>
             </div>
-            <div className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
-                <button className="Large_5 m2" onClick={Registrar_Beneficiario} >Guardar</button>
-                <button className="Large_5 m2">Eliminar Todo</button>
+            <div className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center todos">
+                <button className="PowerMas_Buttom_Primary Large_3 m2" onClick={Registrar_Beneficiario} >Guardar</button>
+                <button className="PowerMas_Buttom_Secondary Large_3 m2" onClick={handleReset}>Limpiar</button>
             </div>
             <Modal
                 ariaHideApp={false}
@@ -1053,4 +1089,4 @@ const FormBeneficiarie = () => {
     )
 }
 
-export default FormBeneficiarie
+export default FormGoalBeneficiarie

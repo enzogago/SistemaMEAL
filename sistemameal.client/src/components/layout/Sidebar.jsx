@@ -109,7 +109,6 @@ const Sidebar = () => {
         <div className="PowerMas_Menu Large_2 Medium_3 Small_12 flex flex-column">
             <div className="PowerMas_SidebarHeader Large-p1 Medium-p_75 Small-p1 center Medium-block Small-flex flex Small-jc-space-between jc-space-between">
                 <img className='Large_12 Medium_10 Phone_6' height="auto"  title="Sistema MEAL Ayuda en Acción" src={logo} alt="Logo Ayuda En Accion" />
-                <h1 className="Powermas_FontTitle center Large-f2_25 Medium-f1_75 Small-f0 f0">Menú</h1>
                 <IoMenu className='Large-f0 Medium-f0 Small-f2_5 Phone_1' />
             </div>
             <div className="PowerMas_MenuContainer Large-f1 flex-grow-1 overflow-auto">

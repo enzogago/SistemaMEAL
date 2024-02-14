@@ -64,7 +64,7 @@ const Modal = ({ closeModal, setData }) => {
             <div className="PowerMas_ModalContent">
                 <span className="PowerMas_CloseModal" onClick={closeModalAndReset}>×</span>
                 <h2 className="center">{estadoEditado ? 'Editar' : 'Nuevo'} Unidad</h2>
-                <form className='Large-f1_25 PowerMas_FormStatus' onSubmit={validateForm(onSubmit)}>
+                <form className='Large-f1 PowerMas_FormStatus' onSubmit={validateForm(onSubmit)}>
                     <label htmlFor='nombre' className="block">
                         Nombre:
                     </label>
@@ -96,10 +96,10 @@ const Modal = ({ closeModal, setData }) => {
                             Espacio reservado para el mensaje de error
                         </p>
                     )}
-                    <label className="block">
+                    <label className="block f1">
                         Involucra Persona:
                     </label>
-                    <div className="flex gap-1 f1">
+                    <div className="flex gap-1">
                         <div className="flex gap_5">
                             <input 
                                 type="radio" 

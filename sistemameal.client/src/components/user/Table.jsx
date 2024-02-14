@@ -26,7 +26,7 @@ import TableRow from "./TableRow"
 const Table = ({data}) => {
     const navigate = useNavigate();
     // Variables State AuthContext 
-    const { authActions, authInfo } = useContext(AuthContext);
+    const { authInfo } = useContext(AuthContext);
     const { userPermissions } = authInfo;
     // States locales
     const [searchFilter, setSearchFilter] = useState('');
@@ -192,7 +192,7 @@ const Table = ({data}) => {
      // Preparar los datos
      const dataExport = table.options.data;  // Tus datos
      const headers = ['AÑO', 'CODIGO', 'NOMBRE', 'APELLIDO', 'CARGO', 'ROL', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
-     const title = 'PROYECTOS';  // El título de tu archivo
+     const title = 'USUARIOS';  // El título de tu archivo
      const properties = ['usuAno', 'usuCod', 'usuNom', 'usuApe', 'carNom', 'rolNom', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
      const format = 'a4';  // El tamaño del formato que quieres establecer para el PDF
  

@@ -1,6 +1,6 @@
 const NotFound = () => {
     return (
-        <div>Recurso no encontrado por favor verifica ruta.</div>
+        <div>Recurso no encontrado por favor verifica la ruta.</div>
     )
 }
 

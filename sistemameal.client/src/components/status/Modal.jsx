@@ -39,9 +39,12 @@ const Modal = ({ closeModal, setEstados }) => {
     // Efecto al editar estado
     useEffect(() => {
         if (estadoEditado) {
+            console.log(estadoEditado)
             const nombre = estadoEditado.estNom.charAt(0).toUpperCase() + estadoEditado.estNom.slice(1).toLowerCase();
+            console.log(nombre)
             const color = estadoEditado.estCol.charAt(0).toUpperCase() + estadoEditado.estCol.slice(1).toLowerCase();
-
+            console.log(color)
+            
             setValue('nombre', nombre);
             setValue('color', color);
             setColor(estadoEditado.estCol);

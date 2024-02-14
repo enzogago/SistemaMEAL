@@ -6,7 +6,6 @@ import { AuthContext } from '../../context/AuthContext';
 import { StatusContext } from '../../context/StatusContext';
 // Componentes
 import Table from './Table';
-import Modal from './Modal';
 
 const Beneficiarie = () => {
     // Variables State AuthContext 
@@ -72,12 +71,6 @@ const Beneficiarie = () => {
         <div className="PowerMas_StatusContainer">
             <Table
                 data={data} 
-                openModal={openModal} 
-                setData={setData}
-            />
-            <Modal 
-                closeModal={closeModal} 
-                setData={setData}
             />
         </div>
     )
