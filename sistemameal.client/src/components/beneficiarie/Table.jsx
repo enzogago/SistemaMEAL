@@ -26,22 +26,79 @@ const Table = ({ data, openModal, setData }) => {
 
     /* TANSTACK */
     const actions = {
-        add: userPermissions.some(permission => permission.perNom === "INSERTAR ROL"),
-        delete: userPermissions.some(permission => permission.perNom === "ELIMINAR ROL"),
-        edit: userPermissions.some(permission => permission.perNom === "MODIFICAR ROL"),
+        add: userPermissions.some(permission => permission.perNom === "INSERTAR BENEFICIARIO"),
+        delete: userPermissions.some(permission => permission.perNom === "ELIMINAR BENEFICIARIO"),
+        edit: userPermissions.some(permission => permission.perNom === "MODIFICAR BENEFICIARIO"),
     };
 
     const columns = useMemo(() => {
         let baseColumns = [
             {
-                header: "Codigo",
-                accessorKey: "rolCod",
+                header: "Código",
+                accessorKey: "benCod",
+                cell: ({row}) => (
+                    <div className="">
+                        {row.original.benAno + row.original.benCod}
+                    </div>
+                ),
             },
             {
                 header: "Nombre",
-                accessorKey: "rolNom",
+                accessorKey: "benNom",
+                cell: ({row}) => {
+                    const text = row.original.benNom.toLowerCase();
+                    return (
+                        <div style={{textTransform: 'capitalize'}}>
+                            {text}
+                        </div>
+                    )
+                }
             },
-        ];
+            {
+                header: "Apellido",
+                accessorKey: "benApe",
+                cell: ({row}) => {
+                    const text = row.original.benApe.toLowerCase();
+                    return (
+                        <div style={{textTransform: 'capitalize'}}>
+                            {text}
+                        </div>
+                    )
+                }
+            },
+            {
+                header: "Correo",
+                accessorKey: "benCorEle",
+                cell: ({row}) => {
+                    const text = row.original.benCorEle.toLowerCase();
+                    return (
+                        <div>
+                            {text}
+                        </div>
+                    )
+                }
+            },
+            {
+                header: "Telefono",
+                accessorKey: "benTel",
+            },
+            {
+                header: "Contacto",
+                accessorKey: "benTelCon"
+            },
+            {
+                header: "Sexo",
+                accessorKey: "benSex",
+                cell: ({row}) => {
+                    const text = row.original.benSex;
+                    return (
+                        <>
+                            {text === 'M' ? 'Masculino' : 'Femenino'}
+                        </>
+                    )
+                },
+            },
+        ]
     
         if (actions.delete || actions.edit) {
             baseColumns.push({
@@ -63,7 +120,7 @@ const Table = ({ data, openModal, setData }) => {
                                 data-tooltip-id="delete-tooltip" 
                                 data-tooltip-content="Eliminar" 
                                 className='Large-p_25' 
-                                onClick={() => handleDelete('Rol', row.original.rolCod, setData, setIsLoggedIn)} 
+                                onClick={() => handleDelete('Beneficiario', row.original.uniCod, setData, setIsLoggedIn)} 
                             />
                         }
                         <Tooltip 
@@ -87,8 +144,15 @@ const Table = ({ data, openModal, setData }) => {
     const [sorting, setSorting] = useState([]);
     const filteredData = useMemo(() => 
         data.filter(item => 
-            item.rolCod.includes(searchFilter.toUpperCase()) ||
-            item.rolNom.includes(searchFilter.toUpperCase()) 
+            item.benAno.includes(searchFilter.toUpperCase()) ||
+            item.benCod.includes(searchFilter.toUpperCase()) ||
+            item.benNom.includes(searchFilter.toUpperCase()) ||
+            item.benApe.includes(searchFilter.toUpperCase()) ||
+            item.benCorEle.includes(searchFilter.toUpperCase()) ||
+            item.benTel.includes(searchFilter.toUpperCase()) ||
+            item.benTelCon.includes(searchFilter.toUpperCase()) ||
+            (item.benSex === 'M' && 'MASCULINO'.includes(searchFilter.toUpperCase())) ||
+            (item.benSex === 'F' && 'FEMENINO'.includes(searchFilter.toUpperCase()))
         ), [data, searchFilter]
     );
 
@@ -107,10 +171,15 @@ const Table = ({ data, openModal, setData }) => {
     /* END TANSTACK */
 
     // Preparar los datos
-    const dataExport = table.options.data;  // Tus datos
-    const headers = ['CODIGO', 'NOMBRE', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
-    const title = 'ROLES';  // El título de tu archivo
-    const properties = ['rolCod', 'rolnom', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
+    let dataExport = [...table.options.data]; 
+    // Modificar el campo 'uniInvPer' en los datos
+    dataExport = dataExport.map(item => ({
+        ...item,
+        uniInvPer: item.uniInvPer === 'S' ? 'SI' : 'NO',
+    }));
+    const headers = ['CODIGO', 'NOMBRE', 'INVOLUCRA', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
+    const title = 'UNIDADES';  // El título de tu archivo
+    const properties = ['uniCod', 'uniNom', 'uniInvPer', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
     const format = 'a4';  // El tamaño del formato que quieres establecer para el PDF
 
     const Export_Excel = () => {
@@ -128,7 +197,7 @@ const Table = ({ data, openModal, setData }) => {
     
     return (
         <CustomTable 
-            title="Listado de Roles" 
+            title="Listado de Beneficiarios" 
             searchFilter={searchFilter} 
             setSearchFilter={setSearchFilter} 
             actions={actions} 

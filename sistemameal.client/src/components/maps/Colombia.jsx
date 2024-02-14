@@ -17,7 +17,7 @@ const Colombia = () => {
         const height = svg.node().getBoundingClientRect().height;
 
         const projection = d3.geoMercator()
-            .center([-80.1000, 9])
+            .center([-80.1000, 8])
             .scale(2000)
             .translate([width / 2, height / 2]);
 

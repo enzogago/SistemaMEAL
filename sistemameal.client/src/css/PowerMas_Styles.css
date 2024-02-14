@@ -947,7 +947,7 @@ input,select{
 	text-align: start;
 }
 
-.PowerMas_TableStatus thead th div{
+.PowerMas_TableStatus thead th > div{
 	display: flex;
     justify-content: space-between;
     align-items: center;

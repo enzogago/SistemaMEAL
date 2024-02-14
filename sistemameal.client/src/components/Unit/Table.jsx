@@ -40,17 +40,34 @@ const Table = ({ data, openModal, setData }) => {
             {
                 header: "Nombre",
                 accessorKey: "uniNom",
+                cell: ({row}) => {
+                    const text = row.original.uniNom.charAt(0).toUpperCase() + row.original.uniNom.slice(1).toLowerCase();
+                    return (
+                        <>
+                            {text}
+                        </>
+                    )
+                },
             },
             {
-                header: "Involucra",
+                header: "Involucra Persona",
                 accessorKey: "uniInvPer",
+                cell: ({row}) => {
+                    const text = row.original.uniInvPer;
+                    return (
+                        <>
+                            {text === 'S' ? 'Si' : 'No'}
+                        </>
+                    )
+                },
             }
         ];
     
         if (actions.delete || actions.edit) {
             baseColumns.push({
-                header: "Acciones",
+                header: () => <div style={{textAlign: 'center', flexGrow: '1'}}>Acciones</div>,
                 accessorKey: "acciones",
+                disableSorting: true,
                 cell: ({row}) => (
                     <div className='PowerMas_IconsTable flex jc-center ai-center'>
                         {actions.edit && 
@@ -92,7 +109,8 @@ const Table = ({ data, openModal, setData }) => {
         data.filter(item => 
             item.uniCod.includes(searchFilter.toUpperCase()) ||
             item.uniNom.includes(searchFilter.toUpperCase()) ||
-            item.uniInvPer.includes(searchFilter.toUpperCase())
+            (item.benSex === 'S' && 'SI'.includes(searchFilter.toUpperCase())) ||
+            (item.benSex === 'N' && 'NO'.includes(searchFilter.toUpperCase()))
         ), [data, searchFilter]
     );
 
@@ -111,7 +129,12 @@ const Table = ({ data, openModal, setData }) => {
     /* END TANSTACK */
 
     // Preparar los datos
-    const dataExport = table.options.data;  // Tus datos
+    let dataExport = [...table.options.data]; 
+    // Modificar el campo 'uniInvPer' en los datos
+    dataExport = dataExport.map(item => ({
+        ...item,
+        uniInvPer: item.uniInvPer === 'S' ? 'SI' : 'NO',
+    }));
     const headers = ['CODIGO', 'NOMBRE', 'INVOLUCRA', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
     const title = 'UNIDADES';  // El título de tu archivo
     const properties = ['uniCod', 'uniNom', 'uniInvPer', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir

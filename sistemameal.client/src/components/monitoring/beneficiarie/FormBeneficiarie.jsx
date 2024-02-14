@@ -6,6 +6,7 @@ import DonutChart from "../../reusable/DonutChart";
 import { useEffect, useState } from "react";
 import Notiflix from "notiflix";
 import { useForm } from 'react-hook-form';
+import TableForm from "./TableForm";
 
 
 const FormBeneficiarie = () => {
@@ -31,7 +32,41 @@ const FormBeneficiarie = () => {
     const [ esMenorDeEdad, setEsMenorDeEdad ] = useState(false);
     const [ mostrarAgregarDocumento, setMostrarAgregarDocumento ] = useState(false);
     const [accionActual, setAccionActual] = useState('buscar');
-
+    const [mostrarTabla, setMostrarTabla] = useState(false);
+    const [updateData, setUpdateData] = useState(false);
+    const [data, setdata] = useState([])
+    useEffect(() => {
+        const fetchano = async () => {
+            try {
+                Notiflix.Loading.pulse('Cargando...');
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Beneficiario/meta/${metAno}/${metCod}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if (!response.ok) {
+                    if(response.status == 401 || response.status == 403){
+                        const data = await response.json();
+                        Notiflix.Notify.failure(data.message);
+                    }
+                    return;
+                }
+                const data = await response.json();
+                if (data.success == false) {
+                    Notiflix.Notify.failure(data.message);
+                    return;
+                }
+                console.log(data)
+                setdata(data)
+            } catch (error) {
+                console.error('Error:', error);
+            } finally {
+                Notiflix.Loading.remove();
+            }
+        };
+        fetchano()
+    }, [updateData])
 
     //
     const { register, watch, handleSubmit: validateForm, formState: { errors, dirtyFields, isSubmitted }, reset, setValue } = 
@@ -468,6 +503,7 @@ const FormBeneficiarie = () => {
             });
             setSelects([]);
             setDocumentosAgregados([])
+            setUpdateData(!updateData);
         } catch (error) {
             console.error('Error:', error);
         } finally {
@@ -913,44 +949,56 @@ const FormBeneficiarie = () => {
                             }
                         </div>
                     </div>
-                    <div className="PowerMas_Info_Form_Beneficiarie Large_6 m1 p1 overflow-auto">
-                        <div className="flex ai-center gap_5">
-                            <p className="p_5 Phone_4">Meta: <span>{metaData && metaData.metMetTec}</span></p>
-                            <p className="p_5 Phone_4">Ejecucion: <span>{metaData && metaData.metEjeTec}</span></p>
-                            <p className="p_5 Phone_4">Saldo: <span>{metaData && (metaData.metMetTec - metaData.metEjeTec)}</span></p>
-                        </div>
-                        <br />
-                        <div className="PowerMas_Info_Form_Beneficiarie_Progress flex ai-center jc-space-around p1 ">
-                            <h2 className="Large-f2 Large_8 Medium_8">Nos encontramos en un Avance de:</h2>
-                            <DonutChart percentage={metaData ? metaData.metPorAvaTec : 0} />
-                        </div>
-                        <br />
-                        <div>
-                            <article>
-                                <h3 className="Large-f1_25 m_5" style={{textTransform: 'capitalize'}}>{metaData && metaData.tipInd.toLowerCase()}</h3>
-                                <p className="m_5">{metaData && metaData.indActResNum + ' - ' + metaData.indActResNom.charAt(0).toUpperCase() + metaData.indActResNom.slice(1).toLowerCase()}</p>
-                            </article>
-                            <article>
-                                <h3 className="Large-f1_25 m_5"> Resultado </h3>
-                                <p className="m_5">{metaData && metaData.resNum + ' - ' + metaData.resNom.charAt(0).toUpperCase() + metaData.indActResNom.slice(1).toLowerCase()}</p>
-                            </article>
-                            <article>
-                                <h3 className="Large-f1_25 m_5">Objetivo Específico</h3>
-                                <p className="m_5">{metaData && metaData.objEspNum + ' - ' + metaData.objEspNom.charAt(0).toUpperCase() + metaData.objEspNom.slice(1).toLowerCase()}</p>
-                            </article>
-                            <article>
-                                <h3 className="Large-f1_25 m_5">Objetivo</h3>
-                                <p className="m_5">{metaData && metaData.objNum + ' - ' + metaData.objNom.charAt(0).toUpperCase() + metaData.objNom.slice(1).toLowerCase()}</p>
-                            </article>
-                            <article>
-                                <h3 className="Large-f1_25 m_5"> Subproyecto </h3>
-                                <p className="m_5">{metaData && metaData.subProNom}</p>
-                            </article>
-                            <article>
-                                <h3 className="Large-f1_25 m_5">Proyecto</h3>
-                                <p className="m_5">{metaData && metaData.proNom}</p>
-                            </article>
-                        </div>
+                    <div className="Large_6 overflow-auto flex flex-column"> 
+                        <button onClick={() => setMostrarTabla(!mostrarTabla)}>
+                            Cambiar vista
+                        </button>
+                        {mostrarTabla ? (
+                            <div className="flex-grow-1">
+                                <TableForm data={data} />
+                            </div>
+                        ) : (
+                            <div className="PowerMas_Info_Form_Beneficiarie m1 p1 ">
+                                <div className="flex ai-center gap_5">
+                                    <p className="p_5 Phone_4">Meta: <span>{metaData && metaData.metMetTec}</span></p>
+                                    <p className="p_5 Phone_4">Ejecucion: <span>{metaData && metaData.metEjeTec}</span></p>
+                                    <p className="p_5 Phone_4">Saldo: <span>{metaData && (metaData.metMetTec - metaData.metEjeTec)}</span></p>
+                                </div>
+                                <br />
+                                <div className="PowerMas_Info_Form_Beneficiarie_Progress flex ai-center jc-space-around p1 ">
+                                    <h2 className="Large-f2 Large_8 Medium_8">Nos encontramos en un Avance de:</h2>
+                                    <DonutChart percentage={metaData ? metaData.metPorAvaTec : 0} />
+                                </div>
+                                <br />
+                                <div>
+                                    <article>
+                                        <h3 className="Large-f1_25 m_5" style={{textTransform: 'capitalize'}}>{metaData && metaData.tipInd.toLowerCase()}</h3>
+                                        <p className="m_5">{metaData && metaData.indActResNum + ' - ' + metaData.indActResNom.charAt(0).toUpperCase() + metaData.indActResNom.slice(1).toLowerCase()}</p>
+                                    </article>
+                                    <article>
+                                        <h3 className="Large-f1_25 m_5"> Resultado </h3>
+                                        <p className="m_5">{metaData && metaData.resNum + ' - ' + metaData.resNom.charAt(0).toUpperCase() + metaData.indActResNom.slice(1).toLowerCase()}</p>
+                                    </article>
+                                    <article>
+                                        <h3 className="Large-f1_25 m_5">Objetivo Específico</h3>
+                                        <p className="m_5">{metaData && metaData.objEspNum + ' - ' + metaData.objEspNom.charAt(0).toUpperCase() + metaData.objEspNom.slice(1).toLowerCase()}</p>
+                                    </article>
+                                    <article>
+                                        <h3 className="Large-f1_25 m_5">Objetivo</h3>
+                                        <p className="m_5">{metaData && metaData.objNum + ' - ' + metaData.objNom.charAt(0).toUpperCase() + metaData.objNom.slice(1).toLowerCase()}</p>
+                                    </article>
+                                    <article>
+                                        <h3 className="Large-f1_25 m_5"> Subproyecto </h3>
+                                        <p className="m_5">{metaData && metaData.subProNom}</p>
+                                    </article>
+                                    <article>
+                                        <h3 className="Large-f1_25 m_5">Proyecto</h3>
+                                        <p className="m_5">{metaData && metaData.proNom}</p>
+                                    </article>
+                                </div>
+                            </div>
+                        )}
+                        
                     </div>
             </div>
             <div className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">

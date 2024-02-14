@@ -59,11 +59,12 @@ const CustomTable = ({ title, searchFilter, setSearchFilter, actions, openModal,
                                                     {
                                                         flexRender(header.column.columnDef.header, header.getContext())
                                                     }
-                                                    <div className='flex flex-column ai-center jc-center'>
-                                                        {header.column.getIsSorted() === 'asc' ? 
+                                                   <div className='flex flex-column ai-center jc-center'>
+                                                        {header.column.getIsSorted() === 'asc' && !header.column.columnDef.disableSorting ? 
                                                             <TiArrowSortedUp className={`sort-icon active`} /> :
-                                                            header.column.getIsSorted() === 'desc' ? 
+                                                            header.column.getIsSorted() === 'desc' && !header.column.columnDef.disableSorting ? 
                                                             <TiArrowSortedDown className={`sort-icon active`} /> :
+                                                            !header.column.columnDef.disableSorting &&
                                                             <>
                                                                 <TiArrowSortedUp className={`sort-icon`} />
                                                                 <TiArrowSortedDown className={`sort-icon`} />

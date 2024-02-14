@@ -21,8 +21,12 @@ const Modal = ({ closeModal, setEstados }) => {
             nombre: 'estNom',
             color: 'estCol'
         };
+
+        // Elimina los espacios en blanco adicionales
+        data.nombre = data.nombre.replace(/\s+/g, ' ').trim();
+        data.color = data.color.replace(/\s+/g, ' ').trim();
+
         handleSubmit('Estado', estadoEditado, data, setEstados, setModalVisible, setIsLoggedIn, fieldMapping, 'estCod');
-        reset();
     };
 
     // Activar focus en input
@@ -35,8 +39,11 @@ const Modal = ({ closeModal, setEstados }) => {
     // Efecto al editar estado
     useEffect(() => {
         if (estadoEditado) {
-            setValue('nombre', estadoEditado.estNom);
-            setValue('color', estadoEditado.estCol);
+            const nombre = estadoEditado.estNom.charAt(0).toUpperCase() + estadoEditado.estNom.slice(1).toLowerCase();
+            const color = estadoEditado.estCol.charAt(0).toUpperCase() + estadoEditado.estCol.slice(1).toLowerCase();
+
+            setValue('nombre', nombre);
+            setValue('color', color);
             setColor(estadoEditado.estCol);
         }
     }, [estadoEditado, setValue]);
@@ -44,6 +51,14 @@ const Modal = ({ closeModal, setEstados }) => {
     const closeModalAndReset = () => {
         closeModal();
         reset();
+    };
+
+    // Función de validación personalizada
+    const validateNoLeadingSpaces = (value) => {
+        if (value.startsWith(' ')) {
+            return 'El campo no puede comenzar con espacios en blanco';
+        }
+        return true;
     };
 
     return (
@@ -72,6 +87,7 @@ const Modal = ({ closeModal, setEstados }) => {
                                     value: /^[A-Za-zñÑ\s]+$/,
                                     message: 'Por favor, introduce solo letras y espacios',
                                 },
+                                validate: validateNoLeadingSpaces,
                             }
                         )}
                     />
@@ -98,6 +114,7 @@ const Modal = ({ closeModal, setEstados }) => {
                                         value: /^#([0-9A-Fa-f]{6})$/,
                                         message: 'Por favor, introduce un color en formato hexadecimal (ejemplo: #123abc)',
                                     },
+                                    validate: validateNoLeadingSpaces,
                                 }
                             )}
                         />

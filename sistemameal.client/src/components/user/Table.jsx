@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useContext, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Tooltip } from 'react-tooltip';
 import CryptoJS from 'crypto-js';
@@ -12,9 +12,11 @@ import {
 // Iconos package
 import { FaEdit, FaPlus, FaRegTrashAlt, FaSearch, FaSortDown } from 'react-icons/fa';
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
-    // Iconos source
+// Iconos source
 import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
 import Pdf_Icon from '../../img/PowerMas_Pdf_Icon.svg';
+// Context
+import { AuthContext } from '../../context/AuthContext';
 // Funciones reusables
 import { Export_Excel_Helper, Export_PDF_Helper } from '../reusable/helper';
 // Componentes
@@ -23,6 +25,9 @@ import TableRow from "./TableRow"
 
 const Table = ({data}) => {
     const navigate = useNavigate();
+    // Variables State AuthContext 
+    const { authActions, authInfo } = useContext(AuthContext);
+    const { userPermissions } = authInfo;
     // States locales
     const [searchFilter, setSearchFilter] = useState('');
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -30,6 +35,13 @@ const Table = ({data}) => {
     const toggleDropdown = () => {
         setDropdownOpen(!dropdownOpen);
     }
+
+    /* TANSTACK */
+    const actions = {
+        add: userPermissions.some(permission => permission.perNom === "INSERTAR USUARIO"),
+        delete: userPermissions.some(permission => permission.perNom === "ELIMINAR USUARIO"),
+        edit: userPermissions.some(permission => permission.perNom === "MODIFICAR USUARIO"),
+    };
 
     const columns = useMemo(() => { 
         let baseColumns = [
@@ -108,13 +120,14 @@ const Table = ({data}) => {
             },
         ]
 
-        if (true || true) {
+        if (actions.delete || actions.edit) {
             baseColumns.push({
-                header: "Acciones",
+                header: () => <div style={{textAlign: 'center', flexGrow: '1'}}>Acciones</div>,
                 accessorKey: "acciones",
+                disableSorting: true,
                 cell: ({row}) => (
                     <div className='PowerMas_IconsTable flex jc-center ai-center'>
-                        {true && 
+                        {actions.edit && 
                             <FaEdit 
                                 data-tooltip-id="edit-tooltip" 
                                 data-tooltip-content="Editar" 
@@ -122,7 +135,7 @@ const Table = ({data}) => {
                                 onClick={() => Editar_Usuario(row)} 
                             />
                         }
-                        {true && 
+                        {actions.delete && 
                             <FaRegTrashAlt 
                                 data-tooltip-id="delete-tooltip" 
                                 data-tooltip-content="Eliminar" 
@@ -130,13 +143,24 @@ const Table = ({data}) => {
                                 // onClick={() => handleDelete('Proyecto', row.original.estCod, setEstados, setIsLoggedIn)} 
                             />
                         }
+                        <Tooltip 
+                            id="edit-tooltip"
+                            effect="solid"
+                            place='top-end'
+                        />
+                        <Tooltip 
+                            id="delete-tooltip" 
+                            effect="solid"
+                            place='top-start'
+                        />
                     </div>
+                    
                 ),
             });
         }
 
         return baseColumns;
-    }, []);
+    }, [actions]);
 
     const [sorting, setSorting] = useState([]);
     const filteredData = useMemo(() => 
@@ -272,11 +296,12 @@ const Table = ({data}) => {
                                                     {
                                                     flexRender(header.column.columnDef.header, header.getContext())
                                                     }
-                                                    <div className='flex flex-column ai-center jc-center PowerMas_Icons_Sorter'>
-                                                        {header.column.getIsSorted() === 'asc' ? 
+                                                    <div className='flex flex-column ai-center jc-center'>
+                                                        {header.column.getIsSorted() === 'asc' && !header.column.columnDef.disableSorting ? 
                                                             <TiArrowSortedUp className={`sort-icon active`} /> :
-                                                            header.column.getIsSorted() === 'desc' ? 
+                                                            header.column.getIsSorted() === 'desc' && !header.column.columnDef.disableSorting ? 
                                                             <TiArrowSortedDown className={`sort-icon active`} /> :
+                                                            !header.column.columnDef.disableSorting &&
                                                             <>
                                                                 <TiArrowSortedUp className={`sort-icon`} />
                                                                 <TiArrowSortedDown className={`sort-icon`} />
@@ -300,16 +325,7 @@ const Table = ({data}) => {
                             : <tr className='PowerMas_TableEmpty'><td colSpan={11} className='Large-p1 center'>No se encontraron registros</td></tr>
                         }
                     </tbody>
-                    <Tooltip 
-                        id="edit-tooltip"
-                        effect="solid"
-                        place='top-end'
-                    />
-                    <Tooltip 
-                        id="delete-tooltip" 
-                        effect="solid"
-                        place='top-start'
-                    />
+                    
                 </table>
             </div>
             <Pagination table={table} />

@@ -79,6 +79,74 @@ namespace SistemaMEAL.Server.Modulos
             return (benAnoOut, benCodOut, mensaje, tipoMensaje);
         }
 
+        public IEnumerable<Beneficiario> Listado(string? benAno = null, string? benCod = null, string? benNom = null, string? benApe = null, string? benFecNac = null, string? benTel = null, string? benCorEle = null, string? benSex = null, string? genCod = null, string? benFecReg = null, string? benCodUni = null, string? benTelCon = null, string? benNomApo = null, string? benApeApo = null, string? nacCod = null)
+        {
+            List<Beneficiario>? temporal = new List<Beneficiario>();
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_BENEFICIARIO", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                // Aquí puedes agregar los parámetros necesarios para tu procedimiento almacenado
+                cmd.Parameters.AddWithValue("@P_BENANO", string.IsNullOrEmpty(benAno) ? (object)DBNull.Value : benAno);
+                cmd.Parameters.AddWithValue("@P_BENCOD", string.IsNullOrEmpty(benCod) ? (object)DBNull.Value : benCod);
+                cmd.Parameters.AddWithValue("@P_BENNOM", string.IsNullOrEmpty(benNom) ? (object)DBNull.Value : benNom);
+                cmd.Parameters.AddWithValue("@P_BENAPE", string.IsNullOrEmpty(benApe) ? (object)DBNull.Value : benApe);
+                cmd.Parameters.AddWithValue("@P_BENFECNAC", string.IsNullOrEmpty(benFecNac) ? (object)DBNull.Value : benFecNac);
+                cmd.Parameters.AddWithValue("@P_BENTEL", string.IsNullOrEmpty(benTel) ? (object)DBNull.Value : benTel);
+                cmd.Parameters.AddWithValue("@P_BENCORELE", string.IsNullOrEmpty(benCorEle) ? (object)DBNull.Value : benCorEle);
+                cmd.Parameters.AddWithValue("@P_BENSEX", string.IsNullOrEmpty(benSex) ? (object)DBNull.Value : benSex);
+                cmd.Parameters.AddWithValue("@P_GENCOD", string.IsNullOrEmpty(genCod) ? (object)DBNull.Value : genCod);
+                cmd.Parameters.AddWithValue("@P_BENFECREG", string.IsNullOrEmpty(benFecReg) ? (object)DBNull.Value : benFecReg);
+                cmd.Parameters.AddWithValue("@P_BENCODUNI", string.IsNullOrEmpty(benCodUni) ? (object)DBNull.Value : benCodUni);
+                cmd.Parameters.AddWithValue("@P_BENTELCON", string.IsNullOrEmpty(benTelCon) ? (object)DBNull.Value : benTelCon);
+                cmd.Parameters.AddWithValue("@P_BENNOMAPO", string.IsNullOrEmpty(benNomApo) ? (object)DBNull.Value : benNomApo);
+                cmd.Parameters.AddWithValue("@P_BENAPEAPO", string.IsNullOrEmpty(benApeApo) ? (object)DBNull.Value : benApeApo);
+                cmd.Parameters.AddWithValue("@P_NACCOD", string.IsNullOrEmpty(nacCod) ? (object)DBNull.Value : nacCod);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
+                cmd.Parameters.AddWithValue("@P_USUANO_U", "2024");
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", "0001");
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", "Juan");
+                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "Perez");
+                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "Gomez");
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (!reader.HasRows)
+                {
+                    jsonResult.Append("[]");
+                }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                Console.WriteLine(jsonResult);
+                // Deserializa la cadena JSON en una lista de objetos Usuario
+                temporal = JsonConvert.DeserializeObject<List<Beneficiario>>(jsonResult.ToString());
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return temporal?? new List<Beneficiario>();
+        }
+
 
         public IEnumerable<Beneficiario> BuscarBeneficiarioPorDocumento(string? docIdeCod = null, string? docIdeBenNum = null)
         {
@@ -120,6 +188,67 @@ namespace SistemaMEAL.Server.Modulos
                         jsonResult.Append(reader.GetValue(0).ToString());
                     }
                 }
+                // Deserializa la cadena JSON en una lista de objetos Usuario
+                temporal = JsonConvert.DeserializeObject<List<Beneficiario>>(jsonResult.ToString());
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return temporal?? new List<Beneficiario>();
+        }
+
+         public IEnumerable<Beneficiario> BuscarMetaBeneficiario(string? metAno = null, string? metCod = null, string? benAno = null, string? benCod = null, string? ubiAno = null, string? ubiCod = null, string? metBenEda = null)
+        {
+            List<Beneficiario>? temporal = new List<Beneficiario>();
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_META_BENEFICIARIO", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                // Aquí puedes agregar los parámetros necesarios para tu procedimiento almacenado
+                cmd.Parameters.AddWithValue("@P_METANO", string.IsNullOrEmpty(metAno) ? (object)DBNull.Value : metAno);
+                cmd.Parameters.AddWithValue("@P_METCOD", string.IsNullOrEmpty(metCod) ? (object)DBNull.Value : metCod);
+                cmd.Parameters.AddWithValue("@P_BENANO", string.IsNullOrEmpty(benAno) ? (object)DBNull.Value : benAno);
+                cmd.Parameters.AddWithValue("@P_BENCOD", string.IsNullOrEmpty(benCod) ? (object)DBNull.Value : benCod);
+                cmd.Parameters.AddWithValue("@P_UBIANO", string.IsNullOrEmpty(ubiAno) ? (object)DBNull.Value : ubiAno);
+                cmd.Parameters.AddWithValue("@P_UBICOD", string.IsNullOrEmpty(ubiCod) ? (object)DBNull.Value : ubiCod);
+                cmd.Parameters.AddWithValue("@P_METBENEDA", string.IsNullOrEmpty(metBenEda) ? (object)DBNull.Value : metBenEda);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
+                cmd.Parameters.AddWithValue("@P_USUANO_U", "2024");
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", "0001");
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", "Juan");
+                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "Perez");
+                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "Gomez");
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (!reader.HasRows)
+                {
+                    jsonResult.Append("[]");
+                }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        Console.WriteLine("desde reader:"+reader.GetValue(0).ToString());
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                Console.WriteLine("desde jsonResult final:"+jsonResult);
                 // Deserializa la cadena JSON en una lista de objetos Usuario
                 temporal = JsonConvert.DeserializeObject<List<Beneficiario>>(jsonResult.ToString());
             }

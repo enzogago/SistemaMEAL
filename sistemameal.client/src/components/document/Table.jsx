@@ -50,8 +50,9 @@ const Table = ({ data, setDocumentosIdentidad, openModal }) => {
     
         if (actions.delete || actions.edit) {
             baseColumns.push({
-                header: "Acciones",
+                header: () => <div style={{textAlign: 'center', flexGrow: '1'}}>Acciones</div>,
                 accessorKey: "acciones",
+                disableSorting: true,
                 cell: ({row}) => (
                     <div className='PowerMas_IconsTable flex jc-center ai-center'>
                         {actions.edit && 

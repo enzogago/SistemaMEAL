@@ -23,6 +23,67 @@ namespace SistemaMEAL.Server.Controllers
             _usuarios = usuarios;
         }
 
+        [HttpGet]
+        public dynamic Listado()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            dynamic data = rToken.result;
+            Usuario usuario = new Usuario
+            {
+                UsuAno = data.UsuAno,
+                UsuCod = data.UsuCod,
+                RolCod = data.RolCod
+
+            };
+            if (usuario.RolCod != "01")
+            {
+                return StatusCode(403, new
+                {
+                    success = false,
+                    message = "No tienes permisos para realizar esta acción",
+                    result = ""
+                });
+            }
+           
+            var resultado = _beneficiarios.Listado();
+            return Ok(resultado);
+        }
+
+        [HttpGet]
+        [Route("meta/{metAno}/{metCod}")]
+        public dynamic BuscarMetaBeneficiario(string metAno, string metCod)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            dynamic data = rToken.result;
+            Usuario usuario = new Usuario
+            {
+                UsuAno = data.UsuAno,
+                UsuCod = data.UsuCod,
+                RolCod = data.RolCod
+
+            };
+            if (usuario.RolCod != "01")
+            {
+                return StatusCode(403, new
+                {
+                    success = false,
+                    message = "No tienes permisos para realizar esta acción",
+                    result = ""
+                });
+            }
+           
+            var resultado = _beneficiarios.BuscarMetaBeneficiario(metAno, metCod);
+            return Ok(resultado);
+        }
+
         [HttpPost]
         public dynamic Insertar(Beneficiario beneficiario)
         {

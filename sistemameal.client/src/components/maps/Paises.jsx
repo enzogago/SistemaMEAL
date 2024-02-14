@@ -28,7 +28,7 @@ const Paises = () => {
         const height = svg.node().getBoundingClientRect().height;
 
         const projection = d3.geoMercator()
-            .center([-90.4678, 8.911])
+            .center([-90.4678, 4.911])
             .scale(1000)
             .translate([width / 2, height / 2]);
 

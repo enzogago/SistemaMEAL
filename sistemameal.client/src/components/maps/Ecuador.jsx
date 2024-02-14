@@ -16,7 +16,7 @@ const Ecuador = () => {
         const height = svg.node().getBoundingClientRect().height;
 
         const projection = d3.geoMercator()
-            .center([-81.1000, 0.1])
+            .center([-81.1000, -0.5])
             .scale(5000)
             .translate([width / 2, height / 2]);
 

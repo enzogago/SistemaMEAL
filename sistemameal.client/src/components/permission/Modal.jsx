@@ -13,7 +13,7 @@ const Modal = ({ closeModal, setPermisos }) => {
     const { estadoEditado, modalVisible } = statusInfo;
     const { setModalVisible } = statusActions;
 
-    const { register, handleSubmit: validateForm, formState: { errors }, reset, setValue } = useForm();
+    const { register, handleSubmit: validateForm, formState: { errors, dirtyFields, isSubmitted  }, reset, setValue } = useForm({ mode: "onChange"});
 
     const onSubmit = (data) => {
         const fieldMapping = {
@@ -21,7 +21,6 @@ const Modal = ({ closeModal, setPermisos }) => {
             referencia: 'perRef',
         };
         handleSubmit('Permiso', estadoEditado, data, setPermisos, setModalVisible, setIsLoggedIn, fieldMapping, 'perCod');
-        reset();
     };
 
     // Activar focus en input   
@@ -56,13 +55,13 @@ const Modal = ({ closeModal, setPermisos }) => {
                         className="flex" 
                         type="text" 
                         placeholder='EJM: DOCUMENTO' 
-                        maxLength={100} 
+                        maxLength={50} 
                         name="nombre" 
                         {...register(
                             'nombre', { 
                                 required: 'El nombre es requerido',
-                                maxLength: { value: 50, message: 'El nombre no puede tener más de 50 caracteres' },
-                                minLength:  { value: 5, message: 'El nombre no puede tener menos de 5 caracteres' },
+                                maxLength: { value: 50, message: 'El campo no puede tener más de 50 caracteres' },
+                                minLength:  { value: 5, message: 'El campo no puede tener menos de 5 caracteres' },
                                 pattern: {
                                     value: /^[A-Za-zñÑáéíóúÁÉÍÓÚ\s_]+$/,
                                     message: 'Por favor, introduce un valor válido',

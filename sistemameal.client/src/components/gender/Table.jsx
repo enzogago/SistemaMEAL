@@ -40,13 +40,22 @@ const Table = ({ data, openModal, setData }) => {
             {
                 header: "Nombre",
                 accessorKey: "genNom",
+                cell: ({row}) => {
+                    const text = row.original.genNom.charAt(0).toUpperCase() + row.original.genNom.slice(1).toLowerCase();
+                    return (
+                        <>
+                            {text}
+                        </>
+                    )
+                },
             },
         ];
     
         if (actions.delete || actions.edit) {
             baseColumns.push({
-                header: "Acciones",
+                header: () => <div style={{textAlign: 'center', flexGrow: '1'}}>Acciones</div>,
                 accessorKey: "acciones",
+                disableSorting: true,
                 cell: ({row}) => (
                     <div className='PowerMas_IconsTable flex jc-center ai-center'>
                         {actions.edit && 

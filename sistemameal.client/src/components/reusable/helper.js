@@ -70,7 +70,7 @@ export const handleDelete = async (controller, codigo, setRegistros, setIsLogged
     );
 };
 
-export const handleSubmit = async (controller, objetoEditado, data, setRegistros, setModalVisible, setIsLoggedIn, fieldMapping, codeField) => {
+export const handleSubmit = async (controller, objetoEditado, data, setRegistros, setModalVisible, setIsLoggedIn, fieldMapping, codeField, reset) => {
 
     const objeto = objetoEditado 
         ?   { 
@@ -134,6 +134,7 @@ export const handleSubmit = async (controller, objetoEditado, data, setRegistros
         });
         const data = await updateResponse.json();
         setRegistros(data);
+        reset();
     } catch (error) {
         console.error('Error:', error);
     }

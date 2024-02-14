@@ -32,6 +32,7 @@ import Gender from './components/gender/Gender';
 import Nationality from './components/Nationality.jsx/Nationality';
 import Unit from './components/Unit/Unit';
 import NotFound from './components/NotFound';
+import Beneficiarie from './components/beneficiarie/Beneficiarie';
 
 const App = () => {
     // Variables state AuthContext
@@ -54,6 +55,7 @@ const App = () => {
         "gender": Gender,
         "nationality": Nationality,
         "unit": Unit,
+        "beneficiarie": Beneficiarie,
     };
 
     return (

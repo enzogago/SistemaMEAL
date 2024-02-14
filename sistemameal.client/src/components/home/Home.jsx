@@ -260,7 +260,7 @@ const Home = () => {
                         <h2 className="Large-m1 Large-f1_5 Powermas_FontTitle">Beneficiarios por</h2>
                         asda
                     </article>
-                    <div className='Phone_8'>
+                    <div className='Phone_8 todos'>
                         <Paises />
                     </div>
                 </div>
