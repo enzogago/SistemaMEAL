@@ -83,7 +83,7 @@ const Table = ({ data }) => {
                         >
                             <div 
                                 className="progress-bar-fill" 
-                                style={{width: `${row.original.metPorAvaTec}%`, backgroundColor: row.original.estCol}}
+                                style={{width: `${row.original.metPorAvaTec > 100 ? 100 : row.original.metPorAvaTec}%`, backgroundColor: row.original.estCol}}
                             ></div>
                         </div>
                     </div>

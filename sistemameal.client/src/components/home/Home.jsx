@@ -19,6 +19,8 @@ const Home = () => {
     const [totalBeneficiarios, setTotalBeneficiarios] = useState(0);
     const [totalAtenciones, setTotalAtenciones] = useState(0);
     const [avanceTecnico, setAvanceTecnico] = useState(0);
+    const [currentMap, setCurrentMap] = useState('Todos');
+
     
 
     // EFECTO AL CARGAR COMPONENTE GET - LISTAR ESTADOS
@@ -111,6 +113,24 @@ const Home = () => {
         setSearchTags(searchTags.filter(t => t !== tag));
     }
 
+    let MapComponent;
+switch (currentMap) {
+    case 'Todos':
+        MapComponent = Paises;
+        break;
+    case 'Perú':
+        MapComponent = Peru;
+        break;
+    case 'Ecuador':
+        MapComponent = Ecuador;
+        break;
+    case 'Colombia':
+        MapComponent = Colombia;
+        break;
+    default:
+        MapComponent = Paises;
+}
+
     return(
     <>
         <div className="PowerMas_Search_Container_Home  p1">
@@ -143,6 +163,10 @@ const Home = () => {
             </div>
             <div className="PowerMas_RightSection Large_4 Phone_12 bg-white">
                 <h2 className="Large-m_75 Large-f1_5 Powermas_FontTitle">Principales KPI</h2>
+                <div className="PowerMas_KPIRow flex-column Large-m_75 Large-f1_25">
+                    <span className="bold Powermas_FontTitle">Avance Técnico</span>
+                    <DonutChart percentage={avanceTecnico} wh={150} rad={20} />
+                </div>
                 <div className="PowerMas_KPIRow Large-m_75 Large-f1_25 Large-p1">
                     <span className="bold Powermas_FontTitle">Atenciones</span>
                     <span>{totalAtenciones.toLocaleString()}</span>
@@ -150,10 +174,6 @@ const Home = () => {
                 <div className="PowerMas_KPIRow Large-m_75 Large-f1_25 Large-p1">
                     <span className="bold Powermas_FontTitle">Beneficiarios</span>
                     <span>{totalBeneficiarios.toLocaleString()}</span>
-                </div>
-                <div className="PowerMas_KPIRow flex-column Large-m_75 Large-f1_25 Large-p1">
-                    <span className="bold Powermas_FontTitle">Avance Técnico</span>
-                    <DonutChart percentage={avanceTecnico} />
                 </div>
             </div>
         </div>
@@ -207,7 +227,7 @@ const Home = () => {
             </div>
         </div>
         <div className="PowerMas_RecentsSection flex Medium-flex-row Small-flex-column m1">
-            <div className="PowerMas_ActivitiesSection Large_5 Medium_5 Phone_12 Large-p2">
+            <div className="PowerMas_ActivitiesSection Large_6 Medium_5 Phone_12 Large-p2">
                 <h2 className="Large-f1_5 Powermas_FontTitle">Actividades recientes</h2>
                 <div className="PowerMas_Article flex Large-f_75 ai-center left">
                     <div className='PowerMas_Icon Large_2 Large-f1_5'>
@@ -255,15 +275,20 @@ const Home = () => {
                     </div>
                 </div>
             </div>
-            <div className="PowerMas_BeneficiarySection Large_7 Medium_7 Phone_12 Large-p1">
-                <div className='flex'>
-                    <article className='Phone_5'>
+            <div className="PowerMas_BeneficiarySection Large_6 Medium_7 Phone_12 flex">
+                <div className='flex flex-grow-1'>
+                    <article className='Phone_5 flex-grow-1'>
                         <h2 className="Large-m1 Large-f1_5 Powermas_FontTitle">Beneficiarios por</h2>
-                        asda
+                        <div className='flex flex-column p1 gap_5'>
+                        <button className='PowerMas_Buttom_Primary' onClick={() => setCurrentMap('Todos')}>Todos</button>
+<button className='PowerMas_Buttom_Primary' onClick={() => setCurrentMap('Perú')}>Perú</button>
+<button className='PowerMas_Buttom_Primary' onClick={() => setCurrentMap('Ecuador')}>Ecuador</button>
+<button className='PowerMas_Buttom_Primary' onClick={() => setCurrentMap('Colombia')}>Colombia</button>
+                        </div>
                     </article>
-                    <div className='Phone_7 todos'>
-                        <Paises />
-                    </div>
+                    <div className='Phone_7 flex-grow-1'>
+        <MapComponent />
+    </div>
                 </div>
             </div>
         </div>

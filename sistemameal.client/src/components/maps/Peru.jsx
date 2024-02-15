@@ -17,8 +17,8 @@ const Peru = () => {
         const height = svg.node().getBoundingClientRect().height;
 
         const projection = d3.geoMercator()
-            .center([-86.1000, -3])
-            .scale(1500)
+            .center([-82.1000, -5])
+            .scale(2000)
             .translate([width / 2, height / 2]);
 
         const path = d3.geoPath().projection(projection);
@@ -54,7 +54,7 @@ const Peru = () => {
             });
     }, []);
 
-    return <svg ref={ref} style={{width: '100%', height: 'auto'}} />;
+    return <svg ref={ref} style={{width: '100%'}} />;
 };
 
 export default Peru;

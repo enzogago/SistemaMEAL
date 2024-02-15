@@ -16,8 +16,8 @@ const Ecuador = () => {
         const height = svg.node().getBoundingClientRect().height;
 
         const projection = d3.geoMercator()
-            .center([-81.1000, -0.5])
-            .scale(5000)
+            .center([-81.1000, -0.2])
+            .scale(5800)
             .translate([width / 2, height / 2]);
 
         const path = d3.geoPath().projection(projection);
@@ -53,7 +53,7 @@ const Ecuador = () => {
             });
     }, []);
 
-    return <svg ref={ref} style={{width: '100%', height: 'auto'}} />;
+    return <svg ref={ref} style={{width: '100%'}} />;
 };
 
 export default Ecuador;

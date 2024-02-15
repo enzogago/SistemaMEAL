@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import Notiflix from "notiflix";
 import { useForm } from 'react-hook-form';
 import TableForm from "./TableForm";
+import { Tooltip } from "react-tooltip";
 
 const FormGoalBeneficiarie = () => {
     const navigate = useNavigate();
@@ -28,6 +29,7 @@ const FormGoalBeneficiarie = () => {
     const [ cargando, setCargando ] = useState(false)
     const [ documentosAgregados, setDocumentosAgregados ] = useState([]);
     const [ modalIsOpen, setModalIsOpen ] = useState(false);
+    const [ modalFormIsOpen, setModalFormIsOpen ] = useState(false);
     const [ esMenorDeEdad, setEsMenorDeEdad ] = useState(false);
     const [ mostrarAgregarDocumento, setMostrarAgregarDocumento ] = useState(false);
     const [ accionActual, setAccionActual] = useState('buscar');
@@ -73,7 +75,7 @@ const FormGoalBeneficiarie = () => {
 
     //
     const { register, watch, handleSubmit: validateForm, formState: { errors, dirtyFields, isSubmitted }, reset, setValue } = 
-    useForm({ mode: "onChange", defaultValues: {benNomApo: '', benApeApo: ''}});
+    useForm({ mode: "onChange", defaultValues: {benNomApo: '', benApeApo: '', genCod: '0'}});
 
     const pais = watch('pais');
 
@@ -107,6 +109,22 @@ const FormGoalBeneficiarie = () => {
                 setMostrarAgregarDocumento(true);
                 setAccionActual('agregar')
                 setFieldsDisabled(false);
+                setEsMenorDeEdad(false);
+                reset({
+                    benApe: '',
+                    benApeApo: '',
+                    benCorEle: '',
+                    benFecNac: '',
+                    benNom: '',
+                    benNomApo: '',
+                    benSex: '',
+                    benTel: '',
+                    benTelCon: '',
+                    genCod: '0',
+                    pais: '0',
+                });
+                setDocumentosAgregados([]);
+                setSelects([]);
                 return;
             }
             const data = await response.json();
@@ -114,7 +132,22 @@ const FormGoalBeneficiarie = () => {
                 Notiflix.Notify.failure(data.message);
                 return;
             }
-            reset(data);
+            // Supongamos que 'data' es tu objeto de datos
+            let newData = {};
+
+            for (let key in data) {
+                if (typeof data[key] === 'string') {
+                    // Convierte cada cadena a minúsculas
+                    newData[key] = data[key].toLowerCase();
+                } else {
+                    // Mantiene los valores no string tal como están
+                    newData[key] = data[key];
+                }
+            }
+            console.log(newData)
+            // Ahora puedes llamar a 'reset()' con los nuevos datos
+            reset(newData);
+
             setShowSearchButton(false);
             console.log(data);
         } catch (error) {
@@ -158,8 +191,6 @@ const FormGoalBeneficiarie = () => {
         }
         
     };
-
-    
 
     // Observa los cambios en los campos 'docIdeBenNum' y 'docIdeCod'
     const docIdeBenNum = watch2('docIdeBenNum');
@@ -214,10 +245,6 @@ const FormGoalBeneficiarie = () => {
         }
     }, [fechaNacimiento]);
     
-    
-    
-    
-
     const abrirModal = () => {
         setModalIsOpen(true);
     };
@@ -225,9 +252,15 @@ const FormGoalBeneficiarie = () => {
     const cerrarModal = () => {
         setModalIsOpen(false);
     };
-    
-    
 
+    const openModal = () => {
+        setModalFormIsOpen(true);
+    }
+    
+    const closeModal = () => {
+        setModalFormIsOpen(false);
+    }
+    
     const fetchBeneficiarie = async () => {
         const token = localStorage.getItem('token');
         Notiflix.Loading.pulse('Cargando...');
@@ -398,6 +431,7 @@ const FormGoalBeneficiarie = () => {
 
     const Registrar_Beneficiario =  () => {
         validateForm( (data) => {
+            console.log(data)
             // Verifica que todos los selects tengan una opción válida seleccionada
             for (let i = 0; i < selects.length; i++) {
                 const selectElement = document.querySelector(`select[name=select${i}]`);
@@ -457,15 +491,30 @@ const FormGoalBeneficiarie = () => {
     };
 
     const handleReset = () => {
-        reset();  // Resetea todos los campos del formulario
-        reset2();  // Resetea todos los campos del segundo formulario
+        reset({
+            benApe: '',
+            benApeApo: '',
+            benCorEle: '',
+            benFecNac: '',
+            benNom: '',
+            benNomApo: '',
+            benSex: '',
+            benTel: '',
+            benTelCon: '',
+            genCod: '0',
+            pais: '0',
+        });
+        reset2({
+            docIdeBenNum: '',
+            docIdeCod: '0',
+        }); // Resetea todos los campos del segundo formulario
         setDocumentosAgregados([]);  // Vacía la lista de documentos agregados
         setSelects([]);  // Vacía la lista de selects
         setShowSearchButton(true);  // Muestra el botón de búsqueda
         setFieldsDisabled(true);  // Deshabilita los campos del formulario
-        // ... resetea cualquier otro estado que necesites ...
+        setMostrarAgregarDocumento(false);
+        setAccionActual('buscar');
     };
-    
     
     const handleSubmitMetaBeneficiario = async (data) => {
         try {
@@ -498,26 +547,8 @@ const FormGoalBeneficiarie = () => {
             Notiflix.Notify.success(successData.message);
             console.log(successData);
             fetchBeneficiarie();
-            reset({
-                benApe: '',
-                benApeApo: '',
-                benCorEle: '',
-                benFecNac: '',
-                benNom: '',
-                benNomApo: '',
-                benSex: '',
-                benTel: '',
-                benTelCon: '',
-                genCod: '0',
-                pais: '0',
-            });
-            reset2({
-                docIdeBenNum: '',
-                docIdeCod: '0',
-            });
-            setSelects([]);
-            setDocumentosAgregados([])
             setUpdateData(!updateData);
+            handleReset();
         } catch (error) {
             console.error('Error:', error);
         } finally {
@@ -527,11 +558,12 @@ const FormGoalBeneficiarie = () => {
 
     const selectedValue = watch('genCod', '0');
     const selectedDocumentValue = watch2('docIdeCod', '0');
+    const benSex = watch('benSex');
 
     return (
         <div className="PowerMas_StatusContainer bg-white h-100 flex flex-column">
             <div className="PowerMas_Header_Form_Beneficiarie flex ai-center p_25">
-                <GrFormPreviousLink className="m1 w-auto Large-f2_5 pointer" onClick={() => navigate('/monitoring')} />
+                <GrFormPreviousLink className="m_25 w-auto Large-f2_5 pointer" onClick={() => navigate('/monitoring')} />
                 <h1 className="f1_75">Nuevo Beneficiario</h1>
             </div>
             <div className="PowerMas_Content_Form_Beneficiarie overflow-auto flex-grow-1 flex">
@@ -615,7 +647,7 @@ const FormGoalBeneficiarie = () => {
                                             <button className="PowerMas_Buttom_Secondary Large_6" type="button" onClick={abrirModal}>Ver Documentos</button>
                                         </div>
                                         :
-                                        showSearchButton && <button className="PowerMas_Buttom_Primary Large_5" type="submit">Buscar</button>
+                                        <button className="PowerMas_Buttom_Primary Large_5" type="submit">Buscar</button>
                                 }
                                 </div>
 
@@ -628,6 +660,7 @@ const FormGoalBeneficiarie = () => {
                                 </label>
                                 <input type="text"
                                     id="benNom"
+                                    style={{textTransform: 'capitalize'}}
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benNom || isSubmitted ? (errors.benNom ? 'invalid' : 'valid') : ''}`} 
                                     placeholder="Enzo Fabricio"
                                     autoComplete="disabled"
@@ -652,6 +685,7 @@ const FormGoalBeneficiarie = () => {
                                 <input 
                                     type="text" 
                                     id="benApe"
+                                    style={{textTransform: 'capitalize'}}
                                     autoComplete="disabled"
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benApe || isSubmitted ? (errors.benApe ? 'invalid' : 'valid') : ''}`} 
                                     placeholder="Gago Aguirre"
@@ -679,9 +713,9 @@ const FormGoalBeneficiarie = () => {
                                             type="radio" 
                                             id="masculino" 
                                             name="benSex" 
-                                            disabled={fieldsDisabled}
-                                            value="M" 
-                                            {...register('benSex', { required: 'Por favor, selecciona una opción' })}
+                                            disabled={fieldsDisabled && benSex !== 'm'}
+                                            value="m" 
+                                            {...register('benSex', { required: 'Por favor, selecciona una opción MMMMM' })}
                                         />
                                         <label htmlFor="masculino" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} >Masculino</label>
                                     </div>
@@ -690,9 +724,9 @@ const FormGoalBeneficiarie = () => {
                                             type="radio" 
                                             id="femenino" 
                                             name="benSex" 
-                                            disabled={fieldsDisabled}
-                                            value="F" 
-                                            {...register('benSex', { required: 'Por favor, selecciona una opción' })}
+                                            disabled={fieldsDisabled && benSex !== 'f'}
+                                            value="f" 
+                                            {...register('benSex', { required: 'Por favor, selecciona una opción FFF' })}
                                         />
                                         <label style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} htmlFor="femenino">Femenino</label>
                                     </div>
@@ -712,8 +746,9 @@ const FormGoalBeneficiarie = () => {
                                 <select 
                                     id="genCod" 
                                     disabled={fieldsDisabled}
-                                    style={{ color: selectedValue === '0' ? '#372e2c60' : '#000000' }}
-                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.genCod || isSubmitted ? (errors.genCod ? 'invalid' : 'valid') : ''}`} 
+                                    style={{ color: selectedValue === '0' ? '#372e2c60' : '#000000', textTransform: 'capitalize'}}
+                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.genCod || isSubmitted ? (errors.genCod ? 'invalid' : 'valid') : ''}`}
+                                    name="genCod"
                                     {...register('genCod', { 
                                         validate: value => value !== '0' || 'El género de identidad es requerido' 
                                     })}
@@ -724,7 +759,7 @@ const FormGoalBeneficiarie = () => {
                                             key={genero.genCod} 
                                             value={genero.genCod}
                                         > 
-                                            {genero.genNom}
+                                            {genero.genNom.toLowerCase()}
                                         </option>
                                     ))}
                                 </select>
@@ -881,6 +916,7 @@ const FormGoalBeneficiarie = () => {
                                         <input 
                                             id="benNomApo"
                                             type="text"
+                                            style={{textTransform: 'capitalize'}}
                                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benNomApo || isSubmitted ? (errors.benNomApo ? 'invalid' : 'valid') : ''}`} 
                                             placeholder="Enzo Fabricio"
                                             autoComplete="disabled"
@@ -905,6 +941,7 @@ const FormGoalBeneficiarie = () => {
                                         <input 
                                             id="benApeApo"
                                             type="text"
+                                            style={{textTransform: 'capitalize'}}
                                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benApeApo || isSubmitted ? (errors.benApeApo ? 'invalid' : 'valid') : ''}`} 
                                             placeholder="Gago Aguirre"
                                             autoComplete="disabled"
@@ -934,9 +971,10 @@ const FormGoalBeneficiarie = () => {
                                 </label>
                                 <select 
                                     id="pais"
+                                    style={{textTransform: 'capitalize'}}
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.pais || isSubmitted ? (errors.pais ? 'invalid' : 'valid') : ''}`} 
                                     {...register('pais', { 
-                                        validate: value => value !== '0' || 'El dcoumento de identidad es requerido' 
+                                        validate: value => value !== '0' || 'El País es requerido' 
                                     })}
                                 >
                                     <option value="0">--Seleccione País--</option>
@@ -945,7 +983,7 @@ const FormGoalBeneficiarie = () => {
                                             key={pais.ubiCod} 
                                             value={JSON.stringify({ ubiCod: pais.ubiCod, ubiAno: pais.ubiAno })}
                                         > 
-                                            {pais.ubiNom}
+                                            {pais.ubiNom.toLowerCase()}
                                         </option>
                                     ))}
                                 </select>
@@ -960,20 +998,21 @@ const FormGoalBeneficiarie = () => {
                             
                             {selects.map((options, index) => (
                                 <div className="m_75" key={index}>
-                                    <label htmlFor={index} className="">
-                                        {options[0].ubiTip}
+                                    <label style={{textTransform: 'capitalize'}} htmlFor={index} className="">
+                                        {options[0].ubiTip.toLowerCase()}
                                     </label>
                                     <select
                                         id={index}
                                         key={index} 
                                         name={`select${index}`} 
                                         onChange={(event) => handleCountryChange(event.target.value, index)} 
+                                        style={{textTransform: 'capitalize'}}
                                         className="block Phone_12"
                                     >
                                         <option style={{textTransform: 'capitalize'}} value="0">--Seleccione {options[0].ubiTip.toLowerCase()}--</option>
                                         {options.map(option => (
                                             <option key={option.ubiCod} value={JSON.stringify({ ubiCod: option.ubiCod, ubiAno: option.ubiAno })}>
-                                                {option.ubiNom}
+                                                {option.ubiNom.toLowerCase()}
                                             </option>
                                         ))}
                                     </select>
@@ -986,26 +1025,38 @@ const FormGoalBeneficiarie = () => {
                         </div>
                     </div>
                     <div className="Large_6 overflow-auto flex flex-column"> 
-                        <button onClick={() => setMostrarTabla(!mostrarTabla)}>
-                            Cambiar vista
-                        </button>
-                        {mostrarTabla ? (
-                            <div className="flex-grow-1">
-                                <TableForm data={data} />
-                            </div>
-                        ) : (
-                            <div className="PowerMas_Info_Form_Beneficiarie m1 p1 ">
-                                <div className="flex ai-center gap_5">
-                                    <p className="p_5 Phone_4">Meta: <span>{metaData && metaData.metMetTec}</span></p>
-                                    <p className="p_5 Phone_4">Ejecucion: <span>{metaData && metaData.metEjeTec}</span></p>
-                                    <p className="p_5 Phone_4">Saldo: <span>{metaData && (metaData.metMetTec - metaData.metEjeTec)}</span></p>
+                            <div className="PowerMas_Info_Form_Beneficiarie m1" >
+                                <div className="flex p1">
+                                    <div className="Large_6 flex flex-column ai-center">
+                                        <h3 className="f1_25 center">Avance Técnico</h3>
+                                        <DonutChart 
+                                            percentage={(metaData ? metaData.metPorAvaTec : 0) == 0 ? 0.1 : (metaData ? metaData.metPorAvaTec : 0)} 
+                                            wh={150}
+                                            rad={20}
+                                        />
+                                    </div>
+                                    <div className="Large_6 flex flex-column gap_3">
+                                        <p className="bold">Nuesta Meta</p>
+                                        <p className="PowerMas_Info_Card p_5">{metaData && Number(metaData.metMetTec).toLocaleString()}</p>
+                                        <p className="bold">Nuestra Ejecución</p>
+                                        <p 
+                                            className="PowerMas_Info_Card p_5 pointer PowerMas_Hover_Grey" 
+                                            onClick={openModal}
+                                            data-tooltip-id="info-tooltip" 
+                                            data-tooltip-content="Haz click aquí para ver los beneficiarios" 
+                                        >
+                                            {metaData && Number(metaData.metEjeTec).toLocaleString()}
+                                        </p>
+                                        <Tooltip 
+                                            id="info-tooltip"
+                                            effect="solid"
+                                            place='top-end'
+                                            className="tooltip"
+                                        />
+                                        <p className="bold">{(metaData && Number(metaData.metMetTec - metaData.metEjeTec)) < 0 ? 'Nos Excedimos en' : 'Nos Falta'  }</p>
+                                        <p className="PowerMas_Info_Card p_5">{metaData && Number(metaData.metMetTec - metaData.metEjeTec).toLocaleString()}</p>
+                                    </div>
                                 </div>
-                                <br />
-                                <div className="PowerMas_Info_Form_Beneficiarie_Progress flex ai-center jc-space-around p1 ">
-                                    <h2 className="Large-f2 Large_8 Medium_8">Nos encontramos en un Avance de:</h2>
-                                    <DonutChart percentage={metaData ? metaData.metPorAvaTec : 0} />
-                                </div>
-                                <br />
                                 <div>
                                     <article>
                                         <h3 className="Large-f1 m_5" style={{textTransform: 'capitalize'}}>{metaData && metaData.tipInd.toLowerCase()}</h3>
@@ -1033,13 +1084,11 @@ const FormGoalBeneficiarie = () => {
                                     </article>
                                 </div>
                             </div>
-                        )}
-                        
                     </div>
             </div>
-            <div className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center todos">
-                <button className="PowerMas_Buttom_Primary Large_3 m2" onClick={Registrar_Beneficiario} >Guardar</button>
-                <button className="PowerMas_Buttom_Secondary Large_3 m2" onClick={handleReset}>Limpiar</button>
+            <div className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
+                <button className="PowerMas_Buttom_Primary Large_3 m_75" onClick={Registrar_Beneficiario} >Guardar</button>
+                <button className="PowerMas_Buttom_Secondary Large_3 m_75" onClick={handleReset}>Limpiar</button>
             </div>
             <Modal
                 ariaHideApp={false}
@@ -1083,6 +1132,35 @@ const FormGoalBeneficiarie = () => {
                     </tbody>
                 </table>
                 <button onClick={cerrarModal}>Cerrar</button>
+            </Modal>
+            <Modal
+                ariaHideApp={false}
+                isOpen={modalFormIsOpen}
+                onRequestClose={closeModal}
+                contentLabel="Table Form"
+                closeTimeoutMS={200}
+                style={{
+                    content: {
+                        top: '50%',
+                        left: '50%',
+                        right: 'auto',
+                        bottom: 'auto',
+                        width: '80%',
+                        height: '80%',
+                        marginRight: '-50%',
+                        transform: 'translate(-50%, -50%)',
+                        backgroundColor: '#f0f0f0',
+                        border: '1px solid #ccc',
+                    },
+                    overlay: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }}
+            >   
+                <TableForm 
+                    data={data}
+                    closeModal={closeModal}
+                />
             </Modal>
 
         </div>

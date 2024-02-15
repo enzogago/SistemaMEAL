@@ -172,7 +172,7 @@ const Table = ({ data }) => {
                         >
                             <div 
                                 className="progress-bar-fill" 
-                                style={{width: `${row.original.metPorAvaTec}%`, backgroundColor: row.original.estCol}}
+                                style={{width: `${row.original.metPorAvaTec > 100 ? 100 : row.original.metPorAvaTec}%`, backgroundColor: row.original.estCol}}
                             ></div>
                         </div>
                     </div>
@@ -240,7 +240,7 @@ const Table = ({ data }) => {
                         :
                         <div className="flex jc-center ai-center">
                             <button  
-                                className="PowerMas_Add_Beneficiarie f_75 p_25" 
+                                className="PowerMas_Add_Execution f_75 p_25 flex-grow-1" 
                             >
                                 Ejecución
                             </button>
@@ -423,9 +423,9 @@ const Table = ({ data }) => {
                         <div className="PowerMas_Input_Filter_Container flex">
                             <div className="flex ai-center">
                                 {searchTags.map(tag => (
-                                    <span key={tag} className="PowerMas_InputTag flex">
+                                    <span key={tag} className="PowerMas_InputTag flex ai-center jc-center p_25 gap_5">
                                         <span className="f_75 flex ai-center">{tag}</span>
-                                        <button className="f_75" onClick={() => removeTag(tag)}>x</button>
+                                        <button className="f1 bold p0" onClick={() => removeTag(tag)}>x</button>
                                     </span>
                                 ))}
                             </div>

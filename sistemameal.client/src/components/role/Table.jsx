@@ -110,7 +110,7 @@ const Table = ({ data, openModal, setData }) => {
     const dataExport = table.options.data;  // Tus datos
     const headers = ['CODIGO', 'NOMBRE', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
     const title = 'ROLES';  // El título de tu archivo
-    const properties = ['rolCod', 'rolnom', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
+    const properties = ['rolCod', 'rolNom', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
     const format = 'a4';  // El tamaño del formato que quieres establecer para el PDF
 
     const Export_Excel = () => {

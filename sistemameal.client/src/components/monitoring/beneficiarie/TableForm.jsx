@@ -23,7 +23,7 @@ import TableRow from "./TableRow"
 import { AuthContext } from "../../../context/AuthContext";
 import Notiflix from "notiflix";
 
-const TableForm = ({data}) => {
+const TableForm = ({data, closeModal}) => {
     
     const navigate = useNavigate();
     // Variables State AuthContext 
@@ -172,7 +172,10 @@ const TableForm = ({data}) => {
     return (
         <div className='TableMainContainer Large-p1 Medium-p1 Small-p_5 h-100 overflow-auto'>
             <div>
-                <h1 className="flex left Large-f1_5 Medium-f1_5 Small-f1_5 ">Listado de Beneficiarios</h1>
+                <div className="flex">
+                    <h1 className="flex left Large-f1_5 Medium-f1_5 Small-f1_5 flex-grow-1">Listado de Beneficiarios</h1>
+                    <span className="PowerMas_CloseModal" onClick={closeModal}>×</span>
+                </div>
                 <div className="flex ">
                     <div className="PowerMas_Search_Container Large_6 Large-m_5">
                         <div className="PowerMas_Input_Filter_Container flex">

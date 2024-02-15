@@ -65,6 +65,11 @@ namespace SistemaMEAL.Server.Models
         public String? UniNom { get; set; }
         public String? UniInvPer { get; set; }
 
+        public String? UbiAno { get; set; }
+        public String? UbiCod { get; set; }
+        public String? UbiNom { get; set; }
+        public String? UbiTip { get; set; }
+
         public String? ImpCod { get; set; }
         public String? ImpNom { get; set; }
         public String? UsuIng { get; set; }

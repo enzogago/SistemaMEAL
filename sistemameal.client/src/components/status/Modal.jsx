@@ -26,7 +26,7 @@ const Modal = ({ closeModal, setEstados }) => {
         data.nombre = data.nombre.replace(/\s+/g, ' ').trim();
         data.color = data.color.replace(/\s+/g, ' ').trim();
 
-        handleSubmit('Estado', estadoEditado, data, setEstados, setModalVisible, setIsLoggedIn, fieldMapping, 'estCod');
+        handleSubmit('Estado', estadoEditado, data, setEstados, setModalVisible, setIsLoggedIn, fieldMapping, 'estCod', reset);
     };
 
     // Activar focus en input

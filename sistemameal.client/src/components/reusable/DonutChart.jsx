@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
-const DonutChart = ({ percentage }) => {
-    const width = 120;
-    const height = 120;
+const DonutChart = ({ percentage, wh, rad }) => {
+    console.log(percentage)
+    const width = wh;
+    const height = wh;
     const radius = Math.min(width, height) / 2;
     const prevPercentage = useRef(0); // Almacena el valor anterior
 
@@ -12,11 +13,11 @@ const DonutChart = ({ percentage }) => {
         d3.select("#chart").html("");
     
         const color = d3.scaleOrdinal()
-            .range(["#20737B", "transparent"]); 
+            .range(["#20737B", "#d3d3d3"]); 
     
         const data = [
             { value: percentage },
-            { value: 100 - percentage }
+            { value: 0.1 - percentage }
         ];
     
         const pie = d3.pie()
@@ -24,7 +25,7 @@ const DonutChart = ({ percentage }) => {
             .sort(null);
     
         const arc = d3.arc()
-            .innerRadius(radius - 14)
+            .innerRadius(radius - rad)
             .outerRadius(radius);
     
         const svg = d3.select("#chart")
@@ -42,7 +43,7 @@ const DonutChart = ({ percentage }) => {
         path.transition() // Inicia la transición
             .duration(1000) // Duración de la transición en milisegundos
             .attrTween("d", function(d) { // Interpola los valores de 'd' para la transición
-                var interpolate = d3.interpolate(prevPercentage.current / 100 * 2 * Math.PI, percentage / 100 * 2 * Math.PI);
+                var interpolate = d3.interpolate(prevPercentage.current / 100 * 2 * Math.PI, (percentage > 100 ? 100 : percentage) / 100 * 2 * Math.PI);
                 return function(t) {
                     d.endAngle = interpolate(t);
                     return arc(d);
@@ -53,12 +54,11 @@ const DonutChart = ({ percentage }) => {
             .attr("text-anchor", "middle")
             .attr("dy", ".35em")
             .style("fill", "#20737B")
-            .text(percentage + "%");
+            .text((percentage == 0.1 ? 0 : percentage) + "%");
 
-        prevPercentage.current = percentage; // Actualiza el valor anterior
     }, [percentage]);
 
-    return <div className='Large-f1_5 p1' id="chart"></div>;
+    return <div className='Large-f1_5 p_5' id="chart"></div>;
 };
 
 export default DonutChart;

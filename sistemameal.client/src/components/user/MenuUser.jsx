@@ -407,8 +407,8 @@ const MenuUser = () => {
         </div>
         </div>
         <div className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
-            <button onClick={() => navigate(`/form-user/${safeCiphertext}`)} className="Large_5 m2">Atras</button>
-            <button onClick={handleNext} className="Large_5 m2">Siguiente</button>
+            <button onClick={() => navigate(`/form-user/${safeCiphertext}`)} className="Large_5 m2 PowerMas_Buttom_Secondary">Atras</button>
+            <button onClick={handleNext} className="Large_5 m2 PowerMas_Buttom_Primary">Siguiente</button>
         </div>
       </div>
     </>

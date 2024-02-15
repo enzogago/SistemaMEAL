@@ -18,7 +18,7 @@ const Colombia = () => {
 
         const projection = d3.geoMercator()
             .center([-80.1000, 8])
-            .scale(2000)
+            .scale(2300)
             .translate([width / 2, height / 2]);
 
         const path = d3.geoPath().projection(projection);
@@ -54,7 +54,7 @@ const Colombia = () => {
             });
     }, []);
 
-    return <svg ref={ref} style={{width: '100%', height: 'auto'}} />;
+    return <svg ref={ref} style={{width: '100%'}} />;
 };
 
 export default Colombia;

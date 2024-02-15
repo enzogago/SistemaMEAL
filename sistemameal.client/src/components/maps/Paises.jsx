@@ -13,7 +13,7 @@ const Paises = () => {
 
     const color = d3.scaleSequential()
         .domain([0, d3.max(Object.values(poblacionPorPais))])  // El dominio va desde 0 hasta la población máxima
-        .interpolator(d3.interpolateOranges);  // Usa el interpolador que prefieras
+        .interpolator(d3.interpolateGreens);  // Usa el interpolador que prefieras
     
     console.log(data)
     const ref = useRef();
@@ -28,8 +28,8 @@ const Paises = () => {
         const height = svg.node().getBoundingClientRect().height;
 
         const projection = d3.geoMercator()
-            .center([-90.4678, 6.911])
-            .scale(1000)
+            .center([-88.4678, 4.911])
+            .scale(1200)
             .translate([width / 2, height / 2]);
 
         const path = d3.geoPath().projection(projection);
@@ -54,7 +54,7 @@ const Paises = () => {
             .attr('stroke', 'black')  // Esto establece el color del borde
             .attr('stroke-width', 1)  // Esto establece el grosor del borde
             .on('mouseover', function(event, d) {
-                d3.select(this).attr('fill', 'blue');
+                d3.select(this).attr('fill', '#20737b');
                 const paisData = event.srcElement.__data__.properties;
                 tip.show(paisData, this);
             })
@@ -65,7 +65,7 @@ const Paises = () => {
 
     }, []);
 
-    return <svg ref={ref} style={{width: '100%', height: 'auto'}} />;
+    return <svg ref={ref} style={{width: '100%'}} />;
 };
 
 export default Paises;

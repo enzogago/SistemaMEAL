@@ -562,9 +562,10 @@ input::placeholder,select::placeholder{
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	background-color: #FFF5EE;
 	border-radius: 5px;
-	border: 1px solid #372e2c6f;
+	background-color: #f7f7f7;
+	border: 1px solid #cfcfcf;
+	border-radius: 5px;
 }
 
 .PowerMas_TableHome {
@@ -851,15 +852,16 @@ input::placeholder,select::placeholder{
 
 /* SATUS VIEW */
 .PowerMas_InputTag{
-	border: 1px solid blueviolet;
-	background-color: rgb(185, 154, 213);
-	color: #fff;
+	border: 1px solid #87828060;
+	background-color: #372e2c02;
+	color: #000;
 	margin-left: 5px;
+	border-radius: 5px;
 }
 .PowerMas_InputTag button{
-	border: none;
+	border: 1px solid transparent;
 	background-color: transparent;
-	color: #fff;
+	color: #372E2C;
 }
 .PowerMas_Search_Container{
 	border: 1px solid #F7CEAD;
@@ -877,13 +879,19 @@ input::placeholder,select::placeholder{
 	flex-wrap: nowrap;
 	overflow-x: auto;
 	scrollbar-width: thin;
+	border: 1px solid #F7CEAD;
+	background-color: #fff;
 }
 .PowerMas_Input_Filter{
 	padding-left: 45px;
 	outline: none;
-	border: 1px solid transparent;
+	border: none;
 	min-width: 30%;
 	margin: 0;
+}
+.PowerMas_Input_Filter:focus{
+	border: none!important;
+	box-shadow: none;
 }
 .PowerMas_Dropdown_Export {
     position: relative;
@@ -1114,6 +1122,7 @@ input::placeholder,select::placeholder{
     transition: visibility 0s linear 0.5s, opacity 0.5s 0s, transform 0.5s;
 }
 .PowerMas_ModalContent {
+	width: 30%;
 	min-width: 30%;
     max-width: 50%;
     background-color: #fff;
@@ -1319,18 +1328,33 @@ input::placeholder,select::placeholder{
 .color-black{
 	color: #000;
 }
+.gap_3{
+	gap: 0.3rem;
+}
 
 .PowerMas_Buttom_Primary{
 	background-color: #F7775A;
 	color: #F6E3D6;
 	border-radius: 5px;
 	border: 1px solid;
+	transition: background-color 0.2s ease-in;
+}
+.PowerMas_Buttom_Primary:hover{
+	background-color: #D03F1E;
 }
 .PowerMas_Buttom_Secondary{
 	background-color: #FFFDFD;
 	color: #F7775A;
 	border-radius: 5px;
 	border: 1px solid;
+	transition: background-color 0.2s ease-in;
+}
+.PowerMas_Buttom_Secondary:hover{
+	background-color: #ffeadf;
+}
+
+.PowerMas_Hover_Grey:hover{
+	background-color: #e6e4e4;
 }
 /* END REUSABLE */
 
@@ -1494,6 +1518,11 @@ input::placeholder,select::placeholder{
 	background-color: #FFF5EE;
 	border-radius: 5px;
 }
+.PowerMas_Add_Execution{
+	border: 1px solid #20737B;
+	background-color: #20737b0f;
+	border-radius: 5px;
+}
 
 .progress-bar {
     width: 100%;
@@ -1560,11 +1589,12 @@ input::placeholder,select::placeholder{
 	border: 1px solid #cfcfcf;
 	border-radius: 5px;
 }
-.PowerMas_Info_Form_Beneficiarie > div > p{
+
+.PowerMas_Info_Card{
 	background-color: #F3F3F3;
 	color: #000;
-	border: 1px solid #CFCFCF;
 	border-radius: 5px;
+	transition: background-color 0.2s ease-in;
 }
 .PowerMas_Info_Form_Beneficiarie_Progress{
 	background-color: #F3F3F3;
@@ -1574,9 +1604,6 @@ input::placeholder,select::placeholder{
 }
 .PowerMas_Info_Form_Beneficiarie_Progress h2{
 	color: #20737B;
-}
-.PowerMas_Info_Form_Beneficiarie article{
-	border-bottom: 1px solid #372e2c50;
 }
 
 .PowerMas_Info_Form_Beneficiarie article > p{
