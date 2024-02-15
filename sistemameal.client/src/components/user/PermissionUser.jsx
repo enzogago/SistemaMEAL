@@ -290,9 +290,8 @@ const PermissionUser = () => {
 
   return (
     <div className="bg-white h-100 flex flex-column">
-      <div className="PowerMas_Header_Form_Beneficiarie flex ai-center p2">
+      <div className="PowerMas_Header_Form_Beneficiarie flex ai-center">
         {/* <GrFormPreviousLink className="m1 w-auto Large-f2_5 pointer" onClick={() => navigate('/user')} /> */}
-        <h1 className="flex-grow-1">Permisos del Usuario</h1>
         <Bar currentStep={3} />
       </div>
       <div className="flex-grow-1 overflow-auto p1_25">

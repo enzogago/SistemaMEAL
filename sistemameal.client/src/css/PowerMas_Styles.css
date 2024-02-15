@@ -1388,15 +1388,36 @@ input::placeholder,select::placeholder{
 	border: 1px solid #372e2c5e;
 	border-radius: 5px;
 	color: #372e2c86;
+	white-space: nowrap;
+}
+.PowerMas_Form_User_Bar > div > p {
+	white-space: nowrap;
+}
+.PowerMas_Form_User_Bar > div > div > span {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    line-height: 20px;
+    border: 1px solid transparent;
+	background-color: #372e2c11;
+	color: #372e2c86;
+}
+.PowerMas_Form_User_Bar > div > div > article > p:last-child{
+	color: #372e2c86;
 }
 .PowerMas_Form_User_Bar_Active{
-	color: #F7775A;
+	background-color: #F7775A!important;
+	color: #fff!important;
 }
 .PowerMas_Form_User_Card{
 	border: 1px solid #372e2c60;
 	border-radius: 5px;
 }
 .PowerMas_Hr{
+	height: 1px;
 	border: 1px solid #1111113a;
 }
 .PowerMas_Form_User_Card input,
@@ -1408,7 +1429,7 @@ input::placeholder,select::placeholder{
 	padding: 0.25rem;
 }
 .PowerMas_Form_User_Card > div {
-    padding-right: 1rem;
+    /* padding-right: 1rem; */
 }
 
 .PowerMas_Form_User_Card > div:nth-child(2n) {

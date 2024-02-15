@@ -176,17 +176,15 @@ const FormUser = () => {
     
     return (
         <div className="bg-white h-100 flex flex-column">
-            <div className="PowerMas_Header_Form_Beneficiarie flex ai-center p2">
-                {/* <GrFormPreviousLink className="m1 w-auto Large-f2_5 pointer" onClick={() => navigate('/user')} /> */}
-                <h1 className="flex-grow-1">{isEditing ? 'Editar' : 'Nuevo'} Usuario</h1>
+            <div className="PowerMas_Header_Form_Beneficiarie flex ai-center">
                 <Bar isEditing={isEditing} currentStep={1} />
             </div>
-            <div className="flex-grow-1 overflow-auto p1_25">
-                <div className="">
-                    <h2>Datos Personales </h2>
-                    <br />
-                    <div className="PowerMas_Form_User_Card flex flex-wrap p1">
-                        <div className="Large_6 flex flex-column p1">
+            <div className="flex flex-grow-1 overflow-auto p1_25 gap-1">
+                <div className="Large_6">
+                    <div className="PowerMas_Form_User_Card flex flex flex-wrap p1">
+                        <h2 className="f1_25">Datos Personales </h2>
+                        <br /><br />
+                        <div className="Large_12 flex flex-column">
                             <label htmlFor="docIdeCod">Documento Identidad</label>
                             <select 
                                 id="docIdeCod" 
@@ -211,7 +209,7 @@ const FormUser = () => {
                                 </p>
                             )}
                         </div>
-                        <div className="Large_6 flex flex-column p1">
+                        <div className="Large_12 flex flex-column">
                             <label htmlFor="usuNumDoc">Número documento</label>
                             <input
                                 id="usuNumDoc"
@@ -228,7 +226,7 @@ const FormUser = () => {
                                 </p>
                             )}
                         </div>
-                        <div className="Large_6 flex flex-column p1">
+                        <div className="Large_12 flex flex-column">
                             <label htmlFor="usuNom">Nombre</label>
                             <input type="text"
                                 id="usuNom"
@@ -247,7 +245,7 @@ const FormUser = () => {
                                 </p>
                             )}
                         </div>
-                        <div className="Large_6 flex flex-column p1">
+                        <div className="Large_12 flex flex-column">
                             <label htmlFor="usuApe">Apellido</label>
                             <input 
                                 type="text" 
@@ -267,149 +265,7 @@ const FormUser = () => {
                                 </p>
                             )}
                         </div>
-                        <div className="Large_6 flex flex-column p1">
-                            <label htmlFor="usuTel">Teléfono</label>
-                            <input 
-                                type="text" 
-                                id="usuTel" 
-                                className={`p1 PowerMas_Modal_Form_${dirtyFields.usuTel || isSubmitted ? (errors.usuTel ? 'invalid' : 'valid') : ''}`} 
-                                placeholder="Ejm: 922917351"
-                                {...register('usuTel', { 
-                                    required: 'El número de telefono es requerido',
-                                    minLength: { value: 9, message: 'El número de telefono debe tener minimo 9 digitos' },
-                                })} 
-                            />
-                            {errors.usuTel ? (
-                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.usuTel.message}</p>
-                            ) : (
-                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                Espacio reservado para el mensaje de error
-                                </p>
-                            )}
-                        </div>
-                        <div className="Large_6 flex flex-column p1">
-                            <label htmlFor="usuFecNac">Fecha de nacimiento</label>
-                                <input 
-                                    type="text" 
-                                    id="usuFecNac" 
-                                    className={`p1 PowerMas_Modal_Form_${dirtyFields.usuFecNac || isSubmitted ? (errors.usuFecNac ? 'invalid' : 'valid') : ''}`} 
-                                    placeholder="Ejm: 2023-03-17"
-                                    {...register('usuFecNac', { 
-                                        required: 'La Fecha de nacimiento es requerido',
-                                        pattern: {
-                                            value: /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/,
-                                            message: 'La fecha debe estar en el formato YYYY-MM-DD',
-                                        },
-                                    })} 
-                                />
-                                {errors.usuFecNac ? (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.usuFecNac.message}</p>
-                                ) : (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                    Espacio reservado para el mensaje de error
-                                    </p>
-                                )}
-                        </div>
-                    </div>
-                </div>
-                <hr className="PowerMas_Hr" />
-                <div className="">
-                    <h2>Datos Profesionales </h2>
-                    <br />
-                    <div className="PowerMas_Form_User_Card p1 flex flex-wrap">
-                        <div className="Large_6 flex flex-column p1">
-                            <label htmlFor="usuCorEle">Email</label>
-                            <input 
-                                type="text" 
-                                id="usuCorEle" 
-                                className={`p1 PowerMas_Modal_Form_${dirtyFields.usuCorEle || isSubmitted ? (errors.usuCorEle ? 'invalid' : 'valid') : ''}`} 
-                                placeholder="Ejm: correo@correo.es"
-                                {...register('usuCorEle', { 
-                                    required: 'El Email es requerido',
-                                    pattern: {
-                                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
-                                        message: 'Dirección de correo electrónico inválida',
-                                    },
-                                })} 
-                            />
-                             {errors.usuCorEle ? (
-                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.usuCorEle.message}</p>
-                            ) : (
-                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                Espacio reservado para el mensaje de error
-                                </p>
-                            )}
-                        </div>
-                        {
-                            !isEditing &&
-                            (
-                                <div className="Large_6 flex flex-column p1">
-                                    <label htmlFor="usuPas">Contraseña</label>
-                                    <input 
-                                        type="password" 
-                                        id="usuPas" 
-                                        className={`p1 PowerMas_Modal_Form_${dirtyFields.usuPas || isSubmitted ? (errors.usuPas ? 'invalid' : 'valid') : ''}`} 
-                                        placeholder="Ejm: 12345678"
-                                        {...register('usuPas', { 
-                                            required: 'La contraseña es requerido',
-                                            minLength: { value: 8, message: 'La contraseña debe tener minimo 8 digitos' },
-                                        })} 
-                                    />
-                                     {errors.usuPas ? (
-                                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.usuPas.message}</p>
-                                    ) : (
-                                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                        Espacio reservado para el mensaje de error
-                                        </p>
-                                    )}
-                                </div>
-                            )
-                        }
-                        <div className="Large_6 flex flex-column p1">
-                            <label htmlFor="rolCod">Rol</label>
-                            <select 
-                                id="rolCod"
-                                className={`p1 PowerMas_Modal_Form_${dirtyFields.rolCod || isSubmitted ? (errors.rolCod ? 'invalid' : 'valid') : ''}`}
-                                {...register('rolCod', { 
-                                    validate: value => value !== '0' || 'El rol es requerido' 
-                                })}
-                            >
-                                <option value="0">--SELECCIONE UN ROL--</option>
-                                {roles.map(rol => (
-                                    <option key={rol.rolCod} value={rol.rolCod}>{rol.rolNom}</option>
-                                ))}
-                            </select>
-                            {errors.rolCod ? (
-                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.rolCod.message}</p>
-                            ) : (
-                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                Espacio reservado para el mensaje de error
-                                </p>
-                            )}
-                        </div>
-                        <div className="Large_6 flex flex-column p1">
-                            <label htmlFor="carCod">Cargo</label>
-                            <select 
-                                id="carCod" 
-                                className={`p1 PowerMas_Modal_Form_${dirtyFields.carCod || isSubmitted ? (errors.carCod ? 'invalid' : 'valid') : ''}`}
-                                {...register('carCod', { 
-                                    validate: value => value !== '0' || 'El cargo es requerido' 
-                                })}
-                            >
-                                <option value="0">--SELECCIONE UN CARGO--</option>
-                                {cargos.map(cargo => (
-                                    <option key={cargo.carCod} value={cargo.carCod}>{cargo.carNom}</option>
-                                ))}
-                            </select>
-                            {errors.carCod ? (
-                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.carCod.message}</p>
-                            ) : (
-                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                Espacio reservado para el mensaje de error
-                                </p>
-                            )}
-                        </div>
-                        <div className="Large_6 flex flex-column p1">
+                        <div className="Large_12 flex flex-column">
                             <label htmlFor="">Sexo</label>
                             <div className="flex gap-1">
                                 <div className="flex gap_5">
@@ -433,9 +289,177 @@ const FormUser = () => {
                                     <label htmlFor="femenino">Femenino</label>
                                 </div>
                             </div>
+                            <br />
+                        </div>
+                        <div className="Large_12 flex flex-column">
+                            <label htmlFor="usuFecNac">Fecha de nacimiento</label>
+                                <input 
+                                    type="text" 
+                                    id="usuFecNac" 
+                                    className={`p1 PowerMas_Modal_Form_${dirtyFields.usuFecNac || isSubmitted ? (errors.usuFecNac ? 'invalid' : 'valid') : ''}`} 
+                                    placeholder="Ejm: 2023-03-17"
+                                    {...register('usuFecNac', { 
+                                        required: 'La Fecha de nacimiento es requerido',
+                                        pattern: {
+                                            value: /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/,
+                                            message: 'La fecha debe estar en el formato YYYY-MM-DD',
+                                        },
+                                    })} 
+                                />
+                                {errors.usuFecNac ? (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.usuFecNac.message}</p>
+                                ) : (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                    Espacio reservado para el mensaje de error
+                                    </p>
+                                )}
+                        </div>
+                        <div className="Large_12 flex flex-column">
+                            <label htmlFor="usuCorEle">Email</label>
+                            <input 
+                                type="text" 
+                                id="usuCorEle" 
+                                className={`p1 PowerMas_Modal_Form_${dirtyFields.usuCorEle || isSubmitted ? (errors.usuCorEle ? 'invalid' : 'valid') : ''}`} 
+                                placeholder="Ejm: correo@correo.es"
+                                {...register('usuCorEle', { 
+                                    required: 'El Email es requerido',
+                                    pattern: {
+                                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+                                        message: 'Dirección de correo electrónico inválida',
+                                    },
+                                })} 
+                            />
+                             {errors.usuCorEle ? (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.usuCorEle.message}</p>
+                            ) : (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                Espacio reservado para el mensaje de error
+                                </p>
+                            )}
+                        </div>
+                        <div className="Large_12 flex flex-column">
+                            <label htmlFor="usuTel">Teléfono</label>
+                            <input 
+                                type="text" 
+                                id="usuTel" 
+                                className={`p1 PowerMas_Modal_Form_${dirtyFields.usuTel || isSubmitted ? (errors.usuTel ? 'invalid' : 'valid') : ''}`} 
+                                placeholder="Ejm: 922917351"
+                                {...register('usuTel', { 
+                                    required: 'El número de telefono es requerido',
+                                    minLength: { value: 9, message: 'El número de telefono debe tener minimo 9 digitos' },
+                                })} 
+                            />
+                            {errors.usuTel ? (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.usuTel.message}</p>
+                            ) : (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                Espacio reservado para el mensaje de error
+                                </p>
+                            )}
                         </div>
                         
-                        <div className="Large_6 flex flex-column p1">
+                    </div>
+                </div>
+                <div className="Large_6">
+                    <div className="PowerMas_Form_User_Card p1 flex flex-wrap">
+                        <h2 className="f1_25">Datos Profesionales </h2>
+                        <br /><br />
+                        
+                        
+                        <div className="Large_12 flex flex-column">
+                            <label htmlFor="rolCod">Rol</label>
+                            <select 
+                                id="rolCod"
+                                className={`p1 PowerMas_Modal_Form_${dirtyFields.rolCod || isSubmitted ? (errors.rolCod ? 'invalid' : 'valid') : ''}`}
+                                {...register('rolCod', { 
+                                    validate: value => value !== '0' || 'El rol es requerido' 
+                                })}
+                            >
+                                <option value="0">--SELECCIONE UN ROL--</option>
+                                {roles.map(rol => (
+                                    <option key={rol.rolCod} value={rol.rolCod}>{rol.rolNom}</option>
+                                ))}
+                            </select>
+                            {errors.rolCod ? (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.rolCod.message}</p>
+                            ) : (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                Espacio reservado para el mensaje de error
+                                </p>
+                            )}
+                        </div>
+                        <div className="Large_12 flex flex-column">
+                            <label htmlFor="carCod">Cargo</label>
+                            <select 
+                                id="carCod" 
+                                className={`p1 PowerMas_Modal_Form_${dirtyFields.carCod || isSubmitted ? (errors.carCod ? 'invalid' : 'valid') : ''}`}
+                                {...register('carCod', { 
+                                    validate: value => value !== '0' || 'El cargo es requerido' 
+                                })}
+                            >
+                                <option value="0">--SELECCIONE UN CARGO--</option>
+                                {cargos.map(cargo => (
+                                    <option key={cargo.carCod} value={cargo.carCod}>{cargo.carNom}</option>
+                                ))}
+                            </select>
+                            {errors.carCod ? (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.carCod.message}</p>
+                            ) : (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                Espacio reservado para el mensaje de error
+                                </p>
+                            )}
+                        </div>
+                        <div className="Large_12 flex flex-column">
+                            <label htmlFor="usuCorEle">Usuario</label>
+                            <input 
+                                type="text" 
+                                id="usuCorEle" 
+                                className={`p1 PowerMas_Modal_Form_${dirtyFields.usuCorEle || isSubmitted ? (errors.usuCorEle ? 'invalid' : 'valid') : ''}`} 
+                                placeholder="Ejm: correo@correo.es"
+                                {...register('usuCorEle', { 
+                                    required: 'El Email es requerido',
+                                    pattern: {
+                                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+                                        message: 'Dirección de correo electrónico inválida',
+                                    },
+                                })} 
+                            />
+                             {errors.usuCorEle ? (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.usuCorEle.message}</p>
+                            ) : (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                Espacio reservado para el mensaje de error
+                                </p>
+                            )}
+                        </div>
+                        
+                        {
+                            !isEditing &&
+                            (
+                                <div className="Large_12 flex flex-column">
+                                    <label htmlFor="usuPas">Contraseña</label>
+                                    <input 
+                                        type="password" 
+                                        id="usuPas" 
+                                        className={`p1 PowerMas_Modal_Form_${dirtyFields.usuPas || isSubmitted ? (errors.usuPas ? 'invalid' : 'valid') : ''}`} 
+                                        placeholder="Ejm: 12345678"
+                                        {...register('usuPas', { 
+                                            required: 'La contraseña es requerido',
+                                            minLength: { value: 8, message: 'La contraseña debe tener minimo 8 digitos' },
+                                        })} 
+                                    />
+                                     {errors.usuPas ? (
+                                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.usuPas.message}</p>
+                                    ) : (
+                                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                        Espacio reservado para el mensaje de error
+                                        </p>
+                                    )}
+                                </div>
+                            )
+                        }
+                        <div className="Large_12 flex flex-column">
                             <label htmlFor="">Estado</label>
                             <div className="flex gap-1">
                                 <div className="flex gap_5">
@@ -464,8 +488,8 @@ const FormUser = () => {
                 </div>
             </div>
             <div className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
-                <button onClick={() => navigate('/user')} className="Large_5 m2 PowerMas_Buttom_Secondary">Atras</button>
-                <button onClick={handleNext} className="Large_5 m2 PowerMas_Buttom_Primary">Siguiente</button>
+                <button onClick={handleNext} className="Large_3 m_75 PowerMas_Buttom_Primary">Siguiente</button>
+                <button onClick={() => navigate('/user')} className="Large_3 m_75 PowerMas_Buttom_Secondary">Atras</button>
             </div>
         </div>
   )

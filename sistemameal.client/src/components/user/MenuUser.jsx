@@ -360,8 +360,7 @@ const MenuUser = () => {
   return (
     <>
       <div className="bg-white h-100 flex flex-column">
-        <div className="PowerMas_Header_Form_Beneficiarie flex ai-center p2">
-          <h1 className="flex-grow-1">Menu Usuario</h1>
+        <div className="PowerMas_Header_Form_Beneficiarie flex ai-center">
           <Bar currentStep={2} />
         </div>
         <div className="flex-grow-1 overflow-auto p1_25">
