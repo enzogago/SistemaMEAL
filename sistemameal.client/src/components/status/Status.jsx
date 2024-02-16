@@ -71,6 +71,7 @@ const Status = () => {
     }, []);
     
     
+    
 
     return (
         <div className="PowerMas_StatusContainer">

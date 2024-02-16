@@ -609,8 +609,8 @@ const FormBeneficiarie = () => {
                     }
             </div>
             <div className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
-                <button onClick={() => navigate('/beneficiarie')} className="Large_5 m2">Atras</button>
-                <button onClick={handleNext} className="Large_5 m2">Siguiente</button>
+                <button onClick={() => navigate('/beneficiarie')} className="PowerMas_Buttom_Secondary Large_3 m_75">Atras</button>
+                <button onClick={handleNext} className="PowerMas_Buttom_Primary Large_3 m_75">Siguiente</button>
             </div>
         </div>
     )

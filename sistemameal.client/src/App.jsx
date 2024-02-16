@@ -35,6 +35,8 @@ import Beneficiarie from './components/beneficiarie/Beneficiarie';
 import FormGoalBeneficiarie from './components/monitoring/beneficiarie/FormGoalBeneficiarie';
 import FormBeneficiarie from './components/beneficiarie/FormBeneficiarie';
 import FormProfile from './components/profile/FormProfile';
+import UploadStatus from './components/maintenance/UploadStatus';
+import UploadCharge from './components/maintenance/UploadCharge';
 
 const App = () => {
     // Variables state AuthContext
@@ -58,6 +60,8 @@ const App = () => {
         "nationality": Nationality,
         "unit": Unit,
         "beneficiarie": Beneficiarie,
+        "upload-status": UploadStatus,
+        "upload-charge": UploadCharge,
     };
 
     return (
