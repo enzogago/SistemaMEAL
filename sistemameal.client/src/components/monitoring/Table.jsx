@@ -231,7 +231,7 @@ const Table = ({ data }) => {
                         row.original.uniInvPer === 'S' ?
                         <div className="flex jc-center ai-center">
                             <button  
-                                className="PowerMas_Add_Beneficiarie f_75 p_25" 
+                                className="PowerMas_Add_Beneficiarie f_75 p_25 flex-grow-1" 
                                 onClick={() => Register_Beneficiarie(row)}
                             >
                                 Beneficiario

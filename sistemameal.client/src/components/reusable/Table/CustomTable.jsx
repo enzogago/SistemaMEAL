@@ -1,7 +1,7 @@
 import { FaPlus, FaSearch, FaSortDown } from 'react-icons/fa';
 import { TiArrowSortedUp ,TiArrowSortedDown } from "react-icons/ti";
-import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
-import Pdf_Icon from '../../img/PowerMas_Pdf_Icon.svg';
+import Excel_Icon from '../../../img/PowerMas_Excel_Icon.svg';
+import Pdf_Icon from '../../../img/PowerMas_Pdf_Icon.svg';
 import Pagination from './Pagination';
 import {
     flexRender, 
@@ -108,7 +108,7 @@ const CustomTable = ({ title, searchFilter, setSearchFilter, actions, openModal,
                                     </tr>
                                 ))
                             :   <tr className='PowerMas_TableEmpty'>
-                                    <td colSpan={3} className='Large-p1 center'>
+                                    <td colSpan={20} className='Large-p1 center'>
                                         No se encontraron registros
                                     </td>
                                 </tr>

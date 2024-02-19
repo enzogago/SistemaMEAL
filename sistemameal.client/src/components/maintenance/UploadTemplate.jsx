@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
+import Notiflix from 'notiflix';
 
 const UploadTemplate = ({ expectedHeaders, controller }) => {
     const fileInput = useRef();
@@ -8,6 +9,39 @@ const UploadTemplate = ({ expectedHeaders, controller }) => {
     const [postData, setPostData] = useState([]); // Datos para enviar al servidor
     const [isValid, setIsValid] = useState(true);
     const [errorCells, setErrorCells] = useState([]);
+
+    const validateCell = (value, validationRules) => {
+        if (validationRules.maxLength && value.length > validationRules.maxLength) {
+            return `El campo no puede tener más de ${validationRules.maxLength} caracteres`;
+        }
+        if (validationRules.minLength && value.length < validationRules.minLength) {
+            return `El campo no puede tener menos de ${validationRules.minLength} caracteres`;
+        }
+        if (validationRules.pattern && !validationRules.pattern.test(value)) {
+            return validationRules.patternMessage;
+        }
+        if (validationRules.noLeadingSpaces && value.startsWith(' ')) {
+            return 'El campo no puede comenzar con espacios en blanco';
+        }
+        return true;
+    };
+
+    const validationRules = {
+        'nombre': {
+            maxLength: 50,
+            minLength: 5,
+            pattern: /^[A-Za-zñÑ\s]+$/,
+            patternMessage: 'Por favor, introduce solo letras y espacios',
+        },
+        'color': {
+            minLength: 7,
+            maxLength: 7,
+            pattern: /^#([0-9A-Fa-f]{6})$/,
+            patternMessage: 'Por favor, introduce un color en formato hexadecimal',
+        },
+        // Agrega aquí las reglas para otros campos...
+    };
+    
 
     const handleUpload = async () => {
         // Reinicia los estados cada vez que se carga un archivo
@@ -43,6 +77,16 @@ const UploadTemplate = ({ expectedHeaders, controller }) => {
                         tableRowData[colNumber - 1] = cellValue; // Llena la fila con los datos del archivo Excel
                         const databaseKey = expectedHeaders[colNumber - 1].dbKey; // Obtiene la clave de la base de datos correspondiente
                         postRowData[databaseKey] = cellValue; // Llena la fila con los datos del archivo Excel
+                
+                        // Obtiene las reglas de validación para este campo
+                        const fieldValidationRules = validationRules[expectedHeaders[colNumber - 1].display.toLowerCase()];
+                
+                        // Valida la celda
+                        const validationMessage = validateCell(cellValue, fieldValidationRules);
+                        if (validationMessage !== true) {
+                            newErrorCells.push({ row: rowNumber - 2, column: colNumber - 1,  message: validationMessage});
+                            setIsValid(false);
+                        }
                     }
                 });
                 tableData.push(tableRowData);
@@ -50,13 +94,13 @@ const UploadTemplate = ({ expectedHeaders, controller }) => {
                 // Verifica si alguna celda en la fila está vacía
                 for (let i = 0; i < tableRowData.length; i++) {
                     if (!tableRowData[i]) {
-                        newErrorCells.push({ row: rowNumber - 2, column: i });
+                        newErrorCells.push({ row: rowNumber - 2, column: i, message: "El campo es requerido" });
                         setIsValid(false);
                     }
                 }
             }
             // Extrae los encabezados legibles por humanos de expectedHeaders
-            const expectedHeaderDisplays = expectedHeaders.map(header => header.display);
+            const expectedHeaderDisplays = expectedHeaders.map(header => header.display.toUpperCase());
 
             // Verifica que los encabezados son correctos
             const headers = worksheet.getRow(1).values.slice(1, worksheet.getRow(1).values.length);
@@ -70,6 +114,7 @@ const UploadTemplate = ({ expectedHeaders, controller }) => {
             setPostData(postData);
             console.log(postData);
             setErrorCells(newErrorCells);
+            console.log(newErrorCells)
             // Aquí puedes procesar los datos y enviarlos al servidor
         };
         reader.readAsArrayBuffer(file);
@@ -84,13 +129,13 @@ const UploadTemplate = ({ expectedHeaders, controller }) => {
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet("Plantilla");
     
-        worksheet.columns = expectedHeaders.map(header => ({ header: header.display, key: header.display, width: 15 }));
+        worksheet.columns = expectedHeaders.map(header => ({ header: header.display.toUpperCase(), key: header.display, width: 15 }));
         workbook.xlsx.writeBuffer().then(function(buffer) {
             saveAs(new Blob([buffer]), `PLANTILLA_${controller.toUpperCase()}.xlsx`);
         });
     };
 
-    const processValidData = () => {
+    const processValidData = async() => {
         // Verifica que los datos sean válidos y que no estén vacíos
         if (!isValid || postData.length === 0) {
             alert('Los datos son inválidos o no hay datos para procesar');
@@ -100,6 +145,26 @@ const UploadTemplate = ({ expectedHeaders, controller }) => {
         // Aquí puedes procesar los datos y enviarlos al servidor
         console.log('Procesando datos...');
         console.log(postData);
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/${controller}/Masivo`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(postData),
+            });
+            console.log("desde response: ",response)
+            const data = await response.json();
+            if (!response.ok) {
+                Notiflix.Notify.failure(data.message)
+                return;
+            }
+            Notiflix.Notify.success(data.message)
+        } catch (error) {
+            console.error('Error:', error);
+        }
     }
     
     return (
@@ -115,7 +180,7 @@ const UploadTemplate = ({ expectedHeaders, controller }) => {
                     <thead>
                         <tr>
                             {expectedHeaders.map((header, index) => (
-                                <th key={index}>{header.display}</th>
+                                <th key={index}>{header.display.toUpperCase()}</th>
                             ))}
                         </tr>
                     </thead>

@@ -1166,7 +1166,7 @@ input::placeholder,select::placeholder{
 	width: 100%;
 	border-radius: 5px;
 	padding: 0.5rem;
-	border: 2px solid #FFDED7;
+	border: 1px solid #FFDED7;
 	outline: none;
 }
 .PowerMas_StatusSubmit{

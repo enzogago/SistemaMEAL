@@ -2,8 +2,8 @@ import UploadTemplate from "./UploadTemplate"
 
 const UploadStatus = () => {
     const expectedHeaders = [
-        { display: 'ESTADO_NOMBRE', dbKey: 'estNom' },
-        { display: 'ESTADO_COLOR', dbKey: 'estCol' },
+        { display: 'nombre', dbKey: 'estNom' },
+        { display: 'color', dbKey: 'estCol' },
         // Agrega aquí el resto de los mapeos
     ];
     return (

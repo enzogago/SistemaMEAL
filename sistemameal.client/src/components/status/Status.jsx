@@ -1,24 +1,22 @@
-import { useContext, useEffect, useState } from 'react';
-// Libraries
-import Notiflix from 'notiflix';
+import { useEffect, useState } from 'react';
 // Componentes
-import Table from './Table';
-import Modal from './Modal';
-// Context
-import { AuthContext } from '../../context/AuthContext';
-import { StatusContext } from '../../context/StatusContext';
+import Table from '../reusable/Table/Table';
+import Modal from '../reusable/ModalForm/Modal';
+// Fetch Get
+import { fetchData } from '../reusable/helper';
 
 const Status = () => {
-    // Variables State AuthContext 
-    const { authActions } = useContext(AuthContext);
-    const { setIsLoggedIn, setUserLogged } = authActions;
-    // Variables State statusContext
-    const { statusActions } = useContext(StatusContext);
-    const { setModalVisible, setEstadoEditado } = statusActions;
     // States locales
-    const [ estados, setEstados ] = useState([])
-    
-    // TOGGLE MODAL
+    const [ data, setData ] = useState([])
+    const [ modalVisible, setModalVisible ] = useState(false)
+    const [ estadoEditado, setEstadoEditado ] = useState(false)
+
+    // Definir controller y fieldMapping como variables
+    const controller = 'Estado';
+    const fieldMapping = { codigo: 'estCod', nombre: 'estNom', color: 'estCol' };
+    const { codigo, ...restFieldMapping } = fieldMapping;
+  
+    // Toggle Modal
     const openModal = (estado = null) => {
         setEstadoEditado(estado);
         setModalVisible(true);
@@ -27,65 +25,34 @@ const Status = () => {
         setEstadoEditado(null);
         setModalVisible(false);
     };
-
-    // EFECTO AL CARGAR COMPONENTE GET - LISTAR ESTADOS
+  
+    // Cargar los registros
     useEffect(() => {
-        const fetchEstados = async () => {
-            try {
-                Notiflix.Loading.pulse('Cargando...');
-                const token = localStorage.getItem('token');
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Estado`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                const data = await response.json();
-                console.log(response)
-                console.log(data)
-                if (!response.ok) {
-                    if(response.status == 401){
-                        Notiflix.Notify.failure(data.message);
-                        setUserLogged({})
-                        localStorage.removeItem('token');
-                        setIsLoggedIn(false);
-                    }
-                    return;
-                }
-                if (data.success == false) {
-                    console.log(data)
-                    Notiflix.Notify.failure(data.message);
-                    setUserLogged({})
-                    localStorage.removeItem('token');
-                    setIsLoggedIn(false);
-                    return;
-                }
-                setEstados(data);
-            } catch (error) {
-                console.error('Error:', error);
-            } finally {
-                Notiflix.Loading.remove();
-            }
-        };
-    
-        fetchEstados();
+        fetchData(controller, setData);
     }, []);
-    
-    
-    
 
     return (
         <div className="PowerMas_StatusContainer">
-            <Table 
-                data={estados} 
-                openModal={openModal}
-                setEstados={setEstados}
+            <Table
+                data={data} 
+                openModal={openModal} 
+                setData={setData}
+                controller={controller}
+                fieldMapping={fieldMapping}
             />
-            <Modal 
-                closeModal={closeModal}
-                setEstados={setEstados}
+
+            <Modal
+                modalVisible={modalVisible}
+                setModalVisible={setModalVisible}
+                estadoEditado={estadoEditado}
+                closeModal={closeModal} 
+                setData={setData}
+                fieldMapping={restFieldMapping}
+                controller={controller}
+                codeField={codigo}
             />
         </div>
-    );
+    )
 }
 
-export default Status;
+export default Status

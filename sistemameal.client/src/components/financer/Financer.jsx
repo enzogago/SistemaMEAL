@@ -1,23 +1,22 @@
-import { useContext, useEffect, useState } from 'react';
-// Libraries
-import Notiflix from 'notiflix';
-// Context
-import { AuthContext } from '../../context/AuthContext';
-import { StatusContext } from '../../context/StatusContext';
+import { useEffect, useState } from 'react';
 // Componentes
-import Table from './Table';
-import Modal from './Modal';
+import Table from '../reusable/Table/Table';
+import Modal from '../reusable/ModalForm/Modal';
+// Fetch Get
+import { fetchData } from '../reusable/helper';
+
 const Financer = () => {
-    // Variables State AuthContext 
-    const { authActions } = useContext(AuthContext);
-    const { setIsLoggedIn } = authActions;
-    // Variables State statusContext
-    const { statusActions } = useContext(StatusContext);
-    const { setModalVisible, setEstadoEditado } = statusActions;
     // States locales
-    const [ financiadores, setFinanciadores ] = useState([])
-    
-    // TOGGLE MODAL
+    const [ data, setData ] = useState([])
+    const [ modalVisible, setModalVisible ] = useState(false)
+    const [ estadoEditado, setEstadoEditado ] = useState(false)
+
+    // Definir controller y fieldMapping como variables
+    const controller = 'Financiador';
+    const fieldMapping = { codigo: 'finCod', nombre: 'finNom' };
+    const { codigo, ...restFieldMapping } = fieldMapping;
+  
+    // Toggle Modal
     const openModal = (estado = null) => {
         setEstadoEditado(estado);
         setModalVisible(true);
@@ -26,54 +25,31 @@ const Financer = () => {
         setEstadoEditado(null);
         setModalVisible(false);
     };
-
-    // EFECTO AL CARGAR COMPONENTE GET - LISTAR ESTADOS
+  
+    // Cargar los registros
     useEffect(() => {
-        const fetchFinanciadores = async () => {
-            try {
-                Notiflix.Loading.pulse('Cargando...');
-                const token = localStorage.getItem('token');
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Financiador`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                console.log(response)
-                if (!response.ok) {
-                    if(response.status == 401 || response.status == 403){
-                        const data = await response.json();
-                        Notiflix.Notify.failure(data.message);
-                        setIsLoggedIn(false);
-                    }
-                    return;
-                }
-                const data = await response.json();
-                console.log(data)
-                if (data.success == false) {
-                    Notiflix.Notify.failure(data.message);
-                    return;
-                }
-                setFinanciadores(data);
-            } catch (error) {
-                console.error('Error:', error);
-            } finally {
-                Notiflix.Loading.remove();
-            }
-        };
-
-        fetchFinanciadores();
+        fetchData(controller, setData);
     }, []);
 
     return (
         <div className="PowerMas_StatusContainer">
-            <Table 
-                data={financiadores} 
+            <Table
+                data={data} 
                 openModal={openModal} 
-                setFinanciadores={setFinanciadores}
+                setData={setData}
+                controller={controller}
+                fieldMapping={fieldMapping}
             />
-            <Modal 
+
+            <Modal
+                modalVisible={modalVisible}
+                setModalVisible={setModalVisible}
+                estadoEditado={estadoEditado}
                 closeModal={closeModal} 
-                setFinanciadores={setFinanciadores}
+                setData={setData}
+                fieldMapping={restFieldMapping}
+                controller={controller}
+                codeField={codigo}
             />
         </div>
     )

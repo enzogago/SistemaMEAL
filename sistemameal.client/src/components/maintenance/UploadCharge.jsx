@@ -2,8 +2,7 @@ import UploadTemplate from "./UploadTemplate"
 
 const UploadCharge = () => {
     const expectedHeaders = [
-        { display: 'CARGO_NOMBRE', dbKey: 'carNom' },
-        { display: 'CARGO_EXPLICA', dbKey: 'carExp' },
+        { display: 'nombre', dbKey: 'carNom' },
         // Agrega aquí el resto de los mapeos
     ];
     return (

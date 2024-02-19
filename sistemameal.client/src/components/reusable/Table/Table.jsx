@@ -9,17 +9,15 @@ import {
 // Iconos package
 import { FaEdit , FaRegTrashAlt } from 'react-icons/fa';
 // Context
-import { AuthContext } from '../../context/AuthContext';
 // Funciones reusables
-import { Export_Excel_Helper, Export_PDF_Helper, handleDelete } from '../reusable/helper';
 // Componentes
-import CustomTable from '../reusable/CustomTable';
+import { AuthContext } from '../../../context/AuthContext';
+import { Export_Excel_Helper, Export_PDF_Helper, handleDelete } from '../helper';
+import CustomTable from './CustomTable';
 
-
-const Table = ({ data, setDocumentosIdentidad, openModal }) => {
+const Table = ({ data, openModal, setData, controller, fieldMapping }) => {
     // Variables State AuthContext 
-    const { authActions, authInfo } = useContext(AuthContext);
-    const { setIsLoggedIn } = authActions;
+    const { authInfo } = useContext(AuthContext);
     const { userPermissions } = authInfo;
     // States locales
     const [searchFilter, setSearchFilter] = useState('');
@@ -27,26 +25,31 @@ const Table = ({ data, setDocumentosIdentidad, openModal }) => {
 
     /* TANSTACK */
     const actions = {
-        add: userPermissions.some(permission => permission.perNom === "INSERTAR DOCUMENTO_IDENTIDAD"),
-        delete: userPermissions.some(permission => permission.perNom === "ELIMINAR DOCUMENTO_IDENTIDAD"),
-        edit: userPermissions.some(permission => permission.perNom === "MODIFICAR DOCUMENTO_IDENTIDAD"),
+        add: userPermissions.some(permission => permission.perNom === `INSERTAR ${controller.toUpperCase()}`),
+        delete: userPermissions.some(permission => permission.perNom === `INSERTAR ${controller.toUpperCase()}`),
+        edit: userPermissions.some(permission => permission.perNom === `MODIFICAR ${controller.toUpperCase()}`),
     };
 
     const columns = useMemo(() => {
-        let baseColumns = [
-            {
-                header: "Código",
-                accessorKey: "docIdeCod",
+        let baseColumns = Object.keys(fieldMapping).map(field => ({
+            header: field,
+            accessorKey: fieldMapping[field],
+            cell: ({row}) => {
+                let text = row.original[fieldMapping[field]];
+                if (field === 'involucra') {
+                    text = text === 'S' ? 'Sí' : 'No';
+                } else if (field === 'color') {
+                    return (
+                        <div style={{color: text}}>
+                            {text}
+                        </div>
+                    );
+                } else {
+                    text = text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+                }
+                return text;
             },
-            {
-                header: "Nombre",
-                accessorKey: "docIdeNom",
-            },
-            {
-                header: "Abreviatura",
-                accessorKey: "docIdeAbr",
-            }
-        ];
+        }));
     
         if (actions.delete || actions.edit) {
             baseColumns.push({
@@ -68,7 +71,7 @@ const Table = ({ data, setDocumentosIdentidad, openModal }) => {
                                 data-tooltip-id="delete-tooltip" 
                                 data-tooltip-content="Eliminar" 
                                 className='Large-p_25' 
-                                onClick={() => handleDelete('DocumentoIdentidad', row.original.docIdeCod, setDocumentosIdentidad, setIsLoggedIn)} 
+                                onClick={() => handleDelete(controller, row.original[fieldMapping.codigo], setData)} 
                             />
                         }
                         <Tooltip 
@@ -88,16 +91,16 @@ const Table = ({ data, setDocumentosIdentidad, openModal }) => {
     
         return baseColumns;
     }, [actions]);
-    
 
     const [sorting, setSorting] = useState([]);
     const filteredData = useMemo(() => 
         data.filter(item => 
-            item.docIdeCod.includes(searchFilter.toUpperCase()) ||
-            item.docIdeNom.includes(searchFilter.toUpperCase()) ||
-            item.docIdeAbr.includes(searchFilter.toUpperCase())
-        ), [data, searchFilter]
+            Object.keys(fieldMapping).some(field =>
+                item[fieldMapping[field]].toUpperCase().includes(searchFilter.toUpperCase())
+            )
+        ), [data, searchFilter, fieldMapping]
     );
+
     const table = useReactTable({
         data: filteredData,
         columns,
@@ -112,28 +115,29 @@ const Table = ({ data, setDocumentosIdentidad, openModal }) => {
     })
     /* END TANSTACK */
 
-     // Preparar los datos
-     const dataExport = table.options.data;  // Tus datos
-     const headers = ['CODIGO', 'NOMBRE', 'ABREVIATURA', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
-     const title = 'DOCUMENTOS_IDENTIDAD';  // El título de tu archivo
-     const properties = ['docIdeCod', 'docIdeNom', 'docIdeAbr', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
-     const format = 'a4';  // El tamaño del formato que quieres establecer para el PDF
- 
-     const Export_Excel = () => {
-         // Luego puedes llamar a la función Export_Excel_Helper de esta manera:
-         Export_Excel_Helper(dataExport, headers, title, properties);
-         setDropdownOpen(false);
-     };
- 
-     const Export_PDF = () => {
-         // Luego puedes llamar a la función Export_PDF_Helper de esta manera:
-         Export_PDF_Helper(dataExport, headers, title, properties, format);
-         setDropdownOpen(false);
-     };
+    // Preparar los datos
+    const dataExport = table.options.data;  // Tus datos
+    const title = controller.toUpperCase() + 'S';  // El título de tu archivo
+    const headers = Object.keys(fieldMapping).map(field => field.toUpperCase()).concat(['USUARIO_MODIFICADO', 'FECHA_MODIFICADO']);
+    const properties = Object.values(fieldMapping).concat(['usuMod', 'fecMod']);
+    const format = 'a4';  // El tamaño del formato que quieres establecer para el PDF
 
+    const Export_Excel = () => {
+        // Luego puedes llamar a la función Export_Excel_Helper de esta manera:
+        Export_Excel_Helper(dataExport, headers, title, properties);
+        setDropdownOpen(false);
+    };
+
+    const Export_PDF = () => {
+        // Luego puedes llamar a la función Export_PDF_Helper de esta manera:
+        Export_PDF_Helper(dataExport, headers, title, properties, format);
+        setDropdownOpen(false);
+    };
+
+    
     return (
         <CustomTable 
-            title="Listado de Documentos Identidad" 
+            title={controller}
             searchFilter={searchFilter} 
             setSearchFilter={setSearchFilter} 
             actions={actions} 
@@ -144,7 +148,7 @@ const Table = ({ data, setDocumentosIdentidad, openModal }) => {
             Export_PDF={Export_PDF} 
             table={table}
         />
-    )
+    );
 }
 
-export default Table
+export default Table;

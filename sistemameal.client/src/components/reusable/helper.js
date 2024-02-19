@@ -8,7 +8,7 @@ import 'jspdf-autotable';
 
 
 
-export const handleDelete = async (controller, codigo, setRegistros, setIsLoggedIn) => {
+export const handleDelete = async (controller, codigo, setRegistros) => {
     Notiflix.Confirm.show(
         'Eliminar registro',
         '¿Estás seguro de que quieres eliminar este registro?',
@@ -40,9 +40,6 @@ export const handleDelete = async (controller, codigo, setRegistros, setIsLogged
                 const contentType = response.headers.get("content-type");
                 if (contentType && contentType.indexOf("application/json") !== -1) {
                     const data = await response.json();
-                    if (data.result) {
-                        setIsLoggedIn(false);
-                    }
                     
                     Notiflix.Notify.failure(data.message);
                     setModalVisible(false); 
@@ -70,7 +67,7 @@ export const handleDelete = async (controller, codigo, setRegistros, setIsLogged
     );
 };
 
-export const handleSubmit = async (controller, objetoEditado, data, setRegistros, setModalVisible, setIsLoggedIn, fieldMapping, codeField, reset) => {
+export const handleSubmit = async (controller, objetoEditado, data, setRegistros, setModalVisible, fieldMapping, codeField, closeModalAndReset) => {
 
     const objeto = objetoEditado 
         ?   { 
@@ -112,10 +109,6 @@ export const handleSubmit = async (controller, objetoEditado, data, setRegistros
         const contentType = response.headers.get("content-type");
         if (contentType && contentType.indexOf("application/json") !== -1) {
             const data = await response.json();
-            if (data.result) {
-                setIsLoggedIn(false);
-            }
-
             Notiflix.Notify.failure(data.message);
             setModalVisible(false); 
             return;
@@ -125,7 +118,6 @@ export const handleSubmit = async (controller, objetoEditado, data, setRegistros
         Notiflix.Notify.success(text);
         console.log(text)
         setModalVisible(false); // Cierra el modal
-
         // Actualiza los datos después de insertar o modificar un registro
         const updateResponse = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/${controller}`, {
             headers: {
@@ -134,7 +126,7 @@ export const handleSubmit = async (controller, objetoEditado, data, setRegistros
         });
         const data = await updateResponse.json();
         setRegistros(data);
-        reset();
+        closeModalAndReset();
     } catch (error) {
         console.error('Error:', error);
     }
@@ -307,4 +299,38 @@ export const Export_PDF_Helper = async (data, headers, title, properties, format
     };
 
     savePdf();
+};
+
+
+// Esta es tu nueva función reutilizable
+export const fetchData = async (controller, setData) => {
+    try {
+        Notiflix.Loading.pulse('Cargando...');
+        // Valores del storage
+        const token = localStorage.getItem('token');
+        
+        // Obtenemos los datos
+        const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/${controller}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        if (!response.ok) {
+            if(response.status === 401 || response.status === 403){
+                const data = await response.json();
+                Notiflix.Notify.failure(data.message);
+            }
+            return;
+        }
+        const data = await response.json();
+        if (data.success === false) {
+            Notiflix.Notify.failure(data.message);
+            return;
+        }
+        setData(data);
+    } catch (error) {
+        console.error('Error:', error);
+    } finally {
+        Notiflix.Loading.remove();
+    }
 };

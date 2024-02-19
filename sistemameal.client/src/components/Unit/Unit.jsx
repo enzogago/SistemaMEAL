@@ -1,24 +1,22 @@
-import { useContext, useEffect, useState } from 'react';
-// Libraries
-import Notiflix from 'notiflix';
-// Context
-import { AuthContext } from '../../context/AuthContext';
-import { StatusContext } from '../../context/StatusContext';
+import { useEffect, useState } from 'react';
 // Componentes
-import Table from './Table';
-import Modal from './Modal';
+import Table from '../reusable/Table/Table';
+import Modal from '../reusable/ModalForm/Modal';
+// Fetch Get
+import { fetchData } from '../reusable/helper';
 
 const Unit = () => {
-    // Variables State AuthContext 
-    const { authActions } = useContext(AuthContext);
-    const { setIsLoggedIn } = authActions;
-    // Variables State statusContext
-    const { statusActions } = useContext(StatusContext);
-    const { setModalVisible, setEstadoEditado } = statusActions;
     // States locales
     const [ data, setData ] = useState([])
+    const [ modalVisible, setModalVisible ] = useState(false)
+    const [ estadoEditado, setEstadoEditado ] = useState(false)
+
+    // Definir controller y fieldMapping como variables
+    const controller = 'Unidad';
+    const fieldMapping = { codigo: 'uniCod', nombre: 'uniNom', involucra: 'uniInvPer' };
+    const { codigo, ...restFieldMapping } = fieldMapping;
   
-    // TOGGLE MODAL
+    // Toggle Modal
     const openModal = (estado = null) => {
         setEstadoEditado(estado);
         setModalVisible(true);
@@ -27,44 +25,10 @@ const Unit = () => {
         setEstadoEditado(null);
         setModalVisible(false);
     };
-
   
-    // EFECTO AL CARGAR COMPONENTE GET - LISTAR ESTADOS
+    // Cargar los registros
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                Notiflix.Loading.pulse('Cargando...');
-                // Valores del storage
-                const token = localStorage.getItem('token');
-                
-                // Obtenemos los cargos
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Unidad`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                if (!response.ok) {
-                    if(response.status == 401 || response.status == 403){
-                        const data = await response.json();
-                        Notiflix.Notify.failure(data.message);
-                        setIsLoggedIn(false);
-                    }
-                    return;
-                }
-                const data = await response.json();
-                if (data.success == false) {
-                    Notiflix.Notify.failure(data.message);
-                    return;
-                }
-                setData(data);
-            } catch (error) {
-                console.error('Error:', error);
-            } finally {
-                Notiflix.Loading.remove();
-            }
-        };
-
-        fetchData();
+        fetchData(controller, setData);
     }, []);
 
     return (
@@ -73,10 +37,19 @@ const Unit = () => {
                 data={data} 
                 openModal={openModal} 
                 setData={setData}
+                controller={controller}
+                fieldMapping={fieldMapping}
             />
-            <Modal 
+
+            <Modal
+                modalVisible={modalVisible}
+                setModalVisible={setModalVisible}
+                estadoEditado={estadoEditado}
                 closeModal={closeModal} 
                 setData={setData}
+                fieldMapping={restFieldMapping}
+                controller={controller}
+                codeField={codigo}
             />
         </div>
     )

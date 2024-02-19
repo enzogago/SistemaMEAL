@@ -4,6 +4,7 @@ using SistemaMEAL.Server.Models;
 using SistemaMEAL.Server.Modulos;
 using Newtonsoft.Json;
 using System.Text;
+using System.Transactions;
 
 namespace SistemaMEAL.Modulos
 {
@@ -198,6 +199,73 @@ namespace SistemaMEAL.Modulos
             {
                 cn.getcn.Close();
             }
+            return (mensaje, tipoMensaje);
+        }
+
+        public (string? message, string? messageType) InsertarEstadosMasivo(List<Estado> estados)
+        {
+            string? mensaje = "";
+            string? tipoMensaje = "";
+
+            using (TransactionScope scope = new TransactionScope())
+            {
+                using (SqlConnection connection = cn.getcn)
+                {
+                    try
+                    {
+                        if (connection.State == ConnectionState.Closed)
+                        {
+                            connection.Open();
+                        }
+
+                        foreach (var estado in estados)
+                        {
+                            SqlCommand cmd = new SqlCommand("SP_INSERTAR_ESTADO", connection);
+                            cmd.CommandType = CommandType.StoredProcedure;
+
+                            cmd.Parameters.AddWithValue("@P_ESTNOM", estado.EstNom);
+                            cmd.Parameters.AddWithValue("@P_ESTCOL", estado.EstCol);
+                            cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
+                            cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
+                            cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
+                            cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
+                            cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
+                            cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "GAGO");
+                            cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "AGUIRRE");
+
+                            SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                            pDescripcionMensaje.Direction = ParameterDirection.Output;
+                            cmd.Parameters.Add(pDescripcionMensaje);
+
+                            SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                            pTipoMensaje.Direction = ParameterDirection.Output;
+                            cmd.Parameters.Add(pTipoMensaje);
+
+                            cmd.ExecuteNonQuery();
+
+                            mensaje = pDescripcionMensaje.Value.ToString();
+                            tipoMensaje = pTipoMensaje.Value.ToString();
+
+                            if (tipoMensaje != "3") // Si hay un error, hace rollback y sale del bucle
+                            {
+                                throw new Exception(mensaje);
+                            }
+                        }
+
+                        // Si todas las operaciones fueron exitosas, confirma la transacción
+                        scope.Complete();
+                        mensaje = "Todos los estados se insertaron correctamente";
+                        tipoMensaje = "3";
+                    }
+                    catch (Exception ex)
+                    {
+                        // Si alguna operación falló, la transacción se revierte.
+                        mensaje = ex.Message;
+                        tipoMensaje = "1";
+                    }
+                }
+            }
+
             return (mensaje, tipoMensaje);
         }
 

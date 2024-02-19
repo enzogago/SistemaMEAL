@@ -34,7 +34,6 @@ namespace SistemaMEAL.Server.Controllers
             return Ok(estados);
         }
 
-
         [HttpPost]
         public dynamic Insertar(Estado estado)
         {
@@ -156,6 +155,28 @@ namespace SistemaMEAL.Server.Controllers
                 return Ok(message);
             }
         }
+
+        [HttpPost]
+        [Route("Masivo")]
+        public dynamic InsertarEstadosMasivo(List<Estado> estados)
+        {
+            // Aquí va la misma lógica de validación de token y permisos que tienes en tu método Insertar...
+
+            var (message, messageType) = _estados.InsertarEstadosMasivo(estados);
+            if (messageType == "1") // Error
+            {
+                return new BadRequestObjectResult(new { success = false, message });
+            }
+            else if (messageType == "2") // Registro ya existe
+            {
+                return new ConflictObjectResult(new { success = false, message });
+            }
+            else // Registros insertados correctamente
+            {
+                return new OkObjectResult(new { success = true, message });
+            }
+        }
+
 
 
     }

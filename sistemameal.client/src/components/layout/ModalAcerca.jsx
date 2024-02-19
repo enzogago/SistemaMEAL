@@ -6,7 +6,7 @@ import { handleSubmit } from '../reusable/helper';
 // sources
 import logo from '../../img/PowerMas_LogoAyudaEnAccion.svg';
 
-const ModalAcerca = ({ isOpen, closeModal, setData }) => {
+const ModalAcerca = ({ isOpen, closeModal }) => {
     // variables state de AuthContext
     const { authActions } = useContext(AuthContext);
     const { setIsLoggedIn } = authActions;
@@ -27,7 +27,6 @@ const ModalAcerca = ({ isOpen, closeModal, setData }) => {
     
     const closeModalAndReset = () => {
         closeModal();
-        reset();
     };
 
 
@@ -61,7 +60,7 @@ const ModalAcerca = ({ isOpen, closeModal, setData }) => {
                     </span>
                 </div>
                 <div className='PowerMas_StatusSubmit flex jc-center ai-center'>
-                    <button className='' value="Cerrar" > Cerrar </button>
+                    <button className='' value="Cerrar"onClick={closeModalAndReset} > Cerrar </button>
                 </div>
             </div>
         </div>
