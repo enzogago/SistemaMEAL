@@ -4,7 +4,6 @@ import Result from "./Result";
 import Objective from "./Objective";
 
 const SubProject = ({subProAno, subProCod, subProNom, subProSap, objetivos, resultados }) => {
-    console.log(objetivos)
 
     const [ editObjetivos, setEditObjetivos] = useState([]);
     const [ editResultados, setEditResultados] = useState([]);

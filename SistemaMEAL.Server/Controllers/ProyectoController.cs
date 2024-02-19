@@ -88,20 +88,6 @@ namespace SistemaMEAL.Server.Controllers
             return Ok(proyectos);
         }
 
-
-        // [HttpGet]
-        // public dynamic Listado()
-        // {
-        //     var identity = HttpContext.User.Identity as ClaimsIdentity;
-        //     var rToken = Jwt.validarToken(identity, _usuarios);
-
-        //     if (!rToken.success) return Unauthorized(rToken);
-
-        //     var proyectos = _proyectos.Listado();
-        //     Console.WriteLine(proyectos);
-        //     return Ok(proyectos);
-        // }
-
         [HttpGet]
         [Route("{usuAno}/{usuCod}")]
         public dynamic ListarProyectosUsuario(string usuAno, string usuCod)
@@ -128,6 +114,70 @@ namespace SistemaMEAL.Server.Controllers
             Console.WriteLine(Ok(proyecto));
             return Ok(proyecto);
         }
+
+        [HttpPost]
+        public dynamic Insertar(Proyecto proyecto)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return rToken;
+
+            dynamic data = rToken.result;
+            Usuario usuarioActual = new Usuario
+            {
+                UsuAno = data.UsuAno,
+                UsuCod = data.UsuCod,
+                RolCod = data.RolCod
+            };
+            if (usuarioActual.RolCod != "01")
+            {
+                return new
+                {
+                    success = false,
+                    message = "No tienes permisos para realizar esta accion",
+                    result = ""
+                };
+            }
+
+            var (proAno, proCod, message, messageType) = _proyectos.Insertar(proyecto);
+            if (messageType == "1") // Error
+            {
+                return new BadRequestObjectResult(new { success = false, message });
+            }
+            else if (messageType == "2") // Registro ya existe
+            {
+                return new ConflictObjectResult(new { success = false, message });
+            }
+            else // Registro modificado correctamente
+            {
+                return new OkObjectResult(new { proAno, proCod, success = true, message });
+            }
+        }
+
+        [HttpPost]
+        [Route("Masivo")]
+        public dynamic InsertarEstadosMasivo(List<Proyecto> proyectos)
+        {
+            // Aquí va la misma lógica de validación de token y permisos que tienes en tu método Insertar...
+
+            var (message, messageType) = _proyectos.InsertarMasivo(proyectos);
+            if (messageType == "1") // Error
+            {
+                return new BadRequestObjectResult(new { success = false, message });
+            }
+            else if (messageType == "2") // Registro ya existe
+            {
+                return new ConflictObjectResult(new { success = false, message });
+            }
+            else // Registros insertados correctamente
+            {
+                return new OkObjectResult(new { success = true, message });
+            }
+        }
+
+        
+
 
     }
 }

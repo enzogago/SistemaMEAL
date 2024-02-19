@@ -227,7 +227,7 @@ const FormBeneficiarie = () => {
 
     return (
         <div className="bg-white h-100 flex flex-column">
-            <div className="PowerMas_Header_Form_Beneficiarie flex ai-center p">
+            <div className="PowerMas_Header_Form_Beneficiarie flex ai-center">
                 <GrFormPreviousLink className="m1 w-auto Large-f2_5 pointer" onClick={() => navigate('/beneficiarie')} />
                 <h1 className="flex-grow-1">{isEditing ? 'Editar' : 'Nuevo'} Beneficiario</h1>
             </div>

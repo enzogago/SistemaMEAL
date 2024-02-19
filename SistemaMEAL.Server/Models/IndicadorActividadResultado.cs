@@ -4,19 +4,20 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SistemaMEAL.Server.Models
 {
-    public class Objetivo
+    public class IndicadorActividadResultado
     {
         [Key, Column(Order = 0)]
-        public String? ObjAno { get; set; }
+        public String? IndActResAno { get; set; }
         [Key, Column(Order = 1)]
-        public String? ObjCod { get; set; }
-        [ForeignKey("SubProyecto")]
-        public String? SubProAno { get; set; }
+        public String? IndActResCod { get; set; }
+        [ForeignKey("Resultado")]
+        public String? ResAno { get; set; }
 
-        [ForeignKey("SubProyecto")]
-        public String? SubProCod { get; set; }
-        public String? ObjNom { get; set; }
-        public String? ObjNum { get; set; }
+        [ForeignKey("Resultado")]
+        public String? ResCod { get; set; }
+        public String? IndActResNom { get; set; }
+        public String? IndActResNum { get; set; }
+        public String? IndActResTip { get; set; }
         public String? UsuIng { get; set; }
 
         public DateTime? FecIng { get; set; }
@@ -26,6 +27,6 @@ namespace SistemaMEAL.Server.Models
         public DateTime? FecMod { get; set; }
 
         public char EstReg { get; set; }
-        public List<ObjetivoEspecifico>? ObjetivosEspecificos { get; set; }
+
     }
 }

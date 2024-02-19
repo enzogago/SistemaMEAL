@@ -32,9 +32,6 @@ namespace SistemaMEAL.Server.Models
 
         public char EstReg { get; set; }
 
-        public virtual Proyecto? Proyecto { get; set; }
-
         public List<Objetivo>? Objetivos { get; set; }
-        public List<Resultado>? Resultados { get; set; }
     }
 }

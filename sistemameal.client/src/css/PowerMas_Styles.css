@@ -669,9 +669,7 @@ input::placeholder,select::placeholder{
 /*	
 	VISTA NewProject.cshtml
 */
-.PowerMas_FormProject > div:first-child{
-	height: 10%;
-}
+
 .PowerMas_MainNewProject {
 	padding: 0 1rem;
 	display: flex;
@@ -740,10 +738,9 @@ input::placeholder,select::placeholder{
 	outline: none;
 }
 
-.PowerMas_MainNewProject textarea {
-	padding: 10px;
-	border: 1px solid #757575;
-	border-radius: 0;
+textarea {
+	border-radius: 5px;
+	min-height: 6rem;
 }
 
 .PowerMas_MainNewProject textarea:focus {
