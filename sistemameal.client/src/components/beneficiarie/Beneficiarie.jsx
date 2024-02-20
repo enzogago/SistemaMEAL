@@ -68,11 +68,11 @@ const Beneficiarie = () => {
     }, []);
 
     return (
-        <div className="PowerMas_StatusContainer">
+        <>
             <Table
                 data={data} 
             />
-        </div>
+        </>
     )
 }
 

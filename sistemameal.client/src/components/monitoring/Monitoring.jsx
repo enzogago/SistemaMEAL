@@ -40,11 +40,11 @@ const Monitoring = () => {
     }, []);
 
     return (
-        <div className='bg-white PowerMas_StatusContainer'>
+        <>
             <Table 
                 data={monitoringData} 
             />
-        </div>
+        </>
     )
 }
 

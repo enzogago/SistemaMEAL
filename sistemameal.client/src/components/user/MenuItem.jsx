@@ -13,7 +13,7 @@ const MenuItem = ({ menu, level, handleToggle, handleCheck, openMenus, checkedMe
     return (
         <li className='' style={{ marginBottom: level === 1 ? '1rem' : '0', fontSize: level === 1 ? '1rem': '0.75rem', color: level === 1 ? '#F7775A' : '#000'}} >
             <div className='p_25 PowerMas_Menu_Dropdown'>
-                <div>
+                <div className=''>
                     <input
                         id={menu.menAno+menu.menCod}
                         type="checkbox" 
@@ -29,12 +29,12 @@ const MenuItem = ({ menu, level, handleToggle, handleCheck, openMenus, checkedMe
                 {
                 menu.permissions.length > 0 &&
                 (
-                    <button className='PowerMas_Button_Permissions' onClick={openModal}>Permisos</button>
+                    <button className='PowerMas_Button_Permissions f_75' onClick={openModal}>Permisos</button>
                 )
                 }
                 {level === 1 && (menu.subMenus.length > 0) &&
                 <span 
-                    className={`p_25 bold round ${openMenus[menu.menCod] ? 'open-user' : 'closed'}`}
+                    className={`m_25 p_25 bold ${openMenus[menu.menCod] ? 'open-user' : 'closed'}`}
                     onClick={level === 1 ? () => handleToggle(menu) : null}
                 > 
                     &gt; 
@@ -87,13 +87,14 @@ const MenuItem = ({ menu, level, handleToggle, handleCheck, openMenus, checkedMe
                         <hr className='PowerMas_Hr' />
                         {menu.permissions.map((permission, index) => (
                             <div className='flex p_5 gap_5' key={index}>
-                                <input 
+                                <input
+                                    id={permission.perCod}
                                     type="checkbox" 
                                     value={permission.perCod} 
                                     onChange={(event) => handlePermissionCheck(permission, event.target.checked)}
                                     checked={checkedPermissions[permission.perCod]}
                                 />
-                                <label>
+                                <label htmlFor={permission.perCod}>
                                     {permission.perNom}
                                 </label>
                             </div>

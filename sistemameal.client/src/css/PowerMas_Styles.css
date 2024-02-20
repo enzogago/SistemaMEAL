@@ -270,6 +270,10 @@ input::placeholder,select::placeholder{
 	flex-grow: 1;
 	display: flex;
 	flex-direction: column;
+	background-color: #fff;
+	height: 100vh;
+	overflow: auto;
+	border-radius: 5px;
 }
 /* .PowerMas_MainRender::before{
 	content: "";
@@ -948,18 +952,12 @@ textarea {
 .PowerMas_ButtonStatus:hover {
     background-color: #D03F1E; /* Cambia el color de fondo cuando se pasa el ratón por encima para un efecto hover */
 }
-.PowerMas_StatusContainer{
-	display: flex;
-	margin: 1rem;
-	flex-grow: 1;
-	overflow: auto;
-	background-color: #fff;
-	border-radius: 5px;
-}
+
 .TableMainContainer{
 	flex-grow: 1;
 	display: flex;
 	flex-direction: column;
+	overflow: auto;
 }
 .TableMainContainer h1{
 	padding: 0 0.5rem;
@@ -1483,7 +1481,13 @@ textarea {
 	border: 1px solid #F7775A;
 	border-radius: 5px;
 	color: #F7775A;
+	transition: background-color 0.2s ease-in;
 }
+.PowerMas_Button_Permissions:hover{
+	background-color: #fce3e3;
+}
+
+
 .PowerMas_Menu_Dropdown{
 	background-color: #FFFAF6;
 	border: 1px solid #372e2c3e;
@@ -1590,7 +1594,7 @@ textarea {
 	border-radius: 5px;
 }
 .PowerMas_Buttoms_Form_Beneficiarie{
-	background-color: FFFDFD;
+	background-color: #FFFDFD;
 	box-shadow: 0 -10px 10px rgba(0, 0, 0, 0.1);
 }
 .PowerMas_Buttoms_Form_Beneficiarie button{

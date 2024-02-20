@@ -32,7 +32,7 @@ const Implementer = () => {
     }, []);
 
     return (
-        <div className="PowerMas_StatusContainer">
+        <>
             <Table
                 data={data} 
                 openModal={openModal} 
@@ -51,7 +51,7 @@ const Implementer = () => {
                 controller={controller}
                 codeField={codigo}
             />
-        </div>
+        </>
     )
 }
 

@@ -32,7 +32,7 @@ const Charge = () => {
     }, []);
 
     return (
-        <div className="PowerMas_StatusContainer">
+        <>
             <Table
                 data={data} 
                 openModal={openModal} 
@@ -51,7 +51,7 @@ const Charge = () => {
                 controller={controller}
                 codeField={codigo}
             />
-        </div>
+        </>
     )
 }
 

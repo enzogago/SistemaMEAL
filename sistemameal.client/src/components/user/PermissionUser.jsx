@@ -289,65 +289,65 @@ const PermissionUser = () => {
 
 
   return (
-    <div className="bg-white h-100 flex flex-column">
-      <div className="PowerMas_Header_Form_Beneficiarie flex ai-center">
-        {/* <GrFormPreviousLink className="m1 w-auto Large-f2_5 pointer" onClick={() => navigate('/user')} /> */}
-        <Bar currentStep={3} />
-      </div>
-      <div className="flex-grow-1 overflow-auto p1_25">
-        <div className="flex gap-1">
-            <div className="PowerMas_ListPermission Large_6">
-                <ul>
-                    {proyectos.map(proyecto => (
-                        <ProjectItem 
-                            key={proyecto.proCod} 
-                            proyecto={proyecto} 
-                            handleCheck={handleCheck} 
-                            checkedProyectos={checkedProyectos} 
-                            checkedSubProyectos={checkedSubProyectos} 
-                        />
-                    ))}
-                </ul>
+        <div className="bg-white h-100 flex flex-column">
+            <div className="PowerMas_Header_Form_Beneficiarie flex ai-center">
+                {/* <GrFormPreviousLink className="m1 w-auto Large-f2_5 pointer" onClick={() => navigate('/user')} /> */}
+                <Bar currentStep={3} />
             </div>
-            <div className="Large_6">
-            <article className="p_25">
-              <p>Usuario:</p>
-              <p>{user && user.usuNom + ' ' + user.usuApe}</p>
-            </article>
-            <hr className="PowerMas_Hr m_25" />
-            <article className="p_25">
-              <p>Documento de identidad:</p>
-              <p>{user && user.docIdeNom}</p>
-            </article>
-            <hr className="PowerMas_Hr m_25" />
-            <article className="p_25">
-              <p>Número de identidad:</p>
-              <p>{user && user.usuNumDoc}</p>
-            </article>
-            <hr className="PowerMas_Hr m_25" />
-            <article className="p_25">
-              <p>Rol:</p>
-              <p>{user && user.rolNom}</p>
-            </article>
-            <hr className="PowerMas_Hr m_25" />
-            <article className="p_25">
-              <p>Cargo:</p>
-              <p>{user && user.carNom}</p>
-            </article>
-            <hr className="PowerMas_Hr m_25" />
-            <article className="p_25">
-              <p>Estado:</p>
-              <p>{user && user.usuEst}</p>
-            </article>
-          </div>
+            <div className="flex-grow-1 overflow-auto p1_25">
+                <div className="flex gap-1">
+                    <div className="PowerMas_ListPermission Large_6">
+                        <ul>
+                            {proyectos.map(proyecto => (
+                                <ProjectItem 
+                                    key={proyecto.proCod} 
+                                    proyecto={proyecto} 
+                                    handleCheck={handleCheck} 
+                                    checkedProyectos={checkedProyectos} 
+                                    checkedSubProyectos={checkedSubProyectos} 
+                                />
+                            ))}
+                        </ul>
+                    </div>
+                    <div className="Large_6">
+                        <article className="p_25">
+                        <p>Usuario:</p>
+                        <p>{user && user.usuNom + ' ' + user.usuApe}</p>
+                        </article>
+                        <hr className="PowerMas_Hr m_25" />
+                        <article className="p_25">
+                        <p>Documento de identidad:</p>
+                        <p>{user && user.docIdeNom}</p>
+                        </article>
+                        <hr className="PowerMas_Hr m_25" />
+                        <article className="p_25">
+                        <p>Número de identidad:</p>
+                        <p>{user && user.usuNumDoc}</p>
+                        </article>
+                        <hr className="PowerMas_Hr m_25" />
+                        <article className="p_25">
+                        <p>Rol:</p>
+                        <p>{user && user.rolNom}</p>
+                        </article>
+                        <hr className="PowerMas_Hr m_25" />
+                        <article className="p_25">
+                        <p>Cargo:</p>
+                        <p>{user && user.carNom}</p>
+                        </article>
+                        <hr className="PowerMas_Hr m_25" />
+                        <article className="p_25">
+                        <p>Estado:</p>
+                        <p>{user && user.usuEst}</p>
+                        </article>
+                    </div>
+                </div>
+            </div>
+            <footer className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
+                <button onClick={() => navigate(`/menu-user/${safeCiphertext}`)} className="Large_3 m_75 PowerMas_Buttom_Secondary">Atras</button>
+                <button onClick={handleClickaso} className="Large_3 m_75 PowerMas_Buttom_Primary">Finalizar</button>
+            </footer>
         </div>
-    </div>
-    <div className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
-        <button onClick={() => navigate(`/menu-user/${safeCiphertext}`)} className="Large_5 m2 PowerMas_Buttom_Secondary">Atras</button>
-        <button onClick={handleClickaso} className="Large_5 m2 PowerMas_Buttom_Primary">Finalizar</button>
-    </div>
-    </div>
-  )
+    )
 }
 
 export default PermissionUser

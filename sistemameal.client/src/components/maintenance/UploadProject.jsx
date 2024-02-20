@@ -23,12 +23,12 @@ const UploadProject = () => {
     ];
     
     return (
-        <div className="PowerMas_StatusContainer flex-column p1">
+        <>
             <UploadTemplateTransaction
                 expectedHeaders={expectedHeaders}
                 controller='Proyecto'
             />
-        </div>
+        </>
     )
 }
 

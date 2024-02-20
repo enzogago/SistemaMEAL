@@ -32,7 +32,7 @@ const Gender = () => {
     }, []);
 
     return (
-        <div className="PowerMas_StatusContainer">
+        <>
             <Table
                 data={data} 
                 openModal={openModal} 
@@ -51,7 +51,7 @@ const Gender = () => {
                 controller={controller}
                 codeField={codigo}
             />
-        </div>
+        </>
     )
 }
 

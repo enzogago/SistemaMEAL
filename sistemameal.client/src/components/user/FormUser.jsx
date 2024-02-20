@@ -175,7 +175,7 @@ const FormUser = () => {
     }
     
     return (
-        <div className="bg-white h-100 flex flex-column">
+        <>
             <div className="PowerMas_Header_Form_Beneficiarie flex ai-center">
                 <Bar isEditing={isEditing} currentStep={1} />
             </div>
@@ -487,11 +487,11 @@ const FormUser = () => {
                     </div>
                 </div>
             </div>
-            <div className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
-                <button onClick={handleNext} className="Large_3 m_75 PowerMas_Buttom_Primary">Siguiente</button>
+            <footer className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
                 <button onClick={() => navigate('/user')} className="Large_3 m_75 PowerMas_Buttom_Secondary">Atras</button>
-            </div>
-        </div>
+                <button onClick={handleNext} className="Large_3 m_75 PowerMas_Buttom_Primary">Siguiente</button>
+            </footer>
+        </>
   )
 }
 

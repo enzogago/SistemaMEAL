@@ -33,11 +33,11 @@ const User = () => {
         fetchUsuarios();
     }, []);
     return (
-        <div className="PowerMas_StatusContainer">
+        <>
             <Table
                 data={ usersTable }
             />
-        </div>
+        </>
     )
 }
 

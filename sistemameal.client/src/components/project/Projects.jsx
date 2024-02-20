@@ -45,11 +45,11 @@ const projects = () => {
     }, [userLogged]);
 
     return (
-        <div className='bg-white h-100 flex'>
+        <>
             <Table 
                 data={ proyectos }
             />
-        </div>
+        </>
     );
 };
 

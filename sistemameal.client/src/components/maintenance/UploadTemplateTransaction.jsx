@@ -304,7 +304,7 @@ const UploadTemplateTransaction = ({ expectedHeaders, controller }) => {
     }
     
     return (
-        <>
+        <div className='flex flex-column flex-grow-1 Large-p1'>
             <div className="flex Large_12 gap_3">
                 <h3 className='flex-grow-1'>Upload {controller}</h3>
                 <input className='PowerMas_Hover_Grey' style={{border: '1px solid transparent', margin: 0, cursor: 'pointer', transition: 'background-color 0.2s ease-in'}} type="file" ref={fileInput} accept=".xlsx, .xls" />
@@ -341,7 +341,7 @@ const UploadTemplateTransaction = ({ expectedHeaders, controller }) => {
             </div>
             <p>{isValid && postData.length !== 0 ? 'Datos válidos' : 'Datos inválidos o no hay datos'}</p>
             <button className='PowerMas_Buttom_Primary' onClick={processValidData} disabled={!isValid || postData.length === 0}>Procesar datos</button>
-        </>
+        </div>
     )
 }
 
