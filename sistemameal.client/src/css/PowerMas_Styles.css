@@ -275,6 +275,22 @@ input::placeholder,select::placeholder{
 	overflow: auto;
 	border-radius: 5px;
 }
+/* Personaliza la barra de desplazamiento */
+.PowerMas_Content::-webkit-scrollbar {
+	width: 6px;
+}
+
+.PowerMas_Content::-webkit-scrollbar-track {
+	background: #dedddd;
+}
+
+.PowerMas_Content::-webkit-scrollbar-thumb {
+	background: #888;
+}
+
+.PowerMas_Content::-webkit-scrollbar-thumb:hover {
+	background: #555;
+}
 /* .PowerMas_MainRender::before{
 	content: "";
     position: absolute;
@@ -449,8 +465,11 @@ input::placeholder,select::placeholder{
 	width: 75px;
 	height: 75px;
 	border-radius: 50%;
-	background: #277980; /* Reemplaza esto con la imagen de perfil */
 	overflow: hidden;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 0.75rem;
 }
 .PowerMas_ProfilePicture2 img {
     height: auto;
@@ -1040,7 +1059,9 @@ textarea {
 
 
 
-
+.PowerMas_TableStatus{
+	font-size: 0.75rem;
+}
 .PowerMas_TableStatus thead tr:last-child th:hover{
 	/* background-color: #f0f0f0; */
 	cursor: pointer;
@@ -1055,7 +1076,7 @@ textarea {
 }
 
 .PowerMas_TableStatus td {
-	padding-left: 1rem;
+	padding: 0 0.5rem;
 	width: auto;
     word-wrap: break-word;
 	border-bottom: 1px solid #d3d3d3;
@@ -1352,6 +1373,10 @@ textarea {
 .PowerMas_Hover_Grey:hover{
 	background-color: #e6e4e4;
 }
+
+.color-gray{
+	color: #7E7D7D;
+}
 /* END REUSABLE */
 
 /* CREAR/MODIFICAR USUARIO */
@@ -1428,6 +1453,12 @@ textarea {
     /* padding-right: 1rem; */
 }
 
+.PowerMas_Info_User > article{
+	display: flex;
+	gap: 1rem;
+}
+
+
 .PowerMas_Form_User_Card > div:nth-child(2n) {
     padding-right: 0;
 }
@@ -1435,26 +1466,14 @@ textarea {
 /* END CREAR/MODIFICAR USUARIO */
 
 /* CREAR/MODIFICAR MENU-USUARIO */
-.PowerMas_ListMenus > ul {
-	width: 100%;
-}
-.PowerMas_ListMenus > ul > li > label {
-	width: 100%;
-	justify-content: space-between;
-}
+
 .PowerMas_ListMenus ul{
 	list-style: none;
-}
-.PowerMas_ListMenus li > div{
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	gap: 0.5rem;
 }
 .PowerMas_ListMenus li div span{
 	cursor: pointer;
 }
-.PowerMas_ListMenus li div span.closed {
+.closed {
     display: inline-block;
     transform: rotate(0);
     transition: transform 0.2s ease-in-out;
@@ -1522,12 +1541,12 @@ textarea {
 .PowerMas_ListPermission > ul > li{
 	margin-bottom: 1.5rem;
 }
-.PowerMas_ListPermission > ul > li > div {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-}
+
 .PowerMas_Permission_Dropdown{
+	background-color: #FFFAF6;
+	border: 1px solid #372e2c3e;
+}
+.PowerMas_Sub_Project_Item{
 	background-color: #FFFAF6;
 	border: 1px solid #372e2c3e;
 }
@@ -1566,7 +1585,7 @@ textarea {
 	gap: 1rem;
 }
 .PowerMas_Icons_Sorter{
-	width: 18px;
+	width: 14px;
 }
 .ws-nowrap{
 	white-space: nowrap;

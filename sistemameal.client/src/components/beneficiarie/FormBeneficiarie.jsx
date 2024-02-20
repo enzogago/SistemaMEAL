@@ -166,23 +166,24 @@ const FormBeneficiarie = () => {
 
     useEffect(() => {
         if (fechaNacimiento) {
+            console.log(fechaNacimiento)
             // Remueve cualquier guión existente
             let cleanFecha = fechaNacimiento.replace(/-/g, '');
             
             // Inserta los guiones después del año y el mes
-            if (cleanFecha.length >= 4) {
-                cleanFecha = cleanFecha.slice(0, 4) + '-' + cleanFecha.slice(4);
+            if (cleanFecha.length >= 2) {
+                cleanFecha = cleanFecha.slice(0, 2) + '-' + cleanFecha.slice(2);
             }
-            if (cleanFecha.length >= 7) {
-                cleanFecha = cleanFecha.slice(0, 7) + '-' + cleanFecha.slice(7);
+            if (cleanFecha.length >= 5) {
+                cleanFecha = cleanFecha.slice(0, 5) + '-' + cleanFecha.slice(5);
             }
             
             // Si el usuario borra los dígitos de la fecha, también borra los guiones
-            if (cleanFecha.length <= 5) {
-                cleanFecha = cleanFecha.slice(0, 4);
+            if (cleanFecha.length <= 3) {
+                cleanFecha = cleanFecha.slice(0, 2);
             }
-            if (cleanFecha.length <= 8) {
-                cleanFecha = cleanFecha.slice(0, 7);
+            if (cleanFecha.length <= 6) {
+                cleanFecha = cleanFecha.slice(0, 5);
             }
             
             // Actualiza el valor del campo con los guiones insertados
@@ -325,6 +326,7 @@ const FormBeneficiarie = () => {
                                 className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benNom || isSubmitted ? (errors.benNom ? 'invalid' : 'valid') : ''}`} 
                                 placeholder="Enzo Fabricio"
                                 autoComplete="disabled"
+                                maxLength={50}
                                 {...register('benNom', { 
                                     required: 'El nombre es requerido',
                                     minLength: { value: 3, message: 'El nombre debe tener minimo 3 digitos' },
@@ -432,7 +434,7 @@ const FormBeneficiarie = () => {
                                 type="text" 
                                 id="benFecNac"
                                 className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benFecNac || isSubmitted ? (errors.benFecNac ? 'invalid' : 'valid') : ''}`} 
-                                placeholder="2003-03-17"
+                                placeholder="Ejm: 17-03-2003 (DD-MM-YYYY)"
                                 autoComplete="disabled"
                                 maxLength={10}
                                 onKeyDown={(event) => {
@@ -443,8 +445,8 @@ const FormBeneficiarie = () => {
                                 {...register('benFecNac', { 
                                     required: 'La Fecha de nacimiento es requerido',
                                     pattern: {
-                                        value: /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/,
-                                        message: 'Ingrese una fecha valida y en formato YYYY-MM-DD',
+                                        value: /^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[012])-\d{4}$/,
+                                        message: 'La fecha debe estar en el formato DD-MM-YYYY',
                                     },
                                 })} 
                             />

@@ -29,14 +29,85 @@ const FormUser = () => {
     const [ documentos, setDocumentos ] = useState([]);
     const [ roles, setRoles ] = useState([]);
     const [ cargos, setCargos ] = useState([]);
-    const [initialValues, setInitialValues] = useState(null);
+    const [ initialValues, setInitialValues] = useState({
+        usuEst: ''
+    });
+    const [ inputView, setInputView ] = useState('');
 
 
-    const { register, handleSubmit: validateForm, formState: { errors, dirtyFields, isSubmitted }, reset, setValue } = 
+    const { register, handleSubmit: validateForm, formState: { errors, dirtyFields, isSubmitted }, reset, setValue, watch, trigger } = 
     useForm({ mode: "onChange", defaultValues: {
-        usuSex: 'M',
         usuEst: 'A',
     } });
+
+    const fechaNacimiento = watch('usuFecNac');
+    const email = watch('usuCorEle');
+
+    useEffect(() => {
+        if (email) {
+            setInputView(email);
+        }else{
+            setInputView('')
+        }
+    }, [email]);
+
+    useEffect(() => {
+        if (fechaNacimiento) {
+            // Remueve cualquier guión existente
+            let cleanFecha = fechaNacimiento.replace(/-/g, '');
+            
+            // Inserta los guiones después del año y el mes
+            if (cleanFecha.length >= 2) {
+                cleanFecha = cleanFecha.slice(0, 2) + '-' + cleanFecha.slice(2);
+            }
+            if (cleanFecha.length >= 5) {
+                cleanFecha = cleanFecha.slice(0, 5) + '-' + cleanFecha.slice(5);
+            }
+            
+            // Si el usuario borra los dígitos de la fecha, también borra los guiones
+            if (cleanFecha.length <= 3) {
+                cleanFecha = cleanFecha.slice(0, 2);
+            }
+            if (cleanFecha.length <= 6) {
+                cleanFecha = cleanFecha.slice(0, 5);
+            }
+            
+            // Actualiza el valor del campo con los guiones insertados
+            setValue('usuFecNac', cleanFecha);
+        }
+    }, [fechaNacimiento]);
+
+    useEffect(() => {
+        if (!isEditing) {
+            const nombre = watch('usuNom');
+            const apellido = watch('usuApe');
+            const fechaNacimiento = watch('usuFecNac');
+    
+            if (nombre && apellido && fechaNacimiento) {
+                const generarContrasena = async () => {
+                    const esNombreValido = await trigger('usuNom');
+                    const esApellidoValido = await trigger('usuApe');
+                    const esFechaNacimientoValida = await trigger('usuFecNac');
+            
+                    if (esNombreValido && esApellidoValido && esFechaNacimientoValida) {
+                        const anoNacimiento = fechaNacimiento.split('-')[2];
+                        const contrasena = `${nombre[0]}${apellido}${anoNacimiento}`;
+                        setValue('usuPas', contrasena.toLocaleLowerCase());
+                    } else{
+                        setValue('usuPas', '');
+                    }
+                };
+                generarContrasena();
+                console.log("entro")
+            } else{
+                console.log("else")
+                setValue('usuPas', '');
+            }
+        }
+    
+    }, [watch('usuNom'), watch('usuApe'), watch('usuFecNac')]);
+    
+    
 
     useEffect(() => {
         const fetchOptions = async () => {
@@ -164,7 +235,9 @@ const FormUser = () => {
     
     const handleNext = () => {
         validateForm((data) => {
+            console.log(data)
             const hasChanged = Object.keys(data).some(key => data[key] !== initialValues[key]);
+            console.log(hasChanged)
             if (hasChanged) {
                 handleSubmit(data, isEditing, navigate, safeCiphertext);
             } else {
@@ -193,11 +266,12 @@ const FormUser = () => {
                                     validate: value => value !== '0' || 'El documento de identidad es requerido' 
                                 })}
                             >
-                                <option value="0">--SELECCIONE UN DOCUMENTO--</option>
+                                <option value="0">--Seleccione Documento Identidad--</option>
                                 {documentos.map(documento => (
                                     <option 
-                                        key={documento.docIdeCod} 
-                                        value={documento.docIdeCod}> ({documento.docIdeAbr}) {documento.docIdeNom}
+                                        key={documento.docIdeCod}
+                                        style={{textTransform: 'capitalize'}}
+                                        value={documento.docIdeCod}> ({documento.docIdeAbr}) {documento.docIdeNom.toLowerCase()}
                                     </option>
                                 ))}
                             </select>
@@ -215,8 +289,29 @@ const FormUser = () => {
                                 id="usuNumDoc"
                                 className={`p1 PowerMas_Modal_Form_${dirtyFields.usuNumDoc || isSubmitted ? (errors.usuNumDoc ? 'invalid' : 'valid') : ''}`} 
                                 type="text" 
-                                placeholder="Ejm: 922917351"
-                                {...register('usuNumDoc', { required: 'El número de documento es requerido' })} 
+                                placeholder="Ejm: 74301932"
+                                maxLength={10}
+                                autoComplete="disabled"
+                                onKeyDown={(event) => {
+                                    if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
+                                        event.preventDefault();
+                                    }
+                                }}
+                                {...register('usuNumDoc', { 
+                                    required: 'El número de documento es requerido',
+                                    minLength: {
+                                        value: 6,
+                                        message: 'El número de documento debe tener al menos 6 dígitos'
+                                    },
+                                    maxLength: {
+                                        value: 10,
+                                        message: 'El número de documento no debe tener más de 10 dígitos'
+                                    },
+                                    pattern: {
+                                        value: /^[0-9]*$/,
+                                        message: 'El número de documento solo debe contener números'
+                                    }
+                                })}
                             />
                             {errors.usuNumDoc ? (
                                 <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.usuNumDoc.message}</p>
@@ -232,6 +327,8 @@ const FormUser = () => {
                                 id="usuNom"
                                 className={`p1 PowerMas_Modal_Form_${dirtyFields.usuNom || isSubmitted ? (errors.usuNom ? 'invalid' : 'valid') : ''}`} 
                                 placeholder="Ejm: Andres"
+                                maxLength={50}
+                                autoComplete="disabled"
                                 {...register('usuNom', { 
                                     required: 'El nombre es requerido',
                                     minLength: { value: 3, message: 'El nombre debe tener minimo 3 digitos' },
@@ -250,8 +347,10 @@ const FormUser = () => {
                             <input 
                                 type="text" 
                                 id="usuApe"
+                                autoComplete="disabled"
                                 className={`p1 PowerMas_Modal_Form_${dirtyFields.usuApe || isSubmitted ? (errors.usuApe ? 'invalid' : 'valid') : ''}`} 
                                 placeholder="Ejm: Eras"
+                                maxLength={50}
                                 {...register('usuApe', { 
                                     required: 'El apellido es requerido',
                                         minLength: { value: 3, message: 'El apellido debe tener minimo 3 digitos' },
@@ -274,7 +373,7 @@ const FormUser = () => {
                                         id="masculino" 
                                         name="usuSex" 
                                         value="M" 
-                                        {...register('usuSex')}
+                                        {...register('usuSex', { required: 'Por favor, selecciona una opción' })}
                                     />
                                     <label htmlFor="masculino">Masculino</label>
                                 </div>
@@ -284,12 +383,18 @@ const FormUser = () => {
                                         id="femenino" 
                                         name="usuSex" 
                                         value="F" 
-                                        {...register('usuSex')}
+                                        {...register('usuSex', { required: 'Por favor, selecciona una opción' })}
                                     />
                                     <label htmlFor="femenino">Femenino</label>
                                 </div>
                             </div>
-                            <br />
+                            {errors.usuSex ? (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.usuSex.message}</p>
+                            ) : (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                    Espacio reservado para el mensaje de error
+                                </p>
+                            )}
                         </div>
                         <div className="Large_12 flex flex-column">
                             <label htmlFor="usuFecNac">Fecha de nacimiento</label>
@@ -297,12 +402,19 @@ const FormUser = () => {
                                     type="text" 
                                     id="usuFecNac" 
                                     className={`p1 PowerMas_Modal_Form_${dirtyFields.usuFecNac || isSubmitted ? (errors.usuFecNac ? 'invalid' : 'valid') : ''}`} 
-                                    placeholder="Ejm: 2023-03-17"
+                                    placeholder="Ejm: 17-03-2003 (DD-MM-YYYY)"
+                                    maxLength={10}
+                                    autoComplete="disabled"
+                                    onKeyDown={(event) => {
+                                        if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
+                                            event.preventDefault();
+                                        }
+                                    }}
                                     {...register('usuFecNac', { 
                                         required: 'La Fecha de nacimiento es requerido',
                                         pattern: {
-                                            value: /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/,
-                                            message: 'La fecha debe estar en el formato YYYY-MM-DD',
+                                            value: /^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[012])-\d{4}$/,
+                                            message: 'La fecha debe estar en el formato DD-MM-YYYY',
                                         },
                                     })} 
                                 />
@@ -321,6 +433,8 @@ const FormUser = () => {
                                 id="usuCorEle" 
                                 className={`p1 PowerMas_Modal_Form_${dirtyFields.usuCorEle || isSubmitted ? (errors.usuCorEle ? 'invalid' : 'valid') : ''}`} 
                                 placeholder="Ejm: correo@correo.es"
+                                autoComplete="disabled"
+                                maxLength={50}
                                 {...register('usuCorEle', { 
                                     required: 'El Email es requerido',
                                     pattern: {
@@ -344,6 +458,7 @@ const FormUser = () => {
                                 id="usuTel" 
                                 className={`p1 PowerMas_Modal_Form_${dirtyFields.usuTel || isSubmitted ? (errors.usuTel ? 'invalid' : 'valid') : ''}`} 
                                 placeholder="Ejm: 922917351"
+                                autoComplete="disabled"
                                 {...register('usuTel', { 
                                     required: 'El número de telefono es requerido',
                                     minLength: { value: 9, message: 'El número de telefono debe tener minimo 9 digitos' },
@@ -375,9 +490,15 @@ const FormUser = () => {
                                     validate: value => value !== '0' || 'El rol es requerido' 
                                 })}
                             >
-                                <option value="0">--SELECCIONE UN ROL--</option>
+                                <option value="0">--Seleccione Rol--</option>
                                 {roles.map(rol => (
-                                    <option key={rol.rolCod} value={rol.rolCod}>{rol.rolNom}</option>
+                                    <option 
+                                        key={rol.rolCod} 
+                                        value={rol.rolCod}
+                                        style={{textTransform: 'capitalize'}}
+                                    >
+                                        {rol.rolNom.toLowerCase()}
+                                    </option>
                                 ))}
                             </select>
                             {errors.rolCod ? (
@@ -397,9 +518,15 @@ const FormUser = () => {
                                     validate: value => value !== '0' || 'El cargo es requerido' 
                                 })}
                             >
-                                <option value="0">--SELECCIONE UN CARGO--</option>
+                                <option value="0">--Seleccione Cargo--</option>
                                 {cargos.map(cargo => (
-                                    <option key={cargo.carCod} value={cargo.carCod}>{cargo.carNom}</option>
+                                    <option 
+                                        key={cargo.carCod} 
+                                        value={cargo.carCod}
+                                        style={{textTransform: 'capitalize'}}
+                                    >
+                                        {cargo.carNom.toLowerCase()}
+                                    </option>
                                 ))}
                             </select>
                             {errors.carCod ? (
@@ -411,27 +538,17 @@ const FormUser = () => {
                             )}
                         </div>
                         <div className="Large_12 flex flex-column">
-                            <label htmlFor="usuCorEle">Usuario</label>
+                            <label htmlFor="usuNomUsu">Usuario</label>
                             <input 
                                 type="text" 
-                                id="usuCorEle" 
-                                className={`p1 PowerMas_Modal_Form_${dirtyFields.usuCorEle || isSubmitted ? (errors.usuCorEle ? 'invalid' : 'valid') : ''}`} 
+                                id="usuNomUsu"
+                                className='p1'
+                                disabled={true}
+                                value={inputView}
                                 placeholder="Ejm: correo@correo.es"
-                                {...register('usuCorEle', { 
-                                    required: 'El Email es requerido',
-                                    pattern: {
-                                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
-                                        message: 'Dirección de correo electrónico inválida',
-                                    },
-                                })} 
+        
                             />
-                             {errors.usuCorEle ? (
-                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.usuCorEle.message}</p>
-                            ) : (
-                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                Espacio reservado para el mensaje de error
-                                </p>
-                            )}
+                            <br />
                         </div>
                         
                         {
@@ -440,16 +557,17 @@ const FormUser = () => {
                                 <div className="Large_12 flex flex-column">
                                     <label htmlFor="usuPas">Contraseña</label>
                                     <input 
-                                        type="password" 
+                                        type="text" 
                                         id="usuPas" 
                                         className={`p1 PowerMas_Modal_Form_${dirtyFields.usuPas || isSubmitted ? (errors.usuPas ? 'invalid' : 'valid') : ''}`} 
                                         placeholder="Ejm: 12345678"
+                                        disabled={true}
                                         {...register('usuPas', { 
                                             required: 'La contraseña es requerido',
                                             minLength: { value: 8, message: 'La contraseña debe tener minimo 8 digitos' },
                                         })} 
                                     />
-                                     {errors.usuPas ? (
+                                    {errors.usuPas ? (
                                         <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.usuPas.message}</p>
                                     ) : (
                                         <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
@@ -468,7 +586,7 @@ const FormUser = () => {
                                         id="activo" 
                                         name="usuEst" 
                                         value="A"
-                                        {...register('usuEst')}
+                                        {...register('usuEst', { required: 'Por favor, selecciona una opción' })}
                                     />
                                     <label htmlFor="activo">Activo</label>
                                 </div>
@@ -478,11 +596,18 @@ const FormUser = () => {
                                         id="inactivo" 
                                         name="usuEst" 
                                         value="I"
-                                        {...register('usuEst')}
+                                        {...register('usuEst', { required: 'Por favor, selecciona una opción' })}
                                     />
                                     <label htmlFor="inactivo">Inactivo</label>
                                 </div>
                             </div>
+                            {errors.usuEst ? (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.usuEst.message}</p>
+                            ) : (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                Espacio reservado para el mensaje de error
+                                </p>
+                            )}
                         </div>
                     </div>
                 </div>

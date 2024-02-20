@@ -11,12 +11,15 @@ import { StatusContext } from '../../context/StatusContext';
 import Modal from './Modal';
 import ModalAcerca from './ModalAcerca';
 import CryptoJS from 'crypto-js';
+import masculino from '../../img/PowerMas_Avatar_Masculino.svg';
+import femenino from '../../img/PowerMas_Avatar_Femenino.svg';
 
 const Bar = () => {
     const navigate = useNavigate();
     // Variables state AuthContext
     const { authInfo, authActions } = useContext(AuthContext);
     const { userLogged } = authInfo;
+    console.log(userLogged)
     const { setUserLogged } = authActions;
     // Variables State statusContext
     const { statusActions } = useContext(StatusContext);
@@ -73,14 +76,14 @@ const Bar = () => {
         const safeCiphertext = btoa(ciphertext).replace('+', '-').replace('/', '_').replace(/=+$/, '');
         return safeCiphertext;
     }
-
+    console.log(userLogged)
   
     return (
         <div className="PowerMas_BarContainer flex ai-center jc-space-between p_5">
             <h2 className="Large-f2 Medium-f1_5 Small-f1">¡Hola de nuevo!</h2>
             <div className="PowerMas_ProfileContainer">
                 <div className="PowerMas_ProfilePicture">
-                    <img src={avatar} alt="Descripción de la imagen" />
+                    <img src={userLogged && (userLogged.usuSex === 'M' ? masculino : femenino)} alt="Descripción de la imagen" />
                 </div>
                 <div className="PowerMas_ProfileInfo flex-column m_5">
                     <span style={{textTransform: 'capitalize'}} className="PowerMas_Username Large-f1 Medium-f1 Small-f_75">{userLogged && userLogged.cargo ? `${userLogged.usuNom.toLowerCase()} ${userLogged.usuApe.toLowerCase()}` : ''}</span>
@@ -96,7 +99,7 @@ const Bar = () => {
                     <div className={`Phone_2 PowerMas_DropdownMenu ${isOpen ? 'PowerMas_DropdownMenu--open' : ''}`}>
                         <div className='PowerMas_Profile_Name p_75 flex flex-column jc-center ai-center gap_5'> 
                             <div className="PowerMas_ProfilePicture2">
-                                <img src={avatar} alt="Descripción de la imagen" />
+                                <img src={userLogged && (userLogged.usuSex === 'M' ? masculino : femenino)} alt="Descripción de la imagen" />
                             </div>
                             <p style={{textTransform: 'capitalize'}} className='color-black'>Hola, {userLogged && userLogged.cargo ? `${userLogged.usuNom.toLowerCase()}` : ''}</p>
                         </div>
@@ -129,6 +132,7 @@ const Bar = () => {
             <Modal 
                 isOpen={isModalOpen}
                 closeModal={closeModal}
+                user={userLogged}
             />
             <ModalAcerca 
                 isOpen={isModalAcercaOpen}

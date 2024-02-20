@@ -22,6 +22,9 @@ import { Export_Excel_Helper, Export_PDF_Helper } from '../reusable/helper';
 // Componentes
 import Pagination from "../reusable/Pagination";
 import TableRow from "./TableRow"
+import Modal from "../layout/Modal";
+import masculino from '../../img/PowerMas_Avatar_Masculino.svg';
+import femenino from '../../img/PowerMas_Avatar_Femenino.svg';
 
 const Table = ({data}) => {
     const navigate = useNavigate();
@@ -31,9 +34,26 @@ const Table = ({data}) => {
     // States locales
     const [searchFilter, setSearchFilter] = useState('');
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
+    const [selectedUser, setSelectedUser] = useState(null);
     // Dropdown botones Export
     const toggleDropdown = () => {
         setDropdownOpen(!dropdownOpen);
+    }
+
+    // Funciones para abrir y cerrar los modales
+    const openModal = () => {
+        setIsOpen(true);
+    };
+    
+    const closeModal = () => {
+        setIsOpen(false);
+    };
+
+    const Restablecer_Password = (row) => {
+        setSelectedUser({ usuAno: row.original.usuAno, usuCod: row.original.usuCod });
+        console.log({ usuAno: row.original.usuAno, usuCod: row.original.usuCod })
+        openModal();
     }
 
     /* TANSTACK */
@@ -46,19 +66,38 @@ const Table = ({data}) => {
     const columns = useMemo(() => { 
         let baseColumns = [
             {
-                header: "Código",
-                accessorKey: "usuCod",
-                cell: ({row}) => (
-                    <div className="">
-                        {row.original.usuAno + row.original.usuCod}
-                    </div>
-                ),
+                header: "",
+                accessorKey: "avatar",
+                disableSorting: true,
+                cell: ({row}) => {
+                    const user = row.original;
+                    return (
+                        <div className="PowerMas_ProfilePicture2 m_25" style={{width: '35px', height: '35px', border: `2px solid ${user && (user.usuSex === 'M' ? '#20737b' : '#E5554F')}`}}>
+                            <img src={user && (user.usuSex === 'M' ? masculino : femenino)} alt="Descripción de la imagen" />
+                        </div>
+                    )
+                }
             },
             {
-                header: "Nombre",
+                header: "Estado",
+                accessorKey: "usuEst",
+                cell: ({row}) => {
+                    const text = row.original.usuEst === 'A' ? 'Activo' : 'Inactivo';
+                    return (
+                        <div
+                            className="bold"
+                            style={{textTransform: 'capitalize', color: `${row.original.usuEst === 'A' ? '#20737b' : '#E5554F'}`}}
+                        >
+                            {text}
+                        </div>
+                    )
+                }
+            },
+            {
+                header: "Nombre Completo",
                 accessorKey: "usuNom",
                 cell: ({row}) => {
-                    const text = row.original.usuNom.toLowerCase();
+                    const text = row.original.docIdeAbr + ' ' + row.original.usuNumDoc + ' - ' + row.original.usuNom.toLowerCase() + ' ' + row.original.usuApe.toLowerCase();
                     return (
                         <div style={{textTransform: 'capitalize'}}>
                             {text}
@@ -67,16 +106,8 @@ const Table = ({data}) => {
                 }
             },
             {
-                header: "Apellido",
-                accessorKey: "usuApe",
-                cell: ({row}) => {
-                    const text = row.original.usuApe.toLowerCase();
-                    return (
-                        <div style={{textTransform: 'capitalize'}}>
-                            {text}
-                        </div>
-                    )
-                }
+                header: "Fecha Nacimiento",
+                accessorKey: "usuFecNac",
             },
             {
                 header: "Correo",
@@ -89,6 +120,10 @@ const Table = ({data}) => {
                         </div>
                     )
                 }
+            },
+            {
+                header: "Teléfono",
+                accessorKey: "usuTel",
             },
             {
                 header: "Cargo",
@@ -115,9 +150,22 @@ const Table = ({data}) => {
                 }
             },
             {
-                header: "Estado",
-                accessorKey: "usuEst"
+                header: "Contraseña",
+                accessorKey: "password",
+                cell: ({row}) => {
+                    return (
+                        <div className="flex jc-center ai-center">
+                            <button  
+                                className="PowerMas_Add_Beneficiarie f_75 p_25 flex-grow-1" 
+                                onClick={() => Restablecer_Password(row)}
+                            >
+                                Restablecer
+                            </button>
+                        </div>
+                    )
+                }
             },
+            
         ]
 
         if (actions.delete || actions.edit) {
@@ -165,14 +213,18 @@ const Table = ({data}) => {
     const [sorting, setSorting] = useState([]);
     const filteredData = useMemo(() => 
     data.filter(item => 
-        item.usuAno.includes(searchFilter.toUpperCase()) ||
-        item.usuCod.includes(searchFilter.toUpperCase()) ||
         item.usuNom.includes(searchFilter.toUpperCase()) ||
         item.usuApe.includes(searchFilter.toUpperCase()) ||
         item.usuCorEle.includes(searchFilter.toUpperCase()) ||
+        item.usuFecNac.includes(searchFilter.toUpperCase()) ||
+        item.usuTel.includes(searchFilter.toUpperCase()) ||
+        item.usuNumDoc.includes(searchFilter.toUpperCase()) ||
+        item.docIdeAbr.includes(searchFilter.toUpperCase()) ||
         item.carNom.includes(searchFilter.toUpperCase()) ||
         item.rolNom.includes(searchFilter.toUpperCase()) ||
-        item.usuEst.includes(searchFilter.toUpperCase())
+        item.usuEst.includes(searchFilter.toUpperCase()) ||
+        (item.usuEst === 'A' && 'ACTIVO'.includes(searchFilter.toUpperCase())) ||
+        (item.usuEst === 'I' && 'INACTIVO'.includes(searchFilter.toUpperCase()))
     ), [data, searchFilter]
 );
     
@@ -189,24 +241,32 @@ const Table = ({data}) => {
         columnResizeMode: "onChange"
     })
 
-     // Preparar los datos
-     const dataExport = table.options.data;  // Tus datos
-     const headers = ['AÑO', 'CODIGO', 'NOMBRE', 'APELLIDO', 'CARGO', 'ROL', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
-     const title = 'USUARIOS';  // El título de tu archivo
-     const properties = ['usuAno', 'usuCod', 'usuNom', 'usuApe', 'carNom', 'rolNom', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
-     const format = 'a4';  // El tamaño del formato que quieres establecer para el PDF
- 
-     const Export_Excel = () => {
-         // Luego puedes llamar a la función Export_Excel_Helper de esta manera:
-         Export_Excel_Helper(dataExport, headers, title, properties);
-         setDropdownOpen(false);
-     };
- 
-     const Export_PDF = () => {
-         // Luego puedes llamar a la función Export_PDF_Helper de esta manera:
-         Export_PDF_Helper(dataExport, headers, title, properties, format);
-         setDropdownOpen(false);
-     };
+    // Preparar los datos
+    let dataExport = table.options.data;  // Tus datos
+
+    // Transformar los datos
+    dataExport = dataExport.map(item => {
+        return {
+            ...item,
+            usuEst: item.usuEst === 'A' ? 'ACTIVO' : 'INACTIVO'
+        };
+    });
+    const headers = ['ESTADO','DOCUMENTO','NUMERO_DOCUMENTO','NOMBRE', 'APELLIDO', 'CORREO', 'TELEFONO', 'CARGO', 'ROL', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
+    const title = 'USUARIOS';  // El título de tu archivo
+    const properties = ['usuEst','docIdeNom','usuNumDoc','usuNom', 'usuApe', 'usuCorEle', 'usuTel', 'carNom', 'rolNom', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
+    const format = [500, 250];
+
+    const Export_Excel = () => {
+        // Luego puedes llamar a la función Export_Excel_Helper de esta manera:
+        Export_Excel_Helper(dataExport, headers, title, properties);
+        setDropdownOpen(false);
+    };
+
+    const Export_PDF = () => {
+        // Luego puedes llamar a la función Export_PDF_Helper de esta manera:
+        Export_PDF_Helper(dataExport, headers, title, properties, format);
+        setDropdownOpen(false);
+    };
  
     const tableRef = useRef();  // Referencia al elemento de la tabla
  
@@ -296,7 +356,7 @@ const Table = ({data}) => {
                                                     {
                                                     flexRender(header.column.columnDef.header, header.getContext())
                                                     }
-                                                    <div className='flex flex-column ai-center jc-center'>
+                                                    <div className='flex flex-column ai-center jc-center PowerMas_Icons_Sorter'>
                                                         {header.column.getIsSorted() === 'asc' && !header.column.columnDef.disableSorting ? 
                                                             <TiArrowSortedUp className={`sort-icon active`} /> :
                                                             header.column.getIsSorted() === 'desc' && !header.column.columnDef.disableSorting ? 
@@ -329,6 +389,11 @@ const Table = ({data}) => {
                 </table>
             </div>
             <Pagination table={table} />
+            <Modal 
+                isOpen={isOpen}
+                closeModal={closeModal}
+                user={selectedUser}
+            />
         </div>
     )
 }

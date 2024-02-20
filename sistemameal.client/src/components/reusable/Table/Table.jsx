@@ -26,7 +26,7 @@ const Table = ({ data, openModal, setData, controller, fieldMapping }) => {
     /* TANSTACK */
     const actions = {
         add: userPermissions.some(permission => permission.perNom === `INSERTAR ${controller.toUpperCase()}`),
-        delete: userPermissions.some(permission => permission.perNom === `INSERTAR ${controller.toUpperCase()}`),
+        delete: userPermissions.some(permission => permission.perNom === `ELIMINAR ${controller.toUpperCase()}`),
         edit: userPermissions.some(permission => permission.perNom === `MODIFICAR ${controller.toUpperCase()}`),
     };
 

@@ -7,35 +7,37 @@ const ProjectItem = ({ proyecto, handleCheck, checkedProyectos, checkedSubProyec
     const handleToggle = () => {
         setIsOpen(!isOpen);
     }
-
+    console.log(proyecto)
     return (
         <li className="PowerMas_Permission_Dropdown" >
-            <div className="p_5"  style={{color: '#F7775A'}}>
-                <div className="flex gap-1">
-                    <input 
+            <div className="p_5 flex jc-ac-space-between ai-center"  style={{color: '#F7775A'}}>
+                <div className="flex flex-grow-1 gap-1">
+                    <input
+                        id={`P${proyecto.proAno}-${proyecto.proCod}`}
                         type="checkbox" 
-                        value={proyecto.proCod} 
+                        value={`${proyecto.proAno}-${proyecto.proCod}`}
+                        className='m0'
                         checked={!!checkedProyectos[`${proyecto.proAno}-${proyecto.proCod}`]}
                         onChange={(event) => handleCheck(proyecto, event.target.checked, false)}
                     />
-                    <label>
+                    <label htmlFor={`P${proyecto.proAno}-${proyecto.proCod}`}>
                         {proyecto.proNom}
                     </label>
                 </div>
                 {
                     proyecto.subProyectos &&
                     <span 
-                        className={`pointer round p_25 bold ${isOpen && 'open-user'}`}
+                        className={`pointer round p_25 bold ${isOpen ? 'open-user': 'closed'}`}
                         onClick={handleToggle}
                     > 
                         &gt;
                     </span>
                 }
             </div>
-            <div className={`PowerMas_Permission_Dropdown menu ${isOpen && 'active'}`}>
-                {proyecto.subProyectos && proyecto.subProyectos.map(subProyecto => (
+            <div className={`flex flex-column menu ${isOpen && 'active'}`}>
+                {proyecto.subProyectos && proyecto.subProyectos.map((subProyecto, index) => (
                     <SubProjectItem 
-                        key={subProyecto.subProCod} 
+                        key={index} 
                         subProyecto={subProyecto} 
                         proyecto={proyecto} 
                         handleCheck={handleCheck} 

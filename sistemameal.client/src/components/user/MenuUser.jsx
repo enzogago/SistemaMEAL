@@ -4,6 +4,9 @@ import MenuItem from "./MenuItem";
 import { useNavigate, useParams } from "react-router-dom";
 import Bar from "./Bar";
 import CryptoJS from 'crypto-js';
+import avatar from '../../img/avatar.jpeg';
+import masculino from '../../img/PowerMas_Avatar_Masculino.svg';
+import femenino from '../../img/PowerMas_Avatar_Femenino.svg';
 
 const MenuUser = () => {
   const navigate = useNavigate();
@@ -215,9 +218,9 @@ const MenuUser = () => {
   const handlePermissionCheck = useCallback((permission, isChecked) => {
     console.log(permission)
     setCheckedPermissions(prevCheckedPermissions => {
-        const newCheckedPermissions = {...prevCheckedPermissions, [permission.perCod]: isChecked}
+      const newCheckedPermissions = {...prevCheckedPermissions, [permission.perCod]: isChecked}
 
-        return newCheckedPermissions;
+       return newCheckedPermissions;
     });
     console.log(checkedPermissions);
   }, []);
@@ -364,35 +367,51 @@ const MenuUser = () => {
         </div>
         <div className="flex-grow-1 p1_25 overflow-auto">
             <div className="flex gap-1">
-              <div className="PowerMas_ListMenus Large_6 ">
-                <ul className=" overflow-auto">
+              <div className="PowerMas_ListMenus PowerMas_Form_User_Card Large_6 p1">
+                <h3 className="f1_25">Listado de Menus:</h3>
+                <br />
+                <ul className="overflow-auto">
                   {menus.map(menu => renderMenu(menu, 1))}
                 </ul>
               </div>
-              <div className="Large_6">
+              <div className="PowerMas_Info_User Large_6 PowerMas_Form_User_Card p1" style={{backgroundColor: '#f7f7f7'}}>
+                <div className="flex flex-column jc-center ai-center gap_5">
+                  <div className="PowerMas_ProfilePicture2" style={{width: 125, height: 125}}>
+                    <img src={user && (user.usuSex === 'M' ? masculino : femenino)} alt="Descripción de la imagen" />
+                  </div>
+                  <div className="center">
+                    <p className="f1_25 bold" style={{textTransform: 'capitalize'}}>{user && user.usuNom.toLowerCase() + ' ' + user.usuApe.toLowerCase() }</p>
+                    <p className="color-gray" style={{textTransform: 'capitalize'}}>{user && user.carNom.toLowerCase() }</p>
+                  </div>
+                </div>
+                <br />
                 <article className="p_25">
-                  <p>Usuario:</p>
-                  <p>{user && user.usuNom + ' ' + user.usuApe}</p>
+                  <p className="bold">Tipo Documento:</p>
+                  <p className="color-gray" style={{textTransform: 'capitalize'}}>{user && user.docIdeNom.toLowerCase() }</p>
                 </article>
                 <article className="p_25">
-                  <p>Documento de identidad:</p>
-                  <p>{user && user.docIdeNom}</p>
+                  <p className="bold">Documento:</p>
+                  <p className="color-gray">{user && user.usuNumDoc}</p>
                 </article>
                 <article className="p_25">
-                  <p>Número de identidad:</p>
-                  <p>{user && user.usuNumDoc}</p>
+                  <p className="bold">Correo:</p>
+                  <p className="color-gray">{user && user.usuCorEle.toLowerCase() }</p>
                 </article>
                 <article className="p_25">
-                  <p>Rol:</p>
-                  <p>{user && user.rolNom}</p>
+                  <p className="bold">Nacimiento:</p>
+                  <p className="color-gray">{user && user.usuFecNac }</p>
                 </article>
                 <article className="p_25">
-                  <p>Cargo:</p>
-                  <p>{user && user.carNom}</p>
+                  <p className="bold">Teléfono:</p>
+                  <p className="color-gray">{user && user.usuTel }</p>
                 </article>
                 <article className="p_25">
-                  <p>Estado:</p>
-                  <p>{user && user.usuEst}</p>
+                  <p className="bold">Rol:</p>
+                  <p className="color-gray" style={{textTransform: 'capitalize'}}>{user && user.rolNom.toLowerCase() }</p>
+                </article>
+                <article className="p_25">
+                  <p className="bold">Estado:</p>
+                  <p className="color-gray bold" style={{color: `${user && (user.usuEst === 'A' ? '#20737b' : '#E5554F')}`}}>{user && (user.usuEst === 'A' ? 'Activo' : 'Inactivo')}</p>
                 </article>
               </div>
             </div>

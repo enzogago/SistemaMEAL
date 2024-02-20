@@ -12,7 +12,7 @@ const MenuItem = ({ menu, level, handleToggle, handleCheck, openMenus, checkedMe
 
     return (
         <li className='' style={{ marginBottom: level === 1 ? '1rem' : '0', fontSize: level === 1 ? '1rem': '0.75rem', color: level === 1 ? '#F7775A' : '#000'}} >
-            <div className='p_25 PowerMas_Menu_Dropdown'>
+            <div className='p_25 PowerMas_Menu_Dropdown flex ai-center jc-space-between gap_5'>
                 <div className=''>
                     <input
                         id={menu.menAno+menu.menCod}
@@ -70,10 +70,10 @@ const MenuItem = ({ menu, level, handleToggle, handleCheck, openMenus, checkedMe
                             left: '50%',
                             right: 'auto',
                             bottom: 'auto',
-                            width: '40%',
+                            width: '25%',
                             marginRight: '-50%',
                             transform: 'translate(-50%, -50%)',
-                            backgroundColor: '#f0f0f0',
+                            backgroundColor: '#fff',
                             border: '1px solid #ccc',
                             padding: '20px'
                         },
@@ -83,24 +83,41 @@ const MenuItem = ({ menu, level, handleToggle, handleCheck, openMenus, checkedMe
                     }}
                 >
                     <div className='flex flex-column Large_12'>
-                        <h2 className='PowerMas_Title_Modal_Permission center'>Permisos del menú {menu.menNom}</h2>
-                        <hr className='PowerMas_Hr' />
-                        {menu.permissions.map((permission, index) => (
-                            <div className='flex p_5 gap_5' key={index}>
-                                <input
-                                    id={permission.perCod}
-                                    type="checkbox" 
-                                    value={permission.perCod} 
-                                    onChange={(event) => handlePermissionCheck(permission, event.target.checked)}
-                                    checked={checkedPermissions[permission.perCod]}
-                                />
-                                <label htmlFor={permission.perCod}>
-                                    {permission.perNom}
-                                </label>
-                            </div>
-                        ))}
+                        <div className='overflow-auto'>
+                            <span 
+                                className="PowerMas_CloseModal" 
+                                onClick={closeModal}
+                            >
+                                ×
+                            </span>
+                            <br />
+                            <h2 className='PowerMas_Title_Modal_Permission center f1_25'>Permisos del menú</h2>
+                            <h2 className='PowerMas_Title_Modal_Permission center f1_25'>{menu.menNom}</h2>
+                        </div>
+                        <hr className='PowerMas_Hr m_5' />
+                        <p className='PowerMas_Description_Modal_Permission center f_75'>Selecciona las funcionalidades(acciones) que deseas otorgar para este usuario.</p>
+                        <br />
+                        <div className='flex flex-column ai-center'>
+                            {menu.permissions.map((permission, index) => (
+                                <div className='flex p_5 gap_5' key={index}>
+                                    <input
+                                        id={permission.perCod}
+                                        type="checkbox"
+                                        className='m0'
+                                        value={permission.perCod} 
+                                        onChange={(event) => handlePermissionCheck(permission, event.target.checked)}
+                                        checked={checkedPermissions[permission.perCod]}
+                                    />
+                                    <label style={{textTransform: 'capitalize', textWrap: 'nowrap'}} htmlFor={permission.perCod}>
+                                        {permission.perNom.toLowerCase()}
+                                    </label>
+                                </div>
+                            ))}
+
+                        </div>
+                        <br />
                         <div className='flex jc-center'>
-                            <button className='PowerMas_Button_Modal_Permission Large_6' onClick={closeModal}>Aceptar</button>
+                            <button className='PowerMas_Buttom_Primary Large_6' onClick={closeModal}>Guardar</button>
                         </div>
                     </div>
                 </Modal>

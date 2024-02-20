@@ -116,6 +116,49 @@ namespace SistemaMEAL.Server.Controllers
             }
         }
 
+        [HttpPut]
+        [Route("restablecerPassword")]
+        public dynamic RestablecerPassword(Usuario usuario)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return rToken;
+
+            dynamic data = rToken.result;
+            Usuario usuarioActual = new Usuario
+            {
+                UsuAno = data.UsuAno,
+                UsuCod = data.UsuCod,
+                RolCod = data.RolCod
+            };
+            Console.WriteLine("restable"+usuario.UsuPas);
+            using (SHA256 sha256Hash = SHA256.Create())
+            {
+                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(usuario.UsuPas));
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    builder.Append(bytes[i].ToString("x2"));
+                }
+                usuario.UsuPas = builder.ToString();
+            }
+            Console.WriteLine("rest"+usuario.UsuPas);
+            var (message, messageType) = _usuarios.RestablecerPassword(usuario);
+            if (messageType == "1") // Error
+            {
+                return new BadRequestObjectResult(new { success = false, message = message });
+            }
+            else if (messageType == "2") // Registro ya existe
+            {
+                return new ConflictObjectResult(new { success = false, message = message });
+            }
+            else // Registro modificado correctamente
+            {
+                return new OkObjectResult(new {success = true, message = message });
+            }
+        }
+
 
         [HttpGet]
         public dynamic Listado()
@@ -202,12 +245,12 @@ namespace SistemaMEAL.Server.Controllers
             }
             // Recorrer usuarios y validar si hay un usuario con ese email
             var usuario = _usuarios.ValidarUsuario(email, password);
-            if (usuario == null)
+            if (usuario.UsuAno == null)
             {
                 return new
                 {
                     success = false,
-                    message = "Credenciales incorrectas",
+                    message = "Credenciales incorrectas o usuario inactivo",
                     result = ""
                 };
             }

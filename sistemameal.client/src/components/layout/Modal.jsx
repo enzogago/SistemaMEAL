@@ -1,30 +1,48 @@
-import { useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { AuthContext } from '../../context/AuthContext';
-import { StatusContext } from '../../context/StatusContext';
-import { handleSubmit } from '../reusable/helper';
+import Notiflix from 'notiflix';
+import { useEffect } from 'react';
 
-const Modal = ({ isOpen, closeModal, setData }) => {
-    // variables state de AuthContext
-    const { authActions } = useContext(AuthContext);
-    const { setIsLoggedIn } = authActions;
-    // variables state de StatusContext
-    const { statusInfo, statusActions } = useContext(StatusContext);
-    const { estadoEditado, modalVisible } = statusInfo;
-    const { setModalVisible } = statusActions;
+const Modal = ({ isOpen, closeModal, user }) => {
+    const { usuAno, usuCod } = user || {};
 
-    const { register, handleSubmit: validateForm, formState: { errors, dirtyFields, isSubmitted }, reset, setValue } = useForm({ mode: "onChange"});
+    const { register, handleSubmit: validateForm, formState: { errors, dirtyFields, isSubmitted }, reset, getValues } = useForm({ mode: "onChange"});
 
-    const onSubmit = (data) => {
-        const fieldMapping = {
-            nombre: 'genNom',
+    const onSubmit = async(data) => {
+        // Crea el objeto a enviar
+        const payload = {
+            usuPas: data.confirmarContraseña,
+            usuAno,
+            usuCod
         };
-
-        // Elimina los espacios en blanco adicionales
-        data.nombre = data.nombre.replace(/\s+/g, ' ').trim();
-        
-        handleSubmit('Genero', estadoEditado, data, setData, setModalVisible, setIsLoggedIn, fieldMapping, 'genCod',reset);
+    
+        try {
+            Notiflix.Loading.pulse();
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/usuario/restablecerPassword`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(payload),
+            });
+            console.log("desde response: ",response)
+            const data = await response.json();
+            if (!response.ok) {
+                console.log(data);
+                Notiflix.Notify.failure(data.message);
+                return;
+            }
+    
+            Notiflix.Notify.success(data.message);
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            closeModalAndReset();
+            Notiflix.Loading.remove();
+        }
     };
+    
 
     // Activar focus en input
     useEffect(() => {
@@ -33,14 +51,6 @@ const Modal = ({ isOpen, closeModal, setData }) => {
         }
     }, [isOpen]);
 
-    // Efecto al editar estado
-    // useEffect(() => {
-    //     if (estadoEditado) {
-    //         const nombre = estadoEditado.genNom.charAt(0).toUpperCase() + estadoEditado.genNom.slice(1).toLowerCase();
-    //         setValue('nombre', nombre);
-    //     }
-    // }, [estadoEditado, setValue]);
-    
     const closeModalAndReset = () => {
         closeModal();
         reset();
@@ -83,10 +93,10 @@ const Modal = ({ isOpen, closeModal, setData }) => {
                             'nuevaContraseña', { 
                                 required: 'El campo es requerido',
                                 maxLength: { value: 50, message: 'El campo no puede tener más de 50 caracteres' },
-                                minLength:  { value: 3, message: 'El campo no puede tener menos de 3 caracteres' },
+                                minLength:  { value: 8, message: 'El campo no puede tener menos de 8 caracteres' },
                                 pattern: {
-                                    value: /^[A-Za-zñÑ\s]+$/,
-                                    message: 'Por favor, introduce solo letras y espacios',
+                                    value: /^[A-Za-z0-9ñÑ\s@#.$%^&*()_+\-=\[\]{};':"\\|,<>\/?]+$/,
+                                    message: 'Por favor, introduce solo letras, números y caracteres especiales permitidos',
                                 },
                                 validate: validateNoLeadingSpaces,
                             }
@@ -116,13 +126,13 @@ const Modal = ({ isOpen, closeModal, setData }) => {
                         {...register(
                             'confirmarContraseña', { 
                                 required: 'El campo es requerido',
-                                maxLength: { value: 50, message: 'El campo no puede tener más de 50 caracteres' },
-                                minLength:  { value: 3, message: 'El campo no puede tener menos de 3 caracteres' },
-                                pattern: {
-                                    value: /^[A-Za-zñÑ\s]+$/,
-                                    message: 'Por favor, introduce solo letras y espacios',
+                                validate: {
+                                    noLeadingSpaces: validateNoLeadingSpaces,
+                                    matchesPassword: (value) => {
+                                        const { nuevaContraseña } = getValues();
+                                        return nuevaContraseña === value || "Las contraseñas deben coincidir";
+                                    }
                                 },
-                                validate: validateNoLeadingSpaces,
                             }
                         )}
                     />

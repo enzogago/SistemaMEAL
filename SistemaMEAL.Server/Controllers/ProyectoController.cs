@@ -87,6 +87,18 @@ namespace SistemaMEAL.Server.Controllers
             Console.WriteLine(proyectos);
             return Ok(proyectos);
         }
+        [HttpGet]
+        [Route("proyectos-subproyectos")]
+        public dynamic ListarProyectosSubproyectos()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var proyectos = _proyectos.ListarProyectosSubproyectos();
+            return Ok(proyectos);
+        }
 
         [HttpGet]
         [Route("{usuAno}/{usuCod}")]

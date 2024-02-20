@@ -23,6 +23,7 @@ const User = () => {
                     return;
                 }
                 setUsersTable(data);
+                console.log(data)
             } catch (error) {
                 console.error('Error:', error);
             } finally {

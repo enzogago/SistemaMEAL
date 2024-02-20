@@ -25,7 +25,7 @@ namespace SistemaMEAL.Server.Models
 
         public String? UsuFecNac { get; set; }
 
-        public Char? UsuSex { get; set; }
+        public String? UsuSex { get; set; }
 
         public String? UsuCorEle { get; set; }
 

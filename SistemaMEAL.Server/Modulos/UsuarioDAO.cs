@@ -143,6 +143,38 @@ namespace SistemaMEAL.Server.Modulos
             return (usuAnoOut, usuCodOut, mensaje, tipoMensaje);
         }
 
+        public (string? message, string? messageType) RestablecerPassword(Usuario usuario)
+        {
+            string? mensaje = "";
+            string? tipoMensaje = "";
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_RESTABLECER_PASSWORD", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@P_USUANO", usuario.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD", usuario.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUPAS", usuario.UsuPas);
+
+                cmd.ExecuteNonQuery();
+
+                mensaje = "Se restableció la contraseña";
+                tipoMensaje = "3";
+            }
+            catch (SqlException ex)
+            {
+                mensaje = ex.Message;
+                tipoMensaje = "1";
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return (mensaje, tipoMensaje);
+        }
+
         public IEnumerable<Usuario> Listado(string? usuAno = null, string? usuCod = null, string? docIdeCod = null, string? usuNumDoc = null, string? usuNom = null, string? usuApe = null, string? usuFecNac = null, string? usuSex = null, string? usuCorEle = null, string? usuCarCod = null, string? usuFecInc = null, string? usuTel = null, string? usuNomUsu = null, string? usuPas = null, string? usuEst = null, string? rolCod = null)
         {
             List<Usuario>? temporal = new List<Usuario>();
@@ -266,8 +298,9 @@ namespace SistemaMEAL.Server.Modulos
                         UsuCod = rd.GetString(1),
                         UsuNom = rd.GetString(4),
                         UsuApe = rd.GetString(5),
-                        CarCod = rd.GetString(9),
+                        UsuSex = rd.GetString(7),
                         UsuNomUsu = rd.GetString(12),
+                        CarCod = rd.GetString(9),
                         RolCod = rd.GetString(15),
 
                         Cargo = new Cargo()
@@ -318,6 +351,7 @@ namespace SistemaMEAL.Server.Modulos
                         UsuCod = rd.GetString(1),
                         UsuNom = rd.GetString(4),
                         UsuApe = rd.GetString(5),
+                        UsuSex = rd.GetString(7),
                         UsuNomUsu = rd.GetString(12),
 
                         Cargo = new Cargo()
