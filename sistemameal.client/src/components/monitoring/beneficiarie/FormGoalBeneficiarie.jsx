@@ -33,11 +33,10 @@ const FormGoalBeneficiarie = () => {
     const [ esMenorDeEdad, setEsMenorDeEdad ] = useState(false);
     const [ mostrarAgregarDocumento, setMostrarAgregarDocumento ] = useState(false);
     const [ accionActual, setAccionActual] = useState('buscar');
-    const [ mostrarTabla, setMostrarTabla] = useState(false);
     const [ updateData, setUpdateData] = useState(false);
     const [ data, setdata] = useState([])
-    const [fieldsDisabled, setFieldsDisabled] = useState(true);
-    const [showSearchButton, setShowSearchButton] = useState(true);
+    const [ fieldsDisabled, setFieldsDisabled ] = useState(true);
+    const [ existeBeneficiario, setExisteBeneficiario ] = useState(false);
 
 
     useEffect(() => {
@@ -75,7 +74,7 @@ const FormGoalBeneficiarie = () => {
 
     //
     const { register, watch, handleSubmit: validateForm, formState: { errors, dirtyFields, isSubmitted }, reset, setValue } = 
-    useForm({ mode: "onChange", defaultValues: {benNomApo: '', benApeApo: '', genCod: '0'}});
+    useForm({ mode: "onChange", defaultValues: {benNomApo: '', benApeApo: ''}});
 
     const pais = watch('pais');
 
@@ -147,8 +146,7 @@ const FormGoalBeneficiarie = () => {
             console.log(newData)
             // Ahora puedes llamar a 'reset()' con los nuevos datos
             reset(newData);
-
-            setShowSearchButton(false);
+            setExisteBeneficiario(true);
             console.log(data);
         } catch (error) {
             console.error('Error:', error);
@@ -432,62 +430,113 @@ const FormGoalBeneficiarie = () => {
     const Registrar_Beneficiario =  () => {
         validateForm( (data) => {
             console.log(data)
-            // Verifica que todos los selects tengan una opción válida seleccionada
-            for (let i = 0; i < selects.length; i++) {
-                const selectElement = document.querySelector(`select[name=select${i}]`);
-                if (selectElement && selectElement.value === '0') {
-                    console.error(`El select ${i} no tiene una opción válida seleccionada.`);
-                    selectElement.classList.remove('PowerMas_Modal_Form_valid');
-                    selectElement.classList.add('PowerMas_Modal_Form_invalid');
-                    return;
-                } else {
-                    selectElement.classList.remove('PowerMas_Modal_Form_invalid');
-                    selectElement.classList.add('PowerMas_Modal_Form_valid');
-                }
-            }
-        
             // Obtiene el ubiAno y ubiCod del último select
             const lastSelectElement = document.querySelector(`select[name=select${selects.length - 1}]`);
             const lastSelect = JSON.parse(lastSelectElement.value);
             const ubiAno = lastSelect.ubiAno;
             const ubiCod = lastSelect.ubiCod;
 
-
-            // Verifica que el array documentosAgregados tenga al menos un registro
-            if (documentosAgregados.length === 0) {
-                Notiflix.Notify.failure('Debe agregar al menos un documento.');
-                return;
-            }
-
-            // Encuentra el primer documento con código 01
-            let documentoCodUni = documentosAgregados.find(doc => doc.docIdeCod === '01');
-
-            // Si no se encontró un documento con código 01, busca uno con código 03
-            if (!documentoCodUni) {
-                documentoCodUni = documentosAgregados.find(doc => doc.docIdeCod === '03');
-            }
-
-            // Si aún no se encontró un documento, usa el primer documento en el array
-            if (!documentoCodUni) {
-                documentoCodUni = documentosAgregados[0];
-            }
-
-            // Usa el benNumDoc del documento encontrado como benCodUni
-            const benCodUni = documentoCodUni.docIdeBenNum;
-
-            let beneficiarioMonitoreo = {
-                Beneficiario: { ...data, benCodUni },
-                MetaBeneficiario: {
+            if(!existeBeneficiario) {
+                // Verifica que todos los selects tengan una opción válida seleccionada
+                for (let i = 0; i < selects.length; i++) {
+                    const selectElement = document.querySelector(`select[name=select${i}]`);
+                    if (selectElement && selectElement.value === '0') {
+                        console.error(`El select ${i} no tiene una opción válida seleccionada.`);
+                        selectElement.classList.remove('PowerMas_Modal_Form_valid');
+                        selectElement.classList.add('PowerMas_Modal_Form_invalid');
+                        return;
+                    } else {
+                        selectElement.classList.remove('PowerMas_Modal_Form_invalid');
+                        selectElement.classList.add('PowerMas_Modal_Form_valid');
+                    }
+                }
+    
+                // Verifica que el array documentosAgregados tenga al menos un registro
+                if (documentosAgregados.length === 0) {
+                    Notiflix.Notify.failure('Debe agregar al menos un documento.');
+                    return;
+                }
+    
+                // Encuentra el primer documento con código 01
+                let documentoCodUni = documentosAgregados.find(doc => doc.docIdeCod === '01');
+    
+                // Si no se encontró un documento con código 01, busca uno con código 03
+                if (!documentoCodUni) {
+                    documentoCodUni = documentosAgregados.find(doc => doc.docIdeCod === '03');
+                }
+    
+                // Si aún no se encontró un documento, usa el primer documento en el array
+                if (!documentoCodUni) {
+                    documentoCodUni = documentosAgregados[0];
+                }
+    
+                // Usa el benNumDoc del documento encontrado como benCodUni
+                const benCodUni = documentoCodUni.docIdeBenNum;
+    
+                let beneficiarioMonitoreo = {
+                    Beneficiario: { ...data, benCodUni },
+                    MetaBeneficiario: {
+                        metAno,
+                        metCod,
+                        ubiAno,
+                        ubiCod,
+                    },
+                    DocumentoBeneficiario: documentosAgregados
+                }
+                handleSubmitMetaBeneficiario(beneficiarioMonitoreo);
+            } else{
+                const { benAno, benCod } = data;
+                const MetaBeneficiario = {
                     metAno,
                     metCod,
+                    benAno,
+                    benCod,
                     ubiAno,
                     ubiCod,
-                },
-                DocumentoBeneficiario: documentosAgregados
+                }
+                handleSubmitMetaBeneficiarioExiste(MetaBeneficiario);
             }
-            console.log(beneficiarioMonitoreo)
-            handleSubmitMetaBeneficiario(beneficiarioMonitoreo);
         })();
+    };
+
+    const handleSubmitMetaBeneficiarioExiste = async (data) => {
+        try {
+            Notiflix.Loading.pulse('Cargando...');
+            const token = localStorage.getItem('token');
+            
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/existe`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(data),
+            });
+            console.log(response)
+            if (!response.ok) {
+                const errorData = await response.json();
+                if(response.status === 409){
+                    Notiflix.Notify.warning(`${errorData.message}`);
+                    console.log(errorData.message)
+                    return;
+                } else {
+                    Notiflix.Notify.failure(errorData.message);
+                    console.log(errorData.message)
+                    return;
+                }
+            }
+
+            const successData = await response.json();
+            Notiflix.Notify.success(successData.message);
+            console.log(successData);
+            fetchBeneficiarie();
+            setUpdateData(!updateData);
+            handleReset();
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            Notiflix.Loading.remove();
+        }
     };
 
     const handleReset = () => {
@@ -510,7 +559,6 @@ const FormGoalBeneficiarie = () => {
         }); // Resetea todos los campos del segundo formulario
         setDocumentosAgregados([]);  // Vacía la lista de documentos agregados
         setSelects([]);  // Vacía la lista de selects
-        setShowSearchButton(true);  // Muestra el botón de búsqueda
         setFieldsDisabled(true);  // Deshabilita los campos del formulario
         setMostrarAgregarDocumento(false);
         setAccionActual('buscar');
@@ -561,15 +609,15 @@ const FormGoalBeneficiarie = () => {
     const benSex = watch('benSex');
 
     return (
-        <div className="PowerMas_StatusContainer bg-white h-100 flex flex-column">
-            <div className="PowerMas_Header_Form_Beneficiarie flex ai-center p_25">
-                <GrFormPreviousLink className="m_25 w-auto Large-f2_5 pointer" onClick={() => navigate('/monitoring')} />
+        <>
+            <div className="PowerMas_Header_Form_Beneficiarie flex ai-center p_5 gap-1">
+                <GrFormPreviousLink className="w-auto Large-f2_5 pointer" onClick={() => navigate('/monitoring')} />
                 <h1 className="f1_75">Nuevo Beneficiario</h1>
             </div>
             <div className="PowerMas_Content_Form_Beneficiarie overflow-auto flex-grow-1 flex">
                     <div className="Large_6 m1 overflow-auto flex flex-column gap-1">
                         <div className="PowerMas_Content_Form_Beneficiarie_Card Large-p_75">
-                            <h2 className="f1_25">Datos Personales</h2>
+                            <h2 className="f1_25 Large_12">Datos Personales</h2>
                             <form onSubmit={validateForm2(onSubmit)}>
                                 <div className="m_75">
                                     <label htmlFor="docIdeCod" className="">
@@ -1163,7 +1211,7 @@ const FormGoalBeneficiarie = () => {
                 />
             </Modal>
 
-        </div>
+        </>
     )
 }
 

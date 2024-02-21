@@ -278,6 +278,7 @@ namespace SistemaMEAL.Server.Modulos
 
         public Usuario BuscarUsuario(string ano, string cod)
         {
+            List<Usuario>? usuarios = null;
             Usuario? usuario = null;
 
             try
@@ -289,33 +290,25 @@ namespace SistemaMEAL.Server.Modulos
                 cmd.Parameters.AddWithValue("@Ano", ano);
                 cmd.Parameters.AddWithValue("@Cod", cod);
 
-                SqlDataReader rd = cmd.ExecuteReader();
-                if (rd.Read())
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (!reader.HasRows)
                 {
-                    usuario = new Usuario()
-                    {
-                        UsuAno = rd.GetString(0),
-                        UsuCod = rd.GetString(1),
-                        UsuNom = rd.GetString(4),
-                        UsuApe = rd.GetString(5),
-                        UsuSex = rd.GetString(7),
-                        UsuNomUsu = rd.GetString(12),
-                        CarCod = rd.GetString(9),
-                        RolCod = rd.GetString(15),
-
-                        Cargo = new Cargo()
-                        {
-                            CarNom = rd.GetString(22)
-                        },
-
-                        Rol = new Rol()
-                        {
-                            RolCod = rd.GetString(28),
-                            RolNom = rd.GetString(29)
-                        }
-                    };
+                    jsonResult.Append("[]");
                 }
-                rd.Close();
+                else
+                {
+                    while (reader.Read())
+                    {
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                // Deserializa la cadena JSON en una lista de objetos Usuario
+                usuarios = JsonConvert.DeserializeObject<List<Usuario>>(jsonResult.ToString());
+                if (usuarios.Count > 0)
+                {
+                    usuario = usuarios[0];
+                }
             }
             catch (SqlException ex)
             {
@@ -331,6 +324,7 @@ namespace SistemaMEAL.Server.Modulos
 
         public Usuario ValidarUsuario(string email, string password)
         {
+            List<Usuario>? usuarios = null;
             Usuario? usuario = null;
 
             try
@@ -342,31 +336,25 @@ namespace SistemaMEAL.Server.Modulos
                 cmd.Parameters.AddWithValue("@Email", email);
                 cmd.Parameters.AddWithValue("@Password", password);
 
-                SqlDataReader rd = cmd.ExecuteReader();
-                if (rd.Read())
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (!reader.HasRows)
                 {
-                    usuario = new Usuario()
-                    {
-                        UsuAno = rd.GetString(0),
-                        UsuCod = rd.GetString(1),
-                        UsuNom = rd.GetString(4),
-                        UsuApe = rd.GetString(5),
-                        UsuSex = rd.GetString(7),
-                        UsuNomUsu = rd.GetString(12),
-
-                        Cargo = new Cargo()
-                        {
-                            CarNom = rd.GetString(22)
-                        },
-
-                        Rol = new Rol()
-                        {
-                            RolCod = rd.GetString(28),
-                            RolNom = rd.GetString(29)
-                        }
-                    };
+                    jsonResult.Append("[]");
                 }
-                rd.Close();
+                else
+                {
+                    while (reader.Read())
+                    {
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                // Deserializa la cadena JSON en una lista de objetos Usuario
+                usuarios = JsonConvert.DeserializeObject<List<Usuario>>(jsonResult.ToString());
+                if (usuarios.Count > 0)
+                {
+                    usuario = usuarios[0];
+                }
             }
             catch (SqlException ex)
             {
@@ -377,8 +365,10 @@ namespace SistemaMEAL.Server.Modulos
                 cn.getcn.Close();
             }
 
-            return usuario?? new Usuario();
+            return usuario ?? new Usuario();
         }
+
+
 
 
     }

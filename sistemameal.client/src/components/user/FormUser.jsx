@@ -265,6 +265,7 @@ const FormUser = () => {
                                 {...register('docIdeCod', { 
                                     validate: value => value !== '0' || 'El documento de identidad es requerido' 
                                 })}
+                                style={{ textTransform: 'capitalize'}}
                             >
                                 <option value="0">--Seleccione Documento Identidad--</option>
                                 {documentos.map(documento => (
@@ -329,6 +330,7 @@ const FormUser = () => {
                                 placeholder="Ejm: Andres"
                                 maxLength={50}
                                 autoComplete="disabled"
+                                style={{ textTransform: 'capitalize'}}
                                 {...register('usuNom', { 
                                     required: 'El nombre es requerido',
                                     minLength: { value: 3, message: 'El nombre debe tener minimo 3 digitos' },
@@ -489,6 +491,7 @@ const FormUser = () => {
                                 {...register('rolCod', { 
                                     validate: value => value !== '0' || 'El rol es requerido' 
                                 })}
+                                style={{ textTransform: 'capitalize'}}
                             >
                                 <option value="0">--Seleccione Rol--</option>
                                 {roles.map(rol => (
@@ -517,6 +520,7 @@ const FormUser = () => {
                                 {...register('carCod', { 
                                     validate: value => value !== '0' || 'El cargo es requerido' 
                                 })}
+                                style={{ textTransform: 'capitalize'}}
                             >
                                 <option value="0">--Seleccione Cargo--</option>
                                 {cargos.map(cargo => (

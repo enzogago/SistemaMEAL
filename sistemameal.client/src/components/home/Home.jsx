@@ -133,7 +133,7 @@ switch (currentMap) {
 
     return(
     <>
-        <div className="PowerMas_Search_Container_Home p1">
+        <div className="PowerMas_Search_Container_Home" style={{paddingBottom: '1rem'}}>
             <div className="PowerMas_Input_Filter_Container flex">
                 <div className="flex ai-center">
                     {searchTags.map(tag => (

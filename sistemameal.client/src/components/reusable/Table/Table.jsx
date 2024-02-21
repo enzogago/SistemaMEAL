@@ -28,6 +28,8 @@ const Table = ({ data, openModal, setData, controller, fieldMapping }) => {
         add: userPermissions.some(permission => permission.perNom === `INSERTAR ${controller.toUpperCase()}`),
         delete: userPermissions.some(permission => permission.perNom === `ELIMINAR ${controller.toUpperCase()}`),
         edit: userPermissions.some(permission => permission.perNom === `MODIFICAR ${controller.toUpperCase()}`),
+        pdf: userPermissions.some(permission => permission.perNom === `EXPORTAR PDF ${controller.toUpperCase()}`),
+        excel: userPermissions.some(permission => permission.perNom === `EXPORTAR EXCEL ${controller.toUpperCase()}`),
     };
 
     const columns = useMemo(() => {
@@ -37,7 +39,7 @@ const Table = ({ data, openModal, setData, controller, fieldMapping }) => {
             cell: ({row}) => {
                 let text = row.original[fieldMapping[field]];
                 if (field === 'involucra') {
-                    text = text === 'S' ? 'Sí' : 'No';
+                    text = text === 'S' ? 'Si' : 'No';
                 } else if (field === 'color') {
                     return (
                         <div style={{color: text}}>
@@ -95,11 +97,16 @@ const Table = ({ data, openModal, setData, controller, fieldMapping }) => {
     const [sorting, setSorting] = useState([]);
     const filteredData = useMemo(() => 
         data.filter(item => 
-            Object.keys(fieldMapping).some(field =>
-                item[fieldMapping[field]].toUpperCase().includes(searchFilter.toUpperCase())
-            )
+            Object.keys(fieldMapping).some(field => {
+                let value = item[fieldMapping[field]].toUpperCase();
+                if (field === 'involucra') {
+                    value = value === 'S' ? 'SI' : 'NO';
+                }
+                return value.includes(searchFilter.toUpperCase());
+            })
         ), [data, searchFilter, fieldMapping]
     );
+
 
     const table = useReactTable({
         data: filteredData,

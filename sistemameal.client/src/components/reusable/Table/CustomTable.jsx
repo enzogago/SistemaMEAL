@@ -8,6 +8,7 @@ import {
 } from '@tanstack/react-table';
 
 const CustomTable = ({ title, searchFilter, setSearchFilter, actions, openModal, dropdownOpen, setDropdownOpen, Export_Excel, Export_PDF, table }) => {
+    console.log(actions)
     const toggleDropdown = () => {
         setDropdownOpen(!dropdownOpen);
     }
@@ -37,13 +38,22 @@ const CustomTable = ({ title, searchFilter, setSearchFilter, actions, openModal,
                             Nuevo <FaPlus className='Large_1' /> 
                         </button>
                     }
-                    <div className={`PowerMas_Dropdown_Export Large_3 Large-m_5 ${dropdownOpen ? 'open' : ''}`}>
-                        <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>Exportar <FaSortDown className='Large_1' /></button>
-                        <div className="PowerMas_Dropdown_Export_Content Phone_12">
-                            <a onClick={Export_Excel} className='flex jc-space-between p_5'>Excel <img className='Large_1' src={Excel_Icon} alt="" /> </a>
-                            <a onClick={Export_PDF} className='flex jc-space-between p_5'>PDF <img className='Large_1' src={Pdf_Icon} alt="" /></a>
+                    {
+                        (actions.pdf || actions.excel) &&
+                        <div className={`PowerMas_Dropdown_Export Large_3 Large-m_5 ${dropdownOpen ? 'open' : ''}`}>
+                            <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>Exportar <FaSortDown className='Large_1' /></button>
+                            <div className="PowerMas_Dropdown_Export_Content Phone_12">
+                                {
+                                    actions.pdf &&
+                                    <a onClick={Export_PDF} className='flex jc-space-between p_5'>PDF <img className='Large_1' src={Pdf_Icon} alt="" /></a>
+                                }
+                                {
+                                    actions.excel &&
+                                    <a onClick={Export_Excel} className='flex jc-space-between p_5'>Excel <img className='Large_1' src={Excel_Icon} alt="" /> </a>
+                                }
+                            </div>
                         </div>
-                    </div>
+                    }
                 </div>
             </div>
             <div className="PowerMas_TableContainer">

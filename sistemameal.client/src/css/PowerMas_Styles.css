@@ -1433,9 +1433,19 @@ textarea {
 	background-color: #F7775A!important;
 	color: #fff!important;
 }
+.PowerMas_Form_Card {
+	border: 1px solid #372e2c60;
+	border-radius: 5px;
+	padding: 0.75rem;
+	display: flex;
+	flex-direction: column;
+}
 .PowerMas_Form_User_Card{
 	border: 1px solid #372e2c60;
 	border-radius: 5px;
+	padding: 0.75rem;
+	display: flex;
+	flex-direction: column;
 }
 .PowerMas_Hr{
 	height: 1px;
@@ -1449,19 +1459,11 @@ textarea {
 	border-radius: 5px;
 	padding: 0.25rem;
 }
-.PowerMas_Form_User_Card > div {
-    /* padding-right: 1rem; */
-}
-
 .PowerMas_Info_User > article{
 	display: flex;
 	gap: 1rem;
 }
 
-
-.PowerMas_Form_User_Card > div:nth-child(2n) {
-    padding-right: 0;
-}
 
 /* END CREAR/MODIFICAR USUARIO */
 

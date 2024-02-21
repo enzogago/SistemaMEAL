@@ -59,13 +59,16 @@ const Bar = () => {
         setUserLogged({})
         localStorage.removeItem('token');
         navigate('/login');
+        setIsOpen(false);
     }
 
     const CambiarContraseña = () => {
         openModal();
+        setIsOpen(false);
     }
     const AcercDe = () => {
         openModalAcerca();
+        setIsOpen(false);
     }
 
     // Función para encriptar el ID del usuario
@@ -83,11 +86,11 @@ const Bar = () => {
             <h2 className="Large-f2 Medium-f1_5 Small-f1">¡Hola de nuevo!</h2>
             <div className="PowerMas_ProfileContainer">
                 <div className="PowerMas_ProfilePicture">
-                    <img src={userLogged && (userLogged.usuSex === 'M' ? masculino : femenino)} alt="Descripción de la imagen" />
+                    <img src={Object.keys(userLogged).length && (userLogged.usuSex === 'M' ? masculino : femenino)} alt="Descripción de la imagen" />
                 </div>
                 <div className="PowerMas_ProfileInfo flex-column m_5">
-                    <span style={{textTransform: 'capitalize'}} className="PowerMas_Username Large-f1 Medium-f1 Small-f_75">{userLogged && userLogged.cargo ? `${userLogged.usuNom.toLowerCase()} ${userLogged.usuApe.toLowerCase()}` : ''}</span>
-                    <span style={{textTransform: 'capitalize'}}  className="PowerMas_UserRole Large-f_75 Medium-f_75 Small-f_5">{userLogged && userLogged.cargo ? userLogged.cargo.carNom.toLowerCase() : ''}</span>
+                    <span style={{textTransform: 'capitalize'}} className="PowerMas_Username Large-f1 Medium-f1 Small-f_75">{userLogged  ? `${userLogged.usuNom.toLowerCase()} ${userLogged.usuApe.toLowerCase()}` : ''}</span>
+                    <span style={{textTransform: 'capitalize'}}  className="PowerMas_UserRole Large-f_75 Medium-f_75 Small-f_5">{userLogged  ? userLogged.carNom.toLowerCase() : ''}</span>
                 </div>
                 <div 
                     className={`pointer round p_25 PowerMas_MenuIcon ${isOpen ? 'PowerMas_MenuIcon--rotated' : ''}`} 
@@ -101,7 +104,7 @@ const Bar = () => {
                             <div className="PowerMas_ProfilePicture2">
                                 <img src={userLogged && (userLogged.usuSex === 'M' ? masculino : femenino)} alt="Descripción de la imagen" />
                             </div>
-                            <p style={{textTransform: 'capitalize'}} className='color-black'>Hola, {userLogged && userLogged.cargo ? `${userLogged.usuNom.toLowerCase()}` : ''}</p>
+                            <p style={{textTransform: 'capitalize'}} className='color-black'>Hola, {userLogged ? `${userLogged.usuNom.toLowerCase()}` : ''}</p>
                         </div>
                         <hr className='PowerMas_Hr m0' />
                         <Link className='flex ai-center p_25' to={`/form-profile/${encryptId(`${userLogged.usuAno}${userLogged.usuCod}`)}`}>

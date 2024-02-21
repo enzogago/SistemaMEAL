@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from "react-router-dom";
 import CryptoJS from 'crypto-js';
 import { GrFormPreviousLink } from "react-icons/gr";
+import { fetchData } from "../reusable/helper";
 
 const FormBeneficiarie = () => {
     const navigate = useNavigate();
@@ -17,8 +18,7 @@ const FormBeneficiarie = () => {
         const bytes  = CryptoJS.AES.decrypt(ciphertext, 'secret key 123');
         id = bytes.toString(CryptoJS.enc.Utf8);
     }
-    const isEditing = id && id.length >= 10;
-
+    const isEditing = id && id.length === 10;
     var benAno;
     var benCod;
     if (isEditing) {
@@ -28,106 +28,24 @@ const FormBeneficiarie = () => {
 
     const [ documentos, setDocumentos ] = useState([]);
     const [ generos, setGeneros ] = useState([]);
+    const [ nacionalidades, setNacionalidades ] = useState([]);
     const [ esMenorDeEdad, setEsMenorDeEdad ] = useState(false);
-    const [ mostrarAgregarDocumento, setMostrarAgregarDocumento ] = useState(false);
-    const [ initialValues, setInitialValues] = useState(null);
 
-
-    const { register, watch, handleSubmit: validateForm, formState: { errors, dirtyFields, isSubmitted }, reset, setValue } = 
-    useForm({ mode: "onChange"});
-
-    const { register: register2, watch: watch2, handleSubmit: validateForm2, formState: { errors: errors2,dirtyFields: dirtyFields2, isSubmitted: isSubmitted2  }, reset: reset2, trigger: trigger2 } = useForm({ mode: "onChange"});
-
-    // Actualiza la acción actual antes de enviar el formulario
-    const buscarBeneficiarioDocumento = async(data) => {
-        const token = localStorage.getItem('token');
-        Notiflix.Loading.pulse('Cargando...');
-        
-        try {
-            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Beneficiario/documento/${data.docIdeCod}/${data.docIdeBenNum}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            console.log(response)
-            const data = await response.json();
-            if (!response.ok) {
-                Notiflix.Notify.failure(data.message);
-                return;
-            }
-            console.log(data);
-        } catch (error) {
-            console.error('Error:', error);
-            setMostrarAgregarDocumento(true);
-            setAccionActual('agregar')
-        } finally {
-            Notiflix.Loading.remove();
-        }
-    };
-
+    const { 
+        register, 
+        watch, 
+        handleSubmit: validateForm, 
+        formState: { errors, dirtyFields, isSubmitted }, 
+        reset, 
+        setValue, 
+        trigger 
+    } = useForm({ mode: "onChange", defaultValues: { benNomApo: '', benApeApo: ''}});
 
     useEffect(() => {
         const fetchOptions = async () => {
-            const fetchDocumentos = async () => {
-                try {
-                    Notiflix.Loading.pulse('Cargando...');
-                    const token = localStorage.getItem('token');
-                    const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/DocumentoIdentidad`, {
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
-                    if (!response.ok) {
-                        if(response.status == 401 || response.status == 403){
-                            const data = await response.json();
-                            Notiflix.Notify.failure(data.message);
-                        }
-                        return;
-                    }
-                    const data = await response.json();
-                    if (data.success == false) {
-                        Notiflix.Notify.failure(data.message);
-                        return;
-                    }
-                    setDocumentos(data);
-                } catch (error) {
-                    console.error('Error:', error);
-                } finally {
-                    Notiflix.Loading.remove();
-                }
-            };
-
-            const fetchGneros = async () => {
-                try {
-                    Notiflix.Loading.pulse('Cargando...');
-                    const token = localStorage.getItem('token');
-                    const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Genero`, {
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
-                    if (!response.ok) {
-                        if(response.status == 401 || response.status == 403){
-                            const data = await response.json();
-                            Notiflix.Notify.failure(data.message);
-                        }
-                        return;
-                    }
-                    const data = await response.json();
-                    if (data.success == false) {
-                        Notiflix.Notify.failure(data.message);
-                        return;
-                    }
-                    console.log(data)
-                    setGeneros(data);
-                } catch (error) {
-                    console.error('Error:', error);
-                } finally {
-                    Notiflix.Loading.remove();
-                }
-            };
-            fetchGneros();
-            fetchDocumentos();
+            fetchData('DocumentoIdentidad',setDocumentos);
+            fetchData('Genero',setGeneros);
+            fetchData('Nacionalidad',setNacionalidades);
         }
 
         const fetchBeneficiario = async () => {
@@ -145,7 +63,6 @@ const FormBeneficiarie = () => {
                     return;
                 }
                 reset(data);
-                setInitialValues(data);
             } catch (error) {
                 console.error('Error:', error);
             } finally {
@@ -164,9 +81,9 @@ const FormBeneficiarie = () => {
     // Observa los cambios en el campo 'benFecNac'
     const fechaNacimiento = watch('benFecNac');
 
+    // Efecto para la concatenación automatica en la separacion de día mes y año
     useEffect(() => {
         if (fechaNacimiento) {
-            console.log(fechaNacimiento)
             // Remueve cualquier guión existente
             let cleanFecha = fechaNacimiento.replace(/-/g, '');
             
@@ -191,133 +108,163 @@ const FormBeneficiarie = () => {
         }
     }, [fechaNacimiento]);
 
+    // Efecto para la verificación si el beneficiario es menor de edad y así habilitar
+    // Los campos de "Datos de Autorización"
     useEffect(() => {
         if (fechaNacimiento) {
-            // Asegúrate de que la fecha de nacimiento tiene el formato correcto
-            const regex = /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/;
-            if (regex.test(fechaNacimiento)) {
-                // Convierte la fecha de nacimiento al formato que JavaScript puede entender
-                const fechaFormateada = fechaNacimiento.replace(/\//g, '-');
-                const fecha = new Date(fechaFormateada);
-                const hoy = new Date();
-                let edad = hoy.getFullYear() - fecha.getFullYear();
-                const m = hoy.getMonth() - fecha.getMonth();
-                if (m < 0 || (m === 0 && hoy.getDate() < fecha.getDate())) {
-                    edad--;
+            const generarContrasena = async () => {
+                const esNombreValido = await trigger('benFecNac');
+        
+                if (esNombreValido) {
+                    const fechaFormateada = fechaNacimiento.split("-").reverse().join("-");
+                    const fecha = new Date(fechaFormateada);
+                    const hoy = new Date();
+                    let edad = hoy.getFullYear() - fecha.getFullYear();
+                    const m = hoy.getMonth() - fecha.getMonth();
+                    if (m < 0 || (m === 0 && hoy.getDate() < fecha.getDate())) {
+                        edad--;
+                    }
+                    setEsMenorDeEdad(edad < 18);
+                } else{
+                    setEsMenorDeEdad(false);
+                    setValue('benNomApo', '');
+                    setValue('benApeApo', '');
                 }
-                console.log(edad)
-                setEsMenorDeEdad(edad < 18);
-            }
+            };
+            generarContrasena();
         }
     }, [fechaNacimiento]);
-
-    const abrirModal = () => {
-        setModalIsOpen(true);
-    };
-    
-    const cerrarModal = () => {
-        setModalIsOpen(false);
-    };
     
     const handleNext = () => {
         validateForm((data) => {
-            console.log(data)
-            // Submit
+            const { docIdeCod, docIdeBenNum } = data;
+            const benCodUni = data.docIdeBenNum;
+            let payload = {
+                Beneficiario: { ...data, benCodUni: docIdeBenNum },
+                DocumentoBeneficiario: {
+                    docIdeCod,
+                    docIdeBenNum
+                }
+            }
+
+            if (isEditing) {
+                handleSubmit(isEditing ,data);
+            } else {
+                handleSubmit(isEditing ,payload);
+            }
         })();
     }
 
+    const handleSubmit = async (isEditing ,data) => {
+        console.log(isEditing);
+        try {
+            Notiflix.Loading.pulse('Cargando...');
+            const token = localStorage.getItem('token');
+            const method = isEditing ? 'PUT' : 'POST';
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Beneficiario`, {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(data),
+            });
+            const responseData = await response.json();
+            if (!response.ok) {
+                Notiflix.Notify.failure(responseData.message);
+                return;
+            }
+
+            Notiflix.Notify.success(responseData.message);
+            reset();
+            navigate('/beneficiarie');
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            Notiflix.Loading.remove();
+        }
+    };
+
     return (
-        <div className="bg-white h-100 flex flex-column">
-            <div className="PowerMas_Header_Form_Beneficiarie flex ai-center">
-                <GrFormPreviousLink className="m1 w-auto Large-f2_5 pointer" onClick={() => navigate('/beneficiarie')} />
-                <h1 className="flex-grow-1">{isEditing ? 'Editar' : 'Nuevo'} Beneficiario</h1>
+        <>
+            <div className="PowerMas_Header_Form_Beneficiarie flex ai-center p_5 gap-1">
+                <GrFormPreviousLink className="w-auto Large-f2_5 pointer" onClick={() => navigate('/beneficiarie')} />
+                <h1 className="flex-grow-1 f1_75">{isEditing ? 'Editar' : 'Nuevo'} Beneficiario</h1>
             </div>
-            <div className="flex-grow-1 overflow-auto p1_25">
-                <div className="">
-                    <h2>Datos Personales </h2>
-                    <br />
-                    <div className="PowerMas_Form_User_Card flex flex-wrap p1">
-                        <form onSubmit={validateForm2()} className="Large_12 flex flex-wrap">
-                            <div className="Large_6 flex flex-column p1">
-                                <label htmlFor="docIdeCod" className="">
-                                    Tipo de documento:
-                                </label>
-                                <select 
-                                    id="docIdeCod" 
-                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields2.docIdeCod || isSubmitted2 ? (errors2.docIdeCod ? 'invalid' : 'valid') : ''}`} 
-                                    {...register2('docIdeCod', { 
-                                        validate: value => value !== '0' || 'El dcoumento de identidad es requerido' 
-                                    })}
-                                >
-                                    <option value="0">--Seleccione Dcoumento Identidad--</option>
-                                    {documentos.map(documento => (
-                                        <option 
-                                            key={documento.docIdeCod} 
-                                            value={documento.docIdeCod}> ({documento.docIdeAbr}) {documento.docIdeNom}
-                                        </option>
-                                    ))}
-                                </select>
-                                {errors2.docIdeCod ? (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors2.docIdeCod.message}</p>
-                                ) : (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                    Espacio reservado para el mensaje de error
-                                    </p>
-                                )}
-                            </div>
-                            <div className="Large_6 flex flex-column p1">
-                                <label htmlFor="docIdeBenNum" className="">
-                                    Numero de documento:
-                                </label>
-                                <input
-                                    id="docIdeBenNum"
-                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields2.docIdeBenNum || isSubmitted2 ? (errors2.docIdeBenNum ? 'invalid' : 'valid') : ''}`} 
-                                    type="text" 
-                                    placeholder="74301932"
-                                    autoComplete="disabled"
-                                    maxLength={10}
-                                    onKeyDown={(event) => {
-                                        if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
-                                            event.preventDefault();
-                                        }
-                                    }}
-                                    {...register2('docIdeBenNum', { 
-                                        required: 'El número de documento es requerido',
-                                        minLength: {
-                                            value: 6,
-                                            message: 'El número de documento debe tener al menos 6 dígitos'
-                                        },
-                                        maxLength: {
-                                            value: 10,
-                                            message: 'El número de documento no debe tener más de 10 dígitos'
-                                        },
-                                        pattern: {
-                                            value: /^[0-9]*$/,
-                                            message: 'El número de documento solo debe contener números'
-                                        }
-                                    })}
-                                />
-                                {errors2.docIdeBenNum ? (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors2.docIdeBenNum.message}</p>
-                                ) : (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                    Espacio reservado para el mensaje de error
-                                    </p>
-                                )}
-                            </div>
-                            <div className="m_75 flex jc-space-between">
+            <div className="flex flex-grow-1 overflow-auto p1 gap-1">
+                <div className="Large_6">
+                    <div className="PowerMas_Form_Card ">
+                        <h2 className="f1_25">Datos Personales </h2>
+                        <div className="p1">
                             {
-                                mostrarAgregarDocumento ? 
-                                    <>
-                                        <button type="submit">Agregar documento</button>
-                                        <button type="button" onClick={abrirModal}>Ver documentos agregados</button>
-                                    </>
-                                    :
-                                    <button type="submit">Buscar</button>
+                                !isEditing &&
+                                <>
+                                    <label htmlFor="docIdeCod" className="">
+                                        Tipo de documento:
+                                    </label>
+                                    <select 
+                                        id="docIdeCod" 
+                                        className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.docIdeCod || isSubmitted ? (errors.docIdeCod ? 'invalid' : 'valid') : ''}`} 
+                                        {...register('docIdeCod', { 
+                                            validate: value => value !== '0' || 'El dcoumento de identidad es requerido' 
+                                        })}
+                                    >
+                                        <option value="0">--Seleccione Dcoumento Identidad--</option>
+                                        {documentos.map(documento => (
+                                            <option 
+                                                key={documento.docIdeCod} 
+                                                value={documento.docIdeCod}> ({documento.docIdeAbr}) {documento.docIdeNom}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {errors.docIdeCod ? (
+                                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.docIdeCod.message}</p>
+                                    ) : (
+                                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                        Espacio reservado para el mensaje de error
+                                        </p>
+                                    )}
+                                    <label htmlFor="docIdeBenNum" className="">
+                                        Numero de documento:
+                                    </label>
+                                    <input
+                                        id="docIdeBenNum"
+                                        className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.docIdeBenNum || isSubmitted ? (errors.docIdeBenNum ? 'invalid' : 'valid') : ''}`} 
+                                        type="text" 
+                                        placeholder="74301932"
+                                        autoComplete="disabled"
+                                        maxLength={10}
+                                        onKeyDown={(event) => {
+                                            if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
+                                                event.preventDefault();
+                                            }
+                                        }}
+                                        {...register('docIdeBenNum', { 
+                                            required: 'El campo es requerido',
+                                            minLength: {
+                                                value: 6,
+                                                message: 'El número de documento debe tener al menos 6 dígitos'
+                                            },
+                                            maxLength: {
+                                                value: 10,
+                                                message: 'El número de documento no debe tener más de 10 dígitos'
+                                            },
+                                            pattern: {
+                                                value: /^[0-9]*$/,
+                                                message: 'El número de documento solo debe contener números'
+                                            }
+                                        })}
+                                    />
+                                    {errors.docIdeBenNum ? (
+                                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.docIdeBenNum.message}</p>
+                                    ) : (
+                                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                        Espacio reservado para el mensaje de error
+                                        </p>
+                                    )}
+                                </>
                             }
-                            </div>
-                        </form>
-                        <div className="Large_6 flex flex-column p1">
+                            
                             <label htmlFor="benNom" className="">
                                 Nombre
                             </label>
@@ -339,8 +286,6 @@ const FormBeneficiarie = () => {
                                 Espacio reservado para el mensaje de error
                                 </p>
                             )}
-                        </div>
-                        <div className="Large_6 flex flex-column p1">
                             <label htmlFor="benApe" className="">
                                 Apellido
                             </label>
@@ -362,8 +307,6 @@ const FormBeneficiarie = () => {
                                 Espacio reservado para el mensaje de error
                                 </p>
                             )}
-                        </div>
-                        <div className="Large_6 flex flex-column p1">
                             <label htmlFor="masculino" className="">
                                 Sexo:
                             </label>
@@ -396,8 +339,6 @@ const FormBeneficiarie = () => {
                                     Espacio reservado para el mensaje de error
                                 </p>
                             )}
-                        </div>
-                        <div className="Large_6 flex flex-column p1">
                             <label htmlFor="genCod" className="">
                                 Género:
                             </label>
@@ -425,40 +366,7 @@ const FormBeneficiarie = () => {
                                 Espacio reservado para el mensaje de error
                                 </p>
                             )}
-                        </div>
-                        <div className="Large_6 flex flex-column p1">
-                            <label htmlFor="benFecNac" className="">
-                                Fecha de nacimiento:
-                            </label>
-                            <input 
-                                type="text" 
-                                id="benFecNac"
-                                className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benFecNac || isSubmitted ? (errors.benFecNac ? 'invalid' : 'valid') : ''}`} 
-                                placeholder="Ejm: 17-03-2003 (DD-MM-YYYY)"
-                                autoComplete="disabled"
-                                maxLength={10}
-                                onKeyDown={(event) => {
-                                    if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
-                                        event.preventDefault();
-                                    }
-                                }}
-                                {...register('benFecNac', { 
-                                    required: 'La Fecha de nacimiento es requerido',
-                                    pattern: {
-                                        value: /^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[012])-\d{4}$/,
-                                        message: 'La fecha debe estar en el formato DD-MM-YYYY',
-                                    },
-                                })} 
-                            />
-                            {errors.benFecNac ? (
-                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.benFecNac.message}</p>
-                            ) : (
-                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                Espacio reservado para el mensaje de error
-                                </p>
-                            )}
-                        </div>
-                        <div className="Large_6 flex flex-column p1">
+                            
                             <label htmlFor="benCorEle" className="">
                                 Email
                             </label>
@@ -483,8 +391,6 @@ const FormBeneficiarie = () => {
                                 Espacio reservado para el mensaje de error
                                 </p>
                             )}
-                        </div>
-                        <div className="Large_6 flex flex-column p1">
                             <label htmlFor="benTel" className="">
                                 Numero de telefono
                             </label>
@@ -517,104 +423,158 @@ const FormBeneficiarie = () => {
                                 Espacio reservado para el mensaje de error
                                 </p>
                             )}
-                        </div>
-                        <div className="Large_6 flex flex-column p1">
-                            <label htmlFor="benTelCon" className="">
-                                Telefono de contacto
-                            </label>
-                            <input 
-                                type="text" 
-                                id="benTelCon"
-                                className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benTelCon || isSubmitted ? (errors.benTelCon ? 'invalid' : 'valid') : ''}`} 
-                                placeholder="907078329"
-                                autoComplete="disabled"
-                                maxLength={10}
-                                onKeyDown={(event) => {
-                                    if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
-                                        event.preventDefault();
-                                    }
-                                }}
-                                {...register('benTelCon', { 
-                                    required: 'El número de telefono es requerido',
-                                    minLength: { value: 9, message: 'El número debe tener minimo 9 digitos' },
-                                    maxLength: { value: 10, message: 'El número debe tener minimo 10 digitos' },
-                                    pattern: {
-                                        value: /^[0-9]*$/,
-                                        message: 'Solo se aceptan numeros'
-                                    }
-                                })} 
-                            />
-                            {errors.benTelCon ? (
-                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.benTelCon.message}</p>
-                            ) : (
-                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                Espacio reservado para el mensaje de error
-                                </p>
-                            )}
+                            
                         </div>
                     </div>
                 </div>
-                    {
-                        esMenorDeEdad && 
-                        <div className="PowerMas_Form_User_Card p1">
-                            <h2>Datos de Autorización</h2>
-                            <p className="f_75">Si el beneficiario es menor de edad se deben introducir los datos de la persona que autoriza el uso de su información.</p>
-                            <div className="PowerMas_Content_Form_Beneficiarie_Card Large-p_75 flex flex-wrap">
-                                <div className="Large_6 flex flex-column p1">
-                                    <label htmlFor="benNomApo" className="">
-                                        Nombre Apoderado
-                                    </label>
-                                    <input 
-                                        id="benNomApo"
-                                        type="text"
-                                        className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benNomApo || isSubmitted ? (errors.benNomApo ? 'invalid' : 'valid') : ''}`} 
-                                        placeholder="Enzo Fabricio"
-                                        autoComplete="disabled"
-                                        {...register('benNomApo', { 
-                                            required: 'El nombre del apoderado es requerido',
-                                            minLength: { value: 3, message: 'El nombre debe tener minimo 3 digitos' },
-                                        })} 
-                                    />
-                                    {errors.benNomApo ? (
-                                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.benNomApo.message}</p>
-                                    ) : (
-                                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                        Espacio reservado para el mensaje de error
-                                        </p>
-                                    )}
-                                </div>
-                                <div className="Large_6 flex flex-column p1">
-                                    <label htmlFor="benApeApo" className="">
-                                        Apellido Apoderado
-                                    </label>
-                                    <input 
-                                        id="benApeApo"
-                                        type="text"
-                                        className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benApeApo || isSubmitted ? (errors.benApeApo ? 'invalid' : 'valid') : ''}`} 
-                                        placeholder="Gago Aguirre"
-                                        autoComplete="disabled"
-                                        {...register('benApeApo', { 
-                                            required: 'El nombre del apoderado es requerido',
-                                            minLength: { value: 3, message: 'El nombre debe tener minimo 3 digitos' },
-                                        })} 
-                                    />
-                                    {errors.benApeApo ? (
-                                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.benApeApo.message}</p>
-                                    ) : (
-                                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                        Espacio reservado para el mensaje de error
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    }
+                <div className="Large_6">
+                    <div className="PowerMas_Form_Card">
+                        <label htmlFor="nacCod" className="">
+                            Nacionalidad:
+                        </label>
+                        <select 
+                            id="nacCod" 
+                            className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.nacCod || isSubmitted ? (errors.nacCod ? 'invalid' : 'valid') : ''}`} 
+                            {...register('nacCod', { 
+                                validate: value => value !== '0' || 'El género de identidad es requerido' 
+                            })}
+                        >
+                            <option value="0">--Seleccione Nacionalidad--</option>
+                            {nacionalidades.map(nacionalidad => (
+                                <option 
+                                    key={nacionalidad.nacCod} 
+                                    value={nacionalidad.nacCod}
+                                > 
+                                    {nacionalidad.nacNom}
+                                </option>
+                            ))}
+                        </select>
+                        {errors.nacCod ? (
+                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.nacCod.message}</p>
+                        ) : (
+                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                            Espacio reservado para el mensaje de error
+                            </p>
+                        )}
+                        <label htmlFor="benTelCon" className="">
+                            Telefono de contacto
+                        </label>
+                        <input 
+                            type="text" 
+                            id="benTelCon"
+                            className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benTelCon || isSubmitted ? (errors.benTelCon ? 'invalid' : 'valid') : ''}`} 
+                            placeholder="907078329"
+                            autoComplete="disabled"
+                            maxLength={10}
+                            onKeyDown={(event) => {
+                                if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
+                                    event.preventDefault();
+                                }
+                            }}
+                            {...register('benTelCon', { 
+                                required: 'El número de telefono es requerido',
+                                minLength: { value: 9, message: 'El número debe tener minimo 9 digitos' },
+                                maxLength: { value: 10, message: 'El número debe tener minimo 10 digitos' },
+                                pattern: {
+                                    value: /^[0-9]*$/,
+                                    message: 'Solo se aceptan numeros'
+                                }
+                            })} 
+                        />
+                        {errors.benTelCon ? (
+                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.benTelCon.message}</p>
+                        ) : (
+                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                            Espacio reservado para el mensaje de error
+                            </p>
+                        )}
+                        <label htmlFor="benFecNac" className="">
+                            Fecha de nacimiento:
+                        </label>
+                        <input 
+                            type="text" 
+                            id="benFecNac"
+                            className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benFecNac || isSubmitted ? (errors.benFecNac ? 'invalid' : 'valid') : ''}`} 
+                            placeholder="Ejm: 17-03-2003 (DD-MM-YYYY)"
+                            autoComplete="disabled"
+                            maxLength={10}
+                            onKeyDown={(event) => {
+                                if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
+                                    event.preventDefault();
+                                }
+                            }}
+                            {...register('benFecNac', { 
+                                required: 'La Fecha de nacimiento es requerido',
+                                pattern: {
+                                    value: /^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[012])-\d{4}$/,
+                                    message: 'La fecha debe estar en el formato DD-MM-YYYY',
+                                },
+                            })} 
+                        />
+                        {errors.benFecNac ? (
+                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.benFecNac.message}</p>
+                        ) : (
+                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                            Espacio reservado para el mensaje de error
+                            </p>
+                        )}
+                        {
+                            esMenorDeEdad &&
+                            <>
+                                <h2 className="f1_25">Datos de Autorización</h2>
+                                <p className="f_75 m_5 p_25" style={{border: '2px dashed black'}}>Si el beneficiario es menor de edad se deben introducir los datos de la persona que autoriza el uso de su información.</p>
+                                <label htmlFor="benNomApo" className="">
+                                    Nombre Apoderado
+                                </label>
+                                <input 
+                                    id="benNomApo"
+                                    type="text"
+                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benNomApo || isSubmitted ? (errors.benNomApo ? 'invalid' : 'valid') : ''}`} 
+                                    placeholder="Enzo Fabricio"
+                                    autoComplete="disabled"
+                                    {...register('benNomApo', { 
+                                        required: 'El nombre del apoderado es requerido',
+                                        minLength: { value: 3, message: 'El nombre debe tener minimo 3 digitos' },
+                                    })} 
+                                />
+                                {errors.benNomApo ? (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.benNomApo.message}</p>
+                                ) : (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                    Espacio reservado para el mensaje de error
+                                    </p>
+                                )}
+                                <label htmlFor="benApeApo" className="">
+                                    Apellido Apoderado
+                                </label>
+                                <input 
+                                    id="benApeApo"
+                                    type="text"
+                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benApeApo || isSubmitted ? (errors.benApeApo ? 'invalid' : 'valid') : ''}`} 
+                                    placeholder="Gago Aguirre"
+                                    autoComplete="disabled"
+                                    {...register('benApeApo', { 
+                                        required: 'El nombre del apoderado es requerido',
+                                        minLength: { value: 3, message: 'El nombre debe tener minimo 3 digitos' },
+                                    })} 
+                                />
+                                {errors.benApeApo ? (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.benApeApo.message}</p>
+                                ) : (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                    Espacio reservado para el mensaje de error
+                                    </p>
+                                )}
+                            </>
+                        }
+                    </div>
+                </div>
             </div>
-            <div className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
-                <button onClick={() => navigate('/beneficiarie')} className="PowerMas_Buttom_Secondary Large_3 m_75">Atras</button>
-                <button onClick={handleNext} className="PowerMas_Buttom_Primary Large_3 m_75">Siguiente</button>
-            </div>
-        </div>
+            <footer className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
+                <button onClick={() => navigate('/beneficiarie')} className="Large_3 m_75 PowerMas_Buttom_Secondary">Atras</button>
+                <button onClick={handleNext} className="Large_3 m_75 PowerMas_Buttom_Primary">Siguiente</button>
+            </footer>
+        </>
     )
 }
 
