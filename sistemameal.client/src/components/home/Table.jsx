@@ -174,7 +174,7 @@ const Table = ({ data }) => {
                     id="info-tooltip"
                     effect="solid"
                     place='bottom-start'
-                    className="tooltip"
+                    className="PowerMas_Tooltip_Info"
                 />
             </div>
         </div>

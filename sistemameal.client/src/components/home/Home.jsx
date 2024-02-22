@@ -8,6 +8,9 @@ import Paises from '../maps/Paises';
 import Ecuador from '../maps/Ecuador';
 import Peru from '../maps/Peru';
 import Colombia from '../maps/Colombia';
+import PieChart from '../reusable/graphics/PieChart';
+import DivergingBarChart from '../reusable/graphics/DivergingBarChart';
+
 
 
 const Home = () => {
@@ -114,22 +117,76 @@ const Home = () => {
     }
 
     let MapComponent;
-switch (currentMap) {
-    case 'Todos':
-        MapComponent = Paises;
-        break;
-    case 'Perú':
-        MapComponent = Peru;
-        break;
-    case 'Ecuador':
-        MapComponent = Ecuador;
-        break;
-    case 'Colombia':
-        MapComponent = Colombia;
-        break;
-    default:
-        MapComponent = Paises;
-}
+    switch (currentMap) {
+        case 'Todos':
+            MapComponent = Paises;
+            break;
+        case 'Perú':
+            MapComponent = Peru;
+            break;
+        case 'Ecuador':
+            MapComponent = Ecuador;
+            break;
+        case 'Colombia':
+            MapComponent = Colombia;
+            break;
+        default:
+            MapComponent = Paises;
+    }
+
+    const maleColor = '#61A2AA';
+    const femaleColor = '#98C0C6';
+
+    const data = [
+        { name: 'Masculino', value: 39489, color: maleColor },
+        { name: 'Femenino', value: 91949, color: femaleColor },
+    ];
+
+    const maleData = [
+        { age: 10, count: 20 },
+        { age: 15, count: 30 },
+        { age: 50, count: 80 },
+        { age: 8, count: 80 },
+        { age: 58, count: 10 },
+        { age: 90, count: 8 },
+        // ...
+    ];
+    
+    const femaleData = [
+        { age: 8, count: 70 },
+        { age: 10, count: 25 },
+        { age: 15, count: 35 },
+        { age: 30, count: 50 },
+        { age: 40, count: 60 },
+        { age: 58, count: 30 },
+        { age: 68, count: 50 },
+        // ...
+    ];
+
+    const ageRanges = [
+        { min: 0, max: 9 },
+        { min: 10, max: 29 },
+        { min: 30, max: 54 },
+        { min: 55, max: 64 },
+        { min: 65, max: 150 }
+    ];
+    
+    const groupDataByAgeRange = (data) => {
+        return ageRanges.map(range => {
+            const count = data.reduce((total, d) => {
+                if (d.age >= range.min && d.age <= range.max) {
+                    total += d.count;
+                }
+                return total;
+            }, 0);
+            return { age: `${range.min}-${range.max}`, count };
+        });
+    };
+    
+    const groupedMaleData = groupDataByAgeRange(maleData);
+    const groupedFemaleData = groupDataByAgeRange(femaleData);
+
+    
 
     return(
     <>
@@ -177,57 +234,53 @@ switch (currentMap) {
                 </div>
             </div>
         </div>
-        <div className='PowerMas_Direct_Access bg-white Large-p1 m1'>
-            <h2 className="block center Large-p_5 Powermas_FontTitle">Accesos directos</h2>
-            <div className="PowerMas_AccessCards">
-                <div className="PowerMas_AccessCard Large_3">
-                    <p className="block center bold Large-f1_25">Usuarios</p>
-                    <Link className="PowerMas_AccessCardHeader flex Large-flex-row Medium-flex-column" to='/form-user'>
-                        <FaUser className='Phone_1' />
-                        <div className="PowerMas_AccessTitle Large_11 Large-f_75 center" >Crear usuario</div>
-                    </Link>
-                    <div className="PowerMas_AccessIndicator">
-                        <span className="Large_6 Large-f_75">Total de usuarios</span>
-                        <span className="Large_6 Large-f2">35</span>
-                    </div>
+        <div className='flex flex-column m1 gap-1'>
+            <div className="flex gap-1">
+                <div className='PowerMas_Home_Card Large-p1 Large_6 Medium_6'>
+                    <h4>Beneficiarios por Nacionalidad</h4>
                 </div>
-                <div className="PowerMas_AccessCard Large_3">
-                    <p className="block center bold Large-f1_25">Proyectos</p>
-                    <Link className="PowerMas_AccessCardHeader flex Large-flex-row Medium-flex-column" to='/form-project'>
-                        <FaRProject className='Phone_1' />
-                        <div className="PowerMas_AccessTitle Large_11 Large-f_75 center">Crear proyecto</div>
-                    </Link>
-                    <div className="PowerMas_AccessIndicator">
-                        <span className="Large_6 Large-f_75">Total de proyectos</span>
-                        <span className="Large_6 Large-f2">50</span>
-                    </div>
+                <div className='PowerMas_Home_Card Large-p1 Large_6 Medium_6'>
+                    <h4>Beneficiarios por Tipo de documento</h4>
                 </div>
-                <div className="PowerMas_AccessCard Large_3">
-                    <p className="block center bold Large-f1_25">Metas</p>
-                    <Link className="PowerMas_AccessCardHeader flex Large-flex-row Medium-flex-column" to='form-goal'>
-                        <FaGlobeAsia className='Phone_1' />
-                        <div className="PowerMas_AccessTitle Large_11 Large-f_75 center">Crear meta</div>
-                    </Link>
-                    <div className="PowerMas_AccessIndicator">
-                        <span className="Large_6 Large-f_75">Total de metas</span>
-                        <span className="Large_6 Large-f2">20</span>
+                
+            </div>
+            <div className="flex gap-1">
+                <div className='PowerMas_Home_Card p1 Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
+                    <h4>Beneficiarios por Edad</h4>
+                    <div className='Large_12 Medium_12 Phone_12 Large-p1 Small-p_75 flex-grow-1'>
+                        <DivergingBarChart maleData={groupedMaleData} femaleData={groupedFemaleData} maleColor={maleColor} femaleColor={femaleColor} ageRanges={ageRanges} id='Diverging' />
                     </div>
+                    <div className='flex flex-wrap gap-1'>
+                        <div className='flex ai-center gap_5'>
+                            <div className='legend-color' style={{ backgroundColor: maleColor, width: '15px', height: '15px' }}></div>
+                            <span className='legend-label'>Masculino</span>
+                        </div>
+                        <div className='flex ai-center gap_5'>
+                            <div className='legend-color' style={{ backgroundColor: femaleColor, width: '15px', height: '15px' }}></div>
+                            <span className='legend-label'>Femenino</span>
+                        </div>
+                    </div>
+
                 </div>
-                <div className="PowerMas_AccessCard Large_3">
-                    <p className="block center bold Large-f1_25">Beneficiarios</p>
-                    <Link className="PowerMas_AccessCardHeader flex Large-flex-row Medium-flex-column">
-                        <FaPersonBooth className='Phone_1'/>
-                        <div className="PowerMas_AccessTitle Large_11 Large-f_75 center">Crear beneficiario</div>
-                    </Link>
-                    <div className="PowerMas_AccessIndicator">
-                        <span className="Large_6 Large-f_75">Total de beneficiarios</span>
-                        <span className="Large_6 Large-f2">90</span>
+                <div className='PowerMas_Home_Card p1 Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
+                    <h4>Beneficiarios por Sexo</h4>
+                    <div className='Large_5 Medium_12 Phone_12 Large-p1 Small-p_75 flex-grow-1'>
+                        <PieChart data={data} id='MaleFemale' />
+                    </div>
+                    <div className='flex flex-wrap gap-1'>
+                        {data.map((item, index) => (
+                            <div key={index} className='flex ai-center gap_5'>
+                                <div className='legend-color' style={{ backgroundColor: item.color, width: '15px', height: '15px' }}></div>
+                                <span className='legend-label'>{item.name}</span>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>
         </div>
-        <div className="PowerMas_RecentsSection flex Medium-flex-row Small-flex-column m1">
-            <div className="PowerMas_ActivitiesSection Large_6 Medium_5 Phone_12 Large-p2">
+        
+        <div className="PowerMas_RecentsSection flex Medium-flex-row Small-flex-column m1 gap-1">
+            <div className="PowerMas_Home_Card PowerMas_ActivitiesSection Large_6 Medium_5 Phone_12 Large-p2">
                 <h2 className="Large-f1_5 Powermas_FontTitle">Actividades recientes</h2>
                 <div className="PowerMas_Article flex Large-f_75 ai-center left">
                     <div className='PowerMas_Icon Large_2 Large-f1_5'>
@@ -275,20 +328,20 @@ switch (currentMap) {
                     </div>
                 </div>
             </div>
-            <div className="PowerMas_BeneficiarySection Large_6 Medium_7 Phone_12 flex">
+            <div className="PowerMas_Home_Card PowerMas_BeneficiarySection Large_6 Medium_7 Phone_12 flex">
                 <div className='flex flex-grow-1'>
                     <article className='Phone_5 flex-grow-1'>
                         <h2 className="Large-m1 Large-f1_5 Powermas_FontTitle">Beneficiarios por</h2>
                         <div className='flex flex-column p1 gap_5'>
-                        <button className='PowerMas_Buttom_Primary' onClick={() => setCurrentMap('Todos')}>Todos</button>
-<button className='PowerMas_Buttom_Primary' onClick={() => setCurrentMap('Perú')}>Perú</button>
-<button className='PowerMas_Buttom_Primary' onClick={() => setCurrentMap('Ecuador')}>Ecuador</button>
-<button className='PowerMas_Buttom_Primary' onClick={() => setCurrentMap('Colombia')}>Colombia</button>
+                            <button className='PowerMas_Buttom_Primary' onClick={() => setCurrentMap('Todos')}>Todos</button>
+                            <button className='PowerMas_Buttom_Primary' onClick={() => setCurrentMap('Perú')}>Perú</button>
+                            <button className='PowerMas_Buttom_Primary' onClick={() => setCurrentMap('Ecuador')}>Ecuador</button>
+                            <button className='PowerMas_Buttom_Primary' onClick={() => setCurrentMap('Colombia')}>Colombia</button>
                         </div>
                     </article>
                     <div className='Phone_7 flex-grow-1'>
-        <MapComponent />
-    </div>
+                        <MapComponent />
+                    </div>
                 </div>
             </div>
         </div>

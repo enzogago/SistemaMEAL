@@ -37,7 +37,7 @@ import FormBeneficiarie from './components/beneficiarie/FormBeneficiarie';
 import FormProfile from './components/profile/FormProfile';
 import UploadStatus from './components/maintenance/UploadStatus';
 import UploadCharge from './components/maintenance/UploadCharge';
-import UploadProject from './components/maintenance/UploadProject';
+import FormatProject from './components/upload/project/FormatProject';
 
 const App = () => {
     // Variables state AuthContext
@@ -63,7 +63,7 @@ const App = () => {
         "beneficiarie": Beneficiarie,
         "upload-status": UploadStatus,
         "upload-charge": UploadCharge,
-        "upload-project": UploadProject,
+        "upload-project": FormatProject,
     };
 
     return (

@@ -1,42 +1,38 @@
-import React from 'react'
-import { FaUser } from 'react-icons/fa'
-import { FaListCheck } from 'react-icons/fa6'
+import React from "react";
 
-const Bar = ({ isEditing, currentStep }) => {
+const Bar = ({ currentStep, type }) => {
+    const stepsByType = {
+        user: [
+            { title: 'Datos del Usuario', description: 'Ingresa los datos' },
+            { title: 'Acceso al Menú', description: 'Ingresa los datos' },
+            { title: 'Acceso a la Información', description: 'Ingresa los datos' },
+        ],
+        upload: [
+            { title: 'Formato de Archivo', description: 'Ingresa los datos' },
+            { title: 'Subir Archivo', description: 'Selecciona el archivo a subir' },
+            { title: 'Confirmación', description: 'Confirma la subida del archivo' },
+        ],
+        // Agrega aquí más tipos si los necesitas
+    };
+
+    const steps = stepsByType[type] || []; // Usa un array vacío como valor por defecto si el tipo no se encuentra
+
     return (
         <div className="PowerMas_Form_User_Bar flex ai-center gap-1 p_25 Phone_12 p1">
-            <div className={`p_25 `}>
-                <div className='flex jc-center ai-center gap-1'>
-                    <span className={`f1_25 ${currentStep >= 1 ? 'PowerMas_Form_User_Bar_Active' : ''}`}>1</span> 
-                    <article>
-                        <p className="flex ai-center gap_5 bold">{isEditing ? 'Editar': 'Nuevo'} Usuario</p>
-                        <p className='f_75' >Ingresa los datos</p>
-                    </article>
-                </div>
-                {/* <FaUser className="f1_5" /> */}
-            </div>
-            <hr className='PowerMas_Hr' />
-            <div className={`p_25 `}>
-                <div className='flex jc-center ai-center gap-1'>
-                    <span className={`f1_25 ${currentStep >= 2 ? 'PowerMas_Form_User_Bar_Active' : ''}`}>2</span> 
-                    <article>
-                        <p className="flex ai-center gap_5 bold">Acceso al Menú</p>
-                        <p className='f_75' >Ingresa los datos</p>
-                    </article>
-                </div>
-                {/* <FaUser className="f1_5" /> */}
-            </div>
-            <hr className='PowerMas_Hr' />
-            <div className={`p_25`}>
-                <div className='flex jc-center ai-center gap-1'>
-                    <span className={`f1_25 ${currentStep >= 3 ? 'PowerMas_Form_User_Bar_Active' : ''}`}>3</span> 
-                    <article>
-                        <p className="flex ai-center gap_5 bold">Acceso a la Información</p>
-                        <p className='f_75' >Ingresa los datos</p>
-                    </article>
-                </div>
-                {/* <FaListCheck className="f1_5" /> */}
-            </div>
+            {steps.map((step, index) => (
+                <React.Fragment key={index}>
+                    <div className={`p_25 `}>
+                        <div className='flex jc-center ai-center gap-1'>
+                            <span className={`f1_25 ${currentStep >= index + 1 ? 'PowerMas_Form_User_Bar_Active' : ''}`}>{index + 1}</span> 
+                            <article>
+                                <p className="flex ai-center gap_5 bold">{step.title}</p>
+                                <p className='f_75' >{step.description}</p>
+                            </article>
+                        </div>
+                    </div>
+                    {index < steps.length - 1 && <hr className='PowerMas_Hr' />}
+                </React.Fragment>
+            ))}
         </div>
     )
 }

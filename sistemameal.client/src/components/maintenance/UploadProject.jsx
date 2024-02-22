@@ -1,4 +1,4 @@
-import UploadTemplateTransaction from "./UploadTemplateTransaction";
+import UploadTransactionProyecto from "./UploadTransactionProyecto";
 
 const UploadProject = () => {
     const expectedHeaders = [
@@ -24,7 +24,7 @@ const UploadProject = () => {
     
     return (
         <>
-            <UploadTemplateTransaction
+            <UploadTransactionProyecto
                 expectedHeaders={expectedHeaders}
                 controller='Proyecto'
             />

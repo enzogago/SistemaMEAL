@@ -561,10 +561,54 @@ input::placeholder,select::placeholder{
 	background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>') no-repeat;
 	cursor: pointer;
 }
-.tooltip {
+.PowerMas_Tooltip_Info {
     max-width: 50%; /* Ajusta esto a la anchura que prefieras */
     word-wrap: break-word;
 	
+}
+
+.tooltip {
+    background-color: #fff;
+    box-shadow: 0 6px 8px rgba(52, 73, 94, .2), 0 1px 1px rgba(52, 73, 94, 0.1);
+    left: 0;
+    opacity: 0;
+    padding: 0.5em 1em;
+    pointer-events: none;
+    border-radius: 5px;
+    position: absolute;
+    text-align: center;
+    top: -12px;
+    transition: opacity 0.2s linear, transform 0.2s ease-in-out;
+    z-index: 1;
+}
+
+.tooltip:before {
+    background-color: #fff;
+    border-left-color: transparent;
+    border-top-color: transparent;
+    bottom: 0;
+    content: '';
+    height: 12px;
+    left: 50%;
+    position: absolute;
+    transform-origin: center center;
+    transform: translate(-50%, 50%) rotate(45deg);
+    width: 12px;
+    z-index: 1;
+}
+
+.tooltip-name {
+    margin-bottom: 0.2em;
+    font-size: 1rem;
+    line-height: 1.4;
+    font-weight: 700;
+}
+
+.tooltip-value {
+    margin-bottom: 0.2em;
+    font-size: 1rem;	
+    line-height: 1.4;
+    font-weight: 400;
 }
 
 .PowerMas_ResumeHome {
@@ -605,10 +649,7 @@ input::placeholder,select::placeholder{
 .PowerMas_TableHome tr:first-child th {
 	border-bottom: 1px solid black;
 }
-.PowerMas_Direct_Access{
-	margin-top: 1rem;
-	border-radius: 5px;
-}
+
 .PowerMas_AccessCards{
 	display:flex;
 	gap: 2rem;
@@ -650,10 +691,6 @@ input::placeholder,select::placeholder{
 }
 .PowerMas_AccessIndicator span:last-child {
 	text-align: right;
-}
-
-.PowerMas_RecentsSection{
-	gap: 2rem;
 }
 
 #donutContainer {
@@ -1440,12 +1477,9 @@ textarea {
 	display: flex;
 	flex-direction: column;
 }
-.PowerMas_Form_User_Card{
+.PowerMas_Home_Card{
 	border: 1px solid #372e2c60;
 	border-radius: 5px;
-	padding: 0.75rem;
-	display: flex;
-	flex-direction: column;
 }
 .PowerMas_Hr{
 	height: 1px;
@@ -1463,7 +1497,6 @@ textarea {
 	display: flex;
 	gap: 1rem;
 }
-
 
 /* END CREAR/MODIFICAR USUARIO */
 
@@ -1608,7 +1641,6 @@ textarea {
 	overflow: hidden;
 }
 .PowerMas_Header_Form_Beneficiarie{
-	border-bottom: 1px solid #372e2c3d;
 }
 .PowerMas_Content_Form_Beneficiarie_Card{
 	border: 1px solid #372e2c3d;

@@ -246,11 +246,11 @@ const FormUser = () => {
             }
         })();
     }
-    
+
     return (
         <>
             <div className="PowerMas_Header_Form_Beneficiarie flex ai-center">
-                <Bar isEditing={isEditing} currentStep={1} />
+                <Bar currentStep={1} type='user' />
             </div>
             <div className="flex flex-grow-1 overflow-auto p1_25 gap-1">
                 <div className="Large_6">
