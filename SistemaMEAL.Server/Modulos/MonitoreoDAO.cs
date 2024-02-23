@@ -256,6 +256,7 @@ namespace SistemaMEAL.Modulos
                 benCodOut = pBenCod.Value.ToString();
                 mensaje = pDescripcionMensaje.Value.ToString();
                 tipoMensaje = pTipoMensaje.Value.ToString();
+                Console.WriteLine(mensaje);
             }
             catch (SqlException ex)
             {
@@ -380,6 +381,7 @@ namespace SistemaMEAL.Modulos
                         var resultBeneficiario = InsertarBeneficiario(beneficiario);
                         if (resultBeneficiario.messageType != "3")
                         {
+                            Console.WriteLine(resultBeneficiario.message);
                             throw new Exception(resultBeneficiario.message);
                         }
 
@@ -391,6 +393,7 @@ namespace SistemaMEAL.Modulos
                         var resultMetaBeneficiario = InsertarMetaBeneficiario(metaBeneficiario);
                         if (resultMetaBeneficiario.messageType != "3")
                         {
+                            Console.WriteLine(resultMetaBeneficiario.message);
                             throw new Exception(resultMetaBeneficiario.message);
                         }
 
@@ -405,6 +408,7 @@ namespace SistemaMEAL.Modulos
                             var resultDocumentoBeneficiario = InsertarDocumentoBeneficiario(documento);
                             if (resultDocumentoBeneficiario.messageType != "3")
                             {
+                                Console.WriteLine(resultDocumentoBeneficiario.message);
                                 throw new Exception(resultDocumentoBeneficiario.message);
                             }
                         }
@@ -634,6 +638,7 @@ namespace SistemaMEAL.Modulos
 
                 mensaje = pDescripcionMensaje.Value.ToString();
                 tipoMensaje = pTipoMensaje.Value.ToString();
+                Console.WriteLine(mensaje);
             }
             catch (SqlException ex)
             {

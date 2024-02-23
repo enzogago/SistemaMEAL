@@ -137,6 +137,7 @@ const FormBeneficiarie = () => {
     
     const handleNext = () => {
         validateForm((data) => {
+            console.log(data)
             const { docIdeCod, docIdeBenNum } = data;
             const benCodUni = data.docIdeBenNum;
             let payload = {
@@ -156,7 +157,7 @@ const FormBeneficiarie = () => {
     }
 
     const handleSubmit = async (isEditing ,data) => {
-        console.log(isEditing);
+        console.log(data);
         try {
             Notiflix.Loading.pulse('Cargando...');
             const token = localStorage.getItem('token');

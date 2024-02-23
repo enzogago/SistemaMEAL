@@ -2,6 +2,8 @@ using Microsoft.Data.SqlClient;
 using System.Data;
 using SistemaMEAL.Server.Models;
 using SistemaMEAL.Server.Modulos;
+using System.Text;
+using Newtonsoft.Json;
 
 namespace SistemaMEAL.Modulos
 {
@@ -9,42 +11,62 @@ namespace SistemaMEAL.Modulos
     {
         private conexionDAO cn = new conexionDAO();
 
-        public IEnumerable<DocumentoIdentidad> Listado()
+        public IEnumerable<DocumentoIdentidad> Listado(string? docIdeCod = null, string? docIdeNom = null, string? docIdeAbr = null)
         {
-            List<DocumentoIdentidad> temporal = new List<DocumentoIdentidad>();
+            List<DocumentoIdentidad>? temporal = new List<DocumentoIdentidad>();
             try
             {
                 cn.getcn.Open();
 
-                SqlCommand cmd = new SqlCommand("SP_LISTAR_DOCUMENTOS_IDENTIDAD", cn.getcn);
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_DOCUMENTO_IDENTIDAD", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                SqlDataReader rd = cmd.ExecuteReader();
-                while (rd.Read())
+
+                cmd.Parameters.AddWithValue("@P_DOCIDECOD", string.IsNullOrEmpty(docIdeCod) ? (object)DBNull.Value : docIdeCod);
+                cmd.Parameters.AddWithValue("@P_DOCIDENOM", string.IsNullOrEmpty(docIdeNom) ? (object)DBNull.Value : docIdeNom);
+                cmd.Parameters.AddWithValue("@P_DOCIDEABR", string.IsNullOrEmpty(docIdeAbr) ? (object)DBNull.Value : docIdeAbr);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
+                cmd.Parameters.AddWithValue("@P_USUANO_U", "2024");
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", "0001");
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", "Juan");
+                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "Perez");
+                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "Gomez");
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+                Console.WriteLine("desde jsonResult:"+jsonResult);
+                if (!reader.HasRows)
                 {
-                    temporal.Add(new DocumentoIdentidad()
-                    {
-                        DocIdeCod = rd.GetString(0),
-                        DocIdeNom = rd.GetString(1),
-                        DocIdeAbr = rd.GetString(2),
-                        UsuIng = rd.GetString(3),
-                        FecIng = rd.IsDBNull(4) ? (DateTime?)null : rd.GetDateTime(4),
-                        UsuMod = rd.GetString(5),
-                        FecMod = rd.IsDBNull(6) ? (DateTime?)null : rd.GetDateTime(6),
-                        EstReg = rd.GetString(7)[0],
-                    });
+                    jsonResult.Append("[]");
                 }
-                rd.Close();
+                else
+                {
+                    while (reader.Read())
+                    {
+                        Console.WriteLine("desde reader:"+reader.GetValue(0).ToString());
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                Console.WriteLine("desde jsonResult final:"+jsonResult);
+                // Deserializa la cadena JSON en una lista de objetos Estado
+                temporal = JsonConvert.DeserializeObject<List<DocumentoIdentidad>>(jsonResult.ToString());
             }
             catch (SqlException ex)
             {
-                temporal = new List<DocumentoIdentidad>();
                 Console.WriteLine(ex.Message);
             }
             finally
             {
                 cn.getcn.Close();
             }
-            return temporal;
+            return temporal?? new List<DocumentoIdentidad>();
         }
 
         public (string message, string messageType) Insertar(DocumentoIdentidad documento)

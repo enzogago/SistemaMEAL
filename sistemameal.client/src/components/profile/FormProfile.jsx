@@ -186,7 +186,7 @@ const FormProfile = () => {
                     <div className="">
                         <h2>Datos Personales </h2>
                         <br />
-                        <div className="PowerMas_Form_User_Card flex flex-wrap p1">
+                        <div className="PowerMas_Form_Card flex flex-wrap p1">
                             <div className="Large_12 flex flex-column p1">
                                 <label htmlFor="docIdeCod">Documento Identidad</label>
                                 <select 
@@ -317,7 +317,7 @@ const FormProfile = () => {
                     <div className="">
                         <h2>Datos Profesionales </h2>
                         <br />
-                        <div className="PowerMas_Form_User_Card p1 flex flex-wrap">
+                        <div className="PowerMas_Form_Card p1 flex flex-wrap">
                             <div className="Large_12 flex flex-column p1">
                                 <label htmlFor="usuCorEle">Email</label>
                                 <input 

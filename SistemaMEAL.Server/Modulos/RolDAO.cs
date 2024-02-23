@@ -11,7 +11,7 @@ namespace SistemaMEAL.Modulos
     {
         private conexionDAO cn = new conexionDAO();
 
-        public IEnumerable<Rol> Listado(string? rolCod = null, string? rolNom = null, string? rolPer = null)
+        public IEnumerable<Rol> Listado(string? rolCod = null, string? rolNom = null)
         {
             List<Rol>? temporal = new List<Rol>();
             try
@@ -23,7 +23,6 @@ namespace SistemaMEAL.Modulos
 
                 cmd.Parameters.AddWithValue("@P_ROLCOD", string.IsNullOrEmpty(rolCod) ? (object)DBNull.Value : rolCod);
                 cmd.Parameters.AddWithValue("@P_ROLNOM", string.IsNullOrEmpty(rolNom) ? (object)DBNull.Value : rolNom);
-                cmd.Parameters.AddWithValue("@P_ROLPER", string.IsNullOrEmpty(rolPer) ? (object)DBNull.Value : rolPer);
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2024");
                 cmd.Parameters.AddWithValue("@P_USUCOD_U", "0001");

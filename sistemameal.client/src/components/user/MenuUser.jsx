@@ -368,14 +368,14 @@ const MenuUser = () => {
         </div>
         <div className="flex-grow-1 p1_25 overflow-auto">
             <div className="flex gap-1">
-              <div className="PowerMas_ListMenus PowerMas_Form_User_Card Large_6 p1">
+              <div className="PowerMas_ListMenus PowerMas_Form_Card Large_6 p1">
                 <h3 className="f1_25">Listado de Menus:</h3>
                 <br />
                 <ul className="overflow-auto">
                   {menus.map(menu => renderMenu(menu, 1))}
                 </ul>
               </div>
-              <div className="PowerMas_Info_User Large_6 PowerMas_Form_User_Card p1" style={{backgroundColor: '#f7f7f7'}}>
+              <div className="PowerMas_Info_User Large_6 PowerMas_Form_Card p1" style={{backgroundColor: '#f7f7f7'}}>
                 <div className="flex flex-column jc-center ai-center gap_5">
                   <div className="PowerMas_ProfilePicture2" style={{width: 125, height: 125}}>
                     <img src={user && (user.usuSex === 'M' ? masculino : femenino)} alt="Descripción de la imagen" />

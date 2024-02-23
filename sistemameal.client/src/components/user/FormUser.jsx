@@ -254,9 +254,9 @@ const FormUser = () => {
             </div>
             <div className="flex flex-grow-1 overflow-auto p1_25 gap-1">
                 <div className="Large_6">
-                    <div className="PowerMas_Form_User_Card flex flex flex-wrap p1">
+                    <div className="PowerMas_Form_Card flex flex flex-wrap p1">
                         <h2 className="f1_25">Datos Personales </h2>
-                        <br /><br />
+                        <br />
                         <div className="Large_12 flex flex-column">
                             <label htmlFor="docIdeCod">Documento Identidad</label>
                             <select 
@@ -478,11 +478,9 @@ const FormUser = () => {
                     </div>
                 </div>
                 <div className="Large_6">
-                    <div className="PowerMas_Form_User_Card p1 flex flex-wrap">
+                    <div className="PowerMas_Form_Card p1 flex flex-wrap">
                         <h2 className="f1_25">Datos Profesionales </h2>
-                        <br /><br />
-                        
-                        
+                        <br />
                         <div className="Large_12 flex flex-column">
                             <label htmlFor="rolCod">Rol</label>
                             <select 

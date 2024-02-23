@@ -12,6 +12,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 // Servicios para los Modulos DAO
+builder.Services.AddScoped<LogDAO>();
 builder.Services.AddScoped<NacionalidadDAO>();
 builder.Services.AddScoped<UnidadDAO>();
 builder.Services.AddScoped<GeneroDAO>();

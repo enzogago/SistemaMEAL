@@ -10,7 +10,11 @@ import Peru from '../maps/Peru';
 import Colombia from '../maps/Colombia';
 import PieChart from '../reusable/graphics/PieChart';
 import DivergingBarChart from '../reusable/graphics/DivergingBarChart';
-
+import HorizontalBarChart from '../reusable/graphics/HorizontalBarChart';
+import masculino from '../../img/PowerMas_Avatar_Masculino.svg';
+import femenino from '../../img/PowerMas_Avatar_Femenino.svg';
+import { fetchData } from '../reusable/helper';
+import { Tooltip } from 'react-tooltip';
 
 
 const Home = () => {
@@ -23,7 +27,7 @@ const Home = () => {
     const [totalAtenciones, setTotalAtenciones] = useState(0);
     const [avanceTecnico, setAvanceTecnico] = useState(0);
     const [currentMap, setCurrentMap] = useState('Todos');
-
+    const [ recents, setRecents ] = useState([]);
     
 
     // EFECTO AL CARGAR COMPONENTE GET - LISTAR ESTADOS
@@ -90,6 +94,8 @@ const Home = () => {
                 Notiflix.Loading.remove();
             }
         };
+
+        fetchData('Log',setRecents);
     
         fetchMonitoreo();
         fetchBeneficiariosCount();
@@ -160,6 +166,7 @@ const Home = () => {
         { age: 40, count: 60 },
         { age: 58, count: 30 },
         { age: 68, count: 50 },
+        { age: 69, count: 80 },
         // ...
     ];
 
@@ -186,11 +193,25 @@ const Home = () => {
     const groupedMaleData = groupDataByAgeRange(maleData);
     const groupedFemaleData = groupDataByAgeRange(femaleData);
 
-    
+    const dataNac = [
+        { name: 'Peruana', value: 100 },
+        { name: 'Colombiana', value: 200 },
+        { name: 'Ecuatoriana', value: 80 },
+        { name: 'Argentina', value: 310 },
+        { name: 'Chilena', value: 20 },
+    ];
+    const dataTipDoc = [
+        { name: 'DNI', value: 100 },
+        { name: 'CE', value: 200 },
+        { name: 'CC', value: 80 },
+        { name: 'PDN', value: 310 },
+        { name: 'PAS', value: 20 },
+    ];
+      
 
     return(
     <>
-        <div className="PowerMas_Search_Container_Home" style={{paddingBottom: '1rem'}}>
+        <div className="PowerMas_Search_Container_Home " style={{paddingBottom: '1rem'}}>
             <div className="PowerMas_Input_Filter_Container flex">
                 <div className="flex ai-center">
                     {searchTags.map(tag => (
@@ -203,7 +224,7 @@ const Home = () => {
                 <div className="Phone_12 relative">
                     <FaSearch className="search-icon" />
                     <input 
-                        className='PowerMas_Input_Filter Large_12 Large-p_5'
+                        className='PowerMas_Input_Filter Phone_12 Large-p_5'
                         type="search"
                         placeholder='Buscar'
                         onChange={handleInputChange}
@@ -214,40 +235,46 @@ const Home = () => {
             </div>
         </div>
 
-        <div className="PowerMas_ResumeHome m1 flex flex-space-between Small-flex-column Medium-flex-row">
-            <div className="PowerMas_LeftSection Large_8 Phone_12 bg-white">
+        <div className="PowerMas_ResumeHome m1 flex Small-flex-column Medium-flex-column Large-flex-row">
+            <div className="PowerMas_LeftSection Large_8 Medium_12 Phone_12 bg-white">
                 {monitoringData ? <Table data={monitoringData} /> : <p>Cargando datos...</p>}
             </div>
-            <div className="PowerMas_RightSection Large_4 Phone_12 bg-white">
+            <div className="PowerMas_RightSection flex flex-column Large_4 Medium_12 Phone_12 bg-white p1 gap_5">
                 <h2 className="Large-m_75 Large-f1_5 Powermas_FontTitle">Principales KPI</h2>
-                <div className="PowerMas_KPIRow flex-column Large-m_75 Large-f1_25">
+                <div className="PowerMas_KPIRow flex-column Large-f1_25">
                     <span className="bold Powermas_FontTitle">Avance Técnico</span>
                     <DonutChart percentage={avanceTecnico} wh={150} rad={20} />
                 </div>
-                <div className="PowerMas_KPIRow Large-m_75 Large-f1_25 Large-p1">
+                <div className="PowerMas_KPIRow Large-f1_25 Large-p1 Medium-p_5">
                     <span className="bold Powermas_FontTitle">Atenciones</span>
                     <span>{totalAtenciones.toLocaleString()}</span>
                 </div>
-                <div className="PowerMas_KPIRow Large-m_75 Large-f1_25 Large-p1">
+                <div className="PowerMas_KPIRow Large-f1_25 Large-p1 Medium-p_5">
                     <span className="bold Powermas_FontTitle">Beneficiarios</span>
                     <span>{totalBeneficiarios.toLocaleString()}</span>
                 </div>
             </div>
         </div>
-        <div className='flex flex-column m1 gap-1'>
-            <div className="flex gap-1">
-                <div className='PowerMas_Home_Card Large-p1 Large_6 Medium_6'>
+        <div className='flex flex-column m1 gap-1 center'>
+            <div className="flex Large-flex-row Medium-flex-row Small-flex-column gap-1">
+                <div className='PowerMas_Home_Card p1 Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
                     <h4>Beneficiarios por Nacionalidad</h4>
+                    <div className='Large_12 Medium_12 Phone_12 Large-p1 Medium-p_75 flex-grow-1'>
+                        <HorizontalBarChart data={dataNac} id='NacionalidadBarChart' barColor='#61A2AA' />
+                    </div>
                 </div>
-                <div className='PowerMas_Home_Card Large-p1 Large_6 Medium_6'>
+                <div className='PowerMas_Home_Card p1 Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
                     <h4>Beneficiarios por Tipo de documento</h4>
+                    <div className='Large_12 Medium_12 Phone_12 Large-p1 Medium-p_75 flex-grow-1'>
+                        <HorizontalBarChart data={dataTipDoc} id='TipoDocBarChart' barColor='#61A2AA' />
+                    </div>
                 </div>
                 
             </div>
-            <div className="flex gap-1">
-                <div className='PowerMas_Home_Card p1 Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
+            <div className="flex Large-flex-row Medium-flex-row Small-flex-column gap-1">
+                <div className='PowerMas_Home_Card Large-p1 Medium-p_75 Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
                     <h4>Beneficiarios por Edad</h4>
-                    <div className='Large_12 Medium_12 Phone_12 Large-p1 Small-p_75 flex-grow-1'>
+                    <div className='Large_12 Medium_12 Phone_12 Large-p1 Medium-p_75 flex-grow-1'>
                         <DivergingBarChart maleData={groupedMaleData} femaleData={groupedFemaleData} maleColor={maleColor} femaleColor={femaleColor} ageRanges={ageRanges} id='Diverging' />
                     </div>
                     <div className='flex flex-wrap gap-1'>
@@ -264,7 +291,7 @@ const Home = () => {
                 </div>
                 <div className='PowerMas_Home_Card p1 Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
                     <h4>Beneficiarios por Sexo</h4>
-                    <div className='Large_5 Medium_12 Phone_12 Large-p1 Small-p_75 flex-grow-1'>
+                    <div className='Large_6 Medium_12 Phone_12 Large-p1 Small-p_75 flex-grow-1'>
                         <PieChart data={data} id='MaleFemale' />
                     </div>
                     <div className='flex flex-wrap gap-1'>
@@ -279,67 +306,68 @@ const Home = () => {
             </div>
         </div>
         
-        <div className="PowerMas_RecentsSection flex Medium-flex-row Small-flex-column m1 gap-1">
-            <div className="PowerMas_Home_Card PowerMas_ActivitiesSection Large_6 Medium_5 Phone_12 Large-p2">
-                <h2 className="Large-f1_5 Powermas_FontTitle">Actividades recientes</h2>
-                <div className="PowerMas_Article flex Large-f_75 ai-center left">
-                    <div className='PowerMas_Icon Large_2 Large-f1_5'>
-                        <div>
-                            <FaReceipt className='Large-f1_25' />
+        <div className="PowerMas_RecentsSection flex Large-flex-row Medium-flex-column Small-flex-column m1 gap-1">
+            <div className="PowerMas_Home_Card flex flex-column Large_6 Medium_12 Phone_12 p1 gap-1">
+                <h4 className="Large-f1_25 center p_25">Actividades recientes</h4>
+                {recents.map((item, index) => {
+                    // Crea un objeto Date a partir de la cadena de fecha y hora
+                    const date = new Date(item.logFecIng);
+
+                    // Formatea la fecha y la hora
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const month = String(date.getMonth() + 1).padStart(2, '0'); // Los meses en JavaScript van de 0 a 11, así que añadimos 1
+                    const year = date.getFullYear();
+                    const formattedDate = `${day}/${month}/${year}`;
+
+                    const hours = String(date.getHours()).padStart(2, '0');
+                    const minutes = String(date.getMinutes()).padStart(2, '0');
+                    const formattedTime = `${hours}:${minutes}`;
+
+                    let text = item.logDes;
+                    let shortText = text.length > 60 ? text.substring(0, 60) + '...' : text;
+
+                    return (
+                        <div className="flex ai-center gap-1" key={index}>
+                            <div className="PowerMas_ProfilePicture2 m_25" style={{width: '40px', height: '40px', border: '1px solid #000000'}}>
+                                <img src={masculino} alt="Descripción de la imagen" />
+                            </div>
+                            <div className="flex flex-column flex-grow-1">
+                                <span className='bold' style={{textTransform: 'capitalize'}}>{item.usuNom.toLowerCase() + ' ' + item.usuApePat.toLowerCase() + ' ' + item.usuApeMat.toLowerCase()}</span>
+                                <span 
+                                    data-tooltip-id="info-tooltip" 
+                                    data-tooltip-content={text} 
+                                    className='f_75' 
+                                    style={{textTransform: 'capitalize'}}
+                                >
+                                    {shortText.toLowerCase()}
+                                </span>
+                            </div>
+                            <div className="flex flex-column center f_75">
+                                <span>{formattedDate}</span>
+                                <span>{formattedTime}</span>
+                            </div>
                         </div>
-                    </div>
-                    <div className="PowerMas_Info Large_8 Large-m1">Omar Chuman registró 55
-                        beneficiarios al indice...
-                    </div>
-                    <div className="PowerMas_DateTime Large_2">
-                        <span>04/12/2023</span>
-                        <span>14:12</span>
-                    </div>
-                </div>
-                <hr className='PowerMas_Hr p0 m0' />
-                <div className="PowerMas_Article flex Large-f_75 ai-center left">
-                    <div className='PowerMas_Icon Large_2 Large-f1_5'>
-                        <div>
-                            <FaReceipt className='Large-f1_25' />
-                        </div>
-                    </div>
-                    <div className="PowerMas_Info Large_8 Large-m1">
-                        Omar Chuman registró 55
-                        beneficiarios al indice...
-                    </div>
-                    <div className="PowerMas_DateTime Large_2">
-                        <span>04/12/2023</span>
-                        <span>14:12</span>
-                    </div>
-                </div>
-                <hr className='PowerMas_Hr p0 m0' />
-                <div className="PowerMas_Article flex Large-f_75 ai-center left">
-                    <div className='PowerMas_Icon Large_2 Large-f1_5'>
-                        <div>
-                            <FaReceipt className='Large-f1_25' />
-                        </div>
-                    </div>
-                    <div className="PowerMas_Info Large_8 Large-m1">
-                        Omar Chuman registró 55 beneficiarios al indice...
-                    </div>
-                    <div className="PowerMas_DateTime Large_2">
-                        <span>04/12/2023</span>
-                        <span>14:12</span>
-                    </div>
-                </div>
+                    );
+                })}
+                <Tooltip 
+                    id="info-tooltip"
+                    effect="solid"
+                    place='bottom-start'
+                    className="PowerMas_Tooltip_Info"
+                />
             </div>
-            <div className="PowerMas_Home_Card PowerMas_BeneficiarySection Large_6 Medium_7 Phone_12 flex">
-                <div className='flex flex-grow-1'>
-                    <article className='Phone_5 flex-grow-1'>
-                        <h2 className="Large-m1 Large-f1_5 Powermas_FontTitle">Beneficiarios por</h2>
-                        <div className='flex flex-column p1 gap_5'>
+            <div className='PowerMas_Home_Card Large-p1 Medium-p_75 Large_6 Medium_6 Phone_12 flex flex-column ai-center todos'>
+                <h4>Beneficiarios por Ubicación</h4>
+                <div className='flex flex-grow-1 Large_12'>
+                    <article className='flex ai-center flex-grow-1'>
+                        <div className='flex flex-column p1 gap_5 Large_12'>
                             <button className='PowerMas_Buttom_Primary' onClick={() => setCurrentMap('Todos')}>Todos</button>
                             <button className='PowerMas_Buttom_Primary' onClick={() => setCurrentMap('Perú')}>Perú</button>
                             <button className='PowerMas_Buttom_Primary' onClick={() => setCurrentMap('Ecuador')}>Ecuador</button>
                             <button className='PowerMas_Buttom_Primary' onClick={() => setCurrentMap('Colombia')}>Colombia</button>
                         </div>
                     </article>
-                    <div className='Phone_7 flex-grow-1'>
+                    <div className='Large_6 Medium_12 Phone_12 flex-grow-1'>
                         <MapComponent />
                     </div>
                 </div>

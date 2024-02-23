@@ -2,12 +2,12 @@ import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
 const DivergingBarChart = ({ maleData, femaleData, id, ageRanges, maleColor, femaleColor }) => {
-    const ageRangeLabels = ageRanges.map(range => `${range.min}-${range.max}`);
+    const ageRangeLabels = ageRanges.map(range => range.min != 65 ? `${range.min} - ${range.max}` : `65+`);
 
     const ref = useRef();
 
     useEffect(() => {
-        const margin = { top: 20, right: 30, bottom: 20, left: 120 };
+        const margin = { top: 20, right: 10, bottom: 20, left: 60 };
         const width = ref.current.clientWidth - (margin.left + margin.right)*2;
         const height = Math.max(maleData.length, femaleData.length) * 40;
 
@@ -53,7 +53,7 @@ const DivergingBarChart = ({ maleData, femaleData, id, ageRanges, maleColor, fem
             .attr("width", d => x(d.count))
             .attr("height", y.bandwidth());
             
-            barsGroup.append("g")
+        barsGroup.append("g")
             .selectAll("rect")
             .data(femaleData)
             .join("rect")
@@ -78,14 +78,14 @@ const DivergingBarChart = ({ maleData, femaleData, id, ageRanges, maleColor, fem
             .selectAll("text")
             .data(femaleData)
             .join("text")
-            .attr("x", d => width / 2 + x(d.count) + margin.right*2 + 5)
+            .attr("x", d => width / 2 + x(d.count) + margin.left/2 + 5)
             .attr("y", (d, i) => y(i) + y.bandwidth() / 2) // Usa el índice en lugar de d.age
             .attr("dy", "0.35em")
             .text(d => d.count);
             
     }, [maleData, femaleData]);
 
-    return <div id={id} ref={ref} style={{position: 'relative'}}></div>;
+    return <div id={id} ref={ref}></div>;
 };
 
 export default DivergingBarChart;

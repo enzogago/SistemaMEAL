@@ -300,7 +300,7 @@ const PermissionUser = () => {
             </div>
             <div className="flex-grow-1 overflow-auto p1_25">
                 <div className="flex gap-1">
-                    <div className="PowerMas_ListPermission PowerMas_Form_User_Card p1 Large_6">
+                    <div className="PowerMas_ListPermission PowerMas_Form_Card p1 Large_6">
                         <ul>
                             {proyectos.map(proyecto => (
                                 <ProjectItem 
@@ -313,7 +313,7 @@ const PermissionUser = () => {
                             ))}
                         </ul>
                     </div>
-                    <div className="PowerMas_Info_User Large_6 PowerMas_Form_User_Card p1" style={{backgroundColor: '#f7f7f7'}}>
+                    <div className="PowerMas_Info_User Large_6 PowerMas_Form_Card p1" style={{backgroundColor: '#f7f7f7'}}>
                         <div className="flex flex-column jc-center ai-center gap_5">
                         <div className="PowerMas_ProfilePicture2" style={{width: 125, height: 125}}>
                             <img src={user && user.usuSex === 'M' ? masculino : femenino} alt="Descripción de la imagen" />

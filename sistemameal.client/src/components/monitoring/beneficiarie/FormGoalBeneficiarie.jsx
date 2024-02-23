@@ -156,7 +156,6 @@ const FormGoalBeneficiarie = () => {
     };
 
     const onSubmit = async(data) => {
-        console.log(data)
         if (accionActual === 'buscar') {
             buscarBeneficiarioDocumento(data)
         } else if (accionActual === 'agregar') {
@@ -197,25 +196,26 @@ const FormGoalBeneficiarie = () => {
     // Observa los cambios en el campo 'benFecNac'
     const fechaNacimiento = watch('benFecNac');
 
+    // Efecto para la concatenación automatica en la separacion de día mes y año
     useEffect(() => {
         if (fechaNacimiento) {
             // Remueve cualquier guión existente
             let cleanFecha = fechaNacimiento.replace(/-/g, '');
             
             // Inserta los guiones después del año y el mes
-            if (cleanFecha.length >= 4) {
-                cleanFecha = cleanFecha.slice(0, 4) + '-' + cleanFecha.slice(4);
+            if (cleanFecha.length >= 2) {
+                cleanFecha = cleanFecha.slice(0, 2) + '-' + cleanFecha.slice(2);
             }
-            if (cleanFecha.length >= 7) {
-                cleanFecha = cleanFecha.slice(0, 7) + '-' + cleanFecha.slice(7);
+            if (cleanFecha.length >= 5) {
+                cleanFecha = cleanFecha.slice(0, 5) + '-' + cleanFecha.slice(5);
             }
             
             // Si el usuario borra los dígitos de la fecha, también borra los guiones
-            if (cleanFecha.length <= 5) {
-                cleanFecha = cleanFecha.slice(0, 4);
+            if (cleanFecha.length <= 3) {
+                cleanFecha = cleanFecha.slice(0, 2);
             }
-            if (cleanFecha.length <= 8) {
-                cleanFecha = cleanFecha.slice(0, 7);
+            if (cleanFecha.length <= 6) {
+                cleanFecha = cleanFecha.slice(0, 5);
             }
             
             // Actualiza el valor del campo con los guiones insertados
@@ -472,7 +472,7 @@ const FormGoalBeneficiarie = () => {
     
                 // Usa el benNumDoc del documento encontrado como benCodUni
                 const benCodUni = documentoCodUni.docIdeBenNum;
-    
+
                 let beneficiarioMonitoreo = {
                     Beneficiario: { ...data, benCodUni },
                     MetaBeneficiario: {
@@ -483,6 +483,7 @@ const FormGoalBeneficiarie = () => {
                     },
                     DocumentoBeneficiario: documentosAgregados
                 }
+                console.log(beneficiarioMonitoreo)
                 handleSubmitMetaBeneficiario(beneficiarioMonitoreo);
             } else{
                 const { benAno, benCod } = data;
@@ -494,6 +495,7 @@ const FormGoalBeneficiarie = () => {
                     ubiAno,
                     ubiCod,
                 }
+                console.log(MetaBeneficiario)
                 handleSubmitMetaBeneficiarioExiste(MetaBeneficiario);
             }
         })();
@@ -820,14 +822,14 @@ const FormGoalBeneficiarie = () => {
                                 )}
                             </div>
                             <div className="m_75">
-                                <label htmlFor="benFecNac" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
+                                <label htmlFor="benFecNac" className="">
                                     Fecha de nacimiento:
                                 </label>
                                 <input 
                                     type="text" 
                                     id="benFecNac"
-                                    className={`PowerMas_Modal_Form_Calendar_${fieldsDisabled ? 'Disabled': 'Enable'} block Phone_12 PowerMas_Modal_Form_${dirtyFields.benFecNac || isSubmitted ? (errors.benFecNac ? 'invalid' : 'valid') : ''}`} 
-                                    placeholder="2003-03-17"
+                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benFecNac || isSubmitted ? (errors.benFecNac ? 'invalid' : 'valid') : ''}`} 
+                                    placeholder="Ejm: 17-03-2003 (DD-MM-YYYY)"
                                     autoComplete="disabled"
                                     maxLength={10}
                                     disabled={fieldsDisabled}
@@ -839,8 +841,8 @@ const FormGoalBeneficiarie = () => {
                                     {...register('benFecNac', { 
                                         required: 'La Fecha de nacimiento es requerido',
                                         pattern: {
-                                            value: /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/,
-                                            message: 'Ingrese una fecha valida y en formato YYYY-MM-DD',
+                                            value: /^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[012])-\d{4}$/,
+                                            message: 'La fecha debe estar en el formato DD-MM-YYYY',
                                         },
                                     })} 
                                 />

@@ -2,6 +2,8 @@ using Microsoft.Data.SqlClient;
 using System.Data;
 using SistemaMEAL.Server.Models;
 using SistemaMEAL.Server.Modulos;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace SistemaMEAL.Modulos
 {
@@ -62,37 +64,62 @@ namespace SistemaMEAL.Modulos
             }
         }
 
-        public IEnumerable<Permiso> Listado()
+        public IEnumerable<Permiso> Listado(string? perCod = null, string? perNom = null, string? perRef = null)
         {
-            List<Permiso> temporal = new List<Permiso>();
+            List<Permiso>? temporal = new List<Permiso>();
             try
             {
                 cn.getcn.Open();
 
-                SqlCommand cmd = new SqlCommand("SP_LISTAR_PERMISOS", cn.getcn);
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_PERMISO", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                SqlDataReader rd = cmd.ExecuteReader();
-                while (rd.Read())
+
+                cmd.Parameters.AddWithValue("@P_PERCOD", string.IsNullOrEmpty(perCod) ? (object)DBNull.Value : perCod);
+                cmd.Parameters.AddWithValue("@P_PERNOM", string.IsNullOrEmpty(perNom) ? (object)DBNull.Value : perNom);
+                cmd.Parameters.AddWithValue("@P_PERREF", string.IsNullOrEmpty(perRef) ? (object)DBNull.Value : perRef);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
+                cmd.Parameters.AddWithValue("@P_USUANO_U", "2024");
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", "0001");
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", "Juan");
+                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "Perez");
+                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "Gomez");
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+                Console.WriteLine("desde jsonResult:"+jsonResult);
+                if (!reader.HasRows)
                 {
-                    temporal.Add(new Permiso()
-                    {
-                        PerCod = rd.GetString(0),
-                        PerNom = rd.GetString(1),
-                        PerRef = rd.IsDBNull(2) ? null : rd.GetString(2),
-                    });
+                    jsonResult.Append("[]");
                 }
-                rd.Close();
+                else
+                {
+                    while (reader.Read())
+                    {
+                        Console.WriteLine("desde reader:"+reader.GetValue(0).ToString());
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                Console.WriteLine("desde jsonResult final:"+jsonResult);
+                // Deserializa la cadena JSON en una lista de objetos Estado
+                temporal = JsonConvert.DeserializeObject<List<Permiso>>(jsonResult.ToString());
             }
             catch (SqlException ex)
             {
-                temporal = new List<Permiso>();
                 Console.WriteLine(ex.Message);
             }
             finally
             {
                 cn.getcn.Close();
             }
-            return temporal;
+            return temporal?? new List<Permiso>();
         }
 
         public (string? message, string? messageType) Insertar(Permiso permiso)

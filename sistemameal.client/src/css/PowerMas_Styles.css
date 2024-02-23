@@ -632,7 +632,6 @@ input::placeholder,select::placeholder{
 	border-radius: 5px;
 	background-color: #f7f7f7;
 	border: 1px solid #cfcfcf;
-	border-radius: 5px;
 }
 
 .PowerMas_TableHome {
@@ -721,10 +720,7 @@ input::placeholder,select::placeholder{
 	justify-content: center;
 	align-items: center;
 }
-.PowerMas_DateTime{
-	display: flex;
-	flex-direction: column;
-}
+
 
 /*	
 	VISTA NewProject.cshtml
@@ -1485,8 +1481,8 @@ textarea {
 	height: 1px;
 	border: 1px solid #1111113a;
 }
-.PowerMas_Form_User_Card input,
-.PowerMas_Form_User_Card select{
+.PowerMas_Form_Card input,
+.PowerMas_Form_Card select{
 	background-color: transparent;
 	outline: none;
 	border: 1px solid #372e2c52;
