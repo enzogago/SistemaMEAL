@@ -34,15 +34,8 @@ const Table = ({ data }) => {
     // States locales
     const [searchTags, setSearchTags] = useState([]);
     const [dropdownOpen, setDropdownOpen] = useState(false);
-    const searchInputRef = useRef('');
     const [isInputEmpty, setIsInputEmpty] = useState(true);
     const [inputValue, setInputValue] = useState('');
-
-
-    // Dropdown botones Export
-    const toggleDropdown = () => {
-        setDropdownOpen(!dropdownOpen);
-    }
 
     // Añade una nueva etiqueta al presionar Enter
     const handleKeyDown = (e) => {
@@ -383,10 +376,6 @@ const Table = ({ data }) => {
         Export_PDF_Helper(dataExport, headers, title, properties, format);
     };
 
-    const tableRef = useRef();  // Referencia al elemento de la tabla
-
-    
-    
     return (
         <>
             <CustomTable 
@@ -397,7 +386,7 @@ const Table = ({ data }) => {
                 Export_Excel={Export_Excel} 
                 Export_PDF={Export_PDF} 
                 table={table}
-                navigatePath='form-user'
+                navigatePath='form-goal'
                 scrolled={true}
                 resize={false}
                 handleInputChange={handleInputChange}

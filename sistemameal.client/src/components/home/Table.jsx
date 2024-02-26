@@ -52,7 +52,7 @@ const Table = ({ data }) => {
                 },
             },
             {
-                header: "Ejecucion",
+                header: "Ejecución",
                 accessorKey: "metEjeTec",
                 cell: ({row}) => {
                     // Convierte el número a una cadena y añade las comas de miles

@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
 const DonutChart = ({ percentage, wh, rad }) => {
-    console.log(percentage)
     const width = wh;
     const height = wh;
     const radius = Math.min(width, height) / 2;

@@ -1097,12 +1097,6 @@ const FormGoalBeneficiarie = () => {
                                         >
                                             {metaData && Number(metaData.metEjeTec).toLocaleString()}
                                         </p>
-                                        <Tooltip 
-                                            id="info-tooltip"
-                                            effect="solid"
-                                            place='top-end'
-                                            className="tooltip"
-                                        />
                                         <p className="bold">{(metaData && Number(metaData.metMetTec - metaData.metEjeTec)) < 0 ? 'Nos Excedimos en' : 'Nos Falta'  }</p>
                                         <p className="PowerMas_Info_Card p_5">{metaData && Number(metaData.metMetTec - metaData.metEjeTec).toLocaleString()}</p>
                                     </div>

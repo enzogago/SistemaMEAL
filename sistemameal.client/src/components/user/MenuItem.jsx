@@ -1,3 +1,4 @@
+import Notiflix from 'notiflix';
 import { useState } from 'react';
 import Modal from 'react-modal';
 
@@ -7,6 +8,7 @@ const MenuItem = ({ menu, level, handleToggle, handleCheck, openMenus, checkedMe
         setModalIsOpen(true);
     }
     const closeModal = () => {
+        Notiflix.Notify.success("Se actualizaron los permisos");
         setModalIsOpen(false);
     }
 

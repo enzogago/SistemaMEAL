@@ -12,18 +12,14 @@ const MenuUser = () => {
   const navigate = useNavigate();
 
   const { id: safeCiphertext } = useParams();
-  console.log(safeCiphertext)
   const ciphertext = atob(safeCiphertext);
   // Desencripta el ID
   const bytes  = CryptoJS.AES.decrypt(ciphertext, 'secret key 123');
   const id = bytes.toString(CryptoJS.enc.Utf8);
-  console.log(id)
 
   const usuAno = id.slice(0, 4);
   const usuCod = id.slice(4);
   
-  console.log(usuAno)
-  console.log(usuCod)
   // Estados locales
   const [ menus, setMenus ] = useState([]);
   const [ openMenus, setOpenMenus ] = useState({}); 
@@ -112,7 +108,6 @@ const MenuUser = () => {
           }
         });
         const userPermissions = await responseUserPermissions.json();
-        console.log(userPermissions)
         setUserPermissions(userPermissions);
         // Obtener todos los permisos
         const responseAllPermissions = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Permiso`, {
@@ -121,7 +116,6 @@ const MenuUser = () => {
           }
         });
         const allPermissions = await responseAllPermissions.json();
-        console.log(allPermissions)
         const markedPermissions = allPermissions.map(permission => ({
           ...permission,
           isChecked: checkedPermissions[permission.perCod] || userPermissions.some(userPermission => userPermission.perCod === permission.perCod)
@@ -149,7 +143,6 @@ const MenuUser = () => {
         });
         // Respuesta de todos los menus disponibles en la aplicacion
         const allMenus = await responseAllMenus.json();
-        console.log(allMenus)
         // Marca los menús a los que el usuario tiene acceso
         const markedMenus = allMenus.map(menu => {
           const menuPermissions = markedPermissions.filter(permission => permission.perRef === menu.menRef);
@@ -159,7 +152,6 @@ const MenuUser = () => {
               permissions: menuPermissions
           }
         });
-        console.log(markedMenus)
         const groupData = groupByParent(markedMenus);
         setMenus(groupData);
         const newCheckedMenus = userMenus.reduce((map, menu) => {
@@ -323,8 +315,8 @@ const MenuUser = () => {
         UsuCod: usuCod,
         PerCod: perCod
       }));
-      console.log(addedPermissionsData)
-      console.log(removedPermissionsData)
+      // console.log(addedPermissionsData)
+      // console.log(removedPermissionsData)
   
       const responseAddPermissions = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Permiso/agregar`, {
         method: 'POST',

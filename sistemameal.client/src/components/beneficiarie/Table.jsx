@@ -22,20 +22,18 @@ import { AuthContext } from '../../context/AuthContext';
 import { Export_Excel_Helper, Export_PDF_Helper, handleDelete } from '../reusable/helper';
 import Pagination from '../reusable/Pagination';
 import TableRow from '../user/TableRow';
+import CustomTable from '../reusable/Table/CustomTable';
 
 const Table = ({ data }) => {
     const navigate = useNavigate();
     // Variables State AuthContext 
-    const { authActions, authInfo } = useContext(AuthContext);
-    const { setIsLoggedIn } = authActions;
+    const { authInfo } = useContext(AuthContext);
     const { userPermissions } = authInfo;
     // States locales
-    const [searchFilter, setSearchFilter] = useState('');
+    const [searchTags, setSearchTags] = useState([]);
     const [dropdownOpen, setDropdownOpen] = useState(false);
-    // Dropdown botones Export
-    const toggleDropdown = () => {
-        setDropdownOpen(!dropdownOpen);
-    }
+    const [isInputEmpty, setIsInputEmpty] = useState(true);
+    const [inputValue, setInputValue] = useState('');
 
     const Editar_Beneficiario = (row) => {
         console.log(row)
@@ -53,6 +51,8 @@ const Table = ({ data }) => {
         add: userPermissions.some(permission => permission.perNom === "INSERTAR BENEFICIARIO"),
         delete: userPermissions.some(permission => permission.perNom === "ELIMINAR BENEFICIARIO"),
         edit: userPermissions.some(permission => permission.perNom === "MODIFICAR BENEFICIARIO"),
+        pdf: userPermissions.some(permission => permission.perNom === `EXPORTAR PDF BENEFICIARIO`),
+        excel: userPermissions.some(permission => permission.perNom === `EXPORTAR EXCEL BENEFICIARIO`),
     };
 
     const columns = useMemo(() => {
@@ -103,7 +103,7 @@ const Table = ({ data }) => {
                 }
             },
             {
-                header: "Telefono",
+                header: "Teléfono",
                 accessorKey: "benTel",
             },
             {
@@ -147,16 +147,6 @@ const Table = ({ data }) => {
                                 // onClick={() => handleDelete('Beneficiario', row.original.uniCod, setData, setIsLoggedIn)} 
                             />
                         }
-                        <Tooltip 
-                            id="edit-tooltip"
-                            effect="solid"
-                            place='top-end'
-                        />
-                        <Tooltip 
-                            id="delete-tooltip" 
-                            effect="solid"
-                            place='top-start'
-                        />
                     </div>
                 ),
             });
@@ -168,16 +158,18 @@ const Table = ({ data }) => {
     const [sorting, setSorting] = useState([]);
     const filteredData = useMemo(() => 
         data.filter(item => 
-            item.benAno.includes(searchFilter.toUpperCase()) ||
-            item.benCod.includes(searchFilter.toUpperCase()) ||
-            item.benNom.includes(searchFilter.toUpperCase()) ||
-            item.benApe.includes(searchFilter.toUpperCase()) ||
-            item.benCorEle.includes(searchFilter.toUpperCase()) ||
-            item.benTel.includes(searchFilter.toUpperCase()) ||
-            item.benTelCon.includes(searchFilter.toUpperCase()) ||
-            (item.benSex === 'M' && 'MASCULINO'.includes(searchFilter.toUpperCase())) ||
-            (item.benSex === 'F' && 'FEMENINO'.includes(searchFilter.toUpperCase()))
-        ), [data, searchFilter]
+            searchTags.every(tag => 
+                item.benAno.includes(tag.toUpperCase()) ||
+                item.benCod.includes(tag.toUpperCase()) ||
+                item.benNom.includes(tag.toUpperCase()) ||
+                item.benApe.includes(tag.toUpperCase()) ||
+                item.benCorEle.includes(tag.toUpperCase()) ||
+                item.benTel.includes(tag.toUpperCase()) ||
+                item.benTelCon.includes(tag.toUpperCase()) ||
+                (item.benSex === 'M' && 'MASCULINO'.includes(tag.toUpperCase())) ||
+                (item.benSex === 'F' && 'FEMENINO'.includes(tag.toUpperCase()))
+            )
+        ), [data, searchTags]
     );
 
     const table = useReactTable({
@@ -202,7 +194,7 @@ const Table = ({ data }) => {
         uniInvPer: item.uniInvPer === 'S' ? 'SI' : 'NO',
     }));
     const headers = ['AÑO', 'CODIGO', 'NOMBRE', 'APELLIDO', 'CODIGO_UNICO', 'CORREO', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
-    const title = 'BENEFICIARIOS';  // El título de tu archivo
+    const title = 'BENEFICIARIO';  // El título de tu archivo
     const properties = ['benAno', 'benCod', 'benNom', 'benApe', 'benCodUni', 'benCorEle', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
     const format = 'a4';  // El tamaño del formato que quieres establecer para el PDF
 
@@ -217,118 +209,47 @@ const Table = ({ data }) => {
         Export_PDF_Helper(dataExport, headers, title, properties, format);
         setDropdownOpen(false);
     };
-    
-    const tableRef = useRef();  // Referencia al elemento de la tabla
- 
-    const animateScroll = (element, to, duration) => {
-        const start = element.scrollLeft,
-            change = to - start,
-            increment = 20;
-        let currentTime = 0;
-    
-        const animateScroll = () => {
-            currentTime += increment;
-            const val = Math.easeInOutQuad(currentTime, start, change, duration);
-            element.scrollLeft = val;
-            if(currentTime < duration) {
-                setTimeout(animateScroll, increment);
-            }
-        };
-        animateScroll();
-    }
 
-    Math.easeInOutQuad = function (t, b, c, d) {
-        t /= d/2;
-        if (t < 1) return c/2*t*t + b;
-        t--;
-        return -c/2 * (t*(t-2) - 1) + b;
-    };
-     
-    const scrollTable = (direction) => {
-        if (tableRef.current) {
-            const distance = tableRef.current.offsetWidth * 0.8;  // 50% del ancho de la tabla
-            const to = tableRef.current.scrollLeft + distance * direction;
-            animateScroll(tableRef.current, to, 500);
+    // Añade una nueva etiqueta al presionar Enter
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter' && inputValue && !searchTags.includes(inputValue)) {
+            setSearchTags(prevTags => [...prevTags, inputValue]);
+            setInputValue('');  // borra el valor del input
+            setIsInputEmpty(true);
+        } else if (e.key === 'Backspace' && isInputEmpty && searchTags.length > 0) {
+            setSearchTags(prevTags => prevTags.slice(0, -1));
         }
     }
+
+    const handleInputChange = (e) => {
+        setInputValue(e.target.value);  // actualiza el valor del input
+        setIsInputEmpty(e.target.value === '');
+    }
+
+    // Elimina una etiqueta
+    const removeTag = (tag) => {
+        setSearchTags(searchTags.filter(t => t !== tag));
+    }
     
+
     return (
-        <div className='TableMainContainer Large-p1 Medium-p1 Small-p_5'>
-            <div>
-                <h1 className="flex left Large-f1_5 Medium-f1_5 Small-f1_5 ">Listado de Beneficiarios</h1>
-                <div className="flex ">
-                    <div className="PowerMas_Search_Container Large_6 Large-m_5">
-                        <FaSearch className="Large_1 search-icon" />
-                        <input 
-                            className='PowerMas_Input_Filter Large_12 Large-p_5'
-                            type="search"
-                            placeholder='Buscar'
-                            value={searchFilter}
-                            onChange={e => setSearchFilter(e.target.value)}
-                        />
-                    </div>
-                    <button 
-                        className=' flex jc-space-between Large_3 Large-m_5 Large-p_5 PowerMas_ButtonStatus'
-                        onClick={() => navigate('/form-beneficiarie')}
-                    >
-                        Nuevo <FaPlus className='Large_1' /> 
-                    </button>
-                    <div className={`PowerMas_Dropdown_Export Large_3 Large-m_5 ${dropdownOpen  ? 'open' : ''}`}>
-                        <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>Exportar <FaSortDown className='Large_1' /></button>
-                        <div className="PowerMas_Dropdown_Export_Content Phone_12">
-                            <a onClick={Export_Excel} className='flex jc-space-between p_5'>Excel <img className='Large_1' src={Excel_Icon} alt="" /> </a>
-                            <a onClick={Export_PDF} className='flex jc-space-between p_5'>PDF <img className='Large_1' src={Pdf_Icon} alt="" /></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div className="PowerMas_TableContainer" ref={tableRef}>
-                <table className="Large_12 PowerMas_TableStatus">
-                    <thead>
-                        {
-                            table.getHeaderGroups().map(headerGroup => (
-                                <tr key={headerGroup.id} className="">
-                                    {
-                                        headerGroup.headers.map(header =>(
-                                            <th className="ws-nowrap" key={header.id} onClick={header.column.getToggleSortingHandler()}>
-                                                <div>
-                                                    {
-                                                    flexRender(header.column.columnDef.header, header.getContext())
-                                                    }
-                                                    <div className='flex flex-column ai-center jc-center'>
-                                                        {header.column.getIsSorted() === 'asc' && !header.column.columnDef.disableSorting ? 
-                                                            <TiArrowSortedUp className={`sort-icon active`} /> :
-                                                            header.column.getIsSorted() === 'desc' && !header.column.columnDef.disableSorting ? 
-                                                            <TiArrowSortedDown className={`sort-icon active`} /> :
-                                                            !header.column.columnDef.disableSorting &&
-                                                            <>
-                                                                <TiArrowSortedUp className={`sort-icon`} />
-                                                                <TiArrowSortedDown className={`sort-icon`} />
-                                                            </>
-                                                        }
-                                                    </div>
-                                                </div>
-                                            </th>
-                                        ))
-                                    }
-                                </tr>
-                            ))
-                        }
-                    </thead>
-                    <tbody>
-                        {
-                            table.getRowModel().rows.length > 0 ?
-                                table.getRowModel().rows.map(row => (
-                                    <TableRow key={row.id} row={row} flexRender={flexRender} />
-                                ))
-                            : <tr className='PowerMas_TableEmpty'><td colSpan={11} className='Large-p1 center'>No se encontraron registros</td></tr>
-                        }
-                    </tbody>
-                    
-                </table>
-            </div>
-            <Pagination table={table} />
-        </div>
+        <CustomTable 
+            title='Beneficiarios'
+            actions={actions} 
+            dropdownOpen={dropdownOpen} 
+            setDropdownOpen={setDropdownOpen} 
+            Export_Excel={Export_Excel} 
+            Export_PDF={Export_PDF} 
+            table={table}
+            navigatePath='form-beneficiarie'
+            resize={false}
+            handleInputChange={handleInputChange}
+            handleKeyDown={handleKeyDown}
+            inputValue={inputValue}
+            removeTag={removeTag}
+            searchTags={searchTags}
+            setSearchTags={setSearchTags}
+        />
     );
 }
 

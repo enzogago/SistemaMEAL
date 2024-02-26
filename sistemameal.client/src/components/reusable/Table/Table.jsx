@@ -12,7 +12,7 @@ import { FaEdit , FaRegTrashAlt } from 'react-icons/fa';
 // Funciones reusables
 // Componentes
 import { AuthContext } from '../../../context/AuthContext';
-import { Export_Excel_Helper, Export_PDF_Helper, handleDelete } from '../helper';
+import { Export_Excel_Helper, Export_PDF_Helper, handleDelete, orthographicCorrections } from '../helper';
 import CustomTable from './CustomTable';
 
 const Table = ({ data, openModal, setData, controller, fieldMapping, title }) => {
@@ -33,25 +33,29 @@ const Table = ({ data, openModal, setData, controller, fieldMapping, title }) =>
     };
 
     const columns = useMemo(() => {
-        let baseColumns = Object.keys(fieldMapping).map(field => ({
-            header: field,
-            accessorKey: fieldMapping[field],
-            cell: ({row}) => {
-                let text = row.original[fieldMapping[field]];
-                if (field === 'involucra') {
-                    text = text === 'S' ? 'Si' : 'No';
-                } else if (field === 'color') {
-                    return (
-                        <div style={{color: text}}>
-                            {text}
-                        </div>
-                    );
-                } else {
-                    text = text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
-                }
-                return text;
-            },
-        }));
+        let baseColumns = Object.keys(fieldMapping).map(field => {
+            // Usa el objeto de mapeo para obtener la versión corregida ortográficamente de la palabra
+            const correctedHeader = orthographicCorrections[field.toLowerCase()] || field;
+            return {
+                header: correctedHeader,
+                accessorKey: fieldMapping[field],
+                cell: ({row}) => {
+                    let text = row.original[fieldMapping[field]];
+                    if (field === 'involucra') {
+                        text = text === 'S' ? 'Si' : 'No';
+                    } else if (field === 'color') {
+                        return (
+                            <div style={{color: text}}>
+                                {text}
+                            </div>
+                        );
+                    } else {
+                        text = text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+                    }
+                    return text;
+                },
+            };
+        });
     
         if (actions.delete || actions.edit) {
             baseColumns.push({
@@ -76,16 +80,6 @@ const Table = ({ data, openModal, setData, controller, fieldMapping, title }) =>
                                 onClick={() => handleDelete(controller, row.original[fieldMapping.codigo], setData)} 
                             />
                         }
-                        <Tooltip 
-                            id="edit-tooltip"
-                            effect="solid"
-                            place='top-end'
-                        />
-                        <Tooltip 
-                            id="delete-tooltip" 
-                            effect="solid"
-                            place='top-start'
-                        />
                     </div>
                 ),
             });

@@ -4,6 +4,7 @@ import Table from '../reusable/Table/Table';
 import Modal from '../reusable/ModalForm/Modal';
 // Fetch Get
 import { fetchData } from '../reusable/helper';
+import { Tooltip } from 'react-tooltip';
 
 const Gender = () => {
     // States locales
@@ -52,6 +53,7 @@ const Gender = () => {
                 controller={controller}
                 codeField={codigo}
             />
+            
         </>
     )
 }

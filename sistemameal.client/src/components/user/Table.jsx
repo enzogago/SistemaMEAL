@@ -1,19 +1,14 @@
 import { useContext, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Tooltip } from 'react-tooltip';
 import CryptoJS from 'crypto-js';
 import {
     useReactTable, 
     getCoreRowModel, 
-    flexRender, 
     getPaginationRowModel,
     getSortedRowModel, 
 } from '@tanstack/react-table';
 // Iconos package
-import { FaEdit, FaPlus, FaRegTrashAlt, FaSearch, FaSortDown } from 'react-icons/fa';
-// Iconos source
-import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
-import Pdf_Icon from '../../img/PowerMas_Pdf_Icon.svg';
+import { FaEdit, FaRegTrashAlt } from 'react-icons/fa';
 // Context
 import { AuthContext } from '../../context/AuthContext';
 // Funciones reusables
@@ -30,14 +25,13 @@ const Table = ({data}) => {
     const { authInfo } = useContext(AuthContext);
     const { userPermissions } = authInfo;
     // States locales
-    const [searchFilter, setSearchFilter] = useState('');
-    const [dropdownOpen, setDropdownOpen] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
-    // Dropdown botones Export
-    const toggleDropdown = () => {
-        setDropdownOpen(!dropdownOpen);
-    }
+
+    const [searchTags, setSearchTags] = useState([]);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [isInputEmpty, setIsInputEmpty] = useState(true);
+    const [inputValue, setInputValue] = useState('');
 
     // Funciones para abrir y cerrar los modales
     const openModal = () => {
@@ -108,6 +102,17 @@ const Table = ({data}) => {
             {
                 header: "Fecha Nacimiento",
                 accessorKey: "usuFecNac",
+            },
+            {
+                header: "Ubicación",
+                accessorKey: "ubiNom",
+                cell: ({row}) => {
+                    return (
+                        <div style={{textTransform: 'capitalize'}}>
+                            {row.original.ubiNom.toLowerCase()}
+                        </div>
+                    )
+                }
             },
             {
                 header: "Correo",
@@ -192,7 +197,6 @@ const Table = ({data}) => {
                             />
                         }
                     </div>
-                    
                 ),
             });
         }
@@ -203,19 +207,21 @@ const Table = ({data}) => {
     const [sorting, setSorting] = useState([]);
     const filteredData = useMemo(() => 
     data.filter(item => 
-        item.usuNom.includes(searchFilter.toUpperCase()) ||
-        item.usuApe.includes(searchFilter.toUpperCase()) ||
-        item.usuCorEle.includes(searchFilter.toUpperCase()) ||
-        item.usuFecNac.includes(searchFilter.toUpperCase()) ||
-        item.usuTel.includes(searchFilter.toUpperCase()) ||
-        item.usuNumDoc.includes(searchFilter.toUpperCase()) ||
-        item.docIdeAbr.includes(searchFilter.toUpperCase()) ||
-        item.carNom.includes(searchFilter.toUpperCase()) ||
-        item.rolNom.includes(searchFilter.toUpperCase()) ||
-        item.usuEst.includes(searchFilter.toUpperCase()) ||
-        (item.usuEst === 'A' && 'ACTIVO'.includes(searchFilter.toUpperCase())) ||
-        (item.usuEst === 'I' && 'INACTIVO'.includes(searchFilter.toUpperCase()))
-    ), [data, searchFilter]
+        searchTags.every(tag =>
+            item.usuNom.includes(tag.toUpperCase()) ||
+            item.usuApe.includes(tag.toUpperCase()) ||
+            item.usuCorEle.includes(tag.toUpperCase()) ||
+            item.usuFecNac.includes(tag.toUpperCase()) ||
+            item.usuTel.includes(tag.toUpperCase()) ||
+            item.usuNumDoc.includes(tag.toUpperCase()) ||
+            item.docIdeAbr.includes(tag.toUpperCase()) ||
+            item.carNom.includes(tag.toUpperCase()) ||
+            item.rolNom.includes(tag.toUpperCase()) ||
+            item.usuEst.includes(tag.toUpperCase()) ||
+            (item.usuEst === 'A' && 'ACTIVO'.includes(tag.toUpperCase())) ||
+            (item.usuEst === 'I' && 'INACTIVO'.includes(tag.toUpperCase()))
+        )
+    ), [data, searchTags]
 );
     
     const table = useReactTable({
@@ -268,13 +274,32 @@ const Table = ({data}) => {
         const safeCiphertext = btoa(ciphertext).replace('+', '-').replace('/', '_').replace(/=+$/, '');
         navigate(`/form-user/${safeCiphertext}`);
     }
+
+    // Añade una nueva etiqueta al presionar Enter
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter' && inputValue && !searchTags.includes(inputValue)) {
+            setSearchTags(prevTags => [...prevTags, inputValue]);
+            setInputValue('');  // borra el valor del input
+            setIsInputEmpty(true);
+        } else if (e.key === 'Backspace' && isInputEmpty && searchTags.length > 0) {
+            setSearchTags(prevTags => prevTags.slice(0, -1));
+        }
+    }
+
+    const handleInputChange = (e) => {
+        setInputValue(e.target.value);  // actualiza el valor del input
+        setIsInputEmpty(e.target.value === '');
+    }
+
+    // Elimina una etiqueta
+    const removeTag = (tag) => {
+        setSearchTags(searchTags.filter(t => t !== tag));
+    }
     
     return (
         <>
             <CustomTable 
                 title='Usuarios'
-                searchFilter={searchFilter} 
-                setSearchFilter={setSearchFilter} 
                 actions={actions} 
                 dropdownOpen={dropdownOpen} 
                 setDropdownOpen={setDropdownOpen} 
@@ -283,6 +308,12 @@ const Table = ({data}) => {
                 table={table}
                 navigatePath='form-user'
                 resize={false}
+                handleInputChange={handleInputChange}
+                handleKeyDown={handleKeyDown}
+                inputValue={inputValue}
+                removeTag={removeTag}
+                searchTags={searchTags}
+                setSearchTags={setSearchTags}
             />
             <Modal 
                 isOpen={isOpen}

@@ -157,7 +157,7 @@ const CustomTable = ({
                                                     {
                                                         flexRender(header.column.columnDef.header, header.getContext())
                                                     }
-                                                   <div className='flex flex-column ai-center jc-center'>
+                                                   <div className='flex flex-column ai-center jc-center PowerMas_Icons_Sorter'>
                                                         {header.column.getIsSorted() === 'asc' && !header.column.columnDef.disableSorting ? 
                                                             <TiArrowSortedUp className={`sort-icon active`} /> :
                                                             header.column.getIsSorted() === 'desc' && !header.column.columnDef.disableSorting ? 
@@ -225,22 +225,6 @@ const CustomTable = ({
                 }
             </div>
             { showPagination && <Pagination table={table} />}
-            <Tooltip 
-                    id="info-tooltip"
-                    effect="solid"
-                    place='bottom-start'
-                    className="PowerMas_Tooltip_Info"
-            />
-            <Tooltip 
-                id="edit-tooltip"
-                effect="solid"
-                place='top-end'
-            />
-            <Tooltip 
-                id="delete-tooltip" 
-                effect="solid"
-                place='top-start'
-            />
         </div>
     );
 }

@@ -230,14 +230,18 @@ export const Export_Excel_Helper = async (data, headers, title, properties) => {
     saveAs(blob, `${title}_${Date.now()}.xlsx`);
 };
 
+export const orthographicCorrections = { 
+    codigo: 'Código',
+};
+
 export const Export_PDF_Helper = async (data, headers, title, properties, format) => {
     const savePdf = async () => {
         const doc = new jsPDF({
             orientation: 'landscape',
             unit: 'mm',
             format
-          });
-           // Crear una nueva instancia de jsPDF en orientación horizontal
+        });
+         // Crear una nueva instancia de jsPDF en orientación horizontal
 
         // Agregar la imagen
         // Asegúrate de tener la imagen en formato base64 o en un ArrayBuffer
@@ -250,8 +254,11 @@ export const Export_PDF_Helper = async (data, headers, title, properties, format
         doc.text(`LISTADO DE ${title}`, titleX, 30);  // Ajusta la posición vertical según tus necesidades
 
         // Definir las columnas de la tabla
-        const tableColumns = headers;
-
+        const tableColumns = headers.map(header => {
+            // Usa el objeto de mapeo para obtener la versión corregida ortográficamente de la palabra
+            const correctedHeader = orthographicCorrections[header.toLowerCase()] || header;
+            return { title: correctedHeader.toUpperCase(), dataKey: header };
+        });
         // Definir los datos de la tabla
         const tableData = data.map(item => {
             let fecha = new Date(item.fecMod);
@@ -265,11 +272,23 @@ export const Export_PDF_Helper = async (data, headers, title, properties, format
             return properties.map(prop => prop === 'fecMod' ? fechaFormateada : item[prop]);
         });
 
-        // Agregar la tabla al documento
+        // Generar los estilos de las columnas
+        let columnStyles = {};
+        for (let i = 0; i < headers.length; i++) {
+            if (i >= headers.length - 2 || headers[i] === 'CODIGO') {
+                // Centrar las dos últimas columnas y la columna "CÓDIGO"
+                columnStyles[i] = { halign: 'center' };
+            } else {
+                // Alinear a la izquierda las demás columnas
+                columnStyles[i] = { halign: 'left' };
+            }
+        }
+
         doc.autoTable({
             columns: tableColumns,
             body: tableData,
             startY: 40,
+            columnStyles: columnStyles,
             didDrawCell: function(data) {
                 var col = data.column.index;
                 if (data.section === 'head') {
@@ -285,6 +304,8 @@ export const Export_PDF_Helper = async (data, headers, title, properties, format
                 }
             }
         });
+
+        
 
         let pageCount = doc.internal.getNumberOfPages();
         for (let i = 1; i <= pageCount; i++) {

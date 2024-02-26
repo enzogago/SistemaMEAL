@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { FaGlobeAsia, FaPersonBooth, FaRProject, FaReceipt, FaSearch, FaUser } from 'react-icons/fa';
-import { Link, useNavigate } from 'react-router-dom';
+import { FaSearch } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 import Notiflix from 'notiflix';
 import Table from './Table';
 import DonutChart from '../reusable/DonutChart';
@@ -14,11 +14,9 @@ import HorizontalBarChart from '../reusable/graphics/HorizontalBarChart';
 import masculino from '../../img/PowerMas_Avatar_Masculino.svg';
 import femenino from '../../img/PowerMas_Avatar_Femenino.svg';
 import { fetchData } from '../reusable/helper';
-import { Tooltip } from 'react-tooltip';
 
 
 const Home = () => {
-    const navigate = useNavigate();
     const [ monitoringData, setMonitoringData] = useState([])
     const [searchTags, setSearchTags] = useState([]);
     const [isInputEmpty, setIsInputEmpty] = useState(true);
@@ -28,6 +26,10 @@ const Home = () => {
     const [avanceTecnico, setAvanceTecnico] = useState(0);
     const [currentMap, setCurrentMap] = useState('Todos');
     const [ recents, setRecents ] = useState([]);
+    const [ nacionalidades, setNacionalidades ] = useState([]);
+    const [ dataNac, setDataNac ] = useState([]);
+    const [ nacionalidadesLoaded, setNacionalidadesLoaded ] = useState(false);
+    const [ pieData, setPieData ] = useState([]);
     
 
     // EFECTO AL CARGAR COMPONENTE GET - LISTAR ESTADOS
@@ -70,11 +72,23 @@ const Home = () => {
             }
         };
 
-        const fetchBeneficiariosCount = async () => {
+        
+
+        fetchData('Nacionalidad', data => {
+            setNacionalidades(data);
+            setNacionalidadesLoaded(true);
+        });
+
+        fetchData('Log',setRecents);
+        fetchMonitoreo();
+    }, [searchTags]);
+
+    useEffect(() => {
+        const fetchDataHome = async () => {
             try {
                 Notiflix.Loading.pulse('Cargando...');
                 const token = localStorage.getItem('token');
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/BeneficiariosCount/${searchTags.join(',')}`, {
+                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Beneficiario/home/${searchTags.join(',')}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -86,8 +100,43 @@ const Home = () => {
                     }
                     return;
                 }
-                const count = await response.json();
-                setTotalBeneficiarios(count);
+                const data = await response.json();
+                // Conteo de beneficiarios
+                setTotalBeneficiarios(data.length);
+
+                // Contar beneficiarios por sexo
+                let maleCount = 0;
+                let femaleCount = 0;
+                data.forEach(beneficiario => {
+                    if (beneficiario.benSex === 'M') {
+                        maleCount++;
+                    } else if (beneficiario.benSex === 'F') {
+                        femaleCount++;
+                    }
+                });
+
+                // Actualizar la data del gráfico de pastel
+                setPieData([
+                    { name: 'Masculino', value: maleCount, color: maleColor },
+                    { name: 'Femenino', value: femaleCount, color: femaleColor },
+                ]);
+    
+                // Crear un objeto para contar las nacionalidades
+                const nacionalidadesCount = {};
+                data.forEach(beneficiario => {
+                    if (!nacionalidadesCount[beneficiario.nacCod]) {
+                        nacionalidadesCount[beneficiario.nacCod] = 1;
+                    } else {
+                        nacionalidadesCount[beneficiario.nacCod]++;
+                    }
+                });
+
+                // Convertir el objeto a un array para usarlo en el gráfico
+                const dataNac = Object.keys(nacionalidadesCount).map(nacCod => {
+                    const nacNom = nacionalidades.find(n => n.nacCod === nacCod).nacNom;
+                    return { name: nacNom, value: nacionalidadesCount[nacCod] };
+                });
+                setDataNac(dataNac);
             } catch (error) {
                 console.error('Error:', error);
             } finally {
@@ -95,11 +144,10 @@ const Home = () => {
             }
         };
 
-        fetchData('Log',setRecents);
-    
-        fetchMonitoreo();
-        fetchBeneficiariosCount();
-    }, [searchTags]);
+        if (nacionalidadesLoaded) {
+            fetchDataHome();
+        }
+    }, [nacionalidadesLoaded, searchTags]);
 
     // Añade una nueva etiqueta al presionar Enter
     const handleKeyDown = (e) => {
@@ -140,8 +188,8 @@ const Home = () => {
             MapComponent = Paises;
     }
 
-    const maleColor = '#61A2AA';
-    const femaleColor = '#98C0C6';
+    const maleColor = '#1d6776';
+    const femaleColor = '#61A2AA';
 
     const data = [
         { name: 'Masculino', value: 39489, color: maleColor },
@@ -193,13 +241,13 @@ const Home = () => {
     const groupedMaleData = groupDataByAgeRange(maleData);
     const groupedFemaleData = groupDataByAgeRange(femaleData);
 
-    const dataNac = [
-        { name: 'Peruana', value: 100 },
-        { name: 'Colombiana', value: 200 },
-        { name: 'Ecuatoriana', value: 80 },
-        { name: 'Argentina', value: 310 },
-        { name: 'Chilena', value: 20 },
-    ];
+    // const dataNac = [
+    //     { name: 'Peruana', value: 100 },
+    //     { name: 'Colombiana', value: 200 },
+    //     { name: 'Ecuatoriana', value: 80 },
+    //     { name: 'Argentina', value: 310 },
+    //     { name: 'Chilena', value: 20 },
+    // ];
     const dataTipDoc = [
         { name: 'DNI', value: 100 },
         { name: 'CE', value: 200 },
@@ -207,7 +255,7 @@ const Home = () => {
         { name: 'PDN', value: 310 },
         { name: 'PAS', value: 20 },
     ];
-      
+
 
     return(
     <>
@@ -260,13 +308,13 @@ const Home = () => {
                 <div className='PowerMas_Home_Card p1 Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
                     <h4>Beneficiarios por Nacionalidad</h4>
                     <div className='Large_12 Medium_12 Phone_12 Large-p1 Medium-p_75 flex-grow-1'>
-                        <HorizontalBarChart data={dataNac} id='NacionalidadBarChart' barColor='#61A2AA' />
+                        <HorizontalBarChart data={dataNac} id='NacionalidadBarChart' barColor='#1d6776' />
                     </div>
                 </div>
                 <div className='PowerMas_Home_Card p1 Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
                     <h4>Beneficiarios por Tipo de documento</h4>
                     <div className='Large_12 Medium_12 Phone_12 Large-p1 Medium-p_75 flex-grow-1'>
-                        <HorizontalBarChart data={dataTipDoc} id='TipoDocBarChart' barColor='#61A2AA' />
+                        <HorizontalBarChart data={dataTipDoc} id='TipoDocBarChart' barColor='#1d6776' />
                     </div>
                 </div>
                 
@@ -292,7 +340,7 @@ const Home = () => {
                 <div className='PowerMas_Home_Card p1 Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
                     <h4>Beneficiarios por Sexo</h4>
                     <div className='Large_6 Medium_12 Phone_12 Large-p1 Small-p_75 flex-grow-1'>
-                        <PieChart data={data} id='MaleFemale' />
+                        <PieChart data={pieData} id='MaleFemale' />
                     </div>
                     <div className='flex flex-wrap gap-1'>
                         {data.map((item, index) => (
@@ -344,6 +392,7 @@ const Home = () => {
                                     {shortText.toLowerCase()}
                                 </span>
                             </div>
+                            
                             <div className="flex flex-column center Large-f_75 Small-f_5">
                                 <span>{formattedDate}</span>
                                 <span>{formattedTime}</span>
@@ -351,22 +400,16 @@ const Home = () => {
                         </div>
                     );
                 })}
-                <Tooltip 
-                    id="info-tooltip"
-                    effect="solid"
-                    place='bottom-start'
-                    className="PowerMas_Tooltip_Info"
-                />
             </div>
-            <div className='PowerMas_Home_Card Large-p1 Medium-p_75 Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
+            <div className='PowerMas_Home_Card Large-p1 Medium-p_75 Large_6 Medium_6 Phone_12 flex flex-column ai-center gap-1'>
                 <h4>Beneficiarios por Ubicación</h4>
-                <div className='flex flex-grow-1 Large_12'>
-                    <article className='flex ai-center flex-grow-1'>
-                        <div className='flex flex-column p1 gap_5 Large_12'>
-                            <button className='PowerMas_Buttom_Primary' onClick={() => setCurrentMap('Todos')}>Todos</button>
-                            <button className='PowerMas_Buttom_Primary' onClick={() => setCurrentMap('Perú')}>Perú</button>
-                            <button className='PowerMas_Buttom_Primary' onClick={() => setCurrentMap('Ecuador')}>Ecuador</button>
-                            <button className='PowerMas_Buttom_Primary' onClick={() => setCurrentMap('Colombia')}>Colombia</button>
+                <div className='flex flex-grow-1 Large_12' style={{position: 'relative'}}>
+                    <article className='flex ai-center flex-grow-1' style={{position: 'absolute', bottom: '0'}}>
+                        <div className='flex flex-column p_5 gap_5 Large_12'>
+                            <button className='PowerMas_Buttom_Map' onClick={() => setCurrentMap('Todos')}>Todos</button>
+                            <button className='PowerMas_Buttom_Map' onClick={() => setCurrentMap('Perú')}>Perú</button>
+                            <button className='PowerMas_Buttom_Map' onClick={() => setCurrentMap('Ecuador')}>Ecuador</button>
+                            <button className='PowerMas_Buttom_Map' onClick={() => setCurrentMap('Colombia')}>Colombia</button>
                         </div>
                     </article>
                     <div className='Large_6 Medium_12 Phone_12 flex-grow-1'>

@@ -1,6 +1,7 @@
 import { useLocation } from 'react-router-dom';
 import Bar from "../layout/Bar";
 import Sidebar from "../layout/Sidebar";
+import { Tooltip } from 'react-tooltip';
 
 const Layout = ({ children }) => {
     const location = useLocation();
@@ -22,6 +23,22 @@ const Layout = ({ children }) => {
                 :
                 <>{children}</>
             }
+            <Tooltip 
+                    id="info-tooltip"
+                    effect="solid"
+                    place='bottom-start'
+                    className="PowerMas_Tooltip_Info"
+            />
+            <Tooltip 
+                id="edit-tooltip"
+                effect="solid"
+                place='top-end'
+            />
+            <Tooltip 
+                id="delete-tooltip" 
+                effect="solid"
+                place='top-start'
+            />
         </div>)
 };
 export default Layout;

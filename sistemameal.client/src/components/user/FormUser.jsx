@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from "react-router-dom";
 import CryptoJS from 'crypto-js';
 import Bar from "./Bar";
+import { fetchData } from "../reusable/helper";
 
 const FormUser = () => {
     const navigate = useNavigate();
@@ -29,6 +30,7 @@ const FormUser = () => {
     const [ documentos, setDocumentos ] = useState([]);
     const [ roles, setRoles ] = useState([]);
     const [ cargos, setCargos ] = useState([]);
+    const [ paises, setPaises ] = useState([]);
     const [ initialValues, setInitialValues] = useState({
         usuEst: ''
     });
@@ -80,7 +82,7 @@ const FormUser = () => {
     useEffect(() => {
         if (!isEditing) {
             const nombre = watch('usuNom');
-            const apellido = watch('usuApe');
+            const apellido = watch('usuApe').split(' ')[0];
             const fechaNacimiento = watch('usuFecNac');
     
             if (nombre && apellido && fechaNacimiento) {
@@ -111,97 +113,15 @@ const FormUser = () => {
 
     useEffect(() => {
         const fetchOptions = async () => {
-            const fetchDocumentos = async () => {
-                try {
-                    Notiflix.Loading.pulse('Cargando...');
-                    const token = localStorage.getItem('token');
-                    const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/DocumentoIdentidad`, {
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
-                    if (!response.ok) {
-                        if(response.status == 401 || response.status == 403){
-                            const data = await response.json();
-                            Notiflix.Notify.failure(data.message);
-                        }
-                        return;
-                    }
-                    const data = await response.json();
-                    if (data.success == false) {
-                        Notiflix.Notify.failure(data.message);
-                        return;
-                    }
-                    setDocumentos(data);
-                } catch (error) {
-                    console.error('Error:', error);
-                } finally {
-                    Notiflix.Loading.remove();
-                }
-            };
-            const fetchCargos = async () => {
-                try {
-                    Notiflix.Loading.pulse('Cargando...');
-                    const token = localStorage.getItem('token');
-                    const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Cargo`, {
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
-                    if (!response.ok) {
-                        if(response.status == 401 || response.status == 403){
-                            const data = await response.json();
-                            Notiflix.Notify.failure(data.message);
-                        }
-                        return;
-                    }
-                    const data = await response.json();
-                    if (data.success == false) {
-                        Notiflix.Notify.failure(data.message);
-                        return;
-                    }
-                    setCargos(data);
-                } catch (error) {
-                    console.error('Error:', error);
-                } finally {
-                    Notiflix.Loading.remove();
-                }
-            };
+            Notiflix.Loading.pulse('Cargando...');
+            await Promise.all([
+                fetchData('Cargo', setCargos),
+                fetchData('Rol', setRoles),
+                fetchData('DocumentoIdentidad', setDocumentos),
+                fetchData('Ubicacion', setPaises)
+            ]);
+        };
     
-            const fetchRoles = async () => {
-                try {
-                    Notiflix.Loading.pulse('Cargando...');
-                    const token = localStorage.getItem('token');
-                    const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Rol`, {
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
-                    if (!response.ok) {
-                        if(response.status == 401 || response.status == 403){
-                            const data = await response.json();
-                            Notiflix.Notify.failure(data.message);
-                        }
-                        return;
-                    }
-                    const data = await response.json();
-                    if (data.success == false) {
-                        Notiflix.Notify.failure(data.message);
-                        return;
-                    }
-                    setRoles(data);
-                } catch (error) {
-                    console.error('Error:', error);
-                } finally {
-                    Notiflix.Loading.remove();
-                }
-            };
-    
-            fetchCargos();
-            fetchRoles();
-            fetchDocumentos();
-        }
-
         const fetchUsuarios = async () => {
             try {
                 Notiflix.Loading.pulse('Cargando...');
@@ -216,22 +136,25 @@ const FormUser = () => {
                     Notiflix.Notify.failure(data.message);
                     return;
                 }
+                // data.pais = JSON.stringify({ ubiCod: data.ubiCod, ubiAno: data.ubiAno });
+                data.pais = JSON.stringify({ ubiCod: data.ubiCod, ubiAno: data.ubiAno });
                 reset(data);
                 setInitialValues(data);
+                console.log(data);
             } catch (error) {
                 console.error('Error:', error);
             } finally {
                 Notiflix.Loading.remove();
             }
         };
-
+    
         fetchOptions().then(() => {
             if(isEditing){
                 fetchUsuarios();
             }
         });
-        
-    }, []);
+    }, [isEditing, usuAno, usuCod]);
+    
     
     const handleNext = () => {
         validateForm((data) => {
@@ -239,6 +162,10 @@ const FormUser = () => {
             const hasChanged = Object.keys(data).some(key => data[key] !== initialValues[key]);
             console.log(hasChanged)
             if (hasChanged) {
+                const { ubiAno, ubiCod } = JSON.parse(data.pais);
+                data.ubiAno = ubiAno;
+                data.ubiCod = ubiCod;
+                console.log(data)
                 handleSubmit(data, isEditing, navigate, safeCiphertext);
             } else {
                 Notiflix.Notify.info("No se realizaron cambios");
@@ -246,6 +173,14 @@ const FormUser = () => {
             }
         })();
     }
+
+    // Función de validación personalizada
+    const validateNoLeadingSpaces = (value) => {
+        if (value.startsWith(' ')) {
+            return 'El campo no puede comenzar con espacios en blanco';
+        }
+        return true;
+    };
 
     return (
         <>
@@ -334,6 +269,11 @@ const FormUser = () => {
                                 {...register('usuNom', { 
                                     required: 'El nombre es requerido',
                                     minLength: { value: 3, message: 'El nombre debe tener minimo 3 digitos' },
+                                    pattern: {
+                                        value: /^[A-Za-zñÑ\s]+$/,
+                                        message: 'Por favor, introduce solo letras y espacios',
+                                    },
+                                    validate: validateNoLeadingSpaces,
                                 })} 
                             />
                              {errors.usuNom ? (
@@ -355,7 +295,12 @@ const FormUser = () => {
                                 maxLength={50}
                                 {...register('usuApe', { 
                                     required: 'El apellido es requerido',
-                                        minLength: { value: 3, message: 'El apellido debe tener minimo 3 digitos' },
+                                    minLength: { value: 3, message: 'El apellido debe tener minimo 3 digitos' },
+                                    pattern: {
+                                        value: /^[A-Za-zñÑ\s]+$/,
+                                        message: 'Por favor, introduce solo letras y espacios',
+                                    },
+                                    validate: validateNoLeadingSpaces,
                                 })} 
                             />
                              {errors.usuApe ? (
@@ -536,6 +481,36 @@ const FormUser = () => {
                             ) : (
                                 <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
                                 Espacio reservado para el mensaje de error
+                                </p>
+                            )}
+                        </div>
+                        <div className="Large_12 flex flex-column">
+                            <label htmlFor="pais" className="">
+                                Pais:
+                            </label>
+                            <select 
+                                id="pais"
+                                style={{textTransform: 'capitalize'}}
+                                className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.pais || isSubmitted ? (errors.pais ? 'invalid' : 'valid') : ''}`} 
+                                {...register('pais', { 
+                                    validate: value => value !== '0' || 'El País es requerido' 
+                                })}
+                            >
+                                <option value="0">--Seleccione País--</option>
+                                {paises.map(pais => (
+                                    <option 
+                                        key={pais.ubiCod} 
+                                        value={JSON.stringify({ ubiCod: pais.ubiCod, ubiAno: pais.ubiAno })}
+                                    > 
+                                        {pais.ubiNom.toLowerCase()}
+                                    </option>
+                                ))}
+                            </select>
+                            {errors.pais ? (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.pais.message}</p>
+                            ) : (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                    Espacio reservado para el mensaje de error
                                 </p>
                             )}
                         </div>

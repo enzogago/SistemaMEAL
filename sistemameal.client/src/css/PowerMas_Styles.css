@@ -1386,6 +1386,18 @@ textarea {
 	gap: 0.3rem;
 }
 
+.PowerMas_Buttom_Map{
+	border: 1px solid transparent;
+	background-color: transparent;
+	color: #fff;
+	transition: all 0.2s ease-in;
+	border-radius: 5px;
+}
+.PowerMas_Buttom_Map:hover{
+	color: #ffc459;
+	border: 1px solid #ffc459;
+}
+
 .PowerMas_Buttom_Primary{
 	background-color: #F7775A;
 	color: #F6E3D6;
@@ -1727,15 +1739,13 @@ textarea {
 
 
 .d3-tip {
+	z-index: 100;
 	color: white;
 	background-color: black;
 	padding: 10px;
 	border-radius: 4px;
 	font-size: 12px;
   }
-
-
-
 
 
 .overlay {

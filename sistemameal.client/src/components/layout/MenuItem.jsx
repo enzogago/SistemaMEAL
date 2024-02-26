@@ -23,7 +23,7 @@ const MenuItem = ({ menu, level }) => {
                     {IconName && <IconName style={{marginLeft: '1rem'}} />}
                     <span className="Large-f1 Medium-f_75 Small-f_75"> {menu.menNom} </span>
                 </Link>
-                {menu.subMenus.length > 0 && <span className="arrow Large_1"> > </span>}
+                {menu.subMenus.length > 0 && <span className="arrow Large_1"> &gt; </span>}
             </div>
             <div className="PowerMas_Submenu">
                 {menu.subMenus.map((subMenu, index) => (

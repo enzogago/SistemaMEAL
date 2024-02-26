@@ -48,6 +48,11 @@ namespace SistemaMEAL.Server.Models
         public String? RolNom { get; set; }
         public String? UsuIma { get; set; }
 
+        [ForeignKey("Ubicacion")]
+        public String? UbiAno { get; set; }
+        public String? UbiCod { get; set; }
+        public String? UbiNom { get; set; }
+
         public String? UsuIng { get; set; }
 
         public DateTime? FecIng { get; set; }
@@ -61,7 +66,10 @@ namespace SistemaMEAL.Server.Models
         public virtual Cargo? Cargo { get; set; }
 
         public virtual Rol? Rol { get; set; }
+
         public virtual DocumentoIdentidad? DocumentoIdentidad { get; set; }
+
+        public virtual Ubicacion? Ubicacion { get; set; }
 
 
     }

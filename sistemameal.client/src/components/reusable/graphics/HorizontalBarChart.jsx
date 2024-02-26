@@ -24,7 +24,8 @@ const HorizontalBarChart = ({ data, id, barColor }) => { // Añade barColor a la
 
         const yAxis = g => g
             .attr("transform", `translate(${margin.left},0)`)
-            .call(d3.axisLeft(y).tickFormat(i => data[i].name));
+            .call(d3.axisLeft(y).tickFormat(i => data[i].name.toLowerCase().replace(/^\w/, (c) => c.toUpperCase())));
+        
 
         const svg = d3.select(`#${id}`)
             .append("svg")
@@ -39,12 +40,13 @@ const HorizontalBarChart = ({ data, id, barColor }) => { // Añade barColor a la
             .attr("y", (d, i) => y(i))
             .attr("width", d => x(d.value) - x(0))
             .attr("height", y.bandwidth());
+            
 
         svg.append("g")
             .attr("fill", "white")
             .attr("text-anchor", "end")
             .attr("font-family", "sans-serif")
-            .attr("font-size", 12)
+            .attr("class", "Large-f1 Medium-f_75 Small-f_75")
             .selectAll("text")
             .data(data)
             .join("text")
