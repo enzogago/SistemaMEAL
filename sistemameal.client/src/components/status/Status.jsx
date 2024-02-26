@@ -39,6 +39,7 @@ const Status = () => {
                 setData={setData}
                 controller={controller}
                 fieldMapping={fieldMapping}
+                title='Estados'
             />
 
             <Modal

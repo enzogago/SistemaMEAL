@@ -39,6 +39,7 @@ const Permission = () => {
                 setData={setData}
                 controller={controller}
                 fieldMapping={fieldMapping}
+                title='Permisos'
             />
 
             <Modal

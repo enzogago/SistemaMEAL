@@ -39,6 +39,7 @@ const Charge = () => {
                 setData={setData}
                 controller={controller}
                 fieldMapping={fieldMapping}
+                title='Cargos'
             />
 
             <Modal

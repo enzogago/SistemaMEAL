@@ -15,7 +15,7 @@ import { AuthContext } from '../../../context/AuthContext';
 import { Export_Excel_Helper, Export_PDF_Helper, handleDelete } from '../helper';
 import CustomTable from './CustomTable';
 
-const Table = ({ data, openModal, setData, controller, fieldMapping }) => {
+const Table = ({ data, openModal, setData, controller, fieldMapping, title }) => {
     // Variables State AuthContext 
     const { authInfo } = useContext(AuthContext);
     const { userPermissions } = authInfo;
@@ -124,27 +124,27 @@ const Table = ({ data, openModal, setData, controller, fieldMapping }) => {
 
     // Preparar los datos
     const dataExport = table.options.data;  // Tus datos
-    const title = controller.toUpperCase() + 'S';  // El título de tu archivo
+    const titleExport = controller.toUpperCase();  // El título de tu archivo
     const headers = Object.keys(fieldMapping).map(field => field.toUpperCase()).concat(['USUARIO_MODIFICADO', 'FECHA_MODIFICADO']);
     const properties = Object.values(fieldMapping).concat(['usuMod', 'fecMod']);
     const format = 'a4';  // El tamaño del formato que quieres establecer para el PDF
 
     const Export_Excel = () => {
         // Luego puedes llamar a la función Export_Excel_Helper de esta manera:
-        Export_Excel_Helper(dataExport, headers, title, properties);
+        Export_Excel_Helper(dataExport, headers, titleExport, properties);
         setDropdownOpen(false);
     };
 
     const Export_PDF = () => {
         // Luego puedes llamar a la función Export_PDF_Helper de esta manera:
-        Export_PDF_Helper(dataExport, headers, title, properties, format);
+        Export_PDF_Helper(dataExport, headers, titleExport, properties, format);
         setDropdownOpen(false);
     };
 
     
     return (
         <CustomTable 
-            title={controller}
+            title={title}
             searchFilter={searchFilter} 
             setSearchFilter={setSearchFilter} 
             actions={actions} 

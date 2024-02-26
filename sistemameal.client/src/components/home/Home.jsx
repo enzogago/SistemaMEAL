@@ -236,7 +236,7 @@ const Home = () => {
         </div>
 
         <div className="PowerMas_ResumeHome m1 flex Small-flex-column Medium-flex-column Large-flex-row">
-            <div className="PowerMas_LeftSection Large_8 Medium_12 Phone_12 bg-white">
+            <div className="PowerMas_LeftSection flex Large_8 Medium_12 Phone_12 bg-white">
                 {monitoringData ? <Table data={monitoringData} /> : <p>Cargando datos...</p>}
             </div>
             <div className="PowerMas_RightSection flex flex-column Large_4 Medium_12 Phone_12 bg-white p1 gap_5">
@@ -308,7 +308,7 @@ const Home = () => {
         
         <div className="PowerMas_RecentsSection flex Large-flex-row Medium-flex-column Small-flex-column m1 gap-1">
             <div className="PowerMas_Home_Card flex flex-column Large_6 Medium_12 Phone_12 p1 gap-1">
-                <h4 className="Large-f1_25 center p_25">Actividades recientes</h4>
+                <h4 className="Large-f1_25 Small-f1 center p_25">Actividades recientes</h4>
                 {recents.map((item, index) => {
                     // Crea un objeto Date a partir de la cadena de fecha y hora
                     const date = new Date(item.logFecIng);
@@ -328,21 +328,23 @@ const Home = () => {
 
                     return (
                         <div className="flex ai-center gap-1" key={index}>
-                            <div className="PowerMas_ProfilePicture2 m_25" style={{width: '40px', height: '40px', border: '1px solid #000000'}}>
-                                <img src={masculino} alt="Descripción de la imagen" />
+                            <div>
+                                <div className="PowerMas_ProfilePicture2 m_25" style={{width: '40px', height: '40px', border: '1px solid #000000'}}>
+                                    <img src={masculino} alt="Descripción de la imagen" />
+                                </div>
                             </div>
                             <div className="flex flex-column flex-grow-1">
-                                <span className='bold' style={{textTransform: 'capitalize'}}>{item.usuNom.toLowerCase() + ' ' + item.usuApePat.toLowerCase() + ' ' + item.usuApeMat.toLowerCase()}</span>
+                                <span className='Large-f1 Small-f_75 bold' style={{textTransform: 'capitalize'}}>{item.usuNom.toLowerCase() + ' ' + item.usuApePat.toLowerCase() + ' ' + item.usuApeMat.toLowerCase()}</span>
                                 <span 
                                     data-tooltip-id="info-tooltip" 
                                     data-tooltip-content={text} 
-                                    className='f_75' 
+                                    className='Large-f_75 Small-f_5' 
                                     style={{textTransform: 'capitalize'}}
                                 >
                                     {shortText.toLowerCase()}
                                 </span>
                             </div>
-                            <div className="flex flex-column center f_75">
+                            <div className="flex flex-column center Large-f_75 Small-f_5">
                                 <span>{formattedDate}</span>
                                 <span>{formattedTime}</span>
                             </div>
@@ -356,7 +358,7 @@ const Home = () => {
                     className="PowerMas_Tooltip_Info"
                 />
             </div>
-            <div className='PowerMas_Home_Card Large-p1 Medium-p_75 Large_6 Medium_6 Phone_12 flex flex-column ai-center todos'>
+            <div className='PowerMas_Home_Card Large-p1 Medium-p_75 Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
                 <h4>Beneficiarios por Ubicación</h4>
                 <div className='flex flex-grow-1 Large_12'>
                     <article className='flex ai-center flex-grow-1'>

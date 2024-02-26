@@ -39,6 +39,7 @@ const Role = () => {
                 setData={setData}
                 controller={controller}
                 fieldMapping={fieldMapping}
+                title='Roles'
             />
 
             <Modal

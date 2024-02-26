@@ -1328,6 +1328,10 @@ textarea {
 .sort-icon.active {
     color: #ff5f3c; /* color para el estado activo */
 }
+.search-icon{
+	width: auto;
+	margin-left: 15px;
+}
 /* REUSABLE */
 .pointer{
 	cursor: pointer;
@@ -1338,8 +1342,8 @@ textarea {
 .h-100{
 	height: 100%;
 }
-.w-200{
-	width: 300%;
+.w-300{
+	min-width: 300%;
 }
 .errorInput{
 	color: red;

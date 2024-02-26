@@ -17,7 +17,7 @@ const DonutChart = ({ percentage, wh, rad }) => {
     
         const data = [
             { value: percentage },
-            { value: 0.1 - percentage }
+            { value: 0 }
         ];
     
         const pie = d3.pie()

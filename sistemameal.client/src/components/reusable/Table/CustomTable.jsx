@@ -6,49 +6,137 @@ import Pagination from './Pagination';
 import {
     flexRender, 
 } from '@tanstack/react-table';
+import { useNavigate } from 'react-router-dom';
+import { GrNext, GrPrevious } from 'react-icons/gr';
+import { useRef } from 'react';
+import { Tooltip } from 'react-tooltip';
 
-const CustomTable = ({ title, searchFilter, setSearchFilter, actions, openModal, dropdownOpen, setDropdownOpen, Export_Excel, Export_PDF, table }) => {
-    console.log(actions)
+const CustomTable = ({ 
+    title, 
+    searchFilter, 
+    setSearchFilter, 
+    actions, 
+    openModal, 
+    dropdownOpen, 
+    setDropdownOpen, 
+    Export_Excel, 
+    Export_PDF, 
+    table, 
+    showPagination = true, 
+    navigatePath = '', 
+    scrolled,
+    resize = true,
+    handleInputChange,
+    handleKeyDown,
+    inputValue,
+    removeTag,
+    searchTags,
+    setSearchTags
+}) => {
+    const navigate = useNavigate();
+    
     const toggleDropdown = () => {
         setDropdownOpen(!dropdownOpen);
     }
 
+    const tableRef = useRef(); 
+
+    const animateScroll = (element, to, duration) => {
+        const start = element.scrollLeft,
+            change = to - start,
+            increment = 20;
+        let currentTime = 0;
+    
+        const animateScroll = () => {
+            currentTime += increment;
+            const val = Math.easeInOutQuad(currentTime, start, change, duration);
+            element.scrollLeft = val;
+            if(currentTime < duration) {
+                setTimeout(animateScroll, increment);
+            }
+        };
+        animateScroll();
+    }
+    
+    Math.easeInOutQuad = function (t, b, c, d) {
+        t /= d/2;
+        if (t < 1) return c/2*t*t + b;
+        t--;
+        return -c/2 * (t*(t-2) - 1) + b;
+    };
+    
+    const scrollTable = (direction) => {
+        if (tableRef.current) {
+            const distance = tableRef.current.offsetWidth * 0.8;  // 50% del ancho de la tabla
+            const to = tableRef.current.scrollLeft + distance * direction;
+            animateScroll(tableRef.current, to, 500);
+        }
+    }
+
     return (
-        <div className='TableMainContainer Large-p1'>
+        <div className='TableMainContainer Large-p1 Medium-p1 Small-p_5'>
             <div className="">
-                <h1 className="Large-f1_5">Listado de {title}s</h1>
+                <h1 className="Large-f1_5">Listado de {title}</h1>
                 <div className="flex">
-                    <div className="PowerMas_Search_Container Large_6 Large-m_5">
-                        <FaSearch className="Large_1 search-icon" />
-                        <input 
-                            className='PowerMas_Input_Filter Large_12 p_5'
-                            type="search"
-                            placeholder='Buscar'
-                            value={searchFilter}
-                            onChange={e => setSearchFilter(e.target.value)}
-                        />
-                    </div>
-                    {
-                        actions.add && 
-                        <button 
-                            className=' flex jc-space-between Large_3 Large-m_5 Large-p_5 PowerMas_ButtonStatus'
-                            onClick={() => openModal()} 
-                            disabled={!actions.add}
-                        >
-                            Nuevo <FaPlus className='Large_1' /> 
-                        </button>
+                    {setSearchFilter && 
+                        <div className="PowerMas_Search_Container Large_6 Large-m_5">
+                            <FaSearch className="Large_1 search-icon" />
+                            <input 
+                                className='PowerMas_Input_Filter Large_12 p_5'
+                                type="search"
+                                placeholder='Buscar'
+                                value={searchFilter}
+                                onChange={e => setSearchFilter(e.target.value)}
+                            />
+                        </div>
                     }
                     {
-                        (actions.pdf || actions.excel) &&
+                        setSearchTags && removeTag &&
+                        <div className="PowerMas_Search_Container Large_6 Large-m_5">
+                            <div className="PowerMas_Input_Filter_Container flex">
+                                <div className="flex ai-center">
+                                    {searchTags && searchTags.map(tag => (
+                                        <span key={tag} className="PowerMas_InputTag flex ai-center jc-center p_25 gap_5">
+                                            <span className="f_75 flex ai-center">{tag}</span>
+                                            <button className="f1 bold p0" onClick={() => removeTag(tag)}>x</button>
+                                        </span>
+                                    ))}
+                                </div>
+                                <div className="Phone_12 relative">
+                                    <FaSearch className="search-icon" />
+                                    <input 
+                                        className='PowerMas_Input_Filter Large_12 Large-p_5'
+                                        type="search"
+                                        placeholder='Buscar'
+                                        onChange={handleInputChange}
+                                        onKeyDown={handleKeyDown}
+                                        value={inputValue}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    {
+                        actions && actions.add && 
+                        <>
+                            <button 
+                                className='flex jc-space-between Large_3 Large-m_5 Large-p_5 PowerMas_ButtonStatus'
+                                onClick={() => {openModal ? openModal() : navigate(`/${navigatePath}`)}} 
+                                disabled={!actions.add}
+                            >
+                                Nuevo <FaPlus className='Large_1' /> 
+                            </button>
+                        </>
+                    }
+                    {
+                        ((actions && actions.pdf) || (actions && actions.excel)) &&
                         <div className={`PowerMas_Dropdown_Export Large_3 Large-m_5 ${dropdownOpen ? 'open' : ''}`}>
                             <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>Exportar <FaSortDown className='Large_1' /></button>
                             <div className="PowerMas_Dropdown_Export_Content Phone_12">
-                                {
-                                    actions.pdf &&
+                                {actions.pdf &&
                                     <a onClick={Export_PDF} className='flex jc-space-between p_5'>PDF <img className='Large_1' src={Pdf_Icon} alt="" /></a>
                                 }
-                                {
-                                    actions.excel &&
+                                {actions.excel &&
                                     <a onClick={Export_Excel} className='flex jc-space-between p_5'>Excel <img className='Large_1' src={Excel_Icon} alt="" /> </a>
                                 }
                             </div>
@@ -56,15 +144,15 @@ const CustomTable = ({ title, searchFilter, setSearchFilter, actions, openModal,
                     }
                 </div>
             </div>
-            <div className="PowerMas_TableContainer">
-                <table className="Large_12 PowerMas_TableStatus">
+            <div className="PowerMas_TableContainer" ref={tableRef}>
+                <table className={`Large_12 PowerMas_TableStatus ${scrolled ? 'w-300' : ''}`}>
                     <thead>
                         {
                             table.getHeaderGroups().map(headerGroup => (
                                 <tr key={headerGroup.id}>
                                     {
                                         headerGroup.headers.map(header =>(
-                                            <th className='' style={{ width: header.getSize(), position: 'relative', textTransform: 'capitalize'  }} key={header.id} onClick={header.column.getToggleSortingHandler()}>
+                                            <th className='ws-nowrap' style={{ width: resize ? header.getSize():  '', position: resize ? 'relative' : '', textTransform: 'capitalize'  }} key={header.id} onClick={header.column.getToggleSortingHandler()}>
                                                 <div>
                                                     {
                                                         flexRender(header.column.columnDef.header, header.getContext())
@@ -83,7 +171,6 @@ const CustomTable = ({ title, searchFilter, setSearchFilter, actions, openModal,
                                                     </div>
                                                 </div>
 
-
                                                 <span 
                                                     onMouseDown={
                                                         header.getResizeHandler()
@@ -97,7 +184,6 @@ const CustomTable = ({ title, searchFilter, setSearchFilter, actions, openModal,
                                                     : "resizer"} >
                                                 </span>
 
-                                                
                                             </th>
                                         ))
                                     }
@@ -111,9 +197,14 @@ const CustomTable = ({ title, searchFilter, setSearchFilter, actions, openModal,
                                 table.getRowModel().rows.map(row => (
                                     <tr key={row.id}>
                                         {row.getVisibleCells().map(cell => (
-                                            <td style={{ width: cell.column.getSize() }} key={cell.id}>
-                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                            </td>
+                                            !resize ?
+                                                <td key={cell.id} className="p_5 ws-nowrap">
+                                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                </td>
+                                            :
+                                                <td className='ws-nowrap' style={{ width:  cell.column.getSize() }} key={cell.id}>
+                                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                </td>
                                         ))}
                                     </tr>
                                 ))
@@ -125,8 +216,31 @@ const CustomTable = ({ title, searchFilter, setSearchFilter, actions, openModal,
                         }
                     </tbody>
                 </table>
+                {
+                    scrolled &&
+                    <>
+                        <GrPrevious className="slider" style={{left: '0'}} onClick={() => scrollTable(-1)} />
+                        <GrNext className="slider" style={{right: '0'}} onClick={() => scrollTable(1)} />
+                    </>
+                }
             </div>
-            <Pagination table={table} />
+            { showPagination && <Pagination table={table} />}
+            <Tooltip 
+                    id="info-tooltip"
+                    effect="solid"
+                    place='bottom-start'
+                    className="PowerMas_Tooltip_Info"
+            />
+            <Tooltip 
+                id="edit-tooltip"
+                effect="solid"
+                place='top-end'
+            />
+            <Tooltip 
+                id="delete-tooltip" 
+                effect="solid"
+                place='top-start'
+            />
         </div>
     );
 }

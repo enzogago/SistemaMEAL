@@ -41,8 +41,45 @@ import FormatProject from './components/upload/project/FormatProject';
 
 const App = () => {
     // Variables state AuthContext
-    const { authInfo } = useContext(AuthContext);
-    const { menuData } = authInfo;
+    const { authActions, authInfo } = useContext(AuthContext);
+    const { setIsLoggedIn, setMenuData } = authActions;
+    const { userLogged, menuData  } = authInfo;
+
+    useEffect(() => {
+        const fetchMenuData = async () => {
+            if (userLogged) {
+                // Storage
+                const token = localStorage.getItem('token');
+                const usuAno = userLogged.usuAno;
+                const usuCod = userLogged.usuCod;
+    
+                try {
+                    const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Menu/${usuAno}/${usuCod}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    if (!response.ok) {
+                        const data = await response.json();
+                        if (data.result) {
+                            setIsLoggedIn(false);
+                        }
+            
+                        Notiflix.Notify.failure(data.message);
+                        Notiflix.Loading.remove();
+                        return;
+                    }
+        
+                    const data = await response.json();
+                    setMenuData(data);
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+        };
+    
+        fetchMenuData();
+    }, [userLogged]);
 
     const componentMap = {
         'user': User,
@@ -65,7 +102,7 @@ const App = () => {
         "upload-charge": UploadCharge,
         "upload-project": FormatProject,
     };
-
+    
     return (
             <Router>
                 <Routes>

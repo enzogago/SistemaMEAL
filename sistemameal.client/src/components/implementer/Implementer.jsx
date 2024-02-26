@@ -39,6 +39,7 @@ const Implementer = () => {
                 setData={setData}
                 controller={controller}
                 fieldMapping={fieldMapping}
+                title='Implementadores'
             />
 
             <Modal

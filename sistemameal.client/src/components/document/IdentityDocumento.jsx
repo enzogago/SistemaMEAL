@@ -39,6 +39,7 @@ const IdentityDocument = () => {
                 setData={setData}
                 controller={controller}
                 fieldMapping={fieldMapping}
+                title='Documentos de Identidad'
             />
 
             <Modal

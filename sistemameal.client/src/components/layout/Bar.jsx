@@ -19,7 +19,7 @@ const Bar = () => {
     // Variables state AuthContext
     const { authInfo, authActions } = useContext(AuthContext);
     const { userLogged } = authInfo;
-    console.log(userLogged)
+
     const { setUserLogged } = authActions;
     // Variables State statusContext
     const { statusActions } = useContext(StatusContext);
@@ -79,7 +79,6 @@ const Bar = () => {
         const safeCiphertext = btoa(ciphertext).replace('+', '-').replace('/', '_').replace(/=+$/, '');
         return safeCiphertext;
     }
-    console.log(userLogged)
   
     return (
         <div className="PowerMas_BarContainer flex ai-center jc-space-between p_5">

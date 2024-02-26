@@ -39,6 +39,7 @@ const Gender = () => {
                 setData={setData}
                 controller={controller}
                 fieldMapping={fieldMapping}
+                title={'Géneros'}
             />
 
             <Modal

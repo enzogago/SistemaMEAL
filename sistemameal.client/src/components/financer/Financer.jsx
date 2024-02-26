@@ -39,6 +39,7 @@ const Financer = () => {
                 setData={setData}
                 controller={controller}
                 fieldMapping={fieldMapping}
+                title='Financiadores'
             />
 
             <Modal

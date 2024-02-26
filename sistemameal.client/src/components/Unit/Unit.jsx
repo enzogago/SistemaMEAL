@@ -39,6 +39,7 @@ const Unit = () => {
                 setData={setData}
                 controller={controller}
                 fieldMapping={fieldMapping}
+                title='Unidades'
             />
 
             <Modal

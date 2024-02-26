@@ -4,7 +4,7 @@ import { types } from "../types/types";
 import { AuthContext } from "./AuthContext";
 
 const AuthState = ({ children }) => {
-    // Estados locales
+    // Estados
     const [ userLogged, setUserLogged ] = useState({})
     const [ userPermissions, setUserPermissions ] = useState([])
     const [ cargando, setCargando ] = useState(true)

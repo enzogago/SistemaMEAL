@@ -39,6 +39,7 @@ const TypeValue = () => {
                 setData={setData}
                 controller={controller}
                 fieldMapping={fieldMapping}
+                title='Tipos de Valor'
             />
 
             <Modal
