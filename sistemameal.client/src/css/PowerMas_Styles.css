@@ -1387,13 +1387,17 @@ textarea {
 }
 
 .PowerMas_Buttom_Map{
-	border: 1px solid transparent;
+	border: 1px solid #fff;
 	background-color: transparent;
 	color: #fff;
 	transition: all 0.2s ease-in;
 	border-radius: 5px;
 }
 .PowerMas_Buttom_Map:hover{
+	color: #ffc459;
+	border: 1px solid #ffc459;
+}
+.PowerMas_Buttom_Map_Active{
 	color: #ffc459;
 	border: 1px solid #ffc459;
 }

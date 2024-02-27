@@ -32,7 +32,7 @@ const ModalAcerca = ({ isOpen, closeModal }) => {
 
     return (
         <div className={`color-black PowerMas_Modal ${isOpen ? 'show' : ''}`}>
-            <div className="PowerMas_ModalContent">
+            <div className="PowerMas_ModalContent" style={{width: '45%'}}>
                 <span 
                     className="PowerMas_CloseModal" 
                     onClick={closeModalAndReset}
@@ -40,7 +40,7 @@ const ModalAcerca = ({ isOpen, closeModal }) => {
                     ×
                 </span>
                 <div className="PowerMas_SidebarHeader flex flex-row ai-center p_5">
-                    <img className='Large_3 Medium_10 Phone_6' height="auto"  title="Sistema MEAL Ayuda en Acción" src={logo} alt="Logo Ayuda En Accion" />
+                    <img className='Large_4 Medium_10 Phone_6' height="auto"  title="Sistema MEAL Ayuda en Acción" src={logo} alt="Logo Ayuda En Accion" />
                     <h2 className="Large_9 center f1_5"> SISTEMA MEAL </h2>
                 </div>
                 <br />

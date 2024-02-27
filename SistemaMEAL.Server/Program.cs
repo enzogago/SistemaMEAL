@@ -11,6 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHttpContextAccessor();
 // Servicios para los Modulos DAO
 builder.Services.AddScoped<LogDAO>();
 builder.Services.AddScoped<NacionalidadDAO>();

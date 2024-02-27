@@ -5,9 +5,9 @@ export const handleSubmit = async (data, isEditing, navigate, safeCiphertext) =>
     const url = isEditing ? `${import.meta.env.VITE_APP_API_URL}/usuario/${data.usuAno}/${data.usuCod}` : `${import.meta.env.VITE_APP_API_URL}/usuario`;
     const method = isEditing ? 'PUT' : 'POST';
 
-    const token = localStorage.getItem('token');
-    console.log(method)
     try {
+        Notiflix.Loading.pulse();
+        const token = localStorage.getItem('token');
         const response = await fetch(url, {
             method: method,
             headers: {
@@ -19,6 +19,7 @@ export const handleSubmit = async (data, isEditing, navigate, safeCiphertext) =>
         
         if (!response.ok) {
             const errorData = await response.json();
+            console.log(errorData)
             if(response.status === 409){
                 Notiflix.Notify.warning(`${errorData.message} ${(data.usuCorEle).toUpperCase()}`);
                 console.log(errorData.message)
@@ -47,5 +48,51 @@ export const handleSubmit = async (data, isEditing, navigate, safeCiphertext) =>
         }
     } catch (error) {
         console.error('Error:', error);
+    } finally {
+        Notiflix.Loading.remove();
     }
+};
+
+export const handleDelete = async (ano, cod, setData) => {
+    Notiflix.Confirm.show(
+        'Eliminar Registro',
+        '¿Estás seguro que quieres eliminar este registro?',
+        'Sí',
+        'No',
+        async () => {
+            const url = `${import.meta.env.VITE_APP_API_URL}/usuario/${ano}/${cod}`;
+
+            const token = localStorage.getItem('token');
+
+            try {
+                const response = await fetch(url, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                });
+                const data = await response.json();
+                if (!response.ok) {
+                    Notiflix.Notify.failure(data.message)
+                    return;
+                }
+
+                Notiflix.Notify.success(data.message);
+                
+                // Actualiza los datos después de eliminar un registro
+                const updateResponse = await fetch(`${import.meta.env.VITE_APP_API_URL}/usuario`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const updateData = await updateResponse.json();
+                setData(updateData);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        },
+        () => {
+            // El usuario ha cancelado la operación de eliminación
+        }
+    );
 };

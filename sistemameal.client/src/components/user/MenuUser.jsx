@@ -411,7 +411,7 @@ const MenuUser = () => {
         </div>
         <footer className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
             <button onClick={() => navigate(`/form-user/${safeCiphertext}`)} className="Large_3 m_75 PowerMas_Buttom_Secondary">Atras</button>
-            <button onClick={handleNext} className="Large_3 m_75 PowerMas_Buttom_Primary">Siguiente</button>
+            <button onClick={handleNext} className="Large_3 m_75 PowerMas_Buttom_Primary">Grabar y Siguiente</button>
         </footer>
     </>
   )

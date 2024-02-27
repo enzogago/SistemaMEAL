@@ -3,14 +3,37 @@ using Newtonsoft.Json;
 using SistemaMEAL.Server.Models;
 using System.Data;
 using System.Text;
+using System.Security.Claims;
 
 namespace SistemaMEAL.Server.Modulos
 {
 
     public class UsuarioDAO
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private conexionDAO cn = new conexionDAO();
 
+        public UsuarioDAO(IHttpContextAccessor httpContextAccessor)
+        {
+            _httpContextAccessor = httpContextAccessor;
+        }
+
+        private Usuario ObtenerUsuarioLogueado()
+        {
+            // Obtén los detalles del usuario actual de los claims del token
+            var identity = _httpContextAccessor.HttpContext.User.Identity as ClaimsIdentity;
+            var usuAno = identity.Claims.FirstOrDefault(x => x.Type == "ANO").Value;
+            var usuCod = identity.Claims.FirstOrDefault(x => x.Type == "COD").Value;
+            var ip = identity.Claims.FirstOrDefault(x => x.Type == "IP").Value; // Obtiene la dirección IP del claim
+
+            // Busca los detalles del usuario en la base de datos
+            var usuarioActual = BuscarUsuarioLog(usuAno, usuCod);
+
+            // Asigna la dirección IP del claim a la propiedad Ip del usuario
+            usuarioActual.Ip = ip;
+
+            return usuarioActual;
+        }
 
         public (string? message, string? messageType) Modificar(Usuario usuario)
         {
@@ -44,13 +67,22 @@ namespace SistemaMEAL.Server.Modulos
                 cmd.Parameters.AddWithValue("@P_ROLCOD", usuario.RolCod);
                 cmd.Parameters.AddWithValue("@P_UBIANO", usuario.UbiAno);
                 cmd.Parameters.AddWithValue("@P_UBICOD", usuario.UbiCod);
-                cmd.Parameters.AddWithValue("@P_USUMOD", "Usuario");
-                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
-                cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
-                cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
-                cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
-                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "GAGO");
-                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "AGUIRRE");
+
+                // Obtén los detalles del usuario logueado
+                var usuarioActual = ObtenerUsuarioLogueado();
+                
+                cmd.Parameters.AddWithValue("@P_USUMOD", usuarioActual.UsuNomUsu);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", usuarioActual.Ip);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", usuarioActual.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", usuarioActual.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", usuarioActual.UsuNom);
+
+                string[] apellidos = usuarioActual.UsuApe.Split(' ');
+                string apellidoPaterno = apellidos[0];
+                string apellidoMaterno = apellidos.Length > 1 ? apellidos[1] : "";
+
+                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", apellidoPaterno);
+                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", apellidoMaterno);
 
                 SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                 pDescripcionMensaje.Direction = ParameterDirection.Output;
@@ -97,19 +129,29 @@ namespace SistemaMEAL.Server.Modulos
                 cmd.Parameters.AddWithValue("@P_USUSEX", usuario.UsuSex);
                 cmd.Parameters.AddWithValue("@P_USUCORELE", usuario.UsuCorEle);
                 cmd.Parameters.AddWithValue("@P_CARCOD", usuario.CarCod);
-                cmd.Parameters.AddWithValue("@P_USUFECINC", "2023-03-17");
+                cmd.Parameters.AddWithValue("@P_USUFECINC", "17-03-2003");
                 cmd.Parameters.AddWithValue("@P_USUTEL", usuario.UsuTel);
                 cmd.Parameters.AddWithValue("@P_USUNOMUSU", "EGAGO");
                 cmd.Parameters.AddWithValue("@P_USUPAS", usuario.UsuPas);
                 cmd.Parameters.AddWithValue("@P_USUEST", usuario.UsuEst);
                 cmd.Parameters.AddWithValue("@P_ROLCOD", usuario.RolCod);
-                cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
-                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
-                cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
-                cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
-                cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
-                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "GAGO");
-                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "AGUIRRE");
+                cmd.Parameters.AddWithValue("@P_UBIANO", usuario.UbiAno);
+                cmd.Parameters.AddWithValue("@P_UBICOD", usuario.UbiCod);
+
+                // Obtén los detalles del usuario logueado
+                var usuarioActual = ObtenerUsuarioLogueado();
+
+                cmd.Parameters.AddWithValue("@P_USUING", usuarioActual.UsuNomUsu);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", usuarioActual.Ip);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", usuarioActual.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", usuarioActual.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", usuarioActual.UsuNom);
+                string[] apellidos = usuarioActual.UsuApe.Split(' ');
+                string apellidoPaterno = apellidos[0];
+                string apellidoMaterno = apellidos.Length > 1 ? apellidos[1] : "";
+
+                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", apellidoPaterno);
+                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", apellidoMaterno);
 
                 SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                 pDescripcionMensaje.Direction = ParameterDirection.Output;
@@ -326,6 +368,49 @@ namespace SistemaMEAL.Server.Modulos
             return usuario?? new Usuario();
         }
 
+        public Usuario BuscarUsuarioLog(string ano, string cod)
+        {
+            List<Usuario>? usuarios = null;
+            Usuario? usuario = null;
+
+            try
+            {
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_USUARIO_AUTH", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@Ano", ano);
+                cmd.Parameters.AddWithValue("@Cod", cod);
+
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (!reader.HasRows)
+                {
+                    jsonResult.Append("[]");
+                }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                // Deserializa la cadena JSON en una lista de objetos Usuario
+                usuarios = JsonConvert.DeserializeObject<List<Usuario>>(jsonResult.ToString());
+                if (usuarios.Count > 0)
+                {
+                    usuario = usuarios[0];
+                }
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+            }
+
+            return usuario?? new Usuario();
+        }
+
         public Usuario ValidarUsuario(string email, string password)
         {
             List<Usuario>? usuarios = null;
@@ -372,7 +457,50 @@ namespace SistemaMEAL.Server.Modulos
             return usuario ?? new Usuario();
         }
 
+        public (string? message, string? messageType) Eliminar(string usuAno, string usuCod)
+        {
+            string? mensaje = "";
+            string? tipoMensaje = "";
+            try
+            {
+                cn.getcn.Open();
 
+                SqlCommand cmd = new SqlCommand("SP_ELIMINAR_USUARIO", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@P_USUANO", usuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD", usuCod);
+                cmd.Parameters.AddWithValue("@P_USUMOD", "Usuario");
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
+                cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
+                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "GAGO");
+                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "AGUIRRE");
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+
+                cmd.ExecuteNonQuery();
+
+                mensaje = pDescripcionMensaje.Value.ToString();
+                tipoMensaje = pTipoMensaje.Value.ToString();
+            }
+            catch (SqlException ex)
+            {
+                mensaje = ex.Message;
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return (mensaje, tipoMensaje);
+        }
 
 
     }

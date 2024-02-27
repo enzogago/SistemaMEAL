@@ -357,7 +357,7 @@ const PermissionUser = () => {
             </div>
             <footer className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
                 <button onClick={() => navigate(`/menu-user/${safeCiphertext}`)} className="Large_3 m_75 PowerMas_Buttom_Secondary">Atras</button>
-                <button onClick={handleClickaso} className="Large_3 m_75 PowerMas_Buttom_Primary">Finalizar</button>
+                <button onClick={handleClickaso} className="Large_3 m_75 PowerMas_Buttom_Primary">Grabar y Finalizar</button>
             </footer>
         </div>
     )

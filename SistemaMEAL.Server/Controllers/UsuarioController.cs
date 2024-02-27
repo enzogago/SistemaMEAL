@@ -231,6 +231,7 @@ namespace SistemaMEAL.Server.Controllers
 
             string email = data.email.ToString();
             string password = data.password.ToString();
+            string clientIp = data.clientIp.ToString();
 
             // Haz hash de la contraseña proporcionada
             using (SHA256 sha256Hash = SHA256.Create())
@@ -267,7 +268,8 @@ namespace SistemaMEAL.Server.Controllers
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Iat, secondsSinceEpoch.ToString(), ClaimValueTypes.Integer64),
                 new Claim("ANO", usuario.UsuAno),
-                new Claim("COD", usuario.UsuCod)
+                new Claim("COD", usuario.UsuCod),
+                new Claim("IP", clientIp)
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.Key));
@@ -303,6 +305,47 @@ namespace SistemaMEAL.Server.Controllers
             Console.WriteLine(data);
 
             return Ok(data);
+        }
+
+        [HttpDelete]
+        [Route("{usuAno}/{usuCod}")]
+        public dynamic Eliminar(string usuAno, string usuCod)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return rToken;
+
+            dynamic data = rToken.result;
+            Usuario usuario = new Usuario
+            {
+                UsuAno = data.UsuAno,
+                UsuCod = data.UsuCod,
+                RolCod = data.RolCod
+            };
+            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "ELIMINAR ESTADO") && usuario.RolCod != "01")
+            {
+                return new
+                {
+                    success = false,
+                    message = "No tienes permisos para eliminar estados",
+                    result = ""
+                };
+            }
+
+            var (message, messageType) = _usuarios.Eliminar(usuAno, usuCod);
+            if (messageType == "1") // Error
+            {
+                return new BadRequestObjectResult(new { success = false, message });
+            }
+            else if (messageType == "2") // Registro ya existe
+            {
+                return new ConflictObjectResult(new { success = false, message });
+            }
+            else // Registro modificado correctamente
+            {
+                return new OkObjectResult(new {success = true, message });
+            }
         }
 
     }

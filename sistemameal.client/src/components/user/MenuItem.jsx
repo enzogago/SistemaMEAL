@@ -99,7 +99,7 @@ const MenuItem = ({ menu, level, handleToggle, handleCheck, openMenus, checkedMe
                         <hr className='PowerMas_Hr m_5' />
                         <p className='PowerMas_Description_Modal_Permission center f_75'>Selecciona las funcionalidades(acciones) que deseas otorgar para este usuario.</p>
                         <br />
-                        <div className='flex flex-column ai-center'>
+                        <div className='flex flex-column'>
                             {menu.permissions.map((permission, index) => (
                                 <div className='flex p_5 gap_5' key={index}>
                                     <input

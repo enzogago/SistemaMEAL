@@ -10,8 +10,8 @@ import 'jspdf-autotable';
 
 export const handleDelete = async (controller, codigo, setRegistros) => {
     Notiflix.Confirm.show(
-        'Eliminar registro',
-        '¿Estás seguro de que quieres eliminar este registro?',
+        'Eliminar Registro',
+        '¿Estás seguro que quieres eliminar este registro?',
         'Sí',
         'No',
         async () => {

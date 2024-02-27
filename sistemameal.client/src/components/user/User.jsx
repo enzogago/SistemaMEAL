@@ -36,6 +36,7 @@ const User = () => {
         <>
             <Table
                 data={ usersTable }
+                setUsersTable={ setUsersTable }
             />
         </>
     )

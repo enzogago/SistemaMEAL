@@ -12,7 +12,7 @@ const Paises = () => {
 
     const color = d3.scaleOrdinal()
         .domain(Object.keys(poblacionPorPais))
-        .range(["#f0554d", "#ff7a54", "#ffad75"]);  // Reemplaza estos colores con los tuyos
+        .range(["#f0554d", "#ff7a54", "#ffad75"]);
 
     const ref = useRef();
 

@@ -354,8 +354,8 @@ const Home = () => {
             </div>
         </div>
         
-        <div className="PowerMas_RecentsSection flex Large-flex-row Medium-flex-column Small-flex-column m1 gap-1">
-            <div className="PowerMas_Home_Card flex flex-column Large_6 Medium_12 Phone_12 p1 gap-1">
+        <div className="PowerMas_RecentsSection flex Large-flex-row Medium-flex-row Small-flex-column m1 gap-1">
+            <div className="PowerMas_Home_Card flex flex-column Large_6 Medium_6 Phone_12 p1 gap-1">
                 <h4 className="Large-f1_25 Small-f1 center p_25">Actividades recientes</h4>
                 {recents.map((item, index) => {
                     // Crea un objeto Date a partir de la cadena de fecha y hora
@@ -403,13 +403,33 @@ const Home = () => {
             </div>
             <div className='PowerMas_Home_Card Large-p1 Medium-p_75 Large_6 Medium_6 Phone_12 flex flex-column ai-center gap-1'>
                 <h4>Beneficiarios por Ubicación</h4>
-                <div className='flex flex-grow-1 Large_12' style={{position: 'relative'}}>
+                <div className='flex flex-grow-1 Phone_12' style={{position: 'relative'}}>
                     <article className='flex ai-center flex-grow-1' style={{position: 'absolute', bottom: '0'}}>
                         <div className='flex flex-column p_5 gap_5 Large_12'>
-                            <button className='PowerMas_Buttom_Map' onClick={() => setCurrentMap('Todos')}>Todos</button>
-                            <button className='PowerMas_Buttom_Map' onClick={() => setCurrentMap('Perú')}>Perú</button>
-                            <button className='PowerMas_Buttom_Map' onClick={() => setCurrentMap('Ecuador')}>Ecuador</button>
-                            <button className='PowerMas_Buttom_Map' onClick={() => setCurrentMap('Colombia')}>Colombia</button>
+                            <button 
+                                className={`PowerMas_Buttom_Map PowerMas_Buttom_Map_${currentMap === 'Todos' ? 'Active' : ''}`} 
+                                onClick={() => setCurrentMap('Todos')}
+                            >
+                                Todos
+                            </button>
+                            <button 
+                                className={`PowerMas_Buttom_Map PowerMas_Buttom_Map_${currentMap === 'Perú' ? 'Active' : ''}`} 
+                                onClick={() => setCurrentMap('Perú')}
+                            >
+                                Perú
+                            </button>
+                            <button 
+                                className={`PowerMas_Buttom_Map PowerMas_Buttom_Map_${currentMap === 'Ecuador' ? 'Active' : ''}`} 
+                                onClick={() => setCurrentMap('Ecuador')}
+                            >
+                                Ecuador
+                            </button>
+                            <button 
+                                className={`PowerMas_Buttom_Map PowerMas_Buttom_Map_${currentMap === 'Colombia' ? 'Active' : ''}`} 
+                                onClick={() => setCurrentMap('Colombia')}
+                            >
+                                Colombia
+                            </button>
                         </div>
                     </article>
                     <div className='Large_6 Medium_12 Phone_12 flex-grow-1'>

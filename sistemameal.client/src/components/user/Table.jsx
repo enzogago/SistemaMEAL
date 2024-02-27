@@ -18,8 +18,9 @@ import Modal from "../layout/Modal";
 import masculino from '../../img/PowerMas_Avatar_Masculino.svg';
 import femenino from '../../img/PowerMas_Avatar_Femenino.svg';
 import CustomTable from "../reusable/Table/CustomTable";
+import { handleDelete } from "./eventHandlers";
 
-const Table = ({data}) => {
+const Table = ({data, setUsersTable}) => {
     const navigate = useNavigate();
     // Variables State AuthContext 
     const { authInfo } = useContext(AuthContext);
@@ -66,7 +67,7 @@ const Table = ({data}) => {
                 cell: ({row}) => {
                     const user = row.original;
                     return (
-                        <div className="PowerMas_ProfilePicture2 m_25" style={{width: '35px', height: '35px', border: `2px solid ${user && (user.usuSex === 'M' ? '#20737b' : '#E5554F')}`}}>
+                        <div className="PowerMas_ProfilePicture2 m_25" style={{width: '35px', height: '35px', border: `2px solid ${user && (user.usuEst === 'A' ? '#20737b' : '#E5554F')}`}}>
                             <img src={user && (user.usuSex === 'M' ? masculino : femenino)} alt="Descripción de la imagen" />
                         </div>
                     )
@@ -193,7 +194,7 @@ const Table = ({data}) => {
                                 data-tooltip-id="delete-tooltip" 
                                 data-tooltip-content="Eliminar" 
                                 className='Large-p_25' 
-                                // onClick={() => handleDelete('Proyecto', row.original.estCod, setEstados, setIsLoggedIn)} 
+                                onClick={() => handleDelete(row.original.usuAno, row.original.usuCod, setUsersTable)} 
                             />
                         }
                     </div>
@@ -218,6 +219,7 @@ const Table = ({data}) => {
             item.carNom.includes(tag.toUpperCase()) ||
             item.rolNom.includes(tag.toUpperCase()) ||
             item.usuEst.includes(tag.toUpperCase()) ||
+            item.ubiNom.includes(tag.toUpperCase()) ||
             (item.usuEst === 'A' && 'ACTIVO'.includes(tag.toUpperCase())) ||
             (item.usuEst === 'I' && 'INACTIVO'.includes(tag.toUpperCase()))
         )
@@ -247,9 +249,9 @@ const Table = ({data}) => {
             usuEst: item.usuEst === 'A' ? 'ACTIVO' : 'INACTIVO'
         };
     });
-    const headers = ['ESTADO','DOCUMENTO','NUMERO_DOCUMENTO','NOMBRE', 'APELLIDO', 'CORREO', 'TELEFONO', 'CARGO', 'ROL', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
+    const headers = ['ESTADO','DOCUMENTO','NUMERO_DOCUMENTO','NOMBRE', 'APELLIDO', 'NACIMIENTO', 'CORREO', 'PAÍS', 'TELEFONO', 'CARGO', 'ROL', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
     const title = 'USUARIO';  // El título de tu archivo
-    const properties = ['usuEst','docIdeNom','usuNumDoc','usuNom', 'usuApe', 'usuCorEle', 'usuTel', 'carNom', 'rolNom', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
+    const properties = ['usuEst','docIdeNom','usuNumDoc','usuNom', 'usuApe', 'usuFecNac', 'usuCorEle', 'ubiNom', 'usuTel', 'carNom', 'rolNom', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
     const format = [500, 250];
 
     const Export_Excel = () => {

@@ -31,16 +31,74 @@ const FormUser = () => {
     const [ roles, setRoles ] = useState([]);
     const [ cargos, setCargos ] = useState([]);
     const [ paises, setPaises ] = useState([]);
+    const [ phoneCodeInput, setPhoneCodeInput ] = useState('');
     const [ initialValues, setInitialValues] = useState({
         usuEst: ''
     });
     const [ inputView, setInputView ] = useState('');
+    const [ phoneLength, setPhoneLength ] = useState('');
+
+    const countryPhoneCodes = {
+        "peru": "+51",
+        "colombia": "+57",
+        "ecuador" : "+593",
+        // Añade aquí los demás países y sus códigos
+    };
+    const countryPhoneLength = {
+        "peru": 9,
+        "colombia": 10,
+        "ecuador" : 9,
+        // Añade aquí los demás países y sus longitudes
+    };
+    
 
 
     const { register, handleSubmit: validateForm, formState: { errors, dirtyFields, isSubmitted }, reset, setValue, watch, trigger } = 
     useForm({ mode: "onChange", defaultValues: {
-        usuEst: 'A',
+        usuEst: 'a',
     } });
+
+
+    useEffect(() => {
+        const phone = watch('usuTel');
+        if (phone && phoneCodeInput && !phone.startsWith(phoneCodeInput)) {
+            setValue('usuTel', phoneCodeInput);
+        }
+    }, [watch('usuTel')]);
+
+    useEffect(() => {
+        const pais = watch('pais');
+        const tel = watch('usuTel');
+    
+        const updatePhoneCode = async () => {
+            if (pais !== '0') {
+                const isPaisValid = await trigger('pais');
+                if (isPaisValid) {
+                    const { ubiCod } = JSON.parse(pais);
+                    const paisObj = paises.find(p => p.ubiCod === ubiCod);
+                    if (paisObj) {
+                        const newPhoneCode = countryPhoneCodes[paisObj.ubiNom.toLowerCase()];
+                        const phoneLength = countryPhoneLength[paisObj.ubiNom.toLowerCase()];
+                        
+                        // Si el número de teléfono está vacío o no comienza con el nuevo código del país, actualiza el número de teléfono con el nuevo código del país
+                        if (!tel || (tel && !tel.startsWith(newPhoneCode))) {
+                            setValue('usuTel', newPhoneCode);
+                        }
+                        
+                        if (newPhoneCode){
+                            setPhoneCodeInput(newPhoneCode);
+                            setPhoneLength(phoneLength);
+                        }
+                    }
+                } 
+            } else {
+                setValue('usuTel', '');
+            }
+        };
+        updatePhoneCode();
+    }, [watch('pais'), paises]);
+    
+    
 
     const fechaNacimiento = watch('usuFecNac');
     const email = watch('usuCorEle');
@@ -136,11 +194,22 @@ const FormUser = () => {
                     Notiflix.Notify.failure(data.message);
                     return;
                 }
-                // data.pais = JSON.stringify({ ubiCod: data.ubiCod, ubiAno: data.ubiAno });
-                data.pais = JSON.stringify({ ubiCod: data.ubiCod, ubiAno: data.ubiAno });
-                reset(data);
-                setInitialValues(data);
-                console.log(data);
+                // Pasamos todo a minusculas para pintar los campos capitalizados
+                let newData = {};
+                
+                for (let key in data) {
+                    if (typeof data[key] === 'string') {
+                        // Convierte cada cadena a minúsculas
+                        newData[key] = data[key].toLowerCase();
+                    } else {
+                        // Mantiene los valores no string tal como están
+                        newData[key] = data[key];
+                    }
+                }
+                newData.pais = JSON.stringify({ ubiCod: data.ubiCod, ubiAno: data.ubiAno });
+
+                reset(newData);
+                setInitialValues(newData);
             } catch (error) {
                 console.error('Error:', error);
             } finally {
@@ -159,14 +228,30 @@ const FormUser = () => {
     const handleNext = () => {
         validateForm((data) => {
             console.log(data)
+            console.log(initialValues)
             const hasChanged = Object.keys(data).some(key => data[key] !== initialValues[key]);
             console.log(hasChanged)
+
+
+            // Pasamos todo a mayuscula nuevamente para no tener problemas
+            let newData = {};
+                
+            for (let key in data) {
+                if (typeof data[key] === 'string') {
+                    // Convierte cada cadena a minúsculas
+                    newData[key] = data[key].toUpperCase();
+                } else {
+                    // Mantiene los valores no string tal como están
+                    newData[key] = data[key];
+                }
+            }
+
             if (hasChanged) {
                 const { ubiAno, ubiCod } = JSON.parse(data.pais);
-                data.ubiAno = ubiAno;
-                data.ubiCod = ubiCod;
-                console.log(data)
-                handleSubmit(data, isEditing, navigate, safeCiphertext);
+                newData.ubiAno = ubiAno;
+                newData.ubiCod = ubiCod;
+                console.log(newData)
+                handleSubmit(newData, isEditing, navigate, safeCiphertext);
             } else {
                 Notiflix.Notify.info("No se realizaron cambios");
                 navigate(`/menu-user/${safeCiphertext}`);
@@ -270,7 +355,7 @@ const FormUser = () => {
                                     required: 'El nombre es requerido',
                                     minLength: { value: 3, message: 'El nombre debe tener minimo 3 digitos' },
                                     pattern: {
-                                        value: /^[A-Za-zñÑ\s]+$/,
+                                        value: /^[A-Za-zñÑáéíóúÁÉÍÓÚ\s]+$/,
                                         message: 'Por favor, introduce solo letras y espacios',
                                     },
                                     validate: validateNoLeadingSpaces,
@@ -290,6 +375,7 @@ const FormUser = () => {
                                 type="text" 
                                 id="usuApe"
                                 autoComplete="disabled"
+                                style={{ textTransform: 'capitalize'}}
                                 className={`p1 PowerMas_Modal_Form_${dirtyFields.usuApe || isSubmitted ? (errors.usuApe ? 'invalid' : 'valid') : ''}`} 
                                 placeholder="Ejm: Eras"
                                 maxLength={50}
@@ -297,7 +383,7 @@ const FormUser = () => {
                                     required: 'El apellido es requerido',
                                     minLength: { value: 3, message: 'El apellido debe tener minimo 3 digitos' },
                                     pattern: {
-                                        value: /^[A-Za-zñÑ\s]+$/,
+                                        value: /^[A-Za-zñÑáéíóúÁÉÍÓÚ\s]+$/,
                                         message: 'Por favor, introduce solo letras y espacios',
                                     },
                                     validate: validateNoLeadingSpaces,
@@ -319,7 +405,7 @@ const FormUser = () => {
                                         type="radio" 
                                         id="masculino" 
                                         name="usuSex" 
-                                        value="M" 
+                                        value="m" 
                                         {...register('usuSex', { required: 'Por favor, selecciona una opción' })}
                                     />
                                     <label htmlFor="masculino">Masculino</label>
@@ -329,7 +415,7 @@ const FormUser = () => {
                                         type="radio" 
                                         id="femenino" 
                                         name="usuSex" 
-                                        value="F" 
+                                        value="f" 
                                         {...register('usuSex', { required: 'Por favor, selecciona una opción' })}
                                     />
                                     <label htmlFor="femenino">Femenino</label>
@@ -398,6 +484,44 @@ const FormUser = () => {
                                 </p>
                             )}
                         </div>
+                        
+                        
+                    </div>
+                </div>
+                <div className="Large_6">
+                    <div className="PowerMas_Form_Card p1 flex flex-wrap">
+                        <h2 className="f1_25">Datos Profesionales </h2>
+                        <br />
+                        <div className="Large_12 flex flex-column">
+                            <label htmlFor="pais" className="">
+                                Pais:
+                            </label>
+                            <select 
+                                id="pais"
+                                style={{textTransform: 'capitalize'}}
+                                className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.pais || isSubmitted ? (errors.pais ? 'invalid' : 'valid') : ''}`} 
+                                {...register('pais', { 
+                                    validate: value => value !== '0' || 'El País es requerido' 
+                                })}
+                            >
+                                <option value="0">--Seleccione País--</option>
+                                {paises.map(pais => (
+                                    <option 
+                                        key={pais.ubiCod} 
+                                        value={JSON.stringify({ ubiCod: pais.ubiCod, ubiAno: pais.ubiAno })}
+                                    > 
+                                        {pais.ubiNom.toLowerCase()}
+                                    </option>
+                                ))}
+                            </select>
+                            {errors.pais ? (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.pais.message}</p>
+                            ) : (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                    Espacio reservado para el mensaje de error
+                                </p>
+                            )}
+                        </div>
                         <div className="Large_12 flex flex-column">
                             <label htmlFor="usuTel">Teléfono</label>
                             <input 
@@ -406,9 +530,27 @@ const FormUser = () => {
                                 className={`p1 PowerMas_Modal_Form_${dirtyFields.usuTel || isSubmitted ? (errors.usuTel ? 'invalid' : 'valid') : ''}`} 
                                 placeholder="Ejm: 922917351"
                                 autoComplete="disabled"
+                                onKeyDown={(event) => {
+                                    console.log(event.target.value)
+                                    console.log(phoneCodeInput)
+                                    if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
+                                        event.preventDefault();
+                                    }
+                                    if (event.key === 'Backspace' && event.target.value === phoneCodeInput) {
+                                        event.preventDefault();
+                                    }
+                                    // Evita que el usuario ingrese más dígitos de los permitidos
+                                    if (!['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter'].includes(event.key) && event.target.value.length >= phoneLength + phoneCodeInput.length) {
+                                        event.preventDefault();
+                                    }
+                                }}
                                 {...register('usuTel', { 
                                     required: 'El número de telefono es requerido',
-                                    minLength: { value: 9, message: 'El número de telefono debe tener minimo 9 digitos' },
+                                    minLength: { value: phoneLength + phoneCodeInput.length, message: `El número de telefono debe tener minimo ${phoneLength} digitos` },
+                                    pattern: {
+                                        value: /^\+\d*$/,
+                                        message: 'El número de teléfono debe comenzar con "+" y contener solo números',
+                                    },
                                 })} 
                             />
                             {errors.usuTel ? (
@@ -419,13 +561,6 @@ const FormUser = () => {
                                 </p>
                             )}
                         </div>
-                        
-                    </div>
-                </div>
-                <div className="Large_6">
-                    <div className="PowerMas_Form_Card p1 flex flex-wrap">
-                        <h2 className="f1_25">Datos Profesionales </h2>
-                        <br />
                         <div className="Large_12 flex flex-column">
                             <label htmlFor="rolCod">Rol</label>
                             <select 
@@ -484,36 +619,7 @@ const FormUser = () => {
                                 </p>
                             )}
                         </div>
-                        <div className="Large_12 flex flex-column">
-                            <label htmlFor="pais" className="">
-                                Pais:
-                            </label>
-                            <select 
-                                id="pais"
-                                style={{textTransform: 'capitalize'}}
-                                className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.pais || isSubmitted ? (errors.pais ? 'invalid' : 'valid') : ''}`} 
-                                {...register('pais', { 
-                                    validate: value => value !== '0' || 'El País es requerido' 
-                                })}
-                            >
-                                <option value="0">--Seleccione País--</option>
-                                {paises.map(pais => (
-                                    <option 
-                                        key={pais.ubiCod} 
-                                        value={JSON.stringify({ ubiCod: pais.ubiCod, ubiAno: pais.ubiAno })}
-                                    > 
-                                        {pais.ubiNom.toLowerCase()}
-                                    </option>
-                                ))}
-                            </select>
-                            {errors.pais ? (
-                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.pais.message}</p>
-                            ) : (
-                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                    Espacio reservado para el mensaje de error
-                                </p>
-                            )}
-                        </div>
+                        
                         <div className="Large_12 flex flex-column">
                             <label htmlFor="usuNomUsu">Usuario</label>
                             <input 
@@ -562,7 +668,7 @@ const FormUser = () => {
                                         type="radio" 
                                         id="activo" 
                                         name="usuEst" 
-                                        value="A"
+                                        value="a"
                                         {...register('usuEst', { required: 'Por favor, selecciona una opción' })}
                                     />
                                     <label htmlFor="activo">Activo</label>
@@ -572,7 +678,7 @@ const FormUser = () => {
                                         type="radio" 
                                         id="inactivo" 
                                         name="usuEst" 
-                                        value="I"
+                                        value="i"
                                         {...register('usuEst', { required: 'Por favor, selecciona una opción' })}
                                     />
                                     <label htmlFor="inactivo">Inactivo</label>
@@ -591,7 +697,7 @@ const FormUser = () => {
             </div>
             <footer className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
                 <button onClick={() => navigate('/user')} className="Large_3 m_75 PowerMas_Buttom_Secondary">Atras</button>
-                <button onClick={handleNext} className="Large_3 m_75 PowerMas_Buttom_Primary">Siguiente</button>
+                <button onClick={handleNext} className="Large_3 m_75 PowerMas_Buttom_Primary">Grabar y Siguiente</button>
             </footer>
         </>
   )
