@@ -7,6 +7,8 @@ namespace SistemaMEAL.Server.Models
         [Key]
         public String? NacCod { get; set; }
         public String? NacNom{ get; set; }
+        public String? Cantidad{ get; set; }
+        
         public String? UsuIng { get; set; }
         public DateTime? FecIng { get; set; }
         public String? UsuMod { get; set; }

@@ -30,6 +30,12 @@ const Home = () => {
     const [ dataNac, setDataNac ] = useState([]);
     const [ nacionalidadesLoaded, setNacionalidadesLoaded ] = useState(false);
     const [ pieData, setPieData ] = useState([]);
+
+    const [groupedMaleData, setGroupedMaleData] = useState([]);
+    const [groupedFemaleData, setGroupedFemaleData] = useState([]);
+    const [docData, setDocData] = useState([]);
+    const [rangeData, setRangeData] = useState([]);
+
     
 
     // EFECTO AL CARGAR COMPONENTE GET - LISTAR ESTADOS
@@ -83,8 +89,43 @@ const Home = () => {
         fetchMonitoreo();
     }, [searchTags]);
 
+
+
+    const calculateAge = (birthDate) => {
+        const today = new Date();
+        const birthDateParts = birthDate.split('-');
+        const birthDateObject = new Date(birthDateParts[2], birthDateParts[1] - 1, birthDateParts[0]);
+        let age = today.getFullYear() - birthDateObject.getFullYear();
+        const monthDifference = today.getMonth() - birthDateObject.getMonth();
+        if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDateObject.getDate())) {
+            age--;
+        }
+        return age;
+    };
+
+    const ageRanges = [
+        { min: 0, max: 9 },
+        { min: 10, max: 29 },
+        { min: 30, max: 54 },
+        { min: 55, max: 64 },
+        { min: 65, max: Infinity }
+    ];
+    
+
+    const groupDataByAgeRange = (data) => {
+        return ageRanges.map(range => {
+            const count = data.reduce((total, d) => {
+                if (d.age >= range.min && d.age <= range.max) {
+                    total += d.count;
+                }
+                return total;
+            }, 0);
+            return { age: `${range.min}-${range.max}`, count };
+        });
+    };
+
     useEffect(() => {
-        const fetchDataHome = async () => {
+        const fetchBeneficiariosHome = async () => {
             try {
                 Notiflix.Loading.pulse('Cargando...');
                 const token = localStorage.getItem('token');
@@ -104,39 +145,115 @@ const Home = () => {
                 // Conteo de beneficiarios
                 setTotalBeneficiarios(data.length);
 
-                // Contar beneficiarios por sexo
-                let maleCount = 0;
-                let femaleCount = 0;
-                data.forEach(beneficiario => {
-                    if (beneficiario.benSex === 'M') {
-                        maleCount++;
-                    } else if (beneficiario.benSex === 'F') {
-                        femaleCount++;
+            } catch (error) {
+                console.error('Error:', error);
+            } finally {
+                Notiflix.Loading.remove();
+            }
+        };
+        const fetchDocumentosHome = async () => {
+            try {
+                Notiflix.Loading.pulse('Cargando...');
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/DocumentoIdentidad/home/${searchTags.join(',')}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
                     }
                 });
+                if (!response.ok) {
+                    if(response.status == 401 || response.status == 403){
+                        const data = await response.json();
+                        Notiflix.Notify.failure(data.message);
+                    }
+                    return;
+                }
+                const data = await response.json();
+                
+                // Convierte el objeto a un array para usarlo en el gráfico
+                const docData = data.map(item => ({ name: item.docIdeAbr, value: item.cantidad }));
 
-                // Actualizar la data del gráfico de pastel
-                setPieData([
-                    { name: 'Masculino', value: maleCount, color: maleColor },
-                    { name: 'Femenino', value: femaleCount, color: femaleColor },
-                ]);
-    
-                // Crear un objeto para contar las nacionalidades
-                const nacionalidadesCount = {};
-                data.forEach(beneficiario => {
-                    if (!nacionalidadesCount[beneficiario.nacCod]) {
-                        nacionalidadesCount[beneficiario.nacCod] = 1;
-                    } else {
-                        nacionalidadesCount[beneficiario.nacCod]++;
+                setDocData(docData);
+            } catch (error) {
+                console.error('Error:', error);
+            } finally {
+                Notiflix.Loading.remove();
+            }
+        };
+        const fetchNacionalidadesHome = async () => {
+            try {
+                Notiflix.Loading.pulse('Cargando...');
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Nacionalidad/home/${searchTags.join(',')}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
                     }
                 });
+                if (!response.ok) {
+                    if(response.status == 401 || response.status == 403){
+                        const data = await response.json();
+                        Notiflix.Notify.failure(data.message);
+                    }
+                    return;
+                }
+                const data = await response.json();
+                console.log(data)
+                // Convierte el objeto a un array para usarlo en el gráfico
+                const dataFormat = data.map(item => ({ name: item.nacNom, value: item.cantidad }));
 
-                // Convertir el objeto a un array para usarlo en el gráfico
-                const dataNac = Object.keys(nacionalidadesCount).map(nacCod => {
-                    const nacNom = nacionalidades.find(n => n.nacCod === nacCod).nacNom;
-                    return { name: nacNom, value: nacionalidadesCount[nacCod] };
+                setDataNac(dataFormat);
+            } catch (error) {
+                console.error('Error:', error);
+            } finally {
+                Notiflix.Loading.remove();
+            }
+        };
+        const fetchSexosHome = async () => {
+            try {
+                Notiflix.Loading.pulse('Cargando...');
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Beneficiario/sexo-home/${searchTags.join(',')}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
                 });
-                setDataNac(dataNac);
+                if (!response.ok) {
+                    if(response.status == 401 || response.status == 403){
+                        const data = await response.json();
+                        Notiflix.Notify.failure(data.message);
+                    }
+                    return;
+                }
+                const data = await response.json();
+                console.log(data)
+                // Convierte el objeto a un array para usarlo en el gráfico
+                const dataFormat = data.map(item => ({ name: item.benSex, value: item.cantidad }));
+
+                setPieData(dataFormat);
+            } catch (error) {
+                console.error('Error:', error);
+            } finally {
+                Notiflix.Loading.remove();
+            }
+        };
+        const fetchRangoHome = async () => {
+            try {
+                Notiflix.Loading.pulse('Cargando...');
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Beneficiario/rango-home/${searchTags.join(',')}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if (!response.ok) {
+                    if(response.status == 401 || response.status == 403){
+                        const data = await response.json();
+                        Notiflix.Notify.failure(data.message);
+                    }
+                    return;
+                }
+                const data = await response.json();
+                console.log(data)
+                setRangeData(data)
             } catch (error) {
                 console.error('Error:', error);
             } finally {
@@ -145,7 +262,11 @@ const Home = () => {
         };
 
         if (nacionalidadesLoaded) {
-            fetchDataHome();
+            fetchBeneficiariosHome();
+            fetchDocumentosHome();
+            fetchNacionalidadesHome();
+            fetchSexosHome();
+            fetchRangoHome();
         }
     }, [nacionalidadesLoaded, searchTags]);
 
@@ -196,66 +317,7 @@ const Home = () => {
         { name: 'Femenino', value: 91949, color: femaleColor },
     ];
 
-    const maleData = [
-        { age: 10, count: 20 },
-        { age: 15, count: 30 },
-        { age: 50, count: 80 },
-        { age: 8, count: 80 },
-        { age: 58, count: 10 },
-        { age: 90, count: 8 },
-        // ...
-    ];
-    
-    const femaleData = [
-        { age: 8, count: 70 },
-        { age: 10, count: 25 },
-        { age: 15, count: 35 },
-        { age: 30, count: 50 },
-        { age: 40, count: 60 },
-        { age: 58, count: 30 },
-        { age: 68, count: 50 },
-        { age: 69, count: 80 },
-        // ...
-    ];
-
-    const ageRanges = [
-        { min: 0, max: 9 },
-        { min: 10, max: 29 },
-        { min: 30, max: 54 },
-        { min: 55, max: 64 },
-        { min: 65, max: 150 }
-    ];
-    
-    const groupDataByAgeRange = (data) => {
-        return ageRanges.map(range => {
-            const count = data.reduce((total, d) => {
-                if (d.age >= range.min && d.age <= range.max) {
-                    total += d.count;
-                }
-                return total;
-            }, 0);
-            return { age: `${range.min}-${range.max}`, count };
-        });
-    };
-    
-    const groupedMaleData = groupDataByAgeRange(maleData);
-    const groupedFemaleData = groupDataByAgeRange(femaleData);
-
-    // const dataNac = [
-    //     { name: 'Peruana', value: 100 },
-    //     { name: 'Colombiana', value: 200 },
-    //     { name: 'Ecuatoriana', value: 80 },
-    //     { name: 'Argentina', value: 310 },
-    //     { name: 'Chilena', value: 20 },
-    // ];
-    const dataTipDoc = [
-        { name: 'DNI', value: 100 },
-        { name: 'CE', value: 200 },
-        { name: 'CC', value: 80 },
-        { name: 'PDN', value: 310 },
-        { name: 'PAS', value: 20 },
-    ];
-
+    const colors = ['#1d6776','#61A2AA']
 
     return(
     <>
@@ -314,7 +376,7 @@ const Home = () => {
                 <div className='PowerMas_Home_Card p1 Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
                     <h4>Beneficiarios por Tipo de documento</h4>
                     <div className='Large_12 Medium_12 Phone_12 Large-p1 Medium-p_75 flex-grow-1'>
-                        <HorizontalBarChart data={dataTipDoc} id='TipoDocBarChart' barColor='#1d6776' />
+                        <HorizontalBarChart data={docData} id='TipoDocBarChart' barColor='#1d6776' />
                     </div>
                 </div>
                 
@@ -323,7 +385,12 @@ const Home = () => {
                 <div className='PowerMas_Home_Card Large-p1 Medium-p_75 Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
                     <h4>Beneficiarios por Edad</h4>
                     <div className='Large_12 Medium_12 Phone_12 Large-p1 Medium-p_75 flex-grow-1'>
-                        <DivergingBarChart maleData={groupedMaleData} femaleData={groupedFemaleData} maleColor={maleColor} femaleColor={femaleColor} ageRanges={ageRanges} id='Diverging' />
+                        <DivergingBarChart 
+                            rangeData={rangeData}
+                            maleColor={maleColor} 
+                            femaleColor={femaleColor} 
+                            id='Diverging' 
+                        />
                     </div>
                     <div className='flex flex-wrap gap-1'>
                         <div className='flex ai-center gap_5'>
@@ -340,7 +407,7 @@ const Home = () => {
                 <div className='PowerMas_Home_Card p1 Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
                     <h4>Beneficiarios por Sexo</h4>
                     <div className='Large_6 Medium_12 Phone_12 Large-p1 Small-p_75 flex-grow-1'>
-                        <PieChart data={pieData} id='MaleFemale' />
+                        <PieChart data={pieData} colors={colors} id='MaleFemale' />
                     </div>
                     <div className='flex flex-wrap gap-1'>
                         {data.map((item, index) => (

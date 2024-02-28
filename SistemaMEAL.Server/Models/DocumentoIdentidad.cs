@@ -10,6 +10,8 @@ namespace SistemaMEAL.Server.Models
         public String? DocIdeCod { get; set; }
         public String? DocIdeNom { get; set; }
         public String? DocIdeAbr { get; set; }
+        // Ayuda
+        public String? Cantidad { get; set; }
         public String? UsuIng { get; set; }
         public DateTime? FecIng { get; set; }
         public String? UsuMod { get; set; }

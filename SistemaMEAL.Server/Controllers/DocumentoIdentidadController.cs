@@ -152,5 +152,18 @@ namespace SistemaMEAL.Server.Controllers
                 return Ok(message);
             }
         }
+
+        [HttpGet]
+        [Route("home/{tags?}")]
+        public dynamic BuscarDocumentosHome(string? tags = null)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var reult = _documentos.BuscarDocumentosHome(tags);
+            return Ok(reult);
+        }
     }
 }

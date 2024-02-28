@@ -101,6 +101,7 @@ const Table = ({ data }) => {
                 item.objEspNum.includes(tag.toUpperCase()) || 
                 item.objNom.includes(tag.toUpperCase()) || 
                 item.subProNom.includes(tag.toUpperCase()) || 
+                item.ubiNom.includes(tag.toUpperCase()) || 
                 item.proNom.includes(tag.toUpperCase())
             )
         ), [data, searchTags]
@@ -299,6 +300,10 @@ const Table = ({ data }) => {
             {
                 header: "Proyecto",
                 accessorKey: "proNom"
+            },
+            {
+                header: "Ubicaciòn",
+                accessorKey: "ubiNom"
             },
             {
                 header: "Financiador",

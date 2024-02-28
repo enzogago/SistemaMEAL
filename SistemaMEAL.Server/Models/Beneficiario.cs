@@ -15,7 +15,7 @@ namespace SistemaMEAL.Server.Models
         public String? BenNomApo { get; set; }
         public String? BenApeApo { get; set; }
         public String? BenFecNac { get; set; }
-        public Char? BenSex { get; set; }
+        public String? BenSex { get; set; }
         [ForeignKey("Genero")]
         public String? GenCod { get; set; }
         public String? GenNom { get; set; }
@@ -25,6 +25,9 @@ namespace SistemaMEAL.Server.Models
         [ForeignKey("Nacionalidad")]
         public String? NacCod { get; set; }
         public String? NacNom { get; set; }
+        public String? EdaMin { get; set; }
+        public String? EdaMax { get; set; }
+        public String? Cantidad { get; set; }
         public String? UsuIng { get; set; }
         public DateTime? FecIng { get; set; }
         public String? UsuMod { get; set; }

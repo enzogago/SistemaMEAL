@@ -8,6 +8,7 @@ import Notiflix from "notiflix";
 import { useForm } from 'react-hook-form';
 import TableForm from "./TableForm";
 import { Tooltip } from "react-tooltip";
+import { fetchData } from "../../reusable/helper";
 
 const FormGoalBeneficiarie = () => {
     const navigate = useNavigate();
@@ -37,6 +38,24 @@ const FormGoalBeneficiarie = () => {
     const [ data, setdata] = useState([])
     const [ fieldsDisabled, setFieldsDisabled ] = useState(true);
     const [ existeBeneficiario, setExisteBeneficiario ] = useState(false);
+    const [isOptionOneSelected, setIsOptionOneSelected] = useState(true);
+
+    const [ phoneCodeInput, setPhoneCodeInput ] = useState('');
+    const [ inputView, setInputView ] = useState('');
+    const [ phoneLength, setPhoneLength ] = useState('');
+
+    const countryPhoneCodes = {
+        "peru": "+51",
+        "colombia": "+57",
+        "ecuador" : "+593",
+        // Añade aquí los demás países y sus códigos
+    };
+    const countryPhoneLength = {
+        "peru": 9,
+        "colombia": 10,
+        "ecuador" : 9,
+        // Añade aquí los demás países y sus longitudes
+    };
 
 
     useEffect(() => {
@@ -73,14 +92,66 @@ const FormGoalBeneficiarie = () => {
     }, [updateData])
 
     //
-    const { register, watch, handleSubmit: validateForm, formState: { errors, dirtyFields, isSubmitted }, reset, setValue } = 
-    useForm({ mode: "onChange", defaultValues: {benNomApo: '', benApeApo: ''}});
+    const { register, watch, handleSubmit: validateForm, formState: { errors, dirtyFields, isSubmitted }, reset, setValue, trigger } = 
+    useForm({ mode: "onChange", defaultValues: {benNomApo: '', benApeApo: '', 'genCod': 0}});
+
+
+    useEffect(() => {
+        const phone = watch('benTel');
+        if (phone && phoneCodeInput && !phone.startsWith(phoneCodeInput)) {
+            setValue('benTel', phoneCodeInput);
+        }
+    }, [watch('benTel')]);
+    useEffect(() => {
+        const phone = watch('benTelCon');
+        if (phone && phoneCodeInput && !phone.startsWith(phoneCodeInput)) {
+            setValue('benTelCon', phoneCodeInput);
+        }
+    }, [watch('benTelCon')]);
+
+    useEffect(() => {
+        const pais = watch('pais');
+        const tel = watch('benTel');
+        const telCon = watch('benTelCon');
+    
+        const updatePhoneCode = async () => {
+            if (pais != '0') {
+                const isPaisValid = await trigger('pais');
+                if (isPaisValid) {
+                    const { ubiCod } = JSON.parse(pais);
+                    const paisObj = paises.find(p => p.ubiCod === ubiCod);
+                    if (paisObj) {
+                        const newPhoneCode = countryPhoneCodes[paisObj.ubiNom.toLowerCase()];
+                        const phoneLength = countryPhoneLength[paisObj.ubiNom.toLowerCase()];
+                        
+                        // Si el número de teléfono está vacío o no comienza con el nuevo código del país, actualiza el número de teléfono con el nuevo código del país
+                        if (!tel || (tel && !tel.startsWith(newPhoneCode))) {
+                            setValue('benTel', newPhoneCode);
+                        }
+
+                        if (!telCon || (telCon && !telCon.startsWith(newPhoneCode))) {
+                            setValue('benTelCon', newPhoneCode);
+                        }
+                        
+                        if (newPhoneCode){
+                            setPhoneCodeInput(newPhoneCode);
+                            setPhoneLength(phoneLength);
+                        }
+                    }
+                } 
+            } else {
+                setValue('benTel', '');
+                setValue('benTelCon', '');
+            }
+        };
+        updatePhoneCode();
+    }, [watch('pais'), paises]);
 
     const pais = watch('pais');
 
     useEffect(() => {
         if (pais) {
-            if (pais === '0') {
+            if (pais == '0') {
                 setSelects([]);
                 return;
             }
@@ -117,13 +188,10 @@ const FormGoalBeneficiarie = () => {
                     benNom: '',
                     benNomApo: '',
                     benSex: '',
-                    benTel: '',
-                    benTelCon: '',
                     genCod: '0',
-                    pais: '0',
                 });
                 setDocumentosAgregados([]);
-                setSelects([]);
+                setIsOptionOneSelected(true);
                 return;
             }
             const data = await response.json();
@@ -260,10 +328,10 @@ const FormGoalBeneficiarie = () => {
     }
     
     const fetchBeneficiarie = async () => {
-        const token = localStorage.getItem('token');
-        Notiflix.Loading.pulse('Cargando...');
-        
         try {
+            const token = localStorage.getItem('token');
+            Notiflix.Loading.pulse('Cargando...');
+            
             const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/${metAno}/${metCod}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -277,6 +345,12 @@ const FormGoalBeneficiarie = () => {
             }
             console.log(data);
             setMetaData(data);
+
+            setValue('metBenMesEjeTec', data.metMesPlaTec)
+            setValue('metBenAnoEjeTec', data.metAnoPlaTec)
+            setValue('pais', JSON.stringify({ ubiCod: data.ubiCod, ubiAno: data.ubiAno }))
+
+            
         } catch (error) {
             console.error('Error:', error);
         } finally {
@@ -284,102 +358,18 @@ const FormGoalBeneficiarie = () => {
         }
     }
 
+    const [isDataLoaded, setIsDataLoaded] = useState(false);
     useEffect(() => {
-        if(id.length === 10){
+        if (id.length === 10 && isDataLoaded) {
             fetchBeneficiarie();
-        };
-    }, [id]);
-
+        }
+    }, [id, isDataLoaded]);
     useEffect(() => {
-        const fetchDocumentos = async () => {
-            try {
-                Notiflix.Loading.pulse('Cargando...');
-                const token = localStorage.getItem('token');
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/DocumentoIdentidad`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                if (!response.ok) {
-                    if(response.status == 401 || response.status == 403){
-                        const data = await response.json();
-                        Notiflix.Notify.failure(data.message);
-                    }
-                    return;
-                }
-                const data = await response.json();
-                if (data.success == false) {
-                    Notiflix.Notify.failure(data.message);
-                    return;
-                }
-                setDocumentos(data);
-            } catch (error) {
-                console.error('Error:', error);
-            } finally {
-                Notiflix.Loading.remove();
-            }
-        };
-        const fetchPaises = async () => {
-            try {
-                Notiflix.Loading.pulse('Cargando...');
-                const token = localStorage.getItem('token');
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Ubicacion`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                if (!response.ok) {
-                    if(response.status == 401 || response.status == 403){
-                        const data = await response.json();
-                        Notiflix.Notify.failure(data.message);
-                    }
-                    return;
-                }
-                const data = await response.json();
-                if (data.success == false) {
-                    Notiflix.Notify.failure(data.message);
-                    return;
-                }
-                console.log(data)
-                setPaises(data);
-            } catch (error) {
-                console.error('Error:', error);
-            } finally {
-                Notiflix.Loading.remove();
-            }
-        };
-        const fetchGneros = async () => {
-            try {
-                Notiflix.Loading.pulse('Cargando...');
-                const token = localStorage.getItem('token');
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Genero`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                if (!response.ok) {
-                    if(response.status == 401 || response.status == 403){
-                        const data = await response.json();
-                        Notiflix.Notify.failure(data.message);
-                    }
-                    return;
-                }
-                const data = await response.json();
-                if (data.success == false) {
-                    Notiflix.Notify.failure(data.message);
-                    return;
-                }
-                console.log(data)
-                setGeneros(data);
-            } catch (error) {
-                console.error('Error:', error);
-            } finally {
-                Notiflix.Loading.remove();
-            }
-        };
-        fetchGneros();
-        fetchPaises();
-        fetchDocumentos();
+        Promise.all([
+            fetchData('Genero', setGeneros),
+            fetchData('Ubicacion', setPaises),
+            fetchData('DocumentoIdentidad', setDocumentos)
+        ]).then(() => setIsDataLoaded(true));
     }, []);
     
 
@@ -550,17 +540,13 @@ const FormGoalBeneficiarie = () => {
             benNom: '',
             benNomApo: '',
             benSex: '',
-            benTel: '',
-            benTelCon: '',
             genCod: '0',
-            pais: '0',
         });
         reset2({
             docIdeBenNum: '',
             docIdeCod: '0',
         }); // Resetea todos los campos del segundo formulario
         setDocumentosAgregados([]);  // Vacía la lista de documentos agregados
-        setSelects([]);  // Vacía la lista de selects
         setFieldsDisabled(true);  // Deshabilita los campos del formulario
         setMostrarAgregarDocumento(false);
         setAccionActual('buscar');
@@ -610,85 +596,284 @@ const FormGoalBeneficiarie = () => {
     const selectedDocumentValue = watch2('docIdeCod', '0');
     const benSex = watch('benSex');
 
+    const metBenAnoEjeTec = watch('metBenAnoEjeTec');
+    const metBenMesEjeTec = watch('metBenMesEjeTec');
+
     return (
         <>
             <div className="PowerMas_Header_Form_Beneficiarie flex ai-center p_5 gap-1">
                 <GrFormPreviousLink className="w-auto Large-f2_5 pointer" onClick={() => navigate('/monitoring')} />
                 <h1 className="f1_75">Nuevo Beneficiario</h1>
             </div>
+            
             <div className="PowerMas_Content_Form_Beneficiarie overflow-auto flex-grow-1 flex">
                     <div className="Large_6 m1 overflow-auto flex flex-column gap-1">
-                        <div className="PowerMas_Content_Form_Beneficiarie_Card Large-p_75">
-                            <h2 className="f1_25 Large_12">Datos Personales</h2>
-                            <form onSubmit={validateForm2(onSubmit)}>
-                                <div className="m_75">
-                                    <label htmlFor="docIdeCod" className="">
-                                        Tipo de documento:
+                    <div className="PowerMas_Content_Form_Beneficiarie_Card Large-p_75">
+                            <h2 className="f1_25">Datos de Ubicación</h2>
+                            <div className="m_75">
+                                <label htmlFor="pais" className="">
+                                    Pais:
+                                </label>
+                                <select 
+                                    id="pais"
+                                    style={{textTransform: 'capitalize'}}
+                                    disabled={true}
+                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.pais || isSubmitted ? (errors.pais ? 'invalid' : 'valid') : ''}`} 
+                                    {...register('pais', { 
+                                        validate: {
+                                            required: value => value !== '0' || 'El campo es requerido',
+                                            equal: value => JSON.stringify({ ubiCod: metaData.ubiCod, ubiAno: metaData.ubiAno }) === value || 'El país debe ser el planificado'
+                                        }
+                                    })}
+                                >
+                                    <option value="0">--Seleccione País--</option>
+                                    {paises.map(pais => (
+                                        <option 
+                                            key={pais.ubiCod} 
+                                            value={JSON.stringify({ ubiCod: pais.ubiCod, ubiAno: pais.ubiAno })}
+                                        > 
+                                            {pais.ubiNom.toLowerCase()}
+                                        </option>
+                                    ))}
+                                </select>
+                                {errors.pais ? (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.pais.message}</p>
+                                ) : (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                        Espacio reservado para el mensaje de error
+                                    </p>
+                                )}
+                            </div>
+                            
+                            {selects.map((options, index) => (
+                                <div className="m_75" key={index}>
+                                    <label style={{textTransform: 'capitalize'}} htmlFor={index} className="">
+                                        {options[0].ubiTip.toLowerCase()}
                                     </label>
-                                    <select 
-                                        id="docIdeCod" 
-                                        className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields2.docIdeCod || isSubmitted2 ? (errors2.docIdeCod ? 'invalid' : 'valid') : ''}`} 
-                                        style={{ color: selectedDocumentValue === '0' ? '#372e2c60' : '#000', textTransform: 'capitalize'}}
-                                        {...register2('docIdeCod', { 
-                                            validate: value => value !== '0' || 'El dcoumento de identidad es requerido' 
-                                        })}
+                                    <select
+                                        id={index}
+                                        key={index} 
+                                        name={`select${index}`} 
+                                        onChange={(event) => handleCountryChange(event.target.value, index)} 
+                                        style={{textTransform: 'capitalize'}}
+                                        className="block Phone_12"
                                     >
-                                        <option value="0">--Seleccione Documento Identidad--</option>
-                                        {documentos.map(documento => (
-                                            <option
-                                                key={documento.docIdeCod} 
-                                                value={documento.docIdeCod}> ({documento.docIdeAbr}) {documento.docIdeNom.toLowerCase()}
+                                        <option style={{textTransform: 'capitalize'}} value="0">--Seleccione {options[0].ubiTip.toLowerCase()}--</option>
+                                        {options.map(option => (
+                                            <option key={option.ubiCod} value={JSON.stringify({ ubiCod: option.ubiCod, ubiAno: option.ubiAno })}>
+                                                {option.ubiNom.toLowerCase()}
                                             </option>
                                         ))}
                                     </select>
-                                    {errors2.docIdeCod ? (
-                                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors2.docIdeCod.message}</p>
-                                    ) : (
-                                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                        Espacio reservado para el mensaje de error
-                                        </p>
-                                    )}
                                 </div>
-                                <div className="m_75">
-                                    <label htmlFor="docIdeBenNum" className="">
-                                        Numero de documento:
+                            ))}
+                            {
+                                cargando &&
+                                <div id="loading" className="m_75">Cargando...</div>
+                            }
+                            <div className="flex">
+                                <div className="m_75 Large_6">
+                                    <label htmlFor="metBenAnoEjeTec" className="">
+                                        Año de Ejecución
                                     </label>
-                                    <input
-                                        id="docIdeBenNum"
-                                        className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields2.docIdeBenNum || isSubmitted2 ? (errors2.docIdeBenNum ? 'invalid' : 'valid') : ''}`} 
+                                    <input 
                                         type="text" 
-                                        placeholder="74301932"
+                                        id="metBenAnoEjeTec"
+                                        className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.metBenAnoEjeTec || isSubmitted ? (errors.metBenAnoEjeTec ? 'invalid' : 'valid') : ''}`} 
+                                        placeholder="2024"
                                         autoComplete="disabled"
-                                        maxLength={10}
+                                        maxLength={4}
                                         onKeyDown={(event) => {
                                             if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
                                                 event.preventDefault();
                                             }
                                         }}
-                                        {...register2('docIdeBenNum', { 
-                                            required: 'El número de documento es requerido',
-                                            minLength: {
-                                                value: 6,
-                                                message: 'El número de documento debe tener al menos 6 dígitos'
-                                            },
-                                            maxLength: {
-                                                value: 10,
-                                                message: 'El número de documento no debe tener más de 10 dígitos'
-                                            },
+                                        {...register('metBenAnoEjeTec', { 
+                                            required: 'El número de telefono es requerido',
+                                            minLength: { value: 4, message: 'El número debe tener minimo 4 digitos' },
+                                            maxLength: { value: 4, message: 'El número debe tener minimo 4 digitos' },
                                             pattern: {
                                                 value: /^[0-9]*$/,
-                                                message: 'El número de documento solo debe contener números'
-                                            }
-                                        })}
+                                                message: 'Solo se aceptan numeros'
+                                            },
+                                            validate: value => parseInt(value) >= metaData.metAnoPlaTec || 'El año debe ser mayor o igual al año planificado'
+                                        })} 
                                     />
-                                    {errors2.docIdeBenNum ? (
-                                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors2.docIdeBenNum.message}</p>
+                                    {errors.metBenAnoEjeTec ? (
+                                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.metBenAnoEjeTec.message}</p>
                                     ) : (
                                         <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
                                         Espacio reservado para el mensaje de error
                                         </p>
                                     )}
                                 </div>
+                                <div className="m_75 Large_6">
+                                    <label htmlFor="metBenMesEjeTec" className="">
+                                        Mes de Ejecución
+                                    </label>
+                                    <select 
+                                        className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.metBenMesEjeTec || isSubmitted ? (errors.metBenMesEjeTec ? 'invalid' : 'valid') : ''}`} 
+                                        {...register('metBenMesEjeTec', { 
+                                            validate: {
+                                                required: value => value !== '0' || 'El campo es requerido',
+                                                greaterOrEqual: value => {
+                                                    const month = value;
+                                                    const year = metBenAnoEjeTec;
+                                                    return (year > metaData.metAnoPlaTec) || (year === metaData.metAnoPlaTec && month >= metaData.metMesPlaTec) || 'El mes y el año deben ser mayores o iguales al mes y al año planificados';
+                                                }
+                                            }
+                                        })}
+                                        id="metBenMesEjeTec" 
+                                    >
+                                        <option value="0">--Seleccione Mes--</option>
+                                        <option value="01">Enero</option>
+                                        <option value="02">Febrero</option>
+                                        <option value="03">Marzo</option>
+                                        <option value="04">Abril</option>
+                                        <option value="05">Mayo</option>
+                                        <option value="06">Junio</option>
+                                        <option value="07">Julio</option>
+                                        <option value="08">Agosto</option>
+                                        <option value="09">Septiembre</option>
+                                        <option value="10">Octubre</option>
+                                        <option value="11">Noviembre</option>
+                                        <option value="12">Diciembre</option>
+                                    </select>
+                                    {errors.metBenMesEjeTec ? (
+                                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.metBenMesEjeTec.message}</p>
+                                    ) : (
+                                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                        Espacio reservado para el mensaje de error
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                        <div className="PowerMas_Content_Form_Beneficiarie_Card Large-p_75">
+                            <h2 className="f1_25 Large_12">Datos Personales</h2>
+                            <form onSubmit={validateForm2(onSubmit)}>
+                                {
+                                    !mostrarAgregarDocumento &&
+                                    <div className="m_75 flex jc-center">
+                                        <label className="Large_6 flex gap_5 ai-center">
+                                            <input
+                                                className="m0"
+                                                type="radio"
+                                                checked={isOptionOneSelected}
+                                                onChange={() => setIsOptionOneSelected(true)}
+                                            />
+                                            Buscar por Documento
+                                        </label>
+                                        <label className="Large_6 flex gap_5 ai-center">
+                                            <input
+                                            className="m0"
+                                                type="radio"
+                                                checked={!isOptionOneSelected}
+                                                onChange={() => setIsOptionOneSelected(false)}
+                                            />
+                                            Buscar por Nombres
+                                        </label>
+                                    </div>
+                                }
+                                {
+                                    isOptionOneSelected ?
+                                    <>
+                                        <div className="m_75">
+                                            <label htmlFor="docIdeCod" className="">
+                                                Tipo de documento:
+                                            </label>
+                                            <select 
+                                                id="docIdeCod" 
+                                                className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields2.docIdeCod || isSubmitted2 ? (errors2.docIdeCod ? 'invalid' : 'valid') : ''}`} 
+                                                style={{ color: selectedDocumentValue === '0' ? '#372e2c60' : '#000', textTransform: 'capitalize'}}
+                                                {...register2('docIdeCod', { 
+                                                    validate: value => value !== '0' || 'El dcoumento de identidad es requerido' 
+                                                })}
+                                            >
+                                                <option value="0">--Seleccione Documento Identidad--</option>
+                                                {documentos.map(documento => (
+                                                    <option
+                                                        key={documento.docIdeCod} 
+                                                        value={documento.docIdeCod}> ({documento.docIdeAbr}) {documento.docIdeNom.toLowerCase()}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            {errors2.docIdeCod ? (
+                                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors2.docIdeCod.message}</p>
+                                            ) : (
+                                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                                Espacio reservado para el mensaje de error
+                                                </p>
+                                            )}
+                                        </div>
+                                        <div className="m_75">
+                                            <label htmlFor="docIdeBenNum" className="">
+                                                Numero de documento:
+                                            </label>
+                                            <input
+                                                id="docIdeBenNum"
+                                                className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields2.docIdeBenNum || isSubmitted2 ? (errors2.docIdeBenNum ? 'invalid' : 'valid') : ''}`} 
+                                                type="text" 
+                                                placeholder="74301932"
+                                                autoComplete="disabled"
+                                                maxLength={10}
+                                                onKeyDown={(event) => {
+                                                    if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
+                                                        event.preventDefault();
+                                                    }
+                                                }}
+                                                {...register2('docIdeBenNum', { 
+                                                    required: 'El número de documento es requerido',
+                                                    minLength: {
+                                                        value: 6,
+                                                        message: 'El número de documento debe tener al menos 6 dígitos'
+                                                    },
+                                                    maxLength: {
+                                                        value: 10,
+                                                        message: 'El número de documento no debe tener más de 10 dígitos'
+                                                    },
+                                                    pattern: {
+                                                        value: /^[0-9]*$/,
+                                                        message: 'El número de documento solo debe contener números'
+                                                    }
+                                                })}
+                                            />
+                                            {errors2.docIdeBenNum ? (
+                                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors2.docIdeBenNum.message}</p>
+                                            ) : (
+                                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                                Espacio reservado para el mensaje de error
+                                                </p>
+                                            )}
+                                        </div>
+                                    </>
+                                    :
+                                    <>
+                                        <div className="m_75">
+                                            <label htmlFor="benNom" className="">
+                                                Nombre
+                                            </label>
+                                            <input
+                                                id="benNom"
+                                                className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields2.benNom || isSubmitted2 ? (errors2.benNom ? 'invalid' : 'valid') : ''}`} 
+                                                type="text" 
+                                                placeholder="Buscar por nombres"
+                                                autoComplete="disabled"
+                                                {...register2('benNom', { 
+                                                    required: 'El campo es requerido',
+                                                    minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
+                                                })}
+                                            />
+                                            {errors2.benNom ? (
+                                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors2.benNom.message}</p>
+                                            ) : (
+                                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                                Espacio reservado para el mensaje de error
+                                                </p>
+                                            )}
+                                        </div>
+                                    </>
+                                }
                                 <div className="m_75 flex jc-center">
                                 {
                                     mostrarAgregarDocumento ? 
@@ -700,10 +885,7 @@ const FormGoalBeneficiarie = () => {
                                         <button className="PowerMas_Buttom_Primary Large_5" type="submit">Buscar</button>
                                 }
                                 </div>
-
                             </form>
-
-
                             <div className="m_75">
                                 <label htmlFor="benNom" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
                                     Nombre
@@ -796,11 +978,11 @@ const FormGoalBeneficiarie = () => {
                                 <select 
                                     id="genCod" 
                                     disabled={fieldsDisabled}
-                                    style={{ color: selectedValue === '0' ? '#372e2c60' : '#000000', textTransform: 'capitalize'}}
+                                    style={{ color: selectedValue == '0' ? '#372e2c60' : '#000000', textTransform: 'capitalize'}}
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.genCod || isSubmitted ? (errors.genCod ? 'invalid' : 'valid') : ''}`}
                                     name="genCod"
                                     {...register('genCod', { 
-                                        validate: value => value !== '0' || 'El género de identidad es requerido' 
+                                        validate: value => value != '0' || 'El género es requerido' 
                                     })}
                                 >
                                     <option value="0">--Seleccione Género--</option>
@@ -822,7 +1004,7 @@ const FormGoalBeneficiarie = () => {
                                 )}
                             </div>
                             <div className="m_75">
-                                <label htmlFor="benFecNac" className="">
+                                <label style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}}htmlFor="benFecNac" className="">
                                     Fecha de nacimiento:
                                 </label>
                                 <input 
@@ -888,25 +1070,32 @@ const FormGoalBeneficiarie = () => {
                                 </label>
                                 <input 
                                     type="text" 
-                                    id="benTel"
+                                    id="benTel" 
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benTel || isSubmitted ? (errors.benTel ? 'invalid' : 'valid') : ''}`} 
-                                    placeholder="907078329"
+                                    placeholder="Ejm: 922917351"
                                     autoComplete="disabled"
-                                    maxLength={10}
                                     disabled={fieldsDisabled}
                                     onKeyDown={(event) => {
+                                        console.log(event.target.value)
+                                        console.log(phoneCodeInput)
                                         if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
+                                            event.preventDefault();
+                                        }
+                                        if (event.key === 'Backspace' && event.target.value === phoneCodeInput) {
+                                            event.preventDefault();
+                                        }
+                                        // Evita que el usuario ingrese más dígitos de los permitidos
+                                        if (!['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter'].includes(event.key) && event.target.value.length >= phoneLength + phoneCodeInput.length) {
                                             event.preventDefault();
                                         }
                                     }}
                                     {...register('benTel', { 
                                         required: 'El número de telefono es requerido',
-                                        minLength: { value: 9, message: 'El número debe tener minimo 9 digitos' },
-                                        maxLength: { value: 10, message: 'El número debe tener minimo 10 digitos' },
+                                        minLength: { value: phoneLength + phoneCodeInput.length, message: `El número de telefono debe tener minimo ${phoneLength} digitos` },
                                         pattern: {
-                                            value: /^[0-9]*$/,
-                                            message: 'Solo se aceptan numeros'
-                                        }
+                                            value: /^\+\d*$/,
+                                            message: 'El número de teléfono debe comenzar con "+" y contener solo números',
+                                        },
                                     })} 
                                 />
                                 {errors.benTel ? (
@@ -922,6 +1111,36 @@ const FormGoalBeneficiarie = () => {
                                     Telefono de contacto
                                 </label>
                                 <input 
+                                    type="text" 
+                                    id="benTelCon" 
+                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benTelCon || isSubmitted ? (errors.benTelCon ? 'invalid' : 'valid') : ''}`} 
+                                    placeholder="Ejm: 922917351"
+                                    autoComplete="disabled"
+                                    disabled={fieldsDisabled}
+                                    onKeyDown={(event) => {
+                                        console.log(event.target.value)
+                                        console.log(phoneCodeInput)
+                                        if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
+                                            event.preventDefault();
+                                        }
+                                        if (event.key === 'Backspace' && event.target.value === phoneCodeInput) {
+                                            event.preventDefault();
+                                        }
+                                        // Evita que el usuario ingrese más dígitos de los permitidos
+                                        if (!['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter'].includes(event.key) && event.target.value.length >= phoneLength + phoneCodeInput.length) {
+                                            event.preventDefault();
+                                        }
+                                    }}
+                                    {...register('benTelCon', { 
+                                        required: 'El número de telefono es requerido',
+                                        minLength: { value: phoneLength + phoneCodeInput.length, message: `El número de telefono debe tener minimo ${phoneLength} digitos` },
+                                        pattern: {
+                                            value: /^\+\d*$/,
+                                            message: 'El número de teléfono debe comenzar con "+" y contener solo números',
+                                        },
+                                    })} 
+                                />
+                                {/* <input 
                                     type="text" 
                                     id="benTelCon"
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benTelCon || isSubmitted ? (errors.benTelCon ? 'invalid' : 'valid') : ''}`} 
@@ -943,7 +1162,7 @@ const FormGoalBeneficiarie = () => {
                                             message: 'Solo se aceptan numeros'
                                         }
                                     })} 
-                                />
+                                /> */}
                                 {errors.benTelCon ? (
                                     <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.benTelCon.message}</p>
                                 ) : (
@@ -1013,66 +1232,7 @@ const FormGoalBeneficiarie = () => {
                             </>
                         }
                        
-                        <div className="PowerMas_Content_Form_Beneficiarie_Card Large-p_75">
-                            <h2 className="f1_25">Datos de Ubicación</h2>
-                            <div className="m_75">
-                                <label htmlFor="pais" className="">
-                                    Pais:
-                                </label>
-                                <select 
-                                    id="pais"
-                                    style={{textTransform: 'capitalize'}}
-                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.pais || isSubmitted ? (errors.pais ? 'invalid' : 'valid') : ''}`} 
-                                    {...register('pais', { 
-                                        validate: value => value !== '0' || 'El País es requerido' 
-                                    })}
-                                >
-                                    <option value="0">--Seleccione País--</option>
-                                    {paises.map(pais => (
-                                        <option 
-                                            key={pais.ubiCod} 
-                                            value={JSON.stringify({ ubiCod: pais.ubiCod, ubiAno: pais.ubiAno })}
-                                        > 
-                                            {pais.ubiNom.toLowerCase()}
-                                        </option>
-                                    ))}
-                                </select>
-                                {errors.pais ? (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.pais.message}</p>
-                                ) : (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                        Espacio reservado para el mensaje de error
-                                    </p>
-                                )}
-                            </div>
-                            
-                            {selects.map((options, index) => (
-                                <div className="m_75" key={index}>
-                                    <label style={{textTransform: 'capitalize'}} htmlFor={index} className="">
-                                        {options[0].ubiTip.toLowerCase()}
-                                    </label>
-                                    <select
-                                        id={index}
-                                        key={index} 
-                                        name={`select${index}`} 
-                                        onChange={(event) => handleCountryChange(event.target.value, index)} 
-                                        style={{textTransform: 'capitalize'}}
-                                        className="block Phone_12"
-                                    >
-                                        <option style={{textTransform: 'capitalize'}} value="0">--Seleccione {options[0].ubiTip.toLowerCase()}--</option>
-                                        {options.map(option => (
-                                            <option key={option.ubiCod} value={JSON.stringify({ ubiCod: option.ubiCod, ubiAno: option.ubiAno })}>
-                                                {option.ubiNom.toLowerCase()}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                            ))}
-                            {
-                                cargando &&
-                                <div id="loading" className="m_75">Cargando...</div>
-                            }
-                        </div>
+                        
                     </div>
                     <div className="Large_6 overflow-auto flex flex-column"> 
                             <div className="PowerMas_Info_Form_Beneficiarie m1" >
@@ -1206,7 +1366,6 @@ const FormGoalBeneficiarie = () => {
                     closeModal={closeModal}
                 />
             </Modal>
-
         </>
     )
 }

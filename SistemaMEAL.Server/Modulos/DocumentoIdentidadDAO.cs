@@ -203,5 +203,44 @@ namespace SistemaMEAL.Modulos
             }
             return (mensaje, tipoMensaje);
         }
+
+        public IEnumerable<DocumentoIdentidad> BuscarDocumentosHome(string? tags)
+        {
+            List<DocumentoIdentidad>? temporal = new List<DocumentoIdentidad>();
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_DOCUMENTOS_HOME", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
+
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (!reader.HasRows)
+                {
+                    jsonResult.Append("[]");
+                }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                Console.WriteLine(jsonResult);
+                // Deserializa la cadena JSON en una lista de objetos Usuario
+                temporal = JsonConvert.DeserializeObject<List<DocumentoIdentidad>>(jsonResult.ToString());
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return temporal?? new List<DocumentoIdentidad>();
+        }
     }
 }

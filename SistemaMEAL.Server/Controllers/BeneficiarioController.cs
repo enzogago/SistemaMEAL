@@ -268,14 +268,38 @@ namespace SistemaMEAL.Server.Controllers
 
         [HttpGet]
         [Route("home/{tags?}")]
-        public dynamic BuscarDataHome(string? tags = null)
+        public dynamic BuscarBeneficiariosHome(string? tags = null)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var reult = _beneficiarios.BuscarDataHome(tags);
+            var reult = _beneficiarios.BuscarBeneficiariosHome(tags);
+            return Ok(reult);
+        }
+        [HttpGet]
+        [Route("sexo-home/{tags?}")]
+        public dynamic BuscarSexoHome(string? tags = null)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var reult = _beneficiarios.BuscarSexoHome(tags);
+            return Ok(reult);
+        }
+        [HttpGet]
+        [Route("rango-home/{tags?}")]
+        public dynamic BuscarRangoHome(string? tags = null)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var reult = _beneficiarios.BuscarRangoHome(tags);
             return Ok(reult);
         }
 

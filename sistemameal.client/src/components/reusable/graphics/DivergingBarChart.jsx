@@ -1,12 +1,35 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
-const DivergingBarChart = ({ maleData, femaleData, id, ageRanges, maleColor, femaleColor }) => {
+const DivergingBarChart = ({ rangeData, id, maleColor, femaleColor }) => {
+
+    const ageRanges = [
+        { min: 0, max: 9 },
+        { min: 10, max: 29 },
+        { min: 30, max: 54 },
+        { min: 55, max: 64 },
+        { min: 65, max: Infinity }
+    ];
+
     const ageRangeLabels = ageRanges.map(range => range.min != 65 ? `${range.min} - ${range.max}` : `65+`);
 
     const ref = useRef();
 
     useEffect(() => {
+        const maleData = ageRanges.map(range => {
+            const count = rangeData.reduce((sum, d) => {
+                return (d.benSex === 'MASCULINO' && d.edaMin >= range.min && (d.edaMax <= range.max || range.max === Infinity)) ? sum + Number(d.cantidad) : sum;
+            }, 0);
+            return { age: `${range.min}-${range.max === Infinity ? 'Infinity' : range.max}`, count };
+        });
+    
+        const femaleData = ageRanges.map(range => {
+            const count = rangeData.reduce((sum, d) => {
+                return (d.benSex === 'FEMENINO' && d.edaMin >= range.min && (d.edaMax <= range.max || range.max === Infinity)) ? sum + Number(d.cantidad) : sum;
+            }, 0);
+            return { age: `${range.min}-${range.max === Infinity ? 'Infinity' : range.max}`, count };
+        });
+
         const margin = { top: 20, right: 10, bottom: 20, left: 60 };
         const width = ref.current.clientWidth - (margin.left + margin.right)*2;
         const height = Math.max(maleData.length, femaleData.length) * 40;
@@ -83,7 +106,7 @@ const DivergingBarChart = ({ maleData, femaleData, id, ageRanges, maleColor, fem
             .attr("dy", "0.35em")
             .text(d => d.count);
             
-    }, [maleData, femaleData]);
+    }, [rangeData]);
 
     return <div id={id} ref={ref}></div>;
 };

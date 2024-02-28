@@ -1671,11 +1671,7 @@ textarea {
 	border: 1px solid;
 }
 
-.PowerMas_Content_Form_Beneficiarie form input, 
-.PowerMas_Content_Form_Beneficiarie form select{
-	background-color: transparent;
-	border: 1px solid #372e2c4f;
-}
+
 .PowerMas_Info_Form_Beneficiarie{
 	background-color: #f7f7f7;
 	border: 1px solid #cfcfcf;

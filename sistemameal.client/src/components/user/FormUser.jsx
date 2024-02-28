@@ -476,7 +476,7 @@ const FormUser = () => {
                                     },
                                 })} 
                             />
-                             {errors.usuCorEle ? (
+                            {errors.usuCorEle ? (
                                 <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.usuCorEle.message}</p>
                             ) : (
                                 <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
