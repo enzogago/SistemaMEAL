@@ -663,7 +663,7 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
                 cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
-                cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
+                cmd.Parameters.AddWithValue("@P_USUNOM_U"   , "ENZO");
                 cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "GAGO");
                 cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "AGUIRRE");
 
