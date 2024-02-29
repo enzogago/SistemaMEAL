@@ -25,9 +25,22 @@ namespace SistemaMEAL.Server.Models
         [ForeignKey("Nacionalidad")]
         public String? NacCod { get; set; }
         public String? NacNom { get; set; }
+        public String? BenDir { get; set; }
+        public String? BenAut { get; set; }
+        public String? UbiAno { get; set; }
+        public String? UbiCod { get; set; }
+        public String? UbiNom { get; set; }
+        // Ayuda Home
         public String? EdaMin { get; set; }
         public String? EdaMax { get; set; }
         public String? Cantidad { get; set; }
+
+        // Ayuda Meta Beneficiario Modal
+        public String? DocIdeNom { get; set; }
+        public String? DocIdeAbr { get; set; }
+        public String? DocIdeBenNum { get; set; }
+
+
         public String? UsuIng { get; set; }
         public DateTime? FecIng { get; set; }
         public String? UsuMod { get; set; }

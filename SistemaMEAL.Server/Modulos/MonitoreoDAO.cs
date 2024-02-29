@@ -116,6 +116,45 @@ namespace SistemaMEAL.Modulos
             }
              return temporal?? new List<Monitoreo>();
         }
+        public IEnumerable<Monitoreo> BuscarMonitoreoPorBeneficiario(string? benAno, string? benCod)
+        {
+            List<Monitoreo>? temporal = new List<Monitoreo>();
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_MONITOREO_POR_BENEFICIARIO", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@P_BENANO", benAno);
+                cmd.Parameters.AddWithValue("@P_BENCOD", benCod);
+
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (!reader.HasRows)
+                {
+                    jsonResult.Append("[]");
+                }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                // Deserializa la cadena JSON en una lista de objetos Estado
+                temporal = JsonConvert.DeserializeObject<List<Monitoreo>>(jsonResult.ToString());
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+             return temporal?? new List<Monitoreo>();
+        }
 
         public IEnumerable<Monitoreo> ListarIndicadorActividad(string? proAno, string? proCod)
         {
@@ -220,11 +259,13 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_BENFECNAC", beneficiario.BenFecNac);
                 cmd.Parameters.AddWithValue("@P_BENSEX", beneficiario.BenSex);
                 cmd.Parameters.AddWithValue("@P_GENCOD", beneficiario.GenCod);
-                cmd.Parameters.AddWithValue("@P_NACCOD", "01"); //
+                cmd.Parameters.AddWithValue("@P_NACCOD", beneficiario.NacCod);
                 cmd.Parameters.AddWithValue("@P_BENCORELE", beneficiario.BenCorEle);
                 cmd.Parameters.AddWithValue("@P_BENTEL", beneficiario.BenTel);
                 cmd.Parameters.AddWithValue("@P_BENTELCON", beneficiario.BenTelCon);
                 cmd.Parameters.AddWithValue("@P_BENCODUNI", beneficiario.BenCodUni);
+                cmd.Parameters.AddWithValue("@P_BENDIR", beneficiario.BenDir);
+                cmd.Parameters.AddWithValue("@P_BENAUT", beneficiario.BenAut);
                 cmd.Parameters.AddWithValue("@P_BENFECREG", "2024-02-06");
                 cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
@@ -644,6 +685,55 @@ namespace SistemaMEAL.Modulos
             {
                 mensaje = ex.Message;
                 tipoMensaje = "1";
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return (mensaje, tipoMensaje);
+        }
+
+        public (string? message, string? messageType) EliminarBeneficiarioMonitoreo(string benAno, string benCod, string ubiAno, string ubiCod, string metAno, string metCod)
+        {
+            string? mensaje = "";
+            string? tipoMensaje = "";
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_ELIMINAR_META_BENEFICIARIO", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@P_METANO", metAno);
+                cmd.Parameters.AddWithValue("@P_METCOD", metCod);
+                cmd.Parameters.AddWithValue("@P_BENANO", benAno);
+                cmd.Parameters.AddWithValue("@P_BENCOD", benCod);
+                cmd.Parameters.AddWithValue("@P_UBIANO", ubiAno);
+                cmd.Parameters.AddWithValue("@P_UBICOD", ubiCod);
+                cmd.Parameters.AddWithValue("@P_USUMOD", "Usuario");
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
+                cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
+                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "GAGO");
+                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "AGUIRRE");
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+
+                cmd.ExecuteNonQuery();
+
+                mensaje = pDescripcionMensaje.Value.ToString();
+                tipoMensaje = pTipoMensaje.Value.ToString();
+            }
+            catch (SqlException ex)
+            {
+                mensaje = ex.Message;
             }
             finally
             {

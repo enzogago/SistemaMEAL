@@ -7,8 +7,9 @@ import { useEffect, useState } from "react";
 import Notiflix from "notiflix";
 import { useForm } from 'react-hook-form';
 import TableForm from "./TableForm";
-import { Tooltip } from "react-tooltip";
 import { fetchData } from "../../reusable/helper";
+import { fetchBeneficiariosMeta, handleSubmitMetaBeneficiario, handleSubmitMetaBeneficiarioExiste } from "./eventHandlers";
+import ModalGoalBeneficiarie from "./ModalGoalBeneficiarie";
 
 const FormGoalBeneficiarie = () => {
     const navigate = useNavigate();
@@ -25,6 +26,7 @@ const FormGoalBeneficiarie = () => {
     const [ documentos, setDocumentos ] = useState([]);
     const [ paises, setPaises ] = useState([]);
     const [ generos, setGeneros ] = useState([]);
+    const [ nacionalidades, setNacionalidades ] = useState([]);
     const [ metaData, setMetaData] = useState(null);
     const [ selects, setSelects ] = useState([]);
     const [ cargando, setCargando ] = useState(false)
@@ -35,67 +37,47 @@ const FormGoalBeneficiarie = () => {
     const [ mostrarAgregarDocumento, setMostrarAgregarDocumento ] = useState(false);
     const [ accionActual, setAccionActual] = useState('buscar');
     const [ updateData, setUpdateData] = useState(false);
-    const [ data, setdata] = useState([])
+    const [ beneficiariosMeta, setBeneficiariosMeta] = useState([])
     const [ fieldsDisabled, setFieldsDisabled ] = useState(true);
     const [ existeBeneficiario, setExisteBeneficiario ] = useState(false);
-    const [isOptionOneSelected, setIsOptionOneSelected] = useState(true);
+    const [ isOptionOneSelected, setIsOptionOneSelected] = useState(true);
 
     const [ phoneCodeInput, setPhoneCodeInput ] = useState('');
-    const [ inputView, setInputView ] = useState('');
     const [ phoneLength, setPhoneLength ] = useState('');
+
+    const [ modalGoalBeneficiarie, setModalGoalBeneficiarie ] = useState(false);
+    const [ dataGoalBeneficiarie, setDataGoalBeneficiarie ] = useState({});
+
+    const [ dataGoals, setDataGoals ] = useState([])
 
     const countryPhoneCodes = {
         "peru": "+51",
         "colombia": "+57",
         "ecuador" : "+593",
-        // Añade aquí los demás países y sus códigos
     };
     const countryPhoneLength = {
         "peru": 9,
         "colombia": 10,
         "ecuador" : 9,
-        // Añade aquí los demás países y sus longitudes
     };
 
-
     useEffect(() => {
-        const fetchano = async () => {
-            try {
-                Notiflix.Loading.pulse('Cargando...');
-                const token = localStorage.getItem('token');
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Beneficiario/meta/${metAno}/${metCod}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                if (!response.ok) {
-                    if(response.status == 401 || response.status == 403){
-                        const data = await response.json();
-                        Notiflix.Notify.failure(data.message);
-                    }
-                    return;
-                }
-                const data = await response.json();
-                if (data.success == false) {
-                    Notiflix.Notify.failure(data.message);
-                    return;
-                }
-                console.log(data)
-                setdata(data)
-            } catch (error) {
-                console.error('Error:', error);
-            } finally {
-                Notiflix.Loading.remove();
-            }
-        };
-        fetchano()
+        fetchBeneficiariosMeta(metAno,metCod,setBeneficiariosMeta);
     }, [updateData])
 
-    //
-    const { register, watch, handleSubmit: validateForm, formState: { errors, dirtyFields, isSubmitted }, reset, setValue, trigger } = 
-    useForm({ mode: "onChange", defaultValues: {benNomApo: '', benApeApo: '', 'genCod': 0}});
+    // Propiedades Form Principal
+    const { 
+        register, 
+        watch, 
+        handleSubmit: 
+        validateForm, 
+        formState: { errors, dirtyFields, isSubmitted }, 
+        reset, 
+        setValue, 
+        trigger 
+    } = useForm({ mode: "onChange", defaultValues: {benNomApo: '', benApeApo: '', genCod: '0', nacCod: '0'}});
 
-
+    // 
     useEffect(() => {
         const phone = watch('benTel');
         if (phone && phoneCodeInput && !phone.startsWith(phoneCodeInput)) {
@@ -160,15 +142,21 @@ const FormGoalBeneficiarie = () => {
         }
     }, [pais]);
 
-
-    const { register: register2, watch: watch2, handleSubmit: validateForm2, formState: { errors: errors2,dirtyFields: dirtyFields2, isSubmitted: isSubmitted2  }, reset: reset2, trigger: trigger2 } = useForm({ mode: "onChange"});
-
+    // Formulario Secundario buscar Beneficiario
+    const { 
+        register: register2, 
+        watch: watch2, 
+        handleSubmit: validateForm2, 
+        formState: { errors: errors2,dirtyFields: dirtyFields2, isSubmitted: isSubmitted2  }, 
+        reset: reset2, 
+        trigger: trigger2 } 
+    = useForm({ mode: "onChange"});
+    
     // Actualiza la acción actual antes de enviar el formulario
     const buscarBeneficiarioDocumento = async (info) => {
-        const token = localStorage.getItem('token');
-        Notiflix.Loading.pulse('Cargando...');
-        
         try {
+            Notiflix.Loading.pulse('Cargando...');
+            const token = localStorage.getItem('token');
             const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Beneficiario/documento/${info.docIdeCod}/${info.docIdeBenNum}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -188,10 +176,16 @@ const FormGoalBeneficiarie = () => {
                     benNom: '',
                     benNomApo: '',
                     benSex: '',
+                    benAut: '',
+                    benDir: '',
+                    benTel: '0',
+                    benTelCon: '0',
                     genCod: '0',
+                    nacCod: '0',
                 });
                 setDocumentosAgregados([]);
                 setIsOptionOneSelected(true);
+                setExisteBeneficiario(false);
                 return;
             }
             const data = await response.json();
@@ -199,6 +193,7 @@ const FormGoalBeneficiarie = () => {
                 Notiflix.Notify.failure(data.message);
                 return;
             }
+            setDataGoalBeneficiarie(data)
             // Supongamos que 'data' es tu objeto de datos
             let newData = {};
 
@@ -211,17 +206,46 @@ const FormGoalBeneficiarie = () => {
                     newData[key] = data[key];
                 }
             }
-            console.log(newData)
             // Ahora puedes llamar a 'reset()' con los nuevos datos
             reset(newData);
             setExisteBeneficiario(true);
+            setModalGoalBeneficiarie(true);
+            fetchDataTable(data.benAno, data.benCod)
+
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            setValue('metBenMesEjeTec', metaData.metMesPlaTec)
+            setValue('metBenAnoEjeTec', metaData.metAnoPlaTec)
+            setValue('pais', JSON.stringify({ ubiCod: metaData.ubiCod, ubiAno: metaData.ubiAno }))
+            Notiflix.Loading.remove();
+        }
+    };
+    const fetchDataTable = async (benAno,benCod) => {
+        try {
+            const token = localStorage.getItem('token');
+            Notiflix.Loading.pulse('Cargando...');
+            
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/beneficiario/${benAno}/${benCod}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            console.log(response)
+            const data = await response.json();
+            if (!response.ok) {
+                Notiflix.Notify.failure(data.message);
+                return;
+            }
             console.log(data);
+            setDataGoals(data);
+
         } catch (error) {
             console.error('Error:', error);
         } finally {
             Notiflix.Loading.remove();
         }
-    };
+    }
 
     const onSubmit = async(data) => {
         if (accionActual === 'buscar') {
@@ -241,8 +265,8 @@ const FormGoalBeneficiarie = () => {
             // Si el documento no existe, agregarlo a la lista
             setDocumentosAgregados([...documentosAgregados, { 
                 docIdeCod: data.docIdeCod, 
-                docIdeNom: documentoCompleto.docIdeNom,  // Agrega el nombre del documento
-                docIdeAbr: documentoCompleto.docIdeAbr,  // Agrega el nombre del documento
+                docIdeNom: documentoCompleto.docIdeNom,
+                docIdeAbr: documentoCompleto.docIdeAbr,
                 docIdeBenNum: data.docIdeBenNum 
             }]);
         
@@ -256,16 +280,10 @@ const FormGoalBeneficiarie = () => {
         }
         
     };
-
-    // Observa los cambios en los campos 'docIdeBenNum' y 'docIdeCod'
-    const docIdeBenNum = watch2('docIdeBenNum');
-    const docIdeCod = watch2('docIdeCod');
-
-    // Observa los cambios en el campo 'benFecNac'
-    const fechaNacimiento = watch('benFecNac');
-
+    
     // Efecto para la concatenación automatica en la separacion de día mes y año
     useEffect(() => {
+        const fechaNacimiento = watch('benFecNac');
         if (fechaNacimiento) {
             // Remueve cualquier guión existente
             let cleanFecha = fechaNacimiento.replace(/-/g, '');
@@ -289,42 +307,45 @@ const FormGoalBeneficiarie = () => {
             // Actualiza el valor del campo con los guiones insertados
             setValue('benFecNac', cleanFecha);
         }
-    }, [fechaNacimiento]);
 
-    useEffect(() => {
         if (fechaNacimiento) {
-            // Asegúrate de que la fecha de nacimiento tiene el formato correcto
-            const regex = /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/;
-            if (regex.test(fechaNacimiento)) {
-                // Convierte la fecha de nacimiento al formato que JavaScript puede entender
-                const fechaFormateada = fechaNacimiento.replace(/\//g, '-');
-                const fecha = new Date(fechaFormateada);
-                const hoy = new Date();
-                let edad = hoy.getFullYear() - fecha.getFullYear();
-                const m = hoy.getMonth() - fecha.getMonth();
-                if (m < 0 || (m === 0 && hoy.getDate() < fecha.getDate())) {
-                    edad--;
+            const generarCamposApoderado = async () => {
+                const esNombreValido = await trigger('benFecNac');
+        
+                if (esNombreValido) {
+                    const fechaFormateada = fechaNacimiento.split("-").reverse().join("-");
+                    const fecha = new Date(fechaFormateada);
+                    const hoy = new Date();
+                    let edad = hoy.getFullYear() - fecha.getFullYear();
+                    const m = hoy.getMonth() - fecha.getMonth();
+                    if (m < 0 || (m === 0 && hoy.getDate() < fecha.getDate())) {
+                        edad--;
+                    }
+                    setEsMenorDeEdad(edad < 18);
+                } else{
+                    setEsMenorDeEdad(false);
+                    setValue('benNomApo', '');
+                    setValue('benApeApo', '');
                 }
-                console.log(edad)
-                setEsMenorDeEdad(edad < 18);
-            }
+            };
+            generarCamposApoderado();
         }
-    }, [fechaNacimiento]);
+    }, [watch('benFecNac')]);
     
     const abrirModal = () => {
         setModalIsOpen(true);
     };
-    
     const cerrarModal = () => {
         setModalIsOpen(false);
     };
-
     const openModal = () => {
         setModalFormIsOpen(true);
     }
-    
     const closeModal = () => {
         setModalFormIsOpen(false);
+    }
+    const closeGoalBeneficiarie = () => {
+        setModalGoalBeneficiarie(false);
     }
     
     const fetchBeneficiarie = async () => {
@@ -349,8 +370,6 @@ const FormGoalBeneficiarie = () => {
             setValue('metBenMesEjeTec', data.metMesPlaTec)
             setValue('metBenAnoEjeTec', data.metAnoPlaTec)
             setValue('pais', JSON.stringify({ ubiCod: data.ubiCod, ubiAno: data.ubiAno }))
-
-            
         } catch (error) {
             console.error('Error:', error);
         } finally {
@@ -367,20 +386,17 @@ const FormGoalBeneficiarie = () => {
     useEffect(() => {
         Promise.all([
             fetchData('Genero', setGeneros),
+            fetchData('Nacionalidad', setNacionalidades),
             fetchData('Ubicacion', setPaises),
             fetchData('DocumentoIdentidad', setDocumentos)
         ]).then(() => setIsDataLoaded(true));
     }, []);
     
-
-
     const handleCountryChange = async (ubicacion, index) => {
         const selectedCountry = JSON.parse(ubicacion);
         console.log(selectedCountry.ubiAno, selectedCountry.ubiCod);
         if (ubicacion === '0') {
-            console.log("entramos")
             setSelects(prevSelects => prevSelects.slice(0, index + 1));  // Reinicia los selects por debajo del nivel actual
-            console.log(selects)
             return;
         }
 
@@ -425,41 +441,37 @@ const FormGoalBeneficiarie = () => {
             const lastSelect = JSON.parse(lastSelectElement.value);
             const ubiAno = lastSelect.ubiAno;
             const ubiCod = lastSelect.ubiCod;
+            // Verifica que todos los selects tengan una opción válida seleccionada
+            for (let i = 0; i < selects.length; i++) {
+                const selectElement = document.querySelector(`select[name=select${i}]`);
+                if (selectElement && selectElement.value === '0') {
+                    console.error(`El select ${i} no tiene una opción válida seleccionada.`);
+                    selectElement.classList.remove('PowerMas_Modal_Form_valid');
+                    selectElement.classList.add('PowerMas_Modal_Form_invalid');
+                    return;
+                } else {
+                    selectElement.classList.remove('PowerMas_Modal_Form_invalid');
+                    selectElement.classList.add('PowerMas_Modal_Form_valid');
+                }
+            }
 
             if(!existeBeneficiario) {
-                // Verifica que todos los selects tengan una opción válida seleccionada
-                for (let i = 0; i < selects.length; i++) {
-                    const selectElement = document.querySelector(`select[name=select${i}]`);
-                    if (selectElement && selectElement.value === '0') {
-                        console.error(`El select ${i} no tiene una opción válida seleccionada.`);
-                        selectElement.classList.remove('PowerMas_Modal_Form_valid');
-                        selectElement.classList.add('PowerMas_Modal_Form_invalid');
-                        return;
-                    } else {
-                        selectElement.classList.remove('PowerMas_Modal_Form_invalid');
-                        selectElement.classList.add('PowerMas_Modal_Form_valid');
-                    }
-                }
     
                 // Verifica que el array documentosAgregados tenga al menos un registro
                 if (documentosAgregados.length === 0) {
                     Notiflix.Notify.failure('Debe agregar al menos un documento.');
                     return;
                 }
-    
                 // Encuentra el primer documento con código 01
                 let documentoCodUni = documentosAgregados.find(doc => doc.docIdeCod === '01');
-    
                 // Si no se encontró un documento con código 01, busca uno con código 03
                 if (!documentoCodUni) {
                     documentoCodUni = documentosAgregados.find(doc => doc.docIdeCod === '03');
                 }
-    
                 // Si aún no se encontró un documento, usa el primer documento en el array
                 if (!documentoCodUni) {
                     documentoCodUni = documentosAgregados[0];
                 }
-    
                 // Usa el benNumDoc del documento encontrado como benCodUni
                 const benCodUni = documentoCodUni.docIdeBenNum;
 
@@ -473,9 +485,16 @@ const FormGoalBeneficiarie = () => {
                     },
                     DocumentoBeneficiario: documentosAgregados
                 }
+
+                if (beneficiarioMonitoreo.Beneficiario.benTel === phoneCodeInput) {
+                    beneficiarioMonitoreo.Beneficiario.benTel = '';
+                }
+                if (beneficiarioMonitoreo.Beneficiario.benTelCon === phoneCodeInput) {
+                    beneficiarioMonitoreo.Beneficiario.benTelCon = '';
+                }
                 console.log(beneficiarioMonitoreo)
-                handleSubmitMetaBeneficiario(beneficiarioMonitoreo);
-            } else{
+                handleSubmitMetaBeneficiario(beneficiarioMonitoreo, handleReset, updateData, setUpdateData, fetchBeneficiarie);
+            } else { // Si existe el beneficairio solo insertar MetaBeneficiario
                 const { benAno, benCod } = data;
                 const MetaBeneficiario = {
                     metAno,
@@ -485,53 +504,14 @@ const FormGoalBeneficiarie = () => {
                     ubiAno,
                     ubiCod,
                 }
-                console.log(MetaBeneficiario)
-                handleSubmitMetaBeneficiarioExiste(MetaBeneficiario);
+                
+                handleSubmitMetaBeneficiarioExiste(MetaBeneficiario, handleReset, updateData, setUpdateData, fetchBeneficiarie);
             }
         })();
     };
 
-    const handleSubmitMetaBeneficiarioExiste = async (data) => {
-        try {
-            Notiflix.Loading.pulse('Cargando...');
-            const token = localStorage.getItem('token');
-            
-            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/existe`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(data),
-            });
-            console.log(response)
-            if (!response.ok) {
-                const errorData = await response.json();
-                if(response.status === 409){
-                    Notiflix.Notify.warning(`${errorData.message}`);
-                    console.log(errorData.message)
-                    return;
-                } else {
-                    Notiflix.Notify.failure(errorData.message);
-                    console.log(errorData.message)
-                    return;
-                }
-            }
-
-            const successData = await response.json();
-            Notiflix.Notify.success(successData.message);
-            console.log(successData);
-            fetchBeneficiarie();
-            setUpdateData(!updateData);
-            handleReset();
-        } catch (error) {
-            console.error('Error:', error);
-        } finally {
-            Notiflix.Loading.remove();
-        }
-    };
-
     const handleReset = () => {
+        setSelects([]);
         reset({
             benApe: '',
             benApeApo: '',
@@ -540,64 +520,34 @@ const FormGoalBeneficiarie = () => {
             benNom: '',
             benNomApo: '',
             benSex: '',
+            benAut: '',
+            benDir: '',
             genCod: '0',
+            nacCod: '0',
+            benTel: '0',
+            benTelCon: '0',
+            pais: '0'
         });
         reset2({
             docIdeBenNum: '',
             docIdeCod: '0',
-        }); // Resetea todos los campos del segundo formulario
-        setDocumentosAgregados([]);  // Vacía la lista de documentos agregados
-        setFieldsDisabled(true);  // Deshabilita los campos del formulario
+        });
+        setDocumentosAgregados([]);
+        setFieldsDisabled(true);
         setMostrarAgregarDocumento(false);
         setAccionActual('buscar');
-    };
-    
-    const handleSubmitMetaBeneficiario = async (data) => {
-        try {
-            Notiflix.Loading.pulse('Cargando...');
-            const token = localStorage.getItem('token');
-            
-            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(data),
-            });
-            console.log(response)
-            if (!response.ok) {
-                const errorData = await response.json();
-                if(response.status === 409){
-                    Notiflix.Notify.warning(`${errorData.message}`);
-                    console.log(errorData.message)
-                    return;
-                } else {
-                    Notiflix.Notify.failure(errorData.message);
-                    console.log(errorData.message)
-                    return;
-                }
-            }
-
-            const successData = await response.json();
-            Notiflix.Notify.success(successData.message);
-            console.log(successData);
-            fetchBeneficiarie();
-            setUpdateData(!updateData);
-            handleReset();
-        } catch (error) {
-            console.error('Error:', error);
-        } finally {
-            Notiflix.Loading.remove();
-        }
+        setValue('metBenMesEjeTec', metaData.metMesPlaTec)
+        setValue('metBenAnoEjeTec', metaData.metAnoPlaTec)
+        setValue('pais', JSON.stringify({ ubiCod: metaData.ubiCod, ubiAno: metaData.ubiAno }))
+        handleCountryChange(pais);
     };
 
+    // Observar Cambios de campos registrados
     const selectedValue = watch('genCod', '0');
-    const selectedDocumentValue = watch2('docIdeCod', '0');
     const benSex = watch('benSex');
-
+    const benAut = watch('benAut');
     const metBenAnoEjeTec = watch('metBenAnoEjeTec');
-    const metBenMesEjeTec = watch('metBenMesEjeTec');
+    const selectedDocumentValue = watch2('docIdeCod', '0');
 
     return (
         <>
@@ -622,7 +572,7 @@ const FormGoalBeneficiarie = () => {
                                     {...register('pais', { 
                                         validate: {
                                             required: value => value !== '0' || 'El campo es requerido',
-                                            equal: value => JSON.stringify({ ubiCod: metaData.ubiCod, ubiAno: metaData.ubiAno }) === value || 'El país debe ser el planificado'
+                                            equal: value => metaData && JSON.stringify({ ubiCod: metaData.ubiCod, ubiAno: metaData.ubiAno }) === value || 'El país debe ser el planificado'
                                         }
                                     })}
                                 >
@@ -887,6 +837,42 @@ const FormGoalBeneficiarie = () => {
                                 </div>
                             </form>
                             <div className="m_75">
+                                <label htmlFor="si" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
+                                    Autoriza el Uso de datos:
+                                </label>
+                                <div className="flex gap-1">
+                                    <div className="flex gap_5">
+                                        <input 
+                                            type="radio" 
+                                            id="si" 
+                                            name="benAut" 
+                                            disabled={fieldsDisabled && benAut !== 's'}
+                                            value="s" 
+                                            {...register('benAut', { required: 'Por favor, selecciona una opción' })}
+                                        />
+                                        <label htmlFor="si" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} >Si</label>
+                                    </div>
+                                    <div className="flex gap_5">
+                                        <input 
+                                            type="radio" 
+                                            id="no" 
+                                            name="benAut" 
+                                            disabled={fieldsDisabled && benAut !== 'n'}
+                                            value="n" 
+                                            {...register('benAut', { required: 'Por favor, selecciona una opción' })}
+                                        />
+                                        <label style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} htmlFor="no">No</label>
+                                    </div>
+                                </div>
+                                {errors.benAut ? (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.benAut.message}</p>
+                                ) : (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                        Espacio reservado para el mensaje de error
+                                    </p>
+                                )}
+                            </div>
+                            <div className="m_75">
                                 <label htmlFor="benNom" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
                                     Nombre
                                 </label>
@@ -936,6 +922,31 @@ const FormGoalBeneficiarie = () => {
                                 )}
                             </div>
                             <div className="m_75">
+                                <label htmlFor="benDir" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
+                                    Dirección
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="benDir"
+                                    style={{textTransform: 'capitalize'}}
+                                    autoComplete="disabled"
+                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benDir || isSubmitted ? (errors.benDir ? 'invalid' : 'valid') : ''}`} 
+                                    placeholder="Dirección del beneficiario"
+                                    disabled={fieldsDisabled}
+                                    {...register('benDir', { 
+                                        required: 'El apellido es requerido',
+                                            minLength: { value: 3, message: 'El apellido debe tener minimo 3 digitos' },
+                                    })} 
+                                />
+                                {errors.benDir ? (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.benDir.message}</p>
+                                ) : (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                    Espacio reservado para el mensaje de error
+                                    </p>
+                                )}
+                            </div>
+                            <div className="m_75">
                                 <label htmlFor="masculino" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
                                     Sexo:
                                 </label>
@@ -971,6 +982,7 @@ const FormGoalBeneficiarie = () => {
                                     </p>
                                 )}
                             </div>
+                           
                             <div className="m_75">
                                 <label htmlFor="genCod" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
                                     Género:
@@ -982,7 +994,7 @@ const FormGoalBeneficiarie = () => {
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.genCod || isSubmitted ? (errors.genCod ? 'invalid' : 'valid') : ''}`}
                                     name="genCod"
                                     {...register('genCod', { 
-                                        validate: value => value != '0' || 'El género es requerido' 
+                                        validate: value => value !== '0' || 'El campo es requerido' 
                                     })}
                                 >
                                     <option value="0">--Seleccione Género--</option>
@@ -1036,6 +1048,37 @@ const FormGoalBeneficiarie = () => {
                                     </p>
                                 )}
                             </div>
+                            <div className="m_75">
+                                <label htmlFor="nacCod" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
+                                    Nacionalidad:
+                                </label>
+                                <select 
+                                    id="nacCod" 
+                                    disabled={fieldsDisabled}
+                                    style={{ color: selectedValue == '0' ? '#372e2c60' : '#000000', textTransform: 'capitalize'}}
+                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.nacCod || isSubmitted ? (errors.nacCod ? 'invalid' : 'valid') : ''}`} 
+                                    {...register('nacCod', { 
+                                        validate: value => value !== '0' || 'El campo es requerido' 
+                                    })}
+                                >
+                                    <option value="0">--Seleccione Nacionalidad--</option>
+                                    {nacionalidades.map(nacionalidad => (
+                                        <option 
+                                            key={nacionalidad.nacCod} 
+                                            value={nacionalidad.nacCod}
+                                        > 
+                                            {nacionalidad.nacNom.toLowerCase()}
+                                        </option>
+                                    ))}
+                                </select>
+                                {errors.nacCod ? (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.nacCod.message}</p>
+                                ) : (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                    Espacio reservado para el mensaje de error
+                                    </p>
+                                )}
+                            </div>
                            
                             <div className="m_75">
                                 <label htmlFor="benCorEle" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
@@ -1049,7 +1092,6 @@ const FormGoalBeneficiarie = () => {
                                     disabled={fieldsDisabled}
                                     autoComplete="disabled"
                                     {...register('benCorEle', { 
-                                        required: 'El correo es requerida',
                                         pattern: {
                                             value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
                                             message: 'Dirección de correo electrónico inválida',
@@ -1090,12 +1132,21 @@ const FormGoalBeneficiarie = () => {
                                         }
                                     }}
                                     {...register('benTel', { 
-                                        required: 'El número de telefono es requerido',
-                                        minLength: { value: phoneLength + phoneCodeInput.length, message: `El número de telefono debe tener minimo ${phoneLength} digitos` },
-                                        pattern: {
-                                            value: /^\+\d*$/,
-                                            message: 'El número de teléfono debe comenzar con "+" y contener solo números',
-                                        },
+                                        validate: value => {
+                                            if (!value || value === phoneCodeInput) {
+                                                // Si el campo está vacío o solo contiene el código del país, se considera válido
+                                                return true;
+                                            } else if (value.length < phoneLength + phoneCodeInput.length) {
+                                                // Si el campo contiene algo más que el código del país, debe tener al menos phoneLength dígitos
+                                                return `El número de telefono debe tener minimo ${phoneLength} digitos`;
+                                            } else if (!/^\+\d*$/.test(value)) {
+                                                // El número de teléfono debe comenzar con "+" y contener solo números
+                                                return 'El número de teléfono debe comenzar con "+" y contener solo números';
+                                            } else {
+                                                // Si pasa todas las validaciones, es válido
+                                                return true;
+                                            }
+                                        }
                                     })} 
                                 />
                                 {errors.benTel ? (
@@ -1132,37 +1183,23 @@ const FormGoalBeneficiarie = () => {
                                         }
                                     }}
                                     {...register('benTelCon', { 
-                                        required: 'El número de telefono es requerido',
-                                        minLength: { value: phoneLength + phoneCodeInput.length, message: `El número de telefono debe tener minimo ${phoneLength} digitos` },
-                                        pattern: {
-                                            value: /^\+\d*$/,
-                                            message: 'El número de teléfono debe comenzar con "+" y contener solo números',
-                                        },
+                                        validate: value => {
+                                            if (!value || value === phoneCodeInput) {
+                                                // Si el campo está vacío o solo contiene el código del país, se considera válido
+                                                return true;
+                                            } else if (value.length < phoneLength + phoneCodeInput.length) {
+                                                // Si el campo contiene algo más que el código del país, debe tener al menos phoneLength dígitos
+                                                return `El número de telefono debe tener minimo ${phoneLength} digitos`;
+                                            } else if (!/^\+\d*$/.test(value)) {
+                                                // El número de teléfono debe comenzar con "+" y contener solo números
+                                                return 'El número de teléfono debe comenzar con "+" y contener solo números';
+                                            } else {
+                                                // Si pasa todas las validaciones, es válido
+                                                return true;
+                                            }
+                                        }
                                     })} 
                                 />
-                                {/* <input 
-                                    type="text" 
-                                    id="benTelCon"
-                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benTelCon || isSubmitted ? (errors.benTelCon ? 'invalid' : 'valid') : ''}`} 
-                                    placeholder="907078329"
-                                    autoComplete="disabled"
-                                    maxLength={10}
-                                    disabled={fieldsDisabled}
-                                    onKeyDown={(event) => {
-                                        if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
-                                            event.preventDefault();
-                                        }
-                                    }}
-                                    {...register('benTelCon', { 
-                                        required: 'El número de telefono es requerido',
-                                        minLength: { value: 9, message: 'El número debe tener minimo 9 digitos' },
-                                        maxLength: { value: 10, message: 'El número debe tener minimo 10 digitos' },
-                                        pattern: {
-                                            value: /^[0-9]*$/,
-                                            message: 'Solo se aceptan numeros'
-                                        }
-                                    })} 
-                                /> */}
                                 {errors.benTelCon ? (
                                     <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.benTelCon.message}</p>
                                 ) : (
@@ -1309,7 +1346,7 @@ const FormGoalBeneficiarie = () => {
                         width: '40%',
                         marginRight: '-50%',
                         transform: 'translate(-50%, -50%)',
-                        backgroundColor: '#f0f0f0',
+                        backgroundColor: '#fff',
                         border: '1px solid #ccc',
                         padding: '20px'
                     },
@@ -1349,23 +1386,37 @@ const FormGoalBeneficiarie = () => {
                         left: '50%',
                         right: 'auto',
                         bottom: 'auto',
-                        width: '80%',
-                        height: '80%',
+                        width: '90%',
+                        height: '90%',
                         marginRight: '-50%',
                         transform: 'translate(-50%, -50%)',
-                        backgroundColor: '#f0f0f0',
+                        backgroundColor: '#fff',
                         border: '1px solid #ccc',
+                        display: 'flex',
+                        flexDirection: 'column'
                     },
                     overlay: {
                         backgroundColor: 'rgba(0, 0, 0, 0.5)'
                     }
                 }}
             >   
+                <span className="PowerMas_CloseModal" style={{position: 'absolute',right: 20, top: 10}} onClick={closeModal}>×</span>
+                <h2 className='PowerMas_Title_Modal f1_5 center'>Beneficiarios asociados a la meta</h2>
                 <TableForm 
-                    data={data}
+                    data={beneficiariosMeta}
                     closeModal={closeModal}
+                    metAno={metAno}
+                    metCod={metCod}
+                    updateData={updateData}
+                    setUpdateData={setUpdateData}
                 />
             </Modal>
+            <ModalGoalBeneficiarie 
+                modalGoalBeneficiarie={modalGoalBeneficiarie} 
+                closeModal={closeGoalBeneficiarie}
+                dataGoalBeneficiarie={dataGoalBeneficiarie}
+                dataGoals={dataGoals}
+            />
         </>
     )
 }

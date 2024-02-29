@@ -564,7 +564,7 @@ input::placeholder,select::placeholder{
 .PowerMas_Tooltip_Info {
     max-width: 50%; /* Ajusta esto a la anchura que prefieras */
     word-wrap: break-word;
-	
+	z-index: 99999999;
 }
 
 .tooltip {
@@ -1203,13 +1203,17 @@ textarea {
 	cursor: pointer;
 }
 .PowerMas_ModalContent > h2{
-	color: #20737B;
-	border-bottom: 1px solid #372e2c96;
-	padding: 1rem;
-	margin-bottom: 10px;
+	
+	
 }
 .PowerMas_ModalContent > label{
 	margin: 1rem 0;
+}
+.PowerMas_Title_Modal{
+	border-bottom: 1px solid #372e2c96;
+	color: #20737B;
+	padding: 1rem;
+	margin-bottom: 10px;
 }
 .PowerMas_FormStatus input[type=text],.PowerMas_FormStatus input[type=password]{
 	width: 100%;

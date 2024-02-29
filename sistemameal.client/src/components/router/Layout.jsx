@@ -33,11 +33,13 @@ const Layout = ({ children }) => {
                 id="edit-tooltip"
                 effect="solid"
                 place='top-end'
+                className="PowerMas_Tooltip_Info"
             />
             <Tooltip 
                 id="delete-tooltip" 
                 effect="solid"
                 place='top-start'
+                className="PowerMas_Tooltip_Info"
             />
         </div>)
 };

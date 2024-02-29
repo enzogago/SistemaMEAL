@@ -22,8 +22,11 @@ import TableRow from "./TableRow"
 // Context
 import { AuthContext } from "../../../context/AuthContext";
 import Notiflix from "notiflix";
+import CustomTable from "../../reusable/Table/CustomTable";
+import { Export_Excel_Helper, Export_PDF_Helper } from "../../reusable/helper";
+import { handleDeleteBeneficiarioMeta } from "./eventHandlers";
 
-const TableForm = ({data, closeModal}) => {
+const TableForm = ({data, closeModal, metAno, metCod, updateData, setUpdateData }) => {
     
     const navigate = useNavigate();
     // Variables State AuthContext 
@@ -33,15 +36,10 @@ const TableForm = ({data, closeModal}) => {
     // States locales
     const [searchTags, setSearchTags] = useState([]);
     const [dropdownOpen, setDropdownOpen] = useState(false);
-    const searchInputRef = useRef('');
+
     const [isInputEmpty, setIsInputEmpty] = useState(true);
     const [inputValue, setInputValue] = useState('');
 
-
-    // Dropdown botones Export
-    const toggleDropdown = () => {
-        setDropdownOpen(!dropdownOpen);
-    }
 
     // Añade una nueva etiqueta al presionar Enter
     const handleKeyDown = (e) => {
@@ -63,6 +61,12 @@ const TableForm = ({data, closeModal}) => {
     const removeTag = (tag) => {
         setSearchTags(searchTags.filter(t => t !== tag));
     }
+
+    const actions = {
+        pdf: userPermissions.some(permission => permission.perNom === `EXPORTAR PDF META`),
+        excel: userPermissions.some(permission => permission.perNom === `EXPORTAR EXCEL META`),
+        delete: userPermissions.some(permission => permission.perNom === "ELIMINAR META"),
+    };
 
     const [sorting, setSorting] = useState([]);
 
@@ -112,14 +116,38 @@ const TableForm = ({data, closeModal}) => {
                 header: "Contacto",
                 accessorKey: "benTelCon",
             },
+            {
+                header: "Ubicación",
+                accessorKey: "ubiNom",
+            },
         ];
 
         baseColumns = baseColumns.filter(column => 
             data.some(item => item[column.accessorKey] !== null)
         );
+
+        if (actions.delete) {
+            baseColumns.push({
+                header: () => <div style={{textAlign: 'center', flexGrow: '1'}}>Acciones</div>,
+                accessorKey: "acciones",
+                disableSorting: true,
+                cell: ({row}) => (
+                    <div className='PowerMas_IconsTable flex jc-center ai-center'>
+                        {actions.delete && 
+                            <FaRegTrashAlt 
+                                data-tooltip-id="delete-tooltip" 
+                                data-tooltip-content="Eliminar" 
+                                className='Large-p_25' 
+                                onClick={() => handleDeleteBeneficiarioMeta('Monitoreo',row.original.benAno,row.original.benCod,row.original.ubiAno,row.original.ubiCod,metAno,metCod, updateData, setUpdateData)} 
+                            />
+                        }
+                    </div>
+                ),
+            });
+        }
     
         return baseColumns;
-    }, []);
+    }, [actions]);
 
     
     const table = useReactTable({
@@ -135,118 +163,44 @@ const TableForm = ({data, closeModal}) => {
         columnResizeMode: "onChange"
     })
 
-    const tableRef = useRef();  // Referencia al elemento de la tabla
-
-    const animateScroll = (element, to, duration) => {
-        const start = element.scrollLeft,
-            change = to - start,
-            increment = 20;
-        let currentTime = 0;
-    
-        const animateScroll = () => {
-            currentTime += increment;
-            const val = Math.easeInOutQuad(currentTime, start, change, duration);
-            element.scrollLeft = val;
-            if(currentTime < duration) {
-                setTimeout(animateScroll, increment);
-            }
-        };
-        animateScroll();
-    }
-    
-    Math.easeInOutQuad = function (t, b, c, d) {
-        t /= d/2;
-        if (t < 1) return c/2*t*t + b;
-        t--;
-        return -c/2 * (t*(t-2) - 1) + b;
+     // Preparar los datos
+     let dataExport = [...table.options.data]; 
+     const headers = ['AÑO', 'CODIGO', 'NOMBRE', 'APELLIDO', 'CODIGO_UNICO', 'CORREO', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
+     const title = 'BENEFICIARIO';  // El título de tu archivo
+     const properties = ['benAno', 'benCod', 'benNom', 'benApe', 'benCodUni', 'benCorEle', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
+     const format = 'a4';  // El tamaño del formato que quieres establecer para el PDF
+ 
+     const Export_Excel = () => {
+         // Luego puedes llamar a la función Export_Excel_Helper de esta manera:
+        Export_Excel_Helper(dataExport, headers, title, properties);
+        setDropdownOpen(false);
+     };
+ 
+    const Export_PDF = () => {
+        // Luego puedes llamar a la función Export_PDF_Helper de esta manera:
+        Export_PDF_Helper(dataExport, headers, title, properties, format);
+        setDropdownOpen(false);
     };
-    
-    const scrollTable = (direction) => {
-        if (tableRef.current) {
-            const distance = tableRef.current.offsetWidth * 0.8;  // 50% del ancho de la tabla
-            const to = tableRef.current.scrollLeft + distance * direction;
-            animateScroll(tableRef.current, to, 500);
-        }
-    }
-    
+
     return (
-        <div className='TableMainContainer Large-p1 Medium-p1 Small-p_5 h-100 overflow-auto'>
-            <div>
-                <div className="flex">
-                    <h1 className="flex left Large-f1_5 Medium-f1_5 Small-f1_5 flex-grow-1">Listado de Beneficiarios</h1>
-                    <span className="PowerMas_CloseModal" onClick={closeModal}>×</span>
-                </div>
-                <div className="flex ">
-                    <div className="PowerMas_Search_Container Large_6 Large-m_5">
-                        <div className="PowerMas_Input_Filter_Container flex">
-                            <div className="flex ai-center">
-                                {searchTags.map(tag => (
-                                    <span key={tag} className="PowerMas_InputTag flex">
-                                        <span className="f_75 flex ai-center">{tag}</span>
-                                        <button className="f_75" onClick={() => removeTag(tag)}>x</button>
-                                    </span>
-                                ))}
-                            </div>
-                            <div className="Phone_12 relative">
-                                <FaSearch className="Large_1 search-icon" />
-                                <input 
-                                    className='PowerMas_Input_Filter Large_12 Large-p_5'
-                                    type="search"
-                                    placeholder='Buscar'
-                                    onChange={handleInputChange}
-                                    onKeyDown={handleKeyDown}
-                                    value={inputValue}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div className="PowerMas_TableContainer" ref={tableRef}>
-                <table className="Large_12 Large-f_75 Medium-f_75 PowerMas_TableStatus">
-                    <thead>
-                        {
-                            table.getHeaderGroups().map(headerGroup => (
-                                <tr key={headerGroup.id} className="">
-                                    {
-                                        headerGroup.headers.map(header =>(
-                                            <th className="ws-nowrap" key={header.id} onClick={header.column.getToggleSortingHandler()}>
-                                                <div>
-                                                    {
-                                                    flexRender(header.column.columnDef.header, header.getContext())
-                                                    }
-                                                    <div className='flex flex-column ai-center jc-center PowerMas_Icons_Sorter'>
-                                                        {header.column.getIsSorted() === 'asc' ? 
-                                                            <TiArrowSortedUp className={`sort-icon active`} /> :
-                                                            header.column.getIsSorted() === 'desc' ? 
-                                                            <TiArrowSortedDown className={`sort-icon active`} /> :
-                                                            <>
-                                                                <TiArrowSortedUp className={`sort-icon`} />
-                                                                <TiArrowSortedDown className={`sort-icon`} />
-                                                            </>
-                                                        }
-                                                    </div>
-                                                </div>
-                                            </th>
-                                        ))
-                                    }
-                                </tr>
-                            ))
-                        }
-                    </thead>
-                    <tbody>
-                        {
-                            table.getRowModel().rows.length > 0 ?
-                                table.getRowModel().rows.map(row => (
-                                    <TableRow key={row.id} row={row} flexRender={flexRender} />
-                                ))
-                            : <tr className='PowerMas_TableEmpty'><td colSpan={2} className='Large-p1 center'>No se encontraron registros</td></tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-            <Pagination table={table} />
-        </div>
+        <>
+            <CustomTable 
+                actions={actions} 
+                dropdownOpen={dropdownOpen} 
+                setDropdownOpen={setDropdownOpen} 
+                Export_Excel={Export_Excel} 
+                Export_PDF={Export_PDF} 
+                table={table}
+                navigatePath='form-goal'
+                resize={false}
+                handleInputChange={handleInputChange}
+                handleKeyDown={handleKeyDown}
+                inputValue={inputValue}
+                removeTag={removeTag}
+                searchTags={searchTags}
+                setSearchTags={setSearchTags}
+            />
+        </>
     )
 }
 

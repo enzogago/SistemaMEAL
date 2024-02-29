@@ -76,7 +76,7 @@ const CustomTable = ({
     return (
         <div className='TableMainContainer Large-p1 Medium-p1 Small-p_5'>
             <div className="">
-                <h1 className="Large-f1_5">Listado de {title}</h1>
+                <h1 className="Large-f1_5"> { title && `Listado de ${title}`}</h1>
                 <div className="flex">
                     {setSearchFilter && 
                         <div className="PowerMas_Search_Container Large_6 Large-m_5">
@@ -92,7 +92,7 @@ const CustomTable = ({
                     }
                     {
                         setSearchTags && removeTag &&
-                        <div className="PowerMas_Search_Container Large_6 Large-m_5">
+                        <div className="PowerMas_Search_Container Large_6 Large-m_5 flex-grow-1">
                             <div className="PowerMas_Input_Filter_Container flex">
                                 <div className="flex ai-center">
                                     {searchTags && searchTags.map(tag => (

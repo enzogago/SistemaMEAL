@@ -37,6 +37,8 @@ namespace SistemaMEAL.Server.Modulos
                 cmd.Parameters.AddWithValue("@P_BENTEL", beneficiario.BenTel);
                 cmd.Parameters.AddWithValue("@P_BENTELCON", beneficiario.BenTel);
                 cmd.Parameters.AddWithValue("@P_BENCODUNI", beneficiario.BenCodUni);
+                cmd.Parameters.AddWithValue("@P_BENDIR", beneficiario.BenDir);
+                cmd.Parameters.AddWithValue("@P_BENAUT", beneficiario.BenAut);
                 cmd.Parameters.AddWithValue("@P_BENFECREG", "10-02-2024");
                 cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
@@ -166,6 +168,8 @@ namespace SistemaMEAL.Server.Modulos
                     cmdBeneficiario.Parameters.AddWithValue("@P_BENTEL", beneficiario.BenTel);
                     cmdBeneficiario.Parameters.AddWithValue("@P_BENTELCON", beneficiario.BenTelCon);
                     cmdBeneficiario.Parameters.AddWithValue("@P_BENCODUNI", beneficiario.BenCodUni);
+                    cmdBeneficiario.Parameters.AddWithValue("@P_BENDIR", beneficiario.BenDir);
+                    cmdBeneficiario.Parameters.AddWithValue("@P_BENAUT", beneficiario.BenAut);
                     cmdBeneficiario.Parameters.AddWithValue("@P_BENFECREG", "10-02-2024");
                     cmdBeneficiario.Parameters.AddWithValue("@P_USUING", "Usuario");
                     cmdBeneficiario.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");

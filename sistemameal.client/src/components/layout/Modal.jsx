@@ -73,7 +73,7 @@ const Modal = ({ isOpen, closeModal, user }) => {
                 >
                     ×
                 </span>
-                <h2 className="center f1_5"> Cambiar Contraseña </h2>
+                <h2 className="PowerMas_Title_Modal center f1_5"> Cambiar Contraseña </h2>
                 <form className='Large-f1_25 PowerMas_FormStatus color-black' onSubmit={validateForm(onSubmit)}>
                     <label
                         htmlFor='nuevaContraseña'

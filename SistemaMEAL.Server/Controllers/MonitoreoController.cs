@@ -59,6 +59,18 @@ namespace SistemaMEAL.Server.Controllers
             var monitoreo = monitoreos.FirstOrDefault();
             return Ok(monitoreo);
         }
+        [HttpGet]
+        [Route("beneficiario/{benAno}/{benCod}")]
+        public dynamic BuscarMonitoreoPorBeneficiario(string benAno, string benCod)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var resultData = _monitoreos.BuscarMonitoreoPorBeneficiario(benAno,benCod);
+            return Ok(resultData);
+        }
 
         [HttpGet]
         [Route("autocomplete/{proAno}/{proCod}")]
@@ -163,6 +175,47 @@ namespace SistemaMEAL.Server.Controllers
             else // Registro modificado correctamente
             {
                 return new OkObjectResult(new { success = true, message });
+            }
+        }
+
+        [HttpDelete]
+        [Route("eliminar-beneficiario/{benAno}/{benCod}/{ubiAno}/{ubiCod}/{metAno}/{metCod}")]
+        public dynamic EliminarBeneficiarioMonitoreo(string benAno, string benCod, string ubiAno, string ubiCod, string metAno, string metCod)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return rToken;
+
+            dynamic data = rToken.result;
+            Usuario usuario = new Usuario
+            {
+                UsuAno = data.UsuAno,
+                UsuCod = data.UsuCod,
+                RolCod = data.RolCod
+            };
+            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "ELIMINAR ESTADO") && usuario.RolCod != "01")
+            {
+                return new
+                {
+                    success = false,
+                    message = "No tienes permisos para eliminar estados",
+                    result = ""
+                };
+            }
+
+            var (message, messageType) = _monitoreos.EliminarBeneficiarioMonitoreo(benAno, benCod, ubiAno, ubiCod, metAno, metCod );
+            if (messageType == "1") // Error
+            {
+                return new BadRequestObjectResult(new { success = false, message });
+            }
+            else if (messageType == "2") // Registro ya existe
+            {
+                return new ConflictObjectResult(new { success = false, message });
+            }
+            else // Registro modificado correctamente
+            {
+                return new OkObjectResult(new {success = true, message });
             }
         }
 
