@@ -16,6 +16,8 @@ namespace SistemaMEAL.Server.Models
         public String? UbiAno { get; set; }
         public String? UbiCod { get; set; }
         public String? MetBenEda { get; set; }
+        public String? MetBenMesEjeTec { get; set; }
+        public String? MetBenAnoEjeTec { get; set; }
         public String? UsuIng { get; set; }
         public DateTime? FecIng { get; set; }
         public String? UsuMod { get; set; }

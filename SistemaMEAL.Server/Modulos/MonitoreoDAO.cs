@@ -324,6 +324,8 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_BENCOD", metaBeneficiario.BenCod);
                 cmd.Parameters.AddWithValue("@P_UBIANO", metaBeneficiario.UbiAno);
                 cmd.Parameters.AddWithValue("@P_UBICOD", metaBeneficiario.UbiCod);
+                cmd.Parameters.AddWithValue("@P_METBENMESEJETEC", metaBeneficiario.MetBenMesEjeTec);
+                cmd.Parameters.AddWithValue("@P_METBENANOEJETEC", metaBeneficiario.MetBenAnoEjeTec);
                 cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
@@ -659,6 +661,8 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_BENCOD", metaBeneficiario.BenCod);
                 cmd.Parameters.AddWithValue("@P_UBIANO", metaBeneficiario.UbiAno);
                 cmd.Parameters.AddWithValue("@P_UBICOD", metaBeneficiario.UbiCod);
+                cmd.Parameters.AddWithValue("@P_METBENMESEJETEC", metaBeneficiario.MetBenMesEjeTec);
+                cmd.Parameters.AddWithValue("@P_METBENANOEJETEC", metaBeneficiario.MetBenAnoEjeTec);
                 cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");

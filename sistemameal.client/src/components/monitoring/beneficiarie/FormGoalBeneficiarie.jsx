@@ -436,6 +436,7 @@ const FormGoalBeneficiarie = () => {
     const Registrar_Beneficiario =  () => {
         validateForm( (data) => {
             console.log(data)
+            const {metBenAnoEjeTec,metBenMesEjeTec} = data;
             // Obtiene el ubiAno y ubiCod del último select
             const lastSelectElement = document.querySelector(`select[name=select${selects.length - 1}]`);
             const lastSelect = JSON.parse(lastSelectElement.value);
@@ -475,6 +476,7 @@ const FormGoalBeneficiarie = () => {
                 // Usa el benNumDoc del documento encontrado como benCodUni
                 const benCodUni = documentoCodUni.docIdeBenNum;
 
+
                 let beneficiarioMonitoreo = {
                     Beneficiario: { ...data, benCodUni },
                     MetaBeneficiario: {
@@ -482,6 +484,8 @@ const FormGoalBeneficiarie = () => {
                         metCod,
                         ubiAno,
                         ubiCod,
+                        metBenMesEjeTec,
+                        metBenAnoEjeTec
                     },
                     DocumentoBeneficiario: documentosAgregados
                 }
@@ -503,6 +507,8 @@ const FormGoalBeneficiarie = () => {
                     benCod,
                     ubiAno,
                     ubiCod,
+                    metBenMesEjeTec,
+                    metBenAnoEjeTec
                 }
                 
                 handleSubmitMetaBeneficiarioExiste(MetaBeneficiario, handleReset, updateData, setUpdateData, fetchBeneficiarie);
