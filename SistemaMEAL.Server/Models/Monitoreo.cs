@@ -58,6 +58,8 @@ namespace SistemaMEAL.Server.Models
         public String? MetMesPlaPre { get; set; }
         public String? MetAnoPlaPre { get; set; }
         
+        public String? MetBenMesEjeTec { get; set; }
+        public String? MetBenAnoEjeTec { get; set; }
 
         public String? FinCod { get; set; }
         public String? FinNom { get; set; }

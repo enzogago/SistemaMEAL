@@ -51,7 +51,7 @@ const TableGoalBeneficiarie = ({ data }) => {
     const [sorting, setSorting] = useState([]);
     // Añade una nueva propiedad 'metMesPlaTecNombre' a cada objeto de tus datos
     data.forEach(item => {
-        item.metMesPlaTecNombre = new Date(2024, item.metMesPlaTec - 1).toLocaleString('es-ES', { month: 'long' });
+        item.metBenMesEjeTecNombre = new Date(2024, item.metBenMesEjeTec - 1).toLocaleString('es-ES', { month: 'long' });
     });
 
     // Filtra los datos por todas las etiquetas
@@ -61,9 +61,8 @@ const TableGoalBeneficiarie = ({ data }) => {
                 item.estNom.includes(tag.toUpperCase()) ||
                 item.metMetTec.includes(tag.toUpperCase()) ||
                 item.metEjeTec.includes(tag.toUpperCase()) ||
-                item.metPorAvaTec.includes(tag.toUpperCase()) ||
-                item.metAnoPlaTec.includes(tag.toUpperCase()) ||
-                item.metMesPlaTecNombre.toUpperCase().includes(tag.toUpperCase()) ||
+                item.metBenAnoEjeTec.includes(tag.toUpperCase()) ||
+                item.metBenMesEjeTecNombre.toUpperCase().includes(tag.toUpperCase()) ||
                 item.indActResNum.includes(tag.toUpperCase()) ||
                 item.indActResNom.includes(tag.toUpperCase()) ||
                 item.tipInd.includes(tag.toUpperCase()) ||
@@ -103,14 +102,14 @@ const TableGoalBeneficiarie = ({ data }) => {
             },
             {
                 header: "Año",
-                accessorKey: "metAnoPlaTec"
+                accessorKey: "metBenAnoEjeTec"
             },
             {
                 header: "Mes",
-                accessorKey: "metMesPlaTecNombre", // Usa la nueva propiedad como accessorKey
+                accessorKey: "metBenMesEjeTecNombre", // Usa la nueva propiedad como accessorKey
                 cell: ({row}) => (
                     <div style={{textTransform: 'capitalize'}}>
-                        {row.original.metMesPlaTecNombre}
+                        {row.original.metBenMesEjeTecNombre}
                     </div>
                 ),
             },
