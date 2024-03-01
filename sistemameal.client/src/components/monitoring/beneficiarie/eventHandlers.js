@@ -54,7 +54,7 @@ export const handleSubmitMetaBeneficiarioExiste = async (data, handleReset, upda
             },
             body: JSON.stringify(data),
         });
-        console.log(response)
+
         if (!response.ok) {
             const errorData = await response.json();
             if(response.status === 409){
@@ -70,7 +70,6 @@ export const handleSubmitMetaBeneficiarioExiste = async (data, handleReset, upda
 
         const successData = await response.json();
         Notiflix.Notify.success(successData.message);
-        console.log(successData);
         fetchBeneficiarie();
         setUpdateData(!updateData);
         handleReset();
@@ -102,7 +101,6 @@ export const fetchBeneficiariosMeta = async (metAno, metCod, setBeneficiariosMet
             Notiflix.Notify.failure(data.message);
             return;
         }
-        console.log(data)
         setBeneficiariosMeta(data)
     } catch (error) {
         console.error('Error:', error);
@@ -111,14 +109,14 @@ export const fetchBeneficiariosMeta = async (metAno, metCod, setBeneficiariosMet
     }
 };
 
-export const handleDeleteBeneficiarioMeta = async (controller,benAno,benCod,ubiAno,ubiCod,metAno,metCod, updateData, setUpdateData) => {
+export const handleDeleteBeneficiarioMeta = async (controller,metAno,metCod,benAno,benCod,ubiAno,ubiCod,metBenAnoEjeTec, metBenMesEjeTec, updateData, setUpdateData, fetchBeneficiarie) => {
     Notiflix.Confirm.show(
         'Eliminar Registro',
         '¿Estás seguro que quieres eliminar este registro?',
         'Sí',
         'No',
         async () => {
-            const url = `${import.meta.env.VITE_APP_API_URL}/api/${controller}/eliminar-beneficiario/${benAno}/${benCod}/${ubiAno}/${ubiCod}/${metAno}/${metCod}`;
+            const url = `${import.meta.env.VITE_APP_API_URL}/api/${controller}/eliminar-beneficiario/${metAno}/${metCod}/${benAno}/${benCod}/${ubiAno}/${ubiCod}/${metBenAnoEjeTec}/${metBenMesEjeTec}`;
 
             const token = localStorage.getItem('token');
 
@@ -130,7 +128,7 @@ export const handleDeleteBeneficiarioMeta = async (controller,benAno,benCod,ubiA
                     },
                 });
                 const data = await response.json();
-
+                console.log(response)
                 if (!response.ok) {
                     Notiflix.Notify.failure(data.message);
                     return;
@@ -139,6 +137,7 @@ export const handleDeleteBeneficiarioMeta = async (controller,benAno,benCod,ubiA
                 Notiflix.Notify.success(data.message);
                 
                 setUpdateData(!updateData);
+                fetchBeneficiarie();
             } catch (error) {
                 console.error('Error:', error);
             }

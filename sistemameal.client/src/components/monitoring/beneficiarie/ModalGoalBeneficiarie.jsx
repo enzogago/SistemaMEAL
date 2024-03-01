@@ -6,8 +6,6 @@ import Notiflix from 'notiflix';
 const ModalGoalBeneficiarie = ({modalGoalBeneficiarie, closeModal, dataGoalBeneficiarie, dataGoals}) => {
     if (!modalGoalBeneficiarie) return;
 
-    console.log(dataGoalBeneficiarie)
-
     const { benAno, benCod, benNom, benApe, benCorEle, benTel, benTelCon, benCodUni, benSex, benFecNac, genNom, nacNom, docIdeBenNum, docIdeAbr, docIdeNom, benNomApo, benApeApo } = dataGoalBeneficiarie;
 
     return (

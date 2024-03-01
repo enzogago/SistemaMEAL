@@ -369,7 +369,7 @@ namespace SistemaMEAL.Server.Modulos
             return temporal?? new List<Beneficiario>();
         }
 
-         public IEnumerable<Beneficiario> BuscarMetaBeneficiario(string? metAno = null, string? metCod = null, string? benAno = null, string? benCod = null, string? ubiAno = null, string? ubiCod = null, string? metBenEda = null)
+         public IEnumerable<Beneficiario> BuscarMetaBeneficiario(string? metAno = null, string? metCod = null, string? benAno = null, string? benCod = null, string? ubiAno = null, string? ubiCod = null, string? metBenEda = null, string? metBenAnoEjeTec = null, string? metBenMesEjeTec = null)
         {
             List<Beneficiario>? temporal = new List<Beneficiario>();
             try
@@ -386,6 +386,8 @@ namespace SistemaMEAL.Server.Modulos
                 cmd.Parameters.AddWithValue("@P_UBIANO", string.IsNullOrEmpty(ubiAno) ? (object)DBNull.Value : ubiAno);
                 cmd.Parameters.AddWithValue("@P_UBICOD", string.IsNullOrEmpty(ubiCod) ? (object)DBNull.Value : ubiCod);
                 cmd.Parameters.AddWithValue("@P_METBENEDA", string.IsNullOrEmpty(metBenEda) ? (object)DBNull.Value : metBenEda);
+                cmd.Parameters.AddWithValue("@P_METBENMESEJETEC", string.IsNullOrEmpty(metBenAnoEjeTec) ? (object)DBNull.Value : metBenAnoEjeTec);
+                cmd.Parameters.AddWithValue("@P_METBENANOEJETEC", string.IsNullOrEmpty(metBenMesEjeTec) ? (object)DBNull.Value : metBenMesEjeTec);
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2024");
                 cmd.Parameters.AddWithValue("@P_USUCOD_U", "0001");

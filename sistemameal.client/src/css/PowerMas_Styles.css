@@ -1202,12 +1202,15 @@ textarea {
 	text-decoration: none;
 	cursor: pointer;
 }
-.PowerMas_ModalContent > h2{
-	
-	
-}
 .PowerMas_ModalContent > label{
 	margin: 1rem 0;
+}
+.PowerMas_Modal_Documentos th,.PowerMas_Modal_Documentos td{
+	border: 1px solid #000;
+}
+.PowerMas_Modal_Documentos th{
+	width: 100%;
+	white-space: nowrap;
 }
 .PowerMas_Title_Modal{
 	border-bottom: 1px solid #372e2c96;

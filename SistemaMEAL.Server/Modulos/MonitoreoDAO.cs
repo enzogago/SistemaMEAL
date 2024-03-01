@@ -683,7 +683,6 @@ namespace SistemaMEAL.Modulos
 
                 mensaje = pDescripcionMensaje.Value.ToString();
                 tipoMensaje = pTipoMensaje.Value.ToString();
-                Console.WriteLine(mensaje);
             }
             catch (SqlException ex)
             {
@@ -697,7 +696,7 @@ namespace SistemaMEAL.Modulos
             return (mensaje, tipoMensaje);
         }
 
-        public (string? message, string? messageType) EliminarBeneficiarioMonitoreo(string benAno, string benCod, string ubiAno, string ubiCod, string metAno, string metCod)
+        public (string? message, string? messageType) EliminarBeneficiarioMonitoreo(string metAno, string metCod, string benAno, string benCod, string ubiAno, string ubiCod, string metBenAnoEjeTec, string metBenMesEjeTec)
         {
             string? mensaje = "";
             string? tipoMensaje = "";
@@ -714,6 +713,8 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_BENCOD", benCod);
                 cmd.Parameters.AddWithValue("@P_UBIANO", ubiAno);
                 cmd.Parameters.AddWithValue("@P_UBICOD", ubiCod);
+                cmd.Parameters.AddWithValue("@P_METBENANOEJETEC", metBenAnoEjeTec);
+                cmd.Parameters.AddWithValue("@P_METBENMESEJETEC", metBenMesEjeTec);
                 cmd.Parameters.AddWithValue("@P_USUMOD", "Usuario");
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");

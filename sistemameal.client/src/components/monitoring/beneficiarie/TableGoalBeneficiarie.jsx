@@ -58,9 +58,7 @@ const TableGoalBeneficiarie = ({ data }) => {
     const filteredData = useMemo(() => 
         data.filter(item => 
             searchTags.every(tag => 
-                item.estNom.includes(tag.toUpperCase()) ||
-                item.metMetTec.includes(tag.toUpperCase()) ||
-                item.metEjeTec.includes(tag.toUpperCase()) ||
+                item.ubiNom.includes(tag.toUpperCase()) ||
                 item.metBenAnoEjeTec.includes(tag.toUpperCase()) ||
                 item.metBenMesEjeTecNombre.toUpperCase().includes(tag.toUpperCase()) ||
                 item.indActResNum.includes(tag.toUpperCase()) ||
@@ -72,22 +70,12 @@ const TableGoalBeneficiarie = ({ data }) => {
                 item.objEspNum.includes(tag.toUpperCase()) || 
                 item.objNom.includes(tag.toUpperCase()) || 
                 item.subProNom.includes(tag.toUpperCase()) || 
-                item.ubiNom.includes(tag.toUpperCase()) || 
-                item.proNom.includes(tag.toUpperCase())
+                item.proNom.includes(tag.toUpperCase()) || 
+                item.impNom.includes(tag.toUpperCase()) || 
+                item.finNom.includes(tag.toUpperCase())
             )
         ), [data, searchTags]
     );
-
-    const Editar_Meta = (row) => {
-        console.log(row)
-        const id = `${row.original.usuAno}${row.original.usuCod}`;
-        console.log(id)
-        // Encripta el ID
-        const ciphertext = CryptoJS.AES.encrypt(id, 'secret key 123').toString();
-        // Codifica la cadena cifrada para que pueda ser incluida de manera segura en una URL
-        const safeCiphertext = btoa(ciphertext).replace('+', '-').replace('/', '_').replace(/=+$/, '');
-        navigate(`/form-goal/${safeCiphertext}`);
-    }
 
     const columns = useMemo(() => {
         let baseColumns = [
@@ -236,7 +224,7 @@ const TableGoalBeneficiarie = ({ data }) => {
     // Preparar los datos
     const dataExport = table.options.data;  // Tus datos
     const headers = ['UBICACION','AÑO','MES','INDICADOR','TIPO_INDICADOR','RESULTADO','OBJETIVO_ESPECIFICO','OBJETIVO','SUBPROYECTO','PROYECTO', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
-    const title = 'METAS';  // El título de tu archivo Excel
+    const title = 'METAS_EJECUTADAS';  // El título de tu archivo Excel
     const properties = ['ubiNom', 'metAnoPlaTec', 'metMesPlaTec', 'indActResNom', 'tipInd', 'resNom', 'objEspNom', 'objNom', 'subProNom', 'proNom', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir en el Excel
     const format = [1000, 500];
 
@@ -252,7 +240,7 @@ const TableGoalBeneficiarie = ({ data }) => {
     return (
         <>
             <CustomTable 
-                title='Metas Involucradas'
+                title='Metas Ejecutadas'
                 actions={actions} 
                 dropdownOpen={dropdownOpen} 
                 setDropdownOpen={setDropdownOpen} 

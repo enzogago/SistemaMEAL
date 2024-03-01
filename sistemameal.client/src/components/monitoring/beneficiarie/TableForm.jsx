@@ -26,7 +26,7 @@ import CustomTable from "../../reusable/Table/CustomTable";
 import { Export_Excel_Helper, Export_PDF_Helper } from "../../reusable/helper";
 import { handleDeleteBeneficiarioMeta } from "./eventHandlers";
 
-const TableForm = ({data, closeModal, metAno, metCod, updateData, setUpdateData }) => {
+const TableForm = ({data, closeModal, metAno, metCod, updateData, setUpdateData, fetchBeneficiarie }) => {
     
     const navigate = useNavigate();
     // Variables State AuthContext 
@@ -70,18 +70,24 @@ const TableForm = ({data, closeModal, metAno, metCod, updateData, setUpdateData 
 
     const [sorting, setSorting] = useState([]);
 
+    data.forEach(item => {
+        item.metBenMesEjeTecNombre = new Date(2024, item.metBenMesEjeTec - 1).toLocaleString('es-ES', { month: 'long' });
+    });
 
     // Filtra los datos por todas las etiquetas
     const filteredData = useMemo(() => 
         data.filter(item => 
             searchTags.every(tag => 
-                item.benCod.includes(tag.toUpperCase()) ||
+                item.benCodUni.includes(tag.toUpperCase()) ||
                 item.benNom.includes(tag.toUpperCase()) ||
                 item.benApe.includes(tag.toUpperCase()) ||
-                item.benCodUni.includes(tag.toUpperCase()) ||
+                item.benFecNac.includes(tag.toUpperCase()) ||
                 item.benCorEle.includes(tag.toUpperCase()) ||
                 item.benTel.includes(tag.toUpperCase()) ||
-                item.benTelCon.includes(tag.toUpperCase())
+                item.benTelCon.includes(tag.toUpperCase()) ||
+                item.metBenAnoEjeTec.includes(tag.toUpperCase()) ||
+                item.metBenMesEjeTecNombre.toUpperCase().includes(tag.toUpperCase()) ||
+                item.ubiNom.includes(tag.toUpperCase())
             )
         ), [data, searchTags]
     );
@@ -89,24 +95,39 @@ const TableForm = ({data, closeModal, metAno, metCod, updateData, setUpdateData 
     const columns = useMemo(() => {
         let baseColumns = [
             {
-                header: "Codigo",
-                accessorKey: "benCod",
-            },
-            {
-                header: "Nombre",
-                accessorKey: "benNom",
-            },
-            {
-                header: "Apellido",
-                accessorKey: "benApe",
-            },
-            {
                 header: "CUB",
                 accessorKey: "benCodUni",
             },
             {
+                header: "Nombre",
+                accessorKey: "benNom",
+                cell: ({row}) => (
+                    <div style={{ textTransform: 'capitalize' }}>
+                        {row.original.benNom.toLowerCase()}
+                    </div>
+                ),
+            },
+            {
+                header: "Apellido",
+                accessorKey: "benApe",
+                cell: ({row}) => (
+                    <div style={{ textTransform: 'capitalize' }}>
+                        {row.original.benApe.toLowerCase()}
+                    </div>
+                ),
+            },
+            {
+                header: "Nacimiento",
+                accessorKey: "benFecNac",
+            },
+            {
                 header: "Correo",
                 accessorKey: "benCorEle",
+                cell: ({row}) => (
+                    <div>
+                        {row.original.benCorEle.toLowerCase()}
+                    </div>
+                ),
             },
             {
                 header: "Teléfono",
@@ -117,8 +138,26 @@ const TableForm = ({data, closeModal, metAno, metCod, updateData, setUpdateData 
                 accessorKey: "benTelCon",
             },
             {
+                header: "Año",
+                accessorKey: "metBenAnoEjeTec",
+            },
+            {
+                header: "Mes",
+                accessorKey: "metBenMesEjeTec",
+                cell: ({row}) => (
+                    <div style={{textTransform: 'capitalize'}}>
+                        {row.original.metBenMesEjeTecNombre}
+                    </div>
+                ),
+            },
+            {
                 header: "Ubicación",
                 accessorKey: "ubiNom",
+                cell: ({row}) => (
+                    <div style={{ textTransform: 'capitalize' }}>
+                        {row.original.ubiNom.toLowerCase()}
+                    </div>
+                ),
             },
         ];
 
@@ -131,18 +170,20 @@ const TableForm = ({data, closeModal, metAno, metCod, updateData, setUpdateData 
                 header: () => <div style={{textAlign: 'center', flexGrow: '1'}}>Acciones</div>,
                 accessorKey: "acciones",
                 disableSorting: true,
-                cell: ({row}) => (
+                cell: ({row}) => {
+                    const {benAno, benCod, ubiAno, ubiCod, metBenAnoEjeTec, metBenMesEjeTec } = row.original;
+                    return(
                     <div className='PowerMas_IconsTable flex jc-center ai-center'>
                         {actions.delete && 
                             <FaRegTrashAlt 
                                 data-tooltip-id="delete-tooltip" 
                                 data-tooltip-content="Eliminar" 
                                 className='Large-p_25' 
-                                onClick={() => handleDeleteBeneficiarioMeta('Monitoreo',row.original.benAno,row.original.benCod,row.original.ubiAno,row.original.ubiCod,metAno,metCod, updateData, setUpdateData)} 
+                                onClick={() => handleDeleteBeneficiarioMeta('Monitoreo',metAno,metCod,benAno,benCod,ubiAno,ubiCod,metBenAnoEjeTec,metBenMesEjeTec, updateData, setUpdateData, fetchBeneficiarie)} 
                             />
                         }
                     </div>
-                ),
+                )},
             });
         }
     

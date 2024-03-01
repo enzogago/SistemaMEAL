@@ -10,6 +10,7 @@ import TableForm from "./TableForm";
 import { fetchData } from "../../reusable/helper";
 import { fetchBeneficiariosMeta, handleSubmitMetaBeneficiario, handleSubmitMetaBeneficiarioExiste } from "./eventHandlers";
 import ModalGoalBeneficiarie from "./ModalGoalBeneficiarie";
+import { FaRegTrashAlt } from "react-icons/fa";
 
 const FormGoalBeneficiarie = () => {
     const navigate = useNavigate();
@@ -137,7 +138,6 @@ const FormGoalBeneficiarie = () => {
                 setSelects([]);
                 return;
             }
-            console.log(pais)
             handleCountryChange(pais);
         }
     }, [pais]);
@@ -162,7 +162,6 @@ const FormGoalBeneficiarie = () => {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            console.log(response)
             if(response.status === 204){
                 setMostrarAgregarDocumento(true);
                 setAccionActual('agregar')
@@ -231,13 +230,11 @@ const FormGoalBeneficiarie = () => {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            console.log(response)
             const data = await response.json();
             if (!response.ok) {
                 Notiflix.Notify.failure(data.message);
                 return;
             }
-            console.log(data);
             setDataGoals(data);
 
         } catch (error) {
@@ -358,13 +355,11 @@ const FormGoalBeneficiarie = () => {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            console.log(response)
             const data = await response.json();
             if (!response.ok) {
                 Notiflix.Notify.failure(data.message);
                 return;
             }
-            console.log(data);
             setMetaData(data);
 
             setValue('metBenMesEjeTec', data.metMesPlaTec)
@@ -394,7 +389,6 @@ const FormGoalBeneficiarie = () => {
     
     const handleCountryChange = async (ubicacion, index) => {
         const selectedCountry = JSON.parse(ubicacion);
-        console.log(selectedCountry.ubiAno, selectedCountry.ubiCod);
         if (ubicacion === '0') {
             setSelects(prevSelects => prevSelects.slice(0, index + 1));  // Reinicia los selects por debajo del nivel actual
             return;
@@ -517,7 +511,6 @@ const FormGoalBeneficiarie = () => {
     };
 
     const handleReset = () => {
-        setSelects([]);
         reset({
             benApe: '',
             benApeApo: '',
@@ -542,10 +535,7 @@ const FormGoalBeneficiarie = () => {
         setFieldsDisabled(true);
         setMostrarAgregarDocumento(false);
         setAccionActual('buscar');
-        setValue('metBenMesEjeTec', metaData.metMesPlaTec)
-        setValue('metBenAnoEjeTec', metaData.metAnoPlaTec)
         setValue('pais', JSON.stringify({ ubiCod: metaData.ubiCod, ubiAno: metaData.ubiAno }))
-        handleCountryChange(pais);
     };
 
     // Observar Cambios de campos registrados
@@ -554,6 +544,12 @@ const FormGoalBeneficiarie = () => {
     const benAut = watch('benAut');
     const metBenAnoEjeTec = watch('metBenAnoEjeTec');
     const selectedDocumentValue = watch2('docIdeCod', '0');
+
+    const eliminarDocumento = (index) => {
+        const nuevosDocumentos = [...documentosAgregados];
+        nuevosDocumentos.splice(index, 1);
+        setDocumentosAgregados(nuevosDocumentos);
+    }
 
     return (
         <>
@@ -645,9 +641,9 @@ const FormGoalBeneficiarie = () => {
                                             }
                                         }}
                                         {...register('metBenAnoEjeTec', { 
-                                            required: 'El número de telefono es requerido',
-                                            minLength: { value: 4, message: 'El número debe tener minimo 4 digitos' },
-                                            maxLength: { value: 4, message: 'El número debe tener minimo 4 digitos' },
+                                            required: 'El campo es requerido',
+                                            minLength: { value: 4, message: 'El campo debe tener minimo 4 digitos' },
+                                            maxLength: { value: 4, message: 'El campo debe tener minimo 4 digitos' },
                                             pattern: {
                                                 value: /^[0-9]*$/,
                                                 message: 'Solo se aceptan numeros'
@@ -743,7 +739,7 @@ const FormGoalBeneficiarie = () => {
                                                 className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields2.docIdeCod || isSubmitted2 ? (errors2.docIdeCod ? 'invalid' : 'valid') : ''}`} 
                                                 style={{ color: selectedDocumentValue === '0' ? '#372e2c60' : '#000', textTransform: 'capitalize'}}
                                                 {...register2('docIdeCod', { 
-                                                    validate: value => value !== '0' || 'El dcoumento de identidad es requerido' 
+                                                    validate: value => value !== '0' || 'El campo es requerido' 
                                                 })}
                                             >
                                                 <option value="0">--Seleccione Documento Identidad--</option>
@@ -779,7 +775,7 @@ const FormGoalBeneficiarie = () => {
                                                     }
                                                 }}
                                                 {...register2('docIdeBenNum', { 
-                                                    required: 'El número de documento es requerido',
+                                                    required: 'El campo es requerido',
                                                     minLength: {
                                                         value: 6,
                                                         message: 'El número de documento debe tener al menos 6 dígitos'
@@ -927,31 +923,7 @@ const FormGoalBeneficiarie = () => {
                                     </p>
                                 )}
                             </div>
-                            <div className="m_75">
-                                <label htmlFor="benDir" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
-                                    Dirección
-                                </label>
-                                <input 
-                                    type="text" 
-                                    id="benDir"
-                                    style={{textTransform: 'capitalize'}}
-                                    autoComplete="disabled"
-                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benDir || isSubmitted ? (errors.benDir ? 'invalid' : 'valid') : ''}`} 
-                                    placeholder="Dirección del beneficiario"
-                                    disabled={fieldsDisabled}
-                                    {...register('benDir', { 
-                                        required: 'El apellido es requerido',
-                                            minLength: { value: 3, message: 'El apellido debe tener minimo 3 digitos' },
-                                    })} 
-                                />
-                                {errors.benDir ? (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.benDir.message}</p>
-                                ) : (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                    Espacio reservado para el mensaje de error
-                                    </p>
-                                )}
-                            </div>
+                            
                             <div className="m_75">
                                 <label htmlFor="masculino" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
                                     Sexo:
@@ -1214,6 +1186,31 @@ const FormGoalBeneficiarie = () => {
                                     </p>
                                 )}
                             </div>
+                            <div className="m_75">
+                                <label htmlFor="benDir" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
+                                    Dirección
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="benDir"
+                                    style={{textTransform: 'capitalize'}}
+                                    autoComplete="disabled"
+                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benDir || isSubmitted ? (errors.benDir ? 'invalid' : 'valid') : ''}`} 
+                                    placeholder="Dirección del beneficiario"
+                                    disabled={fieldsDisabled}
+                                    {...register('benDir', { 
+                                        required: 'El apellido es requerido',
+                                            minLength: { value: 3, message: 'El apellido debe tener minimo 3 digitos' },
+                                    })} 
+                                />
+                                {errors.benDir ? (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.benDir.message}</p>
+                                ) : (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                    Espacio reservado para el mensaje de error
+                                    </p>
+                                )}
+                            </div>
                         </div>
                         {
                             esMenorDeEdad && 
@@ -1361,24 +1358,41 @@ const FormGoalBeneficiarie = () => {
                     }
                 }}
             >
-                <h2>Documentos agregados</h2>
-                <table>
-                    <thead>
+                <span className="PowerMas_CloseModal" style={{position: 'absolute',right: 20, top: 10}} onClick={cerrarModal}>×</span>
+                <h2 className='PowerMas_Title_Modal f1_5 center'>Documentos Agregados</h2>
+                <table className="PowerMas_Modal_Documentos">
+                    <thead className="">
                         <tr>
                             <th>Tipo de documento</th>
                             <th>Número de documento</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
                         {documentosAgregados.map((documento, index) => (
                             <tr key={index}>
-                                <td>{documento.docIdeAbr} - {documento.docIdeNom}</td>
+                                <td style={{textTransform: 'capitalize'}}>{documento.docIdeAbr} - {documento.docIdeNom.toLowerCase()}</td>
                                 <td className="center">{documento.docIdeBenNum}</td>
+                                <td className="PowerMas_IconsTable"> 
+                                    <FaRegTrashAlt 
+                                        data-tooltip-id="delete-tooltip" 
+                                        data-tooltip-content="Eliminar"
+                                        onClick={() => eliminarDocumento(index)}
+                                    />
+                                </td>
                             </tr>
                         ))}
+                        {
+                            documentosAgregados.length == 0 &&
+                            <tr className="center">
+                                <td colSpan={3} className="p1"> No se registraron documentos</td>
+                            </tr>
+                        }
                     </tbody>
                 </table>
-                <button onClick={cerrarModal}>Cerrar</button>
+                <div className=" center">
+                    <button className="PowerMas_Buttom_Primary center p_5 m_25" onClick={cerrarModal}>Cerrar</button>
+                </div>
             </Modal>
             <Modal
                 ariaHideApp={false}
@@ -1415,6 +1429,7 @@ const FormGoalBeneficiarie = () => {
                     metCod={metCod}
                     updateData={updateData}
                     setUpdateData={setUpdateData}
+                    fetchBeneficiarie={fetchBeneficiarie}
                 />
             </Modal>
             <ModalGoalBeneficiarie 
