@@ -39,7 +39,7 @@ const Table = ({ data }) => {
                 },
             },
             {
-                header: "Meta",
+                header: () => <div style={{whiteSpace: 'normal'}} className="center">Meta Programática</div>,
                 accessorKey: "metMetTec",
                 cell: ({row}) => {
                     // Convierte el número a una cadena y añade las comas de miles
@@ -52,7 +52,7 @@ const Table = ({ data }) => {
                 },
             },
             {
-                header: "Ejecución",
+                header: () => <div style={{whiteSpace: 'normal'}} className="center">Ejecución Programática</div>,
                 accessorKey: "metEjeTec",
                 cell: ({row}) => {
                     // Convierte el número a una cadena y añade las comas de miles
@@ -63,9 +63,9 @@ const Table = ({ data }) => {
                         </div>
                     );
                 },
-            },            
+            },
             {
-                header: "% de Avance",
+                header: () => <div style={{whiteSpace: 'normal'}} className="center">% avance Técnico </div>,
                 accessorKey: "metPorAvaTec",
                 cell: ({row}) => (
                     <div className="flex flex-column">
@@ -79,6 +79,52 @@ const Table = ({ data }) => {
                             <div 
                                 className="progress-bar-fill" 
                                 style={{width: `${row.original.metPorAvaTec > 100 ? 100 : row.original.metPorAvaTec}%`, backgroundColor: row.original.estCol}}
+                            ></div>
+                        </div>
+                    </div>
+                ),
+            },    
+            {
+                header: () => <div className="center" style={{color: '#20737B', whiteSpace: 'normal'}}>Meta Presupuesto</div>,
+                accessorKey: "metMetPre",
+                cell: ({row}) => {
+                    // Convierte el número a una cadena y añade las comas de miles
+                    const formattedNumber = Number(row.original.metMetPre).toLocaleString();
+                    return (
+                        <div className="center">
+                            ${formattedNumber}
+                        </div>
+                    );
+                },
+            },
+            {
+                header: () => <div className="center" style={{color: '#20737B',whiteSpace: 'normal'}}>Ejecución Presupuesto</div>,
+                accessorKey: "metEjePre",
+                cell: ({row}) => {
+                    // Convierte el número a una cadena y añade las comas de miles
+                    const formattedNumber = Number(row.original.metEjePre).toLocaleString();
+                    return (
+                        <div className="center">
+                            ${formattedNumber}
+                        </div>
+                    );
+                },
+            },            
+            {
+                header: () => <div className="center" style={{whiteSpace: 'normal',color: '#20737B'}}>% avance Presupuesto</div>,
+                accessorKey: "metPorAvaPre",
+                cell: ({row}) => (
+                    <div className="flex flex-column">
+                        <div className="bold" style={{color: row.original.estCol}}>
+                            {row.original.metPorAvaPre}%
+                        </div>
+                        <div 
+                            className="progress-bar"
+                            style={{backgroundColor: '#d3d3d3', border: `0px solid ${row.original.estCol}`}}
+                        >
+                            <div 
+                                className="progress-bar-fill" 
+                                style={{width: `${row.original.metPorAvaPre > 100 ? 100 : row.original.metPorAvaPre}%`, backgroundColor: row.original.estCol}}
                             ></div>
                         </div>
                     </div>

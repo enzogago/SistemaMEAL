@@ -1017,7 +1017,6 @@ textarea {
 .PowerMas_TableContainer {
 	flex-grow: 1;
     overflow: auto;
-	padding: 0 0.5rem;
 	display: flex;
 	flex-direction: column;
 }
@@ -1205,8 +1204,8 @@ textarea {
 .PowerMas_ModalContent > label{
 	margin: 1rem 0;
 }
-.PowerMas_Modal_Documentos th,.PowerMas_Modal_Documentos td{
-	border: 1px solid #000;
+.PowerMas_Modal_Documentos td,.PowerMas_Modal_Documentos th{
+	border-bottom: 1px solid #372e2c96;
 }
 .PowerMas_Modal_Documentos th{
 	width: 100%;
@@ -1643,10 +1642,14 @@ textarea {
 	gap: 1rem;
 }
 .PowerMas_Icons_Sorter{
-	width: 14px;
+	width: 24px;
+	width: 24px;
 }
 .ws-nowrap{
 	white-space: nowrap;
+}
+.text-wrap{
+	text-wrap: wrap;
 }
 /* FIN MONITOREO */
 
@@ -1795,4 +1798,15 @@ textarea {
 	background-color: #FFE8D9;
 	border: 1px solid #F7775A;
 	border-radius: 5px;
+}
+
+
+
+
+.PowerMas_Permission_Beneficiarie {
+	color: #000;
+	transition: color 0.1s ease-in;
+}
+.PowerMas_Permission_Beneficiarie:hover {
+	color: #F7775A;
 }

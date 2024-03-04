@@ -1,51 +1,53 @@
 import Notiflix from "notiflix";
-import CryptoJS from 'crypto-js';
 
-export const handleSubmit = async (data, isEditing, navigate, safeCiphertext) => {
-    const url = isEditing ? `${import.meta.env.VITE_APP_API_URL}/usuario/${data.usuAno}/${data.usuCod}` : `${import.meta.env.VITE_APP_API_URL}/usuario`;
-    const method = isEditing ? 'PUT' : 'POST';
+export const handleSubmit = async (isEditing ,data, reset, navigate, closeModalEdit, updateData, setUpdateData) => {
+    let newData = {};
+            
+    for (let key in data) {
+        if (typeof data[key] === 'string') {
+            // Convierte cada cadena a minúsculas
+            newData[key] = data[key].toUpperCase();
+        } else {
+            // Mantiene los valores no string tal como están
+            newData[key] = data[key];
+        }
+    }
 
-    const token = localStorage.getItem('token');
-    console.log(method)
     try {
-        const response = await fetch(url, {
-            method: method,
+        Notiflix.Loading.pulse('Cargando...');
+        const token = localStorage.getItem('token');
+        const method = isEditing ? 'PUT' : 'POST';
+        const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Beneficiario`, {
+            method,
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify(data),
+            body: JSON.stringify(newData),
         });
-        
+        const responseData = await response.json();
         if (!response.ok) {
-            const errorData = await response.json();
-            if(response.status === 409){
-                Notiflix.Notify.warning(`${errorData.message} ${(data.usuCorEle).toUpperCase()}`);
-                console.log(errorData.message)
-                return;
-            } else {
-                Notiflix.Notify.failure(errorData.message);
-                console.log(errorData.message)
-                return;
-            }
+            Notiflix.Notify.failure(responseData.message);
+            return;
         }
 
-        const successData = await response.json();
-        Notiflix.Notify.success(successData.message);
-        console.log(successData)
-        // Si se está creando un nuevo usuario, obtén el usuAno y usuCod del último usuario
-        if (!isEditing) {
-            const { usuAno, usuCod } = successData;
-            const id = `${usuAno}${usuCod}`;
-            // Encripta el ID
-            const ciphertext = CryptoJS.AES.encrypt(id, 'secret key 123').toString();
-            // Codifica la cadena cifrada para que pueda ser incluida de manera segura en una URL
-            const safeCiphertext = btoa(ciphertext).replace('+', '-').replace('/', '_').replace(/=+$/, '');
-            navigate(`/menu-user/${safeCiphertext}`);
-        } else {
-            navigate(`/menu-user/${safeCiphertext}`);
+        Notiflix.Notify.success(responseData.message);
+
+        if (reset) {
+            reset();
+        }
+        if (navigate) {
+            navigate('/beneficiarie');
+        }
+        if (closeModalEdit) {
+            closeModalEdit();
+        }
+        if (setUpdateData) {
+            setUpdateData(!updateData)
         }
     } catch (error) {
         console.error('Error:', error);
+    } finally {
+        Notiflix.Loading.remove();
     }
 };

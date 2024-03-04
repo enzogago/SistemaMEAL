@@ -152,7 +152,19 @@ const CustomTable = ({
                                 <tr key={headerGroup.id}>
                                     {
                                         headerGroup.headers.map(header =>(
-                                            <th className='ws-nowrap' style={{ width: resize ? header.getSize():  '', position: resize ? 'relative' : '', textTransform: 'capitalize'  }} key={header.id} onClick={header.column.getToggleSortingHandler()}>
+                                            <th 
+                                                className='ws-nowrap' 
+                                                style={{ 
+                                                    width: resize ? header.getSize():  '', 
+                                                    position: resize ? 'relative' : '', 
+                                                    position: header.column.columnDef.stickyRight !== undefined ? 'sticky' : '', 
+                                                    textTransform: 'capitalize',
+                                                    right: header.column.columnDef.stickyRight !== undefined ? `${header.column.columnDef.stickyRight}px` : 'auto',
+                                                    backgroundColor: '#fff', 
+                                                }} 
+                                                key={header.id} 
+                                                onClick={header.column.getToggleSortingHandler()}
+                                            >
                                                 <div>
                                                     {
                                                         flexRender(header.column.columnDef.header, header.getContext())
@@ -171,18 +183,20 @@ const CustomTable = ({
                                                     </div>
                                                 </div>
 
-                                                <span 
-                                                    onMouseDown={
-                                                        header.getResizeHandler()
-                                                    }
-                                                    onTouchStart={
-                                                        header.getResizeHandler()
-                                                    }
-                                                    
-                                                    className={header.column.getIsResizing() 
-                                                    ? "resizer isResizing" 
-                                                    : "resizer"} >
-                                                </span>
+                                                {header.column.columnDef.stickyRight === undefined &&  // Muestra el elemento <span> solo si la columna no es "sticky"
+                                                    <span 
+                                                        onMouseDown={
+                                                            header.getResizeHandler()
+                                                        }
+                                                        onTouchStart={
+                                                            header.getResizeHandler()
+                                                        }
+                                                        
+                                                        className={header.column.getIsResizing() 
+                                                        ? "resizer isResizing" 
+                                                        : "resizer"} >
+                                                    </span>
+                                                }
 
                                             </th>
                                         ))
@@ -198,7 +212,15 @@ const CustomTable = ({
                                     <tr key={row.id}>
                                         {row.getVisibleCells().map(cell => (
                                             !resize ?
-                                                <td key={cell.id} className="p_5 ws-nowrap">
+                                                <td 
+                                                    key={cell.id} 
+                                                    className="p_5 ws-nowrap"
+                                                    style={{
+                                                        position: cell.column.columnDef.stickyRight !== undefined ? 'sticky' : '', 
+                                                        right: cell.column.columnDef.stickyRight !== undefined ? `${cell.column.columnDef.stickyRight}px` : 'auto',
+                                                        backgroundColor: '#fff'
+                                                    }}
+                                                >
                                                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                                 </td>
                                             :

@@ -31,10 +31,9 @@ const Home = () => {
     const [ nacionalidadesLoaded, setNacionalidadesLoaded ] = useState(false);
     const [ pieData, setPieData ] = useState([]);
 
-    const [groupedMaleData, setGroupedMaleData] = useState([]);
-    const [groupedFemaleData, setGroupedFemaleData] = useState([]);
     const [docData, setDocData] = useState([]);
     const [rangeData, setRangeData] = useState([]);
+    const [mapData, setMapData] = useState([]);
 
     
 
@@ -78,8 +77,6 @@ const Home = () => {
             }
         };
 
-        
-
         fetchData('Nacionalidad', data => {
             setNacionalidades(data);
             setNacionalidadesLoaded(true);
@@ -89,40 +86,6 @@ const Home = () => {
         fetchMonitoreo();
     }, [searchTags]);
 
-
-
-    const calculateAge = (birthDate) => {
-        const today = new Date();
-        const birthDateParts = birthDate.split('-');
-        const birthDateObject = new Date(birthDateParts[2], birthDateParts[1] - 1, birthDateParts[0]);
-        let age = today.getFullYear() - birthDateObject.getFullYear();
-        const monthDifference = today.getMonth() - birthDateObject.getMonth();
-        if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDateObject.getDate())) {
-            age--;
-        }
-        return age;
-    };
-
-    const ageRanges = [
-        { min: 0, max: 9 },
-        { min: 10, max: 29 },
-        { min: 30, max: 54 },
-        { min: 55, max: 64 },
-        { min: 65, max: Infinity }
-    ];
-    
-
-    const groupDataByAgeRange = (data) => {
-        return ageRanges.map(range => {
-            const count = data.reduce((total, d) => {
-                if (d.age >= range.min && d.age <= range.max) {
-                    total += d.count;
-                }
-                return total;
-            }, 0);
-            return { age: `${range.min}-${range.max}`, count };
-        });
-    };
 
     useEffect(() => {
         const fetchBeneficiariosHome = async () => {
@@ -260,6 +223,31 @@ const Home = () => {
                 Notiflix.Loading.remove();
             }
         };
+        const fetchUbicacionesHome = async () => {
+            try {
+                Notiflix.Loading.pulse('Cargando...');
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/paises-home/${searchTags.join(',')}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if (!response.ok) {
+                    if(response.status == 401 || response.status == 403){
+                        const data = await response.json();
+                        Notiflix.Notify.failure(data.message);
+                    }
+                    return;
+                }
+                const data = await response.json();
+                console.log(data)
+                setMapData(data)
+            } catch (error) {
+                console.error('Error:', error);
+            } finally {
+                Notiflix.Loading.remove();
+            }
+        };
 
         if (nacionalidadesLoaded) {
             fetchBeneficiariosHome();
@@ -267,6 +255,7 @@ const Home = () => {
             fetchNacionalidadesHome();
             fetchSexosHome();
             fetchRangoHome();
+            fetchUbicacionesHome();
         }
     }, [nacionalidadesLoaded, searchTags]);
 
@@ -316,8 +305,6 @@ const Home = () => {
         { name: 'Masculino', value: 39489, color: maleColor },
         { name: 'Femenino', value: 91949, color: femaleColor },
     ];
-
-    const colors = ['#1d6776','#61A2AA']
 
     return(
     <>
@@ -407,7 +394,7 @@ const Home = () => {
                 <div className='PowerMas_Home_Card p1 Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
                     <h4>Beneficiarios por Sexo</h4>
                     <div className='Large_6 Medium_12 Phone_12 Large-p1 Small-p_75 flex-grow-1'>
-                        <PieChart data={pieData} colors={colors} id='MaleFemale' />
+                        <PieChart data={pieData} id='MaleFemale' />
                     </div>
                     <div className='flex flex-wrap gap-1'>
                         {data.map((item, index) => (
@@ -500,7 +487,7 @@ const Home = () => {
                         </div>
                     </article>
                     <div className='Large_6 Medium_12 Phone_12 flex-grow-1'>
-                        <MapComponent />
+                        <MapComponent mapData={mapData} />
                     </div>
                 </div>
             </div>

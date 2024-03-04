@@ -1,37 +1,29 @@
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Tooltip } from 'react-tooltip';
-import CryptoJS from 'crypto-js';
+
 import {
     useReactTable, 
     getCoreRowModel, 
-    flexRender, 
     getPaginationRowModel,
     getSortedRowModel, 
 } from '@tanstack/react-table';
 // Iconos package
 import { FaEdit, FaPlus, FaRegTrashAlt, FaSearch, FaSortDown } from 'react-icons/fa';
-import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
-import { GrNext, GrPrevious  } from "react-icons/gr";
-// Iconos source
-import Excel_Icon from '../../../img/PowerMas_Excel_Icon.svg';
-import Pdf_Icon from '../../../img/PowerMas_Pdf_Icon.svg';
-// Componentes
-import Pagination from "../../reusable/Pagination";
-import TableRow from "./TableRow"
 // Context
 import { AuthContext } from "../../../context/AuthContext";
-import Notiflix from "notiflix";
 import CustomTable from "../../reusable/Table/CustomTable";
 import { Export_Excel_Helper, Export_PDF_Helper } from "../../reusable/helper";
 import { handleDeleteBeneficiarioMeta } from "./eventHandlers";
+import masculino from '../../../img/PowerMas_Avatar_Masculino.svg';
+import femenino from '../../../img/PowerMas_Avatar_Femenino.svg';
+
+import ModalEditBeneficiarie from "./ModalEditBeneficiarie";
 
 const TableForm = ({data, closeModal, metAno, metCod, updateData, setUpdateData, fetchBeneficiarie }) => {
-    
+    console.log(data)
     const navigate = useNavigate();
     // Variables State AuthContext 
-    const { authActions, authInfo } = useContext(AuthContext);
-    const { setIsLoggedIn } = authActions;
+    const { authInfo } = useContext(AuthContext);
     const { userPermissions } = authInfo;
     // States locales
     const [searchTags, setSearchTags] = useState([]);
@@ -40,6 +32,13 @@ const TableForm = ({data, closeModal, metAno, metCod, updateData, setUpdateData,
     const [isInputEmpty, setIsInputEmpty] = useState(true);
     const [inputValue, setInputValue] = useState('');
 
+    const [ modalVisible, setModalVisible ] = useState(false)
+
+    const [currentRecord, setCurrentRecord] = useState(null);
+
+    const closeModalEdit = () => {
+        setModalVisible(false);
+    }
 
     // Añade una nueva etiqueta al presionar Enter
     const handleKeyDown = (e) => {
@@ -65,6 +64,7 @@ const TableForm = ({data, closeModal, metAno, metCod, updateData, setUpdateData,
     const actions = {
         pdf: userPermissions.some(permission => permission.perNom === `EXPORTAR PDF META`),
         excel: userPermissions.some(permission => permission.perNom === `EXPORTAR EXCEL META`),
+        edit: userPermissions.some(permission => permission.perNom === "MODIFICAR META"),
         delete: userPermissions.some(permission => permission.perNom === "ELIMINAR META"),
     };
 
@@ -72,7 +72,19 @@ const TableForm = ({data, closeModal, metAno, metCod, updateData, setUpdateData,
 
     data.forEach(item => {
         item.metBenMesEjeTecNombre = new Date(2024, item.metBenMesEjeTec - 1).toLocaleString('es-ES', { month: 'long' });
+    
+        // Convierte la fecha de nacimiento a un objeto Date
+        const [day, month, year] = item.benFecNac.split("-");
+        const birthDate = new Date(year, month - 1, day);
+    
+        // Calcula la diferencia en años
+        const ageDifMs = Date.now() - birthDate.getTime();
+        const ageDate = new Date(ageDifMs);
+        const age = Math.abs(ageDate.getUTCFullYear() - 1970);
+    
+        item.edad = age;
     });
+    
 
     // Filtra los datos por todas las etiquetas
     const filteredData = useMemo(() => 
@@ -87,7 +99,12 @@ const TableForm = ({data, closeModal, metAno, metCod, updateData, setUpdateData,
                 item.benTelCon.includes(tag.toUpperCase()) ||
                 item.metBenAnoEjeTec.includes(tag.toUpperCase()) ||
                 item.metBenMesEjeTecNombre.toUpperCase().includes(tag.toUpperCase()) ||
-                item.ubiNom.includes(tag.toUpperCase())
+                (item.benSex === 'M' && 'MASCULINO'.includes(tag.toUpperCase())) ||
+                (item.benSex === 'F' && 'FEMENINO'.includes(tag.toUpperCase())) ||
+                (item.benAut === 'S' && 'SI'.includes(tag.toUpperCase())) ||
+                (item.benAut === 'N' && 'NO'.includes(tag.toUpperCase())) ||
+                item.ubiNom.includes(tag.toUpperCase()) ||
+                item.edad.toString().includes(tag.toUpperCase())
             )
         ), [data, searchTags]
     );
@@ -95,30 +112,47 @@ const TableForm = ({data, closeModal, metAno, metCod, updateData, setUpdateData,
     const columns = useMemo(() => {
         let baseColumns = [
             {
-                header: "CUB",
-                accessorKey: "benCodUni",
+                header: "",
+                accessorKey: "avatar",
+                disableSorting: true,
+                cell: ({row}) => {
+                    const ben = row.original;
+                    return (
+                        <div className="PowerMas_ProfilePicture2 m_25" style={{width: '35px', height: '35px', border: `2px solid ${ben && (ben.benSex === 'M' ? '#20737b' : '#E5554F')}`}}>
+                            <img src={ben && (ben.benSex === 'M' ? masculino : femenino)} alt="Avatar" />
+                        </div>
+                    )
+                }
             },
             {
-                header: "Nombre",
-                accessorKey: "benNom",
+                header: "Autoriza",
+                accessorKey: "benAut",
                 cell: ({row}) => (
                     <div style={{ textTransform: 'capitalize' }}>
-                        {row.original.benNom.toLowerCase()}
+                        {row.original.benAut === 'S' ? 'Si' : 'No'}
                     </div>
                 ),
             },
             {
-                header: "Apellido",
-                accessorKey: "benApe",
+                header: "CUB",
+                accessorKey: "benCodUni",
+            },
+            {
+                header: "Nombre Completo",
+                accessorKey: "benNom",
                 cell: ({row}) => (
                     <div style={{ textTransform: 'capitalize' }}>
-                        {row.original.benApe.toLowerCase()}
+                        {row.original.benNom.toLowerCase()} {row.original.benApe.toLowerCase()}
                     </div>
                 ),
             },
             {
                 header: "Nacimiento",
                 accessorKey: "benFecNac",
+            },
+            {
+                header: "Edad",
+                accessorKey: "edad",
             },
             {
                 header: "Correo",
@@ -138,17 +172,14 @@ const TableForm = ({data, closeModal, metAno, metCod, updateData, setUpdateData,
                 accessorKey: "benTelCon",
             },
             {
-                header: "Año",
-                accessorKey: "metBenAnoEjeTec",
-            },
-            {
-                header: "Mes",
-                accessorKey: "metBenMesEjeTec",
+                header: "Dirección",
+                accessorKey: "benDir",
                 cell: ({row}) => (
-                    <div style={{textTransform: 'capitalize'}}>
-                        {row.original.metBenMesEjeTecNombre}
+                    <div style={{ textTransform: 'capitalize' }}>
+                        {row.original.benNom.toLowerCase()} {row.original.benDir.toLowerCase()}
                     </div>
                 ),
+                
             },
             {
                 header: "Ubicación",
@@ -159,21 +190,51 @@ const TableForm = ({data, closeModal, metAno, metCod, updateData, setUpdateData,
                     </div>
                 ),
             },
+            {
+                header: () => <div className="text-wrap center">Año Ejecución</div>,
+                accessorKey: "metBenAnoEjeTec",
+                cell: ({row}) => (
+                    <div className="center">
+                        {row.original.metBenAnoEjeTec}
+                    </div>
+                ),
+            },
+            {
+                header: () => <div className="text-wrap center">Mes Ejecución</div>,
+                accessorKey: "metBenMesEjeTec",
+                cell: ({row}) => (
+                    <div className="center" style={{textTransform: 'capitalize'}}>
+                        {row.original.metBenMesEjeTecNombre}
+                    </div>
+                ),
+            },
         ];
 
         baseColumns = baseColumns.filter(column => 
             data.some(item => item[column.accessorKey] !== null)
         );
 
-        if (actions.delete) {
+        if (actions.edit || actions.delete) {
             baseColumns.push({
                 header: () => <div style={{textAlign: 'center', flexGrow: '1'}}>Acciones</div>,
                 accessorKey: "acciones",
                 disableSorting: true,
+                stickyRight: 0,
                 cell: ({row}) => {
                     const {benAno, benCod, ubiAno, ubiCod, metBenAnoEjeTec, metBenMesEjeTec } = row.original;
                     return(
                     <div className='PowerMas_IconsTable flex jc-center ai-center'>
+                        {actions.edit && 
+                            <FaEdit 
+                                data-tooltip-id="edit-tooltip" 
+                                data-tooltip-content="Editar" 
+                                className='Large-p_25' 
+                                onClick={() => {
+                                    setCurrentRecord(row.original);
+                                    setModalVisible(true);
+                                }} 
+                            />
+                        }
                         {actions.delete && 
                             <FaRegTrashAlt 
                                 data-tooltip-id="delete-tooltip" 
@@ -182,6 +243,7 @@ const TableForm = ({data, closeModal, metAno, metCod, updateData, setUpdateData,
                                 onClick={() => handleDeleteBeneficiarioMeta('Monitoreo',metAno,metCod,benAno,benCod,ubiAno,ubiCod,metBenAnoEjeTec,metBenMesEjeTec, updateData, setUpdateData, fetchBeneficiarie)} 
                             />
                         }
+                        
                     </div>
                 )},
             });
@@ -206,10 +268,18 @@ const TableForm = ({data, closeModal, metAno, metCod, updateData, setUpdateData,
 
      // Preparar los datos
      let dataExport = [...table.options.data]; 
-     const headers = ['AÑO', 'CODIGO', 'NOMBRE', 'APELLIDO', 'CODIGO_UNICO', 'CORREO', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
+
+     dataExport = dataExport.map(item => {
+        return {
+            ...item,
+            benAut: item.benAut === 'S' ? 'SI' : 'NO',
+            benSex: item.benSex === 'M' ? 'MASCULINO' : 'FEMENINO'
+        };
+    });
+     const headers = ['AUTORIZA','CUB', 'NOMBRES', 'APELLIDOS', 'FECHA_NACIMIENTO', 'SEXO', 'GENERO', 'NACIONALIDAD', 'CORREO', 'TELEFONO', 'TELEFONO_CONTACTO', 'DIRECCION', 'UBICACION', 'AÑO_EJECUCION' , 'MES_EJECUCION', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
      const title = 'BENEFICIARIO';  // El título de tu archivo
-     const properties = ['benAno', 'benCod', 'benNom', 'benApe', 'benCodUni', 'benCorEle', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
-     const format = 'a4';  // El tamaño del formato que quieres establecer para el PDF
+     const properties = ['benAut', 'benCodUni', 'benNom', 'benApe', 'benFecNac', 'benSex', 'genNom', 'nacNom', 'benCorEle', 'benTel', 'benTelCon', 'benDir', 'ubiNom', 'metBenAnoEjeTec', 'metBenMesEjeTec', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
+     const format = [700,350];  // El tamaño del formato que quieres establecer para el PDF
  
      const Export_Excel = () => {
          // Luego puedes llamar a la función Export_Excel_Helper de esta manera:
@@ -241,6 +311,16 @@ const TableForm = ({data, closeModal, metAno, metCod, updateData, setUpdateData,
                 searchTags={searchTags}
                 setSearchTags={setSearchTags}
             />
+            {
+                currentRecord &&
+                <ModalEditBeneficiarie 
+                    modalVisible={modalVisible}
+                    closeModalEdit={closeModalEdit}
+                    record={currentRecord}
+                    updateData={updateData}
+                    setUpdateData={setUpdateData}
+                />
+            }
         </>
     )
 }

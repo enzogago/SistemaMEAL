@@ -11,6 +11,8 @@ import { fetchData } from "../../reusable/helper";
 import { fetchBeneficiariosMeta, handleSubmitMetaBeneficiario, handleSubmitMetaBeneficiarioExiste } from "./eventHandlers";
 import ModalGoalBeneficiarie from "./ModalGoalBeneficiarie";
 import { FaRegTrashAlt } from "react-icons/fa";
+import { IoIosInformationCircleOutline } from "react-icons/io";
+import logo from '../../../img/PowerMas_LogoAyudaEnAccion.svg';
 
 const FormGoalBeneficiarie = () => {
     const navigate = useNavigate();
@@ -52,6 +54,8 @@ const FormGoalBeneficiarie = () => {
     const [ dataGoals, setDataGoals ] = useState([])
 
     const [isDataLoaded, setIsDataLoaded] = useState(false);
+
+    const [ modalInfoOpen, setModalInfoOpen ] = useState(false);
 
 
     // Cargamos la Informacion a tratar en este Formulario
@@ -456,9 +460,9 @@ const FormGoalBeneficiarie = () => {
     const closeGoalBeneficiarie = () => {
         setModalGoalBeneficiarie(false);
     }
-    
-    
-    
+    const closeModalInfo = () => {
+        setModalInfoOpen(false);
+    }
     
     const handleCountryChange = async (ubicacion, index) => {
         const selectedCountry = JSON.parse(ubicacion);
@@ -913,31 +917,42 @@ const FormGoalBeneficiarie = () => {
                             </form>
                             <div className="m_75">
                                 <label htmlFor="si" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
-                                    Autoriza el Uso de datos:
+                                    Autoriza el uso de datos:
                                 </label>
-                                <div className="flex gap-1">
-                                    <div className="flex gap_5">
-                                        <input 
-                                            type="radio" 
-                                            id="si" 
-                                            name="benAut" 
-                                            disabled={fieldsDisabled && benAut !== 's'}
-                                            value="s" 
-                                            {...register('benAut', { required: 'Por favor, selecciona una opción' })}
-                                        />
-                                        <label htmlFor="si" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} >Si</label>
+                                <div className="flex  jc-space-between">
+                                    <div className="flex gap-1 ">
+                                        <div className="flex gap_5">
+                                            <input 
+                                                type="radio" 
+                                                id="si"
+                                                className="m0"
+                                                name="benAut" 
+                                                disabled={fieldsDisabled && benAut !== 's'}
+                                                value="s" 
+                                                {...register('benAut', { required: 'Por favor, selecciona una opción' })}
+                                            />
+                                            <label htmlFor="si" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} >Si</label>
+                                        </div>
+                                        <div className="flex gap_5">
+                                            <input 
+                                                type="radio" 
+                                                id="no" 
+                                                className="m0"
+                                                name="benAut" 
+                                                disabled={fieldsDisabled && benAut !== 'n'}
+                                                value="n" 
+                                                {...register('benAut', { required: 'Por favor, selecciona una opción' })}
+                                            />
+                                            <label style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} htmlFor="no">No</label>
+                                        </div>
                                     </div>
-                                    <div className="flex gap_5">
-                                        <input 
-                                            type="radio" 
-                                            id="no" 
-                                            name="benAut" 
-                                            disabled={fieldsDisabled && benAut !== 'n'}
-                                            value="n" 
-                                            {...register('benAut', { required: 'Por favor, selecciona una opción' })}
-                                        />
-                                        <label style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} htmlFor="no">No</label>
+                                    <div className="flex ai-center gap_3 PowerMas_Permission_Beneficiarie" onClick={() => setModalInfoOpen(true)}>
+                                        <span className="f_75 pointer">
+                                            Ver Autorización
+                                        </span>
+                                        <IoIosInformationCircleOutline  className="Large-f1_25 bold pointer w-auto" />
                                     </div>
+                                    
                                 </div>
                                 {errors.benAut ? (
                                     <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.benAut.message}</p>
@@ -967,7 +982,7 @@ const FormGoalBeneficiarie = () => {
                                     <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.benNom.message}</p>
                                 ) : (
                                     <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                    Espacio reservado para el mensaje de error
+                                        Espacio reservado para el mensaje de error
                                     </p>
                                 )}
                             </div>
@@ -1419,7 +1434,7 @@ const FormGoalBeneficiarie = () => {
                         left: '50%',
                         right: 'auto',
                         bottom: 'auto',
-                        width: '40%',
+                        width: '50%',
                         marginRight: '-50%',
                         transform: 'translate(-50%, -50%)',
                         backgroundColor: '#fff',
@@ -1444,7 +1459,7 @@ const FormGoalBeneficiarie = () => {
                     <tbody>
                         {documentosAgregados.map((documento, index) => (
                             <tr key={index}>
-                                <td style={{textTransform: 'capitalize'}}>{documento.docIdeAbr} - {documento.docIdeNom.toLowerCase()}</td>
+                                <td style={{textTransform: 'capitalize', textWrap: 'nowrap'}}>{documento.docIdeAbr} - {documento.docIdeNom.toLowerCase()}</td>
                                 <td className="center">{documento.docIdeBenNum}</td>
                                 <td className="PowerMas_IconsTable"> 
                                     <FaRegTrashAlt 
@@ -1511,6 +1526,50 @@ const FormGoalBeneficiarie = () => {
                 dataGoalBeneficiarie={dataGoalBeneficiarie}
                 dataGoals={dataGoals}
             />
+            <Modal
+                ariaHideApp={false}
+                isOpen={modalInfoOpen}
+                onRequestClose={closeModalInfo}
+                closeTimeoutMS={200}
+                style={{
+                    content: {
+                        top: '50%',
+                        left: '50%',
+                        right: 'auto',
+                        bottom: 'auto',
+                        width: '50%',
+                        marginRight: '-50%',
+                        transform: 'translate(-50%, -50%)',
+                        backgroundColor: '#fff',
+                        border: '1px solid #ccc',
+                        display: 'flex',
+                        flexDirection: 'column'
+                    },
+                    overlay: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }}
+            > 
+                <span className="PowerMas_CloseModal" style={{position: 'absolute',right: 20, top: 10}} onClick={closeModalInfo}>×</span>
+                <div className="PowerMas_SidebarHeader flex flex-row ai-center p_5">
+                    <img className='Large_4 Medium_10 Phone_6' height="auto"  title="Sistema MEAL Ayuda en Acción" src={logo} alt="Logo Ayuda En Accion" />
+                    <h2 className="Large_9 center f1_5"> Autorización del uso de Información </h2>
+                </div>
+                <br />
+                
+                <p className="bold">
+                Verificar que la persona beneficiaria disponga la autorización tras ser leída la autorización por la persona que entrevista. En caso de que sea NNA la autorización debe ser leída por el/la cuidador/ra, padre o madre.
+                </p>
+                <br />
+                <p style={{fontStyle: 'italic'}}>
+                Los datos e información sensible que usted nos comparta serán ingresadas en nuestros sistemas de registro, con el objetivo de facilitar el estudio o atención de su caso de manera individual o grupal según corresponda, estos datos también pueden ser usados como datos estadísticos que no comprometan datos personales. En otros casos, podremos hacer uso de los mismos con fines relacionados a la organización, por cuanto, es importante que usted sepa que la Fundación Ayuda en Acción tiene políticas de protección de datos y seguridad de la información y serán tratados con la respectiva confidencialidad.
+                </p>
+
+                <div className='PowerMas_StatusSubmit flex jc-center ai-center'>
+                    <button className='' value="Cerrar"onClick={closeModalInfo} > Cerrar </button>
+                </div>
+                    
+            </Modal>    
         </>
     )
 }

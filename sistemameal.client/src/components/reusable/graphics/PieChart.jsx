@@ -1,9 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
-const PieChart = ({ data, colors, id }) => {
+const PieChart = ({ data, id }) => {
+    const colorMapping = {
+        "MASCULINO": "#1d6776",
+        "FEMENINO": "#61A2AA"
+    };
     const ref = useRef();
-    console.log(data)
+
     useEffect(() => {
         const width = ref.current.clientWidth;
         const height = width;
@@ -16,9 +20,8 @@ const PieChart = ({ data, colors, id }) => {
         d3.select(`#${id}`).html("");
     
         const color = d3.scaleOrdinal()
-            .domain(data.map(d => d.name)) // Define el dominio con los nombres de los datos
-            .range(colors); // Define el rango con los colores de los datos
-
+            .domain(Object.keys(colorMapping))
+            .range(Object.values(colorMapping));
     
         const pie = d3.pie()
             .value(d => d.value)

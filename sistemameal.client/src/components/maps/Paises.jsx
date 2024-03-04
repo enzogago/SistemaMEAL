@@ -3,18 +3,28 @@ import * as d3 from 'd3';
 import d3Tip from 'd3-tip';
 import data from './geojson/paises.json';
 
-const Paises = () => {
-    const poblacionPorPais = {
-        'Peru': 33000000,
-        'Ecuador': 17000000,
-        'Colombia': 48000000,
-    };
+const Paises = ({mapData}) => {
+    const poblacionPorPais = mapData.reduce((obj, item) => {
+        obj[item.ubiNom] = item;  // Aquí puedes seleccionar las características que quieres mostrar
+        return obj;
+    }, {});
+    console.log(poblacionPorPais)
 
     const color = d3.scaleOrdinal()
         .domain(Object.keys(poblacionPorPais))
         .range(["#f0554d", "#ff7a54", "#ffad75"]);
 
     const ref = useRef();
+
+    function formatNumber(num) {
+        num = parseFloat(num);
+        if (isNaN(num)) return "0.00";
+    
+        let [whole, decimal] = num.toFixed(2).split(".");
+        whole = whole.padStart(2, '0');
+        return `${whole}.${decimal}`;
+    }
+    
 
     useEffect(() => {
         d3.select('#Paises').html("");
@@ -50,22 +60,23 @@ const Paises = () => {
             .attr('class', 'd3-tip')
             .offset([0, 0])
             .html(function(d) {
-                const poblacion = poblacionPorPais[d.name] || 'No disponible';
+                const paisData = poblacionPorPais[d.name.toUpperCase()] || {};
+                const { cantidad, metMetTec, metEjeTec, metMetPre, metEjePre, metPorAvaTec, metPorAvaPre } = paisData;
                 return `
                 <div style="z-index: 100;">
-                    <p class="center Large-f1_25 bold">${d.name}</p><br />
-                    <p>Beneficiarios: ${poblacion} </p>
-                    <p>Atenciones:</p>
-                    <hr style="border:1px solid #fff;" />
+                    <p class="center Large-f1_25 bold">${d.name}</p>
+                    <p>Beneficiarios: ${cantidad} </p>
+                    <p>Atenciones: ${metEjeTec.toLocaleString()}</p>
+                    <hr style="border:1px solid #fff;margin: 0.5rem 0" />
                     <p class="" style="text-decoration: underline;">Técnico</p>
-                    <p>Meta:</p>
-                    <p>Ejecución:</p>
-                    <p>Avance:</p>
-                    <hr style="border:1px solid #fff;" />
+                    <p>Meta: ${metMetTec} </p>
+                    <p>Ejecución: ${metEjeTec} </p>
+                    <p>Avance: ${formatNumber(metPorAvaTec)}% </p>
+                    <hr style="border:1px solid #fff;margin: 0.5rem 0" />
                     <p style="text-decoration: underline;">Presupuesto</p>
-                    <p>Meta:</p>
-                    <p>Ejecución:</p>
-                    <p>Avance:</p>
+                    <p>Meta: $${metMetPre} </p>
+                    <p>Ejecución: $${metEjePre} </p>
+                    <p>Avance: ${formatNumber(metPorAvaPre)}% </p>
                 </div>
                 `;
             });
@@ -77,12 +88,12 @@ const Paises = () => {
             .enter()
             .append('path')
             .attr('d', path)
-            .attr('fill', d => poblacionPorPais[d.properties.name] ? color(poblacionPorPais[d.properties.name]) : '#fde7bd')
+            .attr('fill', d => poblacionPorPais[d.properties.name.toUpperCase()] ? color(poblacionPorPais[d.properties.name.toUpperCase()]) : '#fde7bd')
             .attr('stroke', 'black')  // Esto establece el color del borde
             .attr('stroke-width', 1)  // Esto establece el grosor del borde
             .on('mouseover', function(event, d) {
                 d3.select(this).style('cursor', 'pointer');
-                if (poblacionPorPais[d.properties.name]) {
+                if (poblacionPorPais[d.properties.name.toUpperCase()]) {
                     d3.select(this)
                         .transition()  // Inicia una transición
                         .duration(200)  // Duración de la transición en milisegundos
@@ -92,11 +103,11 @@ const Paises = () => {
                 } 
             })
             .on('mouseleave', function(d) {
-                if (poblacionPorPais[d.srcElement.__data__.properties.name]) {
+                if (poblacionPorPais[d.srcElement.__data__.properties.name.toUpperCase()]) {
                     d3.select(this)
                     .transition()  // Inicia una transición
                     .duration(200)  // Duración de la transición en milisegundos
-                    .attr('fill', d => color(poblacionPorPais[d.properties.name] || 0));  // Color final de la transición
+                    .attr('fill', d => color(poblacionPorPais[d.properties.name.toUpperCase()] || 0));  // Color final de la transición
                 }
                 tip.hide();
             })
@@ -117,16 +128,16 @@ const Paises = () => {
             return path.centroid(d)[1];
         })
         .attr("text-anchor","middle")
-        .attr('font-size', d => poblacionPorPais[d.properties.name] ? '1.25rem' : '1rem')
-        .attr('font-weight', d => poblacionPorPais[d.properties.name] ? 'bold' : '')
-        .attr('fill', d => poblacionPorPais[d.properties.name] ? '#000' : '#000');
+        .attr('font-size', d => poblacionPorPais[d.properties.name.toUpperCase()] ? '1.25rem' : '1rem')
+        .attr('font-weight', d => poblacionPorPais[d.properties.name.toUpperCase()] ? 'bold' : '')
+        .attr('fill', d => poblacionPorPais[d.properties.name.toUpperCase()] ? '#000' : '#000');
 
 
         function clicked(event, d) {
             const [[x0, y0], [x1, y1]] = path.bounds(d);
             event.stopPropagation();
             countries.transition().style('fill', null);
-            if (poblacionPorPais[d.properties.name]) {
+            if (poblacionPorPais[d.properties.name.toUpperCase()]) {
                 d3.select(this).transition().style('fill', '#ffc459');
             }
             svg.transition().duration(750).call(
@@ -138,7 +149,7 @@ const Paises = () => {
                 d3.pointer(event, svg.node())
             );
         }
-    }, []);
+    }, [mapData]);
 
     return <svg id='Paises' ref={ref} />;
 };

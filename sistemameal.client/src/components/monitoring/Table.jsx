@@ -130,7 +130,7 @@ const Table = ({ data }) => {
                 ),
             },
             {
-                header: "Meta",
+                header: () => <div className="center" style={{whiteSpace: 'normal'}}>Meta Programática</div>,
                 accessorKey: "metMetTec",
                 cell: ({row}) => {
                     // Convierte el número a una cadena y añade las comas de miles
@@ -143,7 +143,7 @@ const Table = ({ data }) => {
                 },
             },
             {
-                header: "Ejecucion",
+                header: () => <div className="center" style={{whiteSpace: 'normal'}}>Ejecución Programática</div>,
                 accessorKey: "metEjeTec",
                 cell: ({row}) => {
                     // Convierte el número a una cadena y añade las comas de miles
@@ -154,13 +154,13 @@ const Table = ({ data }) => {
                         </div>
                     );
                 },
-            }, 
+            },
             {
-                header: "% de Avance",
+                header: () => <div className="center" style={{whiteSpace: 'normal'}}>% avance Técnico </div>,
                 accessorKey: "metPorAvaTec",
                 cell: ({row}) => (
                     <div className="flex flex-column">
-                        <div className="bold" style={{color: row.original.estCol, textDecoration: ''}}>
+                        <div className="bold" style={{color: row.original.estCol}}>
                             {row.original.metPorAvaTec}%
                         </div>
                         <div 
@@ -170,6 +170,52 @@ const Table = ({ data }) => {
                             <div 
                                 className="progress-bar-fill" 
                                 style={{width: `${row.original.metPorAvaTec > 100 ? 100 : row.original.metPorAvaTec}%`, backgroundColor: row.original.estCol}}
+                            ></div>
+                        </div>
+                    </div>
+                ),
+            },    
+            {
+                header: () => <div className="center" style={{whiteSpace: 'normal',color: '#20737B'}}>Meta Presupuesto</div>,
+                accessorKey: "metMetPre",
+                cell: ({row}) => {
+                    // Convierte el número a una cadena y añade las comas de miles
+                    const formattedNumber = Number(row.original.metMetPre).toLocaleString();
+                    return (
+                        <div className="center">
+                            ${formattedNumber}
+                        </div>
+                    );
+                },
+            },
+            {
+                header: () => <div className="center" style={{whiteSpace: 'normal',color: '#20737B'}}>Ejecución Presupuesto</div>,
+                accessorKey: "metEjePre",
+                cell: ({row}) => {
+                    // Convierte el número a una cadena y añade las comas de miles
+                    const formattedNumber = Number(row.original.metEjePre).toLocaleString();
+                    return (
+                        <div className="center">
+                            ${formattedNumber}
+                        </div>
+                    );
+                },
+            },            
+            {
+                header: () => <div className="center" style={{whiteSpace: 'normal',color: '#20737B'}}>% avance Presupuesto</div>,
+                accessorKey: "metPorAvaPre",
+                cell: ({row}) => (
+                    <div className="flex flex-column">
+                        <div className="bold" style={{color: row.original.estCol}}>
+                            {row.original.metPorAvaPre}%
+                        </div>
+                        <div 
+                            className="progress-bar"
+                            style={{backgroundColor: '#d3d3d3', border: `0px solid ${row.original.estCol}`}}
+                        >
+                            <div 
+                                className="progress-bar-fill" 
+                                style={{width: `${row.original.metPorAvaPre > 100 ? 100 : row.original.metPorAvaPre}%`, backgroundColor: row.original.estCol}}
                             ></div>
                         </div>
                     </div>
@@ -220,31 +266,7 @@ const Table = ({ data }) => {
                     )
                 },
             },
-            {
-                header: "Añadir",
-                accessorKey: "añadir",
-                cell: ({row}) => {
-                    return (
-                        row.original.uniInvPer === 'S' ?
-                        <div className="flex jc-center ai-center">
-                            <button  
-                                className="PowerMas_Add_Beneficiarie f_75 p_25 flex-grow-1" 
-                                onClick={() => Register_Beneficiarie(row)}
-                            >
-                                Beneficiario
-                            </button>
-                        </div>
-                        :
-                        <div className="flex jc-center ai-center">
-                            <button  
-                                className="PowerMas_Add_Execution f_75 p_25 flex-grow-1" 
-                            >
-                                Ejecución
-                            </button>
-                        </div>
-                    )
-                }
-            },
+            
             {
                 header: "Resultado",
                 accessorKey: "resNom",
@@ -313,6 +335,32 @@ const Table = ({ data }) => {
                 header: "Implementador",
                 accessorKey: "impNom"
             },
+            {
+                header: "Añadir",
+                accessorKey: "añadir",
+                stickyRight: 95,
+                cell: ({row}) => {
+                    return (
+                        row.original.uniInvPer === 'S' ?
+                        <div className="flex jc-center ai-center">
+                            <button  
+                                className="PowerMas_Add_Beneficiarie f_75 p_25 flex-grow-1" 
+                                onClick={() => Register_Beneficiarie(row)}
+                            >
+                                Beneficiario
+                            </button>
+                        </div>
+                        :
+                        <div className="flex jc-center ai-center">
+                            <button  
+                                className="PowerMas_Add_Execution f_75 p_25 flex-grow-1" 
+                            >
+                                Ejecución
+                            </button>
+                        </div>
+                    )
+                }
+            },
         ];
 
         baseColumns = baseColumns.filter(column => 
@@ -325,6 +373,7 @@ const Table = ({ data }) => {
                 header: () => <div style={{textAlign: 'center', flexGrow: '1'}}>Acciones</div>,
                 accessorKey: "acciones",
                 disableSorting: true,
+                stickyRight: 0,
                 cell: ({row}) => (
                     <div className='PowerMas_IconsTable flex jc-center ai-center'>
                         {actions.edit && 
@@ -367,10 +416,10 @@ const Table = ({ data }) => {
 
     // Preparar los datos
     const dataExport = table.options.data;  // Tus datos
-    const headers = ['ESTADO', 'META', 'EJECUCION', 'PORCENTAJE_AVANCE','AÑO','MES','INDICADOR','TIPO_INDICADOR','RESULTADO','OBJETIVO_ESPECIFICO','OBJETIVO','SUBPROYECTO','PROYECTO', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
+    const headers = ['ESTADO', 'META_PROGRAMATICA', 'EJECUCION_PROGRAMATICA', 'PORCENTAJE_AVANCE_PROGRAMATICO', 'META_PRESUPUESTO', 'EJECUCION_PRESUPUESTO', 'PORCENTAJE_AVANCE_PRESUPUESTO','AÑO','MES','INDICADOR','TIPO_INDICADOR','RESULTADO','OBJETIVO_ESPECIFICO','OBJETIVO','SUBPROYECTO','PROYECTO', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
     const title = 'METAS';  // El título de tu archivo Excel
-    const properties = ['estNom', 'metMetTec', 'metEjeTec', 'metPorAvaTec', 'metAnoPlaTec', 'metMesPlaTec', 'indActResNom', 'tipInd', 'resNom', 'objEspNom', 'objNom', 'subProNom', 'proNom', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir en el Excel
-    const format = [1000, 500];
+    const properties = ['estNom', 'metMetTec', 'metEjeTec', 'metPorAvaTec', 'metMetPre', 'metEjePre', 'metPorAvaPre', 'metAnoPlaTec', 'metMesPlaTec', 'indActResNom', 'tipInd', 'resNom', 'objEspNom', 'objNom', 'subProNom', 'proNom', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir en el Excel
+    const format = [1200, 600];
 
     const Export_Excel = () => {
         // Luego puedes llamar a la función Export_Excel de esta manera:

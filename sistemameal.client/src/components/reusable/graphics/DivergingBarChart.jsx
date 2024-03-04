@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
 const DivergingBarChart = ({ rangeData, id, maleColor, femaleColor }) => {
-    console.log(rangeData)
     const ageRanges = [
         { min: 0, max: 9 },
         { min: 10, max: 29 },

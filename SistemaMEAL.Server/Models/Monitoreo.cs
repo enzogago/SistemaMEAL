@@ -74,6 +74,9 @@ namespace SistemaMEAL.Server.Models
 
         public String? ImpCod { get; set; }
         public String? ImpNom { get; set; }
+
+
+        public String? Cantidad { get; set; }
         public String? UsuIng { get; set; }
         public DateTime? FecIng { get; set; }
         public String? UsuMod { get; set; }

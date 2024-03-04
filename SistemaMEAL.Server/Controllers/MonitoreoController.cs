@@ -219,6 +219,19 @@ namespace SistemaMEAL.Server.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("paises-home/{tags?}")]
+        public dynamic BuscarPaisesHome (string? tags = null)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var reult = _monitoreos.BuscarPaisesHome(tags);
+            return Ok(reult);
+        }
+
 
     }
 
