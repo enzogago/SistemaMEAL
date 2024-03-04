@@ -51,6 +51,51 @@ const FormGoalBeneficiarie = () => {
 
     const [ dataGoals, setDataGoals ] = useState([])
 
+    const [isDataLoaded, setIsDataLoaded] = useState(false);
+
+
+    // Cargamos la Informacion a tratar en este Formulario
+    const fetchBeneficiarie = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            Notiflix.Loading.pulse('Cargando...');
+            
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/${metAno}/${metCod}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                Notiflix.Notify.failure(data.message);
+                return;
+            }
+            setMetaData(data);
+            console.log(data)
+            setValue('metBenMesEjeTec', data.metMesPlaTec)
+            setValue('metBenAnoEjeTec', data.metAnoPlaTec)
+            setValue('pais', JSON.stringify({ ubiCod: data.ubiCod, ubiAno: data.ubiAno }))
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            Notiflix.Loading.remove();
+        }
+    }
+    useEffect(() => {
+        if (id.length === 10 && isDataLoaded) {
+            fetchBeneficiarie();
+        }
+    }, [id, isDataLoaded]);
+    useEffect(() => {
+        Promise.all([
+            fetchData('Genero', setGeneros),
+            fetchData('Nacionalidad', setNacionalidades),
+            fetchData('Ubicacion', setPaises),
+            fetchData('DocumentoIdentidad', setDocumentos)
+        ]).then(() => setIsDataLoaded(true));
+    }, []);
+
+
     const countryPhoneCodes = {
         "peru": "+51",
         "colombia": "+57",
@@ -148,76 +193,143 @@ const FormGoalBeneficiarie = () => {
         watch: watch2, 
         handleSubmit: validateForm2, 
         formState: { errors: errors2,dirtyFields: dirtyFields2, isSubmitted: isSubmitted2  }, 
-        reset: reset2, 
-        trigger: trigger2 } 
+        reset: reset2,
+    } 
     = useForm({ mode: "onChange"});
     
     // Actualiza la acción actual antes de enviar el formulario
     const buscarBeneficiarioDocumento = async (info) => {
-        try {
-            Notiflix.Loading.pulse('Cargando...');
-            const token = localStorage.getItem('token');
-            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Beneficiario/documento/${info.docIdeCod}/${info.docIdeBenNum}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            if(response.status === 204){
-                setMostrarAgregarDocumento(true);
-                setAccionActual('agregar')
-                setFieldsDisabled(false);
-                setEsMenorDeEdad(false);
-                reset({
-                    benApe: '',
-                    benApeApo: '',
-                    benCorEle: '',
-                    benFecNac: '',
-                    benNom: '',
-                    benNomApo: '',
-                    benSex: '',
-                    benAut: '',
-                    benDir: '',
-                    benTel: '0',
-                    benTelCon: '0',
-                    genCod: '0',
-                    nacCod: '0',
+        if (isOptionOneSelected) {
+            // Buscamos por Documento
+            try {
+                Notiflix.Loading.pulse('Cargando...');
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Beneficiario/documento/${info.docIdeCod}/${info.docIdeBenNum}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
                 });
-                setDocumentosAgregados([]);
-                setIsOptionOneSelected(true);
-                setExisteBeneficiario(false);
-                return;
-            }
-            const data = await response.json();
-            if (!response.ok) {
-                Notiflix.Notify.failure(data.message);
-                return;
-            }
-            setDataGoalBeneficiarie(data)
-            // Supongamos que 'data' es tu objeto de datos
-            let newData = {};
-
-            for (let key in data) {
-                if (typeof data[key] === 'string') {
-                    // Convierte cada cadena a minúsculas
-                    newData[key] = data[key].toLowerCase();
-                } else {
-                    // Mantiene los valores no string tal como están
-                    newData[key] = data[key];
+                if(response.status === 204){
+                    setMostrarAgregarDocumento(true);
+                    setAccionActual('agregar')
+                    setFieldsDisabled(false);
+                    setEsMenorDeEdad(false);
+                    reset({
+                        benApe: '',
+                        benApeApo: '',
+                        benCorEle: '',
+                        benFecNac: '',
+                        benNom: '',
+                        benNomApo: '',
+                        benSex: '',
+                        benAut: '',
+                        benDir: '',
+                        benTel: '0',
+                        benTelCon: '0',
+                        genCod: '0',
+                        nacCod: '0',
+                    });
+                    setDocumentosAgregados([]);
+                    setIsOptionOneSelected(true);
+                    setExisteBeneficiario(false);
+                    return;
                 }
+                const data = await response.json();
+                if (!response.ok) {
+                    Notiflix.Notify.failure(data.message);
+                    return;
+                }
+                setDataGoalBeneficiarie(data)
+                // Supongamos que 'data' es tu objeto de datos
+                let newData = {};
+    
+                for (let key in data) {
+                    if (typeof data[key] === 'string') {
+                        // Convierte cada cadena a minúsculas
+                        newData[key] = data[key].toLowerCase();
+                    } else {
+                        // Mantiene los valores no string tal como están
+                        newData[key] = data[key];
+                    }
+                }
+                reset(newData); // Seteamos los nuevos datos para el Formulario
+                setExisteBeneficiario(true);
+                setModalGoalBeneficiarie(true);
+                fetchDataTable(data.benAno, data.benCod)
+    
+            } catch (error) {
+                console.error('Error:', error);
+            } finally {
+                setValue('metBenMesEjeTec', metaData.metMesPlaTec)
+                setValue('metBenAnoEjeTec', metaData.metAnoPlaTec)
+                setValue('pais', JSON.stringify({ ubiCod: metaData.ubiCod, ubiAno: metaData.ubiAno }))
+                Notiflix.Loading.remove();
             }
-            // Ahora puedes llamar a 'reset()' con los nuevos datos
-            reset(newData);
-            setExisteBeneficiario(true);
-            setModalGoalBeneficiarie(true);
-            fetchDataTable(data.benAno, data.benCod)
-
-        } catch (error) {
-            console.error('Error:', error);
-        } finally {
-            setValue('metBenMesEjeTec', metaData.metMesPlaTec)
-            setValue('metBenAnoEjeTec', metaData.metAnoPlaTec)
-            setValue('pais', JSON.stringify({ ubiCod: metaData.ubiCod, ubiAno: metaData.ubiAno }))
-            Notiflix.Loading.remove();
+        } else {
+            try {
+                Notiflix.Loading.pulse('Cargando...');
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Beneficiario/nombres/${info.benNom}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if(response.status === 204){
+                    setMostrarAgregarDocumento(true);
+                    setAccionActual('agregar')
+                    setFieldsDisabled(false);
+                    setEsMenorDeEdad(false);
+                    reset({
+                        benApe: '',
+                        benApeApo: '',
+                        benCorEle: '',
+                        benFecNac: '',
+                        benNom: '',
+                        benNomApo: '',
+                        benSex: '',
+                        benAut: '',
+                        benDir: '',
+                        benTel: '0',
+                        benTelCon: '0',
+                        genCod: '0',
+                        nacCod: '0',
+                    });
+                    setDocumentosAgregados([]);
+                    setIsOptionOneSelected(true);
+                    setExisteBeneficiario(false);
+                    return;
+                }
+                const data = await response.json();
+                if (!response.ok) {
+                    Notiflix.Notify.failure(data.message);
+                    return;
+                }
+                setDataGoalBeneficiarie(data)
+                // Supongamos que 'data' es tu objeto de datos
+                let newData = {};
+    
+                for (let key in data) {
+                    if (typeof data[key] === 'string') {
+                        // Convierte cada cadena a minúsculas
+                        newData[key] = data[key].toLowerCase();
+                    } else {
+                        // Mantiene los valores no string tal como están
+                        newData[key] = data[key];
+                    }
+                }
+                reset(newData); // Seteamos los nuevos datos para el Formulario
+                setExisteBeneficiario(true);
+                setModalGoalBeneficiarie(true);
+                fetchDataTable(data.benAno, data.benCod)
+    
+            } catch (error) {
+                console.error('Error:', error);
+            } finally {
+                setValue('metBenMesEjeTec', metaData.metMesPlaTec)
+                setValue('metBenAnoEjeTec', metaData.metAnoPlaTec)
+                setValue('pais', JSON.stringify({ ubiCod: metaData.ubiCod, ubiAno: metaData.ubiAno }))
+                Notiflix.Loading.remove();
+            }
         }
     };
     const fetchDataTable = async (benAno,benCod) => {
@@ -345,47 +457,8 @@ const FormGoalBeneficiarie = () => {
         setModalGoalBeneficiarie(false);
     }
     
-    const fetchBeneficiarie = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            Notiflix.Loading.pulse('Cargando...');
-            
-            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/${metAno}/${metCod}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            const data = await response.json();
-            if (!response.ok) {
-                Notiflix.Notify.failure(data.message);
-                return;
-            }
-            setMetaData(data);
-
-            setValue('metBenMesEjeTec', data.metMesPlaTec)
-            setValue('metBenAnoEjeTec', data.metAnoPlaTec)
-            setValue('pais', JSON.stringify({ ubiCod: data.ubiCod, ubiAno: data.ubiAno }))
-        } catch (error) {
-            console.error('Error:', error);
-        } finally {
-            Notiflix.Loading.remove();
-        }
-    }
-
-    const [isDataLoaded, setIsDataLoaded] = useState(false);
-    useEffect(() => {
-        if (id.length === 10 && isDataLoaded) {
-            fetchBeneficiarie();
-        }
-    }, [id, isDataLoaded]);
-    useEffect(() => {
-        Promise.all([
-            fetchData('Genero', setGeneros),
-            fetchData('Nacionalidad', setNacionalidades),
-            fetchData('Ubicacion', setPaises),
-            fetchData('DocumentoIdentidad', setDocumentos)
-        ]).then(() => setIsDataLoaded(true));
-    }, []);
+    
+    
     
     const handleCountryChange = async (ubicacion, index) => {
         const selectedCountry = JSON.parse(ubicacion);
@@ -655,7 +728,7 @@ const FormGoalBeneficiarie = () => {
                                         <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.metBenAnoEjeTec.message}</p>
                                     ) : (
                                         <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                        Espacio reservado para el mensaje de error
+                                            Espacio reservado para el mensaje de error
                                         </p>
                                     )}
                                 </div>
@@ -702,7 +775,7 @@ const FormGoalBeneficiarie = () => {
                             </div>
                         </div>
                         <div className="PowerMas_Content_Form_Beneficiarie_Card Large-p_75">
-                            <h2 className="f1_25 Large_12">Datos Personales</h2>
+                            <h2 className="f1_25 Large_12"> Datos Personales </h2>
                             <form onSubmit={validateForm2(onSubmit)}>
                                 {
                                     !mostrarAgregarDocumento &&
