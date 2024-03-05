@@ -266,6 +266,37 @@ namespace SistemaMEAL.Server.Controllers
             return Ok(beneficiario);
         }
 
+         [HttpGet]
+        [Route("nombres/{nombres}")]
+        public dynamic BuscarBeneficiarioPorDocumento(string nombres)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            dynamic data = rToken.result;
+            Usuario usuario = new Usuario
+            {
+                UsuAno = data.UsuAno,
+                UsuCod = data.UsuCod,
+                RolCod = data.RolCod
+
+            };
+            if (usuario.RolCod != "01")
+            {
+                return StatusCode(403, new
+                {
+                    success = false,
+                    message = "No tienes permisos para realizar esta acción",
+                    result = ""
+                });
+            }
+           
+            var beneficiarios = _beneficiarios.BuscarBeneficiarioPorNombres(nombres);
+            return Ok(beneficiarios);
+        }
+
         [HttpGet]
         [Route("home/{tags?}")]
         public dynamic BuscarBeneficiariosHome(string? tags = null)

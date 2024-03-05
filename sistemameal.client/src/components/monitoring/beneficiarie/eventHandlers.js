@@ -101,6 +101,7 @@ export const fetchBeneficiariosMeta = async (metAno, metCod, setBeneficiariosMet
             Notiflix.Notify.failure(data.message);
             return;
         }
+        console.log(data)
         setBeneficiariosMeta(data)
     } catch (error) {
         console.error('Error:', error);

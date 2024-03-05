@@ -2,7 +2,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import Modal from 'react-modal';
 import CryptoJS from 'crypto-js';
 import { GrFormPreviousLink } from "react-icons/gr";
-import DonutChart from "../../reusable/DonutChart";
 import { useEffect, useState } from "react";
 import Notiflix from "notiflix";
 import { useForm } from 'react-hook-form';
@@ -13,6 +12,8 @@ import ModalGoalBeneficiarie from "./ModalGoalBeneficiarie";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { IoIosInformationCircleOutline } from "react-icons/io";
 import logo from '../../../img/PowerMas_LogoAyudaEnAccion.svg';
+import InfoGoal from "./InfoGoal";
+import ModalBeneficiariesName from "./ModalBeneficiariesName";
 
 const FormGoalBeneficiarie = () => {
     const navigate = useNavigate();
@@ -50,12 +51,14 @@ const FormGoalBeneficiarie = () => {
 
     const [ modalGoalBeneficiarie, setModalGoalBeneficiarie ] = useState(false);
     const [ dataGoalBeneficiarie, setDataGoalBeneficiarie ] = useState({});
+    const [ dataBeneficiariesName, setDataBeneficiariesName ] = useState([]);
 
     const [ dataGoals, setDataGoals ] = useState([])
 
     const [isDataLoaded, setIsDataLoaded] = useState(false);
 
     const [ modalInfoOpen, setModalInfoOpen ] = useState(false);
+    const [ modalBeneficiariesName, setModalBeneficiariesName ] = useState(false);
 
 
     // Cargamos la Informacion a tratar en este Formulario
@@ -127,7 +130,7 @@ const FormGoalBeneficiarie = () => {
         trigger 
     } = useForm({ mode: "onChange", defaultValues: {benNomApo: '', benApeApo: '', genCod: '0', nacCod: '0'}});
 
-    // 
+    
     useEffect(() => {
         const phone = watch('benTel');
         if (phone && phoneCodeInput && !phone.startsWith(phoneCodeInput)) {
@@ -200,6 +203,30 @@ const FormGoalBeneficiarie = () => {
         reset: reset2,
     } 
     = useForm({ mode: "onChange"});
+
+    const buscarDataMetas = (data) => {
+        console.log(data)
+        let newData = {};
+    
+        for (let key in data) {
+            if (typeof data[key] === 'string') {
+                // Convierte cada cadena a minúsculas
+                newData[key] = data[key].toLowerCase();
+            } else {
+                // Mantiene los valores no string tal como están
+                newData[key] = data[key];
+            }
+        }
+
+        setDataGoalBeneficiarie(data)
+        reset(newData);
+        setExisteBeneficiario(true);
+        fetchDataTable(data.benAno, data.benCod)
+        setModalGoalBeneficiarie(true);
+        setValue('metBenMesEjeTec', metaData.metMesPlaTec)
+        setValue('metBenAnoEjeTec', metaData.metAnoPlaTec)
+        setValue('pais', JSON.stringify({ ubiCod: metaData.ubiCod, ubiAno: metaData.ubiAno }))
+    }
     
     // Actualiza la acción actual antes de enviar el formulario
     const buscarBeneficiarioDocumento = async (info) => {
@@ -243,24 +270,8 @@ const FormGoalBeneficiarie = () => {
                     Notiflix.Notify.failure(data.message);
                     return;
                 }
-                setDataGoalBeneficiarie(data)
-                // Supongamos que 'data' es tu objeto de datos
-                let newData = {};
-    
-                for (let key in data) {
-                    if (typeof data[key] === 'string') {
-                        // Convierte cada cadena a minúsculas
-                        newData[key] = data[key].toLowerCase();
-                    } else {
-                        // Mantiene los valores no string tal como están
-                        newData[key] = data[key];
-                    }
-                }
-                reset(newData); // Seteamos los nuevos datos para el Formulario
-                setExisteBeneficiario(true);
-                setModalGoalBeneficiarie(true);
-                fetchDataTable(data.benAno, data.benCod)
-    
+                
+                buscarDataMetas(data);
             } catch (error) {
                 console.error('Error:', error);
             } finally {
@@ -270,15 +281,26 @@ const FormGoalBeneficiarie = () => {
                 Notiflix.Loading.remove();
             }
         } else {
+            // Buscar por nombres y apellidos
+            let benNom = info.benNom.trim(); // Eliminar espacios al principio y al final
+            benNom = benNom.replace(/\s+/g, ' '); // Reemplazar secuencias de espacios en blanco por un solo espacio
+
             try {
                 Notiflix.Loading.pulse('Cargando...');
                 const token = localStorage.getItem('token');
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Beneficiario/nombres/${info.benNom}`, {
+                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Beneficiario/nombres/${benNom}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
-                if(response.status === 204){
+
+                const data = await response.json();
+                if (!response.ok) {
+                    Notiflix.Notify.failure(data.message);
+                    return;
+                }
+                
+                if (data.length === 0) {
                     setMostrarAgregarDocumento(true);
                     setAccionActual('agregar')
                     setFieldsDisabled(false);
@@ -303,35 +325,13 @@ const FormGoalBeneficiarie = () => {
                     setExisteBeneficiario(false);
                     return;
                 }
-                const data = await response.json();
-                if (!response.ok) {
-                    Notiflix.Notify.failure(data.message);
-                    return;
-                }
-                setDataGoalBeneficiarie(data)
-                // Supongamos que 'data' es tu objeto de datos
-                let newData = {};
-    
-                for (let key in data) {
-                    if (typeof data[key] === 'string') {
-                        // Convierte cada cadena a minúsculas
-                        newData[key] = data[key].toLowerCase();
-                    } else {
-                        // Mantiene los valores no string tal como están
-                        newData[key] = data[key];
-                    }
-                }
-                reset(newData); // Seteamos los nuevos datos para el Formulario
-                setExisteBeneficiario(true);
-                setModalGoalBeneficiarie(true);
-                fetchDataTable(data.benAno, data.benCod)
-    
+
+                console.log(data)
+                setDataBeneficiariesName(data)
+                setModalBeneficiariesName(true);
             } catch (error) {
                 console.error('Error:', error);
             } finally {
-                setValue('metBenMesEjeTec', metaData.metMesPlaTec)
-                setValue('metBenAnoEjeTec', metaData.metAnoPlaTec)
-                setValue('pais', JSON.stringify({ ubiCod: metaData.ubiCod, ubiAno: metaData.ubiAno }))
                 Notiflix.Loading.remove();
             }
         }
@@ -463,6 +463,9 @@ const FormGoalBeneficiarie = () => {
     const closeModalInfo = () => {
         setModalInfoOpen(false);
     }
+    const closeBeneficiariesName = () => {
+        setModalBeneficiariesName(false);
+    }
     
     const handleCountryChange = async (ubicacion, index) => {
         const selectedCountry = JSON.parse(ubicacion);
@@ -520,6 +523,7 @@ const FormGoalBeneficiarie = () => {
                     console.error(`El select ${i} no tiene una opción válida seleccionada.`);
                     selectElement.classList.remove('PowerMas_Modal_Form_valid');
                     selectElement.classList.add('PowerMas_Modal_Form_invalid');
+                    selectElement.focus();
                     return;
                 } else {
                     selectElement.classList.remove('PowerMas_Modal_Form_invalid');
@@ -637,7 +641,7 @@ const FormGoalBeneficiarie = () => {
             
             <div className="PowerMas_Content_Form_Beneficiarie overflow-auto flex-grow-1 flex">
                     <div className="Large_6 m1 overflow-auto flex flex-column gap-1">
-                    <div className="PowerMas_Content_Form_Beneficiarie_Card Large-p_75">
+                        <div className="PowerMas_Content_Form_Beneficiarie_Card Large-p_75">
                             <h2 className="f1_25">Datos de Ubicación</h2>
                             <div className="m_75">
                                 <label htmlFor="pais" className="">
@@ -1024,7 +1028,7 @@ const FormGoalBeneficiarie = () => {
                                             name="benSex" 
                                             disabled={fieldsDisabled && benSex !== 'm'}
                                             value="m" 
-                                            {...register('benSex', { required: 'Por favor, selecciona una opción MMMMM' })}
+                                            {...register('benSex', { required: 'Por favor, selecciona una opción' })}
                                         />
                                         <label htmlFor="masculino" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} >Masculino</label>
                                     </div>
@@ -1035,7 +1039,7 @@ const FormGoalBeneficiarie = () => {
                                             name="benSex" 
                                             disabled={fieldsDisabled && benSex !== 'f'}
                                             value="f" 
-                                            {...register('benSex', { required: 'Por favor, selecciona una opción FFF' })}
+                                            {...register('benSex', { required: 'Por favor, selecciona una opción' })}
                                         />
                                         <label style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} htmlFor="femenino">Femenino</label>
                                     </div>
@@ -1185,7 +1189,6 @@ const FormGoalBeneficiarie = () => {
                                     disabled={fieldsDisabled}
                                     onKeyDown={(event) => {
                                         console.log(event.target.value)
-                                        console.log(phoneCodeInput)
                                         if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
                                             event.preventDefault();
                                         }
@@ -1236,7 +1239,6 @@ const FormGoalBeneficiarie = () => {
                                     disabled={fieldsDisabled}
                                     onKeyDown={(event) => {
                                         console.log(event.target.value)
-                                        console.log(phoneCodeInput)
                                         if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
                                             event.preventDefault();
                                         }
@@ -1288,7 +1290,7 @@ const FormGoalBeneficiarie = () => {
                                     disabled={fieldsDisabled}
                                     {...register('benDir', { 
                                         required: 'El apellido es requerido',
-                                            minLength: { value: 3, message: 'El apellido debe tener minimo 3 digitos' },
+                                            minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
                                     })} 
                                 />
                                 {errors.benDir ? (
@@ -1362,61 +1364,10 @@ const FormGoalBeneficiarie = () => {
                        
                         
                     </div>
-                    <div className="Large_6 overflow-auto flex flex-column"> 
-                            <div className="PowerMas_Info_Form_Beneficiarie m1" >
-                                <div className="flex p1">
-                                    <div className="Large_6 flex flex-column ai-center">
-                                        <h3 className="f1_25 center">Avance Técnico</h3>
-                                        <DonutChart 
-                                            percentage={(metaData ? metaData.metPorAvaTec : 0) == 0 ? 0.1 : (metaData ? metaData.metPorAvaTec : 0)} 
-                                            wh={150}
-                                            rad={20}
-                                        />
-                                    </div>
-                                    <div className="Large_6 flex flex-column gap_3">
-                                        <p className="bold">Nuesta Meta</p>
-                                        <p className="PowerMas_Info_Card p_5">{metaData && Number(metaData.metMetTec).toLocaleString()}</p>
-                                        <p className="bold">Nuestra Ejecución</p>
-                                        <p 
-                                            className="PowerMas_Info_Card p_5 pointer PowerMas_Hover_Grey" 
-                                            onClick={openModal}
-                                            data-tooltip-id="info-tooltip" 
-                                            data-tooltip-content="Haz click aquí para ver los beneficiarios" 
-                                        >
-                                            {metaData && Number(metaData.metEjeTec).toLocaleString()}
-                                        </p>
-                                        <p className="bold">{(metaData && Number(metaData.metMetTec - metaData.metEjeTec)) < 0 ? 'Nos Excedimos en' : 'Nos Falta'  }</p>
-                                        <p className="PowerMas_Info_Card p_5">{metaData && Number(metaData.metMetTec - metaData.metEjeTec).toLocaleString()}</p>
-                                    </div>
-                                </div>
-                                <div>
-                                    <article>
-                                        <h3 className="Large-f1 m_5" style={{textTransform: 'capitalize'}}>{metaData && metaData.tipInd.toLowerCase()}</h3>
-                                        <p className="m_5">{metaData && metaData.indActResNum + ' - ' + metaData.indActResNom.charAt(0).toUpperCase() + metaData.indActResNom.slice(1).toLowerCase()}</p>
-                                    </article>
-                                    <article>
-                                        <h3 className="Large-f1 m_5"> Resultado </h3>
-                                        <p className="m_5">{metaData && metaData.resNum + ' - ' + metaData.resNom.charAt(0).toUpperCase() + metaData.indActResNom.slice(1).toLowerCase()}</p>
-                                    </article>
-                                    <article>
-                                        <h3 className="Large-f1 m_5">Objetivo Específico</h3>
-                                        <p className="m_5">{metaData && metaData.objEspNum + ' - ' + metaData.objEspNom.charAt(0).toUpperCase() + metaData.objEspNom.slice(1).toLowerCase()}</p>
-                                    </article>
-                                    <article>
-                                        <h3 className="Large-f1 m_5">Objetivo</h3>
-                                        <p className="m_5">{metaData && metaData.objNum + ' - ' + metaData.objNom.charAt(0).toUpperCase() + metaData.objNom.slice(1).toLowerCase()}</p>
-                                    </article>
-                                    <article>
-                                        <h3 className="Large-f1 m_5"> Subproyecto </h3>
-                                        <p className="m_5">{metaData && metaData.subProNom}</p>
-                                    </article>
-                                    <article>
-                                        <h3 className="Large-f1 m_5">Proyecto</h3>
-                                        <p className="m_5">{metaData && metaData.proNom}</p>
-                                    </article>
-                                </div>
-                            </div>
-                    </div>
+                    <InfoGoal 
+                        metaData={metaData} 
+                        openModal={openModal} 
+                    />
             </div>
             <div className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
                 <button className="PowerMas_Buttom_Primary Large_3 m_75" onClick={Registrar_Beneficiario} >Guardar</button>
@@ -1513,19 +1464,30 @@ const FormGoalBeneficiarie = () => {
                 <TableForm 
                     data={beneficiariosMeta}
                     closeModal={closeModal}
-                    metAno={metAno}
-                    metCod={metCod}
+                    metaData={metaData}
                     updateData={updateData}
                     setUpdateData={setUpdateData}
                     fetchBeneficiarie={fetchBeneficiarie}
                 />
             </Modal>
+
+            {/* Intervenciones del beneficiario */}
             <ModalGoalBeneficiarie 
                 modalGoalBeneficiarie={modalGoalBeneficiarie} 
                 closeModal={closeGoalBeneficiarie}
                 dataGoalBeneficiarie={dataGoalBeneficiarie}
                 dataGoals={dataGoals}
             />
+
+            {/* Resultados de beneficiarios con coincidencia de nombre y/o apellido */}
+            <ModalBeneficiariesName 
+                data={dataBeneficiariesName}
+                modalBeneficiariesName={modalBeneficiariesName}
+                closeBeneficiariesName={closeBeneficiariesName}
+                buscarDataMetas={buscarDataMetas}
+            />
+
+            {/* Modal Información Autorización  */}
             <Modal
                 ariaHideApp={false}
                 isOpen={modalInfoOpen}
@@ -1558,17 +1520,20 @@ const FormGoalBeneficiarie = () => {
                 <br />
                 
                 <p className="bold">
-                Verificar que la persona beneficiaria disponga la autorización tras ser leída la autorización por la persona que entrevista. En caso de que sea NNA la autorización debe ser leída por el/la cuidador/ra, padre o madre.
+                    Verificar que la persona beneficiaria disponga la autorización tras ser leída la autorización por la persona que entrevista. En caso de que sea NNA la 
+                    autorización debe ser leída por el/la cuidador/ra, padre o madre.
                 </p>
                 <br />
                 <p style={{fontStyle: 'italic'}}>
-                Los datos e información sensible que usted nos comparta serán ingresadas en nuestros sistemas de registro, con el objetivo de facilitar el estudio o atención de su caso de manera individual o grupal según corresponda, estos datos también pueden ser usados como datos estadísticos que no comprometan datos personales. En otros casos, podremos hacer uso de los mismos con fines relacionados a la organización, por cuanto, es importante que usted sepa que la Fundación Ayuda en Acción tiene políticas de protección de datos y seguridad de la información y serán tratados con la respectiva confidencialidad.
+                    Los datos e información sensible que usted nos comparta serán ingresadas en nuestros sistemas de registro, con el objetivo de facilitar el estudio o 
+                    atención de su caso de manera individual o grupal según corresponda, estos datos también pueden ser usados como datos estadísticos que no comprometan 
+                    datos personales. En otros casos, podremos hacer uso de los mismos con fines relacionados a la organización, por cuanto, es importante que usted sepa 
+                    que la Fundación Ayuda en Acción tiene políticas de protección de datos y seguridad de la información y serán tratados con la respectiva confidencialidad.
                 </p>
 
                 <div className='PowerMas_StatusSubmit flex jc-center ai-center'>
                     <button className='' value="Cerrar"onClick={closeModalInfo} > Cerrar </button>
                 </div>
-                    
             </Modal>    
         </>
     )

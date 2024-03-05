@@ -1,10 +1,12 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 // Librerias
 import Notiflix from 'notiflix';
 // Source
 import logo from '../../img/PowerMas_LogoAyudaEnAccion.svg';
 import portadaLogin from '../../img/PowerMas_PortadaLogin.webp';
+
+import CryptoJS from 'crypto-js';
 
 const Login = () => {
     // Variables State AuthContext 
@@ -13,6 +15,19 @@ const Login = () => {
     // States locales
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+
+    const [rememberMe, setRememberMe] = useState(false);
+
+    useEffect(() => {
+        const savedCredentials = JSON.parse(localStorage.getItem('credentials'));
+        if (savedCredentials) {
+            console.log(savedCredentials)
+            const bytes  = CryptoJS.AES.decrypt(savedCredentials.encryptedPassword, 'secret key 123');
+            const originalPassword = bytes.toString(CryptoJS.enc.Utf8);
+            setEmail(savedCredentials.email);
+            setPassword(originalPassword);
+        }
+    }, []);
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -48,6 +63,10 @@ const Login = () => {
             const data = await response.json();
             if (data.success) {
                 setUserLogged(data.user);
+                if (rememberMe) {
+                    const encryptedPassword = CryptoJS.AES.encrypt(password, 'secret key 123').toString();
+                    localStorage.setItem('credentials', JSON.stringify({ email, encryptedPassword }));
+                }
                 localStorage.setItem('token', data.result);
                 setIsLoggedIn(true);
             } else {
@@ -89,6 +108,7 @@ const Login = () => {
                                     <input
                                         aria-label='Correo Electronico'
                                         id="txtCorreoElectronico" 
+                                        value={email}
                                         onChange={e => setEmail(e.target.value)} 
                                         className="block PowerMas_InputLogin" 
                                         placeholder="Email" 
@@ -100,6 +120,7 @@ const Login = () => {
                                     <input
                                         aria-label="Contraseña"
                                         id="txtPassword" 
+                                        value={password}
                                         onChange={e => setPassword(e.target.value)} 
                                         className="block PowerMas_InputLogin" 
                                         placeholder="Password" 
@@ -109,11 +130,14 @@ const Login = () => {
                                     />
                                     <p id="lblErrorLogin" className="PowerMas_LabelError"></p>
                                     <p className="p2 Small-p0 Small-f_75 Large-f1 Medium-f_75 PowerMas_RememberMe">
-                                        <label>
+                                        <label className='flex gap_5' >
                                             <input 
                                                 type="checkbox" 
                                                 id="rememberMe" 
-                                                name="rememberMe" 
+                                                name="rememberMe"
+                                                className='m0' 
+                                                checked={rememberMe}
+                                                onChange={e => setRememberMe(e.target.checked)}
                                             />
                                             Recordar
                                         </label>

@@ -40,9 +40,12 @@ namespace SistemaMEAL.Server.Models
         public String? DocIdeAbr { get; set; }
         public String? DocIdeBenNum { get; set; }
 
-
+        // Ayuda Beneficiarios asociados
         public String? MetBenMesEjeTec { get; set; }
         public String? MetBenAnoEjeTec { get; set; }
+        public String? MetAno { get; set; }
+        public String? MetCod { get; set; }
+
 
         public String? UsuIng { get; set; }
         public DateTime? FecIng { get; set; }

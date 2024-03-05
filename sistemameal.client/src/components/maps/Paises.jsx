@@ -8,7 +8,6 @@ const Paises = ({mapData}) => {
         obj[item.ubiNom] = item;  // Aquí puedes seleccionar las características que quieres mostrar
         return obj;
     }, {});
-    console.log(poblacionPorPais)
 
     const color = d3.scaleOrdinal()
         .domain(Object.keys(poblacionPorPais))

@@ -6,7 +6,7 @@ import Notiflix from 'notiflix';
 const ModalGoalBeneficiarie = ({modalGoalBeneficiarie, closeModal, dataGoalBeneficiarie, dataGoals}) => {
     if (!modalGoalBeneficiarie) return;
 
-    const { benAno, benCod, benNom, benApe, benCorEle, benTel, benTelCon, benCodUni, benSex, benFecNac, genNom, nacNom, docIdeBenNum, docIdeAbr, docIdeNom, benNomApo, benApeApo } = dataGoalBeneficiarie;
+    const { benNom, benApe, benCorEle, benTel, benTelCon, benCodUni, benSex, benFecNac, genNom, nacNom, docIdeBenNum, docIdeAbr, docIdeNom, benNomApo, benApeApo } = dataGoalBeneficiarie;
 
     return (
         <Modal
@@ -20,8 +20,7 @@ const ModalGoalBeneficiarie = ({modalGoalBeneficiarie, closeModal, dataGoalBenef
                     left: '50%',
                     right: 'auto',
                     bottom: 'auto',
-                    width: '90%',
-                    height: '90%',
+                    width: '80%',
                     marginRight: '-50%',
                     transform: 'translate(-50%, -50%)',
                     backgroundColor: '#fff',

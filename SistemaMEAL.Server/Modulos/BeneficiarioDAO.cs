@@ -373,6 +373,53 @@ namespace SistemaMEAL.Server.Modulos
             return temporal?? new List<Beneficiario>();
         }
 
+        public IEnumerable<Beneficiario> BuscarBeneficiarioPorNombres(string? tags)
+        {
+            List<Beneficiario>? temporal = new List<Beneficiario>();
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_BENEFICIARIO_POR_NOMBRE", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                // Aquí puedes agregar los parámetros necesarios para tu procedimiento almacenado
+                cmd.Parameters.AddWithValue("@P_ETIQUETAS", tags ?? string.Empty);
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (!reader.HasRows)
+                {
+                    jsonResult.Append("[]");
+                }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                // Deserializa la cadena JSON en una lista de objetos Usuario
+                temporal = JsonConvert.DeserializeObject<List<Beneficiario>>(jsonResult.ToString());
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return temporal?? new List<Beneficiario>();
+        }
+
          public IEnumerable<Beneficiario> BuscarMetaBeneficiario(string? metAno = null, string? metCod = null, string? benAno = null, string? benCod = null, string? ubiAno = null, string? ubiCod = null, string? metBenEda = null, string? metBenAnoEjeTec = null, string? metBenMesEjeTec = null)
         {
             List<Beneficiario>? temporal = new List<Beneficiario>();

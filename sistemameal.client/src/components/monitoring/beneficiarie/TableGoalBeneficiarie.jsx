@@ -240,14 +240,12 @@ const TableGoalBeneficiarie = ({ data }) => {
     return (
         <>
             <CustomTable 
-                title='Metas Ejecutadas'
                 actions={actions} 
                 dropdownOpen={dropdownOpen} 
                 setDropdownOpen={setDropdownOpen} 
                 Export_Excel={Export_Excel} 
                 Export_PDF={Export_PDF} 
                 table={table}
-                navigatePath='form-goal'
                 resize={false}
                 handleInputChange={handleInputChange}
                 handleKeyDown={handleKeyDown}

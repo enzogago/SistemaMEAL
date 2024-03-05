@@ -232,6 +232,20 @@ namespace SistemaMEAL.Server.Controllers
             return Ok(reult);
         }
 
+        [HttpGet]
+        [Route("meta-form/{metAno}/{metCod}/{benAno}/{benCod}/{ubiAno}/{ubiCod}/{metBenAnoEjeTec}/{metBenMesEjeTec}")]
+        public dynamic BuscarMonitoreoForm(string metAno, string metCod, string benAno, string benCod, string ubiAno, string ubiCod, string metBenAnoEjeTec, string metBenMesEjeTec)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var monitoreos = _monitoreos.BuscarMonitoreoForm(metAno, metCod, benAno, benCod, ubiAno, ubiCod, metBenAnoEjeTec, metBenMesEjeTec);
+            var monitoreo = monitoreos.FirstOrDefault();
+            return Ok(monitoreo);
+        }
+
 
     }
 

@@ -1054,6 +1054,7 @@ textarea {
     top: 0;
     background: white; 
 	transition: background-color 0.3s ease;
+	z-index: 999;
 }
 .PowerMas_TableStatus thead tr:first-child input{
 	border: none;

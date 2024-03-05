@@ -1,5 +1,5 @@
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useContext, useMemo, useState } from "react";
+import Modal from 'react-modal';
 
 import {
     useReactTable, 
@@ -7,21 +7,18 @@ import {
     getPaginationRowModel,
     getSortedRowModel, 
 } from '@tanstack/react-table';
-// Iconos package
-import { FaEdit, FaPlus, FaRegTrashAlt, FaSearch, FaSortDown } from 'react-icons/fa';
 // Context
 import { AuthContext } from "../../../context/AuthContext";
 import CustomTable from "../../reusable/Table/CustomTable";
 import { Export_Excel_Helper, Export_PDF_Helper } from "../../reusable/helper";
-import { handleDeleteBeneficiarioMeta } from "./eventHandlers";
 import masculino from '../../../img/PowerMas_Avatar_Masculino.svg';
 import femenino from '../../../img/PowerMas_Avatar_Femenino.svg';
+import { PiArrowFatUpFill } from "react-icons/pi";
 
-import ModalEditBeneficiarie from "./ModalEditBeneficiarie";
+const ModalBeneficiariesName = ({data, modalBeneficiariesName, closeBeneficiariesName,buscarDataMetas }) => {
 
-const TableForm = ({data, closeModal, metaData, updateData, setUpdateData, fetchBeneficiarie }) => {
+    if(!modalBeneficiariesName) return;
     console.log(data)
-    const navigate = useNavigate();
     // Variables State AuthContext 
     const { authInfo } = useContext(AuthContext);
     const { userPermissions } = authInfo;
@@ -31,14 +28,6 @@ const TableForm = ({data, closeModal, metaData, updateData, setUpdateData, fetch
 
     const [isInputEmpty, setIsInputEmpty] = useState(true);
     const [inputValue, setInputValue] = useState('');
-
-    const [ modalVisible, setModalVisible ] = useState(false)
-
-    const [currentRecord, setCurrentRecord] = useState(null);
-
-    const closeModalEdit = () => {
-        setModalVisible(false);
-    }
 
     // Añade una nueva etiqueta al presionar Enter
     const handleKeyDown = (e) => {
@@ -52,7 +41,7 @@ const TableForm = ({data, closeModal, metaData, updateData, setUpdateData, fetch
     }
 
     const handleInputChange = (e) => {
-        setInputValue(e.target.value);  // actualiza el valor del input
+        setInputValue(e.target.value); 
         setIsInputEmpty(e.target.value === '');
     }
 
@@ -103,7 +92,6 @@ const TableForm = ({data, closeModal, metaData, updateData, setUpdateData, fetch
                 (item.benSex === 'F' && 'FEMENINO'.includes(tag.toUpperCase())) ||
                 (item.benAut === 'S' && 'SI'.includes(tag.toUpperCase())) ||
                 (item.benAut === 'N' && 'NO'.includes(tag.toUpperCase())) ||
-                item.ubiNom.includes(tag.toUpperCase()) ||
                 item.edad.toString().includes(tag.toUpperCase())
             )
         ), [data, searchTags]
@@ -176,7 +164,7 @@ const TableForm = ({data, closeModal, metaData, updateData, setUpdateData, fetch
                 accessorKey: "benDir",
                 cell: ({row}) => (
                     <div style={{ textTransform: 'capitalize' }}>
-                        {row.original.benNom.toLowerCase()} {row.original.benDir.toLowerCase()}
+                        {row.original.benDir.toLowerCase()}
                     </div>
                 ),
                 
@@ -214,41 +202,27 @@ const TableForm = ({data, closeModal, metaData, updateData, setUpdateData, fetch
             data.some(item => item[column.accessorKey] !== null)
         );
 
-        if (actions.edit || actions.delete) {
-            baseColumns.push({
-                header: () => <div style={{ flexGrow: '1'}}>Acciones</div>,
-                accessorKey: "acciones",
-                disableSorting: true,
-                stickyRight: 0,
-                cell: ({row}) => {
-                    const {benAno, benCod, ubiAno, ubiCod, metBenAnoEjeTec, metBenMesEjeTec } = row.original;
-                    return(
-                    <div className='PowerMas_IconsTable flex jc-center ai-center'>
-                        {actions.edit && 
-                            <FaEdit 
-                                data-tooltip-id="edit-tooltip" 
-                                data-tooltip-content="Editar" 
-                                className='Large-p_25' 
-                                onClick={() => {
-                                    setCurrentRecord(row.original);
-                                    setModalVisible(true);
-                                }} 
-                            />
-                        }
-                        {actions.delete && 
-                            <FaRegTrashAlt 
-                                data-tooltip-id="delete-tooltip" 
-                                data-tooltip-content="Eliminar" 
-                                className='Large-p_25' 
-                                onClick={() => handleDeleteBeneficiarioMeta('Monitoreo',metaData.metAno,metaData.metCod,benAno,benCod,ubiAno,ubiCod,metBenAnoEjeTec,metBenMesEjeTec, updateData, setUpdateData, fetchBeneficiarie)} 
-                            />
-                        }
-                        
-                    </div>
-                )},
-            });
-        }
-    
+        baseColumns.push({
+            header: () => <div style={{textAlign: 'center', flexGrow: '1'}}>Acciones</div>,
+            accessorKey: "acciones",
+            disableSorting: true,
+            stickyRight: 0,
+            cell: ({row}) => {
+                // const {benAno, benCod, ubiAno, ubiCod, metBenAnoEjeTec, metBenMesEjeTec } = row.original;
+                return(
+                <div className='PowerMas_IconsTable flex jc-center ai-center'>
+                    <PiArrowFatUpFill 
+                        data-tooltip-id="select-tooltip" 
+                        data-tooltip-content="Seleccionar" 
+                        className='Large-p_25' 
+                        onClick={() => {
+                            buscarDataMetas(row.original);
+                        }} 
+                    />
+                </div>
+            )},
+        });
+
         return baseColumns;
     }, [actions]);
 
@@ -276,9 +250,9 @@ const TableForm = ({data, closeModal, metaData, updateData, setUpdateData, fetch
             benSex: item.benSex === 'M' ? 'MASCULINO' : 'FEMENINO'
         };
     });
-     const headers = ['AUTORIZA','CUB', 'NOMBRES', 'APELLIDOS', 'FECHA_NACIMIENTO', 'SEXO', 'GENERO', 'NACIONALIDAD', 'CORREO', 'TELEFONO', 'TELEFONO_CONTACTO', 'DIRECCION', 'UBICACION', 'AÑO_EJECUCION' , 'MES_EJECUCION', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
+     const headers = ['AUTORIZA','CUB', 'NOMBRES', 'APELLIDOS', 'FECHA_NACIMIENTO', 'SEXO', 'GENERO', 'NACIONALIDAD', 'CORREO', 'TELEFONO', 'TELEFONO_CONTACTO', 'DIRECCION', 'AÑO_EJECUCION' , 'MES_EJECUCION', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
      const title = 'BENEFICIARIO';  // El título de tu archivo
-     const properties = ['benAut', 'benCodUni', 'benNom', 'benApe', 'benFecNac', 'benSex', 'genNom', 'nacNom', 'benCorEle', 'benTel', 'benTelCon', 'benDir', 'ubiNom', 'metBenAnoEjeTec', 'metBenMesEjeTec', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
+     const properties = ['benAut', 'benCodUni', 'benNom', 'benApe', 'benFecNac', 'benSex', 'genNom', 'nacNom', 'benCorEle', 'benTel', 'benTelCon', 'benDir', 'metBenAnoEjeTec', 'metBenMesEjeTec', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
      const format = [700,350];  // El tamaño del formato que quieres establecer para el PDF
  
      const Export_Excel = () => {
@@ -294,7 +268,33 @@ const TableForm = ({data, closeModal, metaData, updateData, setUpdateData, fetch
     };
 
     return (
-        <>
+        <Modal
+            ariaHideApp={false}
+            isOpen={modalBeneficiariesName}
+            onRequestClose={closeBeneficiariesName}
+            closeTimeoutMS={200}
+            style={{
+                content: {
+                    top: '50%',
+                    left: '50%',
+                    right: 'auto',
+                    bottom: 'auto',
+                    width: '90%',
+                    height: '90%',
+                    marginRight: '-50%',
+                    transform: 'translate(-50%, -50%)',
+                    backgroundColor: '#fff',
+                    border: '1px solid #ccc',
+                    display: 'flex',
+                    flexDirection: 'column'
+                },
+                overlay: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)'
+                }
+            }}
+        >
+            <span className="PowerMas_CloseModal" style={{position: 'absolute',right: 20, top: 10}} onClick={closeBeneficiariesName}>×</span>
+            <h2 className='PowerMas_Title_Modal f1_5 center'>Coincidencia de Beneficiarios por nombre</h2>
             <CustomTable 
                 actions={actions} 
                 dropdownOpen={dropdownOpen} 
@@ -302,7 +302,6 @@ const TableForm = ({data, closeModal, metaData, updateData, setUpdateData, fetch
                 Export_Excel={Export_Excel} 
                 Export_PDF={Export_PDF} 
                 table={table}
-                navigatePath='form-goal'
                 resize={false}
                 handleInputChange={handleInputChange}
                 handleKeyDown={handleKeyDown}
@@ -311,19 +310,8 @@ const TableForm = ({data, closeModal, metaData, updateData, setUpdateData, fetch
                 searchTags={searchTags}
                 setSearchTags={setSearchTags}
             />
-            {
-                currentRecord &&
-                <ModalEditBeneficiarie 
-                    modalVisible={modalVisible}
-                    closeModalEdit={closeModalEdit}
-                    metaData={metaData}
-                    record={currentRecord}
-                    updateData={updateData}
-                    setUpdateData={setUpdateData}
-                />
-            }
-        </>
+        </Modal>
     )
 }
 
-export default TableForm
+export default ModalBeneficiariesName

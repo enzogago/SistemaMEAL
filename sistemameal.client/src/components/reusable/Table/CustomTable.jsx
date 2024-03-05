@@ -183,7 +183,7 @@ const CustomTable = ({
                                                     </div>
                                                 </div>
 
-                                                {header.column.columnDef.stickyRight === undefined &&  // Muestra el elemento <span> solo si la columna no es "sticky"
+                                                {header.column.columnDef.stickyRight === undefined && resize &&  // Muestra el elemento <span> solo si la columna no es "sticky"
                                                     <span 
                                                         onMouseDown={
                                                             header.getResizeHandler()

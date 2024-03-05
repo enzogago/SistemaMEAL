@@ -38,6 +38,7 @@ import FormProfile from './components/profile/FormProfile';
 import UploadStatus from './components/maintenance/UploadStatus';
 import UploadCharge from './components/maintenance/UploadCharge';
 import FormatProject from './components/upload/project/FormatProject';
+import Notiflix from 'notiflix';
 
 const App = () => {
     // Variables state AuthContext
@@ -65,7 +66,7 @@ const App = () => {
                             setIsLoggedIn(false);
                         }
             
-                        Notiflix.Notify.failure(data.message);
+                        // Notiflix.Notify.failure(data.message);
                         Notiflix.Loading.remove();
                         return;
                     }

@@ -41,6 +41,12 @@ const Layout = ({ children }) => {
                 place='top-start'
                 className="PowerMas_Tooltip_Info"
             />
+            <Tooltip 
+                id="select-tooltip" 
+                effect="solid"
+                place='top-start'
+                className="PowerMas_Tooltip_Info"
+            />
         </div>)
 };
 export default Layout;
