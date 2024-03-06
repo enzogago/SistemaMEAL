@@ -26,7 +26,7 @@ const InputNombre = ({register, errors, dirtyFields, isSubmitted}) => {
                     maxLength: { value: 50, message: 'El campo no puede tener más de 50 caracteres' },
                     minLength:  { value: 5, message: 'El campo no puede tener menos de 5 caracteres' },
                     pattern: {
-                        value: /^[A-Za-zñÑáéíóúÁÉÍÓÚ\s]+$/,
+                        value: /^[A-Za-zñÑáéíóúÁÉÍÓÚ().,;üÜ\s-_]+$/,
                         message: 'Por favor, introduce solo letras y espacios',
                     },
                     validate: validateNoLeadingSpaces,

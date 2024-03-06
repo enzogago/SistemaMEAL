@@ -106,7 +106,7 @@ namespace SistemaMEAL.Server.Modulos
                 cmd.Parameters.AddWithValue("@P_NACCOD", beneficiario.NacCod);
                 cmd.Parameters.AddWithValue("@P_BENCORELE", beneficiario.BenCorEle);
                 cmd.Parameters.AddWithValue("@P_BENTEL", beneficiario.BenTel);
-                cmd.Parameters.AddWithValue("@P_BENTELCON", beneficiario.BenTel);
+                cmd.Parameters.AddWithValue("@P_BENTELCON", beneficiario.BenTelCon);
                 cmd.Parameters.AddWithValue("@P_BENCODUNI", beneficiario.BenCodUni);
                 cmd.Parameters.AddWithValue("@P_BENDIR", beneficiario.BenDir);
                 cmd.Parameters.AddWithValue("@P_BENAUT", beneficiario.BenAut);

@@ -13,13 +13,22 @@ import { FaEdit, FaPlus, FaRegTrashAlt, FaSearch, FaSortDown } from 'react-icons
 import { AuthContext } from "../../../context/AuthContext";
 import CustomTable from "../../reusable/Table/CustomTable";
 import { Export_Excel_Helper, Export_PDF_Helper } from "../../reusable/helper";
-import { handleDeleteBeneficiarioMeta } from "./eventHandlers";
+import { fetchBeneficiariosMeta, handleDeleteBeneficiarioMeta } from "./eventHandlers";
 import masculino from '../../../img/PowerMas_Avatar_Masculino.svg';
 import femenino from '../../../img/PowerMas_Avatar_Femenino.svg';
 
 import ModalEditBeneficiarie from "./ModalEditBeneficiarie";
 
-const TableForm = ({data, closeModal, metaData, updateData, setUpdateData, fetchBeneficiarie }) => {
+const TableForm = ({modalFormIsOpen, metaData, updateData, setUpdateData, fetchBeneficiarie }) => {
+
+    if(!modalFormIsOpen) return;
+
+    const [ data, setData] = useState([])
+    
+    useEffect(() => {
+        fetchBeneficiariosMeta(metaData.metAno,metaData.metCod,setData);
+    }, [updateData])
+
     console.log(data)
     const navigate = useNavigate();
     // Variables State AuthContext 
@@ -176,7 +185,7 @@ const TableForm = ({data, closeModal, metaData, updateData, setUpdateData, fetch
                 accessorKey: "benDir",
                 cell: ({row}) => (
                     <div style={{ textTransform: 'capitalize' }}>
-                        {row.original.benNom.toLowerCase()} {row.original.benDir.toLowerCase()}
+                        {row.original.benDir.toLowerCase()}
                     </div>
                 ),
                 

@@ -255,7 +255,7 @@ const Table = ({ data }) => {
                 },
             },
             {
-                header: "Tipo Inidicador",
+                header: "Tipo Indicador",
                 accessorKey: "tipInd",
                 cell: ({row}) => {
                     const text = row.original.tipInd.charAt(0).toUpperCase() + row.original.tipInd.slice(1).toLowerCase();

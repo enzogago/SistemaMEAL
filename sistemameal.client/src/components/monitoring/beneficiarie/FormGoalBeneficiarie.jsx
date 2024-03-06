@@ -15,6 +15,11 @@ import logo from '../../../img/PowerMas_LogoAyudaEnAccion.svg';
 import InfoGoal from "./InfoGoal";
 import ModalBeneficiariesName from "./ModalBeneficiariesName";
 
+import intlTelInput from 'intl-tel-input';
+import 'intl-tel-input/build/css/intlTelInput.css';
+import 'intl-tel-input/build/js/utils.js';
+import { useRef } from "react";
+
 const FormGoalBeneficiarie = () => {
     const navigate = useNavigate();
     const { id: safeCiphertext } = useParams();
@@ -41,7 +46,7 @@ const FormGoalBeneficiarie = () => {
     const [ mostrarAgregarDocumento, setMostrarAgregarDocumento ] = useState(false);
     const [ accionActual, setAccionActual] = useState('buscar');
     const [ updateData, setUpdateData] = useState(false);
-    const [ beneficiariosMeta, setBeneficiariosMeta] = useState([])
+    
     const [ fieldsDisabled, setFieldsDisabled ] = useState(true);
     const [ existeBeneficiario, setExisteBeneficiario ] = useState(false);
     const [ isOptionOneSelected, setIsOptionOneSelected] = useState(true);
@@ -59,6 +64,105 @@ const FormGoalBeneficiarie = () => {
 
     const [ modalInfoOpen, setModalInfoOpen ] = useState(false);
     const [ modalBeneficiariesName, setModalBeneficiariesName ] = useState(false);
+
+
+
+    // Función para inicializar un input de teléfono
+    const initPhoneInput = (inputRef, setIsValid, setPhoneNumber, setErrorMessage, initialNumber, ubiNom) => {
+        const countryNameToCode = {
+            'PERU': 'pe',
+            'COLOMBIA': 'co',
+            'ECUADOR': 'ec',
+            // Agrega aquí otros países si es necesario
+        };
+        
+        // Obtén el código del país basado en metaData.ubiNom
+        const initialCountryCode = countryNameToCode[ubiNom.toUpperCase()];
+
+        const phoneInput = intlTelInput(inputRef.current, {
+            initialCountry: initialCountryCode || "auto", // Utiliza "auto" como respaldo por si acaso
+        });
+
+        // Establece el número de teléfono inicial
+        if (initialNumber) {
+            phoneInput.setNumber(initialNumber);
+            setPhoneNumber(phoneInput.getNumber());
+            setIsValid(phoneInput.isValidNumberPrecise());
+            console.log(phoneInput);
+        } else {
+            setPhoneNumber('');
+            console.log("nada")
+            setIsValid(true);
+        }
+
+
+        inputRef.current.addEventListener('countrychange', function() {
+            setIsValid(false)
+            const countryData = phoneInput.getSelectedCountryData();
+            let maxLength;
+            switch (countryData.iso2) {
+                case 'pe':  // Perú
+                    maxLength = 11;  
+                    break;
+                case 'ec':  // Ecuador
+                    maxLength = 9;  
+                    break;
+                case 'co':  // Colombia
+                    maxLength = 11;
+                    break;
+                default:
+                    maxLength = 15;  // Valor por defecto
+            }
+            inputRef.current.setAttribute('maxLength', maxLength);
+        });
+
+        inputRef.current.addEventListener('input', function() {
+            const inputValue = this.value;
+            if (inputValue === '') {
+                // Si el campo está vacío, se considera válido
+                setIsValid(true);
+                setErrorMessage('');
+                setPhoneNumber('')
+            } else {
+                // Si el campo no está vacío, se verifica si el número de teléfono es válido
+                setPhoneNumber(phoneInput.getNumber());
+                setIsValid(phoneInput.isValidNumberPrecise())
+                setIsTouched(true);
+                setContactIsTouched(true);
+        
+                let errorMessage = '';
+                switch (phoneInput.getValidationError()) {
+                    case 1:
+                        errorMessage = 'El código del país es inválido';
+                        break;
+                    case 2:
+                        errorMessage = 'El número de teléfono es demasiado corto';
+                        break;
+                    case 3:
+                        errorMessage = 'El número de teléfono es demasiado largo';
+                        break;
+                    case 4:
+                        errorMessage = 'Por favor, ingresa un número de teléfono válido';
+                        break;
+                    default:
+                        errorMessage = 'Por favor, ingresa un número de teléfono válido';
+                }
+                setErrorMessage(errorMessage);
+            }
+        });
+    };
+    // Estados Numero de Telefono
+    const phoneInputRef = useRef();
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [isValid, setIsValid] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+    const [isTouched, setIsTouched] = useState(false);
+    // Estados Telefono de contacto
+    const phoneContactInputRef = useRef();
+    const [phoneContactNumber, setPhoneContactNumber] = useState('');
+    const [contactIsValid, setContactIsValid] = useState(false);
+    const [errorContactMessage, setErrorContactMessage] = useState('');
+    const [contactIsTouched, setContactIsTouched] = useState(false);
 
 
     // Cargamos la Informacion a tratar en este Formulario
@@ -82,6 +186,8 @@ const FormGoalBeneficiarie = () => {
             setValue('metBenMesEjeTec', data.metMesPlaTec)
             setValue('metBenAnoEjeTec', data.metAnoPlaTec)
             setValue('pais', JSON.stringify({ ubiCod: data.ubiCod, ubiAno: data.ubiAno }))
+            initPhoneInput(phoneInputRef, setIsValid, setPhoneNumber, setErrorMessage,'',data.ubiNom);
+            initPhoneInput(phoneContactInputRef, setContactIsValid, setPhoneContactNumber, setErrorContactMessage,'',data.ubiNom);
         } catch (error) {
             console.error('Error:', error);
         } finally {
@@ -114,9 +220,7 @@ const FormGoalBeneficiarie = () => {
         "ecuador" : 9,
     };
 
-    useEffect(() => {
-        fetchBeneficiariosMeta(metAno,metCod,setBeneficiariosMeta);
-    }, [updateData])
+    
 
     // Propiedades Form Principal
     const { 
@@ -127,8 +231,9 @@ const FormGoalBeneficiarie = () => {
         formState: { errors, dirtyFields, isSubmitted }, 
         reset, 
         setValue, 
-        trigger 
-    } = useForm({ mode: "onChange", defaultValues: {benNomApo: '', benApeApo: '', genCod: '0', nacCod: '0'}});
+        trigger,
+        setFocus
+    } = useForm({ mode: "onChange", defaultValues: {benNom: '', benNomApo: '', benApeApo: '', genCod: '0', nacCod: '0'}});
 
     
     useEffect(() => {
@@ -201,6 +306,7 @@ const FormGoalBeneficiarie = () => {
         handleSubmit: validateForm2, 
         formState: { errors: errors2,dirtyFields: dirtyFields2, isSubmitted: isSubmitted2  }, 
         reset: reset2,
+        setValue: setValue2
     } 
     = useForm({ mode: "onChange"});
 
@@ -263,6 +369,25 @@ const FormGoalBeneficiarie = () => {
                     setDocumentosAgregados([]);
                     setIsOptionOneSelected(true);
                     setExisteBeneficiario(false);
+                    // Encuentra el documento completo en el array 'documentos'
+                    const documentoCompleto = documentos.find(doc => doc.docIdeCod === info.docIdeCod);
+                
+                    // Si el documento no existe, agregarlo a la lista
+                    setDocumentosAgregados([...documentosAgregados, { 
+                        docIdeCod: info.docIdeCod, 
+                        docIdeNom: documentoCompleto.docIdeNom,
+                        docIdeAbr: documentoCompleto.docIdeAbr,
+                        docIdeBenNum: info.docIdeBenNum 
+                    }]);
+                    Notiflix.Notify.success("Documento de Identidad agregado")
+                    setModalIsOpen(true)
+                    // Resetear los campos
+                    reset2({
+                        docIdeBenNum: '',
+                        docIdeCod: '0',
+                    });
+                    setValue('benAut','s');
+                    setFocus('benNom');
                     return;
                 }
                 const data = await response.json();
@@ -323,6 +448,8 @@ const FormGoalBeneficiarie = () => {
                     setDocumentosAgregados([]);
                     setIsOptionOneSelected(true);
                     setExisteBeneficiario(false);
+                    setValue2('docIdeCod','0')
+                    setValue2('docIdeBenNum','')
                     return;
                 }
 
@@ -332,6 +459,9 @@ const FormGoalBeneficiarie = () => {
             } catch (error) {
                 console.error('Error:', error);
             } finally {
+                setValue('metBenMesEjeTec', metaData.metMesPlaTec)
+                setValue('metBenAnoEjeTec', metaData.metAnoPlaTec)
+                setValue('pais', JSON.stringify({ ubiCod: metaData.ubiCod, ubiAno: metaData.ubiAno }))
                 Notiflix.Loading.remove();
             }
         }
@@ -509,7 +639,6 @@ const FormGoalBeneficiarie = () => {
 
     const Registrar_Beneficiario =  () => {
         validateForm( (data) => {
-            console.log(data)
             const {metBenAnoEjeTec,metBenMesEjeTec} = data;
             // Obtiene el ubiAno y ubiCod del último select
             const lastSelectElement = document.querySelector(`select[name=select${selects.length - 1}]`);
@@ -531,6 +660,10 @@ const FormGoalBeneficiarie = () => {
                 }
             }
 
+            if (!isValid || !contactIsValid) {
+                return;
+            }
+            
             if(!existeBeneficiario) {
     
                 // Verifica que el array documentosAgregados tenga al menos un registro
@@ -565,12 +698,15 @@ const FormGoalBeneficiarie = () => {
                     DocumentoBeneficiario: documentosAgregados
                 }
 
-                if (beneficiarioMonitoreo.Beneficiario.benTel === phoneCodeInput) {
-                    beneficiarioMonitoreo.Beneficiario.benTel = '';
-                }
-                if (beneficiarioMonitoreo.Beneficiario.benTelCon === phoneCodeInput) {
-                    beneficiarioMonitoreo.Beneficiario.benTelCon = '';
-                }
+                // if (beneficiarioMonitoreo.Beneficiario.benTel === phoneCodeInput) {
+                //     beneficiarioMonitoreo.Beneficiario.benTel = '';
+                // }
+                // if (beneficiarioMonitoreo.Beneficiario.benTelCon === phoneCodeInput) {
+                //     beneficiarioMonitoreo.Beneficiario.benTelCon = '';
+                // }
+                beneficiarioMonitoreo.Beneficiario.benTel=phoneNumber;
+                beneficiarioMonitoreo.Beneficiario.benTelCon=phoneContactNumber;
+
                 console.log(beneficiarioMonitoreo)
                 handleSubmitMetaBeneficiario(beneficiarioMonitoreo, handleReset, updateData, setUpdateData, fetchBeneficiarie);
             } else { // Si existe el beneficairio solo insertar MetaBeneficiario
@@ -585,7 +721,6 @@ const FormGoalBeneficiarie = () => {
                     metBenMesEjeTec,
                     metBenAnoEjeTec
                 }
-                
                 handleSubmitMetaBeneficiarioExiste(MetaBeneficiario, handleReset, updateData, setUpdateData, fetchBeneficiarie);
             }
         })();
@@ -616,7 +751,15 @@ const FormGoalBeneficiarie = () => {
         setFieldsDisabled(true);
         setMostrarAgregarDocumento(false);
         setAccionActual('buscar');
-        setValue('pais', JSON.stringify({ ubiCod: metaData.ubiCod, ubiAno: metaData.ubiAno }))
+        setValue('pais', JSON.stringify({ ubiCod: metaData.ubiCod, ubiAno: metaData.ubiAno }));
+
+        // Resetear campos del telefono
+        setPhoneNumber('');
+        phoneInputRef.current.value = '';
+        setIsTouched(false);
+        setPhoneContactNumber('');
+        phoneContactInputRef.current.value = '';
+        setContactIsTouched(false);
     };
 
     // Observar Cambios de campos registrados
@@ -1176,7 +1319,57 @@ const FormGoalBeneficiarie = () => {
                                     </p>
                                 )}
                             </div>
-                            <div className="m_75">
+                            <div className='m_75'>
+                                <label htmlFor="phone" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="block">
+                                    Telefono:
+                                </label>
+                                <div>
+                                    <input
+                                        ref={phoneInputRef}
+                                        type="tel"
+                                        disabled={fieldsDisabled}
+                                        className={`Phone_12 PowerMas_Modal_Form_${isTouched ? (!isValid ? 'invalid' : 'valid') : ''}`}
+                                        style={{
+                                            paddingRight: '6px',
+                                            padding: '4px 6px 4px 52px',
+                                            margin: 0,
+                                        }}
+                                    />
+                                </div>
+                                {!isValid ? (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errorMessage}</p>
+                                ) : (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                    Espacio reservado para el mensaje de error
+                                    </p>
+                                )}
+                            </div>
+                            <div className='m_75'>
+                                <label htmlFor="phone" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="block">
+                                    Telefono Contacto:
+                                </label>
+                                <div>
+                                    <input
+                                        ref={phoneContactInputRef}
+                                        type="tel"
+                                        disabled={fieldsDisabled}
+                                        className={`Phone_12 PowerMas_Modal_Form_${contactIsTouched ? (!contactIsValid ? 'invalid' : 'valid') : ''}`}
+                                        style={{
+                                            paddingRight: '6px',
+                                            padding: '4px 6px 4px 52px',
+                                            margin: 0,
+                                        }}
+                                    />
+                                </div>
+                                {!contactIsValid ? (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errorContactMessage}</p>
+                                ) : (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                    Espacio reservado para el mensaje de error
+                                    </p>
+                                )}
+                            </div>
+                            {/* <div className="m_75">
                                 <label htmlFor="benTel" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
                                     Numero de telefono
                                 </label>
@@ -1275,7 +1468,7 @@ const FormGoalBeneficiarie = () => {
                                     Espacio reservado para el mensaje de error
                                     </p>
                                 )}
-                            </div>
+                            </div> */}
                             <div className="m_75">
                                 <label htmlFor="benDir" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
                                     Dirección
@@ -1289,7 +1482,6 @@ const FormGoalBeneficiarie = () => {
                                     placeholder="Dirección del beneficiario"
                                     disabled={fieldsDisabled}
                                     {...register('benDir', { 
-                                        required: 'El apellido es requerido',
                                             minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
                                     })} 
                                 />
@@ -1361,8 +1553,6 @@ const FormGoalBeneficiarie = () => {
                                 </div>
                             </>
                         }
-                       
-                        
                     </div>
                     <InfoGoal 
                         metaData={metaData} 
@@ -1373,6 +1563,8 @@ const FormGoalBeneficiarie = () => {
                 <button className="PowerMas_Buttom_Primary Large_3 m_75" onClick={Registrar_Beneficiario} >Guardar</button>
                 <button className="PowerMas_Buttom_Secondary Large_3 m_75" onClick={handleReset}>Limpiar</button>
             </div>
+
+            {/* Modal ver documentos agregados */}
             <Modal
                 ariaHideApp={false}
                 isOpen={modalIsOpen}
@@ -1433,11 +1625,12 @@ const FormGoalBeneficiarie = () => {
                     <button className="PowerMas_Buttom_Primary center p_5 m_25" onClick={cerrarModal}>Cerrar</button>
                 </div>
             </Modal>
+
+            {/* Modal Beneficarios asociados a la meta */}
             <Modal
                 ariaHideApp={false}
                 isOpen={modalFormIsOpen}
                 onRequestClose={closeModal}
-                contentLabel="Table Form"
                 closeTimeoutMS={200}
                 style={{
                     content: {
@@ -1452,18 +1645,19 @@ const FormGoalBeneficiarie = () => {
                         backgroundColor: '#fff',
                         border: '1px solid #ccc',
                         display: 'flex',
-                        flexDirection: 'column'
+                        flexDirection: 'column',
+                        
                     },
                     overlay: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.5)'
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        zIndex: 2
                     }
                 }}
             >   
                 <span className="PowerMas_CloseModal" style={{position: 'absolute',right: 20, top: 10}} onClick={closeModal}>×</span>
                 <h2 className='PowerMas_Title_Modal f1_5 center'>Beneficiarios asociados a la meta</h2>
-                <TableForm 
-                    data={beneficiariosMeta}
-                    closeModal={closeModal}
+                <TableForm
+                    modalFormIsOpen={modalFormIsOpen}
                     metaData={metaData}
                     updateData={updateData}
                     setUpdateData={setUpdateData}
