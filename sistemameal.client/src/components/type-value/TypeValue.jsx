@@ -51,6 +51,7 @@ const TypeValue = () => {
                 fieldMapping={restFieldMapping}
                 controller={controller}
                 codeField={codigo}
+                title='Tipo de Valor'
             />
         </>
     )

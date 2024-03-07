@@ -51,6 +51,7 @@ const Financer = () => {
                 fieldMapping={restFieldMapping}
                 controller={controller}
                 codeField={codigo}
+                title='Financiador'
             />
         </>
     )

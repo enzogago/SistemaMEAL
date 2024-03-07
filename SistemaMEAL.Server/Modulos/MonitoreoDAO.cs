@@ -902,5 +902,174 @@ namespace SistemaMEAL.Modulos
         }
 
 
+        public (string? message, string? messageType) ModificarBeneficiarioTransaction(Beneficiario beneficiario)
+        {
+            string? mensaje = "";
+            string? tipoMensaje = "";
+            try
+            {
+
+                SqlCommand cmd = new SqlCommand("SP_MODIFICAR_BENEFICIARIO", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@P_BENANO", beneficiario.BenAno);
+                cmd.Parameters.AddWithValue("@P_BENCOD", beneficiario.BenCod);
+                cmd.Parameters.AddWithValue("@P_BENNOM", beneficiario.BenNom);
+                cmd.Parameters.AddWithValue("@P_BENAPE", beneficiario.BenApe);
+                cmd.Parameters.AddWithValue("@P_BENNOMAPO", beneficiario.BenNom);
+                cmd.Parameters.AddWithValue("@P_BENAPEAPO", beneficiario.BenApe);
+                cmd.Parameters.AddWithValue("@P_BENFECNAC", beneficiario.BenFecNac);
+                cmd.Parameters.AddWithValue("@P_BENSEX", beneficiario.BenSex);
+                cmd.Parameters.AddWithValue("@P_GENCOD", beneficiario.GenCod);
+                cmd.Parameters.AddWithValue("@P_NACCOD", beneficiario.NacCod);
+                cmd.Parameters.AddWithValue("@P_BENCORELE", beneficiario.BenCorEle);
+                cmd.Parameters.AddWithValue("@P_BENTEL", beneficiario.BenTel);
+                cmd.Parameters.AddWithValue("@P_BENTELCON", beneficiario.BenTelCon);
+                cmd.Parameters.AddWithValue("@P_BENCODUNI", beneficiario.BenCodUni);
+                cmd.Parameters.AddWithValue("@P_BENDIR", beneficiario.BenDir);
+                cmd.Parameters.AddWithValue("@P_BENAUT", beneficiario.BenAut);
+                cmd.Parameters.AddWithValue("@P_BENFECREG", "10-02-2024");
+                cmd.Parameters.AddWithValue("@P_USUMOD", "Usuario");
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
+                cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
+                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "GAGO");
+                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "AGUIRRE");
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+
+                cmd.ExecuteNonQuery();
+
+                mensaje = pDescripcionMensaje.Value.ToString();
+                tipoMensaje = pTipoMensaje.Value.ToString();
+                Console.WriteLine(mensaje);
+            }
+            catch (SqlException ex)
+            {
+                mensaje = ex.Message;
+                tipoMensaje = "1";
+            }
+            finally
+            {
+            }
+            return (mensaje, tipoMensaje);
+        }
+        public (string? message, string? messageType) ModificarMetaBeneficiarioTransaction(MetaBeneficiario metaBeneficiario)
+        {
+            string? mensaje = "";
+            string? tipoMensaje = "";
+            try
+            {
+                SqlCommand cmd = new SqlCommand("SP_MODIFICAR_META_BENEFICIARIO", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@P_METANO_ORIGINAL", metaBeneficiario.MetAnoOri);
+                cmd.Parameters.AddWithValue("@P_METCOD_ORIGINAL", metaBeneficiario.MetCodOri);
+                cmd.Parameters.AddWithValue("@P_BENANO_ORIGINAL", metaBeneficiario.BenAnoOri);
+                cmd.Parameters.AddWithValue("@P_BENCOD_ORIGINAL", metaBeneficiario.BenCodOri);
+                cmd.Parameters.AddWithValue("@P_UBIANO_ORIGINAL", metaBeneficiario.UbiAnoOri);
+                cmd.Parameters.AddWithValue("@P_UBICOD_ORIGINAL", metaBeneficiario.UbiCodOri);
+                cmd.Parameters.AddWithValue("@P_METBENMESEJETEC_ORIGINAL", metaBeneficiario.MetBenMesEjeTecOri);
+                cmd.Parameters.AddWithValue("@P_METBENANOEJETEC_ORIGINAL", metaBeneficiario.MetBenAnoEjeTecOri);
+                cmd.Parameters.AddWithValue("@P_METANO", metaBeneficiario.MetAno);
+                cmd.Parameters.AddWithValue("@P_METCOD", metaBeneficiario.MetCod);
+                cmd.Parameters.AddWithValue("@P_BENANO", metaBeneficiario.BenAno);
+                cmd.Parameters.AddWithValue("@P_BENCOD", metaBeneficiario.BenCod);
+                cmd.Parameters.AddWithValue("@P_UBIANO", metaBeneficiario.UbiAno);
+                cmd.Parameters.AddWithValue("@P_UBICOD", metaBeneficiario.UbiCod);
+                cmd.Parameters.AddWithValue("@P_METBENEDA", metaBeneficiario.MetBenEda);
+                cmd.Parameters.AddWithValue("@P_METBENMESEJETEC", metaBeneficiario.MetBenMesEjeTec);
+                cmd.Parameters.AddWithValue("@P_METBENANOEJETEC", metaBeneficiario.MetBenAnoEjeTec);
+                cmd.Parameters.AddWithValue("@P_USUMOD", "Usuario");
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
+                cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
+                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "GAGO");
+                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "AGUIRRE");
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+
+                cmd.ExecuteNonQuery();
+
+                mensaje = pDescripcionMensaje.Value.ToString();
+                tipoMensaje = pTipoMensaje.Value.ToString();
+            }
+            catch (SqlException ex)
+            {
+                mensaje = ex.Message;
+                tipoMensaje = "1";
+            }
+            finally
+            {
+            }
+            return (mensaje, tipoMensaje);
+        }
+
+        public (string? message, string? messageType) ModificarBeneficiarioMonitoreo(Beneficiario beneficiario, MetaBeneficiario metaBeneficiario)
+        {
+            string? mensaje = "";
+            string? tipoMensaje = "";
+
+            using (TransactionScope scope = new TransactionScope())
+            {
+                using (SqlConnection connection = cn.getcn)
+                {
+                    try
+                    {
+                        if (connection.State == ConnectionState.Closed)
+                        {
+                            connection.Open();
+                        }
+
+                        // Inserta el beneficiario
+                        var resultBeneficiario = ModificarBeneficiarioTransaction(beneficiario);
+                        if (resultBeneficiario.messageType != "3")
+                        {
+                            Console.WriteLine(resultBeneficiario.message);
+                            throw new Exception(resultBeneficiario.message);
+                        }
+
+                        // Inserta el MetaBeneficiario
+                        var resultMetaBeneficiario = ModificarMetaBeneficiarioTransaction(metaBeneficiario);
+                        if (resultMetaBeneficiario.messageType != "3")
+                        {
+                            Console.WriteLine(resultMetaBeneficiario.message);
+                            throw new Exception(resultMetaBeneficiario.message);
+                        }
+
+
+                        // Si todas las operaciones fueron exitosas, confirma la transacción
+                        scope.Complete();
+                        mensaje = resultMetaBeneficiario.message;
+                        tipoMensaje = "3";
+                    }
+                    catch (Exception ex)
+                    {
+                        // Si alguna operación falló, la transacción se revierte.
+                        mensaje = ex.Message;
+                        tipoMensaje = "1";
+                        Console.WriteLine(ex);
+                    }
+                }
+            }
+
+            return (mensaje, tipoMensaje);
+        }
+
+
     }
 }

@@ -1585,7 +1585,8 @@ const FormGoalBeneficiarie = () => {
                         padding: '20px'
                     },
                     overlay: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.5)'
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        zIndex: 30
                     }
                 }}
             >
@@ -1650,7 +1651,7 @@ const FormGoalBeneficiarie = () => {
                     },
                     overlay: {
                         backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                        zIndex: 2
+                        zIndex: 30
                     }
                 }}
             >   

@@ -1,4 +1,4 @@
-import { useReducer } from "react";
+import { useReducer, useState } from "react";
 import { statusReducer } from "../reducers/statusReducer";
 import { StatusContext } from "./StatusContext";
 import { types } from "../types/types";
@@ -9,6 +9,11 @@ const StatusState = ({ children }) => {
         nombreEstado: '',
         estadoEditado: null,
     }
+
+    const [tableData, setTableData] = useState([]);
+    const [postData, setPostData] = useState([]);
+    const [isValid, setIsValid] = useState(true);
+    const [errorCells, setErrorCells] = useState([]);
 
     const [state, dispatch] = useReducer(statusReducer, initialState);
 
@@ -35,6 +40,10 @@ const StatusState = ({ children }) => {
         modalVisible: state.modalVisible,
         nombreEstado: state.nombreEstado,
         estadoEditado: state.estadoEditado,
+        tableData,
+        postData,
+        isValid,
+        errorCells,
     };
 
     const statusActions = {
@@ -42,6 +51,10 @@ const StatusState = ({ children }) => {
         setNombreEstado,
         setEstadoEditado,
         resetStatus,
+        setTableData,
+        setPostData,
+        setIsValid,
+        setErrorCells,
     };
 
     return (

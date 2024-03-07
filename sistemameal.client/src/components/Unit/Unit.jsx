@@ -51,6 +51,7 @@ const Unit = () => {
                 fieldMapping={restFieldMapping}
                 controller={controller}
                 codeField={codigo}
+                title='Unidad'
             />
         </>
     )

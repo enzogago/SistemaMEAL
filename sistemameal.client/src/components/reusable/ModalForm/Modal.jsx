@@ -6,7 +6,7 @@ import InputInvolucra from './Inputs/InputInvolucra';
 import InputAbreviatura from './Inputs/InputAbreviatura';
 import InputColor from './Inputs/InputColor';
 
-const Modal = ({ estadoEditado, modalVisible, setModalVisible, closeModal, setData, fieldMapping, controller, codeField }) => {
+const Modal = ({ estadoEditado, modalVisible, setModalVisible, closeModal, setData, fieldMapping, controller, codeField, title }) => {
     //
     const [color, setColor] = useState('#000000');
 
@@ -66,7 +66,7 @@ const Modal = ({ estadoEditado, modalVisible, setModalVisible, closeModal, setDa
         <div className={`PowerMas_Modal ${modalVisible ? 'show' : ''}`}>
             <div className="PowerMas_ModalContent">
                 <span className="PowerMas_CloseModal" onClick={closeModalAndReset}>×</span>
-                <h2 className="PowerMas_Title_Modal center f1_5">{estadoEditado ? 'Editar' : 'Nuevo'} {controller}</h2>
+                <h2 className="PowerMas_Title_Modal center f1_5">{estadoEditado ? 'Editar' : 'Nuevo'} {title}</h2>
                 <form className='Large-f1 PowerMas_FormStatus' onSubmit={validateForm(onSubmit)}>
                     {Object.keys(fieldMapping).map(field => {
                         switch (field) {

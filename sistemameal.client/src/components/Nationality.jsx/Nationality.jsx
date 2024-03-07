@@ -51,6 +51,7 @@ const Charge = () => {
                 fieldMapping={restFieldMapping}
                 controller={controller}
                 codeField={codigo}
+                title='Nacionalidad'
             />
         </>
     )

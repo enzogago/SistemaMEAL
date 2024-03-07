@@ -52,6 +52,7 @@ const Gender = () => {
                 fieldMapping={restFieldMapping}
                 controller={controller}
                 codeField={codigo}
+                title={'Género'}
             />
             
         </>

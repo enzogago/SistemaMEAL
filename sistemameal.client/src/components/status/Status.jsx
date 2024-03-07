@@ -51,6 +51,7 @@ const Status = () => {
                 fieldMapping={restFieldMapping}
                 controller={controller}
                 codeField={codigo}
+                title='Estado'
             />
         </>
     )

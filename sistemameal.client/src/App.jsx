@@ -39,6 +39,8 @@ import UploadStatus from './components/maintenance/UploadStatus';
 import UploadCharge from './components/maintenance/UploadCharge';
 import FormatProject from './components/upload/project/FormatProject';
 import Notiflix from 'notiflix';
+import SaveProject from './components/upload/project/SaveProject';
+import UploadProject from './components/upload/project/UploadProject';
 
 const App = () => {
     // Variables state AuthContext
@@ -132,6 +134,12 @@ const App = () => {
                                             <Route path="form-user/:id?" element={<FormUser />} />
                                             <Route path="menu-user/:id" element={<MenuUser />} />
                                             <Route path="permiso-user/:id" element={<PermissionUser />} />
+                                        </>
+                                    )}
+                                    {menuData.some(menu => menu.menRef === 'upload-project') && (
+                                        <>
+                                            <Route path="subir-proyecto" element={<UploadProject />} />
+                                            <Route path="guardar-proyecto" element={<SaveProject />} />
                                         </>
                                     )}
                                     {menuData.some(menu => menu.menRef === 'monitoring') && (

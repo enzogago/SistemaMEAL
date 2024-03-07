@@ -11,7 +11,7 @@ import { GrNext, GrPrevious } from 'react-icons/gr';
 import { useRef } from 'react';
 import { Tooltip } from 'react-tooltip';
 
-const CustomTable = ({ 
+const CustomTableUpload = ({ 
     title, 
     searchFilter, 
     setSearchFilter, 
@@ -115,18 +115,6 @@ const CustomTable = ({
                                 </div>
                             </div>
                         </div>
-                    }
-                    {
-                        actions && actions.add && 
-                        <>
-                            <button 
-                                className='flex jc-space-between Large_3 Large-m_5 Large-p_5 PowerMas_ButtonStatus'
-                                onClick={() => {openModal ? openModal() : navigate(`/${navigatePath}`)}} 
-                                disabled={!actions.add}
-                            >
-                                Nuevo <FaPlus className='Large_1' /> 
-                            </button>
-                        </>
                     }
                     {
                         ((actions && actions.pdf) || (actions && actions.excel)) &&
@@ -251,4 +239,4 @@ const CustomTable = ({
     );
 }
 
-export default CustomTable;
+export default CustomTableUpload;

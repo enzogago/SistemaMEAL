@@ -199,7 +199,7 @@ input::placeholder,select::placeholder{
 .PowerMas_Search_Container_Home{
 	position: sticky;
 	top: 0;
-	z-index: 100;
+	z-index: 20;
 	box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5);
 	background-color: #dedddd;
 }
@@ -500,7 +500,7 @@ input::placeholder,select::placeholder{
 	right: 35px;
 	background-color: #f9f9f9;
 	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-	z-index: 100;
+	z-index: 25;
 	border-radius: 5px;
 }
   
@@ -964,7 +964,7 @@ textarea {
 .PowerMas_Dropdown_Export_Content {
     position: absolute;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 100;
+    z-index: 24;
 	transform-origin: top;
     transform: scaleY(0);
     transition: transform 0.3s ease-out;
@@ -1040,8 +1040,10 @@ textarea {
 	display: flex;
     justify-content: space-between;
     align-items: center;
-	color: #F7775A;
 	font-weight: lighter;
+}
+.PowerMas_TableStatus thead th {
+	color: #F7775A;
 }
 
 .PowerMas_TableStatus thead th div svg {
@@ -1054,7 +1056,6 @@ textarea {
     top: 0;
     background: white; 
 	transition: background-color 0.3s ease;
-	z-index: 99;
 }
 .PowerMas_TableStatus thead tr:first-child input{
 	border: none;
@@ -1814,4 +1815,30 @@ textarea {
 
 .iti{
 	width: 100%;
+}
+
+
+.PowerMas_Table_Format_Upload th, .PowerMas_Table_Format_Upload td{
+	border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+.PowerMas_Article_Upload > p{
+	color: #878280;
+}
+
+.PowerMas_Article_Upload > h3{
+	color: #372E2C;
+}
+
+.PowerMas_Input_Upload{
+	background-color: #F7F7F7;
+	border: 3px dashed #ADA9A9;
+	color: #ADA9A9;
+	transition: backgroun-color 0.2s ease-in;
+}
+
+.PowerMas_Input_Upload:hover{
+	background-color: #dcdcdc;
 }

@@ -46,6 +46,19 @@ namespace SistemaMEAL.Server.Controllers
             return Ok(ubicaciones);
         }
 
+        [HttpGet("select/{ubiAno}/{ubiCod}")]
+        public dynamic ListadoUbicacioSelect(string ubiAno, string ubiCod)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var ubicaciones = _ubicaciones.ListadoUbicacioSelect(ubiAno, ubiCod);
+            Console.WriteLine(ubicaciones);
+            return Ok(ubicaciones);
+        }
+
 
     }
 

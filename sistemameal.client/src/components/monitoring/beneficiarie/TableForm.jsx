@@ -285,9 +285,9 @@ const TableForm = ({modalFormIsOpen, metaData, updateData, setUpdateData, fetchB
             benSex: item.benSex === 'M' ? 'MASCULINO' : 'FEMENINO'
         };
     });
-     const headers = ['AUTORIZA','CUB', 'NOMBRES', 'APELLIDOS', 'FECHA_NACIMIENTO', 'SEXO', 'GENERO', 'NACIONALIDAD', 'CORREO', 'TELEFONO', 'TELEFONO_CONTACTO', 'DIRECCION', 'UBICACION', 'AÑO_EJECUCION' , 'MES_EJECUCION', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
+     const headers = ['AUTORIZA','CUB', 'NOMBRES', 'APELLIDOS', 'FECHA_NACIMIENTO', 'EDAD', 'SEXO', 'GENERO', 'NACIONALIDAD', 'CORREO', 'TELEFONO', 'TELEFONO_CONTACTO', 'DIRECCION', 'UBICACION', 'AÑO_EJECUCION' , 'MES_EJECUCION', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
      const title = 'BENEFICIARIO';  // El título de tu archivo
-     const properties = ['benAut', 'benCodUni', 'benNom', 'benApe', 'benFecNac', 'benSex', 'genNom', 'nacNom', 'benCorEle', 'benTel', 'benTelCon', 'benDir', 'ubiNom', 'metBenAnoEjeTec', 'metBenMesEjeTec', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
+     const properties = ['benAut', 'benCodUni', 'benNom', 'benApe', 'benFecNac', 'edad', 'benSex', 'genNom', 'nacNom', 'benCorEle', 'benTel', 'benTelCon', 'benDir', 'ubiNom', 'metBenAnoEjeTec', 'metBenMesEjeTec', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
      const format = [700,350];  // El tamaño del formato que quieres establecer para el PDF
  
      const Export_Excel = () => {

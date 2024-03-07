@@ -51,6 +51,7 @@ const Implementer = () => {
                 fieldMapping={restFieldMapping}
                 controller={controller}
                 codeField={codigo}
+                title='Implementador'
             />
         </>
     )

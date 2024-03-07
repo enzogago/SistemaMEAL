@@ -51,6 +51,7 @@ const Role = () => {
                 fieldMapping={restFieldMapping}
                 controller={controller}
                 codeField={codigo}
+                title='Rol'
             />
         </>
     )

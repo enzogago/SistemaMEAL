@@ -356,7 +356,7 @@ const MenuUser = () => {
   return (
     <>
         <div className="PowerMas_Header_Form_Beneficiarie flex ai-center">
-          <Bar currentStep={1} type='user' />
+          <Bar currentStep={2} type='user' />
         </div>
         <div className="flex-grow-1 p1_25 overflow-auto">
             <div className="flex gap-1">

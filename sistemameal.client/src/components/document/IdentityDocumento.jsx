@@ -51,6 +51,7 @@ const IdentityDocument = () => {
                 fieldMapping={restFieldMapping}
                 controller={controller}
                 codeField={codigo}
+                title='Documento de Identidad'
             />
         </>
     )
