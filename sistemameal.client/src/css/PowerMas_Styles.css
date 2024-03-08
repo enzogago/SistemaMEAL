@@ -1842,3 +1842,7 @@ textarea {
 .PowerMas_Input_Upload:hover{
 	background-color: #dcdcdc;
 }
+
+.error-cell {
+    background-color: red;
+}

@@ -9,35 +9,39 @@ import {
     getSortedRowModel, 
 } from '@tanstack/react-table';
 import CustomTableUpload from "../../reusable/Table/CustomTableUpload";
+import { expectedHeaders } from "./handleUpload";
+import Notiflix from "notiflix";
 
 const SaveProject = () => {
     // Variables State AuthContext 
     const { statusInfo } = useContext(StatusContext);
     const { tableData, postData, isValid, errorCells } = statusInfo;
     if(tableData.length === 0) return;
-    console.log(tableData, postData, isValid, errorCells);
     const [transformedData, setTransformedData] = useState([])
     const navigate = useNavigate();
 
     useEffect(() => {
         // Transforma tableData a un arreglo de objetos
-        const transformedData = tableData.slice(1).map(row => {
-            return row.reduce((obj, cell, index) => {
-                const header = tableData[0][index];
-                obj[header] = cell;
+        const transformedData = tableData.map((row, rowIndex) => {
+            return expectedHeaders.reduce((obj, headerInfo, index) => {
+                const dbKey = headerInfo.dbKey;
+                const cell = row[index];
+                obj[dbKey] = cell;
                 return obj;
             }, {});
         });
         setTransformedData(transformedData)
-    }, [tableData])
+    }, [tableData]);
+    
     
     const [sorting, setSorting] = useState([]);
 
     const columns = useMemo(() => {
         // Usa los encabezados de tableData[0] para generar las columnas
-        return tableData[0].map(header => ({
-            header,
-            accessorKey: header,
+        return expectedHeaders.map((headerInfo, index) => ({
+            header: headerInfo.display,
+            accessorKey: headerInfo.dbKey,
+            index: index,
         }));
     }, []);
 
@@ -53,53 +57,54 @@ const SaveProject = () => {
         onSortingChange: setSorting,
     });
 
+    const processValidData = async() => {
+        // Verifica que los datos sean válidos y que no estén vacíos
+        if (!isValid || postData.length === 0) {
+            alert('Los datos son inválidos o no hay datos para procesar');
+            return;
+        }
+    
+        // Aquí puedes procesar los datos y enviarlos al servidor
+        console.log('Procesando datos...');
+        console.log(postData);
+        try {
+            Notiflix.Loading.pulse();
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Proyecto/Masivo`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(postData),
+            });
+            console.log("desde response: ",response)
+            const data = await response.json();
+            if (!response.ok) {
+                console.log(data)
+                Notiflix.Notify.failure(data.message)
+                return;
+            }
+            console.log(data)
+            Notiflix.Notify.success(data.message)
+            navigate('/upload-project');
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            Notiflix.Loading.remove();
+        }
+    }
+
     return (
         <>
             <Bar currentStep={3} type='upload' />
             <CustomTableUpload
                 table={table}
+                errorCells={errorCells}
             />
-            {/* <div className='flex flex-column flex-grow-1 Large-p1'>
-                <div className="PowerMas_TableContainer flex-grow-1 overflow-auto">
-                    <table className="Phone_12 PowerMas_TableStatus ">
-                        <thead>
-                            <tr>
-                                {tableData[0].map((header, index) => (
-                                    <th 
-                                        key={index}
-                                        className='ws-nowrap' 
-                                        style={{backgroundColor: '#fff' }}
-                                    >
-                                        {header}
-                                    </th>
-                                ))}
-                            </tr>
-                        </thead>
-                        <tbody className=''>
-                            {tableData.slice(1).map((row, rowIndex) => (
-                                <tr key={rowIndex} style={{height: '2rem', backgroundColor: row.color}}>
-                                    {row.map((cell, columnIndex) => (
-                                        <td
-                                            key={columnIndex}
-                                            style={{
-                                                backgroundColor: errorCells.some(errorCell => errorCell.row === rowIndex && errorCell.column === columnIndex) ? 'red' : '#fff',
-                                            }}
-                                        >
-                                            {cell}
-                                        </td>
-                                    ))}
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-
-                <p>{isValid && postData.length !== 0 ? 'Datos válidos' : 'Datos inválidos o no hay datos'}</p>
-                <button className='PowerMas_Buttom_Primary' onClick={processValidData} disabled={!isValid || postData.length === 0}>Procesar datos</button>
-            </div> */}
             <footer className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
                 <button onClick={() => navigate('/subir-proyecto')} className="Large_3 m_75 PowerMas_Buttom_Secondary">Atras</button>
-                <button onClick={() => navigate('/upload-project')} className="Large_3 m_75 PowerMas_Buttom_Primary">Guardar</button>
+                <button disabled={!isValid} onClick={processValidData} className="Large_3 m_75 PowerMas_Buttom_Primary">Guardar</button>
             </footer>
         </>
     )

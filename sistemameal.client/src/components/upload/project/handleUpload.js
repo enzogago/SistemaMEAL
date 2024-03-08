@@ -1,76 +1,103 @@
 import ExcelJS from 'exceljs';
 
-const expectedHeaders = [
-    { display: 'NOMBRE_INDICADOR_ACTIVIDAD', dbKey: 'indActResNom', entity: 'IndicadorActividad', validation: 'nombre' },
-    { display: 'NUMERO_INDICADOR_ACTIVIDAD', dbKey: 'indActResNum', entity: 'IndicadorActividad', validation: 'numero' },
-    { display: 'TIPO_INDICADOR_ACTIVIDAD', dbKey: 'indActResTip', entity: 'IndicadorActividad', validation: 'indicador' },
-    { display: 'NOMBRE_RESULTADO', dbKey: 'resNom', entity: 'Resultado', validation: 'nombre' },
-    { display: 'NUMERO_RESULTADO', dbKey: 'resNum', entity: 'Resultado', validation: 'numero' },
-    { display: 'NOMBRE_OBJETIVO_ESPECIFICO', dbKey: 'objEspNom', entity: 'ObjetivoEspecifico', validation: 'nombre' },
-    { display: 'NUMERO_OBJETIVO_ESPECIFICO', dbKey: 'objEspNum', entity: 'ObjetivoEspecifico', validation: 'numero' },
-    { display: 'NOMBRE_OBJETIVO', dbKey: 'objNom', entity: 'Objetivo', validation: 'nombre' },
-    { display: 'NUMERO_OBJETIVO', dbKey: 'objNum', entity: 'Objetivo', validation: 'numero' },
-    { display: 'NOMBRE_SUB_PROYECTO', dbKey: 'subProNom', entity: 'Subproyecto', validation: 'nombre' },
-    { display: 'SAP_SUB_PROYECTO', dbKey: 'subProSap', entity: 'Subproyecto', validation: 'numero' },
-    { display: 'NOMBRE_PROYECTO', dbKey: 'proNom', entity: 'Proyecto', validation: 'nombre' },
-    { display: 'DESCRIPCION_PROYECTO', dbKey: 'proDes', entity: 'Proyecto', validation: 'nombre' },
-    { display: 'RESPONSABLE_PROYECTO', dbKey: 'proRes', entity: 'Proyecto', validation: 'nombre' },
-    { display: 'AÑO_PERIODO_INICIO_PROYECTO', dbKey: 'proPerAnoIni', entity: 'Proyecto', validation: 'año' },
-    { display: 'MES_PERIODO_INICIO_PROYECTO', dbKey: 'proPerMesIni', entity: 'Proyecto', validation: 'mes' },
-    { display: 'AÑO_PERIODO_FIN_PROYECTO', dbKey: 'proPerAnoFin', entity: 'Proyecto', validation: 'año' },
-    { display: 'MES_PERIODO_FIN_PROYECTO', dbKey: 'proPerMesFin', entity: 'Proyecto', validation: 'mes' },
+export const expectedHeaders = [
+    { display: 'CODIGO', dbKey: 'indActResNum', entity: 'IndicadorActividad', validation: 'numero' },
+    { display: 'DESCRIPCION', dbKey: 'indActResNom', entity: 'IndicadorActividad', validation: 'nombre' },
+    { display: 'TIPO', dbKey: 'indActResTip', entity: 'IndicadorActividad', validation: 'indicador' },
+    { display: 'CODIGO', dbKey: 'resNum', entity: 'Resultado', validation: 'numeroResultado' },
+    { display: 'RESULTADO', dbKey: 'resNom', entity: 'Resultado', validation: 'nombreResultado' },
+    { display: 'CODIGO', dbKey: 'objEspNum', entity: 'ObjetivoEspecifico', validation: 'numero' },
+    { display: 'OBJETIVO ESPECIFICO', dbKey: 'objEspNom', entity: 'ObjetivoEspecifico', validation: 'nombre' },
+    { display: 'CODIGO', dbKey: 'objNum', entity: 'Objetivo', validation: 'numero' },
+    { display: 'OBJETIVO', dbKey: 'objNom', entity: 'Objetivo', validation: 'nombre' },
+    { display: 'CODIGO_SAP', dbKey: 'subProSap', entity: 'Subproyecto', validation: 'numero' },
+    { display: 'NOMBRE', dbKey: 'subProNom', entity: 'Subproyecto', validation: 'nombre' },
+    { display: 'NOMBRE', dbKey: 'proNom', entity: 'Proyecto', validation: 'nombre' },
+    { display: 'DESCRIPCION', dbKey: 'proDes', entity: 'Proyecto', validation: 'descripcion' },
+    { display: 'RESPONSABLE-COORDINADOR', dbKey: 'proRes', entity: 'Proyecto', validation: 'nombre' },
+    { display: 'MES_INICIO', dbKey: 'proPerMesIni', entity: 'Proyecto', validation: 'mes' },
+    { display: 'AÑO_INICIO', dbKey: 'proPerAnoIni', entity: 'Proyecto', validation: 'año' },
+    { display: 'MES_FIN', dbKey: 'proPerMesFin', entity: 'Proyecto', validation: 'mes' },
+    { display: 'AÑO_FIN', dbKey: 'proPerAnoFin', entity: 'Proyecto', validation: 'año' },
 ];
 
 const validateCell = (value, validationRules) => {
-    if (validationRules.maxLength && value.length > validationRules.maxLength) {
-        return `El campo no puede tener más de ${validationRules.maxLength} caracteres`;
+    if (validationRules.required && !value) {
+        return 'El campo es requerido';
     }
-    if (validationRules.minLength && value.length < validationRules.minLength) {
-        return `El campo no puede tener menos de ${validationRules.minLength} caracteres`;
-    }
-    if (validationRules.pattern && !validationRules.pattern.test(value)) {
-        return validationRules.patternMessage;
-    }
-    if (validationRules.noLeadingSpaces && value.startsWith(' ')) {
-        return 'El campo no puede comenzar con espacios en blanco';
+    if (value) { // Solo aplica las otras reglas de validación si value no está vacío
+        if (validationRules.maxLength && value.length > validationRules.maxLength) {
+            return `El campo no puede tener más de ${validationRules.maxLength} caracteres`;
+        }
+        if (validationRules.minLength && value.length < validationRules.minLength) {
+            return `El campo no puede tener menos de ${validationRules.minLength} caracteres`;
+        }
+        if (validationRules.pattern && !validationRules.pattern.test(value)) {
+            return validationRules.patternMessage;
+        }
+        if (validationRules.noLeadingSpaces && value.startsWith(' ')) {
+            return 'El campo no puede comenzar con espacios en blanco';
+        }
     }
     return true;
 };
 
+
 const validationRules = {
-    'nombre': {
-        maxLength: 50,
+    'nombreResultado': {
+        required: false,
+        maxLength: 300,
         minLength: 5,
-        pattern: /^[A-Za-zñÑ\s]+$/,
+        pattern: /^[0-9A-Za-zñÑáéíóúÁÉÍÓÚ()%/.,;üÜ\s-_]+$/,
+        patternMessage: 'Por favor, introduce solo letras y espacios',
+    },
+    'nombre': {
+        required: true,
+        maxLength: 300,
+        minLength: 5,
+        pattern: /^[0-9A-Za-zñÑáéíóúÁÉÍÓÚ():%/.,;üÜ\s-_]+$/,
         patternMessage: 'Por favor, introduce solo letras y espacios',
     },
     'descripcion': {
-        maxLength: 50,
-        minLength: 5,
-        pattern: /^[A-Za-zñÑ\s]+$/,
+        required: false,
+        maxLength: 300,
+        minLength: 0,
+        pattern: /^[0-9A-Za-zñÑáéíóúÁÉÍÓÚ()%/.,;üÜ\s-_]+$/,
         patternMessage: 'Por favor, introduce solo letras y espacios',
     },
     'color': {
+        required: true,
         minLength: 7,
         maxLength: 7,
         pattern: /^#([0-9A-Fa-f]{6})$/,
         patternMessage: 'Por favor, introduce un color en formato hexadecimal',
     },
     'indicador': {
-        pattern: /^[IA]$/,
-        patternMessage: 'Por favor, introduce solo I o A',
+        required: true,
+        pattern: /^(IR|AR|IO)$/, // Acepta solo estos tipos
+        patternMessage: 'Por favor, introduce solo IR,AR o IO',
     },
     'numero': {
-        minLength: 5,
-        maxLength: 50,
+        required: true,
+        minLength: 2,
+        maxLength: 300,
+        pattern: /^[A-Za-z0-9ñÑ\s\.]+$/,
+        patternMessage: 'Por favor, introduce solo letras, números, puntos y espacios',
+    },
+    'numeroResultado': {
+        required: false,
+        minLength: 2,
+        maxLength: 300,
         pattern: /^[A-Za-z0-9ñÑ\s\.]+$/,
         patternMessage: 'Por favor, introduce solo letras, números, puntos y espacios',
     },
     'año': {
+        required: true,
         pattern: /^\d{4}$/,
         patternMessage: 'Por favor, introduce un año válido con 4 dígitos',
     },
     'mes': {
+        required: true,
         pattern: /^(0[1-9]|1[0-2])$/,
         patternMessage: 'Por favor, introduce un mes válido del 01 al 12',
     },
@@ -119,7 +146,7 @@ export const handleUpload = async (file, setTableData, setPostData, setIsValid, 
         const expectedHeaderDisplays = expectedHeaders.map(header => header.display.toUpperCase());
         
         // Verifica que los encabezados son correctos
-        const headers = worksheet.getRow(4).values.slice(2, 20); // Cambia 1 a 4 y limita el rango a las columnas B-F
+        const headers = worksheet.getRow(8).values.slice(2, 20); // Tomando en cuenta los encabezados estan en la fila 4 a partir de la columna 2
         if (!arraysEqual(headers, expectedHeaderDisplays)) {
             alert('Los encabezados no son válidos');
             setIsValid(false);
@@ -130,7 +157,7 @@ export const handleUpload = async (file, setTableData, setPostData, setIsValid, 
         let currentColor = 'lightgray';
 
         // Comienza a leer desde la fila 5
-        let rowNumber = 4; // Cambia 4 a 5
+        let rowNumber = 9; // Cambia 4 a 5
         while (rowNumber <= worksheet.rowCount) { // Itera sobre todas las filas
             const row = worksheet.getRow(rowNumber);
             const tableRowData = new Array(expectedHeaders.length).fill(''); // Inicializa la fila con valores vacíos
@@ -175,7 +202,7 @@ export const handleUpload = async (file, setTableData, setPostData, setIsValid, 
                 // Valida la celda
                 const validationMessage = validateCell(cellValue, fieldValidationRules);
                 if (validationMessage !== true) {
-                    newErrorCells.push({ row: rowNumber - 4, column: colNumber - 2,  message: validationMessage}); // Ajusta los índices para que coincidan con el rango de filas y columnas
+                    newErrorCells.push({ row: rowNumber - 9, column: colNumber - 2,  message: validationMessage}); // Ajusta los índices para que coincidan con el rango de filas y columnas
                     setIsValid(false);
                 }
             }
@@ -242,14 +269,6 @@ export const handleUpload = async (file, setTableData, setPostData, setIsValid, 
             tableRowData.color = currentColor;
 
             tableData.push(tableRowData);
-            postData.push(postRowData);
-            // Verifica si alguna celda en la fila está vacía
-            for (let i = 0; i < tableRowData.length; i++) {
-                if (!tableRowData[i]) {
-                    newErrorCells.push({ row: rowNumber - 5, column: i, message: "El campo es requerido" });
-                    setIsValid(false);
-                }
-            }
             rowNumber++;
         }
         

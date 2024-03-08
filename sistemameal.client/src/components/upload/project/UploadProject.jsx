@@ -83,7 +83,7 @@ const UploadProject = () => {
             <div className="flex-grow-1 flex jc-center ai-center overflow-auto">
                 <div className="Large_8">
                     <article className="PowerMas_Article_Upload center">
-                        <p style={{color: '#878280'}}>Solo se puede subir documentos en formato XML</p>
+                        <p style={{color: '#878280'}}>Solo se puede subir documentos en formato Excel</p>
                         <h3>Subir Archivo</h3>
                     </article>
                     <br />

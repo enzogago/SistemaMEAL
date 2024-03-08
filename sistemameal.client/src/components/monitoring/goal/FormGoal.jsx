@@ -401,9 +401,9 @@ const FormGoal = () => {
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="PowerMas_StatusContainer bg-white h-100 flex flex-column">
-            <div className="PowerMas_Header_Form_Beneficiarie flex ai-center p_25">
-                <GrFormPreviousLink className="m1 w-auto Large-f2_5 pointer" onClick={() => navigate('/monitoring')} />
-                <h1 className=""> {isEditing ? 'Editar' : 'Nueva'} Meta</h1>
+            <div className="PowerMas_Header_Form_Beneficiarie flex ai-center p_5 gap-1">
+                <GrFormPreviousLink className="w-auto Large-f2_5 pointer" onClick={() => navigate('/monitoring')} />
+                <h1 className="f1_75"> {isEditing ? 'Editar' : 'Nueva'} Meta</h1>
             </div>
             <div className="overflow-auto flex-grow-1 flex">
                 <div className="PowerMas_Form_Goal Large_6 m1 overflow-auto">
@@ -711,10 +711,10 @@ const FormGoal = () => {
                 </div>
                 
             </div>
-            <div className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
-                <button type="submit" className="Large_5 m2">Guardar</button>
-                <button type="button" className="Large_5 m2">Eliminar Todo</button>
-            </div>
+            <footer className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
+                <button className="Large_3 m_75 PowerMas_Buttom_Primary">Grabar</button>
+                <button className="Large_3 m_75 PowerMas_Buttom_Secondary">Atras</button>
+            </footer>
         </form>
     )
 }

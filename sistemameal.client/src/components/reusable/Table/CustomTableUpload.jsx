@@ -31,7 +31,8 @@ const CustomTableUpload = ({
     inputValue,
     removeTag,
     searchTags,
-    setSearchTags
+    setSearchTags,
+    errorCells
 }) => {
     const navigate = useNavigate();
     
@@ -198,24 +199,46 @@ const CustomTableUpload = ({
                             table.getRowModel().rows.length > 0 ?
                                 table.getRowModel().rows.map(row => (
                                     <tr key={row.id}>
-                                        {row.getVisibleCells().map(cell => (
-                                            !resize ?
+                                        {row.getVisibleCells().map(cell => {
+                                            // Verifica si esta celda tiene un error
+                                            const hasError = errorCells.some(errorCell => errorCell.row === row.index && errorCell.column === cell.column.columnDef.index);
+                                            const errorCell = errorCells.find(errorCell => errorCell.row === row.index && errorCell.column === cell.column.columnDef.index);
+                                            const errorMessage = errorCell ? errorCell.message : '';
+
+                                            const cellText = cell.getValue();
+                                            const shortText = cellText.length > 50 ? cellText.substring(0, 50) + '...' : cellText;
+
+                                            return (
                                                 <td 
                                                     key={cell.id} 
-                                                    className="p_5 ws-nowrap"
+                                                    className={`p_5 ws-nowrap`}
                                                     style={{
                                                         position: cell.column.columnDef.stickyRight !== undefined ? 'sticky' : '', 
                                                         right: cell.column.columnDef.stickyRight !== undefined ? `${cell.column.columnDef.stickyRight}px` : 'auto',
-                                                        backgroundColor: '#fff'
+                                                        backgroundColor: hasError ? 'red' : '#fff',
+                                                        color: hasError ? '#fff' : '#000',
                                                     }}
                                                 >
-                                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                     <div style={{textWrap: 'nowrap'}}>
+                                                        <span
+                                                            data-tooltip-id="error-tooltip" 
+                                                            data-tooltip-content={errorMessage} 
+                                                        >
+                                                            {hasError ? 'Ver error' : 
+                                                                <>
+                                                                    <div style={{textWrap: 'nowrap'}}>
+                                                                        <span
+                                                                            data-tooltip-id="info-tooltip" 
+                                                                            data-tooltip-content={cellText} 
+                                                                        >{shortText}</span>
+                                                                    </div>
+                                                                </>
+                                                            }
+                                                        </span>
+                                                    </div>
                                                 </td>
-                                            :
-                                                <td className='ws-nowrap' style={{ width:  cell.column.getSize() }} key={cell.id}>
-                                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                                </td>
-                                        ))}
+                                            );
+                                        })}
                                     </tr>
                                 ))
                             :   <tr className='PowerMas_TableEmpty'>

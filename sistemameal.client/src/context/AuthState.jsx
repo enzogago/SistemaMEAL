@@ -28,13 +28,15 @@ const AuthState = ({ children }) => {
             });
             if (!response.ok) {
                     const data = await response.json();
+                    console.log(data)
                     setIsLoggedIn(false);
                     setUserLogged({})
                     localStorage.removeItem('token');
-            }else {
-                const data = await response.json();
-                setUserLogged(data)
+                    return;
             }
+
+            const data = await response.json();
+            setUserLogged(data.result)
         } catch (error) {
             console.error(`Error al hacer la solicitud: ${error}`);
         } finally {

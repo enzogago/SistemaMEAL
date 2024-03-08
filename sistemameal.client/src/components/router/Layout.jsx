@@ -24,6 +24,12 @@ const Layout = ({ children }) => {
                 <>{children}</>
             }
             <Tooltip 
+                    id="error-tooltip"
+                    effect="solid"
+                    place='bottom-start'
+                    className="PowerMas_Tooltip_Info"
+            />
+            <Tooltip 
                     id="info-tooltip"
                     effect="solid"
                     place='bottom-start'

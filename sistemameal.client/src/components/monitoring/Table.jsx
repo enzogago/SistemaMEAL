@@ -86,26 +86,27 @@ const Table = ({ data }) => {
     const filteredData = useMemo(() => 
         data.filter(item => 
             searchTags.every(tag => 
-                item.estNom.includes(tag.toUpperCase()) ||
-                item.metMetTec.includes(tag.toUpperCase()) ||
-                item.metEjeTec.includes(tag.toUpperCase()) ||
-                item.metPorAvaTec.includes(tag.toUpperCase()) ||
-                item.metAnoPlaTec.includes(tag.toUpperCase()) ||
-                item.metMesPlaTecNombre.toUpperCase().includes(tag.toUpperCase()) ||
-                item.indActResNum.includes(tag.toUpperCase()) ||
-                item.indActResNom.includes(tag.toUpperCase()) ||
-                item.tipInd.includes(tag.toUpperCase()) ||
-                item.resNom.includes(tag.toUpperCase()) ||
-                item.resNum.includes(tag.toUpperCase()) ||
-                item.objEspNom.includes(tag.toUpperCase()) || 
-                item.objEspNum.includes(tag.toUpperCase()) || 
-                item.objNom.includes(tag.toUpperCase()) || 
-                item.subProNom.includes(tag.toUpperCase()) || 
-                item.ubiNom.includes(tag.toUpperCase()) || 
-                item.proNom.includes(tag.toUpperCase())
+                (item.estNom ? item.estNom.includes(tag.toUpperCase()) : false) ||
+                (item.metMetTec ? item.metMetTec.includes(tag.toUpperCase()) : false) ||
+                (item.metEjeTec ? item.metEjeTec.includes(tag.toUpperCase()) : false) ||
+                (item.metPorAvaTec ? item.metPorAvaTec.includes(tag.toUpperCase()) : false) ||
+                (item.metAnoPlaTec ? item.metAnoPlaTec.includes(tag.toUpperCase()) : false) ||
+                (item.metMesPlaTecNombre ? item.metMesPlaTecNombre.toUpperCase().includes(tag.toUpperCase()) : false) ||
+                (item.indActResNum ? item.indActResNum.includes(tag.toUpperCase()) : false) ||
+                (item.indActResNom ? item.indActResNom.includes(tag.toUpperCase()) : false) ||
+                (item.tipInd ? item.tipInd.includes(tag.toUpperCase()) : false) ||
+                (item.resNom ? item.resNom.includes(tag.toUpperCase()) : false) ||
+                (item.resNum ? item.resNum.includes(tag.toUpperCase()) : false) ||
+                (item.objEspNom ? item.objEspNom.includes(tag.toUpperCase()) : false) || 
+                (item.objEspNum ? item.objEspNum.includes(tag.toUpperCase()) : false) || 
+                (item.objNom ? item.objNom.includes(tag.toUpperCase()) : false) || 
+                (item.subProNom ? item.subProNom.includes(tag.toUpperCase()) : false) || 
+                (item.ubiNom ? item.ubiNom.includes(tag.toUpperCase()) : false) || 
+                (item.proNom ? item.proNom.includes(tag.toUpperCase()) : false)
             )
         ), [data, searchTags]
     );
+
 
     const Editar_Meta = (row) => {
         console.log(row)
@@ -266,21 +267,22 @@ const Table = ({ data }) => {
                     )
                 },
             },
-            
             {
                 header: "Resultado",
                 accessorKey: "resNom",
                 cell: ({row}) => {
-                    const text = row.original.resNum + ' - ' + row.original.resNom.charAt(0).toUpperCase() + row.original.resNom.slice(1).toLowerCase();
-                    const shortText = text.length > 60 ? text.substring(0, 60) + '...' : text;
-                    return (
-                        <>
-                            <span 
-                                data-tooltip-id="info-tooltip" 
-                                data-tooltip-content={text} 
-                            >{shortText}</span>
-                        </>
-                    );
+                    if (row.original.resNum) {
+                        const text = row.original.resNum + ' - ' + row.original.resNom.charAt(0).toUpperCase() + row.original.resNom.slice(1).toLowerCase();
+                        const shortText = text.length > 60 ? text.substring(0, 60) + '...' : text;
+                        return (
+                            <>
+                                <span 
+                                    data-tooltip-id="info-tooltip" 
+                                    data-tooltip-content={text} 
+                                >{shortText}</span>
+                            </>
+                        );
+                    }
                 },
             },
             {
