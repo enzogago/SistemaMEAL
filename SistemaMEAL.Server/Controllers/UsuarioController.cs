@@ -299,12 +299,16 @@ namespace SistemaMEAL.Server.Controllers
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             dynamic rToken = Jwt.validarToken(identity, _usuarios);
+            Console.WriteLine(rToken);
 
-            if (!rToken.success) return Unauthorized(rToken);
-            dynamic data = rToken.result;
-            Console.WriteLine(data);
-
-            return Ok(data);
+            if (!rToken.success) // Error
+            {
+                return new UnauthorizedObjectResult(rToken);
+            } 
+            else // Registro modificado correctamente
+            {
+                return new OkObjectResult(rToken);
+            }
         }
 
         [HttpDelete]

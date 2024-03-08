@@ -365,8 +365,9 @@ namespace SistemaMEAL.Server.Modulos
                 cn.getcn.Close();
             }
 
-            return usuario?? new Usuario();
+            return usuario; // Devuelve null si no se encontró ningún usuario
         }
+
 
         public Usuario BuscarUsuarioLog(string ano, string cod)
         {

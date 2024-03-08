@@ -343,10 +343,11 @@ namespace SistemaMEAL.Modulos
             return (anoOut, codOut, mensaje, tipoMensaje);
         }
 
-        public (string? message, string? messageType) InsertarMasivo(List<Proyecto> proyectos)
+        public (string? message, string? messageType, List<ErrorCell> errorCells) InsertarMasivo(List<Proyecto> proyectos)
         {
             string? mensaje = "";
             string? tipoMensaje = "";
+            List<ErrorCell> errorCells = new List<ErrorCell>();
 
             string? message;
             string? messageType;
@@ -362,6 +363,7 @@ namespace SistemaMEAL.Modulos
                 SqlParameter pAno;
                 SqlParameter pCod;
 
+                int indiceProyecto = 0;
                 foreach (var proyecto in proyectos)
                 {
                     // Inserta el proyecto
@@ -408,9 +410,14 @@ namespace SistemaMEAL.Modulos
 
                     if (messageType != "3") // Si hay un error o el proyecto ya existe, retorna el mensaje
                     {
-                        return (message, messageType);
+                        if (messageType == "2")
+                        {
+                            return (message, messageType, errorCells);
+                        }
+                        errorCells.Add(new ErrorCell { Row = indiceProyecto, Column = 0, Message = message });
                     }
 
+                    int indiceSubproyecto = 0;
                     // Inserta los subproyectos del proyecto
                     foreach (var subproyecto in proyecto.SubProyectos)
                     {
@@ -457,9 +464,14 @@ namespace SistemaMEAL.Modulos
 
                         if (messageType != "3") // Si hay un error o el proyecto ya existe, retorna el mensaje
                         {
-                            return (message, messageType);
+                            if (messageType == "1")
+                            {
+                                return (message, messageType, errorCells);
+                            }
+                            errorCells.Add(new ErrorCell { Row = indiceProyecto, Column = indiceSubproyecto, Message = message });
                         }
                         
+                        int indiceObjetivo = 0;
                         // Insertamos Objetivos
                         foreach (var objetivo in subproyecto.Objetivos)
                         {
@@ -506,9 +518,14 @@ namespace SistemaMEAL.Modulos
 
                             if (messageType != "3") // Si hay un error o el proyecto ya existe, retorna el mensaje
                             {
-                                return (message, messageType);
+                                if (messageType == "1")
+                                {
+                                    return (message, messageType, errorCells);
+                                }
+                                errorCells.Add(new ErrorCell { Row = indiceSubproyecto, Column = indiceObjetivo, Message = message });
                             }
-
+                            
+                            int indiceObjetivoEspecifico = 0;
                             foreach (var objetivoEspecifico in objetivo.ObjetivosEspecificos)
                             {
                                 objetivoEspecifico.ObjAno = objAno; // Establece la clave foránea
@@ -554,85 +571,86 @@ namespace SistemaMEAL.Modulos
 
                                 if (messageType != "3") // Si hay un error o el proyecto ya existe, retorna el mensaje
                                 {
-                                    return (message, messageType);
+                                    if (messageType == "1")
+                                    {
+                                        return (message, messageType, errorCells);
+                                    }
+                                    errorCells.Add(new ErrorCell { Row = indiceObjetivo, Column = indiceObjetivoEspecifico, Message = message });
                                 }
+                                
+                                int indiceResultado = 0;
 
                                 foreach (var resultado in objetivoEspecifico.Resultados)
                                 {
                                     resultado.ObjEspAno = objEspAno; // Establece la clave foránea
                                     resultado.ObjEspCod = objEspCod; // Establece la clave foránea
-                                    // Inserta el proyecto
-                                    cmd = new SqlCommand("SP_INSERTAR_RESULTADO", cn.getcn);
-                                    cmd.CommandType = CommandType.StoredProcedure;
 
-                                    cmd.Parameters.AddWithValue("@P_OBJESPANO", resultado.ObjEspAno);
-                                    cmd.Parameters.AddWithValue("@P_OBJESPCOD", resultado.ObjEspCod);
-                                    cmd.Parameters.AddWithValue("@P_RESNOM", resultado.ResNom);
-                                    cmd.Parameters.AddWithValue("@P_RESNUM", resultado.ResNum);
-                                    cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
-                                    cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
-                                    cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
-                                    cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
-                                    cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
-                                    cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "GAGO");
-                                    cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "AGUIRRE");
+                                    if (resultado.ResNom.Equals("") || resultado.ResNum.Equals("") ){
+                                        // Insertamos Indicador de Objetivo
 
-                                    pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
-                                    pDescripcionMensaje.Direction = ParameterDirection.Output;
-                                    cmd.Parameters.Add(pDescripcionMensaje);
+                                        int indiceIndicador = 0;
 
-                                    pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
-                                    pTipoMensaje.Direction = ParameterDirection.Output;
-                                    cmd.Parameters.Add(pTipoMensaje);
+                                        foreach (var indicadorActividadResultado in resultado.IndicadoresActividades)
+                                        {
 
-                                    pAno = new SqlParameter("@P_RESANO_OUT", SqlDbType.NVarChar, 4);
-                                    pAno.Direction = ParameterDirection.Output;
-                                    cmd.Parameters.Add(pAno);
+                                            cmd = new SqlCommand("SP_INSERTAR_INDICADOR_OBJETIVO", cn.getcn);
+                                            cmd.CommandType = CommandType.StoredProcedure;
 
-                                    pCod = new SqlParameter("@P_RESCOD_OUT", SqlDbType.Char, 6);
-                                    pCod.Direction = ParameterDirection.Output;
-                                    cmd.Parameters.Add(pCod);
+                                            cmd.Parameters.AddWithValue("@P_OBJANO", objAno);
+                                            cmd.Parameters.AddWithValue("@P_OBJCOD", objCod);
+                                            cmd.Parameters.AddWithValue("@P_INDOBJNOM", indicadorActividadResultado.IndActResNom);
+                                            cmd.Parameters.AddWithValue("@P_INDOBJNUM", indicadorActividadResultado.IndActResNum);
+                                            cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
+                                            cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
+                                            cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
+                                            cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
+                                            cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
+                                            cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "GAGO");
+                                            cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "AGUIRRE");
 
-                                    cmd.ExecuteNonQuery();
+                                            pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                                            pDescripcionMensaje.Direction = ParameterDirection.Output;
+                                            cmd.Parameters.Add(pDescripcionMensaje);
 
-                                    var resAno = pAno.Value.ToString();
-                                    var resCod = pCod.Value.ToString();
-                                    message = pDescripcionMensaje.Value.ToString();
-                                    messageType = pTipoMensaje.Value.ToString();
+                                            pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                                            pTipoMensaje.Direction = ParameterDirection.Output;
+                                            cmd.Parameters.Add(pTipoMensaje);
 
-                                    if (messageType != "3") // Si hay un error o el proyecto ya existe, retorna el mensaje
-                                    {
-                                        return (message, messageType);
-                                    }
+                                            pAno = new SqlParameter("@P_INDOBJANO_OUT", SqlDbType.NVarChar, 4);
+                                            pAno.Direction = ParameterDirection.Output;
+                                            cmd.Parameters.Add(pAno);
 
-                                    foreach (var indicadorActividadResultado in resultado.IndicadoresActividades)
-                                    {
-                                        indicadorActividadResultado.ResAno = resAno; // Establece la clave foránea
-                                        indicadorActividadResultado.ResCod = resCod; // Establece la clave foránea
+                                            pCod = new SqlParameter("@P_INDOBJCOD_OUT", SqlDbType.Char, 6);
+                                            pCod.Direction = ParameterDirection.Output;
+                                            cmd.Parameters.Add(pCod);
 
-                                        string storedProcedureName = indicadorActividadResultado.IndActResTip == "A" ? "SP_INSERTAR_ACTIVIDAD_RESULTADO" : "SP_INSERTAR_INDICADOR_RESULTADO";
+                                            cmd.ExecuteNonQuery();
 
+                                            var resAno = pAno.Value.ToString();
+                                            var resCod = pCod.Value.ToString();
+                                            message = pDescripcionMensaje.Value.ToString();
+                                            messageType = pTipoMensaje.Value.ToString();
 
+                                            if (messageType != "3") // Si hay un error o el proyecto ya existe, retorna el mensaje
+                                            {
+                                                if (messageType == "1")
+                                                {
+                                                    return (message, messageType, errorCells);
+                                                }
+                                                errorCells.Add(new ErrorCell { Row = indiceResultado, Column = indiceIndicador, Message = message });
+                                            }
+                                        }
+                                        indiceIndicador++;
+                                    } else {
+                                        // Continuamos con Indicadores 
                                         // Inserta el proyecto
-                                        cmd = new SqlCommand(storedProcedureName, cn.getcn);
+                                        cmd = new SqlCommand("SP_INSERTAR_RESULTADO", cn.getcn);
                                         cmd.CommandType = CommandType.StoredProcedure;
 
-                                        if (indicadorActividadResultado.IndActResTip == "A") 
-                                        {
-                                            cmd.Parameters.AddWithValue("@P_ACTRESNOM", indicadorActividadResultado.IndActResNom);
-                                            cmd.Parameters.AddWithValue("@P_ACTRESNUM", indicadorActividadResultado.IndActResNum);
-                                            cmd.Parameters.AddWithValue("@P_ACTRESPRE", "100");
-                                        } 
-                                        else 
-                                        {
-                                            cmd.Parameters.AddWithValue("@P_INDRESNOM", indicadorActividadResultado.IndActResNom);
-                                            cmd.Parameters.AddWithValue("@P_INDRESNUM", indicadorActividadResultado.IndActResNum);
-                                        }
-
-                                        cmd.Parameters.AddWithValue("@P_RESANO", indicadorActividadResultado.ResAno);
-                                        cmd.Parameters.AddWithValue("@P_RESCOD", indicadorActividadResultado.ResCod);
-                                        cmd.Parameters.AddWithValue("@P_UNICOD", "01"); // asdasd
-                                        cmd.Parameters.AddWithValue("@P_TIPVALCOD", "01"); // asdasd
+                                        cmd.Parameters.AddWithValue("@P_OBJESPANO", resultado.ObjEspAno);
+                                        cmd.Parameters.AddWithValue("@P_OBJESPCOD", resultado.ObjEspCod);
+                                        cmd.Parameters.AddWithValue("@P_RESNOM", resultado.ResNom);
+                                        cmd.Parameters.AddWithValue("@P_RESNUM", resultado.ResNum);
                                         cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
                                         cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
                                         cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
@@ -649,50 +667,136 @@ namespace SistemaMEAL.Modulos
                                         pTipoMensaje.Direction = ParameterDirection.Output;
                                         cmd.Parameters.Add(pTipoMensaje);
 
+                                        pAno = new SqlParameter("@P_RESANO_OUT", SqlDbType.NVarChar, 4);
+                                        pAno.Direction = ParameterDirection.Output;
+                                        cmd.Parameters.Add(pAno);
 
-                                        if (indicadorActividadResultado.IndActResTip == "A") 
-                                        {
-                                            pAno = new SqlParameter("@P_ACTRESANO_OUT", SqlDbType.NVarChar, 4);
-                                            pAno.Direction = ParameterDirection.Output;
-                                            cmd.Parameters.Add(pAno);
-
-                                            pCod = new SqlParameter("@P_ACTRESCOD_OUT", SqlDbType.Char, 6);
-                                            pCod.Direction = ParameterDirection.Output;
-                                            cmd.Parameters.Add(pCod);
-                                        } else {
-                                            pAno = new SqlParameter("@P_INDRESANO_OUT", SqlDbType.NVarChar, 4);
-                                            pAno.Direction = ParameterDirection.Output;
-                                            cmd.Parameters.Add(pAno);
-
-                                            pCod = new SqlParameter("@P_INDRESCOD_OUT", SqlDbType.Char, 6);
-                                            pCod.Direction = ParameterDirection.Output;
-                                            cmd.Parameters.Add(pCod);
-                                        }
-                                        
+                                        pCod = new SqlParameter("@P_RESCOD_OUT", SqlDbType.Char, 6);
+                                        pCod.Direction = ParameterDirection.Output;
+                                        cmd.Parameters.Add(pCod);
 
                                         cmd.ExecuteNonQuery();
 
-                                        var indActResAno = pAno.Value.ToString();
-                                        var indActResCod = pCod.Value.ToString();
+                                        var resAno = pAno.Value.ToString();
+                                        var resCod = pCod.Value.ToString();
                                         message = pDescripcionMensaje.Value.ToString();
                                         messageType = pTipoMensaje.Value.ToString();
 
                                         if (messageType != "3") // Si hay un error o el proyecto ya existe, retorna el mensaje
                                         {
-                                            return (message, messageType);
+                                            if (messageType == "1")
+                                            {
+                                                return (message, messageType, errorCells);
+                                            }
+                                            errorCells.Add(new ErrorCell { Row = indiceObjetivoEspecifico, Column = indiceResultado, Message = message });
                                         }
+                                        
+                                        int indiceIndicador = 0;
 
-                                        Console.WriteLine(indActResAno);
-                                        Console.WriteLine(indActResCod);
+                                        foreach (var indicadorActividadResultado in resultado.IndicadoresActividades)
+                                        {
+                                            indicadorActividadResultado.ResAno = resAno; // Establece la clave foránea
+                                            indicadorActividadResultado.ResCod = resCod; // Establece la clave foránea
+
+                                            string storedProcedureName = indicadorActividadResultado.IndActResTip == "AR" ? "SP_INSERTAR_ACTIVIDAD_RESULTADO" : "SP_INSERTAR_INDICADOR_RESULTADO";
+
+
+                                            // Inserta el proyecto
+                                            cmd = new SqlCommand(storedProcedureName, cn.getcn);
+                                            cmd.CommandType = CommandType.StoredProcedure;
+                                            if (indicadorActividadResultado.IndActResTip == "AR") 
+                                            {
+                                                cmd.Parameters.AddWithValue("@P_ACTRESNOM", indicadorActividadResultado.IndActResNom);
+                                                cmd.Parameters.AddWithValue("@P_ACTRESNUM", indicadorActividadResultado.IndActResNum);
+                                                cmd.Parameters.AddWithValue("@P_ACTRESPRE", "100");
+                                            } 
+                                            else if (indicadorActividadResultado.IndActResTip == "IR")
+                                            {
+                                                cmd.Parameters.AddWithValue("@P_INDRESNOM", indicadorActividadResultado.IndActResNom);
+                                                cmd.Parameters.AddWithValue("@P_INDRESNUM", indicadorActividadResultado.IndActResNum);
+                                            }
+
+                                            cmd.Parameters.AddWithValue("@P_RESANO", indicadorActividadResultado.ResAno);
+                                            cmd.Parameters.AddWithValue("@P_RESCOD", indicadorActividadResultado.ResCod);
+                                            cmd.Parameters.AddWithValue("@P_UNICOD", "01"); // asdasd
+                                            cmd.Parameters.AddWithValue("@P_TIPVALCOD", "01"); // asdasd
+                                            cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
+                                            cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
+                                            cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
+                                            cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
+                                            cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
+                                            cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "GAGO");
+                                            cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "AGUIRRE");
+
+                                            pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                                            pDescripcionMensaje.Direction = ParameterDirection.Output;
+                                            cmd.Parameters.Add(pDescripcionMensaje);
+
+                                            pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                                            pTipoMensaje.Direction = ParameterDirection.Output;
+                                            cmd.Parameters.Add(pTipoMensaje);
+
+
+                                            if (indicadorActividadResultado.IndActResTip == "AR") 
+                                            {
+                                                pAno = new SqlParameter("@P_ACTRESANO_OUT", SqlDbType.NVarChar, 4);
+                                                pAno.Direction = ParameterDirection.Output;
+                                                cmd.Parameters.Add(pAno);
+
+                                                pCod = new SqlParameter("@P_ACTRESCOD_OUT", SqlDbType.Char, 6);
+                                                pCod.Direction = ParameterDirection.Output;
+                                                cmd.Parameters.Add(pCod);
+                                            } else {
+                                                pAno = new SqlParameter("@P_INDRESANO_OUT", SqlDbType.NVarChar, 4);
+                                                pAno.Direction = ParameterDirection.Output;
+                                                cmd.Parameters.Add(pAno);
+
+                                                pCod = new SqlParameter("@P_INDRESCOD_OUT", SqlDbType.Char, 6);
+                                                pCod.Direction = ParameterDirection.Output;
+                                                cmd.Parameters.Add(pCod);
+                                            }
+                                            
+
+                                            cmd.ExecuteNonQuery();
+
+                                            var indActResAno = pAno.Value.ToString();
+                                            var indActResCod = pCod.Value.ToString();
+                                            message = pDescripcionMensaje.Value.ToString();
+                                            messageType = pTipoMensaje.Value.ToString();
+
+                                             if (messageType != "3") // Si hay un error o el proyecto ya existe, retorna el mensaje
+                                            {
+                                                if (messageType == "1")
+                                                {
+                                                    return (message, messageType, errorCells);
+                                                }
+                                                errorCells.Add(new ErrorCell { Row = indiceResultado, Column = indiceIndicador, Message = message });
+                                            }
+
+                                        }
+                                        indiceIndicador++;
                                     }
                                 }
+                                indiceResultado++;
                             }
+                            indiceObjetivoEspecifico++;
                         }
+                        indiceObjetivo++;
                     }
+                    indiceSubproyecto++;
                 }
+                indiceProyecto++;
 
-                mensaje = "Todos los proyectos se insertaron correctamente";
-                tipoMensaje = "3";
+                if (errorCells.Count > 0)
+                {
+                    mensaje = "Se encontraron errores durante la inserción masiva";
+                    tipoMensaje = "1";
+                }
+                else
+                {
+                    mensaje = "Todos los proyectos se insertaron correctamente";
+                    tipoMensaje = "3";
+                }
             }
             catch (SqlException ex)
             {
@@ -704,7 +808,7 @@ namespace SistemaMEAL.Modulos
                 cn.getcn.Close();
             }
 
-            return (mensaje, tipoMensaje);
+            return (mensaje, tipoMensaje, errorCells);
         }
 
 

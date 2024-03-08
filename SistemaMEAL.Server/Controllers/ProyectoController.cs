@@ -173,20 +173,21 @@ namespace SistemaMEAL.Server.Controllers
         {
             // Aquí va la misma lógica de validación de token y permisos que tienes en tu método Insertar...
 
-            var (message, messageType) = _proyectos.InsertarMasivo(proyectos);
+            var (message, messageType, errorCells) = _proyectos.InsertarMasivo(proyectos);
             if (messageType == "1") // Error
             {
-                return new BadRequestObjectResult(new { success = false, message });
+                return new BadRequestObjectResult(new { success = false, message, errorCells });
             }
             else if (messageType == "2") // Registro ya existe
             {
-                return new ConflictObjectResult(new { success = false, message });
+                return new ConflictObjectResult(new { success = false, message, errorCells });
             }
             else // Registros insertados correctamente
             {
-                return new OkObjectResult(new { success = true, message });
+                return new OkObjectResult(new { success = true, message, errorCells });
             }
         }
+
 
         
 
