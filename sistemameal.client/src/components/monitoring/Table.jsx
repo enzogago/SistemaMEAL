@@ -24,8 +24,9 @@ import TableRow from "./TableRow"
 // Context
 import { AuthContext } from "../../context/AuthContext";
 import CustomTable from "../reusable/Table/CustomTable";
+import Notiflix from "notiflix";
 
-const Table = ({ data }) => {
+const Table = ({ data, setMonitoringData }) => {
     const navigate = useNavigate();
     // Variables State AuthContext 
     const { authActions, authInfo } = useContext(AuthContext);
@@ -118,6 +119,54 @@ const Table = ({ data }) => {
         const safeCiphertext = btoa(ciphertext).replace('+', '-').replace('/', '_').replace(/=+$/, '');
         navigate(`/form-goal/${safeCiphertext}`);
     }
+
+    const Eliminar_Meta_Indicador = (row) => {
+        console.log(row)
+        const { metAno, metCod, indActResAno: metIndAno, indActResCod: metIndCod, metIndTipInd } = row;
+
+        Notiflix.Confirm.show(
+            'Eliminar Registro',
+            '¿Estás seguro que quieres eliminar este registro?',
+            'Sí',
+            'No',
+            async () => {
+                try {
+                    Notiflix.Loading.pulse();
+                    const token = localStorage.getItem('token');
+                    const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/meta-indicador/${metAno}/${metCod}/${metIndAno}/${metIndCod}/${metIndTipInd}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        },
+                    });
+                    console.log(response)
+                    const data = await response.text();
+                    if (!response.ok) {
+                        console.log(data);
+                        return;
+                    }
+                    // Actualiza los datos después de eliminar un registro
+                    const updateResponse = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/Filter`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    const dataUpdate = await updateResponse.json();
+                    setMonitoringData(dataUpdate);
+                    Notiflix.Notify.success(data)
+                } catch (error) {
+                    console.error('Error:', error);
+                } finally{
+                    Notiflix.Loading.remove();
+                }
+            },
+            () => {
+                // El usuario ha cancelado la operación de eliminación
+            }
+        )
+    }
+
+
 
     const columns = useMemo(() => {
         let baseColumns = [
@@ -289,16 +338,18 @@ const Table = ({ data }) => {
                 header: "Objetivo Especifico",
                 accessorKey: "objEspNom",
                 cell: ({row}) => {
-                    const text = row.original.objEspNum + ' - ' + row.original.objEspNom.charAt(0).toUpperCase() + row.original.objEspNom.slice(1).toLowerCase();
-                    const shortText = text.length > 60 ? text.substring(0, 60) + '...' : text;
-                    return (
-                        <>
-                            <span 
-                                data-tooltip-id="info-tooltip" 
-                                data-tooltip-content={text} 
-                            >{shortText}</span>
-                        </>
-                    );
+                    if (row.original.objEspNum) {
+                        const text = row.original.objEspNum + ' - ' + row.original.objEspNom.charAt(0).toUpperCase() + row.original.objEspNom.slice(1).toLowerCase();
+                        const shortText = text.length > 60 ? text.substring(0, 60) + '...' : text;
+                        return (
+                            <>
+                                <span 
+                                    data-tooltip-id="info-tooltip" 
+                                    data-tooltip-content={text} 
+                                >{shortText}</span>
+                            </>
+                        );
+                    }
                 },
             },
             {
@@ -391,7 +442,7 @@ const Table = ({ data }) => {
                                 data-tooltip-id="delete-tooltip" 
                                 data-tooltip-content="Eliminar" 
                                 className='Large-p_25' 
-                                onClick={() => handleDelete('Estado', row.original.estCod, setEstados, setIsLoggedIn)} 
+                                onClick={() => Eliminar_Meta_Indicador(row.original)} 
                             />
                         }
                     </div>
@@ -418,9 +469,9 @@ const Table = ({ data }) => {
 
     // Preparar los datos
     const dataExport = table.options.data;  // Tus datos
-    const headers = ['ESTADO', 'META_PROGRAMATICA', 'EJECUCION_PROGRAMATICA', 'PORCENTAJE_AVANCE_PROGRAMATICO', 'META_PRESUPUESTO', 'EJECUCION_PRESUPUESTO', 'PORCENTAJE_AVANCE_PRESUPUESTO','AÑO','MES','INDICADOR','TIPO_INDICADOR','RESULTADO','OBJETIVO_ESPECIFICO','OBJETIVO','SUBPROYECTO','PROYECTO', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
+    const headers = ['ESTADO', 'META_PROGRAMATICA', 'EJECUCION_PROGRAMATICA', 'PORCENTAJE_AVANCE_PROGRAMATICO', 'META_PRESUPUESTO', 'EJECUCION_PRESUPUESTO', 'PORCENTAJE_AVANCE_PRESUPUESTO','AÑO','MES','INDICADOR','TIPO_INDICADOR','RESULTADO','OBJETIVO_ESPECIFICO','OBJETIVO','SUBPROYECTO','PROYECTO','UBICACION', 'IMPLEMENTADOR', 'FINANCIADOR', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
     const title = 'METAS';  // El título de tu archivo Excel
-    const properties = ['estNom', 'metMetTec', 'metEjeTec', 'metPorAvaTec', 'metMetPre', 'metEjePre', 'metPorAvaPre', 'metAnoPlaTec', 'metMesPlaTec', 'indActResNom', 'tipInd', 'resNom', 'objEspNom', 'objNom', 'subProNom', 'proNom', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir en el Excel
+    const properties = ['estNom', 'metMetTec', 'metEjeTec', 'metPorAvaTec', 'metMetPre', 'metEjePre', 'metPorAvaPre', 'metAnoPlaTec', 'metMesPlaTec', 'indActResNom', 'tipInd', 'resNom', 'objEspNom', 'objNom', 'subProNom', 'proNom','ubiNom', 'impNom', 'finNom', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir en el Excel
     const format = [1200, 600];
 
     const Export_Excel = () => {

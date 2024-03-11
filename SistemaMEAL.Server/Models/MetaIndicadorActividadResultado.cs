@@ -5,17 +5,24 @@ namespace SistemaMEAL.Server.Models
 {
     public class MetaIndicadorActividadResultado
     {
-        [Key, Column(Order = 0)]
+        public String? MetAnoOri { get; set; }
+        public String? MetCodOri { get; set; }
+        public String? MetIndActResAnoOri { get; set; }
+        public String? MetIndActResCodOri { get; set; }
+        public String? MetIndActResTipIndOri { get; set; }
         public String? MetAno { get; set; }
         [Key, Column(Order = 1)]
         public String? MetCod { get; set; }
         public String? MetMetTec { get; set; }
         public String? MetMesPlaTec { get; set; }
         public String? MetAnoPlaTec { get; set; }
+        public String? MetMetPre { get; set; }
         public String? ImpCod { get; set; }
         public String? FinCod { get; set; }
         public String? UbiAno { get; set; }
         public String? UbiCod { get; set; }
+        public String? EstCod { get; set; }
+
 
         [Key, Column(Order = 2)]
         public String? MetIndActResAno { get; set; }

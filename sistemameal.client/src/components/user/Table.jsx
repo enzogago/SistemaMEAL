@@ -158,6 +158,8 @@ const Table = ({data, setUsersTable}) => {
             {
                 header: "Contraseña",
                 accessorKey: "password",
+                disableSorting: true,
+                stickyRight: 90,
                 cell: ({row}) => {
                     return (
                         <div className="flex jc-center ai-center">
@@ -179,6 +181,7 @@ const Table = ({data, setUsersTable}) => {
                 header: () => <div style={{textAlign: 'center', flexGrow: '1'}}>Acciones</div>,
                 accessorKey: "acciones",
                 disableSorting: true,
+                stickyRight: 0,
                 cell: ({row}) => (
                     <div className='PowerMas_IconsTable flex jc-center ai-center'>
                         {actions.edit && 

@@ -82,7 +82,7 @@ const CustomTable = ({
                         <div className="PowerMas_Search_Container Large_6 Large-m_5">
                             <FaSearch className="Large_1 search-icon" />
                             <input 
-                                className='PowerMas_Input_Filter Large_12 p_5'
+                                className='PowerMas_Input_Filter Large_12 p_25'
                                 type="search"
                                 placeholder='Buscar'
                                 value={searchFilter}
@@ -105,7 +105,7 @@ const CustomTable = ({
                                 <div className="Phone_12 relative">
                                     <FaSearch className="search-icon" />
                                     <input 
-                                        className='PowerMas_Input_Filter Large_12 Large-p_5'
+                                        className='PowerMas_Input_Filter Large_12 Large-p_25'
                                         type="search"
                                         placeholder='Buscar'
                                         onChange={handleInputChange}

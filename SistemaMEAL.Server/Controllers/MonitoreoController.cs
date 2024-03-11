@@ -379,6 +379,169 @@ namespace SistemaMEAL.Server.Controllers
             return Ok(data.FirstOrDefault());
         }
 
+        [HttpDelete]
+        [Route("meta-indicador/{metAno}/{metCod}/{metIndAno}/{metIndCod}/{metIndTipInd}")]
+        public dynamic EliminarMetaIndicador(string metAno, string metCod, string metIndAno, string metIndCod, string metIndTipInd)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return rToken;
+
+            dynamic data = rToken.result;
+            Usuario usuario = new Usuario
+            {
+                UsuAno = data.UsuAno,
+                UsuCod = data.UsuCod,
+                RolCod = data.RolCod
+            };
+            if (usuario.RolCod != "01")
+            {
+                return new
+                {
+                    success = false,
+                    message = "No tienes permisos para eliminar estados",
+                    result = ""
+                };
+            }
+
+            var (message, messageType) = _monitoreos.EliminarMetaIndicador(metAno, metCod, metIndAno, metIndCod, metIndTipInd);
+            if (messageType == "1") // Error
+            {
+                return BadRequest(message);
+            }
+            else if (messageType == "2") // Registro ya existe
+            {
+                return Conflict(message);
+            }
+            else // Registro eliminado correctamente
+            {
+                return Ok(message);
+            }
+        }
+
+        [HttpPut]
+        [Route("meta")]
+        public dynamic Modificar(Meta meta)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return rToken;
+
+            dynamic data = rToken.result;
+            Usuario usuario = new Usuario
+            {
+                UsuAno = data.UsuAno,
+                UsuCod = data.UsuCod,
+                RolCod = data.RolCod
+            };
+            if (usuario.RolCod != "01")
+            {
+                return new
+                {
+                    success = false,
+                    message = "No tienes permisos para modificar estados",
+                    result = ""
+                };
+            }
+
+            var (message, messageType) = _monitoreos.ModificarMeta(meta);
+            if (messageType == "1") // Error
+            {
+                return new BadRequestObjectResult(new { success = false, message });
+            }
+            else if (messageType == "2") // Registro ya existe
+            {
+                return new ConflictObjectResult(new { success = false, message });
+            }
+            else // Registro modificado correctamente
+            {
+                return new OkObjectResult(new { success = true, message });
+            }
+        }
+
+        [HttpPut]
+        [Route("indicador")]
+        public dynamic ModificarMetaIndicador(MetaIndicadorActividadResultado? metaIndicador)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return rToken;
+
+            dynamic data = rToken.result;
+            Usuario usuarioActual = new Usuario
+            {
+                UsuAno = data.UsuAno,
+                UsuCod = data.UsuCod,
+                RolCod = data.RolCod
+            };
+            if (usuarioActual.RolCod != "01")
+            {
+                return new
+                {
+                    success = false,
+                    message = "No tienes permisos para modificar usuarios",
+                    result = ""
+                };
+            }
+            var (message, messageType) = _monitoreos.ModificarMetaIndicador(metaIndicador);
+            if (messageType == "1") // Error
+            {
+                return new BadRequestObjectResult(new { success = false, message });
+            }
+            else if (messageType == "2") // Registro ya existe
+            {
+                return new ConflictObjectResult(new { success = false, message });
+            }
+            else // Registro modificado correctamente
+            {
+                return new OkObjectResult(new { success = true, message });
+            }
+        }
+
+        [HttpPut]
+        [Route("meta-indicador")]
+        public dynamic ModificarMetaIndicadorTransaction(MetaIndicadorDto? metaIndicadorDto)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return rToken;
+
+            dynamic data = rToken.result;
+            Usuario usuarioActual = new Usuario
+            {
+                UsuAno = data.UsuAno,
+                UsuCod = data.UsuCod,
+                RolCod = data.RolCod
+            };
+            if (usuarioActual.RolCod != "01")
+            {
+                return new
+                {
+                    success = false,
+                    message = "No tienes permisos para modificar usuarios",
+                    result = ""
+                };
+            }
+            var (message, messageType) = _monitoreos.ModificarMetaIndicadorTransaction(metaIndicadorDto.Meta, metaIndicadorDto.MetaIndicador);
+            if (messageType == "1") // Error
+            {
+                return new BadRequestObjectResult(new { success = false, message });
+            }
+            else if (messageType == "2") // Registro ya existe
+            {
+                return new ConflictObjectResult(new { success = false, message });
+            }
+            else // Registro modificado correctamente
+            {
+                return new OkObjectResult(new { success = true, message });
+            }
+        }
+
+
 
     }
 

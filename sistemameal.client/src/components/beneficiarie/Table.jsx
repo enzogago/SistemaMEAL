@@ -58,11 +58,11 @@ const Table = ({ data }) => {
     const columns = useMemo(() => {
         let baseColumns = [
             {
-                header: "Código",
-                accessorKey: "benCod",
+                header: "Código Único",
+                accessorKey: "benCodUni",
                 cell: ({row}) => (
                     <div className="">
-                        {row.original.benAno + row.original.benCod}
+                        {row.original.benCodUni}
                     </div>
                 ),
             },

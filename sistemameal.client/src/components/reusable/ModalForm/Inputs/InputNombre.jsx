@@ -23,7 +23,7 @@ const InputNombre = ({register, errors, dirtyFields, isSubmitted}) => {
             {...register(
                 'nombre', { 
                     required: 'El campo es requerido',
-                    maxLength: { value: 50, message: 'El campo no puede tener más de 50 caracteres' },
+                    maxLength: { value: 100, message: 'El campo no puede tener más de 100 caracteres' },
                     minLength:  { value: 5, message: 'El campo no puede tener menos de 5 caracteres' },
                     pattern: {
                         value: /^[A-Za-zñÑáéíóúÁÉÍÓÚ().,;üÜ\s-_]+$/,

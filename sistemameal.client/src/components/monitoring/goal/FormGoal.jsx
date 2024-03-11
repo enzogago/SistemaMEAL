@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import CryptoJS from 'crypto-js';
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Notiflix from "notiflix";
 import { GrFormPreviousLink } from "react-icons/gr";
 import { useForm } from 'react-hook-form';
@@ -10,6 +10,7 @@ import { fetchData } from "../../reusable/helper";
 
 const FormGoal = () => {
     const navigate = useNavigate();
+    const tableRef = useRef();
     // Estados locales
     const [ paises, setPaises ] = useState([]);
     const [ financiadores, setFinanciadores ] = useState([]);
@@ -23,6 +24,7 @@ const FormGoal = () => {
     const [ cargando, setCargando ] = useState(false)
 
 
+    const [initialData, setInitialData] = useState(null);
     const [firstEdit, setFirstEdit] = useState(false);
     const [selectedValues, setSelectedValues] = useState([]);
     //
@@ -67,7 +69,7 @@ const FormGoal = () => {
                 const metIndCod = id.slice(14,20);
                 const metIndTipInd = id.slice(20,22);
                 // Ejecuta la función para traer los datos del registro a modificar
-                fetchRegistroAModificar(metAno, metCod, metIndAno, metIndCod, metIndTipInd, reset, fetchSelects, setValue, fetchIndicadorActividad, setIsSecondInputEnabled, setSelectedOption, setJerarquia);
+                fetchRegistroAModificar(metAno, metCod, metIndAno, metIndCod, metIndTipInd, reset, fetchSelects, setValue, fetchIndicadorActividad, setIsSecondInputEnabled, setSelectedOption, setJerarquia, setInitialData);
             }
         });
     }, [isEditing]);
@@ -230,7 +232,7 @@ const FormGoal = () => {
         }
     };
 
-    const onSubmit = (data) => {
+    const onSubmit = async(data) => {
         // Definimos variables de ubicacion
         let ubiAno, ubiCod;
         // Si los selects dinamicos son mayor a 1
@@ -269,24 +271,174 @@ const FormGoal = () => {
         }
 
         let MetaIndicadorActividad = {
-            Meta: { 
+            Meta: {
+                metAno: data.metAno,
+                metCod: data.metCod,
                 metMetTec: data.metMetTec,
+                metMetPre: data.metMetPre,
                 metMesPlaTec: data.metMesPlaTec,
                 metAnoPlaTec: data.metAnoPlaTec,
                 finCod: data.finCod,
                 impCod: data.impCod,
                 ubiAno,
                 ubiCod,
-             },
-             MetaIndicador: {
-                metIndActResAno: data.indActResAno,
-                metIndActResCod: data.indActResCod,
-                metIndActResTipInd: data.tipInd,
+            },
+            MetaIndicador: {
+                metAno: data.metAno,
+                metCod: data.metCod,
+                metIndActResAno: data.metIndActResAno,
+                metIndActResCod: data.metIndActResCod,
+                metIndActResTipInd: data.metIndActResTipInd,
             },
         }
-        console.log(MetaIndicadorActividad);
-        handleSubmitMetaIndicador(MetaIndicadorActividad);
+
+
+        
+        if (isEditing) {
+            MetaIndicadorActividad.MetaIndicador.metAnoOri = initialData.metAno;
+            MetaIndicadorActividad.MetaIndicador.metCodOri = initialData.metCod;
+            MetaIndicadorActividad.MetaIndicador.metIndActResAnoOri = initialData.metIndActResAno;
+            MetaIndicadorActividad.MetaIndicador.metIndActResCodOri = initialData.metIndActResCod;
+            MetaIndicadorActividad.MetaIndicador.metIndActResTipIndOri = initialData.metIndActResTipInd;
+
+            const hasChangedIndicator = ['metIndActResAno', 'metIndActResCod', 'metIndActResTipInd'].some(key => data[key] !== initialData[key]);
+            const hasChangedGoal = ['impCod', 'finCod', 'metAnoPlaTec', 'metMesPlaTec', 'metMetPre', 'metMetTec'].some(key => data[key] !== initialData[key]) || ubiAno !== initialData.ubiAno || ubiCod !== initialData.ubiCod;
+
+            if(hasChangedGoal && hasChangedIndicator){
+                // UPDATE TM_META & TV_META_INDICADOR
+                handleEditMetaIndicador(MetaIndicadorActividad)
+            } else if (hasChangedGoal) {
+                // UPDATE TM_META
+                let MetaSubmit = {...MetaIndicadorActividad.Meta};
+
+                handleEdit(MetaSubmit)
+            } else if (hasChangedIndicator){
+                // UPDATE TV_META_INDICADOR
+                let IndicadorSubmit = {...MetaIndicadorActividad.MetaIndicador};
+                handleEditIndicador(IndicadorSubmit)
+            } else {
+                Notiflix.Notify.warning('No se realizaron cambios');
+            }
+        } else {
+            if (tableRef.current) {
+                const rows = Array.from(tableRef.current.children);
+                let mes = 1;
+        
+                // Itera sobre cada fila
+                await rows.reduce(async (promise, row) => {
+                    await promise; // Espera a que la promesa anterior se resuelva
+        
+                    // Selecciona los inputs en la fila actual
+                    const inputs = row.querySelectorAll('input[type="number"]');
+                    
+                    const metTec = inputs[0].value;
+                    const metPre = inputs[1].value;
+                    // Comprueba si ambos inputs tienen un valor
+                    if (metTec && metPre) {
+                        console.log(`Fila: ${row.rowIndex}, Primer input: ${metTec}, Segundo input: ${inputs[1].value}`);
+                        MetaIndicadorActividad.Meta.metMetTec = metTec;
+                        MetaIndicadorActividad.Meta.metMetPre = metPre;
+                        MetaIndicadorActividad.Meta.metAnoPlaTec = '2024';
+                        MetaIndicadorActividad.Meta.metMesPlaTec = mes < 10 ? `0${mes}` : `${mes}`;
+                        // Haz una copia del objeto antes de imprimirlo
+                        const MetaIndicadorActividadCopy = JSON.parse(JSON.stringify(MetaIndicadorActividad));
+                        console.log(MetaIndicadorActividadCopy);
+                        await handleSubmitMetaIndicador(MetaIndicadorActividadCopy); // Asegúrate de que esta función devuelva una promesa
+                    }
+                    mes++;
+                }, Promise.resolve()); // Inicia con una promesa resuelta
+            }
+        }
+
       }
+
+      const handleEdit = async (data) => {
+        try {
+            Notiflix.Loading.pulse();
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/meta`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(data),
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.log(errorData)
+                Notiflix.Notify.failure(errorData.message);
+                return;
+            }
+    
+            const successData = await response.json();
+            Notiflix.Notify.success(successData.message);
+            console.log(successData)
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            Notiflix.Loading.remove();
+        }
+    };
+      const handleEditMetaIndicador = async (data) => {
+        try {
+            Notiflix.Loading.pulse();
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/meta-indicador`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(data),
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.log(errorData)
+                Notiflix.Notify.failure(errorData.message);
+                return;
+            }
+    
+            const successData = await response.json();
+            Notiflix.Notify.success(successData.message);
+            console.log(successData)
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            Notiflix.Loading.remove();
+        }
+    };
+      const handleEditIndicador = async (data) => {
+        try {
+            Notiflix.Loading.pulse();
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/indicador`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(data),
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.log(errorData)
+                Notiflix.Notify.failure(errorData.message);
+                return;
+            }
+    
+            const successData = await response.json();
+            Notiflix.Notify.success(successData.message);
+            console.log(successData)
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            Notiflix.Loading.remove();
+        }
+    };
 
       const handleSubmitMetaIndicador= async (dataForm) => {
         try {
@@ -393,124 +545,13 @@ const FormGoal = () => {
                         cargando &&
                         <div id="loading" className="m_75">Cargando...</div>
                     }
-                    <div className="m_75 flex gap_5">
-                        <div className="Large_6">
-                            <label htmlFor="metAnoPlaTec" className="">
-                                Año:
-                            </label>
-                            <input
-                                id="metAnoPlaTec"
-                                className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.metAnoPlaTec || isSubmitted ? (errors.metAnoPlaTec ? 'invalid' : 'valid') : ''}`} 
-                                type="text" 
-                                placeholder="2023"
-                                autoComplete="disabled"
-                                maxLength={4}
-                                onKeyDown={(event) => {
-                                    if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
-                                        event.preventDefault();
-                                    }
-                                }}
-                                {...register('metAnoPlaTec', { 
-                                    required: 'El campo es requerido',
-                                    minLength: {
-                                        value: 4,
-                                        message: 'El campo debe tener al menos 4 dígitos'
-                                    },
-                                    maxLength: {
-                                        value: 4,
-                                        message: 'El campo no debe tener más de 4 dígitos'
-                                    },
-                                    pattern: {
-                                        value: /^[0-9]*$/,
-                                        message: 'El campo solo debe contener números'
-                                    }
-                                })}
-                            />
-                            {errors.metAnoPlaTec ? (
-                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.metAnoPlaTec.message}</p>
-                            ) : (
-                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                Espacio reservado para el mensaje de error
-                                </p>
-                            )}
-                        </div>
-                        <div className="Large_6">
-                            <label htmlFor="metMesPlaTec" className="">
-                                Mes:
-                            </label>
-                            <select 
-                                className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.metMesPlaTec || isSubmitted ? (errors.metMesPlaTec ? 'invalid' : 'valid') : ''}`} 
-                                {...register('metMesPlaTec', { 
-                                    validate: value => value !== '0' || 'El campo es requerido' 
-                                })}
-                                id="metMesPlaTec" 
-                            >
-                                <option value="0">--Seleccione Mes--</option>
-                                <option value="01">Enero</option>
-                                <option value="02">Febrero</option>
-                                <option value="03">Marzo</option>
-                                <option value="04">Abril</option>
-                                <option value="05">Mayo</option>
-                                <option value="06">Junio</option>
-                                <option value="07">Julio</option>
-                                <option value="08">Agosto</option>
-                                <option value="09">Septiembre</option>
-                                <option value="10">Octubre</option>
-                                <option value="11">Noviembre</option>
-                                <option value="12">Diciembre</option>
-                            </select>
-                            {errors.metMesPlaTec ? (
-                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.metMesPlaTec.message}</p>
-                            ) : (
-                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                Espacio reservado para el mensaje de error
-                                </p>
-                            )}
-                        </div>
-                    </div>
-                    <div className="m_75">
-                        <label htmlFor="metMetTec" className="">
-                            Meta:
-                        </label>
-                        <input
-                            id="metMetTec"
-                            className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.metMetTec || isSubmitted ? (errors.metMetTec ? 'invalid' : 'valid') : ''}`} 
-                            type="text" 
-                            placeholder="500"
-                            autoComplete="disabled"
-                            maxLength={10}
-                            onKeyDown={(event) => {
-                                if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
-                                    event.preventDefault();
-                                }
-                            }}
-                            {...register('metMetTec', {
-                                required: 'La meta es requerida',
-                                maxLength: {
-                                    value: 10,
-                                    message: 'El campo no debe tener más de 10 dígitos'
-                                },
-                                pattern: {
-                                    value: /^[0-9]*$/,
-                                    message: 'El campo solo debe contener números'
-                                },
-                                validate: value => parseInt(value, 10) > 0 || 'El valor debe ser mayor a 0'
-                            })}
-                        />
-                        {errors.metMetTec ? (
-                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.metMetTec.message}</p>
-                        ) : (
-                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                            Espacio reservado para el mensaje de error
-                            </p>
-                        )}
-                    </div>
                     <div className="m_75">
                         <label htmlFor="impCod" className="">
                             Implementador:
                         </label>
                         <select 
                             id="impCod" 
+                            style={{textTransform: 'capitalize'}}
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.impCod || isSubmitted ? (errors.impCod ? 'invalid' : 'valid') : ''}`} 
                             {...register('impCod', { 
                                 validate: value => value !== '0' || 'El campo es requerido' 
@@ -521,8 +562,9 @@ const FormGoal = () => {
                                 <option 
                                     key={item.impCod} 
                                     value={item.impCod}
+                                    style={{textTransform: 'capitalize'}}
                                 > 
-                                    {item.impNom}
+                                    {item.impNom.toLowerCase()}
                                 </option>
                             ))}
                         </select>
@@ -539,6 +581,7 @@ const FormGoal = () => {
                             Financiador:
                         </label>
                         <select 
+                            style={{textTransform: 'capitalize'}}
                             id="finCod" 
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.finCod || isSubmitted ? (errors.impCod ? 'invalid' : 'valid') : ''}`} 
                             {...register('finCod', { 
@@ -550,8 +593,9 @@ const FormGoal = () => {
                                 <option 
                                     key={item.finCod} 
                                     value={item.finCod}
+                                    style={{textTransform: 'capitalize'}}
                                 > 
-                                    {item.finNom}
+                                    {item.finNom.toLowerCase()}
                                 </option>
                             ))}
                         </select>
@@ -563,6 +607,406 @@ const FormGoal = () => {
                             </p>
                         )}
                     </div>
+                    {
+                        isEditing ?
+                        <>
+                        <div className="m_75 flex gap_5">
+                            <div className="Large_6">
+                                <label htmlFor="metAnoPlaTec" className="">
+                                    Año Programática:
+                                </label>
+                                <input
+                                    id="metAnoPlaTec"
+                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.metAnoPlaTec || isSubmitted ? (errors.metAnoPlaTec ? 'invalid' : 'valid') : ''}`} 
+                                    type="text" 
+                                    placeholder="2023"
+                                    autoComplete="disabled"
+                                    maxLength={4}
+                                    onKeyDown={(event) => {
+                                        if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
+                                            event.preventDefault();
+                                        }
+                                    }}
+                                    {...register('metAnoPlaTec', { 
+                                        required: 'El campo es requerido',
+                                        minLength: {
+                                            value: 4,
+                                            message: 'El campo debe tener al menos 4 dígitos'
+                                        },
+                                        maxLength: {
+                                            value: 4,
+                                            message: 'El campo no debe tener más de 4 dígitos'
+                                        },
+                                        pattern: {
+                                            value: /^[0-9]*$/,
+                                            message: 'El campo solo debe contener números'
+                                        }
+                                    })}
+                                />
+                                {errors.metAnoPlaTec ? (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.metAnoPlaTec.message}</p>
+                                ) : (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                    Espacio reservado para el mensaje de error
+                                    </p>
+                                )}
+                            </div>
+                            <div className="Large_6">
+                                <label htmlFor="metMesPlaTec" className="">
+                                    Mes Programática:
+                                </label>
+                                <select 
+                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.metMesPlaTec || isSubmitted ? (errors.metMesPlaTec ? 'invalid' : 'valid') : ''}`} 
+                                    {...register('metMesPlaTec', { 
+                                        validate: value => value !== '0' || 'El campo es requerido' 
+                                    })}
+                                    id="metMesPlaTec" 
+                                >
+                                    <option value="0">--Seleccione Mes--</option>
+                                    <option value="01">Enero</option>
+                                    <option value="02">Febrero</option>
+                                    <option value="03">Marzo</option>
+                                    <option value="04">Abril</option>
+                                    <option value="05">Mayo</option>
+                                    <option value="06">Junio</option>
+                                    <option value="07">Julio</option>
+                                    <option value="08">Agosto</option>
+                                    <option value="09">Septiembre</option>
+                                    <option value="10">Octubre</option>
+                                    <option value="11">Noviembre</option>
+                                    <option value="12">Diciembre</option>
+                                </select>
+                                {errors.metMesPlaTec ? (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.metMesPlaTec.message}</p>
+                                ) : (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                    Espacio reservado para el mensaje de error
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+                        <div className="m_75">
+                            <label htmlFor="metMetTec" className="">
+                                Meta Programática:
+                            </label>
+                            <input
+                                id="metMetTec"
+                                className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.metMetTec || isSubmitted ? (errors.metMetTec ? 'invalid' : 'valid') : ''}`} 
+                                type="text" 
+                                placeholder="500"
+                                autoComplete="disabled"
+                                maxLength={10}
+                                onKeyDown={(event) => {
+                                    if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
+                                        event.preventDefault();
+                                    }
+                                }}
+                                {...register('metMetTec', {
+                                    required: 'La meta es requerida',
+                                    maxLength: {
+                                        value: 10,
+                                        message: 'El campo no debe tener más de 10 dígitos'
+                                    },
+                                    pattern: {
+                                        value: /^[0-9]*$/,
+                                        message: 'El campo solo debe contener números'
+                                    },
+                                    validate: value => parseInt(value, 10) > 0 || 'El valor debe ser mayor a 0'
+                                })}
+                            />
+                            {errors.metMetTec ? (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.metMetTec.message}</p>
+                            ) : (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                Espacio reservado para el mensaje de error
+                                </p>
+                            )}
+                        </div>
+                        <div className="m_75">
+                            <label htmlFor="metMetPre" className="">
+                                Meta Presupuesto:
+                            </label>
+                            <input
+                                id="metMetPre"
+                                className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.metMetPre || isSubmitted ? (errors.metMetPre ? 'invalid' : 'valid') : ''}`} 
+                                type="text" 
+                                placeholder="500"
+                                autoComplete="disabled"
+                                maxLength={10}
+                                onKeyDown={(event) => {
+                                    if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
+                                        event.preventDefault();
+                                    }
+                                }}
+                                {...register('metMetPre', {
+                                    required: 'La meta es requerida',
+                                    maxLength: {
+                                        value: 10,
+                                        message: 'El campo no debe tener más de 10 dígitos'
+                                    },
+                                    pattern: {
+                                        value: /^[0-9]*$/,
+                                        message: 'El campo solo debe contener números'
+                                    },
+                                    validate: value => parseInt(value, 10) > 0 || 'El valor debe ser mayor a 0'
+                                })}
+                            />
+                            {errors.metMetPre ? (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.metMetPre.message}</p>
+                            ) : (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                Espacio reservado para el mensaje de error
+                                </p>
+                            )}
+                        </div>
+                        </>
+                        :
+                        <>
+                            <div className="PowerMas_TableContainer">
+                                <table className="PowerMas_TableStatus">
+                                    <thead>
+                                        <tr>
+                                            <th>Año - Mes</th>
+                                            <th>Meta Programática</th>
+                                            <th>Meta Presupuesto</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody ref={tableRef}>
+                                        <tr>
+                                            <td> 2024 - Enero </td>
+                                            <td> 
+                                                <input type="number" 
+                                                onInput={(e) => {
+                                                    if (e.target.value.length > 10) {
+                                                        e.target.value = e.target.value.slice(0, 10);
+                                                    }}}  
+                                                /> 
+                                            </td>
+                                            <td> 
+                                                <input type="number" 
+                                                onInput={(e) => {
+                                                    if (e.target.value.length > 10) {
+                                                        e.target.value = e.target.value.slice(0, 10);
+                                                    }}}  
+                                                /> 
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td> 2024 - Febrero </td>
+                                            <td> 
+                                                <input type="number" 
+                                                onInput={(e) => {
+                                                    if (e.target.value.length > 10) {
+                                                        e.target.value = e.target.value.slice(0, 10);
+                                                    }}}  
+                                                /> 
+                                            </td>
+                                            <td> 
+                                                <input type="number" 
+                                                onInput={(e) => {
+                                                    if (e.target.value.length > 10) {
+                                                        e.target.value = e.target.value.slice(0, 10);
+                                                    }}}  
+                                                /> 
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td> 2024 - Marzo </td>
+                                            <td> 
+                                                <input type="number" 
+                                                onInput={(e) => {
+                                                    if (e.target.value.length > 10) {
+                                                        e.target.value = e.target.value.slice(0, 10);
+                                                    }}}  
+                                                /> 
+                                            </td>
+                                            <td> 
+                                                <input type="number" 
+                                                onInput={(e) => {
+                                                    if (e.target.value.length > 10) {
+                                                        e.target.value = e.target.value.slice(0, 10);
+                                                    }}}  
+                                                /> 
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td> 2024 - Abril </td>
+                                            <td> 
+                                                <input type="number" 
+                                                onInput={(e) => {
+                                                    if (e.target.value.length > 10) {
+                                                        e.target.value = e.target.value.slice(0, 10);
+                                                    }}}  
+                                                /> 
+                                            </td>
+                                            <td> 
+                                                <input type="number" 
+                                                onInput={(e) => {
+                                                    if (e.target.value.length > 10) {
+                                                        e.target.value = e.target.value.slice(0, 10);
+                                                    }}}  
+                                                /> 
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td> 2024 - Mayo </td>
+                                            <td> 
+                                                <input type="number" 
+                                                onInput={(e) => {
+                                                    if (e.target.value.length > 10) {
+                                                        e.target.value = e.target.value.slice(0, 10);
+                                                    }}}  
+                                                /> 
+                                            </td>
+                                            <td> 
+                                                <input type="number" 
+                                                onInput={(e) => {
+                                                    if (e.target.value.length > 10) {
+                                                        e.target.value = e.target.value.slice(0, 10);
+                                                    }}}  
+                                                /> 
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td> 2024 - Junio </td>
+                                            <td> 
+                                                <input type="number" 
+                                                onInput={(e) => {
+                                                    if (e.target.value.length > 10) {
+                                                        e.target.value = e.target.value.slice(0, 10);
+                                                    }}}  
+                                                /> 
+                                            </td>
+                                            <td> 
+                                                <input type="number" 
+                                                onInput={(e) => {
+                                                    if (e.target.value.length > 10) {
+                                                        e.target.value = e.target.value.slice(0, 10);
+                                                    }}}  
+                                                /> 
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td> 2024 - Julio </td>
+                                            <td> 
+                                                <input type="number" 
+                                                onInput={(e) => {
+                                                    if (e.target.value.length > 10) {
+                                                        e.target.value = e.target.value.slice(0, 10);
+                                                    }}}  
+                                                /> 
+                                            </td>
+                                            <td> 
+                                                <input type="number" 
+                                                onInput={(e) => {
+                                                    if (e.target.value.length > 10) {
+                                                        e.target.value = e.target.value.slice(0, 10);
+                                                    }}}  
+                                                /> 
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td> 2024 - Agosto </td>
+                                            <td> 
+                                                <input type="number" 
+                                                onInput={(e) => {
+                                                    if (e.target.value.length > 10) {
+                                                        e.target.value = e.target.value.slice(0, 10);
+                                                    }}}  
+                                                /> 
+                                            </td>
+                                            <td> 
+                                                <input type="number" 
+                                                onInput={(e) => {
+                                                    if (e.target.value.length > 10) {
+                                                        e.target.value = e.target.value.slice(0, 10);
+                                                    }}}  
+                                                /> 
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td> 2024 - Setiembre </td>
+                                            <td> 
+                                                <input type="number" 
+                                                onInput={(e) => {
+                                                    if (e.target.value.length > 10) {
+                                                        e.target.value = e.target.value.slice(0, 10);
+                                                    }}}  
+                                                /> 
+                                            </td>
+                                            <td> 
+                                                <input type="number" 
+                                                onInput={(e) => {
+                                                    if (e.target.value.length > 10) {
+                                                        e.target.value = e.target.value.slice(0, 10);
+                                                    }}}  
+                                                /> 
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td> 2024 - Octubre </td>
+                                            <td> 
+                                                <input type="number" 
+                                                onInput={(e) => {
+                                                    if (e.target.value.length > 10) {
+                                                        e.target.value = e.target.value.slice(0, 10);
+                                                    }}}  
+                                                /> 
+                                            </td>
+                                            <td> 
+                                                <input type="number" 
+                                                onInput={(e) => {
+                                                    if (e.target.value.length > 10) {
+                                                        e.target.value = e.target.value.slice(0, 10);
+                                                    }}}  
+                                                /> 
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td> 2024 - Noviembre </td>
+                                            <td> 
+                                                <input type="number" 
+                                                onInput={(e) => {
+                                                    if (e.target.value.length > 10) {
+                                                        e.target.value = e.target.value.slice(0, 10);
+                                                    }}}  
+                                                /> 
+                                            </td>
+                                            <td> 
+                                                <input type="number" 
+                                                onInput={(e) => {
+                                                    if (e.target.value.length > 10) {
+                                                        e.target.value = e.target.value.slice(0, 10);
+                                                    }}}  
+                                                /> 
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td> 2024 - Diciembre </td>
+                                            <td> 
+                                                <input type="number" 
+                                                onInput={(e) => {
+                                                    if (e.target.value.length > 10) {
+                                                        e.target.value = e.target.value.slice(0, 10);
+                                                    }}}  
+                                                /> 
+                                            </td>
+                                            <td> 
+                                                <input type="number" 
+                                                onInput={(e) => {
+                                                    if (e.target.value.length > 10) {
+                                                        e.target.value = e.target.value.slice(0, 10);
+                                                    }}}  
+                                                /> 
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </>
+                    }
+                    
+                    
                 </div>
 
                 <div className="PowerMas_Info_Form_Beneficiarie Large_6 m1 p1 overflow-auto">
@@ -597,9 +1041,9 @@ const FormGoal = () => {
                         isSubmitted={isSubmitted} 
                         optionToString={(option) => option.indActResNum + ' - ' + option.indActResNom}
                         handleOption={async(option) => {
-                            setValue('indActResCod',option.indActResCod)
-                            setValue('indActResAno',option.indActResAno)
-                            setValue('tipInd',option.tipInd)
+                            setValue('metIndActResCod',option.indActResCod)
+                            setValue('metIndActResAno',option.indActResAno)
+                            setValue('metIndActResTipInd',option.tipInd)
                             console.log(option)
                             const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/jerarquia/${option.indActResAno}/${option.indActResCod}/${option.tipInd}`);
                             const data = await response.json();
@@ -619,14 +1063,24 @@ const FormGoal = () => {
                                 <h3 className="Large-f1 m_5" style={{textTransform: 'capitalize'}}>{jerarquia.tipInd.toLowerCase()}</h3>
                                 <p className="m_5">{jerarquia.indActResNum + ' - ' + jerarquia.indActResNom.charAt(0).toUpperCase() + jerarquia.indActResNom.slice(1).toLowerCase()}</p>
                             </article>
-                            <article>
-                                <h3 className="Large-f1 m_5"> Resultado </h3>
-                                <p className="m_5">{jerarquia.resNum + ' - ' + jerarquia.resNom.charAt(0).toUpperCase() + jerarquia.indActResNom.slice(1).toLowerCase()}</p>
-                            </article>
-                            <article>
-                                <h3 className="Large-f1 m_5">Objetivo Específico</h3>
-                                <p className="m_5">{jerarquia.objEspNum + ' - ' + jerarquia.objEspNom.charAt(0).toUpperCase() + jerarquia.objEspNom.slice(1).toLowerCase()}</p>
-                            </article>
+                            {
+                                jerarquia.resNom &&
+                                <>
+                                    <article>
+                                        <h3 className="Large-f1 m_5"> Resultado </h3>
+                                        <p className="m_5">{jerarquia.resNum + ' - ' + jerarquia.resNom.charAt(0).toUpperCase() + jerarquia.indActResNom.slice(1).toLowerCase()}</p>
+                                    </article>
+                                </>
+                            }
+                            {
+                                jerarquia.objEspNom &&
+                                <>
+                                    <article>
+                                        <h3 className="Large-f1 m_5">Objetivo Específico</h3>
+                                        <p className="m_5">{jerarquia.objEspNum + ' - ' + jerarquia.objEspNom.charAt(0).toUpperCase() + jerarquia.objEspNom.slice(1).toLowerCase()}</p>
+                                    </article>
+                                </>
+                            }
                             <article>
                                 <h3 className="Large-f1 m_5">Objetivo</h3>
                                 <p className="m_5">{jerarquia.objNum + ' - ' + jerarquia.objNom.charAt(0).toUpperCase() + jerarquia.objNom.slice(1).toLowerCase()}</p>

@@ -1,63 +1,64 @@
-import { useContext, useMemo, useRef, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Tooltip } from 'react-tooltip';
-import CryptoJS from 'crypto-js';
 import {
     useReactTable, 
     getCoreRowModel, 
-    flexRender, 
     getPaginationRowModel,
     getSortedRowModel, 
 } from '@tanstack/react-table';
 // Iconos package
-import { FaEdit, FaPlus, FaRegTrashAlt, FaSearch, FaSortDown } from 'react-icons/fa';
-import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
-import { GrNext, GrPrevious  } from "react-icons/gr";
-// Iconos source
-import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
-import Pdf_Icon from '../../img/PowerMas_Pdf_Icon.svg';
+import { FaEdit, FaRegTrashAlt } from 'react-icons/fa';
 // Funciones reusables
-import { Export_Excel_Helper, Export_PDF_Helper, handleDelete } from '../reusable/helper';
+import { Export_Excel_Helper, Export_PDF_Helper } from '../reusable/helper';
 // Componentes
-import Pagination from "../reusable/Pagination";
-import TableRow from "./TableRow"
 import { AuthContext } from "../../context/AuthContext";
+import CustomTable from "../reusable/Table/CustomTable";
 
 
 const Table = ({data = []}) => {
     const navigate = useNavigate();
     console.log(data)
     // Variables State AuthContext 
-    const { authActions, authInfo } = useContext(AuthContext);
-    const { setIsLoggedIn } = authActions;
+    const { authInfo } = useContext(AuthContext);
     const { userPermissions } = authInfo;
     // States locales
-    const [searchFilter, setSearchFilter] = useState('');
+    const [searchTags, setSearchTags] = useState([]);
     const [dropdownOpen, setDropdownOpen] = useState(false);
-    // Dropdown botones Export
-    const toggleDropdown = () => {
-        setDropdownOpen(!dropdownOpen);
-    }
-    console.log(userPermissions)
+    const [isInputEmpty, setIsInputEmpty] = useState(true);
+    const [inputValue, setInputValue] = useState('');
+
      /* TANSTACK */
      const actions = {
         add: userPermissions.some(permission => permission.perNom === "INSERTAR PROYECTO"),
         delete: userPermissions.some(permission => permission.perNom === "ELIMINAR PROYECTO"),
         edit: userPermissions.some(permission => permission.perNom === "MODIFICAR PROYECTO"),
+        pdf: userPermissions.some(permission => permission.perNom === `EXPORTAR PDF PROYECTO`),
+        excel: userPermissions.some(permission => permission.perNom === `EXPORTAR EXCEL PROYECTO`),
     };
     const columns = useMemo(() => {
         let baseColumns = [
             {
-                header: "Año",
-                accessorKey: "proAno"
-            },
-            {
-                header: "Código",
-                accessorKey: "proCod"
-            },
-            {
                 header: "Nombre",
                 accessorKey: "proNom"
+            },
+            {
+                header: "Periodo Inicio",
+                accessorKey: "proPerAnoIni",
+                cell: ({row}) => {
+                    return (
+                        <>{row.original.proPerAnoIni + ' - ' + row.original.proPerMesIni}</>
+                    );
+                },
+            },
+            {
+                header: "Periodo Fin",
+                accessorKey: "proPerAnoFin",
+                cell: ({row}) => {
+                    return (
+                        <>{row.original.proPerAnoFin + ' - ' + row.original.proPerMesFin}</>
+                    );
+                },
             },
             {
                 header: "Responsable",
@@ -65,10 +66,12 @@ const Table = ({data = []}) => {
             },
         ];
 
-        if (actions.delete || actions.edit) {
+        if (actions.edit || actions.delete) {
             baseColumns.push({
-                header: "Acciones",
+                header: () => <div style={{textAlign: 'center', flexGrow: '1'}}>Acciones</div>,
                 accessorKey: "acciones",
+                disableSorting: true,
+                stickyRight: 0,
                 cell: ({row}) => (
                     <div className='PowerMas_IconsTable flex jc-center ai-center'>
                         {actions.edit && 
@@ -84,19 +87,9 @@ const Table = ({data = []}) => {
                                 data-tooltip-id="delete-tooltip" 
                                 data-tooltip-content="Eliminar" 
                                 className='Large-p_25' 
-                                // onClick={() => handleDelete('Proyecto', row.original.estCod, setEstados, setIsLoggedIn)} 
+                                // onClick={() => Eliminar_Meta_Indicador(row.original)} 
                             />
                         }
-                        <Tooltip 
-                            id="edit-tooltip"
-                            effect="solid"
-                            place='top-end'
-                        />
-                        <Tooltip 
-                            id="delete-tooltip" 
-                            effect="solid"
-                            place='top-start'
-                        />
                     </div>
                 ),
             });
@@ -109,13 +102,16 @@ const Table = ({data = []}) => {
     const [sorting, setSorting] = useState([]);
     const filteredData = useMemo(() => 
         data.filter(item => 
-            item.proAno.includes(searchFilter.toUpperCase()) ||
-            item.proCod.includes(searchFilter.toUpperCase()) ||
-            item.proNom.includes(searchFilter.toUpperCase()) ||
-            item.proRes.includes(searchFilter.toUpperCase()) ||
-            item.proPer.includes(searchFilter.toUpperCase()) 
-        ), [data, searchFilter]
+            searchTags.every(tag => 
+            item.proAno.includes(tag.toUpperCase()) ||
+            item.proCod.includes(tag.toUpperCase()) ||
+            item.proNom.includes(tag.toUpperCase()) ||
+            item.proRes.includes(tag.toUpperCase()) ||
+            item.proPer.includes(tag.toUpperCase()) 
+            )
+        ), [data, searchTags]
     );
+
     
     const table = useReactTable({
         data: filteredData,
@@ -150,133 +146,47 @@ const Table = ({data = []}) => {
         setDropdownOpen(false);
     };
 
-    const tableRef = useRef();  // Referencia al elemento de la tabla
-
-    const animateScroll = (element, to, duration) => {
-        const start = element.scrollLeft,
-            change = to - start,
-            increment = 20;
-        let currentTime = 0;
-    
-        const animateScroll = () => {
-            currentTime += increment;
-            const val = Math.easeInOutQuad(currentTime, start, change, duration);
-            element.scrollLeft = val;
-            if(currentTime < duration) {
-                setTimeout(animateScroll, increment);
-            }
-        };
-        animateScroll();
-    }
-    
-    Math.easeInOutQuad = function (t, b, c, d) {
-        t /= d/2;
-        if (t < 1) return c/2*t*t + b;
-        t--;
-        return -c/2 * (t*(t-2) - 1) + b;
-    };
-    
-    const scrollTable = (direction) => {
-        if (tableRef.current) {
-            const distance = tableRef.current.offsetWidth * 0.8;  // 50% del ancho de la tabla
-            const to = tableRef.current.scrollLeft + distance * direction;
-            animateScroll(tableRef.current, to, 500);
+    // Añade una nueva etiqueta al presionar Enter
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter' && inputValue && !searchTags.includes(inputValue)) {
+            setSearchTags(prevTags => [...prevTags, inputValue]);
+            setInputValue('');  // borra el valor del input
+            setIsInputEmpty(true);
+        } else if (e.key === 'Backspace' && isInputEmpty && searchTags.length > 0) {
+            setSearchTags(prevTags => prevTags.slice(0, -1));
         }
     }
-    
-    const Editar_Proyecto = (row) => {
-        console.log(row)
-        const id = `${row.original.proAno}${row.original.proCod}`;
-        console.log(id)
-        // Encripta el ID
-        const ciphertext = CryptoJS.AES.encrypt(id, 'secret key 123').toString();
-        // Codifica la cadena cifrada para que pueda ser incluida de manera segura en una URL
-        const encodedCiphertext = encodeURIComponent(ciphertext);
-        navigate(`/form-project/${encodedCiphertext}`);
+
+    const handleInputChange = (e) => {
+        setInputValue(e.target.value);  // actualiza el valor del input
+        setIsInputEmpty(e.target.value === '');
     }
 
+    // Elimina una etiqueta
+    const removeTag = (tag) => {
+        setSearchTags(searchTags.filter(t => t !== tag));
+    }
+    
+    
 
     return (
-        <div className='TableMainContainer Large-p1 Medium-p1 Small-p_5'>
-            <div>
-                <h1 className="flex left Large-f1_5 Medium-f1_5 Small-f1_5 ">Listado de Proyectos</h1>
-                <div className="flex ">
-                    <div className="PowerMas_Search_Container Large_6 Large-m_5">
-                        <FaSearch className="Large_1 search-icon" />
-                        <input 
-                            className='PowerMas_Input_Filter Large_12 Large-p_5'
-                            type="search"
-                            placeholder='Buscar'
-                            value={searchFilter}
-                            onChange={e => setSearchFilter(e.target.value)}
-                        />
-                    </div>
-                    {
-                        actions.add && 
-                        <button 
-                            className=' flex jc-space-between Large_3 Large-m_5 Large-p_5 PowerMas_ButtonStatus'
-                            onClick={() => navigate('/form-project')}
-                            disabled={!actions.add}
-                        >
-                            Nuevo <FaPlus className='Large_1' /> 
-                        </button>
-                    }
-                    <div className={`PowerMas_Dropdown_Export Large_3 Large-m_5 ${dropdownOpen  ? 'open' : ''}`}>
-                        <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>Exportar <FaSortDown className='Large_1' /></button>
-                        <div className="PowerMas_Dropdown_Export_Content Phone_12">
-                            <a onClick={Export_Excel} className='flex jc-space-between p_5'>Excel <img className='Large_1' src={Excel_Icon} alt="" /> </a>
-                            <a onClick={Export_PDF} className='flex jc-space-between p_5'>PDF <img className='Large_1' src={Pdf_Icon} alt="" /></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div className="PowerMas_TableContainer" ref={tableRef}>
-                <table className="Large_12 PowerMas_TableStatus">
-                    <thead>
-                        {
-                            table.getHeaderGroups().map(headerGroup => (
-                                <tr key={headerGroup.id} className="">
-                                    {
-                                        headerGroup.headers.map(header =>(
-                                            <th className="ws-nowrap" key={header.id} onClick={header.column.getToggleSortingHandler()}>
-                                                <div>
-                                                    {
-                                                    flexRender(header.column.columnDef.header, header.getContext())
-                                                    }
-                                                    <div className='flex flex-column ai-center jc-center PowerMas_Icons_Sorter'>
-                                                        {header.column.getIsSorted() === 'asc' ? 
-                                                            <TiArrowSortedUp className={`sort-icon active`} /> :
-                                                            header.column.getIsSorted() === 'desc' ? 
-                                                            <TiArrowSortedDown className={`sort-icon active`} /> :
-                                                            <>
-                                                                <TiArrowSortedUp className={`sort-icon`} />
-                                                                <TiArrowSortedDown className={`sort-icon`} />
-                                                            </>
-                                                        }
-                                                    </div>
-                                                </div>
-                                            </th>
-                                        ))
-                                    }
-                                </tr>
-                            ))
-                        }
-                    </thead>
-                    <tbody>
-                        {
-                            table.getRowModel().rows.length > 0 ?
-                                table.getRowModel().rows.map(row => (
-                                    <TableRow key={row.id} row={row} flexRender={flexRender} />
-                                ))
-                            : <tr className='PowerMas_TableEmpty'><td colSpan={11} className='Large-p1 center'>No se encontraron registros</td></tr>
-                        }
-                    </tbody>
-                </table>
-                {/* <GrPrevious className="slider" style={{left: '0'}} onClick={() => scrollTable(-1)} /> 
-                <GrNext className="slider" style={{right: '0'}} onClick={() => scrollTable(1)} />  */}
-            </div>
-            <Pagination table={table} />
-        </div>
+        <CustomTable
+            title='Proyectos'
+            actions={actions} 
+            dropdownOpen={dropdownOpen} 
+            setDropdownOpen={setDropdownOpen} 
+            Export_Excel={Export_Excel} 
+            Export_PDF={Export_PDF} 
+            table={table}
+            navigatePath='form-project'
+            resize={false}
+            handleInputChange={handleInputChange}
+            handleKeyDown={handleKeyDown}
+            inputValue={inputValue}
+            removeTag={removeTag}
+            searchTags={searchTags}
+            setSearchTags={setSearchTags}
+        />
     )
 }
 

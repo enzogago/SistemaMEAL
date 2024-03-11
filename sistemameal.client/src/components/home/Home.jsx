@@ -309,7 +309,7 @@ const Home = () => {
     return(
     <>
         <div className="PowerMas_Search_Container_Home " style={{paddingBottom: '1rem'}}>
-            <div className="PowerMas_Input_Filter_Container flex">
+            <div className="PowerMas_Input_Filter_Container flex" style={{border: '1px solid #F7CEAD'}}>
                 <div className="flex ai-center">
                     {searchTags.map(tag => (
                         <span key={tag} className="PowerMas_InputTag flex">

@@ -478,28 +478,21 @@ namespace SistemaMEAL.Modulos
             string? tipoMensaje = "";
             try
             {
-
+                cn.getcn.Open();
                 SqlCommand cmd = new SqlCommand("SP_MODIFICAR_META", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 cmd.Parameters.AddWithValue("@P_METANO", meta.MetAno);
                 cmd.Parameters.AddWithValue("@P_METCOD", meta.MetCod);
-                cmd.Parameters.AddWithValue("@P_ESTCOD", "01");
                 cmd.Parameters.AddWithValue("@P_METMETTEC", meta.MetMetTec);
-                cmd.Parameters.AddWithValue("@P_METEJETEC", "0");
-                cmd.Parameters.AddWithValue("@P_METPORAVATEC", "0");
                 cmd.Parameters.AddWithValue("@P_METMESPLATEC", meta.MetMesPlaTec);
                 cmd.Parameters.AddWithValue("@P_METANOPLATEC", meta.MetAnoPlaTec);
-                cmd.Parameters.AddWithValue("@P_METMETPRE", "0");
-                cmd.Parameters.AddWithValue("@P_METEJEPRE", "0");
-                cmd.Parameters.AddWithValue("@P_METPORAVAPRE", "0");
-                cmd.Parameters.AddWithValue("@P_METMESPLAPRE", "0");
-                cmd.Parameters.AddWithValue("@P_METANOPLAPRE", "0");
+                cmd.Parameters.AddWithValue("@P_METMETPRE", meta.MetMetPre);
                 cmd.Parameters.AddWithValue("@P_FINCOD", meta.FinCod);
                 cmd.Parameters.AddWithValue("@P_IMPCOD", meta.ImpCod);
                 cmd.Parameters.AddWithValue("@P_UBIANO", meta.UbiAno);
                 cmd.Parameters.AddWithValue("@P_UBICOD", meta.UbiCod);
-                cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
+                cmd.Parameters.AddWithValue("@P_USUMOD", "Usuario");
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
                 cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
@@ -527,6 +520,7 @@ namespace SistemaMEAL.Modulos
             }
             finally
             {
+                cn.getcn.Close();
             }
             return (mensaje, tipoMensaje);
         }
@@ -549,7 +543,7 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_METPORAVATEC", "0");
                 cmd.Parameters.AddWithValue("@P_METMESPLATEC", meta.MetMesPlaTec);
                 cmd.Parameters.AddWithValue("@P_METANOPLATEC", meta.MetAnoPlaTec);
-                cmd.Parameters.AddWithValue("@P_METMETPRE", "0");
+                cmd.Parameters.AddWithValue("@P_METMETPRE", meta.MetMetPre);
                 cmd.Parameters.AddWithValue("@P_METEJEPRE", "0");
                 cmd.Parameters.AddWithValue("@P_METPORAVAPRE", "0");
                 cmd.Parameters.AddWithValue("@P_METMESPLAPRE", "0");
@@ -1192,6 +1186,239 @@ namespace SistemaMEAL.Modulos
                 cn.getcn.Close();
             }
             return temporal?? new List<MetaIndicadorActividadResultado>();
+        }
+
+        public (string? message, string? messageType) EliminarMetaIndicador(string? metAno = null, string? metCod = null, string? metIndAno = null, string? metIndCod = null, string? metIndTipInd = null)
+        {
+            string? mensaje = "";
+            string? tipoMensaje = "";
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_ELIMINAR_META_INDICADOR_ACTIVIDAD_RESULTADO", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@P_METANO", metAno);
+                cmd.Parameters.AddWithValue("@P_METCOD", metCod);
+                cmd.Parameters.AddWithValue("@P_METINDACTRESANO", metIndAno);
+                cmd.Parameters.AddWithValue("@P_METINDACTRESCOD", metIndCod);
+                cmd.Parameters.AddWithValue("@P_METINDACTRESTIPIND", metIndTipInd);
+                cmd.Parameters.AddWithValue("@P_USUMOD", "Usuario");
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
+                cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
+                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "GAGO");
+                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "AGUIRRE");
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+
+                cmd.ExecuteNonQuery();
+
+                mensaje = pDescripcionMensaje.Value.ToString();
+                tipoMensaje = pTipoMensaje.Value.ToString();
+            }
+            catch (SqlException ex)
+            {
+                mensaje = ex.Message;
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return (mensaje, tipoMensaje);
+        }
+
+        public (string? message, string? messageType) ModificarMetaIndicador(MetaIndicadorActividadResultado metaIndicador)
+        {
+            string? mensaje = "";
+            string? tipoMensaje = "";
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_MODIFICAR_META_INDICADOR_ACTIVIDAD_RESULTADO", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@P_METANO_ORIGINAL", metaIndicador.MetAnoOri);
+                cmd.Parameters.AddWithValue("@P_METCOD_ORIGINAL", metaIndicador.MetCodOri);
+                cmd.Parameters.AddWithValue("@P_METINDACTRESANO_ORIGINAL", metaIndicador.MetIndActResAnoOri);
+                cmd.Parameters.AddWithValue("@P_METINDACTRESCOD_ORIGINAL", metaIndicador.MetIndActResCodOri);
+                cmd.Parameters.AddWithValue("@P_METINDACTRESTIPIND_ORIGINAL", metaIndicador.MetIndActResTipIndOri);
+                cmd.Parameters.AddWithValue("@P_METANO", metaIndicador.MetAno);
+                cmd.Parameters.AddWithValue("@P_METCOD", metaIndicador.MetCod);
+                cmd.Parameters.AddWithValue("@P_METINDACTRESANO", metaIndicador.MetIndActResAno);
+                cmd.Parameters.AddWithValue("@P_METINDACTRESCOD", metaIndicador.MetIndActResCod);
+                cmd.Parameters.AddWithValue("@P_METINDACTRESTIPIND", metaIndicador.MetIndActResTipInd);
+                cmd.Parameters.AddWithValue("@P_USUMOD", "Usuario");
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
+                cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
+                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "GAGO");
+                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "AGUIRRE");
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+
+                cmd.ExecuteNonQuery();
+
+                mensaje = pDescripcionMensaje.Value.ToString();
+                tipoMensaje = pTipoMensaje.Value.ToString();
+            }
+            catch (SqlException ex)
+            {
+                mensaje = ex.Message;
+                tipoMensaje = "1";
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return (mensaje, tipoMensaje);
+        }
+
+
+         public (string? message, string? messageType) ModificarMetaIndicadorTransaction(Meta meta, MetaIndicadorActividadResultado metaIndicador)
+        {
+            string? mensaje = "";
+            string? tipoMensaje = "";
+
+            using (TransactionScope scope = new TransactionScope())
+            {
+                using (SqlConnection connection = cn.getcn)
+                {
+                    try
+                    {
+                        if (connection.State == ConnectionState.Closed)
+                        {
+                            connection.Open();
+                        }
+
+                        // Modiciar Meta
+                        try
+                        {
+                            SqlCommand cmd = new SqlCommand("SP_MODIFICAR_META", cn.getcn);
+                            cmd.CommandType = CommandType.StoredProcedure;
+
+                            cmd.Parameters.AddWithValue("@P_METANO", meta.MetAno);
+                            cmd.Parameters.AddWithValue("@P_METCOD", meta.MetCod);
+                            cmd.Parameters.AddWithValue("@P_METMETTEC", meta.MetMetTec);
+                            cmd.Parameters.AddWithValue("@P_METMESPLATEC", meta.MetMesPlaTec);
+                            cmd.Parameters.AddWithValue("@P_METANOPLATEC", meta.MetAnoPlaTec);
+                            cmd.Parameters.AddWithValue("@P_METMETPRE", meta.MetMetPre);
+                            cmd.Parameters.AddWithValue("@P_FINCOD", meta.FinCod);
+                            cmd.Parameters.AddWithValue("@P_IMPCOD", meta.ImpCod);
+                            cmd.Parameters.AddWithValue("@P_UBIANO", meta.UbiAno);
+                            cmd.Parameters.AddWithValue("@P_UBICOD", meta.UbiCod);
+                            cmd.Parameters.AddWithValue("@P_USUMOD", "Usuario");
+                            cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
+                            cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
+                            cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
+                            cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
+                            cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "GAGO");
+                            cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "AGUIRRE");
+
+                            SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                            pDescripcionMensaje.Direction = ParameterDirection.Output;
+                            cmd.Parameters.Add(pDescripcionMensaje);
+
+                            SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                            pTipoMensaje.Direction = ParameterDirection.Output;
+                            cmd.Parameters.Add(pTipoMensaje);
+
+                            cmd.ExecuteNonQuery();
+
+                            mensaje = pDescripcionMensaje.Value.ToString();
+                            tipoMensaje = pTipoMensaje.Value.ToString();
+                        }
+                        catch (SqlException ex)
+                        {
+                            mensaje = ex.Message;
+                            tipoMensaje = "1";
+                        }
+
+                        if (tipoMensaje != "3")
+                        {
+                            Console.WriteLine(mensaje);
+                            return (mensaje,tipoMensaje);
+                        }
+
+                        // Modificar Indicador
+                        try
+                        {
+                            SqlCommand cmd = new SqlCommand("SP_MODIFICAR_META_INDICADOR_ACTIVIDAD_RESULTADO", cn.getcn);
+                            cmd.CommandType = CommandType.StoredProcedure;
+
+                            cmd.Parameters.AddWithValue("@P_METANO_ORIGINAL", metaIndicador.MetAnoOri);
+                            cmd.Parameters.AddWithValue("@P_METCOD_ORIGINAL", metaIndicador.MetCodOri);
+                            cmd.Parameters.AddWithValue("@P_METINDACTRESANO_ORIGINAL", metaIndicador.MetIndActResAnoOri);
+                            cmd.Parameters.AddWithValue("@P_METINDACTRESCOD_ORIGINAL", metaIndicador.MetIndActResCodOri);
+                            cmd.Parameters.AddWithValue("@P_METINDACTRESTIPIND_ORIGINAL", metaIndicador.MetIndActResTipIndOri);
+                            cmd.Parameters.AddWithValue("@P_METANO", metaIndicador.MetAno);
+                            cmd.Parameters.AddWithValue("@P_METCOD", metaIndicador.MetCod);
+                            cmd.Parameters.AddWithValue("@P_METINDACTRESANO", metaIndicador.MetIndActResAno);
+                            cmd.Parameters.AddWithValue("@P_METINDACTRESCOD", metaIndicador.MetIndActResCod);
+                            cmd.Parameters.AddWithValue("@P_METINDACTRESTIPIND", metaIndicador.MetIndActResTipInd);
+                            cmd.Parameters.AddWithValue("@P_USUMOD", "Usuario");
+                            cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
+                            cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
+                            cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
+                            cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
+                            cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "GAGO");
+                            cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "AGUIRRE");
+
+                            SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                            pDescripcionMensaje.Direction = ParameterDirection.Output;
+                            cmd.Parameters.Add(pDescripcionMensaje);
+
+                            SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                            pTipoMensaje.Direction = ParameterDirection.Output;
+                            cmd.Parameters.Add(pTipoMensaje);
+
+                            cmd.ExecuteNonQuery();
+
+                            mensaje = pDescripcionMensaje.Value.ToString();
+                            tipoMensaje = pTipoMensaje.Value.ToString();
+                        }
+                        catch (SqlException ex)
+                        {
+                            mensaje = ex.Message;
+                            tipoMensaje = "1";
+                        }
+                        if (tipoMensaje != "3")
+                        {
+                            Console.WriteLine(mensaje);
+                            return (mensaje,tipoMensaje);
+                        }
+
+
+                        // Si todas las operaciones fueron exitosas, confirma la transacción
+                        scope.Complete();
+                    }
+                    catch (Exception ex)
+                    {
+                        // Si alguna operación falló, la transacción se revierte.
+                        mensaje = ex.Message;
+                        tipoMensaje = "1";
+                        Console.WriteLine(ex);
+                    }
+                }
+            }
+
+            return (mensaje, tipoMensaje);
         }
 
 

@@ -12,7 +12,10 @@ body {
 input[type=text], select{
 	outline: none;
 }
-input,select{
+input[type=text]{
+	padding-right: 30px;
+}
+.PowerMas_MainHome input,.PowerMas_MainHome select{
 	border-radius: 5px;
 	margin-top: 5px;
 	transition: border 0.2s;
@@ -21,8 +24,9 @@ select option {
     background-color: #fff;
 	color: #000;
 }
-input:focus,select:focus{
-	border: 1px solid #F7775A!important;
+
+input:focus, select:focus{
+	background-color: #FFF7F1!important;
 	box-shadow: 0px 3px 10px rgba(247, 119, 90, 0.3);
 }
 input:disabled,select:disabled{
@@ -58,6 +62,7 @@ input::placeholder,select::placeholder{
 	width: auto; 
 	height: 50px;
 }
+
 
 .allvh {
 	min-height: 100vh;
@@ -173,7 +178,13 @@ input::placeholder,select::placeholder{
 		max-height: 560px;
 	}
 }
-
+.PowerMas_FormLogin input:focus, .PowerMas_FormLogin select:focus{
+	border-bottom: 1px solid black !important;
+	border-top: none!important;
+	border-left: none!important;
+	border-right: none!important;
+	box-shadow: none;
+}
 
 .PowerMas_MainContainer {
 	background-color: #fff;
@@ -932,7 +943,7 @@ textarea {
 	flex-wrap: nowrap;
 	overflow-x: auto;
 	scrollbar-width: thin;
-	border: 1px solid #F7CEAD;
+	/* border: 1px solid #F7CEAD; */
 	background-color: #fff;
 }
 .PowerMas_Input_Filter{
@@ -1044,6 +1055,13 @@ textarea {
 }
 .PowerMas_TableStatus thead th {
 	color: #F7775A;
+	white-space: nowrap;
+}
+.PowerMas_TableStatus tbody td {
+	white-space: nowrap;
+}
+.PowerMas_TableStatus tbody input{
+	width: 70%;
 }
 
 .PowerMas_TableStatus thead th div svg {

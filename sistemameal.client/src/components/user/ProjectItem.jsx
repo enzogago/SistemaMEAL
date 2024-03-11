@@ -7,7 +7,6 @@ const ProjectItem = ({ proyecto, handleCheck, checkedProyectos, checkedSubProyec
     const handleToggle = () => {
         setIsOpen(!isOpen);
     }
-    console.log(proyecto)
     return (
         <li className="PowerMas_Permission_Dropdown" >
             <div className="p_5 flex jc-ac-space-between ai-center"  style={{color: '#F7775A'}}>

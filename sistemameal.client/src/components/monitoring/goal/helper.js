@@ -1,6 +1,6 @@
 import Notiflix from "notiflix";
 
-export const fetchRegistroAModificar = async (metAno, metCod, metIndAno, metIndCod, metIndTipInd, reset, fetchSelects, setValue, fetchIndicadorActividad,setIsSecondInputEnabled, setSelectedOption, setJerarquia) => {
+export const fetchRegistroAModificar = async (metAno, metCod, metIndAno, metIndCod, metIndTipInd, reset, fetchSelects, setValue, fetchIndicadorActividad,setIsSecondInputEnabled, setSelectedOption, setJerarquia, setInitialData) => {
     try {
         Notiflix.Loading.pulse('Cargando...');
         const token = localStorage.getItem('token');
@@ -14,8 +14,9 @@ export const fetchRegistroAModificar = async (metAno, metCod, metIndAno, metIndC
             Notiflix.Notify.failure(data.message);
             return;
         }
-
+        setInitialData(data)
         reset(data);
+        console.log(data)
         fetchSelects(data.ubiAno,data.ubiCod);
         obtenerJerarquia(data, setValue, fetchIndicadorActividad,setIsSecondInputEnabled, setSelectedOption, setJerarquia);
     } catch (error) {
@@ -41,9 +42,9 @@ export const obtenerJerarquia = async (dataInfo, setValue, fetchIndicadorActivid
         await fetchIndicadorActividad(data.proAno,data.proCod);
         setSelectedOption(data)
         setIsSecondInputEnabled(true);
-        setValue('indActResAno',metIndActResAno)
-        setValue('indActResCod',metIndActResCod)
-        setValue('tipInd',metIndActResTipInd)
+        setValue('metIndActResAno',metIndActResAno)
+        setValue('metIndActResCod',metIndActResCod)
+        setValue('metIndActResTipInd',metIndActResTipInd)
         const nombre = data.indActResNum + ' - ' + data.indActResNom;
         setValue('indActResNom', nombre)
 

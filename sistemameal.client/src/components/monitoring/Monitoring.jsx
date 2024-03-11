@@ -42,7 +42,8 @@ const Monitoring = () => {
     return (
         <>
             <Table 
-                data={monitoringData} 
+                data={monitoringData}
+                setMonitoringData={setMonitoringData}
             />
         </>
     )

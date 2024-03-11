@@ -64,6 +64,7 @@ const AutocompleteInput = ({ options, register, watch, dirtyFields, isSubmitted,
                 disabled={disabled}
                 autoComplete='disabled'
                 placeholder={`Selecciona un ${titulo}`}
+                style={{textTransform: 'capitalize'}}
             />
             { isFocused && filteredOptions.length > 0 && (
                 <ul className="PowerMas_Autocomplete_Options">

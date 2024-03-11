@@ -8,6 +8,79 @@ import CryptoJS from 'crypto-js';
 import avatar from '../../img/avatar.jpeg';
 import masculino from '../../img/PowerMas_Avatar_Masculino.svg';
 import femenino from '../../img/PowerMas_Avatar_Femenino.svg';
+import { Button } from 'antd';
+import { Tree } from 'antd';
+
+const treeData = [
+    {
+      title: '0-0',
+      key: '0-0',
+      children: [
+        {
+          title: '0-0-0',
+          key: '0-0-0',
+          children: [
+            {
+              title: '0-0-0-0',
+              key: '0-0-0-0',
+            },
+            {
+              title: '0-0-0-1',
+              key: '0-0-0-1',
+            },
+            {
+              title: '0-0-0-2',
+              key: '0-0-0-2',
+            },
+          ],
+        },
+        {
+          title: '0-0-1',
+          key: '0-0-1',
+          children: [
+            {
+              title: '0-0-1-0',
+              key: '0-0-1-0',
+            },
+            {
+              title: '0-0-1-1',
+              key: '0-0-1-1',
+            },
+            {
+              title: '0-0-1-2',
+              key: '0-0-1-2',
+            },
+          ],
+        },
+        {
+          title: '0-0-2',
+          key: '0-0-2',
+        },
+      ],
+    },
+    {
+      title: '0-1',
+      key: '0-1',
+      children: [
+        {
+          title: '0-1-0-0',
+          key: '0-1-0-0',
+        },
+        {
+          title: '0-1-0-1',
+          key: '0-1-0-1',
+        },
+        {
+          title: '0-1-0-2',
+          key: '0-1-0-2',
+        },
+      ],
+    },
+    {
+      title: '0-2',
+      key: '0-2',
+    },
+  ];
 
 const PermissionUser = () => {
     const navigate = useNavigate();
@@ -94,8 +167,9 @@ const PermissionUser = () => {
                 const data = await response.json();
                 console.log(data)
                 if (!isCancelled) {
-                    setProyectos(data);
-                    console.log(data)
+                    const transformedData = transformData(data);
+                    setProyectos(transformedData);
+                    console.log(transformedData)
                 }
             } catch (error) {
                 Notiflix.Notify.failure('Ha ocurrido un error al cargar los proyectos.');
@@ -290,7 +364,40 @@ const PermissionUser = () => {
     Notiflix.Notify.success("Permisos actualizados correctamente")
     navigate('/user');
   }
-
+  const transformData = (data) => {
+    return data.map(item => {
+      let children = [];
+      if (item.subProyectos) {
+        children = item.subProyectos.map(subItem => {
+          return {
+            title: subItem.subProNom,
+            key: `${item.proAno}-${item.proCod}-${subItem.subProAno}-${subItem.subProCod}`
+          };
+        });
+      }
+      return {
+        title: item.proNom,
+        key: `${item.proAno}-${item.proCod}`,
+        children
+      };
+    });
+  };
+  
+  const [expandedKeys, setExpandedKeys] = useState([]);
+  const [checkedKeys, setCheckedKeys] = useState([]);
+  const [selectedKeys, setSelectedKeys] = useState([]);
+  const [autoExpandParent, setAutoExpandParent] = useState(true);
+  const onExpand = (expandedKeysValue) => {
+    console.log('onExpand', expandedKeysValue);
+    // if not set autoExpandParent to false, if children expanded, parent can not collapse.
+    // or, you can remove all expanded children keys.
+    setExpandedKeys(expandedKeysValue);
+    setAutoExpandParent(false);
+  };
+  const onCheck = (checkedKeysValue) => {
+    console.log('onCheck', checkedKeysValue);
+    setCheckedKeys(checkedKeysValue);
+  };
 
   return (
         <div className="bg-white h-100 flex flex-column">
@@ -301,7 +408,7 @@ const PermissionUser = () => {
             <div className="flex-grow-1 overflow-auto p1_25">
                 <div className="flex gap-1">
                     <div className="PowerMas_ListPermission PowerMas_Form_Card p1 Large_6">
-                        <ul>
+                        {/* <ul>
                             {proyectos.map(proyecto => (
                                 <ProjectItem 
                                     key={proyecto.proCod} 
@@ -311,7 +418,17 @@ const PermissionUser = () => {
                                     checkedSubProyectos={checkedSubProyectos} 
                                 />
                             ))}
-                        </ul>
+                        </ul> */}
+                        <Tree
+                            checkable
+                            onExpand={onExpand}
+                            expandedKeys={expandedKeys}
+                            autoExpandParent={autoExpandParent}
+                            onCheck={onCheck}
+                            checkedKeys={checkedKeys}
+                            selectedKeys={selectedKeys}
+                            treeData={proyectos}
+                        />
                     </div>
                     <div className="PowerMas_Info_User Large_6 PowerMas_Form_Card p1" style={{backgroundColor: '#f7f7f7'}}>
                         <div className="flex flex-column jc-center ai-center gap_5">

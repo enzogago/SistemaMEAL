@@ -28,7 +28,6 @@ namespace SistemaMEAL.Server.Controllers
             if (!rToken.success) return Unauthorized(rToken);
 
             var paises = _ubicaciones.ListadoPaises();
-            Console.WriteLine(paises);
             return Ok(paises);
         }
 
@@ -42,7 +41,6 @@ namespace SistemaMEAL.Server.Controllers
             if (!rToken.success) return Unauthorized(rToken);
 
             var ubicaciones = _ubicaciones.ListadoJerarquiaUbicacion(ubiAno, ubiCod);
-            Console.WriteLine(ubicaciones);
             return Ok(ubicaciones);
         }
 
@@ -55,7 +53,6 @@ namespace SistemaMEAL.Server.Controllers
             if (!rToken.success) return Unauthorized(rToken);
 
             var ubicaciones = _ubicaciones.ListadoUbicacioSelect(ubiAno, ubiCod);
-            Console.WriteLine(ubicaciones);
             return Ok(ubicaciones);
         }
 

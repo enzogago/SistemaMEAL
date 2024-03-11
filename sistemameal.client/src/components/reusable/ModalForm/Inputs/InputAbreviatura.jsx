@@ -24,7 +24,7 @@ const InputAbreviatura = ({register, errors, dirtyFields, isSubmitted}) => {
                     'abreviatura', { 
                         required: 'La abreviatura es requerido',
                         maxLength: { value: 50, message: 'El campo no puede tener más de 50 caracteres' },
-                        minLength:  { value: 3, message: 'El campo no puede tener menos de 5 caracteres' },
+                        minLength:  { value: 2, message: 'El campo no puede tener menos de 2 caracteres' },
                         pattern: {
                             value: /^[A-Za-zñÑ\s]+$/,
                             message: 'Por favor, introduce solo letras y espacios',
