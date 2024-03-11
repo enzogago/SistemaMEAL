@@ -21,7 +21,10 @@ const Layout = ({ children }) => {
                     </div>
                 </>
                 :
-                <>{children}</>
+                <div className='flex flex-column Large_12'>
+                    <Bar />
+                    {children}
+                </div>
             }
             <Tooltip 
                     id="error-tooltip"

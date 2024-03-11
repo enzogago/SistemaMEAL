@@ -29,6 +29,7 @@ namespace SistemaMEAL.Server.Models
         public String? ResNom { get; set; }
 
         public String? TipInd { get; set; }
+        public String? MetIndTipInd { get; set; }
 
         public String? IndActResAno { get; set; }
         public String? IndActResCod { get; set; }

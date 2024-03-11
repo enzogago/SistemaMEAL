@@ -1,64 +1,101 @@
-import { FaLessThanEqual, FaPlus, FaTrash } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import CryptoJS from 'crypto-js';
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Notiflix from "notiflix";
-import { AuthContext } from "../../../context/AuthContext";
 import { GrFormPreviousLink } from "react-icons/gr";
 import { useForm } from 'react-hook-form';
 import AutocompleteInput from "../../reusable/AutoCompleteInput";
+import { fetchRegistroAModificar } from "./helper";
+import { fetchData } from "../../reusable/helper";
 
 const FormGoal = () => {
     const navigate = useNavigate();
-    const { id: encodedCiphertext } = useParams();
-    // Decodifica la cadena cifrada
-    const ciphertext = decodeURIComponent(encodedCiphertext);
-    // Desencripta el ID
-    const bytes  = CryptoJS.AES.decrypt(ciphertext, 'secret key 123');
-    const id = bytes.toString(CryptoJS.enc.Utf8);
-    const metAno = id.slice(0, 4);
-    const metCod = id.slice(4);
-
-    // Estados del AuthContext
-    const { authInfo } = useContext(AuthContext);
-    const { userLogged  } = authInfo;
     // Estados locales
-    const [ isEditing, setIsEditing ] = useState(false);
     const [ paises, setPaises ] = useState([]);
     const [ financiadores, setFinanciadores ] = useState([]);
     const [ implementadores, setImplementadores ] = useState([]);
     const [ proyectos, setProyectos ] = useState([]);
     const [ indicadores, setIndicadores ] = useState([]);
-    const [ estados, setEstados ] = useState([]);
     const [ selectedOption, setSelectedOption ] = useState(null);
     const [ isSecondInputEnabled, setIsSecondInputEnabled ] = useState(false);
     const [ jerarquia, setJerarquia ] = useState(null);
     const [ selects, setSelects ] = useState([]);
     const [ cargando, setCargando ] = useState(false)
 
-    const { register, watch, handleSubmit, formState: { errors, dirtyFields, isSubmitted }, reset, setValue, trigger } = 
+
+    const [firstEdit, setFirstEdit] = useState(false);
+    const [selectedValues, setSelectedValues] = useState([]);
+    //
+    const { id: safeCiphertext } = useParams();
+    let id = '';
+    if (safeCiphertext) {
+        const ciphertext = atob(safeCiphertext);
+        // Desencripta el ID
+        const bytes  = CryptoJS.AES.decrypt(ciphertext, 'secret key 123');
+        id = bytes.toString(CryptoJS.enc.Utf8);
+    }
+    const isEditing = id && id.length === 22;
+
+    // Configuracion del formulario
+    const { 
+        register, 
+        watch, 
+        handleSubmit, 
+        formState: { errors, dirtyFields, isSubmitted }, 
+        reset, 
+        setValue, 
+        trigger 
+    } = 
     useForm({ mode: "onChange"});
 
-    const pais = watch('pais');
-
     useEffect(() => {
+        const fetchOptions = async () => {
+            Notiflix.Loading.pulse('Cargando...');
+            await Promise.all([
+                fetchData('Proyecto', setProyectos),
+                fetchData('Financiador', setFinanciadores),
+                fetchData('Implementador', setImplementadores),
+                fetchData('Ubicacion', setPaises)
+            ]);
+        };
+    
+        fetchOptions().then(() => {
+            if (isEditing) {
+                const metAno = id.slice(0, 4);
+                const metCod = id.slice(4,10);
+                const metIndAno = id.slice(10,14);
+                const metIndCod = id.slice(14,20);
+                const metIndTipInd = id.slice(20,22);
+                // Ejecuta la función para traer los datos del registro a modificar
+                fetchRegistroAModificar(metAno, metCod, metIndAno, metIndCod, metIndTipInd, reset, fetchSelects, setValue, fetchIndicadorActividad, setIsSecondInputEnabled, setSelectedOption, setJerarquia);
+            }
+        });
+    }, [isEditing]);
+
+    // Evento onChange del select Pais
+    useEffect(() => {
+        const pais = watch('pais');
+
         if (pais) {
             if (pais === '0') {
                 setSelects([]);
+                setSelectedValues([]);
                 return;
             }
 
-            handleCountryChange(pais);
+            if (firstEdit || !isEditing) {
+                handleCountryChange(pais);
+            }
         }
-    }, [pais]);
+    }, [watch('pais')]);
     
+    // Manejamos el cambio del select de proyectos para desactivar el de indicadores
     useEffect(() => {
         if (!selectedOption || indicadores.length === 0) {
             setIsSecondInputEnabled(false);
             setValue('indActResNom', '');
         } 
     }, [selectedOption, indicadores]);
-
 
     useEffect(() => {
         // Verifica si el valor actual de 'proNom' coincide con alguna de las opciones
@@ -78,135 +115,48 @@ const FormGoal = () => {
         }
     }, [watch('indActResNom')]);
 
+    //
+    const fetchSelects = async (ubiAno,ubiCod) => {
+        try {
+            const token = localStorage.getItem('token');
+            Notiflix.Loading.pulse('Cargando...');
+            
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Ubicacion/select/${ubiAno}/${ubiCod}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                Notiflix.Notify.failure(data.message);
+                return;
+            }
 
-    useEffect(() => {
-        const fetchPaises = async () => {
-            try {
-                Notiflix.Loading.pulse('Cargando...');
-                const token = localStorage.getItem('token');
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Ubicacion`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                if (!response.ok) {
-                    if(response.status == 401 || response.status == 403){
-                        const data = await response.json();
-                        Notiflix.Notify.failure(data.message);
-                    }
-                    return;
+            if (data.length > 1) {
+                setValue('pais', JSON.stringify({ ubiCod: data[0].ubiCod, ubiAno: data[0].ubiAno }));
+                const newSelectedValues = data.slice(1).map(location => JSON.stringify({ubiCod:location.ubiCod,ubiAno:location.ubiAno}));
+                setSelectedValues(newSelectedValues);
+                
+                for (const [index, location] of data.entries()) {
+                    await handleCountryChange(JSON.stringify({ubiAno: location.ubiAno,ubiCod: location.ubiCod}), index);
+                    setFirstEdit(true);  // Indica que estás estableciendo el valor del select de país
                 }
-                const data = await response.json();
-                if (data.success == false) {
-                    Notiflix.Notify.failure(data.message);
-                    return;
-                }
-                console.log(data)
-                setPaises(data);
-            } catch (error) {
-                console.error('Error:', error);
-            } finally {
-                Notiflix.Loading.remove();
+            } else {
+                setFirstEdit(true);
+                setValue('pais', JSON.stringify({ ubiCod: data[0].ubiCod, ubiAno: data[0].ubiAno }));
             }
-        };
-        const fetchFinanciadores = async () => {
-            try {
-                Notiflix.Loading.pulse('Cargando...');
-                const token = localStorage.getItem('token');
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Financiador`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                if (!response.ok) {
-                    if(response.status == 401 || response.status == 403){
-                        const data = await response.json();
-                        Notiflix.Notify.failure(data.message);
-                    }
-                    return;
-                }
-                const data = await response.json();
-                if (data.success == false) {
-                    Notiflix.Notify.failure(data.message);
-                    return;
-                }
-                console.log(data)
-                setFinanciadores(data);
-            } catch (error) {
-                console.error('Error:', error);
-            } finally {
-                Notiflix.Loading.remove();
-            }
-        };
-        const fetchImplementadores = async () => {
-            try {
-                Notiflix.Loading.pulse('Cargando...');
-                const token = localStorage.getItem('token');
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Implementador`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                if (!response.ok) {
-                    if(response.status == 401 || response.status == 403){
-                        const data = await response.json();
-                        Notiflix.Notify.failure(data.message);
-                    }
-                    return;
-                }
-                const data = await response.json();
-                if (data.success == false) {
-                    Notiflix.Notify.failure(data.message);
-                    return;
-                }
-                console.log(data)
-                setImplementadores(data);
-            } catch (error) {
-                console.error('Error:', error);
-            } finally {
-                Notiflix.Loading.remove();
-            }
-        };
-        const fetchProyectos = async () => {
-            try {
-                Notiflix.Loading.pulse('Cargando...');
-                const token = localStorage.getItem('token');
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Proyecto`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                if (!response.ok) {
-                    if(response.status == 401 || response.status == 403){
-                        const data = await response.json();
-                        Notiflix.Notify.failure(data.message);
-                    }
-                    return;
-                }
-                const data = await response.json();
-                if (data.success == false) {
-                    Notiflix.Notify.failure(data.message);
-                    return;
-                }
-                console.log(data)
-                setProyectos(data);
-            } catch (error) {
-                console.error('Error:', error);
-            } finally {
-                Notiflix.Loading.remove();
-            }
-        };
-        fetchProyectos();
-        fetchFinanciadores();
-        fetchImplementadores();
-        fetchPaises();
-    }, []);
+
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            Notiflix.Loading.remove();
+        }
+    }
 
     const fetchIndicadorActividad = async (proAno, proCod) => {
-        const token = localStorage.getItem('token');
-        Notiflix.Loading.pulse('Cargando...');
-        
         try {
+            Notiflix.Loading.pulse('Cargando...');
+            const token = localStorage.getItem('token');
             const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/autocomplete/${proAno}/${proCod}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -232,11 +182,19 @@ const FormGoal = () => {
 
     const handleCountryChange = async (ubicacion, index) => {
         const selectedCountry = JSON.parse(ubicacion);
-        console.log(selectedCountry.ubiAno, selectedCountry.ubiCod);
+
         if (ubicacion === '0') {
-            console.log("entramos")
             setSelects(prevSelects => prevSelects.slice(0, index + 1));  // Reinicia los selects por debajo del nivel actual
-            console.log(selects)
+
+            // Aquí actualizamos selectedValues para los selectores de nivel inferior
+            setSelectedValues(prevSelectedValues => {
+                const newSelectedValues = [...prevSelectedValues];
+                for (let i = index; i < newSelectedValues.length; i++) {
+                    newSelectedValues[i] = '0';
+                }
+                return newSelectedValues;
+            });
+
             return;
         }
 
@@ -262,10 +220,8 @@ const FormGoal = () => {
             }
             if (data.length > 0) {
                 setSelects(prevSelects => prevSelects.slice(0, index + 1).concat([data]));  // Reinicia los selects por debajo del nivel actual
-                console.log("aver if")
             } else {
                 setSelects(prevSelects => prevSelects.slice(0, index + 1));  // Reinicia los selects por debajo del nivel actual
-                console.log("aver else")
             }
         } catch (error) {
             console.error('Error:', error);
@@ -277,7 +233,6 @@ const FormGoal = () => {
     const onSubmit = (data) => {
         // Definimos variables de ubicacion
         let ubiAno, ubiCod;
-
         // Si los selects dinamicos son mayor a 1
         if (selects.length > 1) {
             // Obtiene el ubiAno y ubiCod del último select
@@ -313,19 +268,9 @@ const FormGoal = () => {
             }
         }
 
-        
-        console.log(ubiAno)
-        console.log(ubiCod)
-
-        
-        
-        const metMetTec = parseInt(data.metMetTec, 10)
-        
         let MetaIndicadorActividad = {
             Meta: { 
-                metMetTec: metMetTec,
-                metEjeTec: 0,
-                metPorAvaTec: 0,
+                metMetTec: data.metMetTec,
                 metMesPlaTec: data.metMesPlaTec,
                 metAnoPlaTec: data.metAnoPlaTec,
                 finCod: data.finCod,
@@ -333,65 +278,38 @@ const FormGoal = () => {
                 ubiAno,
                 ubiCod,
              },
-             MetaIndicadorActividadResultado: {
+             MetaIndicador: {
                 metIndActResAno: data.indActResAno,
                 metIndActResCod: data.indActResCod,
                 metIndActResTipInd: data.tipInd,
             },
         }
-        handleSubmitMetaIndicadorActividad(MetaIndicadorActividad);
+        console.log(MetaIndicadorActividad);
+        handleSubmitMetaIndicador(MetaIndicadorActividad);
       }
 
-      const handleSubmitMetaIndicadorActividad= async (data) => {
+      const handleSubmitMetaIndicador= async (dataForm) => {
         try {
             Notiflix.Loading.pulse('Cargando...');
             const token = localStorage.getItem('token');
             
-            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/MetaIndicador`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/meta-indicador`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify(data),
+                body: JSON.stringify(dataForm),
             });
-            console.log(response)
-            if (!response.ok) {
-                const errorData = await response.json();
-                if(response.status === 409){
-                    Notiflix.Notify.warning(`${errorData.message}`);
-                    console.log(errorData.message)
-                    return;
-                } else {
-                    Notiflix.Notify.failure(errorData.message);
-                    console.log(errorData.message)
-                    return;
-                }
-            }
 
-            const successData = await response.json();
-            Notiflix.Notify.success(successData.message);
-            console.log(successData);
-            fetchBeneficiarie();
-            reset({
-                benApe: '',
-                benApeApo: '',
-                benCorEle: '',
-                benFecNac: '',
-                benNom: '',
-                benNomApo: '',
-                benSex: '',
-                benTel: '',
-                benTelCon: '',
-                genCod: '0',
-                pais: '0',
-            });
-            reset2({
-                benNumDoc: '',
-                docIdeCod: '0',
-            });
-            setSelects([]);
-            setDocumentosAgregados([])
+            const data = await response.json();
+            if (!response.ok) {
+                Notiflix.Notify.failure(data.message)
+                return;
+            }
+            setValue('metAnoPlaTec','');
+            setValue('metMesPlaTec','0');
+            Notiflix.Notify.success(data.message);
         } catch (error) {
             console.error('Error:', error);
         } finally {
@@ -400,22 +318,25 @@ const FormGoal = () => {
     };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="PowerMas_StatusContainer bg-white h-100 flex flex-column">
+        <>
             <div className="PowerMas_Header_Form_Beneficiarie flex ai-center p_5 gap-1">
                 <GrFormPreviousLink className="w-auto Large-f2_5 pointer" onClick={() => navigate('/monitoring')} />
                 <h1 className="f1_75"> {isEditing ? 'Editar' : 'Nueva'} Meta</h1>
             </div>
             <div className="overflow-auto flex-grow-1 flex">
-                <div className="PowerMas_Form_Goal Large_6 m1 overflow-auto">
+                <div className="PowerMas_Content_Form_Beneficiarie_Card Large_6 m1 overflow-auto">
                     <div className="m_75">
                         <label htmlFor="pais" className="">
                             Pais:
                         </label>
                         <select 
                             id="pais"
+                            style={{textTransform: 'capitalize'}}
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.pais || isSubmitted ? (errors.pais ? 'invalid' : 'valid') : ''}`} 
                             {...register('pais', { 
-                                validate: value => value !== '0' || 'El dcoumento de identidad es requerido' 
+                                validate: {
+                                    required: value => value !== '0' || 'El campo es requerido',
+                                }
                             })}
                         >
                             <option value="0">--Seleccione País--</option>
@@ -424,7 +345,7 @@ const FormGoal = () => {
                                     key={pais.ubiCod} 
                                     value={JSON.stringify({ ubiCod: pais.ubiCod, ubiAno: pais.ubiAno })}
                                 > 
-                                    {pais.ubiNom}
+                                    {pais.ubiNom.toLowerCase()}
                                 </option>
                             ))}
                         </select>
@@ -438,20 +359,31 @@ const FormGoal = () => {
                     </div>
                     {selects.map((options, index) => (
                         <div className="m_75" key={index}>
-                            <label htmlFor={index} className="">
-                                {options[0].ubiTip}
+                            <label style={{textTransform: 'capitalize'}} htmlFor={index} className="">
+                                {options[0].ubiTip.toLowerCase()}
                             </label>
                             <select
                                 id={index}
                                 key={index} 
                                 name={`select${index}`} 
-                                onChange={(event) => handleCountryChange(event.target.value, index)} 
+                                onChange={(event) => {
+                                    handleCountryChange(event.target.value, index);
+                                    // Aquí actualizamos el valor seleccionado en el estado
+                                    setSelectedValues(prevSelectedValues => {
+                                        const newSelectedValues = [...prevSelectedValues];
+                                        newSelectedValues[index] = event.target.value;
+                                        console.log(newSelectedValues)
+                                        return newSelectedValues;
+                                    });
+                                }} 
+                                value={selectedValues[index]} 
+                                style={{textTransform: 'capitalize'}}
                                 className="block Phone_12"
                             >
                                 <option style={{textTransform: 'capitalize'}} value="0">--Seleccione {options[0].ubiTip.toLowerCase()}--</option>
                                 {options.map(option => (
                                     <option key={option.ubiCod} value={JSON.stringify({ ubiCod: option.ubiCod, ubiAno: option.ubiAno })}>
-                                        {option.ubiNom}
+                                        {option.ubiNom.toLowerCase()}
                                     </option>
                                 ))}
                             </select>
@@ -479,18 +411,18 @@ const FormGoal = () => {
                                     }
                                 }}
                                 {...register('metAnoPlaTec', { 
-                                    required: 'El número de documento es requerido',
+                                    required: 'El campo es requerido',
                                     minLength: {
                                         value: 4,
-                                        message: 'El número de documento debe tener al menos 6 dígitos'
+                                        message: 'El campo debe tener al menos 4 dígitos'
                                     },
                                     maxLength: {
                                         value: 4,
-                                        message: 'El número de documento no debe tener más de 10 dígitos'
+                                        message: 'El campo no debe tener más de 4 dígitos'
                                     },
                                     pattern: {
                                         value: /^[0-9]*$/,
-                                        message: 'El número de documento solo debe contener números'
+                                        message: 'El campo solo debe contener números'
                                     }
                                 })}
                             />
@@ -509,7 +441,7 @@ const FormGoal = () => {
                             <select 
                                 className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.metMesPlaTec || isSubmitted ? (errors.metMesPlaTec ? 'invalid' : 'valid') : ''}`} 
                                 {...register('metMesPlaTec', { 
-                                    validate: value => value !== '0' || 'El mes es requerido' 
+                                    validate: value => value !== '0' || 'El campo es requerido' 
                                 })}
                                 id="metMesPlaTec" 
                             >
@@ -556,11 +488,11 @@ const FormGoal = () => {
                                 required: 'La meta es requerida',
                                 maxLength: {
                                     value: 10,
-                                    message: 'La meta no debe tener más de 10 dígitos'
+                                    message: 'El campo no debe tener más de 10 dígitos'
                                 },
                                 pattern: {
                                     value: /^[0-9]*$/,
-                                    message: 'El número de documento solo debe contener números'
+                                    message: 'El campo solo debe contener números'
                                 },
                                 validate: value => parseInt(value, 10) > 0 || 'El valor debe ser mayor a 0'
                             })}
@@ -581,7 +513,7 @@ const FormGoal = () => {
                             id="impCod" 
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.impCod || isSubmitted ? (errors.impCod ? 'invalid' : 'valid') : ''}`} 
                             {...register('impCod', { 
-                                validate: value => value !== '0' || 'El Implementador es requerido' 
+                                validate: value => value !== '0' || 'El campo es requerido' 
                             })}
                         >
                             <option value="0">--Seleccione Implementador--</option>
@@ -610,7 +542,7 @@ const FormGoal = () => {
                             id="finCod" 
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.finCod || isSubmitted ? (errors.impCod ? 'invalid' : 'valid') : ''}`} 
                             {...register('finCod', { 
-                                validate: value => value !== '0' || 'El dcoumento de identidad es requerido' 
+                                validate: value => value !== '0' || 'El campo es requerido' 
                             })}
                         >
                             <option value="0">--Seleccione Financiador--</option>
@@ -633,7 +565,7 @@ const FormGoal = () => {
                     </div>
                 </div>
 
-                <div className="PowerMas_Info_Goal Large_6 m1 p1 overflow-auto">
+                <div className="PowerMas_Info_Form_Beneficiarie Large_6 m1 p1 overflow-auto">
                     <h3>Datos del Proyecto</h3>
                     <AutocompleteInput 
                         options={proyectos} 
@@ -646,6 +578,8 @@ const FormGoal = () => {
                         optionToString={(option) => option.proNom}
                         handleOption={(option) => {
                             setIsSecondInputEnabled(true);
+                            setJerarquia(null);
+                            setValue('indActResNom','');
                             fetchIndicadorActividad(option.proAno,option.proCod);
                         }}
                         name='proNom'
@@ -663,14 +597,13 @@ const FormGoal = () => {
                         isSubmitted={isSubmitted} 
                         optionToString={(option) => option.indActResNum + ' - ' + option.indActResNom}
                         handleOption={async(option) => {
-                            console.log(option);
                             setValue('indActResCod',option.indActResCod)
                             setValue('indActResAno',option.indActResAno)
                             setValue('tipInd',option.tipInd)
-
+                            console.log(option)
                             const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/jerarquia/${option.indActResAno}/${option.indActResCod}/${option.tipInd}`);
                             const data = await response.json();
-                            console.log(data);
+
                             setJerarquia(data);
                         }}
                         name='indActResNom'
@@ -683,27 +616,27 @@ const FormGoal = () => {
                     {jerarquia && (
                         <div>
                             <article>
-                                <h3 className="Large-f1_25 m_5" style={{textTransform: 'capitalize'}}>{jerarquia.tipInd.toLowerCase()}</h3>
+                                <h3 className="Large-f1 m_5" style={{textTransform: 'capitalize'}}>{jerarquia.tipInd.toLowerCase()}</h3>
                                 <p className="m_5">{jerarquia.indActResNum + ' - ' + jerarquia.indActResNom.charAt(0).toUpperCase() + jerarquia.indActResNom.slice(1).toLowerCase()}</p>
                             </article>
                             <article>
-                                <h3 className="Large-f1_25 m_5"> Resultado </h3>
+                                <h3 className="Large-f1 m_5"> Resultado </h3>
                                 <p className="m_5">{jerarquia.resNum + ' - ' + jerarquia.resNom.charAt(0).toUpperCase() + jerarquia.indActResNom.slice(1).toLowerCase()}</p>
                             </article>
                             <article>
-                                <h3 className="Large-f1_25 m_5">Objetivo Específico</h3>
+                                <h3 className="Large-f1 m_5">Objetivo Específico</h3>
                                 <p className="m_5">{jerarquia.objEspNum + ' - ' + jerarquia.objEspNom.charAt(0).toUpperCase() + jerarquia.objEspNom.slice(1).toLowerCase()}</p>
                             </article>
                             <article>
-                                <h3 className="Large-f1_25 m_5">Objetivo</h3>
+                                <h3 className="Large-f1 m_5">Objetivo</h3>
                                 <p className="m_5">{jerarquia.objNum + ' - ' + jerarquia.objNom.charAt(0).toUpperCase() + jerarquia.objNom.slice(1).toLowerCase()}</p>
                             </article>
                             <article>
-                                <h3 className="Large-f1_25 m_5"> Subproyecto </h3>
+                                <h3 className="Large-f1 m_5"> Subproyecto </h3>
                                 <p className="m_5">{jerarquia.subProNom}</p>
                             </article>
                             <article>
-                                <h3 className="Large-f1_25 m_5">Proyecto</h3>
+                                <h3 className="Large-f1 m_5">Proyecto</h3>
                                 <p className="m_5">{jerarquia.proNom}</p>
                             </article>
                         </div>
@@ -712,10 +645,10 @@ const FormGoal = () => {
                 
             </div>
             <footer className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
-                <button className="Large_3 m_75 PowerMas_Buttom_Primary">Grabar</button>
-                <button className="Large_3 m_75 PowerMas_Buttom_Secondary">Atras</button>
+                <button onClick={handleSubmit(onSubmit)} className="Large_3 m_75 PowerMas_Buttom_Primary">Grabar</button>
+                <button className="Large_3 m_75 PowerMas_Buttom_Secondary">Limpiar datos</button>
             </footer>
-        </form>
+        </>
     )
 }
 

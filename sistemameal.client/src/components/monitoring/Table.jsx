@@ -110,7 +110,7 @@ const Table = ({ data }) => {
 
     const Editar_Meta = (row) => {
         console.log(row)
-        const id = `${row.original.usuAno}${row.original.usuCod}`;
+        const id = `${row.original.metAno}${row.original.metCod}${row.original.indActResAno}${row.original.indActResCod}${row.original.metIndTipInd}`;
         console.log(id)
         // Encripta el ID
         const ciphertext = CryptoJS.AES.encrypt(id, 'secret key 123').toString();

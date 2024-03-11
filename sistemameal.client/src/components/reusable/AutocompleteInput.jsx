@@ -4,10 +4,9 @@ const AutocompleteInput = ({ options, register, watch, dirtyFields, isSubmitted,
     const watchedValue = watch(name);
     const [filteredOptions, setFilteredOptions] = useState(options);
     const [isFocused, setIsFocused] = useState(false);
-
+    
     useEffect(() => {
         setFilteredOptions(options);
-        console.log(options)
     }, [options]);
 
     useEffect(() => {
@@ -50,20 +49,21 @@ const AutocompleteInput = ({ options, register, watch, dirtyFields, isSubmitted,
 
     return (
         <div className='m_75 PowerMas_Autocomplete'>
-            <label htmlFor={name} className="">
+            <label htmlFor={name} style={{color: `${disabled ? '#372e2c60': '#000'}`}} className="">
                 {titulo}:
             </label>
             <input
                 id={name}
                  className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields[name] || isSubmitted ? (errors[name] ? 'invalid' : 'valid') : ''}`} 
                 {...register(name, {
-                    required: `El ${titulo} es requerido`,
+                    required: `El campo es requerido`,
                 })} 
                 type="search"
                 onFocus={() => setIsFocused(true)}
                 onBlur={handleBlur}
                 disabled={disabled}
                 autoComplete='disabled'
+                placeholder={`Selecciona un ${titulo}`}
             />
             { isFocused && filteredOptions.length > 0 && (
                 <ul className="PowerMas_Autocomplete_Options">

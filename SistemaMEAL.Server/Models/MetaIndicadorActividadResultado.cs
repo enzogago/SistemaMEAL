@@ -9,6 +9,14 @@ namespace SistemaMEAL.Server.Models
         public String? MetAno { get; set; }
         [Key, Column(Order = 1)]
         public String? MetCod { get; set; }
+        public String? MetMetTec { get; set; }
+        public String? MetMesPlaTec { get; set; }
+        public String? MetAnoPlaTec { get; set; }
+        public String? ImpCod { get; set; }
+        public String? FinCod { get; set; }
+        public String? UbiAno { get; set; }
+        public String? UbiCod { get; set; }
+
         [Key, Column(Order = 2)]
         public String? MetIndActResAno { get; set; }
         [Key, Column(Order = 3)]

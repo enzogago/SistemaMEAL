@@ -16,6 +16,13 @@ namespace SistemaMEAL.Server.Models
         public String? MetMetTec { get; set; }
         public String? MetEjeTec { get; set; }
         public String? MetPorAvaTec { get; set; }
+        public String? MetMesPlaTec { get; set; }
+        public String? MetAnoPlaTec { get; set; }
+        public String? MetMetPre { get; set; }
+        public String? MetEjePre { get; set; }
+        public String? MetPorAvaPre { get; set; }
+        public String? MetMesPlaPre { get; set; }
+        public String? MetAnoPlaPre { get; set; }
        
         [ForeignKey("Financiador")]
         public String? FinCod { get; set; }

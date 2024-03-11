@@ -472,7 +472,64 @@ namespace SistemaMEAL.Modulos
             return (mensaje, tipoMensaje);
         }
 
+        public (string? message, string? messageType) ModificarMeta(Meta meta)
+        {
+            string? mensaje = "";
+            string? tipoMensaje = "";
+            try
+            {
 
+                SqlCommand cmd = new SqlCommand("SP_MODIFICAR_META", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@P_METANO", meta.MetAno);
+                cmd.Parameters.AddWithValue("@P_METCOD", meta.MetCod);
+                cmd.Parameters.AddWithValue("@P_ESTCOD", "01");
+                cmd.Parameters.AddWithValue("@P_METMETTEC", meta.MetMetTec);
+                cmd.Parameters.AddWithValue("@P_METEJETEC", "0");
+                cmd.Parameters.AddWithValue("@P_METPORAVATEC", "0");
+                cmd.Parameters.AddWithValue("@P_METMESPLATEC", meta.MetMesPlaTec);
+                cmd.Parameters.AddWithValue("@P_METANOPLATEC", meta.MetAnoPlaTec);
+                cmd.Parameters.AddWithValue("@P_METMETPRE", "0");
+                cmd.Parameters.AddWithValue("@P_METEJEPRE", "0");
+                cmd.Parameters.AddWithValue("@P_METPORAVAPRE", "0");
+                cmd.Parameters.AddWithValue("@P_METMESPLAPRE", "0");
+                cmd.Parameters.AddWithValue("@P_METANOPLAPRE", "0");
+                cmd.Parameters.AddWithValue("@P_FINCOD", meta.FinCod);
+                cmd.Parameters.AddWithValue("@P_IMPCOD", meta.ImpCod);
+                cmd.Parameters.AddWithValue("@P_UBIANO", meta.UbiAno);
+                cmd.Parameters.AddWithValue("@P_UBICOD", meta.UbiCod);
+                cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
+                cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
+                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "GAGO");
+                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "AGUIRRE");
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+
+                cmd.ExecuteNonQuery();
+
+                mensaje = pDescripcionMensaje.Value.ToString();
+                tipoMensaje = pTipoMensaje.Value.ToString();
+            }
+            catch (SqlException ex)
+            {
+                mensaje = ex.Message;
+                tipoMensaje = "1";
+            }
+            finally
+            {
+            }
+            return (mensaje, tipoMensaje);
+        }
 
         public (string? metAnoOut,string? metCodOut,string? message, string? messageType) InsertarMeta(Meta meta)
         {
@@ -488,8 +545,15 @@ namespace SistemaMEAL.Modulos
 
                 cmd.Parameters.AddWithValue("@P_ESTCOD", "01");
                 cmd.Parameters.AddWithValue("@P_METMETTEC", meta.MetMetTec);
-                cmd.Parameters.AddWithValue("@P_METEJETEC", meta.MetEjeTec);
-                cmd.Parameters.AddWithValue("@P_METPORAVATEC", meta.MetPorAvaTec);
+                cmd.Parameters.AddWithValue("@P_METEJETEC", "0");
+                cmd.Parameters.AddWithValue("@P_METPORAVATEC", "0");
+                cmd.Parameters.AddWithValue("@P_METMESPLATEC", meta.MetMesPlaTec);
+                cmd.Parameters.AddWithValue("@P_METANOPLATEC", meta.MetAnoPlaTec);
+                cmd.Parameters.AddWithValue("@P_METMETPRE", "0");
+                cmd.Parameters.AddWithValue("@P_METEJEPRE", "0");
+                cmd.Parameters.AddWithValue("@P_METPORAVAPRE", "0");
+                cmd.Parameters.AddWithValue("@P_METMESPLAPRE", "0");
+                cmd.Parameters.AddWithValue("@P_METANOPLAPRE", "0");
                 cmd.Parameters.AddWithValue("@P_FINCOD", meta.FinCod);
                 cmd.Parameters.AddWithValue("@P_IMPCOD", meta.ImpCod);
                 cmd.Parameters.AddWithValue("@P_UBIANO", meta.UbiAno);
@@ -535,7 +599,8 @@ namespace SistemaMEAL.Modulos
             }
             return (metAnoOut, metCodOut, mensaje, tipoMensaje);
         }
-        public (string? message, string? messageType) InsertarMetaIndicadorActividadResultado(MetaIndicadorActividadResultado metaIndicadorActividadResultado)
+
+        public (string? message, string? messageType) InsertarMetaIndicador(MetaIndicadorActividadResultado metaIndicador)
         {
             string? mensaje = "";
             string? tipoMensaje = "";
@@ -544,11 +609,11 @@ namespace SistemaMEAL.Modulos
                 SqlCommand cmd = new SqlCommand("SP_INSERTAR_META_INDICADOR_ACTIVIDAD_RESULTADO", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
 
-                cmd.Parameters.AddWithValue("@P_METANO", metaIndicadorActividadResultado.MetAno);
-                cmd.Parameters.AddWithValue("@P_METCOD", metaIndicadorActividadResultado.MetCod);
-                cmd.Parameters.AddWithValue("@P_METINDACTRESANO", metaIndicadorActividadResultado.MetIndActResAno);
-                cmd.Parameters.AddWithValue("@P_METINDACTRESCOD", metaIndicadorActividadResultado.MetIndActResCod);
-                cmd.Parameters.AddWithValue("@P_METINDACTRESTIPIND", metaIndicadorActividadResultado.MetIndActResTipInd);
+                cmd.Parameters.AddWithValue("@P_METANO", metaIndicador.MetAno);
+                cmd.Parameters.AddWithValue("@P_METCOD", metaIndicador.MetCod);
+                cmd.Parameters.AddWithValue("@P_METINDACTRESANO", metaIndicador.MetIndActResAno);
+                cmd.Parameters.AddWithValue("@P_METINDACTRESCOD", metaIndicador.MetIndActResCod);
+                cmd.Parameters.AddWithValue("@P_METINDACTRESTIPIND", metaIndicador.MetIndActResTipInd);
                 cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
@@ -582,7 +647,7 @@ namespace SistemaMEAL.Modulos
         }
 
 
-        public (string? message, string? messageType) InsertarMetaMonitoreo(Meta meta, MetaIndicadorActividadResultado metaIndicadorActividadResultado)
+        public (string? message, string? messageType) InsertarMetaMonitoreo(Meta meta, MetaIndicadorActividadResultado metaIndicador)
         {
             string? mensaje = "";
             string? tipoMensaje = "";
@@ -602,20 +667,22 @@ namespace SistemaMEAL.Modulos
 
                         // Inserta el beneficiario
                         var resultMeta = InsertarMeta(meta);
+                        Console.WriteLine(resultMeta.metAnoOut);
                         if (resultMeta.messageType != "3")
                         {
                             throw new Exception(resultMeta.message);
                         }
 
                         // Actualiza el MetaBeneficiario con los IDs del beneficiario insertado
-                        metaIndicadorActividadResultado.MetAno = resultMeta.metAnoOut;
-                        metaIndicadorActividadResultado.MetCod = resultMeta.metCodOut;
+                        metaIndicador.MetAno = resultMeta.metAnoOut;
+                        metaIndicador.MetCod = resultMeta.metCodOut;
 
                         // Inserta el MetaBeneficiario
-                        var resultMetaIndicadorActividadResultado = InsertarMetaIndicadorActividadResultado(metaIndicadorActividadResultado);
-                        if (resultMetaIndicadorActividadResultado.messageType != "3")
+                        var resultMetaIndicador = InsertarMetaIndicador(metaIndicador);
+                        Console.WriteLine(resultMetaIndicador.message);
+                        if (resultMetaIndicador.messageType != "3")
                         {
-                            throw new Exception(resultMetaIndicadorActividadResultado.message);
+                            throw new Exception(resultMetaIndicador.message);
                         }
 
                         // Si ambas operaciones fueron exitosas, confirma la transacción
@@ -1069,6 +1136,64 @@ namespace SistemaMEAL.Modulos
 
             return (mensaje, tipoMensaje);
         }
+
+        public IEnumerable<MetaIndicadorActividadResultado> BuscarMetaIndicador(string? metAno = null, string? metCod = null, string? metIndAno = null, string? metIndCod = null, string? metIndTipInd = null)
+        {
+            List<MetaIndicadorActividadResultado>? temporal = new List<MetaIndicadorActividadResultado>();
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_META_INDICADOR_ACTIVIDAD_RESULTADO", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                // Aquí puedes agregar los parámetros necesarios para tu procedimiento almacenado
+                cmd.Parameters.AddWithValue("@P_METANO", string.IsNullOrEmpty(metAno) ? (object)DBNull.Value : metAno);
+                cmd.Parameters.AddWithValue("@P_METCOD", string.IsNullOrEmpty(metCod) ? (object)DBNull.Value : metCod);
+                cmd.Parameters.AddWithValue("@P_METINDACTRESANO", string.IsNullOrEmpty(metIndAno) ? (object)DBNull.Value : metIndAno);
+                cmd.Parameters.AddWithValue("@P_METINDACTRESCOD", string.IsNullOrEmpty(metIndCod) ? (object)DBNull.Value : metIndCod);
+                cmd.Parameters.AddWithValue("@P_METINDACTRESTIPIND", string.IsNullOrEmpty(metIndTipInd) ? (object)DBNull.Value : metIndTipInd);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
+                cmd.Parameters.AddWithValue("@P_USUANO_U", "2024");
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", "0001");
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", "Juan");
+                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "Perez");
+                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "Gomez");
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (!reader.HasRows)
+                {
+                    jsonResult.Append("[]");
+                }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                // Deserializa la cadena JSON en una lista de objetos Usuario
+                temporal = JsonConvert.DeserializeObject<List<MetaIndicadorActividadResultado>>(jsonResult.ToString());
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return temporal?? new List<MetaIndicadorActividadResultado>();
+        }
+
 
 
     }

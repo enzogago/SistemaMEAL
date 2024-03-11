@@ -40,7 +40,6 @@ namespace SistemaMEAL.Modulos
 
                 StringBuilder jsonResult = new StringBuilder();
                 SqlDataReader reader = cmd.ExecuteReader();
-                Console.WriteLine("desde jsonResult:"+jsonResult);
                 if (!reader.HasRows)
                 {
                     jsonResult.Append("[]");
@@ -49,11 +48,9 @@ namespace SistemaMEAL.Modulos
                 {
                     while (reader.Read())
                     {
-                        Console.WriteLine("desde reader:"+reader.GetValue(0).ToString());
                         jsonResult.Append(reader.GetValue(0).ToString());
                     }
                 }
-                Console.WriteLine("desde jsonResult final:"+jsonResult);
                 // Deserializa la cadena JSON en una lista de objetos Estado
                 temporal = JsonConvert.DeserializeObject<List<Financiador>>(jsonResult.ToString());
             }
