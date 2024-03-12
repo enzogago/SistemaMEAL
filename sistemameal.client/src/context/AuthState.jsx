@@ -44,6 +44,10 @@ const AuthState = ({ children }) => {
         }
     };
 
+    // setTimeout(() => {
+    //     validarUsuario();
+    // }, 15000);
+
     const verificarPermisos = async () => {
         const token = localStorage.getItem('token');
         if(!token) return;
@@ -118,6 +122,7 @@ const AuthState = ({ children }) => {
         setUserLogged,
         setUserPermissions,
         resetUsers,
+        validarUsuario
     };
 
     return (

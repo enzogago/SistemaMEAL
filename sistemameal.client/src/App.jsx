@@ -48,9 +48,12 @@ const App = () => {
     const { setIsLoggedIn, setMenuData } = authActions;
     const { userLogged, menuData  } = authInfo;
 
+    const [isDataLoaded, setIsDataLoaded] = useState(false);
+
     useEffect(() => {
         const fetchMenuData = async () => {
-            if (userLogged) {
+
+            if (Object.keys(userLogged).length > 0) {
                 // Storage
                 const token = localStorage.getItem('token');
                 const usuAno = userLogged.usuAno;
@@ -77,6 +80,8 @@ const App = () => {
                     setMenuData(data);
                 } catch (error) {
                     console.error(error);
+                } finally {
+                    setIsDataLoaded(true);
                 }
             }
         };
@@ -105,7 +110,16 @@ const App = () => {
         "upload-charge": UploadCharge,
         "upload-project": FormatProject,
     };
-    
+
+    let defaultRoute;
+
+    if (menuData.length === 1 && menuData[0].menRef === 'dashboard') {
+        defaultRoute = <Navigate to='/dashboard' />;
+    } else {
+        defaultRoute = <Home />;
+    }
+
+
     return (
             <Router>
                 <Routes>
@@ -115,43 +129,46 @@ const App = () => {
                         </PublicRoute>
                     } />
                     <Route path='*' element={
-                        <PrivateRoute> 
-                            <Layout>
-                                <Routes>
-                                    <Route index element={<Home />} />
-                                    {menuData.map((menu, index) => {
-                                        const Component = componentMap[menu.menRef];
-                                        return Component ? <Route path={`${menu.menRef}`} element={<Component />} key={index} /> : null;
-                                    })}
-                                    {menuData.some(menu => menu.menRef === 'projects') && (
-                                        <Route path="form-project/:id?" element={<FormProject />} />
-                                    )}
-                                    {menuData.some(menu => menu.menRef === 'beneficiarie') && (
-                                        <Route path="form-beneficiarie/:id?" element={<FormBeneficiarie />} />
+                        <PrivateRoute>
+                            {
+                                isDataLoaded && (Object.keys(userLogged).length > 0) &&
+                                <Layout>
+                                    <Routes>
+                                        <Route index element={defaultRoute} />
+                                        {menuData.map((menu, index) => {
+                                            const Component = componentMap[menu.menRef];
+                                            return Component ? <Route path={`${menu.menRef}`} element={<Component />} key={index} /> : null;
+                                        })}
+                                        {menuData.some(menu => menu.menRef === 'projects') && (
+                                            <Route path="form-project/:id?" element={<FormProject />} />
                                         )}
-                                    {menuData.some(menu => menu.menRef === 'user') && (
-                                        <>
-                                            <Route path="form-user/:id?" element={<FormUser />} />
-                                            <Route path="menu-user/:id" element={<MenuUser />} />
-                                            <Route path="permiso-user/:id" element={<PermissionUser />} />
-                                        </>
-                                    )}
-                                    {menuData.some(menu => menu.menRef === 'upload-project') && (
-                                        <>
-                                            <Route path="subir-proyecto" element={<UploadProject />} />
-                                            <Route path="guardar-proyecto" element={<SaveProject />} />
-                                        </>
-                                    )}
-                                    {menuData.some(menu => menu.menRef === 'monitoring') && (
-                                        <>
-                                            <Route path="form-goal-beneficiarie/:id" element={<FormGoalBeneficiarie />} />
-                                            <Route path="form-goal/:id?" element={<FormGoal />} />
-                                        </>
-                                    )}
-                                    <Route path="form-profile/:id" element={<FormProfile />} />
-                                    <Route path="*" element={<NotFound />} />
-                                </Routes>
-                            </Layout>
+                                        {menuData.some(menu => menu.menRef === 'beneficiarie') && (
+                                            <Route path="form-beneficiarie/:id?" element={<FormBeneficiarie />} />
+                                            )}
+                                        {menuData.some(menu => menu.menRef === 'user') && (
+                                            <>
+                                                <Route path="form-user/:id?" element={<FormUser />} />
+                                                <Route path="menu-user/:id" element={<MenuUser />} />
+                                                <Route path="permiso-user/:id" element={<PermissionUser />} />
+                                            </>
+                                        )}
+                                        {menuData.some(menu => menu.menRef === 'upload-project') && (
+                                            <>
+                                                <Route path="subir-proyecto" element={<UploadProject />} />
+                                                <Route path="guardar-proyecto" element={<SaveProject />} />
+                                            </>
+                                        )}
+                                        {menuData.some(menu => menu.menRef === 'monitoring') && (
+                                            <>
+                                                <Route path="form-goal-beneficiarie/:id" element={<FormGoalBeneficiarie />} />
+                                                <Route path="form-goal/:id?" element={<FormGoal />} />
+                                            </>
+                                        )}
+                                        <Route path="form-profile/:id" element={<FormProfile />} />
+                                        <Route path="*" element={<NotFound />} />
+                                    </Routes>
+                                </Layout>
+                            }
                         </PrivateRoute>
                     } />
                 </Routes>

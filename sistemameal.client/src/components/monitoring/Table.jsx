@@ -1,6 +1,5 @@
 import { useContext, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Tooltip } from 'react-tooltip';
 import CryptoJS from 'crypto-js';
 import {
     useReactTable, 
@@ -11,16 +10,8 @@ import {
 } from '@tanstack/react-table';
 // Iconos package
 import { FaEdit, FaPlus, FaRegTrashAlt, FaSearch, FaSortDown } from 'react-icons/fa';
-import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
-import { GrNext, GrPrevious  } from "react-icons/gr";
-// Iconos source
-import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
-import Pdf_Icon from '../../img/PowerMas_Pdf_Icon.svg';
 // Funciones reusables
 import { Export_Excel_Helper, Export_PDF_Helper, handleDelete } from '../reusable/helper';
-// Componentes
-import Pagination from "../reusable/Pagination";
-import TableRow from "./TableRow"
 // Context
 import { AuthContext } from "../../context/AuthContext";
 import CustomTable from "../reusable/Table/CustomTable";
@@ -37,6 +28,9 @@ const Table = ({ data, setMonitoringData }) => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [isInputEmpty, setIsInputEmpty] = useState(true);
     const [inputValue, setInputValue] = useState('');
+
+    
+    const [sums, setSums] = useState(null);
 
     // Añade una nueva etiqueta al presionar Enter
     const handleKeyDown = (e) => {
@@ -83,9 +77,8 @@ const Table = ({ data, setMonitoringData }) => {
     });
 
 
-    // Filtra los datos por todas las etiquetas
-    const filteredData = useMemo(() => 
-        data.filter(item => 
+    const filteredData = useMemo(() => {
+        const filtered = data.filter(item => 
             searchTags.every(tag => 
                 (item.estNom ? item.estNom.includes(tag.toUpperCase()) : false) ||
                 (item.metMetTec ? item.metMetTec.includes(tag.toUpperCase()) : false) ||
@@ -103,10 +96,25 @@ const Table = ({ data, setMonitoringData }) => {
                 (item.objNom ? item.objNom.includes(tag.toUpperCase()) : false) || 
                 (item.subProNom ? item.subProNom.includes(tag.toUpperCase()) : false) || 
                 (item.ubiNom ? item.ubiNom.includes(tag.toUpperCase()) : false) || 
-                (item.proNom ? item.proNom.includes(tag.toUpperCase()) : false)
+                (item.proNom ? item.proNom.includes(tag.toUpperCase()) : false) ||
+                (item.impNom ? item.impNom.includes(tag.toUpperCase()) : false)
             )
-        ), [data, searchTags]
-    );
+        );
+    
+        // Calcula las sumas
+        const sums = {
+            metMetTec: filtered.reduce((sum, item) => sum + Number(item.metMetTec), 0),
+            metEjeTec: filtered.reduce((sum, item) => sum + Number(item.metEjeTec), 0),
+            metMetPre: filtered.reduce((sum, item) => sum + Number(item.metMetPre), 0),
+            metEjePre: filtered.reduce((sum, item) => sum + Number(item.metEjePre), 0),
+        };
+    
+        // Guarda las sumas en el estado
+        setSums(sums);
+    
+        return filtered;
+    }, [data, searchTags]);
+
 
 
     const Editar_Meta = (row) => {
@@ -292,16 +300,20 @@ const Table = ({ data, setMonitoringData }) => {
                 header: "Indicador",
                 accessorKey: "indActResNom",
                 cell: ({row}) => {
-                    const text = row.original.indActResNum + ' - ' + row.original.indActResNom.charAt(0).toUpperCase() + row.original.indActResNom.slice(1).toLowerCase();
-                    const shortText = text.length > 50 ? text.substring(0, 50) + '...' : text;
-                    return (
-                        <>
-                            <span 
-                                data-tooltip-id="info-tooltip" 
-                                data-tooltip-content={text} 
-                            >{shortText}</span>
-                        </>
-                    );
+                    if (row.original.indActResNum && row.original.indActResNom) {
+                        const text = row.original.indActResNum + ' - ' + row.original.indActResNom.charAt(0).toUpperCase() + row.original.indActResNom.slice(1).toLowerCase();
+                        const shortText = text.length > 50 ? text.substring(0, 50) + '...' : text;
+                        return (
+                            <>
+                                <span 
+                                    data-tooltip-id="info-tooltip" 
+                                    data-tooltip-content={text} 
+                                >{shortText}</span>
+                            </>
+                        );
+                    } else {
+                        return null;
+                    }
                 },
             },
             {
@@ -370,23 +382,47 @@ const Table = ({ data, setMonitoringData }) => {
             },
             {
                 header: "Subproyecto",
-                accessorKey: "subProNom"
+                accessorKey: "subProNom",
+                cell: ({row}) => {
+                    return (
+                        <div style={{textTransform: 'capitalize'}}>
+                            {row.original.subProNom.toLowerCase()}
+                        </div>
+                    )
+                }
             },
             {
                 header: "Proyecto",
-                accessorKey: "proNom"
+                accessorKey: "proNom",
+                cell: ({row}) => {
+                    return (
+                        <div style={{textTransform: 'capitalize'}}>
+                            {row.original.proNom.toLowerCase()}
+                        </div>
+                    )
+                }
             },
             {
                 header: "Ubicaciòn",
-                accessorKey: "ubiNom"
-            },
-            {
-                header: "Financiador",
-                accessorKey: "finNom"
+                accessorKey: "ubiNom",
+                cell: ({row}) => {
+                    return (
+                        <div style={{textTransform: 'capitalize'}}>
+                            {row.original.ubiNom.toLowerCase()}
+                        </div>
+                    )
+                }
             },
             {
                 header: "Implementador",
-                accessorKey: "impNom"
+                accessorKey: "impNom",
+                cell: ({row}) => {
+                    return (
+                        <div style={{textTransform: 'capitalize'}}>
+                            {row.original.impNom.toLowerCase()}
+                        </div>
+                    )
+                }
             },
             {
                 header: "Añadir",
@@ -502,6 +538,7 @@ const Table = ({ data, setMonitoringData }) => {
                 removeTag={removeTag}
                 searchTags={searchTags}
                 setSearchTags={setSearchTags}
+                sums={sums}
             />
             
         </>

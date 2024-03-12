@@ -21,6 +21,7 @@ const AutocompleteInput = ({ options, register, watch, dirtyFields, isSubmitted,
     }, [watchedValue]);
 
     const handleOptionClick = (option) => {
+        console.log(option)
         setValue(name, optionToString(option));
         setFilteredOptions([]);
         setIsFocused(false);
@@ -42,14 +43,12 @@ const AutocompleteInput = ({ options, register, watch, dirtyFields, isSubmitted,
             setValue(name, '');
         }
 
-        setTimeout(() => {
-            setIsFocused(false);
-        }, 100);
+        setIsFocused(false);
     };
 
     return (
         <div className='m_75 PowerMas_Autocomplete'>
-            <label htmlFor={name} style={{color: `${disabled ? '#372e2c60': '#000'}`}} className="">
+            <label htmlFor={name} style={{color: `${disabled ? '#372e2c60': '#000'}`}}>
                 {titulo}:
             </label>
             <input
@@ -64,14 +63,24 @@ const AutocompleteInput = ({ options, register, watch, dirtyFields, isSubmitted,
                 disabled={disabled}
                 autoComplete='disabled'
                 placeholder={`Selecciona un ${titulo}`}
-                style={{textTransform: 'capitalize'}}
+                onInput={(e) => {
+                    setValue(name, e.target.value);  // Actualiza el valor del campo de entrada
+                    setIsFocused(true);  // Muestra la lista de opciones
+                }}
             />
             { isFocused && filteredOptions.length > 0 && (
                 <ul className="PowerMas_Autocomplete_Options">
                     {filteredOptions.map((option, index) => (
-                        <li key={index} onClick={() => handleOptionClick(option)} className="PowerMas_Autocomplete_Option f1 p_25">
+                        <li 
+                            key={index} 
+                            onMouseDown={(e) => {
+                                e.preventDefault();  // Previene el evento blur
+                                handleOptionClick(option);
+                            }} 
+                            className="PowerMas_Autocomplete_Option f_75 p_25"
+                        >
                             {
-                                optionToString(option).length > 30 ? optionToString(option).substring(0, 30) + '...' : optionToString(option)
+                                optionToString(option).length > 65 ? optionToString(option).substring(0, 65) + '...' : optionToString(option)
                             }
                         </li>
                     ))}

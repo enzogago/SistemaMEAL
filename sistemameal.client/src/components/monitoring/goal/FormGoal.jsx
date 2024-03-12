@@ -347,6 +347,7 @@ const FormGoal = () => {
                     }
                     mes++;
                 }, Promise.resolve()); // Inicia con una promesa resuelta
+                navigate('/monitoring')
             }
         }
 
@@ -375,6 +376,7 @@ const FormGoal = () => {
             const successData = await response.json();
             Notiflix.Notify.success(successData.message);
             console.log(successData)
+            navigate('/monitoring');
         } catch (error) {
             console.error('Error:', error);
         } finally {
@@ -404,6 +406,7 @@ const FormGoal = () => {
             const successData = await response.json();
             Notiflix.Notify.success(successData.message);
             console.log(successData)
+            navigate('/monitoring');
         } catch (error) {
             console.error('Error:', error);
         } finally {
@@ -433,6 +436,7 @@ const FormGoal = () => {
             const successData = await response.json();
             Notiflix.Notify.success(successData.message);
             console.log(successData)
+            navigate('/monitoring');
         } catch (error) {
             console.error('Error:', error);
         } finally {
@@ -476,6 +480,93 @@ const FormGoal = () => {
                 <h1 className="f1_75"> {isEditing ? 'Editar' : 'Nueva'} Meta</h1>
             </div>
             <div className="overflow-auto flex-grow-1 flex">
+            <div className="PowerMas_Info_Form_Beneficiarie Large_6 m1 p1 overflow-auto">
+                    <h3>Datos del Proyecto</h3>
+                    <AutocompleteInput 
+                        options={proyectos} 
+                        register={register} 
+                        watch={watch}
+                        setValue={setValue}
+                        setSelectedOption={setSelectedOption}
+                        dirtyFields={dirtyFields}
+                        isSubmitted={isSubmitted} 
+                        optionToString={(option) => option.proNom.charAt(0) + option.proNom.slice(1).toLowerCase()}
+                        handleOption={(option) => {
+                            setIsSecondInputEnabled(true);
+                            setJerarquia(null);
+                            setValue('indActResNom','');
+                            fetchIndicadorActividad(option.proAno,option.proCod);
+                        }}
+                        name='proNom'
+                        errors={errors}
+                        titulo='Proyecto'
+                        trigger={trigger}
+                    />
+                    <AutocompleteInput 
+                        options={indicadores} 
+                        register={register} 
+                        watch={watch}
+                        setValue={setValue}
+                        setSelectedOption={setSelectedOption}
+                        dirtyFields={dirtyFields}
+                        isSubmitted={isSubmitted} 
+                        optionToString={(option) => option.indActResNum + ' - ' + option.indActResNom.charAt(0).toUpperCase() + option.indActResNom.slice(1).toLowerCase() }
+                        handleOption={async(option) => {
+                            setValue('metIndActResCod',option.indActResCod)
+                            setValue('metIndActResAno',option.indActResAno)
+                            setValue('metIndActResTipInd',option.tipInd)
+                            console.log(option)
+                            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/jerarquia/${option.indActResAno}/${option.indActResCod}/${option.tipInd}`);
+                            const data = await response.json();
+
+                            setJerarquia(data);
+                        }}
+                        name='indActResNom'
+                        errors={errors}
+                        disabled={!isSecondInputEnabled}
+                        titulo='Indicador'
+                        trigger={trigger}
+                    />
+                    <hr className="PowerMas_Hr" />
+                    {jerarquia && (
+                        <div>
+                            <article>
+                                <h3 className="Large-f1 m_5" style={{textTransform: 'capitalize'}}>{jerarquia.tipInd.toLowerCase()}</h3>
+                                <p className="m_5">{jerarquia.indActResNum + ' - ' + jerarquia.indActResNom.charAt(0).toUpperCase() + jerarquia.indActResNom.slice(1).toLowerCase()}</p>
+                            </article>
+                            {
+                                jerarquia.resNom &&
+                                <>
+                                    <article>
+                                        <h3 className="Large-f1 m_5"> Resultado </h3>
+                                        <p className="m_5">{jerarquia.resNum + ' - ' + jerarquia.resNom.charAt(0).toUpperCase() + jerarquia.indActResNom.slice(1).toLowerCase()}</p>
+                                    </article>
+                                </>
+                            }
+                            {
+                                jerarquia.objEspNom &&
+                                <>
+                                    <article>
+                                        <h3 className="Large-f1 m_5">Objetivo Específico</h3>
+                                        <p className="m_5">{jerarquia.objEspNum + ' - ' + jerarquia.objEspNom.charAt(0).toUpperCase() + jerarquia.objEspNom.slice(1).toLowerCase()}</p>
+                                    </article>
+                                </>
+                            }
+                            <article>
+                                <h3 className="Large-f1 m_5">Objetivo</h3>
+                                <p className="m_5">{jerarquia.objNum + ' - ' + jerarquia.objNom.charAt(0).toUpperCase() + jerarquia.objNom.slice(1).toLowerCase()}</p>
+                            </article>
+                            <article>
+                                <h3 className="Large-f1 m_5"> Subproyecto </h3>
+                                <p className="m_5" style={{textTransform: 'capitalize'}}>{jerarquia.subProNom.toLowerCase()}</p>
+                            </article>
+                            <article>
+                                <h3 className="Large-f1 m_5">Proyecto</h3>
+                                <p className="m_5" style={{textTransform: 'capitalize'}}>{jerarquia.proNom.toLowerCase()}</p>
+                            </article>
+                        </div>
+                    )}
+                </div>
                 <div className="PowerMas_Content_Form_Beneficiarie_Card Large_6 m1 overflow-auto">
                     <div className="m_75">
                         <label htmlFor="pais" className="">
@@ -1009,93 +1100,7 @@ const FormGoal = () => {
                     
                 </div>
 
-                <div className="PowerMas_Info_Form_Beneficiarie Large_6 m1 p1 overflow-auto">
-                    <h3>Datos del Proyecto</h3>
-                    <AutocompleteInput 
-                        options={proyectos} 
-                        register={register} 
-                        watch={watch}
-                        setValue={setValue}
-                        setSelectedOption={setSelectedOption}
-                        dirtyFields={dirtyFields}
-                        isSubmitted={isSubmitted} 
-                        optionToString={(option) => option.proNom}
-                        handleOption={(option) => {
-                            setIsSecondInputEnabled(true);
-                            setJerarquia(null);
-                            setValue('indActResNom','');
-                            fetchIndicadorActividad(option.proAno,option.proCod);
-                        }}
-                        name='proNom'
-                        errors={errors}
-                        titulo='Proyecto'
-                        trigger={trigger}
-                    />
-                    <AutocompleteInput 
-                        options={indicadores} 
-                        register={register} 
-                        watch={watch}
-                        setValue={setValue}
-                        setSelectedOption={setSelectedOption}
-                        dirtyFields={dirtyFields}
-                        isSubmitted={isSubmitted} 
-                        optionToString={(option) => option.indActResNum + ' - ' + option.indActResNom}
-                        handleOption={async(option) => {
-                            setValue('metIndActResCod',option.indActResCod)
-                            setValue('metIndActResAno',option.indActResAno)
-                            setValue('metIndActResTipInd',option.tipInd)
-                            console.log(option)
-                            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/jerarquia/${option.indActResAno}/${option.indActResCod}/${option.tipInd}`);
-                            const data = await response.json();
-
-                            setJerarquia(data);
-                        }}
-                        name='indActResNom'
-                        errors={errors}
-                        disabled={!isSecondInputEnabled}
-                        titulo='Indicador'
-                        trigger={trigger}
-                    />
-                    <hr className="PowerMas_Hr" />
-                    {jerarquia && (
-                        <div>
-                            <article>
-                                <h3 className="Large-f1 m_5" style={{textTransform: 'capitalize'}}>{jerarquia.tipInd.toLowerCase()}</h3>
-                                <p className="m_5">{jerarquia.indActResNum + ' - ' + jerarquia.indActResNom.charAt(0).toUpperCase() + jerarquia.indActResNom.slice(1).toLowerCase()}</p>
-                            </article>
-                            {
-                                jerarquia.resNom &&
-                                <>
-                                    <article>
-                                        <h3 className="Large-f1 m_5"> Resultado </h3>
-                                        <p className="m_5">{jerarquia.resNum + ' - ' + jerarquia.resNom.charAt(0).toUpperCase() + jerarquia.indActResNom.slice(1).toLowerCase()}</p>
-                                    </article>
-                                </>
-                            }
-                            {
-                                jerarquia.objEspNom &&
-                                <>
-                                    <article>
-                                        <h3 className="Large-f1 m_5">Objetivo Específico</h3>
-                                        <p className="m_5">{jerarquia.objEspNum + ' - ' + jerarquia.objEspNom.charAt(0).toUpperCase() + jerarquia.objEspNom.slice(1).toLowerCase()}</p>
-                                    </article>
-                                </>
-                            }
-                            <article>
-                                <h3 className="Large-f1 m_5">Objetivo</h3>
-                                <p className="m_5">{jerarquia.objNum + ' - ' + jerarquia.objNom.charAt(0).toUpperCase() + jerarquia.objNom.slice(1).toLowerCase()}</p>
-                            </article>
-                            <article>
-                                <h3 className="Large-f1 m_5"> Subproyecto </h3>
-                                <p className="m_5">{jerarquia.subProNom}</p>
-                            </article>
-                            <article>
-                                <h3 className="Large-f1 m_5">Proyecto</h3>
-                                <p className="m_5">{jerarquia.proNom}</p>
-                            </article>
-                        </div>
-                    )}
-                </div>
+                
                 
             </div>
             <footer className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">

@@ -2,6 +2,7 @@ import React from 'react'
 import DonutChart from '../../reusable/DonutChart'
 
 const InfoGoal = ({metaData, openModal}) => {
+    console.log(metaData)
     return (
         <div className="Large_6 overflow-auto flex flex-column"> 
             <div className="PowerMas_Info_Form_Beneficiarie m1" >

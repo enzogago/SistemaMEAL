@@ -31,7 +31,8 @@ const CustomTable = ({
     inputValue,
     removeTag,
     searchTags,
-    setSearchTags
+    setSearchTags,
+    sums
 }) => {
     const navigate = useNavigate();
     
@@ -207,28 +208,43 @@ const CustomTable = ({
                     <tbody>
                         {
                             table.getRowModel().rows.length > 0 ?
-                                table.getRowModel().rows.map(row => (
-                                    <tr key={row.id}>
-                                        {row.getVisibleCells().map(cell => (
-                                            !resize ?
-                                                <td 
-                                                    key={cell.id} 
-                                                    className="p_5 ws-nowrap"
-                                                    style={{
-                                                        position: cell.column.columnDef.stickyRight !== undefined ? 'sticky' : '', 
-                                                        right: cell.column.columnDef.stickyRight !== undefined ? `${cell.column.columnDef.stickyRight}px` : 'auto',
-                                                        backgroundColor: '#fff'
-                                                    }}
-                                                >
-                                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                                </td>
-                                            :
-                                                <td className='ws-nowrap' style={{ width:  cell.column.getSize() }} key={cell.id}>
-                                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                                </td>
-                                        ))}
-                                    </tr>
-                                ))
+                                <>
+                                    {table.getRowModel().rows.map(row => (
+                                        <tr key={row.id}>
+                                            {row.getVisibleCells().map(cell => (
+                                                !resize ?
+                                                    <td 
+                                                        key={cell.id} 
+                                                        className="p_5 ws-nowrap"
+                                                        style={{
+                                                            position: cell.column.columnDef.stickyRight !== undefined ? 'sticky' : '', 
+                                                            right: cell.column.columnDef.stickyRight !== undefined ? `${cell.column.columnDef.stickyRight}px` : 'auto',
+                                                            backgroundColor: cell.column.columnDef.stickyRight !== undefined ? '#fff': '', 
+                                                        }}
+                                                    >
+                                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                    </td>
+                                                :
+                                                    <td className='ws-nowrap' style={{ width:  cell.column.getSize() }} key={cell.id}>
+                                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                    </td>
+                                            ))}
+                                        </tr>
+                                    ))}
+                                    {
+                                        sums &&
+                                        <tr className='PowerMas_Totales_Monitoreo'>
+                                            <td>Totales</td>
+                                            <td>{sums.metMetTec.toLocaleString()}</td>
+                                            <td>{sums.metEjeTec.toLocaleString()}</td>
+                                            <td>{((sums.metEjeTec/sums.metMetTec)*100).toFixed(2)}%</td>
+                                            <td>${sums.metMetPre.toLocaleString()}</td>
+                                            <td>${sums.metEjePre.toLocaleString()}</td>
+                                            <td>{((sums.metEjePre/sums.metMetPre)*100).toFixed(2)}%</td>
+                                            <td colSpan={50}></td>
+                                        </tr>
+                                    }
+                                </>
                             :   <tr className='PowerMas_TableEmpty'>
                                     <td colSpan={20} className='Large-p1 center'>
                                         No se encontraron registros

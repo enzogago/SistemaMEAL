@@ -261,13 +261,10 @@ export const Export_PDF_Helper = async (data, headers, title, properties, format
         });
         // Definir los datos de la tabla
         const tableData = data.map(item => {
-            let fecha = new Date(item.fecMod);
+            let fecha = new Date(item.fecMod).toISOString();
 
             // Formatear la fecha y hora
-            let fechaFormateada = fecha.toLocaleString('es-EC', {
-                day: '2-digit', month: '2-digit', year: 'numeric',
-                hour: '2-digit', minute: '2-digit'
-            });
+            let fechaFormateada = fecha.substring(0, 16).replace('T', ' ');
 
             return properties.map(prop => prop === 'fecMod' ? fechaFormateada : item[prop]);
         });

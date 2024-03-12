@@ -276,12 +276,13 @@ namespace SistemaMEAL.Server.Controllers
             var singIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                    jwt.Issuer,
-                    jwt.Audience,
-                    claims,
-                    expires: DateTime.Now.AddHours(30),
-                    signingCredentials: singIn
-                );
+                jwt.Issuer,
+                jwt.Audience,
+                claims,
+                expires: DateTime.Now.AddHours(2),
+                signingCredentials: singIn
+            );
+
             return new
             {
                 success = true,

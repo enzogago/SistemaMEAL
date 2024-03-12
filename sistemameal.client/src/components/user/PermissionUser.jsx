@@ -5,82 +5,10 @@ import Notiflix from "notiflix";
 import ProjectItem from "./ProjectItem";
 import Bar from "./Bar";
 import CryptoJS from 'crypto-js';
-import avatar from '../../img/avatar.jpeg';
 import masculino from '../../img/PowerMas_Avatar_Masculino.svg';
 import femenino from '../../img/PowerMas_Avatar_Femenino.svg';
-import { Button } from 'antd';
 import { Tree } from 'antd';
 
-const treeData = [
-    {
-      title: '0-0',
-      key: '0-0',
-      children: [
-        {
-          title: '0-0-0',
-          key: '0-0-0',
-          children: [
-            {
-              title: '0-0-0-0',
-              key: '0-0-0-0',
-            },
-            {
-              title: '0-0-0-1',
-              key: '0-0-0-1',
-            },
-            {
-              title: '0-0-0-2',
-              key: '0-0-0-2',
-            },
-          ],
-        },
-        {
-          title: '0-0-1',
-          key: '0-0-1',
-          children: [
-            {
-              title: '0-0-1-0',
-              key: '0-0-1-0',
-            },
-            {
-              title: '0-0-1-1',
-              key: '0-0-1-1',
-            },
-            {
-              title: '0-0-1-2',
-              key: '0-0-1-2',
-            },
-          ],
-        },
-        {
-          title: '0-0-2',
-          key: '0-0-2',
-        },
-      ],
-    },
-    {
-      title: '0-1',
-      key: '0-1',
-      children: [
-        {
-          title: '0-1-0-0',
-          key: '0-1-0-0',
-        },
-        {
-          title: '0-1-0-1',
-          key: '0-1-0-1',
-        },
-        {
-          title: '0-1-0-2',
-          key: '0-1-0-2',
-        },
-      ],
-    },
-    {
-      title: '0-2',
-      key: '0-2',
-    },
-  ];
 
 const PermissionUser = () => {
     const navigate = useNavigate();
@@ -420,14 +348,14 @@ const PermissionUser = () => {
                             ))}
                         </ul> */}
                         <Tree
-                            checkable
-                            onExpand={onExpand}
-                            expandedKeys={expandedKeys}
-                            autoExpandParent={autoExpandParent}
-                            onCheck={onCheck}
-                            checkedKeys={checkedKeys}
-                            selectedKeys={selectedKeys}
-                            treeData={proyectos}
+                          checkable
+                          onExpand={onExpand}
+                          expandedKeys={expandedKeys}
+                          autoExpandParent={autoExpandParent}
+                          onCheck={onCheck}
+                          checkedKeys={checkedKeys}
+                          selectedKeys={selectedKeys}
+                          treeData={proyectos}
                         />
                     </div>
                     <div className="PowerMas_Info_User Large_6 PowerMas_Form_Card p1" style={{backgroundColor: '#f7f7f7'}}>

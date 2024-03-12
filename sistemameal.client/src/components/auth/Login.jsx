@@ -68,6 +68,12 @@ const Login = () => {
                     localStorage.setItem('credentials', JSON.stringify({ email, encryptedPassword }));
                 }
                 localStorage.setItem('token', data.result);
+
+                let fecha = new Date();
+                let hora = fecha.getHours();
+                let minutos = fecha.getMinutes();
+
+                localStorage.setItem('timeInit', `${hora}:${minutos}`);
                 setIsLoggedIn(true);
             } else {
                 Notiflix.Notify.failure(data.message);

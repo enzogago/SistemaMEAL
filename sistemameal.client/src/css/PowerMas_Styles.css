@@ -12,7 +12,7 @@ body {
 input[type=text], select{
 	outline: none;
 }
-input[type=text]{
+input[type=text],input[type=search]{
 	padding-right: 30px;
 }
 .PowerMas_MainHome input,.PowerMas_MainHome select{
@@ -71,7 +71,12 @@ input::placeholder,select::placeholder{
 .fixed-top {
 	padding-top: 5rem;
 }
-
+.ant-tree-list-holder-inner > div.ant-tree-treenode {
+	width: 100%;
+	background-color: #FFFAF6;
+    border: 1px solid #372e2c3e;
+  }
+  
 .flex-caption {
 	padding: 2%;
 	color: #116186;
@@ -528,10 +533,10 @@ input::placeholder,select::placeholder{
 	display: block;
 }
   
-.PowerMas_BarContainer {
+/* .PowerMas_BarContainer {
 	background-color: #20737b;
 	color: #fff;
-}
+} */
 
 .PowerMas_BarContainer h2 {
 	font-family: Bogart;
@@ -1863,4 +1868,15 @@ textarea {
 
 .error-cell {
     background-color: red;
+}
+
+.PowerMas_Totales_Monitoreo{
+	position: sticky;
+	bottom: 0;
+	background-color: #F7775A!important;
+}
+
+.PowerMas_Totales_Monitoreo td{
+	text-align: center;
+	font-weight: bold;
 }

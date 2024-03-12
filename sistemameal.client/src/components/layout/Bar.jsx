@@ -13,8 +13,10 @@ import ModalAcerca from './ModalAcerca';
 import CryptoJS from 'crypto-js';
 import masculino from '../../img/PowerMas_Avatar_Masculino.svg';
 import femenino from '../../img/PowerMas_Avatar_Femenino.svg';
+import Logo from '../../img/PowerMas_LogoAyudaEnAccion.png';
 
-const Bar = () => {
+const Bar = ({showSidebarAndBar}) => {
+    console.log(showSidebarAndBar)
     const navigate = useNavigate();
     // Variables state AuthContext
     const { authInfo, authActions } = useContext(AuthContext);
@@ -79,18 +81,33 @@ const Bar = () => {
         const safeCiphertext = btoa(ciphertext).replace('+', '-').replace('/', '_').replace(/=+$/, '');
         return safeCiphertext;
     }
-  
+
     return (
-        <div className="PowerMas_BarContainer flex ai-center jc-space-between p_5">
-            <h2 className="Large-f2 Medium-f1_5 Small-f1">¡Hola de nuevo!</h2>
+        <div 
+            className="PowerMas_BarContainer flex ai-center jc-space-between p_5" 
+            style={{
+                backgroundColor: `${showSidebarAndBar? '#20737b' : '#ffffff'}`,
+                color: `${showSidebarAndBar? '#ffffff' : '#000000'}`,
+                borderBottom:`${showSidebarAndBar? '' : '2px solid #20737b'}`,
+            }}
+        >
+            {
+                showSidebarAndBar ?
+                <h2 className="Large-f2 Medium-f1_5 Small-f1">¡Hola de nuevo!</h2>
+                :
+                <img className='Large_1 Medium_10 Phone_6' height="auto"  title="Sistema MEAL Ayuda en Acción" src={Logo} alt="Logo Ayuda En Accion" />
+            }
             <div className="PowerMas_ProfileContainer">
                 <div className="PowerMas_ProfilePicture">
                     <img src={Object.keys(userLogged).length && (userLogged.usuSex === 'M' ? masculino : femenino)} alt="Descripción de la imagen" />
                 </div>
-                <div className="PowerMas_ProfileInfo flex-column m_5">
-                    <span style={{textTransform: 'capitalize'}} className="PowerMas_Username Large-f1 Medium-f1 Small-f_75">{userLogged  ? `${userLogged.usuNom.toLowerCase()} ${userLogged.usuApe.toLowerCase()}` : ''}</span>
-                    <span style={{textTransform: 'capitalize'}}  className="PowerMas_UserRole Large-f_75 Medium-f_75 Small-f_5">{userLogged  ? userLogged.carNom.toLowerCase() : ''}</span>
-                </div>
+                {
+                    showSidebarAndBar &&
+                    <div className="PowerMas_ProfileInfo flex-column m_5">
+                        <span style={{textTransform: 'capitalize'}} className="PowerMas_Username Large-f1 Medium-f1 Small-f_75">{userLogged  ? `${userLogged.usuNom.toLowerCase()} ${userLogged.usuApe.toLowerCase()}` : ''}</span>
+                        <span style={{textTransform: 'capitalize'}}  className="PowerMas_UserRole Large-f_75 Medium-f_75 Small-f_5">{userLogged  ? userLogged.carNom.toLowerCase() : ''}</span>
+                    </div>
+                }
                 <div 
                     className={`pointer round p_25 PowerMas_MenuIcon ${isOpen ? 'PowerMas_MenuIcon--rotated' : ''}`} 
                     onClick={handleIconClick}
@@ -106,23 +123,28 @@ const Bar = () => {
                             <p style={{textTransform: 'capitalize'}} className='color-black'>Hola, {userLogged ? `${userLogged.usuNom.toLowerCase()}` : ''}</p>
                         </div>
                         <hr className='PowerMas_Hr m0' />
-                        <Link className='flex ai-center p_25' to={`/form-profile/${encryptId(`${userLogged.usuAno}${userLogged.usuCod}`)}`}>
-                            <FaUserAlt className='w-auto m_5' />
-                            <span className='flex'>Perfil</span>
-                        </Link>
-                        <Link className='flex ai-center p_25 grey-hover' onClick={CambiarContraseña}>
-                            <FaUnlockKeyhole className='w-auto m_5' />
-                            <span className='flex'>Contraseña</span>
-                        </Link>
-                        <Link className='flex ai-center p_25' to="/configurar">
-                            <IoPlayCircleSharp className='w-auto m_5' />
-                            <span className='flex'>Tutoriales</span>
-                        </Link>
-                        <Link className='flex ai-center p_25' onClick={AcercDe}>
-                            <AiFillTool className='w-auto m_5' />
-                            <span className='flex'>Acerca De</span>
-                        </Link>
-                        <hr className='PowerMas_Hr m0' />
+                        {
+                            showSidebarAndBar &&
+                            <>
+                                <Link className='flex ai-center p_25' to={`/form-profile/${encryptId(`${userLogged.usuAno}${userLogged.usuCod}`)}`}>
+                                    <FaUserAlt className='w-auto m_5' />
+                                    <span className='flex'>Perfil</span>
+                                </Link>
+                                <Link className='flex ai-center p_25 grey-hover' onClick={CambiarContraseña}>
+                                    <FaUnlockKeyhole className='w-auto m_5' />
+                                    <span className='flex'>Contraseña</span>
+                                </Link>
+                                <Link className='flex ai-center p_25' to="/configurar">
+                                    <IoPlayCircleSharp className='w-auto m_5' />
+                                    <span className='flex'>Tutoriales</span>
+                                </Link>
+                                <Link className='flex ai-center p_25' onClick={AcercDe}>
+                                    <AiFillTool className='w-auto m_5' />
+                                    <span className='flex'>Acerca De</span>
+                                </Link>
+                                <hr className='PowerMas_Hr m0' />
+                            </>
+                        }
                         <Link className='flex ai-center p_25' onClick={CerrarSesion}>
                             <FaPowerOff className='w-auto m_5' />
                             <span className='flex'>Cerrar Sesión</span>
