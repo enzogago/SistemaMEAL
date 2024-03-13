@@ -544,11 +544,11 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_METMESPLATEC", meta.MetMesPlaTec);
                 cmd.Parameters.AddWithValue("@P_METANOPLATEC", meta.MetAnoPlaTec);
                 cmd.Parameters.AddWithValue("@P_METMETPRE", meta.MetMetPre);
-                cmd.Parameters.AddWithValue("@P_METEJEPRE", "0");
-                cmd.Parameters.AddWithValue("@P_METPORAVAPRE", "0");
+                cmd.Parameters.AddWithValue("@P_METEJEPRE", meta.MetEjePre);
+                cmd.Parameters.AddWithValue("@P_METPORAVAPRE", meta.MetPorAvaPre);
                 cmd.Parameters.AddWithValue("@P_METMESPLAPRE", "0");
                 cmd.Parameters.AddWithValue("@P_METANOPLAPRE", "0");
-                cmd.Parameters.AddWithValue("@P_FINCOD", meta.FinCod);
+                cmd.Parameters.AddWithValue("@P_FINCOD", "01");
                 cmd.Parameters.AddWithValue("@P_IMPCOD", meta.ImpCod);
                 cmd.Parameters.AddWithValue("@P_UBIANO", meta.UbiAno);
                 cmd.Parameters.AddWithValue("@P_UBICOD", meta.UbiCod);

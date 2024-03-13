@@ -108,7 +108,7 @@ namespace SistemaMEAL.Modulos
             {
                 cn.getcn.Open();
 
-                SqlCommand cmd = new SqlCommand("SP_LISTAR_SUBPROYECTO_PROYECTO", cn.getcn);
+                SqlCommand cmd = new SqlCommand("SP_LISTAR_MONITOREO_PERMISO", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 StringBuilder jsonResult = new StringBuilder();
@@ -125,6 +125,7 @@ namespace SistemaMEAL.Modulos
                     }
                 }
 
+                Console.WriteLine(jsonResult);
                 // Deserializa la cadena JSON en un objeto Proyecto
                 temporal = JsonConvert.DeserializeObject<List<Proyecto>>(jsonResult.ToString());
             }

@@ -237,47 +237,53 @@ const Table = ({ data, setMonitoringData }) => {
                 header: () => <div className="center" style={{whiteSpace: 'normal',color: '#20737B'}}>Meta Presupuesto</div>,
                 accessorKey: "metMetPre",
                 cell: ({row}) => {
-                    // Convierte el número a una cadena y añade las comas de miles
-                    const formattedNumber = Number(row.original.metMetPre).toLocaleString();
-                    return (
-                        <div className="center">
-                            ${formattedNumber}
-                        </div>
-                    );
+                    if (row.original.metMetPre) {
+                        // Convierte el número a una cadena y añade las comas de miles
+                        const formattedNumber = Number(row.original.metMetPre).toLocaleString();
+                        return (
+                            <div className="center">
+                                ${formattedNumber}
+                            </div>
+                        );
+                    }
                 },
             },
             {
                 header: () => <div className="center" style={{whiteSpace: 'normal',color: '#20737B'}}>Ejecución Presupuesto</div>,
                 accessorKey: "metEjePre",
                 cell: ({row}) => {
-                    // Convierte el número a una cadena y añade las comas de miles
-                    const formattedNumber = Number(row.original.metEjePre).toLocaleString();
-                    return (
-                        <div className="center">
-                            ${formattedNumber}
-                        </div>
-                    );
+                    if (row.original.metEjePre) {
+                        // Convierte el número a una cadena y añade las comas de miles
+                        const formattedNumber = Number(row.original.metEjePre).toLocaleString();
+                        return (
+                            <div className="center">
+                                ${formattedNumber}
+                            </div>
+                        );
+                    }
                 },
             },            
             {
                 header: () => <div className="center" style={{whiteSpace: 'normal',color: '#20737B'}}>% avance Presupuesto</div>,
                 accessorKey: "metPorAvaPre",
-                cell: ({row}) => (
-                    <div className="flex flex-column">
-                        <div className="bold" style={{color: row.original.estCol}}>
-                            {row.original.metPorAvaPre}%
-                        </div>
-                        <div 
-                            className="progress-bar"
-                            style={{backgroundColor: '#d3d3d3', border: `0px solid ${row.original.estCol}`}}
-                        >
-                            <div 
-                                className="progress-bar-fill" 
-                                style={{width: `${row.original.metPorAvaPre > 100 ? 100 : row.original.metPorAvaPre}%`, backgroundColor: row.original.estCol}}
-                            ></div>
-                        </div>
-                    </div>
-                ),
+                cell: ({row}) => {
+                    if (row.original.metPorAvaPre) {
+                    return(
+                            <div className="flex flex-column">
+                                <div className="bold" style={{color: row.original.estCol}}>
+                                    {row.original.metPorAvaPre}%
+                                </div>
+                                <div 
+                                    className="progress-bar"
+                                    style={{backgroundColor: '#d3d3d3', border: `0px solid ${row.original.estCol}`}}
+                                >
+                                    <div 
+                                        className="progress-bar-fill" 
+                                        style={{width: `${row.original.metPorAvaPre > 100 ? 100 : row.original.metPorAvaPre}%`, backgroundColor: row.original.estCol}}
+                                    ></div>
+                                </div>
+                            </div>
+                )}},
             },
             {
                 header: "Año",

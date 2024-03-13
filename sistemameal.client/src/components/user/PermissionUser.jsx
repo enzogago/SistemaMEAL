@@ -14,12 +14,10 @@ const PermissionUser = () => {
     const navigate = useNavigate();
 
     const { id: safeCiphertext } = useParams();
-    console.log(safeCiphertext)
     const ciphertext = atob(safeCiphertext);
     // Desencripta el ID
     const bytes  = CryptoJS.AES.decrypt(ciphertext, 'secret key 123');
     const id = bytes.toString(CryptoJS.enc.Utf8);
-    console.log(id)
     const usuAno = id.slice(0, 4);
     const usuCod = id.slice(4);
     
@@ -294,22 +292,63 @@ const PermissionUser = () => {
   }
   const transformData = (data) => {
     return data.map(item => {
-      let children = [];
-      if (item.subProyectos) {
-        children = item.subProyectos.map(subItem => {
-          return {
-            title: subItem.subProNom,
-            key: `${item.proAno}-${item.proCod}-${subItem.subProAno}-${subItem.subProCod}`
-          };
-        });
-      }
-      return {
-        title: item.proNom,
-        key: `${item.proAno}-${item.proCod}`,
-        children
-      };
+        let children = [];
+        if (item.subProyectos) {
+            children = item.subProyectos.map(subItem => {
+                let subChildren = [];
+                if (subItem.objetivos) {
+                    subChildren = subItem.objetivos.map(objItem => {
+                        let objChildren = [];
+                        if (objItem.objetivosEspecificos) {
+                            objChildren = objItem.objetivosEspecificos.map(objEspItem => {
+                                let resChildren = [];
+                                if (objEspItem.resultados) {
+                                    resChildren = objEspItem.resultados.map(resItem => {
+                                        let indChildren = [];
+                                        if (resItem.indicadoresActividades) {
+                                            indChildren = resItem.indicadoresActividades.map((indItem,index) => {
+                                                return {
+                                                    title: indItem.indActResNom,
+                                                    key: `${item.proAno}-${item.proCod}-${subItem.subProAno}-${subItem.subProCod}-${objItem.objAno}-${objItem.objCod}-${objEspItem.objEspAno}-${objEspItem.objEspCod}-${resItem.resAno}-${resItem.resCod}-${indItem.indActResAno}-${indItem.indActResCod}-${indItem.indActResTip}${index}`
+                                                };
+                                            });
+                                        }
+                                        return {
+                                            title: resItem.resNom,
+                                            key: `${item.proAno}-${item.proCod}-${subItem.subProAno}-${subItem.subProCod}-${objItem.objAno}-${objItem.objCod}-${objEspItem.objEspAno}-${objEspItem.objEspCod}-${resItem.resAno}-${resItem.resCod}`,
+                                            children: indChildren
+                                        };
+                                    });
+                                }
+                                return {
+                                    title: objEspItem.objEspNom,
+                                    key: `${item.proAno}-${item.proCod}-${subItem.subProAno}-${subItem.subProCod}-${objItem.objAno}-${objItem.objCod}-${objEspItem.objEspAno}-${objEspItem.objEspCod}`,
+                                    children: resChildren
+                                };
+                            });
+                        }
+                        return {
+                            title: objItem.objNom,
+                            key: `${item.proAno}-${item.proCod}-${subItem.subProAno}-${subItem.subProCod}-${objItem.objAno}-${objItem.objCod}`,
+                            children: objChildren
+                        };
+                    });
+                }
+                return {
+                    title: subItem.subProNom,
+                    key: `${item.proAno}-${item.proCod}-${subItem.subProAno}-${subItem.subProCod}`,
+                    children: subChildren
+                };
+            });
+        }
+        return {
+            title: item.proNom,
+            key: `${item.proAno}-${item.proCod}`,
+            children
+        };
     });
-  };
+};
+
   
   const [expandedKeys, setExpandedKeys] = useState([]);
   const [checkedKeys, setCheckedKeys] = useState([]);

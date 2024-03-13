@@ -156,6 +156,7 @@ const Table = ({ data }) => {
         <CustomTable 
             title='Metas'
             table={table}
+            resize={false}
             showPagination={false}
         />
     )

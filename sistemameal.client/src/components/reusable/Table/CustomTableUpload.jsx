@@ -145,8 +145,7 @@ const CustomTableUpload = ({
                                                 className='ws-nowrap' 
                                                 style={{ 
                                                     width: resize ? header.getSize():  '', 
-                                                    position: resize ? 'relative' : '', 
-                                                    position: header.column.columnDef.stickyRight !== undefined ? 'sticky' : '', 
+                                                    position: header.column.columnDef.stickyRight !== undefined ? 'sticky' : 'relative', 
                                                     textTransform: 'capitalize',
                                                     right: header.column.columnDef.stickyRight !== undefined ? `${header.column.columnDef.stickyRight}px` : 'auto',
                                                     backgroundColor: '#fff', 

@@ -62,6 +62,7 @@ const Table = ({ data, openModal, setData, controller, fieldMapping, title }) =>
                 header: () => <div style={{textAlign: 'center', flexGrow: '1'}}>Acciones</div>,
                 accessorKey: "acciones",
                 disableSorting: true,
+                stickyRight: 0,
                 cell: ({row}) => (
                     <div className='PowerMas_IconsTable flex jc-center ai-center'>
                         {actions.edit && 

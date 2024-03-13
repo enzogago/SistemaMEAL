@@ -27,6 +27,7 @@ const FormGoal = () => {
     const [initialData, setInitialData] = useState(null);
     const [firstEdit, setFirstEdit] = useState(false);
     const [selectedValues, setSelectedValues] = useState([]);
+    const [esActividad, setEsActividad] = useState(false);
     //
     const { id: safeCiphertext } = useParams();
     let id = '';
@@ -330,20 +331,40 @@ const FormGoal = () => {
         
                     // Selecciona los inputs en la fila actual
                     const inputs = row.querySelectorAll('input[type="number"]');
-                    
-                    const metTec = inputs[0].value;
-                    const metPre = inputs[1].value;
-                    // Comprueba si ambos inputs tienen un valor
-                    if (metTec && metPre) {
-                        console.log(`Fila: ${row.rowIndex}, Primer input: ${metTec}, Segundo input: ${inputs[1].value}`);
-                        MetaIndicadorActividad.Meta.metMetTec = metTec;
-                        MetaIndicadorActividad.Meta.metMetPre = metPre;
-                        MetaIndicadorActividad.Meta.metAnoPlaTec = '2024';
-                        MetaIndicadorActividad.Meta.metMesPlaTec = mes < 10 ? `0${mes}` : `${mes}`;
-                        // Haz una copia del objeto antes de imprimirlo
-                        const MetaIndicadorActividadCopy = JSON.parse(JSON.stringify(MetaIndicadorActividad));
-                        console.log(MetaIndicadorActividadCopy);
-                        await handleSubmitMetaIndicador(MetaIndicadorActividadCopy); // Asegúrate de que esta función devuelva una promesa
+                    console.log(inputs.length)
+                    if (inputs.length >= 2) {
+                        const metTec = inputs[0].value;
+                        const metPre = inputs[1].value;
+                        // Comprueba si ambos inputs tienen un valor
+                        if (metTec && metPre) {
+                            console.log(`Fila: ${row.rowIndex}, Primer input: ${metTec}, Segundo input: ${inputs[1].value}`);
+                            MetaIndicadorActividad.Meta.metMetTec = metTec;
+                            MetaIndicadorActividad.Meta.metMetPre = metPre;
+                            MetaIndicadorActividad.Meta.metPorAvaPre = '0';
+                            MetaIndicadorActividad.Meta.metEjePre= '0';
+                            MetaIndicadorActividad.Meta.metAnoPlaTec = '2024';
+                            MetaIndicadorActividad.Meta.metMesPlaTec = mes < 10 ? `0${mes}` : `${mes}`;
+                            // Haz una copia del objeto antes de imprimirlo
+                            const MetaIndicadorActividadCopy = JSON.parse(JSON.stringify(MetaIndicadorActividad));
+                            console.log(MetaIndicadorActividadCopy);
+                            await handleSubmitMetaIndicador(MetaIndicadorActividadCopy); // Asegúrate de que esta función devuelva una promesa
+                        }
+                    } else {
+                        const metTec = inputs[0].value;
+                        // Comprueba si ambos inputs tienen un valor
+                        if (metTec) {
+                            console.log(`Fila: ${row.rowIndex}, Primer input: ${metTec}`);
+                            MetaIndicadorActividad.Meta.metMetTec = metTec;
+                            MetaIndicadorActividad.Meta.metMetPre = '';
+                            MetaIndicadorActividad.Meta.metPorAvaPre = '';
+                            MetaIndicadorActividad.Meta.metEjePre= '';
+                            MetaIndicadorActividad.Meta.metAnoPlaTec = '2024';
+                            MetaIndicadorActividad.Meta.metMesPlaTec = mes < 10 ? `0${mes}` : `${mes}`;
+                            // Haz una copia del objeto antes de imprimirlo
+                            const MetaIndicadorActividadCopy = JSON.parse(JSON.stringify(MetaIndicadorActividad));
+                            console.log(MetaIndicadorActividadCopy);
+                            await handleSubmitMetaIndicador(MetaIndicadorActividadCopy); // Asegúrate de que esta función devuelva una promesa
+                        }
                     }
                     mes++;
                 }, Promise.resolve()); // Inicia con una promesa resuelta
@@ -515,11 +536,16 @@ const FormGoal = () => {
                             setValue('metIndActResCod',option.indActResCod)
                             setValue('metIndActResAno',option.indActResAno)
                             setValue('metIndActResTipInd',option.tipInd)
-                            console.log(option)
                             const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/jerarquia/${option.indActResAno}/${option.indActResCod}/${option.tipInd}`);
                             const data = await response.json();
-
+                            
                             setJerarquia(data);
+                            console.log(option.tipInd)
+                            if(option.tipInd === 'AR'){
+                                setEsActividad(true);
+                            } else {
+                                setEsActividad(false);
+                            }
                         }}
                         name='indActResNom'
                         errors={errors}
@@ -667,7 +693,7 @@ const FormGoal = () => {
                             </p>
                         )}
                     </div>
-                    <div className="m_75">
+                    {/* <div className="m_75">
                         <label htmlFor="finCod" className="">
                             Financiador:
                         </label>
@@ -697,7 +723,7 @@ const FormGoal = () => {
                             Espacio reservado para el mensaje de error
                             </p>
                         )}
-                    </div>
+                    </div> */}
                     {
                         isEditing ?
                         <>
@@ -859,67 +885,13 @@ const FormGoal = () => {
                                         <tr>
                                             <th>Año - Mes</th>
                                             <th>Meta Programática</th>
-                                            <th>Meta Presupuesto</th>
+                                            {
+                                                esActividad &&
+                                                <th>Meta Presupuesto</th>
+                                            }
                                         </tr>
                                     </thead>
                                     <tbody ref={tableRef}>
-                                        <tr>
-                                            <td> 2024 - Enero </td>
-                                            <td> 
-                                                <input type="number" 
-                                                onInput={(e) => {
-                                                    if (e.target.value.length > 10) {
-                                                        e.target.value = e.target.value.slice(0, 10);
-                                                    }}}  
-                                                /> 
-                                            </td>
-                                            <td> 
-                                                <input type="number" 
-                                                onInput={(e) => {
-                                                    if (e.target.value.length > 10) {
-                                                        e.target.value = e.target.value.slice(0, 10);
-                                                    }}}  
-                                                /> 
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td> 2024 - Febrero </td>
-                                            <td> 
-                                                <input type="number" 
-                                                onInput={(e) => {
-                                                    if (e.target.value.length > 10) {
-                                                        e.target.value = e.target.value.slice(0, 10);
-                                                    }}}  
-                                                /> 
-                                            </td>
-                                            <td> 
-                                                <input type="number" 
-                                                onInput={(e) => {
-                                                    if (e.target.value.length > 10) {
-                                                        e.target.value = e.target.value.slice(0, 10);
-                                                    }}}  
-                                                /> 
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td> 2024 - Marzo </td>
-                                            <td> 
-                                                <input type="number" 
-                                                onInput={(e) => {
-                                                    if (e.target.value.length > 10) {
-                                                        e.target.value = e.target.value.slice(0, 10);
-                                                    }}}  
-                                                /> 
-                                            </td>
-                                            <td> 
-                                                <input type="number" 
-                                                onInput={(e) => {
-                                                    if (e.target.value.length > 10) {
-                                                        e.target.value = e.target.value.slice(0, 10);
-                                                    }}}  
-                                                /> 
-                                            </td>
-                                        </tr>
                                         <tr>
                                             <td> 2024 - Abril </td>
                                             <td> 
@@ -930,14 +902,17 @@ const FormGoal = () => {
                                                     }}}  
                                                 /> 
                                             </td>
-                                            <td> 
-                                                <input type="number" 
-                                                onInput={(e) => {
-                                                    if (e.target.value.length > 10) {
-                                                        e.target.value = e.target.value.slice(0, 10);
-                                                    }}}  
-                                                /> 
-                                            </td>
+                                            {
+                                                esActividad &&
+                                                <td> 
+                                                    <input type="number" 
+                                                    onInput={(e) => {
+                                                        if (e.target.value.length > 10) {
+                                                            e.target.value = e.target.value.slice(0, 10);
+                                                        }}}  
+                                                    /> 
+                                                </td>
+                                            }
                                         </tr>
                                         <tr>
                                             <td> 2024 - Mayo </td>
@@ -949,14 +924,17 @@ const FormGoal = () => {
                                                     }}}  
                                                 /> 
                                             </td>
-                                            <td> 
-                                                <input type="number" 
-                                                onInput={(e) => {
-                                                    if (e.target.value.length > 10) {
-                                                        e.target.value = e.target.value.slice(0, 10);
-                                                    }}}  
-                                                /> 
-                                            </td>
+                                            {
+                                                esActividad &&
+                                                <td> 
+                                                    <input type="number" 
+                                                    onInput={(e) => {
+                                                        if (e.target.value.length > 10) {
+                                                            e.target.value = e.target.value.slice(0, 10);
+                                                        }}}  
+                                                    /> 
+                                                </td>
+                                            }
                                         </tr>
                                         <tr>
                                             <td> 2024 - Junio </td>
@@ -968,14 +946,17 @@ const FormGoal = () => {
                                                     }}}  
                                                 /> 
                                             </td>
-                                            <td> 
-                                                <input type="number" 
-                                                onInput={(e) => {
-                                                    if (e.target.value.length > 10) {
-                                                        e.target.value = e.target.value.slice(0, 10);
-                                                    }}}  
-                                                /> 
-                                            </td>
+                                            {
+                                                esActividad &&
+                                                <td> 
+                                                    <input type="number" 
+                                                    onInput={(e) => {
+                                                        if (e.target.value.length > 10) {
+                                                            e.target.value = e.target.value.slice(0, 10);
+                                                        }}}  
+                                                    /> 
+                                                </td>
+                                            }
                                         </tr>
                                         <tr>
                                             <td> 2024 - Julio </td>
@@ -987,110 +968,19 @@ const FormGoal = () => {
                                                     }}}  
                                                 /> 
                                             </td>
-                                            <td> 
-                                                <input type="number" 
-                                                onInput={(e) => {
-                                                    if (e.target.value.length > 10) {
-                                                        e.target.value = e.target.value.slice(0, 10);
-                                                    }}}  
-                                                /> 
-                                            </td>
+                                            {
+                                                esActividad &&
+                                                <td> 
+                                                    <input type="number" 
+                                                    onInput={(e) => {
+                                                        if (e.target.value.length > 10) {
+                                                            e.target.value = e.target.value.slice(0, 10);
+                                                        }}}  
+                                                    /> 
+                                                </td>
+                                            }
                                         </tr>
-                                        <tr>
-                                            <td> 2024 - Agosto </td>
-                                            <td> 
-                                                <input type="number" 
-                                                onInput={(e) => {
-                                                    if (e.target.value.length > 10) {
-                                                        e.target.value = e.target.value.slice(0, 10);
-                                                    }}}  
-                                                /> 
-                                            </td>
-                                            <td> 
-                                                <input type="number" 
-                                                onInput={(e) => {
-                                                    if (e.target.value.length > 10) {
-                                                        e.target.value = e.target.value.slice(0, 10);
-                                                    }}}  
-                                                /> 
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td> 2024 - Setiembre </td>
-                                            <td> 
-                                                <input type="number" 
-                                                onInput={(e) => {
-                                                    if (e.target.value.length > 10) {
-                                                        e.target.value = e.target.value.slice(0, 10);
-                                                    }}}  
-                                                /> 
-                                            </td>
-                                            <td> 
-                                                <input type="number" 
-                                                onInput={(e) => {
-                                                    if (e.target.value.length > 10) {
-                                                        e.target.value = e.target.value.slice(0, 10);
-                                                    }}}  
-                                                /> 
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td> 2024 - Octubre </td>
-                                            <td> 
-                                                <input type="number" 
-                                                onInput={(e) => {
-                                                    if (e.target.value.length > 10) {
-                                                        e.target.value = e.target.value.slice(0, 10);
-                                                    }}}  
-                                                /> 
-                                            </td>
-                                            <td> 
-                                                <input type="number" 
-                                                onInput={(e) => {
-                                                    if (e.target.value.length > 10) {
-                                                        e.target.value = e.target.value.slice(0, 10);
-                                                    }}}  
-                                                /> 
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td> 2024 - Noviembre </td>
-                                            <td> 
-                                                <input type="number" 
-                                                onInput={(e) => {
-                                                    if (e.target.value.length > 10) {
-                                                        e.target.value = e.target.value.slice(0, 10);
-                                                    }}}  
-                                                /> 
-                                            </td>
-                                            <td> 
-                                                <input type="number" 
-                                                onInput={(e) => {
-                                                    if (e.target.value.length > 10) {
-                                                        e.target.value = e.target.value.slice(0, 10);
-                                                    }}}  
-                                                /> 
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td> 2024 - Diciembre </td>
-                                            <td> 
-                                                <input type="number" 
-                                                onInput={(e) => {
-                                                    if (e.target.value.length > 10) {
-                                                        e.target.value = e.target.value.slice(0, 10);
-                                                    }}}  
-                                                /> 
-                                            </td>
-                                            <td> 
-                                                <input type="number" 
-                                                onInput={(e) => {
-                                                    if (e.target.value.length > 10) {
-                                                        e.target.value = e.target.value.slice(0, 10);
-                                                    }}}  
-                                                /> 
-                                            </td>
-                                        </tr>
+
                                     </tbody>
                                 </table>
                             </div>
