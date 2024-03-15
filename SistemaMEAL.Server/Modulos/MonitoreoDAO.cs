@@ -488,7 +488,6 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_METMESPLATEC", meta.MetMesPlaTec);
                 cmd.Parameters.AddWithValue("@P_METANOPLATEC", meta.MetAnoPlaTec);
                 cmd.Parameters.AddWithValue("@P_METMETPRE", meta.MetMetPre);
-                cmd.Parameters.AddWithValue("@P_FINCOD", meta.FinCod);
                 cmd.Parameters.AddWithValue("@P_IMPCOD", meta.ImpCod);
                 cmd.Parameters.AddWithValue("@P_UBIANO", meta.UbiAno);
                 cmd.Parameters.AddWithValue("@P_UBICOD", meta.UbiCod);
@@ -512,11 +511,13 @@ namespace SistemaMEAL.Modulos
 
                 mensaje = pDescripcionMensaje.Value.ToString();
                 tipoMensaje = pTipoMensaje.Value.ToString();
+                Console.WriteLine(mensaje);
             }
             catch (SqlException ex)
             {
                 mensaje = ex.Message;
                 tipoMensaje = "1";
+                Console.WriteLine(mensaje);
             }
             finally
             {
@@ -540,15 +541,14 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_ESTCOD", "01");
                 cmd.Parameters.AddWithValue("@P_METMETTEC", meta.MetMetTec);
                 cmd.Parameters.AddWithValue("@P_METEJETEC", "0");
-                cmd.Parameters.AddWithValue("@P_METPORAVATEC", "0");
+                cmd.Parameters.AddWithValue("@P_METPORAVATEC", "00.00");
                 cmd.Parameters.AddWithValue("@P_METMESPLATEC", meta.MetMesPlaTec);
                 cmd.Parameters.AddWithValue("@P_METANOPLATEC", meta.MetAnoPlaTec);
                 cmd.Parameters.AddWithValue("@P_METMETPRE", meta.MetMetPre);
                 cmd.Parameters.AddWithValue("@P_METEJEPRE", meta.MetEjePre);
-                cmd.Parameters.AddWithValue("@P_METPORAVAPRE", meta.MetPorAvaPre);
-                cmd.Parameters.AddWithValue("@P_METMESPLAPRE", "0");
-                cmd.Parameters.AddWithValue("@P_METANOPLAPRE", "0");
-                cmd.Parameters.AddWithValue("@P_FINCOD", "01");
+                cmd.Parameters.AddWithValue("@P_METPORAVAPRE", "00.00");
+                cmd.Parameters.AddWithValue("@P_METMESPLAPRE", "");
+                cmd.Parameters.AddWithValue("@P_METANOPLAPRE", "");
                 cmd.Parameters.AddWithValue("@P_IMPCOD", meta.ImpCod);
                 cmd.Parameters.AddWithValue("@P_UBIANO", meta.UbiAno);
                 cmd.Parameters.AddWithValue("@P_UBICOD", meta.UbiCod);
@@ -600,14 +600,13 @@ namespace SistemaMEAL.Modulos
             string? tipoMensaje = "";
             try
             {
-                SqlCommand cmd = new SqlCommand("SP_INSERTAR_META_INDICADOR_ACTIVIDAD_RESULTADO", cn.getcn);
+                SqlCommand cmd = new SqlCommand("SP_INSERTAR_META_INDICADOR", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 cmd.Parameters.AddWithValue("@P_METANO", metaIndicador.MetAno);
                 cmd.Parameters.AddWithValue("@P_METCOD", metaIndicador.MetCod);
-                cmd.Parameters.AddWithValue("@P_METINDACTRESANO", metaIndicador.MetIndActResAno);
-                cmd.Parameters.AddWithValue("@P_METINDACTRESCOD", metaIndicador.MetIndActResCod);
-                cmd.Parameters.AddWithValue("@P_METINDACTRESTIPIND", metaIndicador.MetIndActResTipInd);
+                cmd.Parameters.AddWithValue("@P_INDANO", metaIndicador.MetIndActResAno);
+                cmd.Parameters.AddWithValue("@P_INDCOD", metaIndicador.MetIndActResCod);
                 cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
@@ -1131,21 +1130,20 @@ namespace SistemaMEAL.Modulos
             return (mensaje, tipoMensaje);
         }
 
-        public IEnumerable<MetaIndicadorActividadResultado> BuscarMetaIndicador(string? metAno = null, string? metCod = null, string? metIndAno = null, string? metIndCod = null, string? metIndTipInd = null)
+        public IEnumerable<MetaIndicadorActividadResultado> BuscarMetaIndicador(string? metAno = null, string? metCod = null, string? metIndAno = null, string? metIndCod = null)
         {
             List<MetaIndicadorActividadResultado>? temporal = new List<MetaIndicadorActividadResultado>();
             try
             {
                 cn.getcn.Open();
 
-                SqlCommand cmd = new SqlCommand("SP_BUSCAR_META_INDICADOR_ACTIVIDAD_RESULTADO", cn.getcn);
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_META_INDICADOR", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 // Aquí puedes agregar los parámetros necesarios para tu procedimiento almacenado
                 cmd.Parameters.AddWithValue("@P_METANO", string.IsNullOrEmpty(metAno) ? (object)DBNull.Value : metAno);
                 cmd.Parameters.AddWithValue("@P_METCOD", string.IsNullOrEmpty(metCod) ? (object)DBNull.Value : metCod);
-                cmd.Parameters.AddWithValue("@P_METINDACTRESANO", string.IsNullOrEmpty(metIndAno) ? (object)DBNull.Value : metIndAno);
-                cmd.Parameters.AddWithValue("@P_METINDACTRESCOD", string.IsNullOrEmpty(metIndCod) ? (object)DBNull.Value : metIndCod);
-                cmd.Parameters.AddWithValue("@P_METINDACTRESTIPIND", string.IsNullOrEmpty(metIndTipInd) ? (object)DBNull.Value : metIndTipInd);
+                cmd.Parameters.AddWithValue("@P_INDANO", string.IsNullOrEmpty(metIndAno) ? (object)DBNull.Value : metIndAno);
+                cmd.Parameters.AddWithValue("@P_INDCOD", string.IsNullOrEmpty(metIndCod) ? (object)DBNull.Value : metIndCod);
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2024");
                 cmd.Parameters.AddWithValue("@P_USUCOD_U", "0001");
@@ -1188,7 +1186,7 @@ namespace SistemaMEAL.Modulos
             return temporal?? new List<MetaIndicadorActividadResultado>();
         }
 
-        public (string? message, string? messageType) EliminarMetaIndicador(string? metAno = null, string? metCod = null, string? metIndAno = null, string? metIndCod = null, string? metIndTipInd = null)
+        public (string? message, string? messageType) EliminarMetaIndicador(string? metAno = null, string? metCod = null, string? metIndAno = null, string? metIndCod = null)
         {
             string? mensaje = "";
             string? tipoMensaje = "";
@@ -1196,14 +1194,13 @@ namespace SistemaMEAL.Modulos
             {
                 cn.getcn.Open();
 
-                SqlCommand cmd = new SqlCommand("SP_ELIMINAR_META_INDICADOR_ACTIVIDAD_RESULTADO", cn.getcn);
+                SqlCommand cmd = new SqlCommand("SP_ELIMINAR_META_INDICADOR", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 cmd.Parameters.AddWithValue("@P_METANO", metAno);
                 cmd.Parameters.AddWithValue("@P_METCOD", metCod);
-                cmd.Parameters.AddWithValue("@P_METINDACTRESANO", metIndAno);
-                cmd.Parameters.AddWithValue("@P_METINDACTRESCOD", metIndCod);
-                cmd.Parameters.AddWithValue("@P_METINDACTRESTIPIND", metIndTipInd);
+                cmd.Parameters.AddWithValue("@P_INDANO", metIndAno);
+                cmd.Parameters.AddWithValue("@P_INDCOD", metIndCod);
                 cmd.Parameters.AddWithValue("@P_USUMOD", "Usuario");
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
@@ -1319,7 +1316,6 @@ namespace SistemaMEAL.Modulos
                             cmd.Parameters.AddWithValue("@P_METMESPLATEC", meta.MetMesPlaTec);
                             cmd.Parameters.AddWithValue("@P_METANOPLATEC", meta.MetAnoPlaTec);
                             cmd.Parameters.AddWithValue("@P_METMETPRE", meta.MetMetPre);
-                            cmd.Parameters.AddWithValue("@P_FINCOD", meta.FinCod);
                             cmd.Parameters.AddWithValue("@P_IMPCOD", meta.ImpCod);
                             cmd.Parameters.AddWithValue("@P_UBIANO", meta.UbiAno);
                             cmd.Parameters.AddWithValue("@P_UBICOD", meta.UbiCod);
@@ -1347,6 +1343,7 @@ namespace SistemaMEAL.Modulos
                         catch (SqlException ex)
                         {
                             mensaje = ex.Message;
+                            Console.WriteLine(mensaje);
                             tipoMensaje = "1";
                         }
 
@@ -1359,19 +1356,17 @@ namespace SistemaMEAL.Modulos
                         // Modificar Indicador
                         try
                         {
-                            SqlCommand cmd = new SqlCommand("SP_MODIFICAR_META_INDICADOR_ACTIVIDAD_RESULTADO", cn.getcn);
+                            SqlCommand cmd = new SqlCommand("SP_MODIFICAR_META_INDICADOR", cn.getcn);
                             cmd.CommandType = CommandType.StoredProcedure;
 
                             cmd.Parameters.AddWithValue("@P_METANO_ORIGINAL", metaIndicador.MetAnoOri);
                             cmd.Parameters.AddWithValue("@P_METCOD_ORIGINAL", metaIndicador.MetCodOri);
-                            cmd.Parameters.AddWithValue("@P_METINDACTRESANO_ORIGINAL", metaIndicador.MetIndActResAnoOri);
-                            cmd.Parameters.AddWithValue("@P_METINDACTRESCOD_ORIGINAL", metaIndicador.MetIndActResCodOri);
-                            cmd.Parameters.AddWithValue("@P_METINDACTRESTIPIND_ORIGINAL", metaIndicador.MetIndActResTipIndOri);
+                            cmd.Parameters.AddWithValue("@P_INDANO_ORIGINAL", metaIndicador.MetIndActResAnoOri);
+                            cmd.Parameters.AddWithValue("@P_INDCOD_ORIGINAL", metaIndicador.MetIndActResCodOri);
                             cmd.Parameters.AddWithValue("@P_METANO", metaIndicador.MetAno);
                             cmd.Parameters.AddWithValue("@P_METCOD", metaIndicador.MetCod);
-                            cmd.Parameters.AddWithValue("@P_METINDACTRESANO", metaIndicador.MetIndActResAno);
-                            cmd.Parameters.AddWithValue("@P_METINDACTRESCOD", metaIndicador.MetIndActResCod);
-                            cmd.Parameters.AddWithValue("@P_METINDACTRESTIPIND", metaIndicador.MetIndActResTipInd);
+                            cmd.Parameters.AddWithValue("@P_INDANO", metaIndicador.MetIndActResAno);
+                            cmd.Parameters.AddWithValue("@P_INDCOD", metaIndicador.MetIndActResCod);
                             cmd.Parameters.AddWithValue("@P_USUMOD", "Usuario");
                             cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
                             cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
@@ -1397,6 +1392,7 @@ namespace SistemaMEAL.Modulos
                         {
                             mensaje = ex.Message;
                             tipoMensaje = "1";
+                            Console.WriteLine(mensaje);
                         }
                         if (tipoMensaje != "3")
                         {

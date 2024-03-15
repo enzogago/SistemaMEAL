@@ -1,10 +1,10 @@
 import Notiflix from "notiflix";
 
-export const fetchRegistroAModificar = async (metAno, metCod, metIndAno, metIndCod, metIndTipInd, reset, fetchSelects, setValue, fetchIndicadorActividad,setIsSecondInputEnabled, setSelectedOption, setJerarquia, setInitialData) => {
+export const fetchRegistroAModificar = async (metAno, metCod, metIndAno, metIndCod, reset, fetchSelects, setValue, fetchIndicadorActividad,setIsSecondInputEnabled, setSelectedOption, setJerarquia, setInitialData) => {
     try {
         Notiflix.Loading.pulse('Cargando...');
         const token = localStorage.getItem('token');
-        const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/meta-indicador/${metAno}/${metCod}/${metIndAno}/${metIndCod}/${metIndTipInd}`, {
+        const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/meta-indicador/${metAno}/${metCod}/${metIndAno}/${metIndCod}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }

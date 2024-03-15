@@ -366,22 +366,22 @@ namespace SistemaMEAL.Server.Controllers
         }
 
         [HttpGet]
-        [Route("meta-indicador/{metAno}/{metCod}/{metIndAno}/{metIndCod}/{metIndTipInd}")]
-        public dynamic BuscarMetaIndicador(string metAno, string metCod, string metIndAno, string metIndCod, string metIndTipInd)
+        [Route("meta-indicador/{metAno}/{metCod}/{metIndAno}/{metIndCod}")]
+        public dynamic BuscarMetaIndicador(string metAno, string metCod, string metIndAno, string metIndCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var data = _monitoreos.BuscarMetaIndicador(metAno, metCod, metIndAno, metIndCod, metIndTipInd);
+            var data = _monitoreos.BuscarMetaIndicador(metAno, metCod, metIndAno, metIndCod);
             
             return Ok(data.FirstOrDefault());
         }
 
         [HttpDelete]
-        [Route("meta-indicador/{metAno}/{metCod}/{metIndAno}/{metIndCod}/{metIndTipInd}")]
-        public dynamic EliminarMetaIndicador(string metAno, string metCod, string metIndAno, string metIndCod, string metIndTipInd)
+        [Route("meta-indicador/{metAno}/{metCod}/{metIndAno}/{metIndCod}")]
+        public dynamic EliminarMetaIndicador(string metAno, string metCod, string metIndAno, string metIndCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
@@ -405,7 +405,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _monitoreos.EliminarMetaIndicador(metAno, metCod, metIndAno, metIndCod, metIndTipInd);
+            var (message, messageType) = _monitoreos.EliminarMetaIndicador(metAno, metCod, metIndAno, metIndCod);
             if (messageType == "1") // Error
             {
                 return BadRequest(message);

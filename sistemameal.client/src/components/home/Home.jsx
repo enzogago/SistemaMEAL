@@ -105,8 +105,9 @@ const Home = () => {
                     return;
                 }
                 const data = await response.json();
+                console.log(data)
                 // Conteo de beneficiarios
-                setTotalBeneficiarios(data.length);
+                setTotalBeneficiarios(data.cantidad);
 
             } catch (error) {
                 console.error('Error:', error);

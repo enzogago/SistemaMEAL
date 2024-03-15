@@ -683,7 +683,7 @@ namespace SistemaMEAL.Modulos
                                         message = pDescripcionMensaje.Value.ToString();
                                         messageType = pTipoMensaje.Value.ToString();
 
-                                        if (messageType != "3") // Si hay un error o el proyecto ya existe, retorna el mensaje
+                                        if (messageType != "3")
                                         {
                                             if (messageType == "1")
                                             {
@@ -691,34 +691,64 @@ namespace SistemaMEAL.Modulos
                                             }
                                             errorCells.Add(new ErrorCell { Row = indiceObjetivoEspecifico, Column = indiceResultado, Message = message });
                                         }
+
+                                        //
+                                        cmd = new SqlCommand("SP_INSERTAR_ACTIVIDAD", cn.getcn);
+                                        cmd.CommandType = CommandType.StoredProcedure;
+
+                                        cmd.Parameters.AddWithValue("@P_RESANO", resAno);
+                                        cmd.Parameters.AddWithValue("@P_RESCOD", resCod);
+                                        cmd.Parameters.AddWithValue("@P_ACTNOM", "NA");
+                                        cmd.Parameters.AddWithValue("@P_ACTNUM", "NA");
+                                        cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
+                                        cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
+                                        cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
+                                        cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
+                                        cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
+                                        cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "GAGO");
+                                        cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "AGUIRRE");
+
+                                        pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                                        pDescripcionMensaje.Direction = ParameterDirection.Output;
+                                        cmd.Parameters.Add(pDescripcionMensaje);
+
+                                        pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                                        pTipoMensaje.Direction = ParameterDirection.Output;
+                                        cmd.Parameters.Add(pTipoMensaje);
+
+                                        pAno = new SqlParameter("@P_ACTANO_OUT", SqlDbType.NVarChar, 4);
+                                        pAno.Direction = ParameterDirection.Output;
+                                        cmd.Parameters.Add(pAno);
+
+                                        pCod = new SqlParameter("@P_ACTCOD_OUT", SqlDbType.Char, 6);
+                                        pCod.Direction = ParameterDirection.Output;
+                                        cmd.Parameters.Add(pCod);
+
+                                        cmd.ExecuteNonQuery();
+
+                                        var actAno = pAno.Value.ToString();
+                                        var actCod = pCod.Value.ToString();
+                                        message = pDescripcionMensaje.Value.ToString();
+                                        messageType = pTipoMensaje.Value.ToString();
+
+                                        //
                                         
                                         int indiceIndicador = 0;
 
                                         foreach (var indicadorActividadResultado in resultado.IndicadoresActividades)
                                         {
-                                            indicadorActividadResultado.ResAno = resAno; // Establece la clave foránea
-                                            indicadorActividadResultado.ResCod = resCod; // Establece la clave foránea
-
-                                            string storedProcedureName = indicadorActividadResultado.IndActResTip == "AR" ? "SP_INSERTAR_ACTIVIDAD_RESULTADO" : "SP_INSERTAR_INDICADOR_RESULTADO";
-
+                                            indicadorActividadResultado.ResAno = actAno; // Establece la clave foránea
+                                            indicadorActividadResultado.ResCod = actCod; // Establece la clave foránea
 
                                             // Inserta el proyecto
-                                            cmd = new SqlCommand(storedProcedureName, cn.getcn);
+                                            cmd = new SqlCommand("SP_INSERTAR_INDICADOR", cn.getcn);
                                             cmd.CommandType = CommandType.StoredProcedure;
-                                            if (indicadorActividadResultado.IndActResTip == "AR") 
-                                            {
-                                                cmd.Parameters.AddWithValue("@P_ACTRESNOM", indicadorActividadResultado.IndActResNom);
-                                                cmd.Parameters.AddWithValue("@P_ACTRESNUM", indicadorActividadResultado.IndActResNum);
-                                                cmd.Parameters.AddWithValue("@P_ACTRESPRE", "100");
-                                            } 
-                                            else if (indicadorActividadResultado.IndActResTip == "IR")
-                                            {
-                                                cmd.Parameters.AddWithValue("@P_INDRESNOM", indicadorActividadResultado.IndActResNom);
-                                                cmd.Parameters.AddWithValue("@P_INDRESNUM", indicadorActividadResultado.IndActResNum);
-                                            }
 
-                                            cmd.Parameters.AddWithValue("@P_RESANO", indicadorActividadResultado.ResAno);
-                                            cmd.Parameters.AddWithValue("@P_RESCOD", indicadorActividadResultado.ResCod);
+                                            cmd.Parameters.AddWithValue("@P_ACTANO", indicadorActividadResultado.ResAno);
+                                            cmd.Parameters.AddWithValue("@P_ACTCOD", indicadorActividadResultado.ResCod);
+                                            cmd.Parameters.AddWithValue("@P_INDNOM", indicadorActividadResultado.IndActResNom);
+                                            cmd.Parameters.AddWithValue("@P_INDNUM", indicadorActividadResultado.IndActResNum);
+                                            cmd.Parameters.AddWithValue("@P_INDTIPIND", indicadorActividadResultado.IndActResTip);
                                             cmd.Parameters.AddWithValue("@P_UNICOD", "01"); // asdasd
                                             cmd.Parameters.AddWithValue("@P_TIPVALCOD", "01"); // asdasd
                                             cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
@@ -738,26 +768,14 @@ namespace SistemaMEAL.Modulos
                                             cmd.Parameters.Add(pTipoMensaje);
 
 
-                                            if (indicadorActividadResultado.IndActResTip == "AR") 
-                                            {
-                                                pAno = new SqlParameter("@P_ACTRESANO_OUT", SqlDbType.NVarChar, 4);
-                                                pAno.Direction = ParameterDirection.Output;
-                                                cmd.Parameters.Add(pAno);
+                                            pAno = new SqlParameter("@P_INDANO_OUT", SqlDbType.NVarChar, 4);
+                                            pAno.Direction = ParameterDirection.Output;
+                                            cmd.Parameters.Add(pAno);
 
-                                                pCod = new SqlParameter("@P_ACTRESCOD_OUT", SqlDbType.Char, 6);
-                                                pCod.Direction = ParameterDirection.Output;
-                                                cmd.Parameters.Add(pCod);
-                                            } else {
-                                                pAno = new SqlParameter("@P_INDRESANO_OUT", SqlDbType.NVarChar, 4);
-                                                pAno.Direction = ParameterDirection.Output;
-                                                cmd.Parameters.Add(pAno);
-
-                                                pCod = new SqlParameter("@P_INDRESCOD_OUT", SqlDbType.Char, 6);
-                                                pCod.Direction = ParameterDirection.Output;
-                                                cmd.Parameters.Add(pCod);
-                                            }
+                                            pCod = new SqlParameter("@P_INDCOD_OUT", SqlDbType.Char, 6);
+                                            pCod.Direction = ParameterDirection.Output;
+                                            cmd.Parameters.Add(pCod);
                                             
-
                                             cmd.ExecuteNonQuery();
 
                                             var indActResAno = pAno.Value.ToString();

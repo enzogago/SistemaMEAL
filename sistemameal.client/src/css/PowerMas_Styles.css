@@ -75,7 +75,9 @@ input::placeholder,select::placeholder{
 	width: 100%;
 	background-color: #FFFAF6;
     border: 1px solid #372e2c3e;
-  }
+}
+
+  
   
 .flex-caption {
 	padding: 2%;

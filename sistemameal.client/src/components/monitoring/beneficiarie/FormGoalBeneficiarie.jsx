@@ -721,6 +721,7 @@ const FormGoalBeneficiarie = () => {
                     metBenMesEjeTec,
                     metBenAnoEjeTec
                 }
+                console.log(MetaBeneficiario)
                 handleSubmitMetaBeneficiarioExiste(MetaBeneficiario, handleReset, updateData, setUpdateData, fetchBeneficiarie);
             }
         })();

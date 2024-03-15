@@ -74,8 +74,8 @@ const validationRules = {
     },
     'indicador': {
         required: true,
-        pattern: /^(IR|AR|IO)$/, // Acepta solo estos tipos
-        patternMessage: 'Por favor, introduce solo IR,AR o IO',
+        pattern: /^(IAC|IRE|IOB|ISA)$/, // Acepta solo estos tipos
+        patternMessage: 'Por favor, introduce solo IAC,IRE,IOB O ISA',
     },
     'numero': {
         required: true,

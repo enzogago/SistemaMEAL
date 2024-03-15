@@ -483,7 +483,7 @@ namespace SistemaMEAL.Server.Modulos
             return temporal?? new List<Beneficiario>();
         }
 
-        public IEnumerable<Beneficiario> BuscarBeneficiariosHome(string? tags)
+        public IEnumerable<Beneficiario> ContarBeneficiariosHome(string? tags)
         {
             List<Beneficiario>? temporal = new List<Beneficiario>();
             try

@@ -119,7 +119,7 @@ const Table = ({ data, setMonitoringData }) => {
 
     const Editar_Meta = (row) => {
         console.log(row)
-        const id = `${row.original.metAno}${row.original.metCod}${row.original.indActResAno}${row.original.indActResCod}${row.original.metIndTipInd}`;
+        const id = `${row.original.metAno}${row.original.metCod}${row.original.indActResAno}${row.original.indActResCod}`;
         console.log(id)
         // Encripta el ID
         const ciphertext = CryptoJS.AES.encrypt(id, 'secret key 123').toString();
@@ -130,7 +130,7 @@ const Table = ({ data, setMonitoringData }) => {
 
     const Eliminar_Meta_Indicador = (row) => {
         console.log(row)
-        const { metAno, metCod, indActResAno: metIndAno, indActResCod: metIndCod, metIndTipInd } = row;
+        const { metAno, metCod, indActResAno: metIndAno, indActResCod: metIndCod } = row;
 
         Notiflix.Confirm.show(
             'Eliminar Registro',
@@ -141,7 +141,7 @@ const Table = ({ data, setMonitoringData }) => {
                 try {
                     Notiflix.Loading.pulse();
                     const token = localStorage.getItem('token');
-                    const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/meta-indicador/${metAno}/${metCod}/${metIndAno}/${metIndCod}/${metIndTipInd}`, {
+                    const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/meta-indicador/${metAno}/${metCod}/${metIndAno}/${metIndCod}`, {
                         method: 'DELETE',
                         headers: {
                             'Authorization': `Bearer ${token}`
@@ -431,13 +431,14 @@ const Table = ({ data, setMonitoringData }) => {
                 }
             },
             {
-                header: "Añadir",
+                header: () => <div style={{textAlign: 'center', flexGrow: '1'}}>Añadir</div>,
                 accessorKey: "añadir",
-                stickyRight: 95,
+                disableSorting: true,
+                stickyRight: 110,
                 cell: ({row}) => {
                     return (
                         row.original.uniInvPer === 'S' ?
-                        <div className="flex jc-center ai-center">
+                        <div className="flex jc-center ai-center" >
                             <button  
                                 className="PowerMas_Add_Beneficiarie f_75 p_25 flex-grow-1" 
                                 onClick={() => Register_Beneficiarie(row)}

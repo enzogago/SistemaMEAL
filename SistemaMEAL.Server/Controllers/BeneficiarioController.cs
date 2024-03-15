@@ -299,15 +299,15 @@ namespace SistemaMEAL.Server.Controllers
 
         [HttpGet]
         [Route("home/{tags?}")]
-        public dynamic BuscarBeneficiariosHome(string? tags = null)
+        public dynamic ContarBeneficiariosHome(string? tags = null)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var reult = _beneficiarios.BuscarBeneficiariosHome(tags);
-            return Ok(reult);
+            var reult = _beneficiarios.ContarBeneficiariosHome(tags);
+            return Ok(reult.FirstOrDefault());
         }
         [HttpGet]
         [Route("sexo-home/{tags?}")]

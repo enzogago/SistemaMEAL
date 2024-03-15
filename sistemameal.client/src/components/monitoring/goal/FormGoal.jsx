@@ -13,7 +13,6 @@ const FormGoal = () => {
     const tableRef = useRef();
     // Estados locales
     const [ paises, setPaises ] = useState([]);
-    const [ financiadores, setFinanciadores ] = useState([]);
     const [ implementadores, setImplementadores ] = useState([]);
     const [ proyectos, setProyectos ] = useState([]);
     const [ indicadores, setIndicadores ] = useState([]);
@@ -37,7 +36,8 @@ const FormGoal = () => {
         const bytes  = CryptoJS.AES.decrypt(ciphertext, 'secret key 123');
         id = bytes.toString(CryptoJS.enc.Utf8);
     }
-    const isEditing = id && id.length === 22;
+
+    const isEditing = id && id.length === 20;
 
     // Configuracion del formulario
     const { 
@@ -56,7 +56,6 @@ const FormGoal = () => {
             Notiflix.Loading.pulse('Cargando...');
             await Promise.all([
                 fetchData('Proyecto', setProyectos),
-                fetchData('Financiador', setFinanciadores),
                 fetchData('Implementador', setImplementadores),
                 fetchData('Ubicacion', setPaises)
             ]);
@@ -68,9 +67,8 @@ const FormGoal = () => {
                 const metCod = id.slice(4,10);
                 const metIndAno = id.slice(10,14);
                 const metIndCod = id.slice(14,20);
-                const metIndTipInd = id.slice(20,22);
                 // Ejecuta la función para traer los datos del registro a modificar
-                fetchRegistroAModificar(metAno, metCod, metIndAno, metIndCod, metIndTipInd, reset, fetchSelects, setValue, fetchIndicadorActividad, setIsSecondInputEnabled, setSelectedOption, setJerarquia, setInitialData);
+                fetchRegistroAModificar(metAno, metCod, metIndAno, metIndCod, reset, fetchSelects, setValue, fetchIndicadorActividad, setIsSecondInputEnabled, setSelectedOption, setJerarquia, setInitialData);
             }
         });
     }, [isEditing]);
@@ -173,6 +171,7 @@ const FormGoal = () => {
             if (data.length === 0) {
                 setIsSecondInputEnabled(false);
             } else {
+                console.log(data);
                 setIndicadores(data);
                 setIsSecondInputEnabled(true);
             }
@@ -311,7 +310,7 @@ const FormGoal = () => {
             } else if (hasChangedGoal) {
                 // UPDATE TM_META
                 let MetaSubmit = {...MetaIndicadorActividad.Meta};
-
+                console.log(MetaSubmit)
                 handleEdit(MetaSubmit)
             } else if (hasChangedIndicator){
                 // UPDATE TV_META_INDICADOR
@@ -541,7 +540,7 @@ const FormGoal = () => {
                             
                             setJerarquia(data);
                             console.log(option.tipInd)
-                            if(option.tipInd === 'AR'){
+                            if(option.tipInd === 'IAC'){
                                 setEsActividad(true);
                             } else {
                                 setEsActividad(false);
