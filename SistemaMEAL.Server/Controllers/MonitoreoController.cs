@@ -74,27 +74,27 @@ namespace SistemaMEAL.Server.Controllers
 
         [HttpGet]
         [Route("autocomplete/{proAno}/{proCod}")]
-        public dynamic ListarIndicadorActividad(string proAno, string proCod)
+        public dynamic ListarIndicadoresPorProyecto(string proAno, string proCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var data = _monitoreos.ListarIndicadorActividad(proAno,proCod);
+            var data = _monitoreos.ListarIndicadoresPorProyecto(proAno,proCod);
             return Ok(data);
         }
 
         [HttpGet]
-        [Route("jerarquia/{indActResAno}/{indActResCod}/{tipInd}")]
-        public dynamic ObtenerJerarquia(string indActResAno, string indActResCod,string tipInd)
+        [Route("jerarquia/{indAno}/{indCod}")]
+        public dynamic ObtenerJerarquia(string indAno, string indCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             // if (!rToken.success) return Unauthorized(rToken);
 
-            var jerarquia = _monitoreos.ObtenerJerarquia(indActResAno,indActResCod,tipInd);
+            var jerarquia = _monitoreos.ObtenerJerarquia(indAno,indCod);
             var data = jerarquia.FirstOrDefault();
             return Ok(data);
         }
@@ -366,15 +366,15 @@ namespace SistemaMEAL.Server.Controllers
         }
 
         [HttpGet]
-        [Route("meta-indicador/{metAno}/{metCod}/{metIndAno}/{metIndCod}")]
-        public dynamic BuscarMetaIndicador(string metAno, string metCod, string metIndAno, string metIndCod)
+        [Route("meta-indicador/{metAno}/{metCod}/{indAno}/{indCod}")]
+        public dynamic BuscarMetaIndicador(string metAno, string metCod, string indAno, string indCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var data = _monitoreos.BuscarMetaIndicador(metAno, metCod, metIndAno, metIndCod);
+            var data = _monitoreos.BuscarMetaIndicador(metAno, metCod, indAno, indCod);
             
             return Ok(data.FirstOrDefault());
         }
@@ -463,7 +463,7 @@ namespace SistemaMEAL.Server.Controllers
 
         [HttpPut]
         [Route("indicador")]
-        public dynamic ModificarMetaIndicador(MetaIndicadorActividadResultado? metaIndicador)
+        public dynamic ModificarMetaIndicador(MetaIndicador? metaIndicador)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);

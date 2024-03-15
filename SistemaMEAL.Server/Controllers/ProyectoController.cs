@@ -32,6 +32,7 @@ namespace SistemaMEAL.Server.Controllers
             Console.WriteLine(data);
             return Ok(data);
         }
+        
 
         [HttpPost("agregar-exclusiones/{usuAno}/{usuCod}")]
         public IActionResult AgregarExclusiones([FromBody] ModificarExclusionesRequest request, string usuAno, string usuCod)

@@ -12,6 +12,7 @@ const FormGoal = () => {
     const navigate = useNavigate();
     const tableRef = useRef();
     // Estados locales
+    const [ usersTecnicos, setUsersTecnicos ] = useState([]);
     const [ paises, setPaises ] = useState([]);
     const [ implementadores, setImplementadores ] = useState([]);
     const [ proyectos, setProyectos ] = useState([]);
@@ -51,13 +52,48 @@ const FormGoal = () => {
     } = 
     useForm({ mode: "onChange"});
 
+    const fetchUsuariosTecnico = async () => {
+        try {
+            Notiflix.Loading.pulse('Cargando...');
+            // Valores del storage
+            const token = localStorage.getItem('token');
+            
+            // Obtenemos los datos
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/usuario/tecnico`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            console.log(response)
+            if (!response.ok) {
+                if(response.status === 401 || response.status === 403){
+                    const data = await response.json();
+                    Notiflix.Notify.failure(data.message);
+                }
+                return;
+            }
+            const data = await response.json();
+            if (data.success === false) {
+                Notiflix.Notify.failure(data.message);
+                return;
+            }
+            setUsersTecnicos(data);
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            Notiflix.Loading.remove();
+        }
+    };
+
+
     useEffect(() => {
         const fetchOptions = async () => {
             Notiflix.Loading.pulse('Cargando...');
             await Promise.all([
                 fetchData('Proyecto', setProyectos),
                 fetchData('Implementador', setImplementadores),
-                fetchData('Ubicacion', setPaises)
+                fetchData('Ubicacion', setPaises),
+                fetchUsuariosTecnico()
             ]);
         };
     
@@ -65,10 +101,10 @@ const FormGoal = () => {
             if (isEditing) {
                 const metAno = id.slice(0, 4);
                 const metCod = id.slice(4,10);
-                const metIndAno = id.slice(10,14);
-                const metIndCod = id.slice(14,20);
+                const indAno = id.slice(10,14);
+                const indCod = id.slice(14,20);
                 // Ejecuta la función para traer los datos del registro a modificar
-                fetchRegistroAModificar(metAno, metCod, metIndAno, metIndCod, reset, fetchSelects, setValue, fetchIndicadorActividad, setIsSecondInputEnabled, setSelectedOption, setJerarquia, setInitialData);
+                fetchRegistroAModificar(metAno, metCod, indAno, indCod, reset, fetchSelects, setValue, fetchIndicadorActividad, setIsSecondInputEnabled, setSelectedOption, setJerarquia, setInitialData);
             }
         });
     }, [isEditing]);
@@ -94,7 +130,7 @@ const FormGoal = () => {
     useEffect(() => {
         if (!selectedOption || indicadores.length === 0) {
             setIsSecondInputEnabled(false);
-            setValue('indActResNom', '');
+            setValue('indNom', '');
         } 
     }, [selectedOption, indicadores]);
 
@@ -104,17 +140,17 @@ const FormGoal = () => {
 
         if (!matchingOption) {
             // Si no hay ninguna opción que coincida, limpia ambos campos
-            setValue('indActResNom', '');
+            setValue('indNom', '');
             setIsSecondInputEnabled(false);
         } 
     }, [watch('proNom')]);
 
     useEffect(() => {
         // Si el valor de 'indActResNom' está vacío, entonces limpia los datos
-        if (!watch('indActResNom')) {
+        if (!watch('indNom')) {
             setJerarquia(null);
         }
-    }, [watch('indActResNom')]);
+    }, [watch('indNom')]);
 
     //
     const fetchSelects = async (ubiAno,ubiCod) => {
@@ -286,9 +322,9 @@ const FormGoal = () => {
             MetaIndicador: {
                 metAno: data.metAno,
                 metCod: data.metCod,
-                metIndActResAno: data.metIndActResAno,
-                metIndActResCod: data.metIndActResCod,
-                metIndActResTipInd: data.metIndActResTipInd,
+                indAno: data.indAno,
+                indCod: data.indCod,
+                indTipInd: data.indTipInd,
             },
         }
 
@@ -297,11 +333,11 @@ const FormGoal = () => {
         if (isEditing) {
             MetaIndicadorActividad.MetaIndicador.metAnoOri = initialData.metAno;
             MetaIndicadorActividad.MetaIndicador.metCodOri = initialData.metCod;
-            MetaIndicadorActividad.MetaIndicador.metIndActResAnoOri = initialData.metIndActResAno;
-            MetaIndicadorActividad.MetaIndicador.metIndActResCodOri = initialData.metIndActResCod;
-            MetaIndicadorActividad.MetaIndicador.metIndActResTipIndOri = initialData.metIndActResTipInd;
+            MetaIndicadorActividad.MetaIndicador.indAnoOri = initialData.indAno;
+            MetaIndicadorActividad.MetaIndicador.indCodOri = initialData.indCod;
+            MetaIndicadorActividad.MetaIndicador.indTipIndOri = initialData.indTipInd;
 
-            const hasChangedIndicator = ['metIndActResAno', 'metIndActResCod', 'metIndActResTipInd'].some(key => data[key] !== initialData[key]);
+            const hasChangedIndicator = ['indAno', 'indCod', 'indTipInd'].some(key => data[key] !== initialData[key]);
             const hasChangedGoal = ['impCod', 'finCod', 'metAnoPlaTec', 'metMesPlaTec', 'metMetPre', 'metMetTec'].some(key => data[key] !== initialData[key]) || ubiAno !== initialData.ubiAno || ubiCod !== initialData.ubiCod;
 
             if(hasChangedGoal && hasChangedIndicator){
@@ -493,6 +529,14 @@ const FormGoal = () => {
         }
     };
 
+    const indTipIndMap = {
+        'IAC': 'Indicador Actividad',
+        'IRE': 'Indicador Resultado',
+        'IOB': 'Indicador Objetivo',
+        'IOE': 'Indicador Objetivo Especifico',
+        'ISA': 'Indicador Sub Actividad',
+    };
+    
     return (
         <>
             <div className="PowerMas_Header_Form_Beneficiarie flex ai-center p_5 gap-1">
@@ -500,7 +544,7 @@ const FormGoal = () => {
                 <h1 className="f1_75"> {isEditing ? 'Editar' : 'Nueva'} Meta</h1>
             </div>
             <div className="overflow-auto flex-grow-1 flex">
-            <div className="PowerMas_Info_Form_Beneficiarie Large_6 m1 p1 overflow-auto">
+                <div className="PowerMas_Info_Form_Beneficiarie Large_6 m1 p1 overflow-auto">
                     <h3>Datos del Proyecto</h3>
                     <AutocompleteInput 
                         options={proyectos} 
@@ -514,7 +558,7 @@ const FormGoal = () => {
                         handleOption={(option) => {
                             setIsSecondInputEnabled(true);
                             setJerarquia(null);
-                            setValue('indActResNom','');
+                            setValue('indNom','');
                             fetchIndicadorActividad(option.proAno,option.proCod);
                         }}
                         name='proNom'
@@ -530,23 +574,24 @@ const FormGoal = () => {
                         setSelectedOption={setSelectedOption}
                         dirtyFields={dirtyFields}
                         isSubmitted={isSubmitted} 
-                        optionToString={(option) => option.indActResNum + ' - ' + option.indActResNom.charAt(0).toUpperCase() + option.indActResNom.slice(1).toLowerCase() }
+                        optionToString={(option) => option.indNum + ' - ' + option.indNom.charAt(0).toUpperCase() + option.indNom.slice(1).toLowerCase()}
                         handleOption={async(option) => {
-                            setValue('metIndActResCod',option.indActResCod)
-                            setValue('metIndActResAno',option.indActResAno)
-                            setValue('metIndActResTipInd',option.tipInd)
-                            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/jerarquia/${option.indActResAno}/${option.indActResCod}/${option.tipInd}`);
+                            console.log(option)
+                            setValue('indAno',option.indAno)
+                            setValue('indCod',option.indCod)
+                            setValue('indTipInd',option.indTipInd)
+                            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/jerarquia/${option.indAno}/${option.indCod}`);
                             const data = await response.json();
-                            
+                            console.log(data)
                             setJerarquia(data);
-                            console.log(option.tipInd)
-                            if(option.tipInd === 'IAC'){
+                            
+                            if(option.indTipInd === 'IAC'){
                                 setEsActividad(true);
                             } else {
                                 setEsActividad(false);
                             }
                         }}
-                        name='indActResNom'
+                        name='indNom'
                         errors={errors}
                         disabled={!isSecondInputEnabled}
                         titulo='Indicador'
@@ -556,15 +601,17 @@ const FormGoal = () => {
                     {jerarquia && (
                         <div>
                             <article>
-                                <h3 className="Large-f1 m_5" style={{textTransform: 'capitalize'}}>{jerarquia.tipInd.toLowerCase()}</h3>
-                                <p className="m_5">{jerarquia.indActResNum + ' - ' + jerarquia.indActResNom.charAt(0).toUpperCase() + jerarquia.indActResNom.slice(1).toLowerCase()}</p>
+                            <h3 className="Large-f1 m_5" style={{textTransform: 'capitalize'}}>
+                                {indTipIndMap[jerarquia.indTipInd] || jerarquia.indTipInd.toLowerCase()}
+                            </h3>
+                                <p className="m_5">{jerarquia.indNum + ' - ' + jerarquia.indNom.charAt(0).toUpperCase() + jerarquia.indNom.slice(1).toLowerCase()}</p>
                             </article>
                             {
                                 jerarquia.resNom &&
                                 <>
                                     <article>
                                         <h3 className="Large-f1 m_5"> Resultado </h3>
-                                        <p className="m_5">{jerarquia.resNum + ' - ' + jerarquia.resNom.charAt(0).toUpperCase() + jerarquia.indActResNom.slice(1).toLowerCase()}</p>
+                                        <p className="m_5">{jerarquia.resNum + ' - ' + jerarquia.resNom.charAt(0).toUpperCase() + jerarquia.indNom.slice(1).toLowerCase()}</p>
                                     </article>
                                 </>
                             }
@@ -692,37 +739,38 @@ const FormGoal = () => {
                             </p>
                         )}
                     </div>
-                    {/* <div className="m_75">
-                        <label htmlFor="finCod" className="">
-                            Financiador:
+                    <div className="m_75">
+                        <label htmlFor="tecnico" className="">
+                            Técnico Asignado:
                         </label>
                         <select 
+                            id="tecnico"
                             style={{textTransform: 'capitalize'}}
-                            id="finCod" 
-                            className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.finCod || isSubmitted ? (errors.impCod ? 'invalid' : 'valid') : ''}`} 
-                            {...register('finCod', { 
-                                validate: value => value !== '0' || 'El campo es requerido' 
+                            className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.tecnico || isSubmitted ? (errors.tecnico ? 'invalid' : 'valid') : ''}`} 
+                            {...register('tecnico', { 
+                                validate: {
+                                    required: value => value !== '0' || 'El campo es requerido',
+                                }
                             })}
                         >
-                            <option value="0">--Seleccione Financiador--</option>
-                            {financiadores.map(item => (
+                            <option value="0">--Seleccione Técnico--</option>
+                            {usersTecnicos.map((tecnico, index) => (
                                 <option 
-                                    key={item.finCod} 
-                                    value={item.finCod}
-                                    style={{textTransform: 'capitalize'}}
+                                    key={index} 
+                                    value={JSON.stringify({ usuCod: tecnico.usuCod, usuAno: tecnico.usuAno })}
                                 > 
-                                    {item.finNom.toLowerCase()}
+                                    {tecnico.usuNom.toLowerCase() + ' ' + tecnico.usuApe.toLowerCase() }
                                 </option>
                             ))}
                         </select>
-                        {errors.finCod ? (
-                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.finCod.message}</p>
+                        {errors.tecnico ? (
+                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.tecnico.message}</p>
                         ) : (
                             <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                            Espacio reservado para el mensaje de error
+                                Espacio reservado para el mensaje de error
                             </p>
                         )}
-                    </div> */}
+                    </div>
                     {
                         isEditing ?
                         <>
@@ -838,43 +886,46 @@ const FormGoal = () => {
                                 </p>
                             )}
                         </div>
-                        <div className="m_75">
-                            <label htmlFor="metMetPre" className="">
-                                Meta Presupuesto:
-                            </label>
-                            <input
-                                id="metMetPre"
-                                className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.metMetPre || isSubmitted ? (errors.metMetPre ? 'invalid' : 'valid') : ''}`} 
-                                type="text" 
-                                placeholder="500"
-                                autoComplete="disabled"
-                                maxLength={10}
-                                onKeyDown={(event) => {
-                                    if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
-                                        event.preventDefault();
-                                    }
-                                }}
-                                {...register('metMetPre', {
-                                    required: 'La meta es requerida',
-                                    maxLength: {
-                                        value: 10,
-                                        message: 'El campo no debe tener más de 10 dígitos'
-                                    },
-                                    pattern: {
-                                        value: /^[0-9]*$/,
-                                        message: 'El campo solo debe contener números'
-                                    },
-                                    validate: value => parseInt(value, 10) > 0 || 'El valor debe ser mayor a 0'
-                                })}
-                            />
-                            {errors.metMetPre ? (
-                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.metMetPre.message}</p>
-                            ) : (
-                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                Espacio reservado para el mensaje de error
-                                </p>
-                            )}
-                        </div>
+                        {
+                            esActividad &&
+                            <div className="m_75">
+                                <label htmlFor="metMetPre" className="">
+                                    Meta Presupuesto:
+                                </label>
+                                <input
+                                    id="metMetPre"
+                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.metMetPre || isSubmitted ? (errors.metMetPre ? 'invalid' : 'valid') : ''}`} 
+                                    type="text" 
+                                    placeholder="500"
+                                    autoComplete="disabled"
+                                    maxLength={10}
+                                    onKeyDown={(event) => {
+                                        if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
+                                            event.preventDefault();
+                                        }
+                                    }}
+                                    {...register('metMetPre', {
+                                        required: 'La meta es requerida',
+                                        maxLength: {
+                                            value: 10,
+                                            message: 'El campo no debe tener más de 10 dígitos'
+                                        },
+                                        pattern: {
+                                            value: /^[0-9]*$/,
+                                            message: 'El campo solo debe contener números'
+                                        },
+                                        validate: value => parseInt(value, 10) > 0 || 'El valor debe ser mayor a 0'
+                                    })}
+                                />
+                                {errors.metMetPre ? (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.metMetPre.message}</p>
+                                ) : (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                    Espacio reservado para el mensaje de error
+                                    </p>
+                                )}
+                            </div>
+                        }
                         </>
                         :
                         <>

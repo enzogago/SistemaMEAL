@@ -1,0 +1,28 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace SistemaMEAL.Server.Models
+{
+    public class Indicador
+    {
+        [Key, Column(Order = 0)]
+        public String? IndAno { get; set; }
+        [Key, Column(Order = 1)]
+        public String? IndCod { get; set; }
+        [ForeignKey("Actividad")]
+        public String? ActAno { get; set; }
+        [ForeignKey("Actividad")]
+        public String? ActCod { get; set; }
+        public String? IndNom { get; set; }
+        public String? IndNum { get; set; }
+        public String? UniCod { get; set; }
+        public String? TipValCod { get; set; }
+        public String? IndTipInd { get; set; }
+        public String? UsuIng { get; set; }
+        public DateTime? FecIng { get; set; }
+        public String? UsuMod { get; set; }
+        public DateTime? FecMod { get; set; }
+        public char EstReg { get; set; }
+
+    }
+}

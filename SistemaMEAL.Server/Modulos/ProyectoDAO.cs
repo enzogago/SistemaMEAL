@@ -591,7 +591,7 @@ namespace SistemaMEAL.Modulos
 
                                         int indiceIndicador = 0;
 
-                                        foreach (var indicadorActividadResultado in resultado.IndicadoresActividades)
+                                        foreach (var indicador in resultado.Indicadores)
                                         {
 
                                             cmd = new SqlCommand("SP_INSERTAR_INDICADOR_OBJETIVO", cn.getcn);
@@ -599,8 +599,8 @@ namespace SistemaMEAL.Modulos
 
                                             cmd.Parameters.AddWithValue("@P_OBJANO", objAno);
                                             cmd.Parameters.AddWithValue("@P_OBJCOD", objCod);
-                                            cmd.Parameters.AddWithValue("@P_INDOBJNOM", indicadorActividadResultado.IndActResNom);
-                                            cmd.Parameters.AddWithValue("@P_INDOBJNUM", indicadorActividadResultado.IndActResNum);
+                                            cmd.Parameters.AddWithValue("@P_INDOBJNOM", indicador.IndNom);
+                                            cmd.Parameters.AddWithValue("@P_INDOBJNUM", indicador.IndNum);
                                             cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
                                             cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
                                             cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
@@ -735,22 +735,22 @@ namespace SistemaMEAL.Modulos
                                         
                                         int indiceIndicador = 0;
 
-                                        foreach (var indicadorActividadResultado in resultado.IndicadoresActividades)
+                                        foreach (var indicador in resultado.Indicadores)
                                         {
-                                            indicadorActividadResultado.ResAno = actAno; // Establece la clave foránea
-                                            indicadorActividadResultado.ResCod = actCod; // Establece la clave foránea
+                                            indicador.ActAno = actAno; // Establece la clave foránea
+                                            indicador.ActCod = actCod; // Establece la clave foránea
 
                                             // Inserta el proyecto
                                             cmd = new SqlCommand("SP_INSERTAR_INDICADOR", cn.getcn);
                                             cmd.CommandType = CommandType.StoredProcedure;
 
-                                            cmd.Parameters.AddWithValue("@P_ACTANO", indicadorActividadResultado.ResAno);
-                                            cmd.Parameters.AddWithValue("@P_ACTCOD", indicadorActividadResultado.ResCod);
-                                            cmd.Parameters.AddWithValue("@P_INDNOM", indicadorActividadResultado.IndActResNom);
-                                            cmd.Parameters.AddWithValue("@P_INDNUM", indicadorActividadResultado.IndActResNum);
-                                            cmd.Parameters.AddWithValue("@P_INDTIPIND", indicadorActividadResultado.IndActResTip);
-                                            cmd.Parameters.AddWithValue("@P_UNICOD", "01"); // asdasd
-                                            cmd.Parameters.AddWithValue("@P_TIPVALCOD", "01"); // asdasd
+                                            cmd.Parameters.AddWithValue("@P_ACTANO", indicador.ActAno);
+                                            cmd.Parameters.AddWithValue("@P_ACTCOD", indicador.ActCod);
+                                            cmd.Parameters.AddWithValue("@P_INDNOM", indicador.IndNom);
+                                            cmd.Parameters.AddWithValue("@P_INDNUM", indicador.IndNum);
+                                            cmd.Parameters.AddWithValue("@P_INDTIPIND", indicador.IndTipInd);
+                                            cmd.Parameters.AddWithValue("@P_UNICOD", indicador.UniCod);
+                                            cmd.Parameters.AddWithValue("@P_TIPVALCOD", indicador.TipValCod);
                                             cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
                                             cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
                                             cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");

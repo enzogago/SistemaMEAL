@@ -434,7 +434,7 @@ const Table = ({ data, setMonitoringData }) => {
                 header: () => <div style={{textAlign: 'center', flexGrow: '1'}}>Añadir</div>,
                 accessorKey: "añadir",
                 disableSorting: true,
-                stickyRight: 110,
+                stickyRight: 95,
                 cell: ({row}) => {
                     return (
                         row.original.uniInvPer === 'S' ?

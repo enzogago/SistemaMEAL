@@ -221,6 +221,9 @@ namespace SistemaMEAL.Server.Modulos
 
         public IEnumerable<Usuario> Listado(string? usuAno = null, string? usuCod = null, string? docIdeCod = null, string? usuNumDoc = null, string? usuNom = null, string? usuApe = null, string? usuFecNac = null, string? usuSex = null, string? usuCorEle = null, string? usuCarCod = null, string? usuFecInc = null, string? usuTel = null, string? usuNomUsu = null, string? usuPas = null, string? usuEst = null, string? rolCod = null, string? ubiAno = null, string? ubiCod = null)
         {
+            Console.WriteLine(rolCod);
+            Console.WriteLine(usuAno);
+            Console.WriteLine(usuCod);
             List<Usuario>? temporal = new List<Usuario>();
             try
             {
@@ -275,6 +278,7 @@ namespace SistemaMEAL.Server.Modulos
                         jsonResult.Append(reader.GetValue(0).ToString());
                     }
                 }
+                Console.WriteLine(jsonResult);
                 // Deserializa la cadena JSON en una lista de objetos Usuario
                 temporal = JsonConvert.DeserializeObject<List<Usuario>>(jsonResult.ToString());
             }

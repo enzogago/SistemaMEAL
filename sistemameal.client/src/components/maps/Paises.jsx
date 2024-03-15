@@ -5,6 +5,7 @@ import data from './geojson/paises.json';
 
 const Paises = ({mapData}) => {
     const poblacionPorPais = mapData.reduce((obj, item) => {
+        console.log(obj)
         obj[item.ubiNom] = item;  // Aquí puedes seleccionar las características que quieres mostrar
         return obj;
     }, {});
@@ -59,7 +60,7 @@ const Paises = ({mapData}) => {
             .attr('class', 'd3-tip')
             .offset([0, 0])
             .html(function(d) {
-                const paisData = poblacionPorPais[d.name.toUpperCase()] || {};
+                const paisData = poblacionPorPais[d.name_es.toUpperCase()] || {};
                 const { cantidad, metMetTec, metEjeTec, metMetPre, metEjePre, metPorAvaTec, metPorAvaPre } = paisData;
                 return `
                 <div style="z-index: 100;">
@@ -87,12 +88,12 @@ const Paises = ({mapData}) => {
             .enter()
             .append('path')
             .attr('d', path)
-            .attr('fill', d => poblacionPorPais[d.properties.name.toUpperCase()] ? color(poblacionPorPais[d.properties.name.toUpperCase()]) : '#fde7bd')
+            .attr('fill', d => poblacionPorPais[d.properties.name_es.toUpperCase()] ? color(poblacionPorPais[d.properties.name_es.toUpperCase()]) : '#fde7bd')
             .attr('stroke', 'black')  // Esto establece el color del borde
             .attr('stroke-width', 1)  // Esto establece el grosor del borde
             .on('mouseover', function(event, d) {
                 d3.select(this).style('cursor', 'pointer');
-                if (poblacionPorPais[d.properties.name.toUpperCase()]) {
+                if (poblacionPorPais[d.properties.name_es.toUpperCase()]) {
                     d3.select(this)
                         .transition()  // Inicia una transición
                         .duration(200)  // Duración de la transición en milisegundos
@@ -102,11 +103,11 @@ const Paises = ({mapData}) => {
                 } 
             })
             .on('mouseleave', function(d) {
-                if (poblacionPorPais[d.srcElement.__data__.properties.name.toUpperCase()]) {
+                if (poblacionPorPais[d.srcElement.__data__.properties.name_es.toUpperCase()]) {
                     d3.select(this)
                     .transition()  // Inicia una transición
                     .duration(200)  // Duración de la transición en milisegundos
-                    .attr('fill', d => color(poblacionPorPais[d.properties.name.toUpperCase()] || 0));  // Color final de la transición
+                    .attr('fill', d => color(poblacionPorPais[d.properties.name_es.toUpperCase()] || 0));  // Color final de la transición
                 }
                 tip.hide();
             })
@@ -118,7 +119,7 @@ const Paises = ({mapData}) => {
         .enter()
         .append("text")
         .text(function(d) {
-            return d.properties.name;
+            return d.properties.name_es;
         })
         .attr("x", function(d) {
             return path.centroid(d)[0];
@@ -127,16 +128,16 @@ const Paises = ({mapData}) => {
             return path.centroid(d)[1];
         })
         .attr("text-anchor","middle")
-        .attr('font-size', d => poblacionPorPais[d.properties.name.toUpperCase()] ? '1.25rem' : '1rem')
-        .attr('font-weight', d => poblacionPorPais[d.properties.name.toUpperCase()] ? 'bold' : '')
-        .attr('fill', d => poblacionPorPais[d.properties.name.toUpperCase()] ? '#000' : '#000');
+        .attr('font-size', d => poblacionPorPais[d.properties.name_es.toUpperCase()] ? '1.25rem' : '1rem')
+        .attr('font-weight', d => poblacionPorPais[d.properties.name_es.toUpperCase()] ? 'bold' : '')
+        .attr('fill', d => poblacionPorPais[d.properties.name_es.toUpperCase()] ? '#000' : '#000');
 
 
         function clicked(event, d) {
             const [[x0, y0], [x1, y1]] = path.bounds(d);
             event.stopPropagation();
             countries.transition().style('fill', null);
-            if (poblacionPorPais[d.properties.name.toUpperCase()]) {
+            if (poblacionPorPais[d.properties.name_es.toUpperCase()]) {
                 d3.select(this).transition().style('fill', '#ffc459');
             }
             svg.transition().duration(750).call(

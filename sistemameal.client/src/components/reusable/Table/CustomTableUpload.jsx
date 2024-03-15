@@ -32,7 +32,8 @@ const CustomTableUpload = ({
     removeTag,
     searchTags,
     setSearchTags,
-    errorCells
+    errorCells,
+    isLargePagination
 }) => {
     const navigate = useNavigate();
     
@@ -204,7 +205,7 @@ const CustomTableUpload = ({
                                             const errorCell = errorCells.find(errorCell => errorCell.row === row.index && errorCell.column === cell.column.columnDef.index);
                                             const errorMessage = errorCell ? errorCell.message : '';
 
-                                            const cellText = cell.getValue();
+                                            const cellText = cell.getValue().charAt(0) + cell.getValue().slice(1).toLowerCase();
                                             const shortText = cellText.length > 50 ? cellText.substring(0, 50) + '...' : cellText;
 
                                             return (
@@ -225,12 +226,16 @@ const CustomTableUpload = ({
                                                         >
                                                             {hasError ? 'Ver error' : 
                                                                 <>
+                                                                {
+                                                                    cellText.length > 50 ?
                                                                     <div style={{textWrap: 'nowrap'}}>
                                                                         <span
                                                                             data-tooltip-id="info-tooltip" 
                                                                             data-tooltip-content={cellText} 
                                                                         >{shortText}</span>
-                                                                    </div>
+                                                                    </div> :
+                                                                    cellText
+                                                                }
                                                                 </>
                                                             }
                                                         </span>
@@ -256,7 +261,7 @@ const CustomTableUpload = ({
                     </>
                 }
             </div>
-            { showPagination && <Pagination table={table} />}
+            { showPagination && <Pagination table={table} isLargePagination={isLargePagination} />}
         </div>
     );
 }

@@ -3,9 +3,9 @@ import { useForm } from 'react-hook-form';
 import Notiflix from 'notiflix';
 import { useEffect, useRef, useState } from 'react';
 import { fetchData } from '../../reusable/helper';
-import intlTelInput from 'intl-tel-input';
 import 'intl-tel-input/build/css/intlTelInput.css';
 import 'intl-tel-input/build/js/utils.js';
+import { initPhoneInput } from './eventHandlers';
 
 const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, updateData, setUpdateData, metaData}) => {
 
@@ -16,7 +16,6 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, updateData
     const [ selects, setSelects ] = useState([]);
     const [ isDataLoaded, setIsDataLoaded ] = useState(false);
     const [ cargando, setCargando ] = useState(false);
-
 
     const [ initialData, setInitialData ] = useState(null);
     const [ fieldsDisabled, setFieldsDisabled ] = useState(true);
@@ -37,94 +36,10 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, updateData
 
     const [selectedValues, setSelectedValues] = useState([]);
 
-    
-    // Función para inicializar un input de teléfono
-    const initPhoneInput = (inputRef, setIsValid, setTelefono, setErrorMessage, initialNumber, ubiNom) => {
-        const countryNameToCode = {
-            'PERU': 'pe',
-            'COLOMBIA': 'co',
-            'ECUADOR': 'ec',
-            // Agrega aquí otros países si es necesario
-          };
-          
-          // Obtén el código del país basado en metaData.ubiNom
-          const initialCountryCode = countryNameToCode[ubiNom.toUpperCase()];
-
-        const phoneInput = intlTelInput(inputRef.current, {
-            initialCountry: initialCountryCode || "auto", // Utiliza "auto" como respaldo por si acaso
-        });
-
-        // Establece el número de teléfono inicial
-        if (initialNumber) {
-            phoneInput.setNumber(initialNumber);
-            setTelefono(phoneInput.getNumber());
-            setIsValid(phoneInput.isValidNumberPrecise());
-        } else {
-            setTelefono('');
-            setIsValid(true);
-        }
-
-
-        inputRef.current.addEventListener('countrychange', function() {
-            setIsValid(false)
-            const countryData = phoneInput.getSelectedCountryData();
-            let maxLength;
-            switch (countryData.iso2) {
-                case 'pe':  // Perú
-                    maxLength = 11;  
-                    break;
-                case 'ec':  // Ecuador
-                    maxLength = 9;  
-                    break;
-                case 'co':  // Colombia
-                    maxLength = 11;
-                    break;
-                default:
-                    maxLength = 15;  // Valor por defecto
-            }
-            inputRef.current.setAttribute('maxLength', maxLength);
-        });
-
-        inputRef.current.addEventListener('input', function() {
-            const inputValue = this.value;
-            if (inputValue === '') {
-                // Si el campo está vacío, se considera válido
-                setIsValid(true);
-                setErrorMessage('');
-                setTelefono('')
-            } else {
-                // Si el campo no está vacío, se verifica si el número de teléfono es válido
-                setTelefono(phoneInput.getNumber());
-                setIsValid(phoneInput.isValidNumberPrecise())
-                setIsTouched(true);
-                setContactIsTouched(true);
-        
-                let errorMessage = '';
-                switch (phoneInput.getValidationError()) {
-                    case 1:
-                        errorMessage = 'El código del país es inválido';
-                        break;
-                    case 2:
-                        errorMessage = 'El número de teléfono es demasiado corto';
-                        break;
-                    case 3:
-                        errorMessage = 'El número de teléfono es demasiado largo';
-                        break;
-                    case 4:
-                        errorMessage = 'Por favor, ingresa un número de teléfono válido';
-                        break;
-                    default:
-                        errorMessage = 'Por favor, ingresa un número de teléfono válido';
-                }
-                setErrorMessage(errorMessage);
-            }
-        });
-    };
-
     // Luego puedes llamar a esta función para cada input de teléfono en tu función afterOpenModal
     const afterOpenModal = () => {
-        initPhoneInput(phoneInputRef, setIsValid, setPhoneNumber, setErrorMessage, record.benTel, metaData.ubiNom);
-        initPhoneInput(phoneContactInputRef, setContactIsValid, setPhoneContactNumber, setErrorContactMessage, record.benTelCon, metaData.ubiNom);
+        initPhoneInput(phoneInputRef, setIsValid, setPhoneNumber, setErrorMessage, record.benTel, metaData.ubiNom, setIsTouched);
+        initPhoneInput(phoneContactInputRef, setContactIsValid, setPhoneContactNumber, setErrorContactMessage, record.benTelCon, metaData.ubiNom, setContactIsTouched);
     };
 
     const { 

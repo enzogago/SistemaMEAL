@@ -45,14 +45,21 @@ const SaveProject = () => {
         }));
     }, []);
 
+    const [pagination, setPagination] = useState({
+        pageIndex: 0, //initial page index
+        pageSize: 100, //default page size
+      });
+
     const table = useReactTable({
         data: transformedData, // Usa los datos transformados
         columns,
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
+        onPaginationChange: setPagination,
         state: {
-            sorting
+            sorting,
+            pagination,
         },
         onSortingChange: setSorting,
     });
@@ -67,32 +74,32 @@ const SaveProject = () => {
         // Aquí puedes procesar los datos y enviarlos al servidor
         console.log('Procesando datos...');
         console.log(postData);
-        try {
-            Notiflix.Loading.pulse();
-            const token = localStorage.getItem('token');
-            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Proyecto/Masivo`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(postData),
-            });
-            console.log("desde response: ",response)
-            const data = await response.json();
-            if (!response.ok) {
-                console.log(data)
-                Notiflix.Notify.failure(data.message)
-                return;
-            }
-            console.log(data)
-            Notiflix.Notify.success(data.message)
-            navigate('/upload-project');
-        } catch (error) {
-            console.error('Error:', error);
-        } finally {
-            Notiflix.Loading.remove();
-        }
+        // try {
+        //     Notiflix.Loading.pulse();
+        //     const token = localStorage.getItem('token');
+        //     const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Proyecto/Masivo`, {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //             'Authorization': `Bearer ${token}`
+        //         },
+        //         body: JSON.stringify(postData),
+        //     });
+        //     console.log("desde response: ",response)
+        //     const data = await response.json();
+        //     if (!response.ok) {
+        //         console.log(data)
+        //         Notiflix.Notify.failure(data.message)
+        //         return;
+        //     }
+        //     console.log(data)
+        //     Notiflix.Notify.success(data.message)
+        //     navigate('/upload-project');
+        // } catch (error) {
+        //     console.error('Error:', error);
+        // } finally {
+        //     Notiflix.Loading.remove();
+        // }
     }
 
     return (
@@ -101,6 +108,7 @@ const SaveProject = () => {
             <CustomTableUpload
                 table={table}
                 errorCells={errorCells}
+                isLargePagination={true}
             />
             <footer className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
                 <button onClick={() => navigate('/subir-proyecto')} className="Large_3 m_75 PowerMas_Buttom_Secondary">Atras</button>

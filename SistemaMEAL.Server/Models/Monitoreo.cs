@@ -29,12 +29,17 @@ namespace SistemaMEAL.Server.Models
         public String? ResNom { get; set; }
 
         public String? TipInd { get; set; }
+        public String? IndTipInd { get; set; }
         public String? MetIndTipInd { get; set; }
 
         public String? IndActResAno { get; set; }
         public String? IndActResCod { get; set; }
         public String? IndActResNum { get; set; }
         public String? IndActResNom { get; set; }
+        public String? IndAno { get; set; }
+        public String? IndCod { get; set; }
+        public String? IndNum { get; set; }
+        public String? IndNom { get; set; }
         public String? TipValCod { get; set; }
         public String? TipValNom { get; set; }
 

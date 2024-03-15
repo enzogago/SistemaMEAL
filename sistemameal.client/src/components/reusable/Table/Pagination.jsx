@@ -1,4 +1,11 @@
-const Pagination = ({ table }) => {
+const Pagination = ({ table, isLargePagination }) => {
+    // Define los tamaños de página para la paginación pequeña y grande
+    const smallPageSizes = [10, 20, 30, 50];
+    const largePageSizes = [100, 200, 300, 500];
+
+    // Usa los tamaños de página correspondientes dependiendo del valor de isLargePagination
+    const pageSizes = isLargePagination ? largePageSizes : smallPageSizes;
+
     return (
         <div className="PowerMas_Pagination Large_12 flex column jc-space-between ai-center Large-p2">
             <div className="todo">
@@ -13,9 +20,9 @@ const Pagination = ({ table }) => {
                     onChange={(e) => table.setPageSize(e.target.value)}
                     className="p_5"
                 > 
-                    {[10,20,30,50].map(pageSizeEl => {
-                        return  <option key={ pageSizeEl } value={pageSizeEl}> 
-                                    {pageSizeEl} 
+                    {pageSizes.map(pageSize => {
+                        return  <option key={pageSize} value={pageSize}> 
+                                    {pageSize} 
                                 </option>;
                     })}
                 </select>

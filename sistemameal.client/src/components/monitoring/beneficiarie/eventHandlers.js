@@ -1,5 +1,5 @@
 import Notiflix from "notiflix";
-
+import intlTelInput from 'intl-tel-input';
 
 export const handleSubmitMetaBeneficiario = async (data, handleReset, updateData, setUpdateData, fetchBeneficiarie) => {
     try {
@@ -89,6 +89,7 @@ export const fetchBeneficiariosMeta = async (metAno, metCod, setBeneficiariosMet
                 'Authorization': `Bearer ${token}`
             }
         });
+        console.log(response)
         if (!response.ok) {
             if(response.status == 401 || response.status == 403){
                 const data = await response.json();
@@ -147,4 +148,90 @@ export const handleDeleteBeneficiarioMeta = async (controller,metAno,metCod,benA
             // El usuario ha cancelado la operación de eliminación
         }
     );
+};
+
+export const initPhoneInput = (inputRef, setIsValid, setTelefono, setErrorMessage, initialNumber, ubiNom, setIsTouchable) => {
+    const countryNameToCode = {
+        'PERU': 'pe',
+        'COLOMBIA': 'co',
+        'ECUADOR': 'ec',
+      };
+      
+    // Obtén el código del país basado en metaData.ubiNom
+    const initialCountryCode = countryNameToCode[ubiNom?.toUpperCase()];
+
+    const phoneInput = intlTelInput(inputRef.current, {
+        initialCountry: initialCountryCode || "auto",
+        geoIpLookup: function(callback) {
+            fetch('https://ipinfo.io/json')
+                .then(response => response.json())
+                .then(data => callback(data.country))
+                .catch(() => callback(''));
+        },
+    });
+
+    // Establece el número de teléfono inicial
+    if (initialNumber) {
+        phoneInput.setNumber(initialNumber);
+        setTelefono(phoneInput.getNumber());
+        setIsValid(phoneInput.isValidNumberPrecise());
+    } else {
+        setTelefono('');
+        setIsValid(true);
+    }
+
+
+    inputRef.current.addEventListener('countrychange', function() {
+        setIsValid(false)
+        const countryData = phoneInput.getSelectedCountryData();
+        let maxLength;
+        switch (countryData.iso2) {
+            case 'pe':  // Perú
+                maxLength = 11;  
+                break;
+            case 'ec':  // Ecuador
+                maxLength = 9;  
+                break;
+            case 'co':  // Colombia
+                maxLength = 11;
+                break;
+            default:
+                maxLength = 15;  // Valor por defecto
+        }
+        inputRef.current.setAttribute('maxLength', maxLength);
+    });
+
+    inputRef.current.addEventListener('input', function() {
+        const inputValue = this.value;
+        if (inputValue === '') {
+            // Si el campo está vacío, se considera válido
+            setIsValid(true);
+            setErrorMessage('');
+            setTelefono('')
+        } else {
+            // Si el campo no está vacío, se verifica si el número de teléfono es válido
+            setTelefono(phoneInput.getNumber());
+            setIsValid(phoneInput.isValidNumberPrecise())
+            setIsTouchable(true);
+    
+            let errorMessage = '';
+            switch (phoneInput.getValidationError()) {
+                case 1:
+                    errorMessage = 'El código del país es inválido';
+                    break;
+                case 2:
+                    errorMessage = 'El número de teléfono es demasiado corto';
+                    break;
+                case 3:
+                    errorMessage = 'El número de teléfono es demasiado largo';
+                    break;
+                case 4:
+                    errorMessage = 'Por favor, ingresa un número de teléfono válido';
+                    break;
+                default:
+                    errorMessage = 'Por favor, ingresa un número de teléfono válido';
+            }
+            setErrorMessage(errorMessage);
+        }
+    });
 };

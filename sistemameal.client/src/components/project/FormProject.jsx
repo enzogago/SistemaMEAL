@@ -7,8 +7,10 @@ import { useContext, useEffect, useState } from "react";
 import Notiflix from "notiflix";
 import { useForm } from 'react-hook-form';
 import { handleSubmit } from "./eventHandlers";
+import { GrFormPreviousLink } from "react-icons/gr";
 
 const FormProject = () => {
+    const navigate = useNavigate();
     const { id: encodedCiphertext } = useParams();
     // Decodifica la cadena cifrada
     const ciphertext = decodeURIComponent(encodedCiphertext);
@@ -81,15 +83,14 @@ const FormProject = () => {
     }
 
     return (
-        <div className="bg-white h-100 flex flex-column">
-            <div className="">
-                <h1 className="flex flex-grow-1"> 
-                    {isEditing ? 'Editar proyecto' : 'Crear un nuevo proyecto'} 
-                </h1>
+        <>
+            <div className="PowerMas_Header_Form_Beneficiarie flex ai-center p_5 gap-1">
+                <GrFormPreviousLink className="w-auto Large-f2_5 pointer" onClick={() => navigate('/projects')} />
+                <h1 className="f1_75"> {true ? 'Editar' : 'Nueva'} Meta</h1>
             </div>
 
-            <div className="flex flex-grow-1 overflow-auto  p1_25">
-                <div className="PowerMas_ProjectInfo Large_6 overflow-auto">
+            <div className="overflow-auto flex-grow-1 flex">
+                <div className="PowerMas_Content_Form_Beneficiarie_Card Large_6 overflow-auto m1 p1">
                     <label htmlFor="proNom" className="">
                         Nombre
                     </label>
@@ -99,8 +100,8 @@ const FormProject = () => {
                         placeholder="Enzo Fabricio"
                         autoComplete="disabled"
                         {...register('proNom', { 
-                            required: 'El nombre es requerido',
-                            minLength: { value: 3, message: 'El nombre debe tener minimo 3 digitos' },
+                            required: 'El campo es requerido',
+                            minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
                         })} 
                     />
                     {errors.proNom ? (
@@ -119,8 +120,8 @@ const FormProject = () => {
                         placeholder="Enzo Fabricio"
                         autoComplete="disabled"
                         {...register('proDes', { 
-                            required: 'El nombre es requerido',
-                            minLength: { value: 3, message: 'El nombre debe tener minimo 3 digitos' },
+                            required: 'El campo es requerido',
+                            minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
                         })} 
                     />
                     {errors.proDes ? (
@@ -139,8 +140,8 @@ const FormProject = () => {
                         placeholder="Enzo Fabricio"
                         autoComplete="disabled"
                         {...register('proRes', { 
-                            required: 'El nombre es requerido',
-                            minLength: { value: 3, message: 'El nombre debe tener minimo 3 digitos' },
+                            required: 'El campo es requerido',
+                            minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
                         })} 
                     />
                     {errors.proRes ? (
@@ -166,18 +167,18 @@ const FormProject = () => {
                             }
                         }}
                         {...register('proPerAnoIni', { 
-                            required: 'El número de documento es requerido',
+                            required: 'El campo es requerido',
                             minLength: {
                                 value: 4,
-                                message: 'El número de documento debe tener al menos 6 dígitos'
+                                message: 'El campo debe tener al menos 6 dígitos'
                             },
                             maxLength: {
                                 value: 4,
-                                message: 'El número de documento no debe tener más de 10 dígitos'
+                                message: 'El campo no debe tener más de 10 dígitos'
                             },
                             pattern: {
                                 value: /^[0-9]*$/,
-                                message: 'El número de documento solo debe contener números'
+                                message: 'El campo solo debe contener números'
                             }
                         })}
                     />
@@ -235,18 +236,18 @@ const FormProject = () => {
                             }
                         }}
                         {...register('proPerAnoFin', { 
-                            required: 'El número de documento es requerido',
+                            required: 'El campo es requerido',
                             minLength: {
                                 value: 4,
-                                message: 'El número de documento debe tener al menos 6 dígitos'
+                                message: 'El campo debe tener al menos 6 dígitos'
                             },
                             maxLength: {
                                 value: 4,
-                                message: 'El número de documento no debe tener más de 10 dígitos'
+                                message: 'El campo no debe tener más de 10 dígitos'
                             },
                             pattern: {
                                 value: /^[0-9]*$/,
-                                message: 'El número de documento solo debe contener números'
+                                message: 'El campo solo debe contener números'
                             }
                         })}
                     />
@@ -290,7 +291,7 @@ const FormProject = () => {
                     )}
                 </div>
 
-                <div className="PowerMas_ProjectDetails Large_6">
+                <div className="PowerMas_Info_Form_Beneficiarie Large_6 m1 p1 overflow-auto">
                     <div className="PowerMas_NewSubproject">
                         <h2 className="Large-f1_5">Subproyectos</h2>
                         <div className="PowerMas_ButtomContainer">
@@ -321,7 +322,7 @@ const FormProject = () => {
                 <button onClick={Guardar_Proyecto} className="PowerMas_Buttom_Primary Large_3 m_75">Siguiente</button>
             </div>
 
-        </div>
+        </>
     )
 }
 

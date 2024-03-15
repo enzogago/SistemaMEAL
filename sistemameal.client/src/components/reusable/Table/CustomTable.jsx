@@ -32,7 +32,8 @@ const CustomTable = ({
     removeTag,
     searchTags,
     setSearchTags,
-    sums
+    sums,
+    isLargePagination
 }) => {
     const navigate = useNavigate();
     
@@ -261,7 +262,7 @@ const CustomTable = ({
                     </>
                 }
             </div>
-            { showPagination && <Pagination table={table} />}
+            { showPagination && <Pagination table={table} isLargePagination={isLargePagination} />}
         </div>
     );
 }

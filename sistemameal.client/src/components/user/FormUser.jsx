@@ -6,6 +6,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import CryptoJS from 'crypto-js';
 import Bar from "./Bar";
 import { fetchData } from "../reusable/helper";
+import { initPhoneInput } from "../monitoring/beneficiarie/eventHandlers";
+import { useRef } from "react";
 
 const FormUser = () => {
     const navigate = useNavigate();
@@ -38,67 +40,18 @@ const FormUser = () => {
     const [ inputView, setInputView ] = useState('');
     const [ phoneLength, setPhoneLength ] = useState('');
 
-    const countryPhoneCodes = {
-        "peru": "+51",
-        "colombia": "+57",
-        "ecuador" : "+593",
-        // Añade aquí los demás países y sus códigos
-    };
-    const countryPhoneLength = {
-        "peru": 9,
-        "colombia": 10,
-        "ecuador" : 9,
-        // Añade aquí los demás países y sus longitudes
-    };
-    
+    // Estados Numero de Telefono
+    const phoneInputRef = useRef();
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [isValid, setIsValid] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+    const [isTouched, setIsTouched] = useState(false);
 
 
     const { register, handleSubmit: validateForm, formState: { errors, dirtyFields, isSubmitted }, reset, setValue, watch, trigger } = 
     useForm({ mode: "onChange", defaultValues: {
         usuEst: 'a',
     } });
-
-
-    useEffect(() => {
-        const phone = watch('usuTel');
-        if (phone && phoneCodeInput && !phone.startsWith(phoneCodeInput)) {
-            setValue('usuTel', phoneCodeInput);
-        }
-    }, [watch('usuTel')]);
-
-    useEffect(() => {
-        const pais = watch('pais');
-        const tel = watch('usuTel');
-    
-        const updatePhoneCode = async () => {
-            if (pais !== '0') {
-                const isPaisValid = await trigger('pais');
-                if (isPaisValid) {
-                    const { ubiCod } = JSON.parse(pais);
-                    const paisObj = paises.find(p => p.ubiCod === ubiCod);
-                    if (paisObj) {
-                        const newPhoneCode = countryPhoneCodes[paisObj.ubiNom.toLowerCase()];
-                        const phoneLength = countryPhoneLength[paisObj.ubiNom.toLowerCase()];
-                        
-                        // Si el número de teléfono está vacío o no comienza con el nuevo código del país, actualiza el número de teléfono con el nuevo código del país
-                        if (!tel || (tel && !tel.startsWith(newPhoneCode))) {
-                            setValue('usuTel', newPhoneCode);
-                        }
-                        
-                        if (newPhoneCode){
-                            setPhoneCodeInput(newPhoneCode);
-                            setPhoneLength(phoneLength);
-                        }
-                    }
-                } 
-            } else {
-                setValue('usuTel', '');
-            }
-        };
-        updatePhoneCode();
-    }, [watch('pais'), paises]);
-    
-    
 
     const fechaNacimiento = watch('usuFecNac');
     const email = watch('usuCorEle');
@@ -172,6 +125,7 @@ const FormUser = () => {
     useEffect(() => {
         const fetchOptions = async () => {
             Notiflix.Loading.pulse('Cargando...');
+            
             await Promise.all([
                 fetchData('Cargo', setCargos),
                 fetchData('Rol', setRoles),
@@ -207,7 +161,7 @@ const FormUser = () => {
                     }
                 }
                 newData.pais = JSON.stringify({ ubiCod: data.ubiCod, ubiAno: data.ubiAno });
-
+                initPhoneInput(phoneInputRef, setIsValid, setPhoneNumber, setErrorMessage, data.usuTel, data.ubiNom, setIsTouched);
                 reset(newData);
                 setInitialValues(newData);
             } catch (error) {
@@ -220,6 +174,8 @@ const FormUser = () => {
         fetchOptions().then(() => {
             if(isEditing){
                 fetchUsuarios();
+            } else {
+                initPhoneInput(phoneInputRef, setIsValid, setPhoneNumber, setErrorMessage, '', '', setIsTouched);
             }
         });
     }, [isEditing, usuAno, usuCod]);
@@ -227,11 +183,13 @@ const FormUser = () => {
     
     const handleNext = () => {
         validateForm((data) => {
-            console.log(data)
-            console.log(initialValues)
-            const hasChanged = Object.keys(data).some(key => data[key] !== initialValues[key]);
-            console.log(hasChanged)
+            if (!isValid) {
+                return;
+            }
 
+            data.usuTel=phoneNumber;
+
+            const hasChanged = Object.keys(data).some(key => data[key] !== initialValues[key]);
 
             // Pasamos todo a mayuscula nuevamente para no tener problemas
             let newData = {};
@@ -522,7 +480,31 @@ const FormUser = () => {
                                 </p>
                             )}
                         </div>
-                        <div className="Large_12 flex flex-column">
+                        <div className='Large_12 flex flex-column'>
+                            <label htmlFor="phone" className="block">
+                                Telefono:
+                            </label>
+                            <div>
+                                <input
+                                    ref={phoneInputRef}
+                                    type="tel"
+                                    className={`Phone_12 PowerMas_Modal_Form_${isTouched ? (!isValid ? 'invalid' : 'valid') : ''}`}
+                                    style={{
+                                        paddingRight: '6px',
+                                        padding: '4px 6px 4px 52px',
+                                        margin: 0,
+                                    }}
+                                />
+                            </div>
+                            {!isValid ? (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errorMessage}</p>
+                            ) : (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                Espacio reservado para el mensaje de error
+                                </p>
+                            )}
+                        </div>
+                        {/* <div className="Large_12 flex flex-column">
                             <label htmlFor="usuTel">Teléfono</label>
                             <input 
                                 type="text" 
@@ -560,7 +542,7 @@ const FormUser = () => {
                                 Espacio reservado para el mensaje de error
                                 </p>
                             )}
-                        </div>
+                        </div> */}
                         <div className="Large_12 flex flex-column">
                             <label htmlFor="rolCod">Rol</label>
                             <select 

@@ -28,6 +28,6 @@ namespace SistemaMEAL.Server.Models
 
         public char EstReg { get; set; }
 
-        public List<IndicadorActividadResultado>? IndicadoresActividades { get; set; }
+        public List<Indicador>? Indicadores { get; set; }
     }
 }

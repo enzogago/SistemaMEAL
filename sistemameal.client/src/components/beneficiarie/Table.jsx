@@ -10,18 +10,12 @@ import {
 } from '@tanstack/react-table';
 // Iconos package
 import { FaEdit, FaPlus, FaRegTrashAlt, FaSearch, FaSortDown } from 'react-icons/fa';
-import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
-// Iconos source
-import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
-import Pdf_Icon from '../../img/PowerMas_Pdf_Icon.svg';
 // 
 import CryptoJS from 'crypto-js';
 // Context
 import { AuthContext } from '../../context/AuthContext';
 // Funciones reusables
 import { Export_Excel_Helper, Export_PDF_Helper, handleDelete } from '../reusable/helper';
-import Pagination from '../reusable/Pagination';
-import TableRow from '../user/TableRow';
 import CustomTable from '../reusable/Table/CustomTable';
 
 const Table = ({ data }) => {
