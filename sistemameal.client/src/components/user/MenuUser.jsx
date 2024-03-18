@@ -270,7 +270,7 @@ const MenuUser = () => {
         MenAno: menu.menAno,
         MenCod: menu.menCod
       }));
-  
+      console.log(addedMenusData)
       const token = localStorage.getItem('token');
       // Realizar la petición para agregar menús
       const responseAdd = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Menu/agregar`, {
@@ -308,15 +308,15 @@ const MenuUser = () => {
       const addedPermissionsData = addedPermissions.map(perCod => ({
         UsuAno: usuAno,
         UsuCod: usuCod,
-        PerCod: perCod
+        PerCod: perCod.trim()
       }));
       const removedPermissionsData = removedPermissions.map(perCod => ({
         UsuAno: usuAno,
         UsuCod: usuCod,
-        PerCod: perCod
+        PerCod: perCod.trim()
       }));
-      // console.log(addedPermissionsData)
-      // console.log(removedPermissionsData)
+      console.log(addedPermissionsData)
+      console.log(removedPermissionsData)
   
       const responseAddPermissions = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Permiso/agregar`, {
         method: 'POST',

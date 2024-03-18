@@ -26,7 +26,7 @@ select option {
 }
 
 input:focus, select:focus{
-	background-color: #FFF7F1!important;
+	background-color: #FFF7F1;
 	box-shadow: 0px 3px 10px rgba(247, 119, 90, 0.3);
 }
 input:disabled,select:disabled{
@@ -928,6 +928,7 @@ textarea {
 	color: #000;
 	margin-left: 5px;
 	border-radius: 5px;
+	white-space: nowrap;
 }
 .PowerMas_InputTag button{
 	border: 1px solid transparent;
@@ -939,6 +940,9 @@ textarea {
 	border-radius: 5px;
 	position: relative;
 }
+.PowerMas_Search_Container input:focus{
+	background-color: #fff!important;
+}	
 .PowerMas_Search_Container svg{
 	position: absolute;
     left: 0;
@@ -951,6 +955,10 @@ textarea {
 	overflow-x: auto;
 	scrollbar-width: thin;
 	/* border: 1px solid #F7CEAD; */
+	background-color: #fff;
+}
+
+.PowerMas_Input_Filter_Container input:focus{
 	background-color: #fff;
 }
 .PowerMas_Input_Filter{
@@ -1536,7 +1544,6 @@ textarea {
 }
 .PowerMas_Form_Card input,
 .PowerMas_Form_Card select{
-	background-color: transparent;
 	outline: none;
 	border: 1px solid #372e2c52;
 	border-radius: 5px;
@@ -1545,6 +1552,8 @@ textarea {
 .PowerMas_Info_User > article{
 	display: flex;
 	gap: 1rem;
+	flex-wrap: nowrap;
+	margin: 0.25rem 0;
 }
 
 /* END CREAR/MODIFICAR USUARIO */

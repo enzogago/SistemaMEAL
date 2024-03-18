@@ -24,7 +24,7 @@ namespace SistemaMEAL.Server.Modulos
             var identity = _httpContextAccessor.HttpContext.User.Identity as ClaimsIdentity;
             var usuAno = identity.Claims.FirstOrDefault(x => x.Type == "ANO").Value;
             var usuCod = identity.Claims.FirstOrDefault(x => x.Type == "COD").Value;
-            var ip = identity.Claims.FirstOrDefault(x => x.Type == "IP").Value; // Obtiene la dirección IP del claim
+            var ip = identity.Claims.FirstOrDefault(x => x.Type == "IP").Value;
 
             // Busca los detalles del usuario en la base de datos
             var usuarioActual = BuscarUsuarioLog(usuAno, usuCod);

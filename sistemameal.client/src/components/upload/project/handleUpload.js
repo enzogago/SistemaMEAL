@@ -21,6 +21,7 @@ export const expectedHeaders = [
     { display: 'AÑO_INICIO', dbKey: 'proPerAnoIni', entity: 'Proyecto', validation: 'año' },
     { display: 'MES_FIN', dbKey: 'proPerMesFin', entity: 'Proyecto', validation: 'nombre' },
     { display: 'AÑO_FIN', dbKey: 'proPerAnoFin', entity: 'Proyecto', validation: 'año' },
+    { display: 'INVOLUCRA_SUB_ACTIVIDAD', dbKey: 'proInvSubAct', entity: 'Proyecto', validation: 'descripcion' },
 ];
 
 const validateCell = (value, validationRules) => {
@@ -156,7 +157,7 @@ export const handleUpload = async (file, setTableData, setPostData, setIsValid, 
         const expectedHeaderDisplays = expectedHeaders.map(header => header.display.toUpperCase());
         console.log(expectedHeaderDisplays);
         // Verifica que los encabezados son correctos
-        const headers = worksheet.getRow(12).values.slice(3, 23); // Tomando en cuenta los encabezados estan en la fila 4 a partir de la columna 2
+        const headers = worksheet.getRow(12).values.slice(3, 24); // Tomando en cuenta los encabezados estan en la fila 4 a partir de la columna 2
         console.log(headers);
         if (!arraysEqual(headers, expectedHeaderDisplays)) {
             alert('Los encabezados no son válidos');
@@ -173,7 +174,7 @@ export const handleUpload = async (file, setTableData, setPostData, setIsValid, 
             const row = worksheet.getRow(rowNumber);
 
             // Verifica si todas las celdas en la fila están vacías
-            const isEmptyRow = row.values.slice(3, 23).every(cell => !cell || cell.trim() === '');
+            const isEmptyRow = row.values.slice(3, 24).every(cell => !cell || cell.trim() === '');
             // Si la fila está vacía, detiene la iteración
             if (isEmptyRow) {
                 break;
@@ -189,12 +190,13 @@ export const handleUpload = async (file, setTableData, setPostData, setIsValid, 
             const resultData  = {}; // Inicializa los datos del subproyecto
             const IndicatorData  = {}; // Inicializa los datos del subproyecto
 
-            for (let colNumber = 3; colNumber <= 22; colNumber++) { // Itera desde la columna B (2) hasta la F (6)
-                const cellValueForIndTipInd = row.getCell(23).text.trim();
-                const cellValueForProMesIni = row.getCell(24).text.trim();
-                const cellValueForProMesFin = row.getCell(25).text.trim();
-                const cellValueForUni = row.getCell(26).text.trim();
-                const cellValueForTipVal = row.getCell(27).text.trim();
+            for (let colNumber = 3; colNumber <= 23; colNumber++) { // Itera desde la columna B (2) hasta la F (6)
+                const cellValueForIndTipInd = row.getCell(24).text.trim();
+                const cellValueForProMesIni = row.getCell(25).text.trim();
+                const cellValueForProMesFin = row.getCell(26).text.trim();
+                const cellValueForUni = row.getCell(27).text.trim();
+                const cellValueForTipVal = row.getCell(28).text.trim();
+                const cellValueForInvSubAct = row.getCell(29).text.trim();
 
                 const cell = row.getCell(colNumber);
                 const cellValue = cell.text.trim();
@@ -209,6 +211,8 @@ export const handleUpload = async (file, setTableData, setPostData, setIsValid, 
                         projectData[databaseKey] = cellValueForProMesIni;
                     } else if (databaseKey === 'proPerMesFin') {
                         projectData[databaseKey] = cellValueForProMesFin;
+                    } else if (databaseKey === 'proInvSubAct') {
+                        projectData[databaseKey] = cellValueForInvSubAct;
                     } else {
                         projectData[databaseKey] = cellValue;
                     }

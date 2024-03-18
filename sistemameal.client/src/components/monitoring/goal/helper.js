@@ -1,6 +1,6 @@
 import Notiflix from "notiflix";
 
-export const fetchRegistroAModificar = async (metAno, metCod, indAno, indCod, reset, fetchSelects, setValue, fetchIndicadorActividad,setIsSecondInputEnabled, setSelectedOption, setJerarquia, setInitialData) => {
+export const fetchRegistroAModificar = async (metAno, metCod, indAno, indCod, reset, fetchSelects, setValue, fetchIndicadorActividad,setIsSecondInputEnabled, setSelectedOption, setJerarquia, setInitialData, setEsActividad) => {
     try {
         Notiflix.Loading.pulse('Cargando...');
         const token = localStorage.getItem('token');
@@ -17,6 +17,9 @@ export const fetchRegistroAModificar = async (metAno, metCod, indAno, indCod, re
         setInitialData(data)
         reset(data);
         console.log(data)
+        if (data.indTipInd === 'IAC') {
+            setEsActividad(true);
+        }
         fetchSelects(data.ubiAno,data.ubiCod);
         obtenerJerarquia(data, setValue, fetchIndicadorActividad,setIsSecondInputEnabled, setSelectedOption, setJerarquia);
     } catch (error) {

@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 import Bar from "../../user/Bar";
 import { useContext, useRef, useState } from "react";
 import { FaRegFileExcel } from "react-icons/fa";
-import UploadTransactionProyecto from "../../maintenance/UploadTransactionProyecto";
 import Notiflix from "notiflix";
 import ExcelJS from 'exceljs';
 import { handleUpload } from "./handleUpload";

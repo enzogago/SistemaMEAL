@@ -30,6 +30,8 @@ namespace SistemaMEAL.Server.Models
 
         [ForeignKey("Proyecto")]
         public String? ProCod { get; set; }
+        public String? ProNom { get; set; }
+        public String? ProRes { get; set; }
         public List<Objetivo>? Objetivos { get; set; }
     }
 }

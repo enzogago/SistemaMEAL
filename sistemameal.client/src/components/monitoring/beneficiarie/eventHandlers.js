@@ -139,7 +139,7 @@ export const handleDeleteBeneficiarioMeta = async (controller,metAno,metCod,benA
                 Notiflix.Notify.success(data.message);
                 
                 setUpdateData(!updateData);
-                fetchBeneficiarie();
+                // fetchBeneficiarie();
             } catch (error) {
                 console.error('Error:', error);
             }
@@ -152,14 +152,14 @@ export const handleDeleteBeneficiarioMeta = async (controller,metAno,metCod,benA
 
 export const initPhoneInput = (inputRef, setIsValid, setTelefono, setErrorMessage, initialNumber, ubiNom, setIsTouchable) => {
     const countryNameToCode = {
-        'PERU': 'pe',
+        'PERÚ': 'pe',
         'COLOMBIA': 'co',
         'ECUADOR': 'ec',
       };
-      
+      console.log(ubiNom)
     // Obtén el código del país basado en metaData.ubiNom
     const initialCountryCode = countryNameToCode[ubiNom?.toUpperCase()];
-
+      console.log(initialCountryCode)
     const phoneInput = intlTelInput(inputRef.current, {
         initialCountry: initialCountryCode || "auto",
         geoIpLookup: function(callback) {

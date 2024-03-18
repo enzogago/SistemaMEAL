@@ -22,6 +22,7 @@ namespace SistemaMEAL.Server.Models
         public String? ProPerMesIni { get; set; }
         public String? ProPerAnoFin { get; set; }
         public String? ProPerMesFin { get; set; }
+        public String? ProInvSubAct { get; set; }
 
         public String? UsuIng { get; set; }
 

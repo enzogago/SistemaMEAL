@@ -220,7 +220,7 @@ namespace SistemaMEAL.Modulos
             return temporal?? new List<Proyecto>();
         }
 
-        public IEnumerable<Proyecto> Listado(string? proAno = null, string? proCod = null, string? proNom = null, string? proDes = null, string? proRes = null, string? proPerAnoIni = null, string? proPerMesIni = null, string? proPerAnoFin = null, string? proPerMesFin = null)
+        public IEnumerable<Proyecto> Listado(string? proAno = null, string? proCod = null, string? proNom = null, string? proDes = null, string? proRes = null, string? proPerAnoIni = null, string? proPerMesIni = null, string? proPerAnoFin = null, string? proPerMesFin = null, string? proInvSubAct = null)
         {
             List<Proyecto>? temporal = new List<Proyecto>();
             try
@@ -239,6 +239,7 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_PROPERMESINI", string.IsNullOrEmpty(proPerMesIni) ? (object)DBNull.Value : proPerMesIni);
                 cmd.Parameters.AddWithValue("@P_PROPERANOFIN", string.IsNullOrEmpty(proPerAnoFin) ? (object)DBNull.Value : proPerAnoFin);
                 cmd.Parameters.AddWithValue("@P_PROPERMESFIN", string.IsNullOrEmpty(proPerMesFin) ? (object)DBNull.Value : proPerMesFin);
+                cmd.Parameters.AddWithValue("@P_PROINVSUBACT", string.IsNullOrEmpty(proInvSubAct) ? (object)DBNull.Value : proInvSubAct);
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2024");
                 cmd.Parameters.AddWithValue("@P_USUCOD_U", "0001");
@@ -301,6 +302,7 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_PROPERMESINI", proyecto.ProPerMesIni);
                 cmd.Parameters.AddWithValue("@P_PROPERANOFIN", proyecto.ProPerAnoFin);
                 cmd.Parameters.AddWithValue("@P_PROPERMESFIN", proyecto.ProPerMesFin);
+                cmd.Parameters.AddWithValue("@P_PROINVSUBACT", "S");
                 cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
@@ -475,7 +477,8 @@ namespace SistemaMEAL.Modulos
                     cmd.Parameters.AddWithValue("@P_PROPERANOINI", proyecto.ProPerAnoIni);
                     cmd.Parameters.AddWithValue("@P_PROPERMESINI", proyecto.ProPerMesIni);
                     cmd.Parameters.AddWithValue("@P_PROPERANOFIN", proyecto.ProPerAnoFin);
-                    cmd.Parameters.AddWithValue("@P_PROPERMESFIN", proyecto.ProPerMesFin);
+                    cmd.Parameters.AddWithValue("@P_PROPERMESFIN", proyecto.ProPerMesFin);  
+                    cmd.Parameters.AddWithValue("@P_PROINVSUBACT", proyecto.ProInvSubAct);  
                     cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
                     cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
                     cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
@@ -506,6 +509,10 @@ namespace SistemaMEAL.Modulos
                     var proCod = pCod.Value.ToString();
                     message = pDescripcionMensaje.Value.ToString();
                     messageType = pTipoMensaje.Value.ToString();
+                    Console.WriteLine(proAno);
+                    Console.WriteLine(proCod);
+                    Console.WriteLine(message);
+                    Console.WriteLine(messageType);
 
                     if (messageType != "3") // Si hay un error o el proyecto ya existe, retorna el mensaje
                     {

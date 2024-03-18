@@ -3,8 +3,17 @@ import * as d3 from 'd3';
 import d3Tip from 'd3-tip';
 import data from './geojson/paises.json';
 
-const Paises = ({mapData}) => {
-    const poblacionPorPais = mapData.reduce((obj, item) => {
+const Paises = ({mapData, beneficiariosData}) => {
+    console.log(beneficiariosData)
+    const combinedData = mapData.map(ubicacion => {
+        const beneficiario = beneficiariosData.find(b => b.ubiNom === ubicacion.ubiNom);
+        return {
+            ...ubicacion,
+            cantidad: beneficiario ? beneficiario.cantidad : 0
+        };
+    });
+
+    const poblacionPorPais = combinedData.reduce((obj, item) => {
         console.log(obj)
         obj[item.ubiNom] = item;  // Aquí puedes seleccionar las características que quieres mostrar
         return obj;
@@ -149,7 +158,7 @@ const Paises = ({mapData}) => {
                 d3.pointer(event, svg.node())
             );
         }
-    }, [mapData]);
+    }, [mapData, beneficiariosData]);
 
     return <svg id='Paises' ref={ref} />;
 };

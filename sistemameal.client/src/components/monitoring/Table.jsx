@@ -20,8 +20,7 @@ import Notiflix from "notiflix";
 const Table = ({ data, setMonitoringData }) => {
     const navigate = useNavigate();
     // Variables State AuthContext 
-    const { authActions, authInfo } = useContext(AuthContext);
-    const { setIsLoggedIn } = authActions;
+    const { authInfo } = useContext(AuthContext);
     const { userPermissions } = authInfo;
     // States locales
     const [searchTags, setSearchTags] = useState([]);
@@ -511,10 +510,10 @@ const Table = ({ data, setMonitoringData }) => {
     })
 
     // Preparar los datos
-    const dataExport = table.options.data;  // Tus datos
-    const headers = ['ESTADO', 'META_PROGRAMATICA', 'EJECUCION_PROGRAMATICA', 'PORCENTAJE_AVANCE_PROGRAMATICO', 'META_PRESUPUESTO', 'EJECUCION_PRESUPUESTO', 'PORCENTAJE_AVANCE_PRESUPUESTO','AÑO','MES','INDICADOR','TIPO_INDICADOR','RESULTADO','OBJETIVO_ESPECIFICO','OBJETIVO','SUBPROYECTO','PROYECTO','UBICACION', 'IMPLEMENTADOR', 'FINANCIADOR', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
-    const title = 'METAS';  // El título de tu archivo Excel
-    const properties = ['estNom', 'metMetTec', 'metEjeTec', 'metPorAvaTec', 'metMetPre', 'metEjePre', 'metPorAvaPre', 'metAnoPlaTec', 'metMesPlaTec', 'indActResNom', 'tipInd', 'resNom', 'objEspNom', 'objNom', 'subProNom', 'proNom','ubiNom', 'impNom', 'finNom', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir en el Excel
+    const dataExport = table.options.data;
+    const headers = ['ESTADO', 'META_PROGRAMATICA', 'EJECUCION_PROGRAMATICA', 'PORCENTAJE_AVANCE_PROGRAMATICO', 'META_PRESUPUESTO', 'EJECUCION_PRESUPUESTO', 'PORCENTAJE_AVANCE_PRESUPUESTO','AÑO','MES','INDICADOR','TIPO_INDICADOR','RESULTADO','OBJETIVO_ESPECIFICO','OBJETIVO','SUBPROYECTO','PROYECTO','UBICACION', 'IMPLEMENTADOR', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
+    const title = 'METAS';
+    const properties = ['estNom', 'metMetTec', 'metEjeTec', 'metPorAvaTec', 'metMetPre', 'metEjePre', 'metPorAvaPre', 'metAnoPlaTec', 'metMesPlaTec', 'indActResNom', 'tipInd', 'resNom', 'objEspNom', 'objNom', 'subProNom', 'proNom','ubiNom', 'impNom', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir en el Excel
     const format = [1200, 600];
 
     const Export_Excel = () => {

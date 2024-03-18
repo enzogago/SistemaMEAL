@@ -7,15 +7,13 @@ import Notiflix from "notiflix";
 import { useForm } from 'react-hook-form';
 import TableForm from "./TableForm";
 import { fetchData } from "../../reusable/helper";
-import { fetchBeneficiariosMeta, handleSubmitMetaBeneficiario, handleSubmitMetaBeneficiarioExiste, initPhoneInput } from "./eventHandlers";
+import { handleSubmitMetaBeneficiario, handleSubmitMetaBeneficiarioExiste, initPhoneInput } from "./eventHandlers";
 import ModalGoalBeneficiarie from "./ModalGoalBeneficiarie";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { IoIosInformationCircleOutline } from "react-icons/io";
 import logo from '../../../img/PowerMas_LogoAyudaEnAccion.svg';
 import InfoGoal from "./InfoGoal";
 import ModalBeneficiariesName from "./ModalBeneficiariesName";
-
-import intlTelInput from 'intl-tel-input';
 import 'intl-tel-input/build/css/intlTelInput.css';
 import 'intl-tel-input/build/js/utils.js';
 import { useRef } from "react";
@@ -51,13 +49,12 @@ const FormGoalBeneficiarie = () => {
     const [ existeBeneficiario, setExisteBeneficiario ] = useState(false);
     const [ isOptionOneSelected, setIsOptionOneSelected] = useState(true);
 
-    const [ phoneCodeInput, setPhoneCodeInput ] = useState('');
-    const [ phoneLength, setPhoneLength ] = useState('');
-
     const [ modalGoalBeneficiarie, setModalGoalBeneficiarie ] = useState(false);
     const [ dataGoalBeneficiarie, setDataGoalBeneficiarie ] = useState({});
     const [ dataBeneficiariesName, setDataBeneficiariesName ] = useState([]);
-
+    
+    const [ verificarPais, setVerificarPais ] = useState(null);
+    
     const [ dataGoals, setDataGoals ] = useState([])
 
     const [isDataLoaded, setIsDataLoaded] = useState(false);
@@ -65,7 +62,8 @@ const FormGoalBeneficiarie = () => {
     const [ modalInfoOpen, setModalInfoOpen ] = useState(false);
     const [ modalBeneficiariesName, setModalBeneficiariesName ] = useState(false);
 
-
+    const [selectedValues, setSelectedValues] = useState([]);
+    const [firstEdit, setFirstEdit] = useState(false);
 
     // Estados Numero de Telefono
     const phoneInputRef = useRef();
@@ -101,9 +99,9 @@ const FormGoalBeneficiarie = () => {
             console.log(data)
             setValue('metBenMesEjeTec', data.metMesPlaTec)
             setValue('metBenAnoEjeTec', data.metAnoPlaTec)
-            setValue('pais', JSON.stringify({ ubiCod: data.ubiCod, ubiAno: data.ubiAno }))
-            initPhoneInput(phoneInputRef, setIsValid, setPhoneNumber, setErrorMessage,'',data.ubiNom, setIsTouched);
-            initPhoneInput(phoneContactInputRef, setContactIsValid, setPhoneContactNumber, setErrorContactMessage,'',data.ubiNom, setContactIsTouched);
+            // setValue('pais', JSON.stringify({ ubiCod: data.ubiCod, ubiAno: data.ubiAno }))
+            
+            fetchSelects(data.ubiAno, data.ubiCod);
         } catch (error) {
             console.error('Error:', error);
         } finally {
@@ -124,18 +122,6 @@ const FormGoalBeneficiarie = () => {
         ]).then(() => setIsDataLoaded(true));
     }, []);
 
-
-    const countryPhoneCodes = {
-        "peru": "+51",
-        "colombia": "+57",
-        "ecuador" : "+593",
-    };
-    const countryPhoneLength = {
-        "peru": 9,
-        "colombia": 10,
-        "ecuador" : 9,
-    };
-
     // Propiedades Form Principal
     const { 
         register, 
@@ -149,67 +135,17 @@ const FormGoalBeneficiarie = () => {
         setFocus
     } = useForm({ mode: "onChange", defaultValues: {benNom: '', benNomApo: '', benApeApo: '', genCod: '0', nacCod: '0'}});
 
-    
-    useEffect(() => {
-        const phone = watch('benTel');
-        if (phone && phoneCodeInput && !phone.startsWith(phoneCodeInput)) {
-            setValue('benTel', phoneCodeInput);
-        }
-    }, [watch('benTel')]);
-    useEffect(() => {
-        const phone = watch('benTelCon');
-        if (phone && phoneCodeInput && !phone.startsWith(phoneCodeInput)) {
-            setValue('benTelCon', phoneCodeInput);
-        }
-    }, [watch('benTelCon')]);
-
-    useEffect(() => {
-        const pais = watch('pais');
-        const tel = watch('benTel');
-        const telCon = watch('benTelCon');
-    
-        const updatePhoneCode = async () => {
-            if (pais != '0') {
-                const isPaisValid = await trigger('pais');
-                if (isPaisValid) {
-                    const { ubiCod } = JSON.parse(pais);
-                    const paisObj = paises.find(p => p.ubiCod === ubiCod);
-                    if (paisObj) {
-                        const newPhoneCode = countryPhoneCodes[paisObj.ubiNom.toLowerCase()];
-                        const phoneLength = countryPhoneLength[paisObj.ubiNom.toLowerCase()];
-                        
-                        // Si el número de teléfono está vacío o no comienza con el nuevo código del país, actualiza el número de teléfono con el nuevo código del país
-                        if (!tel || (tel && !tel.startsWith(newPhoneCode))) {
-                            setValue('benTel', newPhoneCode);
-                        }
-
-                        if (!telCon || (telCon && !telCon.startsWith(newPhoneCode))) {
-                            setValue('benTelCon', newPhoneCode);
-                        }
-                        
-                        if (newPhoneCode){
-                            setPhoneCodeInput(newPhoneCode);
-                            setPhoneLength(phoneLength);
-                        }
-                    }
-                } 
-            } else {
-                setValue('benTel', '');
-                setValue('benTelCon', '');
-            }
-        };
-        updatePhoneCode();
-    }, [watch('pais'), paises]);
-
     const pais = watch('pais');
-
     useEffect(() => {
         if (pais) {
             if (pais == '0') {
+                console.log("te reinicio pq puedo")
                 setSelects([]);
                 return;
-            }
+            } 
+            console.log(pais)
             handleCountryChange(pais);
+            console.log("ok bravo")
         }
     }, [pais]);
 
@@ -245,7 +181,7 @@ const FormGoalBeneficiarie = () => {
         setModalGoalBeneficiarie(true);
         setValue('metBenMesEjeTec', metaData.metMesPlaTec)
         setValue('metBenAnoEjeTec', metaData.metAnoPlaTec)
-        setValue('pais', JSON.stringify({ ubiCod: metaData.ubiCod, ubiAno: metaData.ubiAno }))
+        setValue('pais', JSON.stringify(verificarPais));
     }
     
     // Actualiza la acción actual antes de enviar el formulario
@@ -316,7 +252,7 @@ const FormGoalBeneficiarie = () => {
             } finally {
                 setValue('metBenMesEjeTec', metaData.metMesPlaTec)
                 setValue('metBenAnoEjeTec', metaData.metAnoPlaTec)
-                setValue('pais', JSON.stringify({ ubiCod: metaData.ubiCod, ubiAno: metaData.ubiAno }))
+                setValue('pais', JSON.stringify(verificarPais));
                 Notiflix.Loading.remove();
             }
         } else {
@@ -375,11 +311,12 @@ const FormGoalBeneficiarie = () => {
             } finally {
                 setValue('metBenMesEjeTec', metaData.metMesPlaTec)
                 setValue('metBenAnoEjeTec', metaData.metAnoPlaTec)
-                setValue('pais', JSON.stringify({ ubiCod: metaData.ubiCod, ubiAno: metaData.ubiAno }))
+                setValue('pais', JSON.stringify(verificarPais));
                 Notiflix.Loading.remove();
             }
         }
     };
+    
     const fetchDataTable = async (benAno,benCod) => {
         try {
             const token = localStorage.getItem('token');
@@ -435,7 +372,6 @@ const FormGoalBeneficiarie = () => {
                 docIdeCod: '0',
             });
         }
-        
     };
     
     // Efecto para la concatenación automatica en la separacion de día mes y año
@@ -513,8 +449,18 @@ const FormGoalBeneficiarie = () => {
     
     const handleCountryChange = async (ubicacion, index) => {
         const selectedCountry = JSON.parse(ubicacion);
-        if (ubicacion === '0') {
+        console.log(selectedCountry)
+        if (ubicacion == '0') {
             setSelects(prevSelects => prevSelects.slice(0, index + 1));  // Reinicia los selects por debajo del nivel actual
+
+            // Aquí actualizamos selectedValues para los selectores de nivel inferior
+            setSelectedValues(prevSelectedValues => {
+                const newSelectedValues = [...prevSelectedValues];
+                for (let i = index; i < newSelectedValues.length; i++) {
+                    newSelectedValues[i] = '0';
+                }
+                return newSelectedValues;
+            });
             return;
         }
 
@@ -550,9 +496,49 @@ const FormGoalBeneficiarie = () => {
         }
     };
 
+    const fetchSelects = async (ubiAno,ubiCod) => {
+        try {
+            const token = localStorage.getItem('token');
+            Notiflix.Loading.pulse('Cargando...');
+            
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Ubicacion/select/${ubiAno}/${ubiCod}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                Notiflix.Notify.failure(data.message);
+                return;
+            }
+            console.log(data)
+            if (data.length > 1) {
+                setValue('pais', JSON.stringify({ ubiCod: data[0].ubiCod, ubiAno: data[0].ubiAno }));
+                const newSelectedValues = data.slice(1).map(location => JSON.stringify({ubiCod:location.ubiCod,ubiAno:location.ubiAno}));
+                setSelectedValues(newSelectedValues);
+                console.log(newSelectedValues)
+                for (const [index, location] of data.slice(1).entries()) {
+                    console.log("cuantas")
+                    await handleCountryChange(JSON.stringify({ubiCod: location.ubiCod,ubiAno: location.ubiAno}), index);
+                    setFirstEdit(true);  // Indica que estás estableciendo el valor del select de país
+                }
+            } else {
+                setFirstEdit(true);
+                setValue('pais', JSON.stringify({ ubiCod: data[0].ubiCod, ubiAno: data[0].ubiAno }));
+            }
+            setVerificarPais({ ubiCod: data[0].ubiCod, ubiAno: data[0].ubiAno });
+            initPhoneInput(phoneInputRef, setIsValid, setPhoneNumber, setErrorMessage,'',data[0].ubiNom, setIsTouched);
+            initPhoneInput(phoneContactInputRef, setContactIsValid, setPhoneContactNumber, setErrorContactMessage,'',data[0].ubiNom, setContactIsTouched);
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            Notiflix.Loading.remove();
+        }
+    }
 
     const Registrar_Beneficiario =  () => {
         validateForm( (data) => {
+            console.log(data)
             const {metBenAnoEjeTec,metBenMesEjeTec} = data;
             // Obtiene el ubiAno y ubiCod del último select
             const lastSelectElement = document.querySelector(`select[name=select${selects.length - 1}]`);
@@ -575,11 +561,12 @@ const FormGoalBeneficiarie = () => {
             }
 
             if (!isValid || !contactIsValid) {
+                console.log(isValid)
+                console.log(contactIsValid)
                 return;
             }
             
             if(!existeBeneficiario) {
-    
                 // Verifica que el array documentosAgregados tenga al menos un registro
                 if (documentosAgregados.length === 0) {
                     Notiflix.Notify.failure('Debe agregar al menos un documento.');
@@ -598,7 +585,6 @@ const FormGoalBeneficiarie = () => {
                 // Usa el benNumDoc del documento encontrado como benCodUni
                 const benCodUni = documentoCodUni.docIdeBenNum;
 
-
                 let beneficiarioMonitoreo = {
                     Beneficiario: { ...data, benCodUni },
                     MetaBeneficiario: {
@@ -612,12 +598,6 @@ const FormGoalBeneficiarie = () => {
                     DocumentoBeneficiario: documentosAgregados
                 }
 
-                // if (beneficiarioMonitoreo.Beneficiario.benTel === phoneCodeInput) {
-                //     beneficiarioMonitoreo.Beneficiario.benTel = '';
-                // }
-                // if (beneficiarioMonitoreo.Beneficiario.benTelCon === phoneCodeInput) {
-                //     beneficiarioMonitoreo.Beneficiario.benTelCon = '';
-                // }
                 beneficiarioMonitoreo.Beneficiario.benTel=phoneNumber;
                 beneficiarioMonitoreo.Beneficiario.benTelCon=phoneContactNumber;
 
@@ -655,8 +635,8 @@ const FormGoalBeneficiarie = () => {
             genCod: '0',
             nacCod: '0',
             benTel: '0',
+            pais: '0',
             benTelCon: '0',
-            pais: '0'
         });
         reset2({
             docIdeBenNum: '',
@@ -666,7 +646,9 @@ const FormGoalBeneficiarie = () => {
         setFieldsDisabled(true);
         setMostrarAgregarDocumento(false);
         setAccionActual('buscar');
-        setValue('pais', JSON.stringify({ ubiCod: metaData.ubiCod, ubiAno: metaData.ubiAno }));
+        setValue('metBenMesEjeTec', metaData.metMesPlaTec)
+        setValue('metBenAnoEjeTec', metaData.metAnoPlaTec)
+        setValue('pais', JSON.stringify(verificarPais));
 
         // Resetear campos del telefono
         setPhoneNumber('');
@@ -713,7 +695,7 @@ const FormGoalBeneficiarie = () => {
                                     {...register('pais', { 
                                         validate: {
                                             required: value => value !== '0' || 'El campo es requerido',
-                                            equal: value => metaData && JSON.stringify({ ubiCod: metaData.ubiCod, ubiAno: metaData.ubiAno }) === value || 'El país debe ser el planificado'
+                                            equal: value => metaData && JSON.stringify(verificarPais) === value || 'El país debe ser el planificado'
                                         }
                                     })}
                                 >
@@ -744,8 +726,17 @@ const FormGoalBeneficiarie = () => {
                                     <select
                                         id={index}
                                         key={index} 
+                                        value={selectedValues[index]}
                                         name={`select${index}`} 
-                                        onChange={(event) => handleCountryChange(event.target.value, index)} 
+                                        onChange={(event) => {
+                                            handleCountryChange(event.target.value, index);
+                                            // Aquí actualizamos el valor seleccionado en el estado
+                                            setSelectedValues(prevSelectedValues => {
+                                                const newSelectedValues = [...prevSelectedValues];
+                                                newSelectedValues[index] = event.target.value;
+                                                return newSelectedValues;
+                                            });
+                                        }} 
                                         style={{textTransform: 'capitalize'}}
                                         className="block Phone_12"
                                     >
@@ -1284,106 +1275,6 @@ const FormGoalBeneficiarie = () => {
                                     </p>
                                 )}
                             </div>
-                            {/* <div className="m_75">
-                                <label htmlFor="benTel" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
-                                    Numero de telefono
-                                </label>
-                                <input 
-                                    type="text" 
-                                    id="benTel" 
-                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benTel || isSubmitted ? (errors.benTel ? 'invalid' : 'valid') : ''}`} 
-                                    placeholder="Ejm: 922917351"
-                                    autoComplete="disabled"
-                                    disabled={fieldsDisabled}
-                                    onKeyDown={(event) => {
-                                        console.log(event.target.value)
-                                        if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
-                                            event.preventDefault();
-                                        }
-                                        if (event.key === 'Backspace' && event.target.value === phoneCodeInput) {
-                                            event.preventDefault();
-                                        }
-                                        // Evita que el usuario ingrese más dígitos de los permitidos
-                                        if (!['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter'].includes(event.key) && event.target.value.length >= phoneLength + phoneCodeInput.length) {
-                                            event.preventDefault();
-                                        }
-                                    }}
-                                    {...register('benTel', { 
-                                        validate: value => {
-                                            if (!value || value === phoneCodeInput) {
-                                                // Si el campo está vacío o solo contiene el código del país, se considera válido
-                                                return true;
-                                            } else if (value.length < phoneLength + phoneCodeInput.length) {
-                                                // Si el campo contiene algo más que el código del país, debe tener al menos phoneLength dígitos
-                                                return `El número de telefono debe tener minimo ${phoneLength} digitos`;
-                                            } else if (!/^\+\d*$/.test(value)) {
-                                                // El número de teléfono debe comenzar con "+" y contener solo números
-                                                return 'El número de teléfono debe comenzar con "+" y contener solo números';
-                                            } else {
-                                                // Si pasa todas las validaciones, es válido
-                                                return true;
-                                            }
-                                        }
-                                    })} 
-                                />
-                                {errors.benTel ? (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.benTel.message}</p>
-                                ) : (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                    Espacio reservado para el mensaje de error
-                                    </p>
-                                )}
-                            </div>
-                            <div className="m_75">
-                                <label htmlFor="benTelCon" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
-                                    Telefono de contacto
-                                </label>
-                                <input 
-                                    type="text" 
-                                    id="benTelCon" 
-                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benTelCon || isSubmitted ? (errors.benTelCon ? 'invalid' : 'valid') : ''}`} 
-                                    placeholder="Ejm: 922917351"
-                                    autoComplete="disabled"
-                                    disabled={fieldsDisabled}
-                                    onKeyDown={(event) => {
-                                        console.log(event.target.value)
-                                        if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
-                                            event.preventDefault();
-                                        }
-                                        if (event.key === 'Backspace' && event.target.value === phoneCodeInput) {
-                                            event.preventDefault();
-                                        }
-                                        // Evita que el usuario ingrese más dígitos de los permitidos
-                                        if (!['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter'].includes(event.key) && event.target.value.length >= phoneLength + phoneCodeInput.length) {
-                                            event.preventDefault();
-                                        }
-                                    }}
-                                    {...register('benTelCon', { 
-                                        validate: value => {
-                                            if (!value || value === phoneCodeInput) {
-                                                // Si el campo está vacío o solo contiene el código del país, se considera válido
-                                                return true;
-                                            } else if (value.length < phoneLength + phoneCodeInput.length) {
-                                                // Si el campo contiene algo más que el código del país, debe tener al menos phoneLength dígitos
-                                                return `El número de telefono debe tener minimo ${phoneLength} digitos`;
-                                            } else if (!/^\+\d*$/.test(value)) {
-                                                // El número de teléfono debe comenzar con "+" y contener solo números
-                                                return 'El número de teléfono debe comenzar con "+" y contener solo números';
-                                            } else {
-                                                // Si pasa todas las validaciones, es válido
-                                                return true;
-                                            }
-                                        }
-                                    })} 
-                                />
-                                {errors.benTelCon ? (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.benTelCon.message}</p>
-                                ) : (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                    Espacio reservado para el mensaje de error
-                                    </p>
-                                )}
-                            </div> */}
                             <div className="m_75">
                                 <label htmlFor="benDir" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
                                     Dirección

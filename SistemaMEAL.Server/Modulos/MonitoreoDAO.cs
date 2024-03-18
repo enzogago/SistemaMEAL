@@ -5,12 +5,38 @@ using SistemaMEAL.Server.Modulos;
 using Newtonsoft.Json;
 using System.Text;
 using System.Transactions;
+using System.Security.Claims;
 
 namespace SistemaMEAL.Modulos
 {
     public class MonitoreoDAO
     {
+        private UsuarioDAO _usuarioDAO;
         private conexionDAO cn = new conexionDAO();
+
+        private readonly IHttpContextAccessor? _httpContextAccessor;
+
+        public MonitoreoDAO(IHttpContextAccessor httpContextAccessor)
+        {   
+            _usuarioDAO  = new UsuarioDAO(httpContextAccessor);
+        }
+
+        private Usuario ObtenerUsuarioLogueado()
+        {
+            // Obtén los detalles del usuario actual de los claims del token
+            var identity = _httpContextAccessor.HttpContext.User.Identity as ClaimsIdentity;
+            var usuAno = identity.Claims.FirstOrDefault(x => x.Type == "ANO").Value;
+            var usuCod = identity.Claims.FirstOrDefault(x => x.Type == "COD").Value;
+            var ip = identity.Claims.FirstOrDefault(x => x.Type == "IP").Value; // Obtiene la dirección IP del claim
+
+            // Busca los detalles del usuario en la base de datos
+            var usuarioActual = _usuarioDAO.BuscarUsuarioLog(usuAno, usuCod);
+
+            // Asigna la dirección IP del claim a la propiedad Ip del usuario
+            usuarioActual.Ip = ip;
+
+            return usuarioActual;
+        }
 
         public IEnumerable<Monitoreo> Listado(string? tags)
         {
@@ -821,7 +847,6 @@ namespace SistemaMEAL.Modulos
                         jsonResult.Append(reader.GetValue(0).ToString());
                     }
                 }
-                Console.WriteLine(jsonResult);
                 // Deserializa la cadena JSON en una lista de objetos Usuario
                 temporal = JsonConvert.DeserializeObject<List<Monitoreo>>(jsonResult.ToString());
             }

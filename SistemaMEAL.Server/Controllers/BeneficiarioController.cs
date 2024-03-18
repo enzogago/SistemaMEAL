@@ -298,7 +298,7 @@ namespace SistemaMEAL.Server.Controllers
         }
 
         [HttpGet]
-        [Route("home/{tags?}")]
+        [Route("contar-home/{tags?}")]
         public dynamic ContarBeneficiariosHome(string? tags = null)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
@@ -309,6 +309,20 @@ namespace SistemaMEAL.Server.Controllers
             var reult = _beneficiarios.ContarBeneficiariosHome(tags);
             return Ok(reult.FirstOrDefault());
         }
+        
+        [HttpGet]
+        [Route("home/{tags?}")]
+        public dynamic BuscarBeneficiariosHome(string? tags = null)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var reult = _beneficiarios.BuscarBeneficiariosHome(tags);
+            return Ok(reult);
+        }
+
         [HttpGet]
         [Route("sexo-home/{tags?}")]
         public dynamic BuscarSexoHome(string? tags = null)

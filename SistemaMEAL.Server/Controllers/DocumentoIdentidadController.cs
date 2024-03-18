@@ -28,7 +28,6 @@ namespace SistemaMEAL.Server.Controllers
             if (!rToken.success) return Unauthorized(rToken);
 
             var documentos = _documentos.Listado();
-            Console.WriteLine(documentos);
             return Ok(documentos);
         }
 

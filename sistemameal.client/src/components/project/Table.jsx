@@ -57,6 +57,15 @@ const Table = ({data = [], setData}) => {
                 ),
             },
             {
+                header: "Responsable",
+                accessorKey: "proRes",
+                cell: ({row}) => (
+                    <div style={{textTransform: 'capitalize'}}>
+                        {row.original.proRes.toLowerCase()}
+                    </div>
+                ),
+            },
+            {
                 header: "Periodo Inicio",
                 accessorKey: "proPerAnoIni",
                 cell: ({row}) => {
@@ -75,14 +84,15 @@ const Table = ({data = [], setData}) => {
                 },
             },
             {
-                header: "Responsable",
-                accessorKey: "proRes",
-                cell: ({row}) => (
-                    <div style={{textTransform: 'capitalize'}}>
-                        {row.original.proRes.toLowerCase()}
-                    </div>
-                ),
+                header: "Involucra Sub Acvtidad",
+                accessorKey: "proInvSubAct",
+                cell: ({row}) => {
+                    return (
+                        <>{ (row.original.proInvSubAct.trim() == 'S') ? 'Proyecto con Sub Actividades' : 'Proyecto sin Sub Actividades'}</>
+                    );
+                },
             },
+            
         ];
 
         if (actions.edit || actions.delete) {

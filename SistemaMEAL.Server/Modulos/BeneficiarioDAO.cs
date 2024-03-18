@@ -490,6 +490,44 @@ namespace SistemaMEAL.Server.Modulos
             {
                 cn.getcn.Open();
 
+                SqlCommand cmd = new SqlCommand("SP_CONTAR_BENEFICIARIOS_HOME", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
+
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (!reader.HasRows)
+                {
+                    jsonResult.Append("[]");
+                }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                Console.WriteLine(jsonResult);
+                // Deserializa la cadena JSON en una lista de objetos Usuario
+                temporal = JsonConvert.DeserializeObject<List<Beneficiario>>(jsonResult.ToString());
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return temporal?? new List<Beneficiario>();
+        }
+        public IEnumerable<Beneficiario> BuscarBeneficiariosHome(string? tags)
+        {
+            List<Beneficiario>? temporal = new List<Beneficiario>();
+            try
+            {
+                cn.getcn.Open();
+
                 SqlCommand cmd = new SqlCommand("SP_BUSCAR_BENEFICIARIOS_HOME", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);

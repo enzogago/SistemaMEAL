@@ -104,7 +104,7 @@ const FormGoal = () => {
                 const indAno = id.slice(10,14);
                 const indCod = id.slice(14,20);
                 // Ejecuta la función para traer los datos del registro a modificar
-                fetchRegistroAModificar(metAno, metCod, indAno, indCod, reset, fetchSelects, setValue, fetchIndicadorActividad, setIsSecondInputEnabled, setSelectedOption, setJerarquia, setInitialData);
+                fetchRegistroAModificar(metAno, metCod, indAno, indCod, reset, fetchSelects, setValue, fetchIndicadorActividad, setIsSecondInputEnabled, setSelectedOption, setJerarquia, setInitialData, setEsActividad);
             }
         });
     }, [isEditing]);
@@ -327,8 +327,6 @@ const FormGoal = () => {
                 indTipInd: data.indTipInd,
             },
         }
-
-
         
         if (isEditing) {
             MetaIndicadorActividad.MetaIndicador.metAnoOri = initialData.metAno;

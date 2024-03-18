@@ -28,7 +28,6 @@ namespace SistemaMEAL.Server.Controllers
             if (!rToken.success) return Unauthorized(rToken);
 
             var data = _nacionalidades.Listado();
-            Console.WriteLine(data);
             return Ok(data);
         }
 

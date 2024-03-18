@@ -9,7 +9,6 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { GrNext, GrPrevious } from 'react-icons/gr';
 import { useRef } from 'react';
-import { Tooltip } from 'react-tooltip';
 
 const CustomTable = ({ 
     title, 
@@ -81,7 +80,7 @@ const CustomTable = ({
                 <h1 className="Large-f1_5"> { title && `Listado de ${title}`}</h1>
                 <div className="flex">
                     {setSearchFilter && 
-                        <div className="PowerMas_Search_Container Large_6 Large-m_5">
+                        <div className="PowerMas_Search_Container Large_6 Large-m_5 flex-grow-1">
                             <FaSearch className="Large_1 search-icon" />
                             <input 
                                 className='PowerMas_Input_Filter Large_12 p_25'
@@ -136,10 +135,16 @@ const CustomTable = ({
                             <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>Exportar <FaSortDown className='Large_1' /></button>
                             <div className="PowerMas_Dropdown_Export_Content Phone_12">
                                 {actions.pdf &&
-                                    <a onClick={Export_PDF} className='flex jc-space-between p_5'>PDF <img className='Large_1' src={Pdf_Icon} alt="" /></a>
+                                    <a onClick={() => {
+                                        Export_PDF();
+                                        setDropdownOpen(false);
+                                    }} className='flex jc-space-between p_5'>PDF <img className='Large_1' src={Pdf_Icon} alt="" /></a>
                                 }
                                 {actions.excel &&
-                                    <a onClick={Export_Excel} className='flex jc-space-between p_5'>Excel <img className='Large_1' src={Excel_Icon} alt="" /> </a>
+                                    <a onClick={() => {
+                                        Export_Excel();
+                                        setDropdownOpen(false);
+                                    }} className='flex jc-space-between p_5'>Excel <img className='Large_1' src={Excel_Icon} alt="" /> </a>
                                 }
                             </div>
                         </div>
@@ -153,7 +158,7 @@ const CustomTable = ({
                             table.getHeaderGroups().map(headerGroup => (
                                 <tr key={headerGroup.id} style={{zIndex: 10}}>
                                     {
-                                        headerGroup.headers.map(header =>(
+                                        headerGroup.headers.map((header, index, array) => (
                                             <th 
                                                 className='ws-nowrap' 
                                                 style={{ 
@@ -170,7 +175,7 @@ const CustomTable = ({
                                                     {
                                                         flexRender(header.column.columnDef.header, header.getContext())
                                                     }
-                                                   <div className='flex flex-column ai-center jc-center PowerMas_Icons_Sorter'>
+                                                    <div className='flex flex-column ai-center jc-center PowerMas_Icons_Sorter'>
                                                         {header.column.getIsSorted() === 'asc' && !header.column.columnDef.disableSorting ? 
                                                             <TiArrowSortedUp className={`sort-icon active`} /> :
                                                             header.column.getIsSorted() === 'desc' && !header.column.columnDef.disableSorting ? 
@@ -184,7 +189,7 @@ const CustomTable = ({
                                                     </div>
                                                 </div>
 
-                                                {header.column.columnDef.stickyRight === undefined && resize &&  // Muestra el elemento <span> solo si la columna no es "sticky"
+                                                {header.column.columnDef.stickyRight === undefined && resize && index !== array.length - 1 &&  // Muestra el elemento <span> solo si la columna no es "sticky" y no es el último encabezado
                                                     <span 
                                                         onMouseDown={
                                                             header.getResizeHandler()

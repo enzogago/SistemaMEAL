@@ -28,7 +28,6 @@ namespace SistemaMEAL.Server.Controllers
             if (!rToken.success) return Unauthorized(rToken);
             
             var implementadores = _implementadores.Listado();
-            Console.WriteLine(implementadores);
             return Ok(implementadores);
         }
 

@@ -6,8 +6,6 @@ import { saveAs } from 'file-saver';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
-
-
 export const handleDeleteMant = async (controller, obj, setRegistros) => {
     Notiflix.Confirm.show(
         'Eliminar Registro',
@@ -17,7 +15,6 @@ export const handleDeleteMant = async (controller, obj, setRegistros) => {
         async () => {
             const url = `${import.meta.env.VITE_APP_API_URL}/api/${controller}`;
 
-            
             try {
                 Notiflix.Loading.pulse();
                 const token = localStorage.getItem('token');
@@ -64,10 +61,8 @@ export const handleDelete = async (controller, codigo, setRegistros) => {
         'No',
         async () => {
             const url = `${import.meta.env.VITE_APP_API_URL}/api/${controller}/${codigo}`;
-
-            const token = localStorage.getItem('token');
-
             try {
+                const token = localStorage.getItem('token');
                 const response = await fetch(url, {
                     method: 'DELETE',
                     headers: {
@@ -156,12 +151,11 @@ export const handleSubmit = async (controller, objetoEditado, objeto, setRegistr
 };
 
 export const handleSubmitMant = async (controller, objetoEditado, objeto, setRegistros, setModalVisible, closeModalAndReset) => {
-    console.log(objeto)
-
     const method = objetoEditado ? 'PUT' : 'POST';
-    const token = localStorage.getItem('token');
-
+    
     try {
+        Notiflix.Loading.pulse();
+        const token = localStorage.getItem('token');
         const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/${controller}`, {
             method: method,
             headers: {
@@ -176,8 +170,7 @@ export const handleSubmitMant = async (controller, objetoEditado, objeto, setReg
             return;
         }
         
-        Notiflix.Notify.success(data.message);
-        setModalVisible(false); // Cierra el modal
+        closeModalAndReset(); // Cierra el Modal y resetea los campos
         // Actualiza los datos después de insertar o modificar un registro
         const updateResponse = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/${controller}`, {
             headers: {
@@ -186,9 +179,11 @@ export const handleSubmitMant = async (controller, objetoEditado, objeto, setReg
         });
         const updateData = await updateResponse.json();
         setRegistros(updateData);
-        closeModalAndReset();
+        Notiflix.Notify.success(data.message);
     } catch (error) {
         console.error('Error:', error);
+    } finally {
+        Notiflix.Loading.remove();
     }
 };
 
@@ -401,6 +396,7 @@ export const fetchData = async (controller, setData) => {
             return;
         }
         const data = await response.json();
+        console.log(data)
         if (data.success === false) {
             Notiflix.Notify.failure(data.message);
             return;

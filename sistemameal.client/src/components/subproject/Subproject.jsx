@@ -15,7 +15,7 @@ const Subproject = () => {
     const controllerSelect = 'Proyecto';
     // Definir controller y fieldMapping como variables
     const controller = 'SubProyecto';
-    const fieldMapping = { nombre: 'subProNom', 'codigoSAP': 'subProSap' };
+    const fieldMapping = { 'codigoSAP': 'subProSap', nombre: 'subProNom','Nombre Proyecto': 'proNom', 'Responsable': 'proRes' };
     const { codigo, ...restFieldMapping } = fieldMapping;
   
     // Toggle Modal

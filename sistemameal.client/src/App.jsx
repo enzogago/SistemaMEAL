@@ -35,8 +35,6 @@ import Beneficiarie from './components/beneficiarie/Beneficiarie';
 import FormGoalBeneficiarie from './components/monitoring/beneficiarie/FormGoalBeneficiarie';
 import FormBeneficiarie from './components/beneficiarie/FormBeneficiarie';
 import FormProfile from './components/profile/FormProfile';
-import UploadStatus from './components/maintenance/UploadStatus';
-import UploadCharge from './components/maintenance/UploadCharge';
 import FormatProject from './components/upload/project/FormatProject';
 import Notiflix from 'notiflix';
 import SaveProject from './components/upload/project/SaveProject';
@@ -118,8 +116,6 @@ const App = () => {
         "nationality": Nationality,
         "unit": Unit,
         "beneficiarie": Beneficiarie,
-        "upload-status": UploadStatus,
-        "upload-charge": UploadCharge,
         "upload-project": FormatProject,
     };
 

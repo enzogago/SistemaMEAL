@@ -18,13 +18,13 @@ import { fetchData } from '../reusable/helper';
 
 const Home = () => {
     const [ monitoringData, setMonitoringData] = useState([])
-    const [searchTags, setSearchTags] = useState([]);
-    const [isInputEmpty, setIsInputEmpty] = useState(true);
-    const [inputValue, setInputValue] = useState('');
-    const [totalBeneficiarios, setTotalBeneficiarios] = useState(0);
-    const [totalAtenciones, setTotalAtenciones] = useState(0);
-    const [avanceTecnico, setAvanceTecnico] = useState(0);
-    const [currentMap, setCurrentMap] = useState('Todos');
+    const [ searchTags, setSearchTags] = useState([]);
+    const [ isInputEmpty, setIsInputEmpty] = useState(true);
+    const [ inputValue, setInputValue] = useState('');
+    const [ totalBeneficiarios, setTotalBeneficiarios] = useState(0);
+    const [ totalAtenciones, setTotalAtenciones] = useState(0);
+    const [ avanceTecnico, setAvanceTecnico] = useState(0);
+    const [ currentMap, setCurrentMap] = useState('Todos');
     const [ recents, setRecents ] = useState([]);
     const [ nacionalidades, setNacionalidades ] = useState([]);
     const [ dataNac, setDataNac ] = useState([]);
@@ -34,6 +34,7 @@ const Home = () => {
     const [docData, setDocData] = useState([]);
     const [rangeData, setRangeData] = useState([]);
     const [mapData, setMapData] = useState([]);
+    const [beneficiariosData, setBeneficiariosData] = useState([]);
 
     
 
@@ -88,6 +89,32 @@ const Home = () => {
 
 
     useEffect(() => {
+        const fetchContarBeneficiariosHome = async () => {
+            try {
+                Notiflix.Loading.pulse('Cargando...');
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Beneficiario/contar-home/${searchTags.join(',')}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if (!response.ok) {
+                    if(response.status == 401 || response.status == 403){
+                        const data = await response.json();
+                        Notiflix.Notify.failure(data.message);
+                    }
+                    return;
+                }
+                const data = await response.json();
+                // Suma de la propiedad 'cantidad' en todos los objetos
+                setTotalBeneficiarios(data.cantidad);
+            } catch (error) {
+                console.error('Error:', error);
+            } finally {
+                Notiflix.Loading.remove();
+            }
+        };
+        
         const fetchBeneficiariosHome = async () => {
             try {
                 Notiflix.Loading.pulse('Cargando...');
@@ -105,16 +132,15 @@ const Home = () => {
                     return;
                 }
                 const data = await response.json();
-                console.log(data)
-                // Conteo de beneficiarios
-                setTotalBeneficiarios(data.cantidad);
-
+                // Suma de la propiedad 'cantidad' en todos los objetos
+                setBeneficiariosData(data);
             } catch (error) {
                 console.error('Error:', error);
             } finally {
                 Notiflix.Loading.remove();
             }
         };
+
         const fetchDocumentosHome = async () => {
             try {
                 Notiflix.Loading.pulse('Cargando...');
@@ -251,6 +277,7 @@ const Home = () => {
         };
 
         if (nacionalidadesLoaded) {
+            fetchContarBeneficiariosHome();
             fetchBeneficiariosHome();
             fetchDocumentosHome();
             fetchNacionalidadesHome();
@@ -426,7 +453,7 @@ const Home = () => {
                     const minutes = String(date.getMinutes()).padStart(2, '0');
                     const formattedTime = `${hours}:${minutes}`;
 
-                    let text = item.logDes;
+                    let text = item.logDes ? item.logDes : '';
                     let shortText = text.length > 60 ? text.substring(0, 60) + '...' : text;
 
                     return (
@@ -488,7 +515,7 @@ const Home = () => {
                         </div>
                     </article>
                     <div className='Large_6 Medium_12 Phone_12 flex-grow-1'>
-                        <MapComponent mapData={mapData} />
+                        <MapComponent mapData={mapData} beneficiariosData={beneficiariosData} />
                     </div>
                 </div>
             </div>

@@ -29,7 +29,6 @@ namespace SistemaMEAL.Server.Controllers
             if (!rToken.success) return Unauthorized(rToken);
 
             var data = _proyectos.Listado();
-            Console.WriteLine(data);
             return Ok(data);
         }
         
@@ -98,9 +97,9 @@ namespace SistemaMEAL.Server.Controllers
             if (!rToken.success) return Unauthorized(rToken);
 
             var proyectos = _proyectos.ListadoAccesibles(usuAno, usuCod);
-            Console.WriteLine(proyectos);
             return Ok(proyectos);
         }
+
         [HttpGet]
         [Route("proyectos-subproyectos")]
         public dynamic ListarProyectosSubproyectos()
@@ -114,8 +113,6 @@ namespace SistemaMEAL.Server.Controllers
             return Ok(proyectos);
         }
 
-
-
         [HttpGet]
         [Route("{usuAno}/{usucod}/proyecto/{proAno}/{proCod}")]
         public dynamic ObtenerDetallesProyectoUsuario(string usuAno, string usucod, string proAno, string proCod)
@@ -126,7 +123,6 @@ namespace SistemaMEAL.Server.Controllers
             if (!rToken.success) return Unauthorized(rToken);
 
             var proyecto = _proyectos.ObtenerDetallesProyectoUsuario(usuAno, usucod, proAno, proCod);
-            Console.WriteLine(Ok(proyecto));
             return Ok(proyecto);
         }
 
