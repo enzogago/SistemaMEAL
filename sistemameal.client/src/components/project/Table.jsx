@@ -1,6 +1,6 @@
 import { useContext, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Tooltip } from 'react-tooltip';
+import CryptoJS from 'crypto-js';
 import {
     useReactTable, 
     getCoreRowModel, 
@@ -14,11 +14,11 @@ import { Export_Excel_Helper, Export_PDF_Helper } from '../reusable/helper';
 // Componentes
 import { AuthContext } from "../../context/AuthContext";
 import CustomTable from "../reusable/Table/CustomTable";
+import { handleDelete } from "./eventHandlers";
 
 
-const Table = ({data = []}) => {
+const Table = ({data = [], setData}) => {
     const navigate = useNavigate();
-    console.log(data)
     // Variables State AuthContext 
     const { authInfo } = useContext(AuthContext);
     const { userPermissions } = authInfo;
@@ -40,7 +40,21 @@ const Table = ({data = []}) => {
         let baseColumns = [
             {
                 header: "Nombre",
-                accessorKey: "proNom"
+                accessorKey: "proNom",
+                cell: ({row}) => (
+                    <div style={{textTransform: 'capitalize'}}>
+                        {row.original.proNom.toLowerCase()}
+                    </div>
+                ),
+            },
+            {
+                header: "Descripción",
+                accessorKey: "proDes",
+                cell: ({row}) => (
+                    <div style={{textTransform: 'capitalize'}}>
+                        {row.original.proDes.toLowerCase()}
+                    </div>
+                ),
             },
             {
                 header: "Periodo Inicio",
@@ -62,7 +76,12 @@ const Table = ({data = []}) => {
             },
             {
                 header: "Responsable",
-                accessorKey: "proRes"
+                accessorKey: "proRes",
+                cell: ({row}) => (
+                    <div style={{textTransform: 'capitalize'}}>
+                        {row.original.proRes.toLowerCase()}
+                    </div>
+                ),
             },
         ];
 
@@ -87,7 +106,7 @@ const Table = ({data = []}) => {
                                 data-tooltip-id="delete-tooltip" 
                                 data-tooltip-content="Eliminar" 
                                 className='Large-p_25' 
-                                // onClick={() => Eliminar_Meta_Indicador(row.original)} 
+                                onClick={() => handleDelete('Proyecto',row.original, setData)} 
                             />
                         }
                     </div>
@@ -97,6 +116,16 @@ const Table = ({data = []}) => {
 
         return baseColumns;
     }, [actions]);
+
+    const Editar_Proyecto = (row) => {
+        const id = `${row.original.proAno}${row.original.proCod}`;
+        console.log(id)
+        // Encripta el ID
+        const ciphertext = CryptoJS.AES.encrypt(id, 'secret key 123').toString();
+        // Codifica la cadena cifrada para que pueda ser incluida de manera segura en una URL
+        const safeCiphertext = btoa(ciphertext).replace('+', '-').replace('/', '_').replace(/=+$/, '');
+        navigate(`/form-project/${safeCiphertext}`);
+    }
         
 
     const [sorting, setSorting] = useState([]);
@@ -166,8 +195,6 @@ const Table = ({data = []}) => {
     const removeTag = (tag) => {
         setSearchTags(searchTags.filter(t => t !== tag));
     }
-    
-    
 
     return (
         <CustomTable

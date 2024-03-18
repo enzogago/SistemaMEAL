@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -10,11 +9,6 @@ namespace SistemaMEAL.Server.Models
         public String? ObjAno { get; set; }
         [Key, Column(Order = 1)]
         public String? ObjCod { get; set; }
-        [ForeignKey("SubProyecto")]
-        public String? SubProAno { get; set; }
-
-        [ForeignKey("SubProyecto")]
-        public String? SubProCod { get; set; }
         public String? ObjNom { get; set; }
         public String? ObjNum { get; set; }
         public String? UsuIng { get; set; }
@@ -26,6 +20,11 @@ namespace SistemaMEAL.Server.Models
         public DateTime? FecMod { get; set; }
 
         public char EstReg { get; set; }
+        [ForeignKey("SubProyecto")]
+        public String? SubProAno { get; set; }
+
+        [ForeignKey("SubProyecto")]
+        public String? SubProCod { get; set; }
         public List<ObjetivoEspecifico>? ObjetivosEspecificos { get; set; }
     }
 }

@@ -41,6 +41,12 @@ import FormatProject from './components/upload/project/FormatProject';
 import Notiflix from 'notiflix';
 import SaveProject from './components/upload/project/SaveProject';
 import UploadProject from './components/upload/project/UploadProject';
+import Subproject from './components/subproject/Subproject';
+import Objective from './components/objective/Objective';
+import ObjectiveSpecific from './components/objective-specific/ObjectiveSpecific';
+import Result from './components/result/Result';
+import Indicator from './components/indicator/Indicator';
+import Activity from './components/activity/Activity';
 
 const App = () => {
     // Variables state AuthContext
@@ -101,6 +107,12 @@ const App = () => {
         'permission': Permission,
         'type-value': TypeValue,
         "projects": Projects,
+        "subproject": Subproject,
+        "objective": Objective,
+        "objective-specific": ObjectiveSpecific,
+        "result": Result,
+        "activity": Activity,
+        "indicator": Indicator,
         "dashboard": Dashboard,
         "gender": Gender,
         "nationality": Nationality,

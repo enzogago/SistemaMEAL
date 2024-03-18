@@ -8,6 +8,54 @@ import 'jspdf-autotable';
 
 
 
+export const handleDeleteMant = async (controller, obj, setRegistros) => {
+    Notiflix.Confirm.show(
+        'Eliminar Registro',
+        '¿Estás seguro que quieres eliminar este registro?',
+        'Sí',
+        'No',
+        async () => {
+            const url = `${import.meta.env.VITE_APP_API_URL}/api/${controller}`;
+
+            
+            try {
+                Notiflix.Loading.pulse();
+                const token = localStorage.getItem('token');
+                const response = await fetch(url, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(obj),
+                });
+                const data = await response.json();
+                if (!response.ok) {
+                    Notiflix.Notify.failure(data.message);
+                    return;
+                }
+                
+                // Actualiza los datos después de eliminar un registro
+                const updateResponse = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/${controller}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const updateData = await updateResponse.json();
+                setRegistros(updateData);
+                Notiflix.Notify.success(data.message);
+            } catch (error) {
+                console.error('Error:', error);
+            } finally {
+                Notiflix.Loading.remove();
+            }
+        },
+        () => {
+            // El usuario ha cancelado la operación de eliminación
+        }
+    );
+};
+
 export const handleDelete = async (controller, codigo, setRegistros) => {
     Notiflix.Confirm.show(
         'Eliminar Registro',
@@ -67,17 +115,8 @@ export const handleDelete = async (controller, codigo, setRegistros) => {
     );
 };
 
-export const handleSubmit = async (controller, objetoEditado, data, setRegistros, setModalVisible, fieldMapping, codeField, closeModalAndReset) => {
-
-    const objeto = objetoEditado 
-        ?   { 
-                ...objetoEditado, 
-                ...Object.keys(data).reduce((obj, key) => ({...obj, [fieldMapping[key]]: data[key]}), {}),
-            } 
-        :   { 
-                ...Object.keys(data).reduce((obj, key) => ({...obj, [fieldMapping[key]]: data[key]}), {}),
-            };
-
+export const handleSubmit = async (controller, objetoEditado, objeto, setRegistros, setModalVisible, codeField, closeModalAndReset) => {
+    console.log(codeField)
     const url = objetoEditado 
                 ? `${import.meta.env.VITE_APP_API_URL}/api/${controller}/${objeto[codeField]}` 
                 : `${import.meta.env.VITE_APP_API_URL}/api/${controller}`;
@@ -94,29 +133,13 @@ export const handleSubmit = async (controller, objetoEditado, data, setRegistros
             },
             body: JSON.stringify(objeto),
         });
-        console.log("desde response: ",response)
+        const data = await response.json();
         if (!response.ok) {
-            const text = await response.text();
-            const messageType = text.split(":")[0];
-            if (messageType === "1") {
-                Notiflix.Notify.failure("Error durante la ejecución del procedimiento almacenado");
-            } else {
-                Notiflix.Notify.failure(text);
-            }
-            throw new Error(text);
-        }
-
-        const contentType = response.headers.get("content-type");
-        if (contentType && contentType.indexOf("application/json") !== -1) {
-            const data = await response.json();
             Notiflix.Notify.failure(data.message);
-            setModalVisible(false); 
             return;
         }
         
-        const text = await response.text();
-        Notiflix.Notify.success(text);
-        console.log(text)
+        Notiflix.Notify.success(data.message);
         setModalVisible(false); // Cierra el modal
         // Actualiza los datos después de insertar o modificar un registro
         const updateResponse = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/${controller}`, {
@@ -124,8 +147,45 @@ export const handleSubmit = async (controller, objetoEditado, data, setRegistros
                 'Authorization': `Bearer ${token}`
             }
         });
-        const data = await updateResponse.json();
-        setRegistros(data);
+        const updateData = await updateResponse.json();
+        setRegistros(updateData);
+        closeModalAndReset();
+    } catch (error) {
+        console.error('Error:', error);
+    }
+};
+
+export const handleSubmitMant = async (controller, objetoEditado, objeto, setRegistros, setModalVisible, closeModalAndReset) => {
+    console.log(objeto)
+
+    const method = objetoEditado ? 'PUT' : 'POST';
+    const token = localStorage.getItem('token');
+
+    try {
+        const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/${controller}`, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(objeto),
+        });
+        const data = await response.json();
+        if (!response.ok) {
+            Notiflix.Notify.failure(data.message);
+            return;
+        }
+        
+        Notiflix.Notify.success(data.message);
+        setModalVisible(false); // Cierra el modal
+        // Actualiza los datos después de insertar o modificar un registro
+        const updateResponse = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/${controller}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        const updateData = await updateResponse.json();
+        setRegistros(updateData);
         closeModalAndReset();
     } catch (error) {
         console.error('Error:', error);

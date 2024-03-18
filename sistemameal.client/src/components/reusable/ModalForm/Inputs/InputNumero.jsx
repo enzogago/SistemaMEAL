@@ -1,4 +1,4 @@
-const InputNombre = ({register, errors, dirtyFields, isSubmitted}) => {
+const InputNumero = ({register, errors, dirtyFields, isSubmitted}) => {
     // Función de validación personalizada
     const validateNoLeadingSpaces = (value) => {
         if (value.startsWith(' ')) {
@@ -10,31 +10,31 @@ const InputNombre = ({register, errors, dirtyFields, isSubmitted}) => {
     return (
         <>
         <label className="block">
-            Nombre:
+            Código:
         </label>
         <input 
-            id="nombre"
-            className={`p1 PowerMas_Modal_Form_${dirtyFields.nombre || isSubmitted ? (errors.nombre ? 'invalid' : 'valid') : ''}`}  
+            id="codigo"
+            className={`p1 PowerMas_Modal_Form_${dirtyFields.codigo || isSubmitted ? (errors.codigo ? 'invalid' : 'valid') : ''}`}  
             type="text" 
             placeholder='Nuevo' 
-            maxLength={300} 
-            name="nombre" 
+            maxLength={100} 
+            name="codigo" 
             autoComplete='disabled'
             {...register(
-                'nombre', { 
+                'codigo', { 
                     required: 'El campo es requerido',
-                    maxLength: { value: 300, message: 'El campo no puede tener más de 300 caracteres' },
+                    maxLength: { value: 100, message: 'El campo no puede tener más de 100 caracteres' },
                     minLength:  { value: 5, message: 'El campo no puede tener menos de 5 caracteres' },
                     pattern: {
-                        value: /^[A-Za-zñÑáéíóúÁÉÍÓÚ().,;üÜ/\s-_]+$/,
+                        value: /^[A-Za-zñÑáéíóúÁÉÍÓÚ().,;üÜ\s-_]+$/,
                         message: 'Por favor, introduce solo letras y espacios',
                     },
                     validate: validateNoLeadingSpaces,
                 }
             )}
         />
-        {errors.nombre ? (
-            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.nombre.message}</p>
+        {errors.codigo ? (
+            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.codigo.message}</p>
         ) : (
             <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
                 Espacio reservado para el mensaje de error
@@ -44,4 +44,4 @@ const InputNombre = ({register, errors, dirtyFields, isSubmitted}) => {
     )
 }
 
-export default InputNombre
+export default InputNumero

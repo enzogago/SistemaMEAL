@@ -33,6 +33,19 @@ namespace SistemaMEAL.Server.Controllers
             return Ok(data);
         }
         
+        [HttpGet]
+        [Route("{proAno}/{proCod}")]
+        public dynamic BuscarProyecto(string proAno, string proCod)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var data = _proyectos.Listado(proAno, proCod);
+            return Ok(data.FirstOrDefault());
+        }
+
 
         [HttpPost("agregar-exclusiones/{usuAno}/{usuCod}")]
         public IActionResult AgregarExclusiones([FromBody] ModificarExclusionesRequest request, string usuAno, string usuCod)
@@ -101,18 +114,7 @@ namespace SistemaMEAL.Server.Controllers
             return Ok(proyectos);
         }
 
-        [HttpGet]
-        [Route("{usuAno}/{usuCod}")]
-        public dynamic ListarProyectosUsuario(string usuAno, string usuCod)
-        {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
 
-            if (!rToken.success) return Unauthorized(rToken);
-
-            var proyectos = _proyectos.ListarProyectosUsuario(usuAno, usuCod);
-            return Ok(proyectos);
-        }
 
         [HttpGet]
         [Route("{usuAno}/{usucod}/proyecto/{proAno}/{proCod}")]
@@ -167,6 +169,87 @@ namespace SistemaMEAL.Server.Controllers
                 return new OkObjectResult(new { proAno, proCod, success = true, message });
             }
         }
+
+        [HttpPut]
+        public dynamic Modificar(Proyecto proyecto)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return rToken;
+
+            dynamic data = rToken.result;
+            Usuario usuarioActual = new Usuario
+            {
+                UsuAno = data.UsuAno,
+                UsuCod = data.UsuCod,
+                RolCod = data.RolCod
+            };
+            if (usuarioActual.RolCod != "01")
+            {
+                return new
+                {
+                    success = false,
+                    message = "No tienes permisos para realizar esta accion",
+                    result = ""
+                };
+            }
+
+            var (message, messageType) = _proyectos.Modificar(proyecto);
+            if (messageType == "1") // Error
+            {
+                return new BadRequestObjectResult(new { success = false, message });
+            }
+            else if (messageType == "2") // Registro ya existe
+            {
+                return new ConflictObjectResult(new { success = false, message });
+            }
+            else // Registro modificado correctamente
+            {
+                return new OkObjectResult(new { success = true, message });
+            }
+        }
+
+        [HttpDelete]
+        public dynamic Eliminar(Proyecto proyecto)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return rToken;
+
+            dynamic data = rToken.result;
+            Usuario usuarioActual = new Usuario
+            {
+                UsuAno = data.UsuAno,
+                UsuCod = data.UsuCod,
+                RolCod = data.RolCod
+            };
+            if (usuarioActual.RolCod != "01")
+            {
+                return new
+                {
+                    success = false,
+                    message = "No tienes permisos para realizar esta accion",
+                    result = ""
+                };
+            }
+
+            var (message, messageType) = _proyectos.Eliminar(proyecto);
+            if (messageType == "1") // Error
+            {
+                return new BadRequestObjectResult(new { success = false, message });
+            }
+            else if (messageType == "2") // Registro ya existe
+            {
+                return new ConflictObjectResult(new { success = false, message });
+            }
+            else // Registro modificado correctamente
+            {
+                return new OkObjectResult(new { success = true, message });
+            }
+        }
+
 
         [HttpPost]
         [Route("Masivo")]

@@ -12,10 +12,11 @@ import { FaEdit , FaRegTrashAlt } from 'react-icons/fa';
 // Funciones reusables
 // Componentes
 import { AuthContext } from '../../../context/AuthContext';
-import { Export_Excel_Helper, Export_PDF_Helper, handleDelete, orthographicCorrections } from '../helper';
+import { Export_Excel_Helper, Export_PDF_Helper, handleDeleteMant, orthographicCorrections } from '../helper';
 import CustomTable from './CustomTable';
 
-const Table = ({ data, openModal, setData, controller, fieldMapping, title }) => {
+const Table = ({ data, openModal, setData, controller, fieldMapping, title, resize }) => {
+    console.log(data)
     // Variables State AuthContext 
     const { authInfo } = useContext(AuthContext);
     const { userPermissions } = authInfo;
@@ -78,7 +79,7 @@ const Table = ({ data, openModal, setData, controller, fieldMapping, title }) =>
                                 data-tooltip-id="delete-tooltip" 
                                 data-tooltip-content="Eliminar" 
                                 className='Large-p_25' 
-                                onClick={() => handleDelete(controller, row.original[fieldMapping.codigo], setData)} 
+                                onClick={() => handleDeleteMant(controller, row.original, setData)} 
                             />
                         }
                     </div>
@@ -144,7 +145,8 @@ const Table = ({ data, openModal, setData, controller, fieldMapping, title }) =>
             setSearchFilter={setSearchFilter} 
             actions={actions} 
             openModal={openModal} 
-            dropdownOpen={dropdownOpen} 
+            dropdownOpen={dropdownOpen}
+            resize={resize}
             setDropdownOpen={setDropdownOpen} 
             Export_Excel={Export_Excel} 
             Export_PDF={Export_PDF} 

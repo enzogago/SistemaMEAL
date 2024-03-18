@@ -2,31 +2,89 @@ import Notiflix from "notiflix";
 import CryptoJS from 'crypto-js';
 
 export const handleSubmit = async (data, isEditing) => {
-
-    console.log(data)
-    const url = isEditing ? `${import.meta.env.VITE_APP_API_URL}/api/Proyecto/${data.proAno}/${data.proCod}` : `${import.meta.env.VITE_APP_API_URL}/api/Proyecto`;
     const method = isEditing ? 'PUT' : 'POST';
+    let newData = {};
+    for (let key in data) {
+        if (typeof data[key] === 'string') {
+            // Convierte cada cadena a minúsculas
+            newData[key] = data[key].toUpperCase();
+        } else {
+            // Mantiene los valores no string tal como están
+            newData[key] = data[key];
+        }
+    }
+    console.log(newData)
 
-    const token = localStorage.getItem('token');
-    console.log(method)
     try {
-        const response = await fetch(url, {
+        Notiflix.Loading.pulse();
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Proyecto`, {
             method: method,
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify(data),
+            body: JSON.stringify(newData),
         });
         
         const dataResult = await response.json();
         if (!response.ok) {
-            console.log(dataResult)
+            Notiflix.Notify.failure(dataResult.message)
             return;
         }
-
-        console.log(dataResult)
+        Notiflix.Notify.success(dataResult.message)
     } catch (error) {
         console.error('Error:', error);
+    } finally {
+        Notiflix.Loading.remove();
     }
+};
+
+
+export const handleDelete = async (controller, obj, setRegistros) => {
+    Notiflix.Confirm.show(
+        'Eliminar Registro',
+        '¿Estás seguro que quieres eliminar este registro?',
+        'Sí',
+        'No',
+        async () => {
+            const url = `${import.meta.env.VITE_APP_API_URL}/api/${controller}`;
+
+            
+            try {
+                Notiflix.Loading.pulse();
+                const token = localStorage.getItem('token');
+                const response = await fetch(url, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(obj),
+                });
+                const data = await response.json();
+                if (!response.ok) {
+                    Notiflix.Notify.failure(data.message);
+                    return;
+                }
+                
+                // Actualiza los datos después de eliminar un registro
+                const updateResponse = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/${controller}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const updateData = await updateResponse.json();
+                setRegistros(updateData);
+                Notiflix.Notify.success(data.message);
+            } catch (error) {
+                console.error('Error:', error);
+            } finally {
+                Notiflix.Loading.remove();
+            }
+        },
+        () => {
+            // El usuario ha cancelado la operación de eliminación
+        }
+    );
 };

@@ -344,6 +344,104 @@ namespace SistemaMEAL.Modulos
             return (anoOut, codOut, mensaje, tipoMensaje);
         }
 
+        public (string? message, string? messageType) Modificar(Proyecto proyecto)
+        {
+            string? mensaje = "";
+            string? tipoMensaje = "";
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_MODIFICAR_PROYECTO", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@P_PROANO", proyecto.ProAno);
+                cmd.Parameters.AddWithValue("@P_PROCOD", proyecto.ProCod);
+                cmd.Parameters.AddWithValue("@P_PRONOM", proyecto.ProNom);
+                cmd.Parameters.AddWithValue("@P_PRODES", proyecto.ProDes);
+                cmd.Parameters.AddWithValue("@P_PRORES", proyecto.ProRes);
+                cmd.Parameters.AddWithValue("@P_PROPERANOINI", proyecto.ProPerAnoIni);
+                cmd.Parameters.AddWithValue("@P_PROPERMESINI", proyecto.ProPerMesIni);
+                cmd.Parameters.AddWithValue("@P_PROPERANOFIN", proyecto.ProPerAnoFin);
+                cmd.Parameters.AddWithValue("@P_PROPERMESFIN", proyecto.ProPerMesFin);
+                cmd.Parameters.AddWithValue("@P_USUMOD", "Usuario");
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
+                cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
+                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "GAGO");
+                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "AGUIRRE");
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+
+                cmd.ExecuteNonQuery();
+
+                mensaje = pDescripcionMensaje.Value.ToString();
+                tipoMensaje = pTipoMensaje.Value.ToString();
+            }
+            catch (SqlException ex)
+            {
+                mensaje = ex.Message;
+                tipoMensaje = "1";
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return (mensaje, tipoMensaje);
+        }
+        public (string? message, string? messageType) Eliminar(Proyecto proyecto)
+        {
+            string? mensaje = "";
+            string? tipoMensaje = "";
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_ELIMINAR_PROYECTO", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@P_PROANO", proyecto.ProAno);
+                cmd.Parameters.AddWithValue("@P_PROCOD", proyecto.ProCod);
+                cmd.Parameters.AddWithValue("@P_USUMOD", "Usuario");
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
+                cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
+                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "GAGO");
+                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "AGUIRRE");
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+
+                cmd.ExecuteNonQuery();
+
+                mensaje = pDescripcionMensaje.Value.ToString();
+                tipoMensaje = pTipoMensaje.Value.ToString();
+            }
+            catch (SqlException ex)
+            {
+                mensaje = ex.Message;
+                tipoMensaje = "1";
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return (mensaje, tipoMensaje);
+        }
+
         public (string? message, string? messageType, List<ErrorCell> errorCells) InsertarMasivo(List<Proyecto> proyectos)
         {
             string? mensaje = "";

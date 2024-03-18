@@ -156,7 +156,7 @@ export const handleUpload = async (file, setTableData, setPostData, setIsValid, 
         const expectedHeaderDisplays = expectedHeaders.map(header => header.display.toUpperCase());
         console.log(expectedHeaderDisplays);
         // Verifica que los encabezados son correctos
-        const headers = worksheet.getRow(10).values.slice(3, 23); // Tomando en cuenta los encabezados estan en la fila 4 a partir de la columna 2
+        const headers = worksheet.getRow(12).values.slice(3, 23); // Tomando en cuenta los encabezados estan en la fila 4 a partir de la columna 2
         console.log(headers);
         if (!arraysEqual(headers, expectedHeaderDisplays)) {
             alert('Los encabezados no son válidos');
@@ -168,7 +168,7 @@ export const handleUpload = async (file, setTableData, setPostData, setIsValid, 
         let currentColor = 'lightgray';
 
         // Comienza a leer desde la fila 11
-        let rowNumber = 11;
+        let rowNumber = 13;
         while (rowNumber <= worksheet.rowCount) { // Itera sobre todas las filas
             const row = worksheet.getRow(rowNumber);
 
@@ -193,6 +193,8 @@ export const handleUpload = async (file, setTableData, setPostData, setIsValid, 
                 const cellValueForIndTipInd = row.getCell(23).text.trim();
                 const cellValueForProMesIni = row.getCell(24).text.trim();
                 const cellValueForProMesFin = row.getCell(25).text.trim();
+                const cellValueForUni = row.getCell(26).text.trim();
+                const cellValueForTipVal = row.getCell(27).text.trim();
 
                 const cell = row.getCell(colNumber);
                 const cellValue = cell.text.trim();
@@ -219,7 +221,15 @@ export const handleUpload = async (file, setTableData, setPostData, setIsValid, 
                 } else if (entity === 'Resultado') {
                     resultData[databaseKey] = cellValue; // Agrega los datos del objetivo específico
                 }else if (entity === 'Indicador') {
-                    IndicatorData[databaseKey] = databaseKey === 'indTipInd' ? cellValueForIndTipInd : cellValue;
+                    if (databaseKey === 'indTipInd') {
+                        IndicatorData[databaseKey] = cellValueForIndTipInd;
+                    } else if (databaseKey === 'uniCod') {
+                        IndicatorData[databaseKey] = cellValueForUni;
+                    } else if (databaseKey === 'tipValCod') {
+                        IndicatorData[databaseKey] = cellValueForTipVal;
+                    } else {
+                        IndicatorData[databaseKey] = cellValue;
+                    }
                 }
 
                 // Agrega los datos a tableRowData y postRowData
@@ -232,7 +242,7 @@ export const handleUpload = async (file, setTableData, setPostData, setIsValid, 
                 // Valida la celda
                 const validationMessage = validateCell(cellValue, fieldValidationRules);
                 if (validationMessage !== true) {
-                    newErrorCells.push({ row: rowNumber - 11, column: colNumber - 3,  message: validationMessage}); // Ajusta los índices para que coincidan con el rango de filas y columnas
+                    newErrorCells.push({ row: rowNumber - 13, column: colNumber - 3,  message: validationMessage}); // Ajusta los índices para que coincidan con el rango de filas y columnas
                     setIsValid(false);
                 }
             }

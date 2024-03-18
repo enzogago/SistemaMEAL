@@ -74,32 +74,32 @@ const SaveProject = () => {
         // Aquí puedes procesar los datos y enviarlos al servidor
         console.log('Procesando datos...');
         console.log(postData);
-        // try {
-        //     Notiflix.Loading.pulse();
-        //     const token = localStorage.getItem('token');
-        //     const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Proyecto/Masivo`, {
-        //         method: 'POST',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //             'Authorization': `Bearer ${token}`
-        //         },
-        //         body: JSON.stringify(postData),
-        //     });
-        //     console.log("desde response: ",response)
-        //     const data = await response.json();
-        //     if (!response.ok) {
-        //         console.log(data)
-        //         Notiflix.Notify.failure(data.message)
-        //         return;
-        //     }
-        //     console.log(data)
-        //     Notiflix.Notify.success(data.message)
-        //     navigate('/upload-project');
-        // } catch (error) {
-        //     console.error('Error:', error);
-        // } finally {
-        //     Notiflix.Loading.remove();
-        // }
+        try {
+            Notiflix.Loading.pulse();
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Proyecto/Masivo`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(postData),
+            });
+            console.log("desde response: ",response)
+            const data = await response.json();
+            if (!response.ok) {
+                console.log(data)
+                Notiflix.Notify.failure(data.message)
+                return;
+            }
+            console.log(data)
+            Notiflix.Notify.success(data.message)
+            navigate('/upload-project');
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            Notiflix.Loading.remove();
+        }
     }
 
     return (
