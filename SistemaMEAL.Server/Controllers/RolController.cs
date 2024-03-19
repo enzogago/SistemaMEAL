@@ -60,20 +60,20 @@ namespace SistemaMEAL.Server.Controllers
             var (message, messageType) = _roles.Insertar(rol);
             if (messageType == "1") // Error
             {
-                return BadRequest(message);
+                return new BadRequestObjectResult(new { success = false, message });
             }
             else if (messageType == "2") // Registro ya existe
             {
-                return Conflict(message);
+                return new ConflictObjectResult(new { success = false, message });
             }
-            else // Registro insertado correctamente
+            else // Registro modificado correctamente
             {
-                return Ok(message);
+                return new OkObjectResult(new { success = true, message });
             }
         }
 
-        [HttpPut("{rolCod}")]
-        public dynamic Modificar(string rolCod, Rol rol)
+        [HttpPut]
+        public dynamic Modificar(Rol rol)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
@@ -97,24 +97,23 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            rol.RolCod = rolCod;
             var (message, messageType) = _roles.Modificar(rol);
             if (messageType == "1") // Error
             {
-                return BadRequest(message);
+                return new BadRequestObjectResult(new { success = false, message });
             }
             else if (messageType == "2") // Registro ya existe
             {
-                return Conflict(message);
+                return new ConflictObjectResult(new { success = false, message });
             }
             else // Registro modificado correctamente
             {
-                return Ok(message);
+                return new OkObjectResult(new { success = true, message });
             }
         }
 
-        [HttpDelete("{rolCod}")]
-        public dynamic Eliminar(string rolCod)
+        [HttpDelete]
+        public dynamic Eliminar(Rol rol)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
@@ -138,18 +137,18 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _roles.Eliminar(rolCod);
+            var (message, messageType) = _roles.Eliminar(rol);
             if (messageType == "1") // Error
             {
-                return BadRequest(message);
+                return new BadRequestObjectResult(new { success = false, message });
             }
             else if (messageType == "2") // Registro ya existe
             {
-                return Conflict(message);
+                return new ConflictObjectResult(new { success = false, message });
             }
-            else // Registro eliminado correctamente
+            else // Registro modificado correctamente
             {
-                return Ok(message);
+                return new OkObjectResult(new { success = true, message });
             }
         }
     }

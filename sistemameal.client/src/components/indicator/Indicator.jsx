@@ -15,8 +15,7 @@ const Indicator = () => {
     const controllerSelect = 'Actividad';
     // Definir controller y fieldMapping como variables
     const controller = 'Indicador';
-    const fieldMapping = { codigo: 'indNum', nombre: 'indNom' };
-    const { codigo, ...restFieldMapping } = fieldMapping;
+    const fieldMapping = { codigo: 'indNum', nombre: 'indNom', 'Código Resultado': 'resNum', 'Resultado': 'resNom', 'Código Objetivo Específico': 'objEspNum', 'Objetivo Específico': 'objEspNom', 'Código Objetivo': 'objNum', 'Objetivo': 'objNom', 'Sub Proyecto': 'subProNom', 'Proyecto': 'proNom' };
   
     // Toggle Modal
     const openModal = (estado = null) => {
@@ -66,7 +65,6 @@ const Indicator = () => {
                 setData={setData}
                 fieldMapping={fieldMapping}
                 controller={controller}
-                codeField={codigo}
                 title='Indicador'
                 controllerSelect={controllerSelect}
                 select={select}

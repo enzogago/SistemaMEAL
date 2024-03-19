@@ -15,8 +15,7 @@ const Result = () => {
     const controllerSelect = 'ObjetivoEspecifico';
     // Definir controller y fieldMapping como variables
     const controller = 'Resultado';
-    const fieldMapping = { codigo: 'resNum', nombre: 'resNom' };
-    const { codigo, ...restFieldMapping } = fieldMapping;
+    const fieldMapping = { codigo: 'resNum', nombre: 'resNom', 'Código Objetivo Específico': 'objEspNum', 'Objetivo Específico': 'objEspNom', 'Código Objetivo': 'objNum', 'Objetivo': 'objNom', 'Sub Proyecto': 'subProNom', 'Proyecto': 'proNom' };
   
     // Toggle Modal
     const openModal = (estado = null) => {
@@ -66,7 +65,6 @@ const Result = () => {
                 setData={setData}
                 fieldMapping={fieldMapping}
                 controller={controller}
-                codeField={codigo}
                 title='Resultado'
                 controllerSelect={controllerSelect}
                 select={select}

@@ -63,20 +63,20 @@ namespace SistemaMEAL.Server.Controllers
             var (message, messageType) = _generos.Insertar(genero);
             if (messageType == "1") // Error
             {
-                return BadRequest(message);
+                return new BadRequestObjectResult(new { success = false, message });
             }
             else if (messageType == "2") // Registro ya existe
             {
-                return Conflict(message);
+                return new ConflictObjectResult(new { success = false, message });
             }
-            else // Registro insertado correctamente
+            else // Registro modificado correctamente
             {
-                return Ok(message);
+                return new OkObjectResult(new { success = true, message });
             }
         }
 
-        [HttpPut("{genCod}")]
-        public dynamic Modificar(string genCod, Genero genero)
+        [HttpPut]
+        public dynamic Modificar(Genero genero)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
@@ -100,25 +100,24 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            genero.GenCod = genCod; // Asegúrate de que el código del estado en el objeto estado sea el correcto
             var (message, messageType) = _generos.Modificar(genero);
             if (messageType == "1") // Error
             {
-                return BadRequest(message);
+                return new BadRequestObjectResult(new { success = false, message });
             }
             else if (messageType == "2") // Registro ya existe
             {
-                return Conflict(message);
+                return new ConflictObjectResult(new { success = false, message });
             }
             else // Registro modificado correctamente
             {
-                return Ok(message);
+                return new OkObjectResult(new { success = true, message });
             }
         }
 
 
-        [HttpDelete("{genCod}")]
-        public dynamic Eliminar(string genCod)
+        [HttpDelete]
+        public dynamic Eliminar(Genero genero)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
@@ -142,18 +141,18 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _generos.Eliminar(genCod);
+            var (message, messageType) = _generos.Eliminar(genero);
             if (messageType == "1") // Error
             {
-                return BadRequest(message);
+                return new BadRequestObjectResult(new { success = false, message });
             }
             else if (messageType == "2") // Registro ya existe
             {
-                return Conflict(message);
+                return new ConflictObjectResult(new { success = false, message });
             }
-            else // Registro eliminado correctamente
+            else // Registro modificado correctamente
             {
-                return Ok(message);
+                return new OkObjectResult(new { success = true, message });
             }
         }
 

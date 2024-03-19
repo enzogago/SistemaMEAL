@@ -15,8 +15,7 @@ const ObjectiveSpecific = () => {
     const controllerSelect = 'Objetivo';
     // Definir controller y fieldMapping como variables
     const controller = 'ObjetivoEspecifico';
-    const fieldMapping = { codigo: 'objEspNum', nombre: 'objEspNom' };
-    const { codigo, ...restFieldMapping } = fieldMapping;
+    const fieldMapping = { codigo: 'objEspNum', nombre: 'objEspNom', 'Código_Objetivo': 'objNum', 'Objetivo': 'objNom', 'Sub Proyecto': 'subProNom', 'Proyecto': 'proNom' };
   
     // Toggle Modal
     const openModal = (estado = null) => {
@@ -66,7 +65,6 @@ const ObjectiveSpecific = () => {
                 setData={setData}
                 fieldMapping={fieldMapping}
                 controller={controller}
-                codeField={codigo}
                 title='Objetivo Especifico'
                 controllerSelect={controllerSelect}
                 select={select}

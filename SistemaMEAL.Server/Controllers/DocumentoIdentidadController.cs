@@ -59,20 +59,20 @@ namespace SistemaMEAL.Server.Controllers
             var (message, messageType) = _documentos.Insertar(documento);
             if (messageType == "1") // Error
             {
-                return BadRequest(message);
+                return new BadRequestObjectResult(new { success = false, message });
             }
             else if (messageType == "2") // Registro ya existe
             {
-                return Conflict(message);
+                return new ConflictObjectResult(new { success = false, message });
             }
-            else // Registro insertado correctamente
+            else // Registro modificado correctamente
             {
-                return Ok(message);
+                return new OkObjectResult(new { success = true, message });
             }
         }
 
-        [HttpPut("{docIdeCod}")]
-        public dynamic Modificar(string docIdeCod, DocumentoIdentidad documento)
+        [HttpPut]
+        public dynamic Modificar(DocumentoIdentidad documento)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
@@ -96,24 +96,23 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            documento.DocIdeCod = docIdeCod;
             var (message, messageType) = _documentos.Modificar(documento);
             if (messageType == "1") // Error
             {
-                return BadRequest(message);
+                return new BadRequestObjectResult(new { success = false, message });
             }
             else if (messageType == "2") // Registro ya existe
             {
-                return Conflict(message);
+                return new ConflictObjectResult(new { success = false, message });
             }
             else // Registro modificado correctamente
             {
-                return Ok(message);
+                return new OkObjectResult(new { success = true, message });
             }
         }
 
-        [HttpDelete("{docIdeCod}")]
-        public dynamic Eliminar(string docIdeCod)
+        [HttpDelete]
+        public dynamic Eliminar(DocumentoIdentidad documentoIdentidad)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
@@ -137,18 +136,18 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _documentos.Eliminar(docIdeCod);
+            var (message, messageType) = _documentos.Eliminar(documentoIdentidad);
             if (messageType == "1") // Error
             {
-                return BadRequest(message);
+                return new BadRequestObjectResult(new { success = false, message });
             }
             else if (messageType == "2") // Registro ya existe
             {
-                return Conflict(message);
+                return new ConflictObjectResult(new { success = false, message });
             }
-            else // Registro eliminado correctamente
+            else // Registro modificado correctamente
             {
-                return Ok(message);
+                return new OkObjectResult(new { success = true, message });
             }
         }
 

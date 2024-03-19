@@ -59,20 +59,20 @@ namespace SistemaMEAL.Server.Controllers
             var (message, messageType) = _nacionalidades.Insertar(nacionalidad);
             if (messageType == "1") // Error
             {
-                return BadRequest(message);
+                return new BadRequestObjectResult(new { success = false, message });
             }
             else if (messageType == "2") // Registro ya existe
             {
-                return Conflict(message);
+                return new ConflictObjectResult(new { success = false, message });
             }
-            else // Registro insertado correctamente
+            else // Registro modificado correctamente
             {
-                return Ok(message);
+                return new OkObjectResult(new { success = true, message });
             }
         }
 
-        [HttpPut("{nacCod}")]
-        public dynamic Modificar(string nacCod, Nacionalidad nacionalidad)
+        [HttpPut]
+        public dynamic Modificar(Nacionalidad nacionalidad)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
@@ -96,24 +96,23 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            nacionalidad.NacCod = nacCod;
             var (message, messageType) = _nacionalidades.Modificar(nacionalidad);
             if (messageType == "1") // Error
             {
-                return BadRequest(message);
+                return new BadRequestObjectResult(new { success = false, message });
             }
             else if (messageType == "2") // Registro ya existe
             {
-                return Conflict(message);
+                return new ConflictObjectResult(new { success = false, message });
             }
             else // Registro modificado correctamente
             {
-                return Ok(message);
+                return new OkObjectResult(new { success = true, message });
             }
         }
 
-        [HttpDelete("{nacCod}")]
-        public dynamic Eliminar(string nacCod)
+        [HttpDelete]
+        public dynamic Eliminar(Nacionalidad nacionalidad)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
@@ -137,18 +136,18 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _nacionalidades.Eliminar(nacCod);
+            var (message, messageType) = _nacionalidades.Eliminar(nacionalidad);
             if (messageType == "1") // Error
             {
-                return BadRequest(message);
+                return new BadRequestObjectResult(new { success = false, message });
             }
             else if (messageType == "2") // Registro ya existe
             {
-                return Conflict(message);
+                return new ConflictObjectResult(new { success = false, message });
             }
-            else // Registro eliminado correctamente
+            else // Registro modificado correctamente
             {
-                return Ok(message);
+                return new OkObjectResult(new { success = true, message });
             }
         }
 

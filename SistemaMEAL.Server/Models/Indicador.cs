@@ -9,10 +9,6 @@ namespace SistemaMEAL.Server.Models
         public String? IndAno { get; set; }
         [Key, Column(Order = 1)]
         public String? IndCod { get; set; }
-        [ForeignKey("Actividad")]
-        public String? ActAno { get; set; }
-        [ForeignKey("Actividad")]
-        public String? ActCod { get; set; }
         public String? IndNom { get; set; }
         public String? IndNum { get; set; }
         public String? UniCod { get; set; }
@@ -24,5 +20,19 @@ namespace SistemaMEAL.Server.Models
         public DateTime? FecMod { get; set; }
         public char EstReg { get; set; }
 
+        [ForeignKey("Actividad")]
+        public String? ActAno { get; set; }
+        [ForeignKey("Actividad")]
+        public String? ActCod { get; set; }
+        public String? ActNom { get; set; }
+        public String? ActNum { get; set; }
+        public String? ResNom { get; set; }
+        public String? ResNum { get; set; }
+        public String? ObjEspNom { get; set; }
+        public String? ObjEspNum { get; set; }
+        public String? ObjNum { get; set; }
+        public String? ObjNom { get; set; }
+        public String? SubProNom { get; set; }
+        public String? ProNom { get; set; }
     }
 }

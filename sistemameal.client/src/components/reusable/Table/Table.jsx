@@ -52,8 +52,20 @@ const Table = ({ data, openModal, setData, controller, fieldMapping, title, resi
                         );
                     } else {
                         text = text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+                        const shortText = text.length > 60 ? text.substring(0, 60) + '...' : text;
+                        if(text.length >= 60){
+                            return (
+                                <>
+                                    <span 
+                                        data-tooltip-id="info-tooltip" 
+                                        data-tooltip-content={text} 
+                                    >{shortText}</span>
+                                </>
+                            );
+                        } else {
+                            return text;
+                        }
                     }
-                    return text;
                 },
             };
         });

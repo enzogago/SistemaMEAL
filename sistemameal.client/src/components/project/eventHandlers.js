@@ -1,7 +1,6 @@
 import Notiflix from "notiflix";
-import CryptoJS from 'crypto-js';
 
-export const handleSubmit = async (data, isEditing) => {
+export const handleSubmit = async (data, isEditing, setRegistros, closeModalAndReset) => {
     const method = isEditing ? 'PUT' : 'POST';
     let newData = {};
     for (let key in data) {
@@ -32,6 +31,16 @@ export const handleSubmit = async (data, isEditing) => {
             Notiflix.Notify.failure(dataResult.message)
             return;
         }
+
+         // Actualiza los datos después de eliminar un registro
+         const updateResponse = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Proyecto`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        const updateData = await updateResponse.json();
+        setRegistros(updateData);
+        closeModalAndReset();
         Notiflix.Notify.success(dataResult.message)
     } catch (error) {
         console.error('Error:', error);

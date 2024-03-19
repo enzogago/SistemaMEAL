@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace SistemaMEAL.Server.Models
 {
     public class BeneficiarioMonitoreo

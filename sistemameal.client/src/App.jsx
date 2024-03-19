@@ -23,7 +23,6 @@ import Financer from './components/financer/Financer';
 import Implementer from './components/implementer/Implementer';
 import Permission from './components/permission/Permission';
 import TypeValue from './components/type-value/TypeValue';
-import FormProject from './components/project/FormProject';
 import Projects from './components/project/Projects';
 import Dashboard from './components/dashboard/Dashboard';
 import FormGoal from './components/monitoring/goal/FormGoal';
@@ -45,6 +44,7 @@ import ObjectiveSpecific from './components/objective-specific/ObjectiveSpecific
 import Result from './components/result/Result';
 import Indicator from './components/indicator/Indicator';
 import Activity from './components/activity/Activity';
+import FormSubProject from './components/subproject/FormSubProject';
 
 const App = () => {
     // Variables state AuthContext
@@ -147,8 +147,8 @@ const App = () => {
                                             const Component = componentMap[menu.menRef];
                                             return Component ? <Route path={`${menu.menRef}`} element={<Component />} key={index} /> : null;
                                         })}
-                                        {menuData.some(menu => menu.menRef === 'projects') && (
-                                            <Route path="form-project/:id?" element={<FormProject />} />
+                                        {menuData.some(menu => menu.menRef === 'subproject') && (
+                                            <Route path="form-subproject/:id?" element={<FormSubProject />} />
                                         )}
                                         {menuData.some(menu => menu.menRef === 'beneficiarie') && (
                                             <Route path="form-beneficiarie/:id?" element={<FormBeneficiarie />} />

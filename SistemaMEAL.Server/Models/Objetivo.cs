@@ -25,6 +25,8 @@ namespace SistemaMEAL.Server.Models
 
         [ForeignKey("SubProyecto")]
         public String? SubProCod { get; set; }
+        public String? SubProNom { get; set; }
+        public String? ProNom { get; set; }
         public List<ObjetivoEspecifico>? ObjetivosEspecificos { get; set; }
     }
 }

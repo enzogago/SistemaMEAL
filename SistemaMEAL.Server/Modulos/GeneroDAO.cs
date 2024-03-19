@@ -157,7 +157,7 @@ namespace SistemaMEAL.Modulos
             return (mensaje, tipoMensaje);
         }
 
-        public (string? message, string? messageType) Eliminar(string genCod)
+        public (string? message, string? messageType) Eliminar(Genero genero)
         {
             string? mensaje = "";
             string? tipoMensaje = "";
@@ -168,7 +168,7 @@ namespace SistemaMEAL.Modulos
                 SqlCommand cmd = new SqlCommand("SP_ELIMINAR_GENERO", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
 
-                cmd.Parameters.AddWithValue("@P_GENCOD", genCod);
+                cmd.Parameters.AddWithValue("@P_GENCOD", genero.GenCod);
                 cmd.Parameters.AddWithValue("@P_USUMOD", "Usuario");
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");

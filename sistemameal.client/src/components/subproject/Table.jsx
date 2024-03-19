@@ -10,14 +10,14 @@ import {
 // Iconos package
 import { FaEdit, FaRegTrashAlt } from 'react-icons/fa';
 // Funciones reusables
-import { Export_Excel_Helper, Export_PDF_Helper } from '../reusable/helper';
+import { Export_Excel_Helper, Export_PDF_Helper, handleDeleteMant } from '../reusable/helper';
 // Componentes
 import { AuthContext } from "../../context/AuthContext";
 import CustomTable from "../reusable/Table/CustomTable";
-import { handleDelete } from "./eventHandlers";
 
 
-const Table = ({data = [], setData, openModal}) => {
+const Table = ({data = [], setData}) => {
+    const navigate = useNavigate();
     // Variables State AuthContext 
     const { authInfo } = useContext(AuthContext);
     const { userPermissions } = authInfo;
@@ -29,29 +29,33 @@ const Table = ({data = [], setData, openModal}) => {
 
      /* TANSTACK */
      const actions = {
-        add: userPermissions.some(permission => permission.perNom === "INSERTAR PROYECTO"),
-        delete: userPermissions.some(permission => permission.perNom === "ELIMINAR PROYECTO"),
-        edit: userPermissions.some(permission => permission.perNom === "MODIFICAR PROYECTO"),
-        pdf: userPermissions.some(permission => permission.perNom === `EXPORTAR PDF PROYECTO`),
-        excel: userPermissions.some(permission => permission.perNom === `EXPORTAR EXCEL PROYECTO`),
+        add: userPermissions.some(permission => permission.perNom === "INSERTAR SUBPROYECTO"),
+        delete: userPermissions.some(permission => permission.perNom === "ELIMINAR SUBPROYECTO"),
+        edit: userPermissions.some(permission => permission.perNom === "MODIFICAR SUBPROYECTO"),
+        pdf: userPermissions.some(permission => permission.perNom === `EXPORTAR PDF SUBPROYECTO`),
+        excel: userPermissions.some(permission => permission.perNom === `EXPORTAR EXCEL SUBPROYECTO`),
     };
     const columns = useMemo(() => {
         let baseColumns = [
             {
                 header: "Nombre",
-                accessorKey: "proNom",
+                accessorKey: "subProNom",
                 cell: ({row}) => (
                     <div style={{textTransform: 'capitalize'}}>
-                        {row.original.proNom.toLowerCase()}
+                        {row.original.subProNom.toLowerCase()}
                     </div>
                 ),
             },
             {
-                header: "Descripción",
-                accessorKey: "proDes",
+                header: "Còdigo SAP",
+                accessorKey: "subProSap",
+            },
+            {
+                header: "Proyecto",
+                accessorKey: "proNom",
                 cell: ({row}) => (
                     <div style={{textTransform: 'capitalize'}}>
-                        {row.original.proDes.toLowerCase()}
+                        {row.original.proNom.toLowerCase()}
                     </div>
                 ),
             },
@@ -64,34 +68,6 @@ const Table = ({data = [], setData, openModal}) => {
                     </div>
                 ),
             },
-            {
-                header: "Periodo Inicio",
-                accessorKey: "proPerAnoIni",
-                cell: ({row}) => {
-                    return (
-                        <div style={{textTransform: 'capitalize'}}>{row.original.proPerAnoIni + ' - ' + row.original.proPerMesIniNombre}</div>
-                    );
-                },
-            },
-            {
-                header: "Periodo Fin",
-                accessorKey: "proPerAnoFin",
-                cell: ({row}) => {
-                    return (
-                        <div style={{textTransform: 'capitalize'}}>{row.original.proPerAnoFin + ' - ' + row.original.proPerMesFinNombre}</div>
-                    );
-                },
-            },
-            {
-                header: "Involucra Sub Acvtidad",
-                accessorKey: "proInvSubAct",
-                cell: ({row}) => {
-                    return (
-                        <>{ (row.original.proInvSubAct.trim() == 'S') ? 'Proyecto con Sub Actividades' : 'Proyecto sin Sub Actividades'}</>
-                    );
-                },
-            },
-            
         ];
 
         if (actions.edit || actions.delete) {
@@ -107,7 +83,7 @@ const Table = ({data = [], setData, openModal}) => {
                                 data-tooltip-id="edit-tooltip" 
                                 data-tooltip-content="Editar" 
                                 className='Large-p_25' 
-                                onClick={() => openModal(row.original)} 
+                                onClick={() => Editar_Sub_Proyecto(row)} 
                             />
                         }
                         {actions.delete && 
@@ -115,7 +91,7 @@ const Table = ({data = [], setData, openModal}) => {
                                 data-tooltip-id="delete-tooltip" 
                                 data-tooltip-content="Eliminar" 
                                 className='Large-p_25' 
-                                onClick={() => handleDelete('Proyecto',row.original, setData)} 
+                                onClick={() => handleDeleteMant('SubProyecto',row.original, setData)} 
                             />
                         }
                     </div>
@@ -126,23 +102,24 @@ const Table = ({data = [], setData, openModal}) => {
         return baseColumns;
     }, [actions]);
 
-    data.forEach(item => {
-        item.proPerMesFinNombre = new Date(2024, item.proPerMesFin - 1).toLocaleString('es-ES', { month: 'long' });
-        item.proPerMesIniNombre = new Date(2024, item.proPerMesIni - 1).toLocaleString('es-ES', { month: 'long' });
-    });
-
+    const Editar_Sub_Proyecto = (row) => {
+        const id = `${row.original.subProAno}${row.original.subProCod}`;
+        console.log(id)
+        // Encripta el ID
+        const ciphertext = CryptoJS.AES.encrypt(id, 'secret key 123').toString();
+        // Codifica la cadena cifrada para que pueda ser incluida de manera segura en una URL
+        const safeCiphertext = btoa(ciphertext).replace('+', '-').replace('/', '_').replace(/=+$/, '');
+        navigate(`/form-subproject/${safeCiphertext}`);
+    }
+    
     const [sorting, setSorting] = useState([]);
     const filteredData = useMemo(() => 
         data.filter(item => 
             searchTags.every(tag => 
-            (item.proAno ? item.proAno.includes(tag.toUpperCase()) : false) ||
-            (item.proCod ? item.proCod.includes(tag.toUpperCase()) : false) ||
+            (item.subProNom ? item.proAno.includes(tag.toUpperCase()) : false) ||
+            (item.subProSap ? item.proCod.includes(tag.toUpperCase()) : false) ||
             (item.proNom ? item.proNom.includes(tag.toUpperCase()) : false) ||
-            (item.proRes ? item.proRes.includes(tag.toUpperCase()) : false) ||
-            (item.proPerAnoFin ? item.proPerAnoFin.includes(tag.toUpperCase()) : false) ||
-            (item.proPerAnoIni ? item.proPerAnoIni.includes(tag.toUpperCase()) : false) ||
-            (item.proPerMesFinNombre ? item.proPerMesFinNombre.toUpperCase().includes(tag.toUpperCase()) : false) ||
-            (item.proPerMesIniNombre ? item.proPerMesIniNombre.toUpperCase().includes(tag.toUpperCase()) : false) 
+            (item.proRes ? item.proRes.includes(tag.toUpperCase()) : false)
             )
         ), [data, searchTags]
     );
@@ -163,14 +140,9 @@ const Table = ({data = [], setData, openModal}) => {
 
     // Preparar los datos
     let dataExport = [...table.options.data]; 
-    // Modificar el campo 'uniInvPer' en los datos
-    dataExport = dataExport.map(item => ({
-        ...item,
-        proInvSubAct: item.proInvSubAct === 'S' ? 'SI' : 'NO',
-    }));
-    const headers = ['AÑO', 'CODIGO', 'NOMBRE', 'RESPONSABLE','AÑO_INICIO','MES_INICIO','AÑO_FIN','MES_FIN','INVOLUCRA_SUB_ACTIVIDAD', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
-    const title = 'PROYECTOS';  // El título de tu archivo
-    const properties = ['proAno', 'proCod', 'proNom', 'proRes', 'proPerAnoIni', 'proPerMesIni', 'proPerAnoFin', 'proPerMesFin', 'proInvSubAct', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
+    const headers = ['NOMBRE', 'CODIGO_SAP', 'PROYECTO', 'RESPONSABLE', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
+    const title = 'SUB_PROYECTOS';  // El título de tu archivo
+    const properties = ['subProNom', 'subProSap', 'proNom', 'proRes', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
     const format = 'a3';  // El tamaño del formato que quieres establecer para el PDF
 
     const Export_Excel = () => {
@@ -208,13 +180,14 @@ const Table = ({data = [], setData, openModal}) => {
 
     return (
         <CustomTable
-            title='Proyectos'
+            title='Sub Proyectos'
             actions={actions} 
             dropdownOpen={dropdownOpen} 
             setDropdownOpen={setDropdownOpen} 
             Export_Excel={Export_Excel} 
             Export_PDF={Export_PDF} 
             table={table}
+            navigatePath='form-subproject'
             resize={false}
             handleInputChange={handleInputChange}
             handleKeyDown={handleKeyDown}
@@ -222,7 +195,6 @@ const Table = ({data = [], setData, openModal}) => {
             removeTag={removeTag}
             searchTags={searchTags}
             setSearchTags={setSearchTags}
-            openModal={openModal}
         />
     )
 }

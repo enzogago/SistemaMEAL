@@ -143,6 +143,7 @@ const MenuUser = () => {
         });
         // Respuesta de todos los menus disponibles en la aplicacion
         const allMenus = await responseAllMenus.json();
+        console.log(allMenus)
         // Marca los menús a los que el usuario tiene acceso
         const markedMenus = allMenus.map(menu => {
           const menuPermissions = markedPermissions.filter(permission => permission.perRef === menu.menRef);

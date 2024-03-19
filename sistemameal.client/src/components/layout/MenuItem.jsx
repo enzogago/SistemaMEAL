@@ -2,7 +2,7 @@ import * as Icons from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 const MenuItem = ({ menu, level }) => {
-    const IconName = Icons[menu.menIco];
+    const IconName = Icons[menu.menIco.trim()];
 
     const toggleActive = (event, level) => {
         event.stopPropagation();
