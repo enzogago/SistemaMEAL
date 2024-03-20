@@ -84,16 +84,16 @@ const Bar = ({showSidebarAndBar}) => {
 
     return (
         <div 
-            className="PowerMas_BarContainer flex ai-center jc-space-between p_5" 
+            className="PowerMas_BarContainer flex ai-center jc-space-between p1" 
             style={{
-                backgroundColor: `${showSidebarAndBar? '#20737b' : '#ffffff'}`,
-                color: `${showSidebarAndBar? '#ffffff' : '#000000'}`,
-                borderBottom:`${showSidebarAndBar? '' : '2px solid #20737b'}`,
+                backgroundColor: `${showSidebarAndBar? '#C6D5D7' : '#ffffff'}`,
+                color: `${showSidebarAndBar? '#000' : '#000000'}`,
+                borderBottom:`${showSidebarAndBar? '' : '2px solid #C6D5D7'}`,
             }}
         >
             {
                 showSidebarAndBar ?
-                <h2 className="Large-f2 Medium-f1_5 Small-f1">¡Hola de nuevo!</h2>
+                <h1 className="Powermas_FontTitle Large-f2_5 Medium-f1_5 Small-f1">Hola de Nuevo</h1>
                 :
                 <img className='Large_1 Medium_10 Phone_6' height="auto"  title="Sistema MEAL Ayuda en Acción" src={Logo} alt="Logo Ayuda En Accion" />
             }

@@ -2,7 +2,6 @@ import { useLocation } from 'react-router-dom';
 import Bar from "../layout/Bar";
 import Sidebar from "../layout/Sidebar";
 import { Tooltip } from 'react-tooltip';
-import Notiflix from 'notiflix';
 
 const Layout = ({ children }) => {
     const location = useLocation();

@@ -8,6 +8,8 @@ import Bar from "./Bar";
 import { fetchData } from "../reusable/helper";
 import { initPhoneInput } from "../monitoring/beneficiarie/eventHandlers";
 import { useRef } from "react";
+import 'intl-tel-input/build/css/intlTelInput.css';
+import 'intl-tel-input/build/js/utils.js';
 
 const FormUser = () => {
     const navigate = useNavigate();

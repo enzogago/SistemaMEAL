@@ -21,7 +21,7 @@ const Paises = ({mapData, beneficiariosData}) => {
 
     const color = d3.scaleOrdinal()
         .domain(Object.keys(poblacionPorPais))
-        .range(["#f0554d", "#ff7a54", "#ffad75"]);
+        .range(["#0A515C", "#068591", "#61A2AA"]);
 
     const ref = useRef();
 
@@ -42,7 +42,7 @@ const Paises = ({mapData, beneficiariosData}) => {
             .attr('width', '100%')
             .attr('height', '100%')
             .attr('viewBox', [0, 0, 975, 610])
-            .style('background', '#1d6776')
+            .style('background', '')
             .style('border-radius', '5px');
         
         const width = ref.current.clientWidth;
@@ -97,9 +97,9 @@ const Paises = ({mapData, beneficiariosData}) => {
             .enter()
             .append('path')
             .attr('d', path)
-            .attr('fill', d => poblacionPorPais[d.properties.name_es.toUpperCase()] ? color(poblacionPorPais[d.properties.name_es.toUpperCase()]) : '#fde7bd')
-            .attr('stroke', 'black')  // Esto establece el color del borde
-            .attr('stroke-width', 1)  // Esto establece el grosor del borde
+            .attr('fill', d => poblacionPorPais[d.properties.name_es.toUpperCase()] ? color(poblacionPorPais[d.properties.name_es.toUpperCase()]) : '#ABA3A3')
+            .attr('stroke', '#fff')  // Esto establece el color del borde
+            .attr('stroke-width', 5)  // Esto establece el grosor del borde
             .on('mouseover', function(event, d) {
                 d3.select(this).style('cursor', 'pointer');
                 if (poblacionPorPais[d.properties.name_es.toUpperCase()]) {
@@ -137,9 +137,9 @@ const Paises = ({mapData, beneficiariosData}) => {
             return path.centroid(d)[1];
         })
         .attr("text-anchor","middle")
-        .attr('font-size', d => poblacionPorPais[d.properties.name_es.toUpperCase()] ? '1.25rem' : '1rem')
-        .attr('font-weight', d => poblacionPorPais[d.properties.name_es.toUpperCase()] ? 'bold' : '')
-        .attr('fill', d => poblacionPorPais[d.properties.name_es.toUpperCase()] ? '#000' : '#000');
+        .attr('font-size', d => poblacionPorPais[d.properties.name_es.toUpperCase()] ? '1.3rem' : '1rem')
+        .attr('font-weight', d => poblacionPorPais[d.properties.name_es.toUpperCase()] ? '' : '')
+        .attr('fill', d => poblacionPorPais[d.properties.name_es.toUpperCase()] ? '#fff' : '#000');
 
 
         function clicked(event, d) {

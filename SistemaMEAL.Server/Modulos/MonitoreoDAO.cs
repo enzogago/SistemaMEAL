@@ -571,7 +571,7 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_METANOPLATEC", meta.MetAnoPlaTec);
                 cmd.Parameters.AddWithValue("@P_METMETPRE", meta.MetMetPre);
                 cmd.Parameters.AddWithValue("@P_METEJEPRE", meta.MetEjePre);
-                cmd.Parameters.AddWithValue("@P_METPORAVAPRE", "00.00");
+                cmd.Parameters.AddWithValue("@P_METPORAVAPRE", meta.MetEjePre);
                 cmd.Parameters.AddWithValue("@P_METMESPLAPRE", "");
                 cmd.Parameters.AddWithValue("@P_METANOPLAPRE", "");
                 cmd.Parameters.AddWithValue("@P_IMPCOD", meta.ImpCod);

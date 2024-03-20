@@ -1,50 +1,53 @@
-import { useContext, useEffect, useState } from 'react';
+import { Suspense, lazy, useContext, useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 // Notiflix Configuracion estilos
 import './js/notiflixConfig';
 // Context
 import { AuthContext } from './context/AuthContext';
+import LoadingComponent from './components/LoadingComponent';
+// import Login from './components/auth/Login';
+// import Layout from './components/router/Layout';
 // Componentes
-import Home from './components/home/Home';
-import Login from './components/auth/Login';
-import PrivateRoute from './components/router/PrivateRoute';
-import PublicRoute from './components/router/PublicRoute';
-import Layout from './components/router/Layout';
-import Monitoring from './components/monitoring/Monitoring';
-import User from './components/user/User';
-import FormUser from './components/user/FormUser';
-import MenuUser from './components/user/MenuUser';
-import PermissionUser from './components/user/PermissionUser';
-import Status from './components/status/Status';
-import IdentityDocumento from './components/document/IdentityDocumento';
-import Charge from './components/charge/Charge';
-import Role from './components/role/Role';
-import Financer from './components/financer/Financer';
-import Implementer from './components/implementer/Implementer';
-import Permission from './components/permission/Permission';
-import TypeValue from './components/type-value/TypeValue';
-import Projects from './components/project/Projects';
-import Dashboard from './components/dashboard/Dashboard';
-import FormGoal from './components/monitoring/goal/FormGoal';
-import Gender from './components/gender/Gender';
-import Nationality from './components/Nationality.jsx/Nationality';
-import Unit from './components/Unit/Unit';
-import NotFound from './components/NotFound';
-import Beneficiarie from './components/beneficiarie/Beneficiarie';
-import FormGoalBeneficiarie from './components/monitoring/beneficiarie/FormGoalBeneficiarie';
-import FormBeneficiarie from './components/beneficiarie/FormBeneficiarie';
-import FormProfile from './components/profile/FormProfile';
-import FormatProject from './components/upload/project/FormatProject';
-import Notiflix from 'notiflix';
-import SaveProject from './components/upload/project/SaveProject';
-import UploadProject from './components/upload/project/UploadProject';
-import Subproject from './components/subproject/Subproject';
-import Objective from './components/objective/Objective';
-import ObjectiveSpecific from './components/objective-specific/ObjectiveSpecific';
-import Result from './components/result/Result';
-import Indicator from './components/indicator/Indicator';
-import Activity from './components/activity/Activity';
-import FormSubProject from './components/subproject/FormSubProject';
+const Home = lazy(() => import('./components/home/Home'));
+const Login = lazy(() => import('./components/auth/Login'));
+const PrivateRoute = lazy(() => import('./components/router/PrivateRoute'));
+const PublicRoute = lazy(() => import('./components/router/PublicRoute'));
+const Layout = lazy(() => import('./components/router/Layout'));
+const Monitoring = lazy(() => import('./components/monitoring/Monitoring'));
+const User = lazy(() => import('./components/user/User'));
+const FormUser = lazy(() => import('./components/user/FormUser'));
+const MenuUser = lazy(() => import('./components/user/MenuUser'));
+const PermissionUser = lazy(() => import('./components/user/PermissionUser'));
+const Status = lazy(() => import('./components/status/Status'));
+const IdentityDocumento = lazy(() => import('./components/document/IdentityDocumento'));
+const Charge = lazy(() => import('./components/charge/Charge'));
+const Role = lazy(() => import('./components/role/Role'));
+const Financer = lazy(() => import('./components/financer/Financer'));
+const Implementer = lazy(() => import('./components/implementer/Implementer'));
+const Permission = lazy(() => import('./components/permission/Permission'));
+const TypeValue = lazy(() => import('./components/type-value/TypeValue'));
+const Projects = lazy(() => import('./components/project/Projects'));
+const Dashboard = lazy(() => import('./components/dashboard/Dashboard'));
+const FormGoal = lazy(() => import('./components/monitoring/goal/FormGoal'));
+const Gender = lazy(() => import('./components/gender/Gender'));
+const Nationality = lazy(() => import('./components/Nationality.jsx/Nationality'));
+const Unit = lazy(() => import('./components/Unit/Unit'));
+const NotFound = lazy(() => import('./components/NotFound'));
+const Beneficiarie = lazy(() => import('./components/beneficiarie/Beneficiarie'));
+const FormGoalBeneficiarie = lazy(() => import('./components/monitoring/beneficiarie/FormGoalBeneficiarie'));
+const FormBeneficiarie = lazy(() => import('./components/beneficiarie/FormBeneficiarie'));
+const FormProfile = lazy(() => import('./components/profile/FormProfile'));
+const FormatProject = lazy(() => import('./components/upload/project/FormatProject'));
+const Notiflix = lazy(() => import('notiflix'));
+const SaveProject = lazy(() => import('./components/upload/project/SaveProject'));
+const UploadProject = lazy(() => import('./components/upload/project/UploadProject'));
+const Subproject = lazy(() => import('./components/subproject/Subproject'));
+const Objective = lazy(() => import('./components/objective/Objective'));
+const ObjectiveSpecific = lazy(() => import('./components/objective-specific/ObjectiveSpecific'));
+const Result = lazy(() => import('./components/result/Result'));
+const Indicator = lazy(() => import('./components/indicator/Indicator'));
+const Activity = lazy(() => import('./components/activity/Activity'));
+const FormSubProject = lazy(() => import('./components/subproject/FormSubProject'));
 
 const App = () => {
     // Variables state AuthContext
@@ -130,56 +133,60 @@ const App = () => {
 
     return (
             <Router>
-                <Routes>
-                    <Route path='/login' element={
-                        <PublicRoute>
-                            <Login />
-                        </PublicRoute>
-                    } />
-                    <Route path='*' element={
-                        <PrivateRoute>
-                            {
-                                isDataLoaded && (Object.keys(userLogged).length > 0) &&
-                                <Layout>
-                                    <Routes>
-                                        <Route index element={defaultRoute} />
-                                        {menuData.map((menu, index) => {
-                                            const Component = componentMap[menu.menRef];
-                                            return Component ? <Route path={`${menu.menRef}`} element={<Component />} key={index} /> : null;
-                                        })}
-                                        {menuData.some(menu => menu.menRef === 'subproject') && (
-                                            <Route path="form-subproject/:id?" element={<FormSubProject />} />
-                                        )}
-                                        {menuData.some(menu => menu.menRef === 'beneficiarie') && (
-                                            <Route path="form-beneficiarie/:id?" element={<FormBeneficiarie />} />
-                                            )}
-                                        {menuData.some(menu => menu.menRef === 'user') && (
-                                            <>
-                                                <Route path="form-user/:id?" element={<FormUser />} />
-                                                <Route path="menu-user/:id" element={<MenuUser />} />
-                                                <Route path="permiso-user/:id" element={<PermissionUser />} />
-                                            </>
-                                        )}
-                                        {menuData.some(menu => menu.menRef === 'upload-project') && (
-                                            <>
-                                                <Route path="subir-proyecto" element={<UploadProject />} />
-                                                <Route path="guardar-proyecto" element={<SaveProject />} />
-                                            </>
-                                        )}
-                                        {menuData.some(menu => menu.menRef === 'monitoring') && (
-                                            <>
-                                                <Route path="form-goal-beneficiarie/:id" element={<FormGoalBeneficiarie />} />
-                                                <Route path="form-goal/:id?" element={<FormGoal />} />
-                                            </>
-                                        )}
-                                        <Route path="form-profile/:id" element={<FormProfile />} />
-                                        <Route path="*" element={<NotFound />} />
-                                    </Routes>
-                                </Layout>
-                            }
-                        </PrivateRoute>
-                    } />
-                </Routes>
+                    <Routes>
+                        <Route path='/login' element={
+                            <PublicRoute>
+                                <Suspense fallback={<LoadingComponent />}>
+                                    <Login />
+                                </Suspense>
+                            </PublicRoute>
+                        } />
+                        <Route path='*' element={
+                            <PrivateRoute>
+                                {
+                                    isDataLoaded && (Object.keys(userLogged).length > 0) &&
+                                    <Suspense fallback={<LoadingComponent />}>
+                                    <Layout>
+                                            <Routes>
+                                                <Route index element={defaultRoute} />
+                                                {menuData.map((menu, index) => {
+                                                    const Component = componentMap[menu.menRef];
+                                                    return Component ? <Route path={`${menu.menRef}`} element={<Component />} key={index} /> : null;
+                                                })}
+                                                {menuData.some(menu => menu.menRef === 'subproject') && (
+                                                    <Route path="form-subproject/:id?" element={<FormSubProject />} />
+                                                )}
+                                                {menuData.some(menu => menu.menRef === 'beneficiarie') && (
+                                                    <Route path="form-beneficiarie/:id?" element={<FormBeneficiarie />} />
+                                                    )}
+                                                {menuData.some(menu => menu.menRef === 'user') && (
+                                                    <>
+                                                        <Route path="form-user/:id?" element={<FormUser />} />
+                                                        <Route path="menu-user/:id" element={<MenuUser />} />
+                                                        <Route path="permiso-user/:id" element={<PermissionUser />} />
+                                                    </>
+                                                )}
+                                                {menuData.some(menu => menu.menRef === 'upload-project') && (
+                                                    <>
+                                                        <Route path="subir-proyecto" element={<UploadProject />} />
+                                                        <Route path="guardar-proyecto" element={<SaveProject />} />
+                                                    </>
+                                                )}
+                                                {menuData.some(menu => menu.menRef === 'monitoring') && (
+                                                    <>
+                                                        <Route path="form-goal-beneficiarie/:id" element={<FormGoalBeneficiarie />} />
+                                                        <Route path="form-goal/:id?" element={<FormGoal />} />
+                                                    </>
+                                                )}
+                                                <Route path="form-profile/:id" element={<FormProfile />} />
+                                                <Route path="*" element={<NotFound />} />
+                                            </Routes>
+                                    </Layout>
+                                    </Suspense>
+                                }
+                            </PrivateRoute>
+                        } />
+                    </Routes>
             </Router>
     );
 };

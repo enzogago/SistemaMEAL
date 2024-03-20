@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
-const DonutChart = ({ percentage, wh, rad }) => {
+const DonutChart = ({ percentage, wh, rad, newId }) => {
     const width = wh;
     const height = wh;
     const radius = Math.min(width, height) / 2;
@@ -9,7 +9,7 @@ const DonutChart = ({ percentage, wh, rad }) => {
 
     useEffect(() => {
         // Limpia el div antes de añadir el nuevo gráfico de rosquilla
-        d3.select("#chart").html("");
+        d3.select(`#${newId}`).html("");
     
         const color = d3.scaleOrdinal()
             .range(["#20737B", "#d3d3d3"]); 
@@ -27,7 +27,7 @@ const DonutChart = ({ percentage, wh, rad }) => {
             .innerRadius(radius - rad)
             .outerRadius(radius);
     
-        const svg = d3.select("#chart")
+        const svg = d3.select(`#${newId}`)
             .append("svg")
             .attr("width", width)
             .attr("height", height)
@@ -52,12 +52,12 @@ const DonutChart = ({ percentage, wh, rad }) => {
         svg.append("text")
             .attr("text-anchor", "middle")
             .attr("dy", ".35em")
-            .style("fill", "#20737B")
+            .style("fill", "#fff")
             .text((percentage == 0.1 ? 0 : percentage) + "%");
 
     }, [percentage]);
 
-    return <div className='Large-f1_5 p_5' id="chart"></div>;
+    return <div className='Large-f1_5 p_5' id={newId}></div>;
 };
 
 export default DonutChart;

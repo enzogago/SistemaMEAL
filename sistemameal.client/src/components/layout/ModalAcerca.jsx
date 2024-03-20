@@ -1,8 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { AuthContext } from '../../context/AuthContext';
 import { StatusContext } from '../../context/StatusContext';
-import { handleSubmit } from '../reusable/helper';
 // sources
 import logo from '../../img/PowerMas_LogoAyudaEnAccion.svg';
 

@@ -34,9 +34,23 @@
     <link rel="stylesheet" href="src/css/PowerMas_Layout.css" />
     <link rel="stylesheet" href="src/css/PowerMas_Reset.css" />
     <link rel="stylesheet" href="src/css/PowerMas_Styles.css" />
+
 </head>
 <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+      <div id="root">
+            <div class="PowerMas_Page_Loading" id="loading-indicator">
+                  <p>Cargando...</p>
+            </div>
+      </div>
+      <script type="module" src="/src/main.jsx"></script>
+      <script>
+            // Este código oculta el indicador de carga una vez que la aplicación de React se ha cargado
+            document.addEventListener('DOMContentLoaded', function() {
+            const loadingIndicator = document.getElementById('loading-indicator');
+            if (loadingIndicator) {
+                        loadingIndicator.style.display = 'none';
+            }
+            });
+      </script>
 </body>
 </html>

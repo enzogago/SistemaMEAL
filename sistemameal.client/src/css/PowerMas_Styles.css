@@ -247,7 +247,7 @@ input::placeholder,select::placeholder{
 }
 
 .PowerMas_Menu {
-	background-color: #F87C56;
+	background-color: #0A515C;
 	height: 100%;
 	box-sizing: border-box;
 }
@@ -262,7 +262,7 @@ input::placeholder,select::placeholder{
 }
 
 .PowerMas_MenuContainer::-webkit-scrollbar-track {
-	background: #F87C56;
+	background: #0A515C;
 }
 
 .PowerMas_MenuContainer::-webkit-scrollbar-thumb {
@@ -373,7 +373,7 @@ input::placeholder,select::placeholder{
 	cursor: pointer;
 }
 .PowerMas_Submenu div.menu-item:hover, .PowerMas_MenuOptions a:hover, .PowerMas_MenuOptions > div .menu-item:hover{
-	background-color: #e47e5f;
+	color: #FFC658;
 }
 
 .PowerMas_MenuOptions > div {
@@ -644,14 +644,25 @@ input::placeholder,select::placeholder{
 }
 
 .PowerMas_KPIRow {
+	padding: 0.5rem;
 	display: flex;
-	justify-content: space-between;
+	flex-direction: column;
 	align-items: center;
+	justify-content: center;
 	border-radius: 5px;
-	background-color: #f7f7f7;
-	border: 1px solid #cfcfcf;
+	background-color: #85A9AD;
+	border: 1px solid #006776;
+	width: 20%;
+	gap: 0.5rem;
+}
+.PowerMas_KPIRow > p {
+	text-align: center;
+	color: #FFFFFF;
 }
 
+.PowerMas_KPIRow > span {
+	color: #195C66;
+}
 .PowerMas_TableHome {
 	width: 100%;
 	table-layout: fixed;
@@ -1428,19 +1439,23 @@ textarea {
 }
 
 .PowerMas_Buttom_Map{
-	border: 1px solid #fff;
+	border: 1px solid #F7775A;
 	background-color: transparent;
-	color: #fff;
+	color: #F7775A;
 	transition: all 0.2s ease-in;
 	border-radius: 5px;
+	font-size: 0.75rem;
+	padding: 0.5rem 1rem;
 }
 .PowerMas_Buttom_Map:hover{
-	color: #ffc459;
-	border: 1px solid #ffc459;
+	color: #fff;
+	border: 1px solid #F7775A;
+	background-color: #F7775A;
 }
 .PowerMas_Buttom_Map_Active{
-	color: #ffc459;
-	border: 1px solid #ffc459;
+	color: #fff;
+	border: 1px solid #F7775A;
+	background-color: #F7775A;
 }
 
 .PowerMas_Buttom_Primary{
@@ -1898,4 +1913,25 @@ textarea {
 .PowerMas_Totales_Monitoreo td:first-child{
 	color: #000;
 	font-weight: bold;
+}
+
+
+.PowerMas_Page_Loading{
+	background-color: #F87C56;
+	width: 100vw;
+	height: 100vh;
+	transition: all 0.3s ease-in;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.PowerMas_Page_Loading > p{
+	font-size: 2rem;
+	color: #fff;
+}
+
+.PowerMas_Resume_Home{
+	border: 1px solid #85A9AD;
+	border-radius: 5px;
 }
