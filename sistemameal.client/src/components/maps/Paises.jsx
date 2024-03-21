@@ -4,7 +4,6 @@ import d3Tip from 'd3-tip';
 import data from './geojson/paises.json';
 
 const Paises = ({mapData, beneficiariosData}) => {
-    console.log(beneficiariosData)
     const combinedData = mapData.map(ubicacion => {
         const beneficiario = beneficiariosData.find(b => b.ubiNom === ubicacion.ubiNom);
         return {
@@ -14,14 +13,13 @@ const Paises = ({mapData, beneficiariosData}) => {
     });
 
     const poblacionPorPais = combinedData.reduce((obj, item) => {
-        console.log(obj)
         obj[item.ubiNom] = item;  // Aquí puedes seleccionar las características que quieres mostrar
         return obj;
     }, {});
 
     const color = d3.scaleOrdinal()
         .domain(Object.keys(poblacionPorPais))
-        .range(["#0A515C", "#068591", "#61A2AA"]);
+        .range(["#f0554d", "#ff7a54", "#ffad75"]);
 
     const ref = useRef();
 
@@ -42,7 +40,7 @@ const Paises = ({mapData, beneficiariosData}) => {
             .attr('width', '100%')
             .attr('height', '100%')
             .attr('viewBox', [0, 0, 975, 610])
-            .style('background', '')
+            .style('background', '#C2D4D6')
             .style('border-radius', '5px');
         
         const width = ref.current.clientWidth;
@@ -74,7 +72,7 @@ const Paises = ({mapData, beneficiariosData}) => {
                 return `
                 <div style="z-index: 100;">
                     <p class="center Large-f1_25 bold">${d.name}</p>
-                    <p>Beneficiarios: ${cantidad} </p>
+                    <p>Beneficiarios: ${Number(cantidad).toLocaleString()} </p>
                     <p>Atenciones: ${metEjeTec.toLocaleString()}</p>
                     <hr style="border:1px solid #fff;margin: 0.5rem 0" />
                     <p class="" style="text-decoration: underline;">Técnico</p>
@@ -97,9 +95,9 @@ const Paises = ({mapData, beneficiariosData}) => {
             .enter()
             .append('path')
             .attr('d', path)
-            .attr('fill', d => poblacionPorPais[d.properties.name_es.toUpperCase()] ? color(poblacionPorPais[d.properties.name_es.toUpperCase()]) : '#ABA3A3')
-            .attr('stroke', '#fff')  // Esto establece el color del borde
-            .attr('stroke-width', 5)  // Esto establece el grosor del borde
+            .attr('fill', d => poblacionPorPais[d.properties.name_es.toUpperCase()] ? color(poblacionPorPais[d.properties.name_es.toUpperCase()]) : '#fde7bd ')
+            .attr('stroke', '#000')  // Esto establece el color del borde
+            .attr('stroke-width', 1)  // Esto establece el grosor del borde
             .on('mouseover', function(event, d) {
                 d3.select(this).style('cursor', 'pointer');
                 if (poblacionPorPais[d.properties.name_es.toUpperCase()]) {
@@ -138,8 +136,8 @@ const Paises = ({mapData, beneficiariosData}) => {
         })
         .attr("text-anchor","middle")
         .attr('font-size', d => poblacionPorPais[d.properties.name_es.toUpperCase()] ? '1.3rem' : '1rem')
-        .attr('font-weight', d => poblacionPorPais[d.properties.name_es.toUpperCase()] ? '' : '')
-        .attr('fill', d => poblacionPorPais[d.properties.name_es.toUpperCase()] ? '#fff' : '#000');
+        .attr('font-weight', d => poblacionPorPais[d.properties.name_es.toUpperCase()] ? 'bold' : '')
+        .attr('fill', d => poblacionPorPais[d.properties.name_es.toUpperCase()] ? '#000' : '#000');
 
 
         function clicked(event, d) {

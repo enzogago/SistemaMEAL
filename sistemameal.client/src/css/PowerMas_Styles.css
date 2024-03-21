@@ -473,6 +473,7 @@ input::placeholder,select::placeholder{
 	border-radius: 50%;
 	background: #277980; /* Reemplaza esto con la imagen de perfil */
 	overflow: hidden;
+	border: 2px solid #ADA9A9;
 }
 .PowerMas_ProfilePicture img {
     height: auto;
@@ -825,7 +826,7 @@ input::placeholder,select::placeholder{
 
 textarea {
 	border-radius: 5px;
-	min-height: 6rem;
+	min-height: 3rem;
 }
 
 .PowerMas_MainNewProject textarea:focus {
@@ -1266,12 +1267,8 @@ textarea {
 .PowerMas_FormStatus input[type=text],.PowerMas_FormStatus input[type=password]{
 	width: 100%;
 	border-radius: 5px;
-	padding: 0.5rem;
 	border: 1px solid #FFDED7;
 	outline: none;
-}
-.PowerMas_StatusSubmit{
-	margin-top: 1.5rem;
 }
 .PowerMas_StatusSubmit input, .PowerMas_StatusSubmit button{
 	padding: 0.5rem 1rem;
@@ -1439,22 +1436,21 @@ textarea {
 }
 
 .PowerMas_Buttom_Map{
-	border: 1px solid #F7775A;
+	border: 1px solid #000;
 	background-color: transparent;
-	color: #F7775A;
+	color: #000;
 	transition: all 0.2s ease-in;
 	border-radius: 5px;
 	font-size: 0.75rem;
 	padding: 0.5rem 1rem;
 }
 .PowerMas_Buttom_Map:hover{
-	color: #fff;
-	border: 1px solid #F7775A;
-	background-color: #F7775A;
+	color: #F7775A;
+	border: 1px solid #000;
 }
 .PowerMas_Buttom_Map_Active{
-	color: #fff;
-	border: 1px solid #F7775A;
+	color: #000;
+	border: 1px solid #000;
 	background-color: #F7775A;
 }
 

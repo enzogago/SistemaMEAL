@@ -1,21 +1,19 @@
 import { useEffect, useState } from 'react';
 // Componentes
 import Table from '../reusable/Table/Table';
-import Modal from '../reusable/ModalForm/Modal';
 // Fetch Get
 import { fetchData } from '../reusable/helper';
+import Modal from './Modal';
 
 const Objective = () => {
     // States locales
     const [ data, setData ] = useState([])
-    const [ select, setSelect ] = useState([]) // Nuevo caso
     const [ modalVisible, setModalVisible ] = useState(false)
     const [ estadoEditado, setEstadoEditado ] = useState(false)
 
-    const controllerSelect = 'SubProyecto';
     // Definir controller y fieldMapping como variables
     const controller = 'Objetivo';
-    const fieldMapping = { codigo: 'objNum', nombre: 'objNom', 'Subproyecto': 'subProNom', 'Proyecto': 'proNom' };
+    const fieldMapping = { codigo: 'objNum', nombre: 'objNom', 'Subproyecto': 'subProNomSap', 'Proyecto': 'proNom', 'Responsable': 'proRes','Periodo Inicio':'proPerIni','Periodo Fin': 'proPerFin' };
   
     // Toggle Modal
     const openModal = (estado = null) => {
@@ -36,15 +34,7 @@ const Objective = () => {
     // Cargar los registros
     useEffect(() => {
         fetchData(controller, setData);
-        fetchData(controllerSelect, setSelect);
     }, []);
-
-    // En tu componente principal, defines el mapeo
-    const selectMapping = {
-        value: item => JSON.stringify({ subProCod: item.subProCod, subProAno: item.subProAno }),
-        display: item => item.subProNom.toLowerCase(),
-        properties: ['subProCod', 'subProAno'] // Aquí defines las propiedades que quieres extraer
-    };
 
     return (
         <>
@@ -59,17 +49,11 @@ const Objective = () => {
             />
             <Modal
                 modalVisible={modalVisible}
-                setModalVisible={setModalVisible}
                 estadoEditado={estadoEditado}
                 closeModal={closeModal} 
                 setData={setData}
-                fieldMapping={fieldMapping}
-                controller={controller}
                 title='Objetivo'
-                controllerSelect={controllerSelect}
-                select={select}
-                selectMapping={selectMapping}
-            />
+            />  
         </>
     );
 };

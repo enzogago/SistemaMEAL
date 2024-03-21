@@ -45,7 +45,7 @@ const DivergingBarChart = ({ rangeData, id, maleColor, femaleColor }) => {
 
         const x = d3.scaleLinear()
             .domain([0, d3.max([...maleData, ...femaleData], d => d.count)])
-            .range([0, width / 2]);
+            .range([0, width / 2.5]);
 
         const y = d3.scaleBand()
             .domain(d3.range(Math.max(maleData.length, femaleData.length)))
@@ -94,7 +94,7 @@ const DivergingBarChart = ({ rangeData, id, maleColor, femaleColor }) => {
             .attr("y", (d, i) => y(i) + y.bandwidth() / 2) // Usa el índice en lugar de d.age
             .attr("text-anchor", "end")
             .attr("dy", "0.35em")
-            .text(d => d.count);
+            .text(d => d.count.toLocaleString());
             
             svg.append("g")
             .selectAll("text")
@@ -103,7 +103,7 @@ const DivergingBarChart = ({ rangeData, id, maleColor, femaleColor }) => {
             .attr("x", d => width / 2 + x(d.count) + margin.left/2 + 5)
             .attr("y", (d, i) => y(i) + y.bandwidth() / 2) // Usa el índice en lugar de d.age
             .attr("dy", "0.35em")
-            .text(d => d.count);
+            .text(d => d.count.toLocaleString());
             
     }, [rangeData]);
 

@@ -3,8 +3,8 @@ import * as d3 from 'd3';
 
 const PieChart = ({ data, id }) => {
     const colorMapping = {
-        "MASCULINO": "#FFE8D9",
-        "FEMENINO": "#E5554F"
+        "MASCULINO": "#E5554F",
+        "FEMENINO": "#FFE8D9"
     };
     const ref = useRef();
 
@@ -15,7 +15,6 @@ const PieChart = ({ data, id }) => {
 
         // Calcula el total de todos los valores
         const total = data.reduce((sum, d) => sum + Number(d.value), 0);
-        console.log(total)
         // Limpia el div antes de añadir el nuevo gráfico de pastel
         d3.select(`#${id}`).html("");
     
@@ -47,7 +46,7 @@ const PieChart = ({ data, id }) => {
         const path = svg.selectAll("path")
             .data(pie(data))
             .enter().append("path")
-            .attr("fill", (d, i) => color(i))
+            .attr("fill", d => color(d.data.name)) // Utiliza el nombre de la categoría para seleccionar el color
             .attr("d", arc)
             .on("mouseenter", onMouseEnter)
             .on("mouseleave", onMouseLeave);
@@ -77,7 +76,7 @@ const PieChart = ({ data, id }) => {
                     <span style="text-transform: capitalize;">${d.data.name.toLowerCase()}</span>
                 </div>
                 <div class="tooltip-value">
-                    <span>${d.data.value.toLocaleString()}</span>
+                    <span>${Number(d.data.value).toLocaleString()}</span>
                 </div>
             `);
         }

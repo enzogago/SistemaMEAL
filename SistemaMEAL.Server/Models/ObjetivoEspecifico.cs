@@ -28,8 +28,16 @@ namespace SistemaMEAL.Server.Models
         public String? ObjCod { get; set; }
         public String? ObjNum { get; set; }
         public String? ObjNom { get; set; }
+        public String? SubProAno { get; set; }
+        public String? SubProCod { get; set; }
         public String? SubProNom { get; set; }
+        public String? SubProSap { get; set; }
         public String? ProNom { get; set; }
+        public String? ProRes { get; set; }
+        public String? ProPerAnoIni { get; set; }
+        public String? ProPerMesIni { get; set; }
+        public String? ProPerAnoFin { get; set; }
+        public String? ProPerMesFin { get; set; }
         public List<Resultado>? Resultados { get; set; }
     }
 }

@@ -15,7 +15,7 @@ const Activity = () => {
     const controllerSelect = 'Resultado';
     // Definir controller y fieldMapping como variables
     const controller = 'Actividad';
-    const fieldMapping = { codigo: 'actNum', nombre: 'actNom' };
+    const fieldMapping = { codigo: 'actNum', nombre: 'actNom', 'Resultado': 'resNom', 'Objetivo Específico': 'objEspNom', 'Objetivo': 'objNom', 'Subproyecto': 'subProNomSap', 'Proyecto': 'proNom', 'Responsable': 'proRes','Periodo Inicio':'proPerIni','Periodo Fin': 'proPerFin' };
     const { codigo, ...restFieldMapping } = fieldMapping;
   
     // Toggle Modal
@@ -40,13 +40,6 @@ const Activity = () => {
         fetchData(controllerSelect, setSelect);
     }, []);
 
-    // En tu componente principal, defines el mapeo
-    const selectMapping = {
-        value: item => JSON.stringify({ resCod: item.resCod, resAno: item.resAno }),
-        display: item => item.resNom.toLowerCase(),
-        properties: ['resCod', 'resAno'] // Aquí defines las propiedades que quieres extraer
-    };
-
     return (
         <>
             <Table 
@@ -58,7 +51,7 @@ const Activity = () => {
                 title='Actividades'
                 resize={false}
             />
-            <Modal
+            {/* <Modal
                 modalVisible={modalVisible}
                 setModalVisible={setModalVisible}
                 estadoEditado={estadoEditado}
@@ -71,7 +64,7 @@ const Activity = () => {
                 controllerSelect={controllerSelect}
                 select={select}
                 selectMapping={selectMapping}
-            />
+            /> */}
         </>
     );
 };

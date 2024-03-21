@@ -15,7 +15,7 @@ import { AuthContext } from '../../../context/AuthContext';
 import { Export_Excel_Helper, Export_PDF_Helper, handleDeleteMant, orthographicCorrections } from '../helper';
 import CustomTable from './CustomTable';
 
-const Table = ({ data, openModal, setData, controller, fieldMapping, title, resize }) => {
+const Table = ({ data, openModal, setData, controller, fieldMapping, title, resize, isLargePagination=false }) => {
     console.log(data)
     // Variables State AuthContext 
     const { authInfo } = useContext(AuthContext);
@@ -50,6 +50,94 @@ const Table = ({ data, openModal, setData, controller, fieldMapping, title, resi
                                 {text}
                             </div>
                         );
+                    } else if (field === 'Objetivo') {
+                        const text = row.original.objNum + ' - ' + row.original.objNom.charAt(0).toUpperCase() + row.original.objNom.slice(1).toLowerCase();
+                        const shortText = text.length > 60 ? text.substring(0, 60) + '...' : text;
+                        if(text.length >= 60){
+                            return (
+                                <>
+                                    <span 
+                                        data-tooltip-id="info-tooltip" 
+                                        data-tooltip-content={text} 
+                                    >{shortText}</span>
+                                </>
+                            );
+                        } else {
+                            return text;
+                        }
+                    } else if (field === 'Objetivo Específico') {
+                        const text = row.original.objEspNum + ' - ' + row.original.objEspNom.charAt(0).toUpperCase() + row.original.objEspNom.slice(1).toLowerCase();
+                        const shortText = text.length > 60 ? text.substring(0, 60) + '...' : text;
+                        if(text.length >= 60){
+                            return (
+                                <>
+                                    <span 
+                                        data-tooltip-id="info-tooltip" 
+                                        data-tooltip-content={text} 
+                                    >{shortText}</span>
+                                </>
+                            );
+                        } else {
+                            return text;
+                        }
+                    } else if (field === 'Resultado') {
+                        const text = row.original.resNum + ' - ' + row.original.resNom.charAt(0).toUpperCase() + row.original.resNom.slice(1).toLowerCase();
+                        const shortText = text.length > 60 ? text.substring(0, 60) + '...' : text;
+                        if(text.length >= 60){
+                            return (
+                                <>
+                                    <span 
+                                        data-tooltip-id="info-tooltip" 
+                                        data-tooltip-content={text} 
+                                    >{shortText}</span>
+                                </>
+                            );
+                        } else {
+                            return text;
+                        }
+                    } else if (field === 'Actividad') {
+                        if (row.original.actNom === 'NA') {
+                            return '';
+                        } else {
+                            const text = row.original.actNum + ' - ' + row.original.actNom.charAt(0).toUpperCase() + row.original.actNom.slice(1).toLowerCase();
+                            const shortText = text.length > 60 ? text.substring(0, 60) + '...' : text;
+                            if(text.length >= 60){
+                                return (
+                                    <>
+                                        <span 
+                                            data-tooltip-id="info-tooltip" 
+                                            data-tooltip-content={text} 
+                                        >{shortText}</span>
+                                    </>
+                                );
+                            } else {
+                                return text;
+                            }
+                        }
+                    } else if (field === 'Subproyecto') {
+                        return row.original.subProSap + ' - ' + row.original.subProNom.charAt(0).toUpperCase() + row.original.subProNom.slice(1).toLowerCase();
+                    } else if (field === 'Periodo Inicio') {
+                        return <div style={{textTransform: 'capitalize'}}>{row.original.proPerMesIniNombre + ' - ' +  row.original.proPerAnoIni }</div>;
+                    } else if (field === 'Periodo Fin') {
+                        return <div style={{textTransform: 'capitalize'}}>{row.original.proPerMesFinNombre + ' - ' +  row.original.proPerAnoFin }</div>;
+                    } else if (field === 'Responsable') {
+                        return <div style={{textTransform: 'capitalize'}}>{ text.toLowerCase() }</div>;
+                    } else if (field === 'Tipo de Indicador') {
+                        let indicador = '';
+                        if (row.original.indTipInd === 'IRE') {
+                            indicador = 'Indicador de Resultado';
+                        } else if(row.original.indTipInd === 'IAC') {
+                            indicador = 'Indicador de Actividad';
+                        } else if(row.original.indTipInd === 'IOB') {
+                            indicador = 'Indicador de Objetivo';
+                        } else if(row.original.indTipInd === 'IOE') {
+                            indicador = 'Indicador de Objetivo Específico';
+                        } else if(row.original.indTipInd === 'ISA') {
+                            indicador = 'Indicador de Sub Actividad';
+                        }
+                        return <div style={{textTransform: 'capitalize'}}>{ indicador }</div>;
+                    } else if (field === 'codigo') {
+                        return <div>{ text }</div>;
                     } else {
                         text = text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
                         const shortText = text.length > 60 ? text.substring(0, 60) + '...' : text;
@@ -102,19 +190,28 @@ const Table = ({ data, openModal, setData, controller, fieldMapping, title, resi
         return baseColumns;
     }, [actions]);
 
+    data.forEach(item => {
+        item.proPerMesFinNombre = new Date(2024, item.proPerMesFin - 1).toLocaleString('es-ES', { month: 'long' });
+        item.proPerMesIniNombre = new Date(2024, item.proPerMesIni - 1).toLocaleString('es-ES', { month: 'long' });
+    });
+
     const [sorting, setSorting] = useState([]);
     const filteredData = useMemo(() => 
         data.filter(item => 
-            Object.keys(fieldMapping).some(field => {
-                let value = item[fieldMapping[field]].toUpperCase();
+            Object.keys(item).some(field => {
+                let value = item[field].toUpperCase();
                 if (field === 'involucra') {
                     value = value === 'S' ? 'SI' : 'NO';
                 }
                 return value.includes(searchFilter.toUpperCase());
             })
-        ), [data, searchFilter, fieldMapping]
+        ), [data, searchFilter]
     );
 
+    const [pagination, setPagination] = useState({
+        pageIndex: 0, //initial page index
+        pageSize: 100, //default page size
+      });
 
     const table = useReactTable({
         data: filteredData,
@@ -122,8 +219,10 @@ const Table = ({ data, openModal, setData, controller, fieldMapping, title, resi
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
+        onPaginationChange: setPagination,
         state: {
-            sorting
+            sorting,
+            pagination,
         },
         onSortingChange: setSorting,
         columnResizeMode: "onChange"
@@ -135,7 +234,7 @@ const Table = ({ data, openModal, setData, controller, fieldMapping, title, resi
     const titleExport = controller.toUpperCase();  // El título de tu archivo
     const headers = Object.keys(fieldMapping).map(field => field.toUpperCase()).concat(['USUARIO_MODIFICADO', 'FECHA_MODIFICADO']);
     const properties = Object.values(fieldMapping).concat(['usuMod', 'fecMod']);
-    const format = 'a4';  // El tamaño del formato que quieres establecer para el PDF
+    const format = 'a3';  // El tamaño del formato que quieres establecer para el PDF
 
     const Export_Excel = () => {
         // Luego puedes llamar a la función Export_Excel_Helper de esta manera:
@@ -163,6 +262,7 @@ const Table = ({ data, openModal, setData, controller, fieldMapping, title, resi
             Export_Excel={Export_Excel} 
             Export_PDF={Export_PDF} 
             table={table}
+            isLargePagination={isLargePagination}
         />
     );
 }

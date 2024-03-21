@@ -150,8 +150,19 @@ export const handleSubmit = async (controller, objetoEditado, objeto, setRegistr
     }
 };
 
-export const handleSubmitMant = async (controller, objetoEditado, objeto, setRegistros, setModalVisible, closeModalAndReset) => {
+export const handleSubmitMant = async (controller, objetoEditado, objeto, setRegistros, closeModalAndReset) => {
     const method = objetoEditado ? 'PUT' : 'POST';
+
+    let newData = {};
+    for (let key in objeto) {
+        if (typeof objeto[key] === 'string') {
+            // Convierte cada cadena a minúsculas
+            newData[key] = objeto[key].toUpperCase();
+        } else {
+            // Mantiene los valores no string tal como están
+            newData[key] = objeto[key];
+        }
+    }
     
     try {
         Notiflix.Loading.pulse();
@@ -162,8 +173,9 @@ export const handleSubmitMant = async (controller, objetoEditado, objeto, setReg
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify(objeto),
+            body: JSON.stringify(newData),
         });
+        console.log(response)
         const data = await response.json();
         if (!response.ok) {
             Notiflix.Notify.failure(data.message);

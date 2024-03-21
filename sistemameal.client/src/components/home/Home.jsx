@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useState } from 'react';
+import { Fragment, Suspense, lazy, useEffect, useState } from 'react';
 import { FaSearch } from 'react-icons/fa';
 import Notiflix from 'notiflix';
 import Table from './Table';
@@ -189,7 +189,7 @@ const Home = () => {
                 const data = await response.json();
                 
                 // Convierte el objeto a un array para usarlo en el gráfico
-                const docData = data.map(item => ({ name: item.docIdeAbr, value: item.cantidad }));
+                const docData = data.map(item => ({ name: item.docIdeAbr, value: item.cantidad, tip: item.docIdeNom }));
 
                 setDocData(docData);
             } catch (error) {
@@ -395,26 +395,26 @@ const Home = () => {
                     {/* <h2 className="Large-m_75 Large-f1_5 Powermas_FontTitle">Principales KPI</h2> */}
                     <div className="PowerMas_KPIRow Large-f1_25 Large-p1 Medium-p_5">
                         <p className=" f1_25">Atenciones brindadas</p>
-                        <span className='f2'>{totalAtenciones.toLocaleString()}000</span>
+                        <span className='f2'>{totalAtenciones.toLocaleString()}</span>
                     </div>
                     <div className="PowerMas_KPIRow Large-f1_25 Large-p1 Medium-p_5">
                         <p className=" f1_25">Beneficiarios totales</p>
-                        <span className='f2'>{totalBeneficiarios.toLocaleString()}000</span>
+                        <span className='f2'>{Number(totalBeneficiarios).toLocaleString()}</span>
                     </div>
                     <div className="PowerMas_KPIRow Large-f1_25 Large-p1 Medium-p_5">
                         <p className=" f1_25">Beneficiarios recurrentes</p>
-                        <span className='f2'>{totalBeneficiarios.toLocaleString()}000</span>
+                        <span className='f2'>{0}</span>
                     </div>
                     <div className="PowerMas_KPIRow gap_3 flex-column Large-f1_25">
                         <p className=" f1_25" style={{whiteSpace: 'nowrap'}}>Avance Presupuesto</p>
                         <Suspense fallback={<div>Cargando...</div>}>
-                            <DonutChart percentage={90} wh={140} rad={20} newId={'Dona_Presupuesto'} />
+                            <DonutChart percentage={avanceTecnico} wh={140} rad={20} newId={'Dona_Presupuesto'} />
                         </Suspense>
                     </div>
                     <div className="PowerMas_KPIRow gap_3 flex-column Large-f1_25">
                         <p className=" f1_25">Avance Técnico</p>
                         <Suspense fallback={<div>Cargando...</div>}>
-                            <DonutChart percentage={80} wh={140} rad={20} newId={'Dona_Tecnico'} />
+                            <DonutChart percentage={avanceTecnico} wh={140} rad={20} newId={'Dona_Tecnico'} />
                         </Suspense>
                     </div>
                 </div>
@@ -491,8 +491,6 @@ const Home = () => {
                     {recents.map((item, index) => {
                         // Crea un objeto Date a partir de la cadena de fecha y hora
                         const date = new Date(item.logFecIng);
-                        console.log(index+1)
-                        console.log(recents.length)
                         // Formatea la fecha y la hora
                         const day = String(date.getDate()).padStart(2, '0');
                         const month = String(date.getMonth() + 1).padStart(2, '0'); // Los meses en JavaScript van de 0 a 11, así que añadimos 1
@@ -507,8 +505,8 @@ const Home = () => {
                         let shortText = text.length > 50? text.substring(0, 50) + '...' : text;
 
                         return (
-                            <>
-                                <div className="flex ai-center gap-1" key={index}>
+                            <Fragment  key={index}>
+                                <div className="flex ai-center gap-1">
                                     <div>
                                         <div className="PowerMas_ProfilePicture2 m_25" style={{width: '40px', height: '40px', border: '1px solid #000000'}}>
                                             <img src={masculino} alt="Descripción de la imagen" />
@@ -535,7 +533,7 @@ const Home = () => {
                                     (recents.length != (index+1)) &&
                                     <hr className='PowerMas_Hr m0' />
                                 }
-                            </>
+                            </Fragment>
                         );
                     })}
                 </div>

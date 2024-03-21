@@ -32,6 +32,18 @@ namespace SistemaMEAL.Server.Controllers
             return Ok(data);
         }
 
+        [HttpGet("subproyecto/{subProAno}/{subProCod}")]
+        public dynamic BuscarObjetivosPorSubproyecto(string subProAno, string subProCod )
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var data = _objetivos.Buscar(subProAno, subProCod);
+            return Ok(data);
+        }
+
         [HttpPost]
         public dynamic Insertar(Objetivo objetivo)
         {

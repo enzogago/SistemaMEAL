@@ -59,22 +59,23 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
     }, [estadoEditado, reset]);
 
 
+    const currentYear = new Date().getFullYear();
     
     return (
         <div className={` PowerMas_Modal ${modalVisible ? 'show' : ''}`}>
             <div className="PowerMas_ModalContent" style={{width: '40%'}}>
                 <span className="PowerMas_CloseModal" onClick={closeModalAndReset}>×</span>
                 <h2 className="PowerMas_Title_Modal center f1_5">{estadoEditado ? 'Editar' : 'Nuevo'} {title}</h2>
-                <form className='Large-f1 PowerMas_FormStatus flex flex-column gap_5' onSubmit={validateForm(onSubmit)}>
+                <form className='Large-f1 PowerMas_FormStatus flex flex-column gap_3' onSubmit={validateForm(onSubmit)}>
                     <div className="">
                         <label htmlFor="proNom" className="">
-                            Nombre
+                            Nombre del proyecto
                         </label>
                         <input type="text"
                             id="proNom"
                             style={{textTransform: 'capitalize'}}
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.proNom || isSubmitted ? (errors.proNom ? 'invalid' : 'valid') : ''}`} 
-                            placeholder="Enzo Fabricio"
+                            placeholder="Movilidad Humana"
                             autoComplete="disabled"
                             {...register('proNom', { 
                                 required: 'El campo es requerido',
@@ -91,12 +92,12 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                     </div>
                     <div className="">
                         <label htmlFor="proDes" className="">
-                            Descripción
+                            Descripción del proyecto
                         </label>
                         <textarea
                             id="proDes"
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.proDes || isSubmitted ? (errors.proDes ? 'invalid' : 'valid') : ''}`} 
-                            placeholder="Enzo Fabricio"
+                            placeholder="Descripción del proyecto"
                             autoComplete="disabled"
                             style={{textTransform: 'capitalize'}}
                             {...register('proDes', { 
@@ -113,16 +114,20 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                     </div>
                     <div className="">
                         <label htmlFor="proRes" className="">
-                            Responsable
+                            Responsable del proyecto
                         </label>
                         <input type="text"
                             id="proRes"
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.proRes || isSubmitted ? (errors.proRes ? 'invalid' : 'valid') : ''}`} 
-                            placeholder="Enzo Fabricio"
+                            placeholder="Andres Eras"
                             autoComplete="disabled"
                             style={{textTransform: 'capitalize'}}
                             {...register('proRes', { 
                                 required: 'El campo es requerido',
+                                pattern: {
+                                    value: /^[A-Za-zñÑáéíóúÁÉÍÓÚüÜ/\s-_]+$/,
+                                    message: 'Por favor, introduce solo letras y espacios',
+                                },
                                 minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
                             })} 
                         />
@@ -136,7 +141,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                     </div>
                     <div className="">
                         <label className="block f1">
-                            Involucra Sub Actividad:
+                            ¿El proyecto involucra sub actividades?
                         </label>
                         <div className="flex gap-1">
                             <div className="flex gap_5">
@@ -171,7 +176,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                     <div className="flex gap-1">
                         <div className="Large_6 ">
                             <label htmlFor="proPerMesIni" className="">
-                                Mes:
+                                Mes Inicio:
                             </label>
                             <select 
                                 className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.proPerMesIni || isSubmitted ? (errors.proPerMesIni ? 'invalid' : 'valid') : ''}`} 
@@ -204,7 +209,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                         </div>
                         <div className="Large_6 ">
                             <label htmlFor="proPerAnoIni" className="">
-                                Año:
+                                Año Inicio:
                             </label>
                             <input
                                 id="proPerAnoIni"
@@ -220,13 +225,18 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                                 }}
                                 {...register('proPerAnoIni', { 
                                     required: 'El campo es requerido',
+                                    validate: value => {
+                                        if (value < currentYear - 1 || value > currentYear + 10) {
+                                            return 'El año debe estar entre ' + (currentYear - 1) + ' y ' + (currentYear + 10);
+                                        }
+                                    },
                                     minLength: {
                                         value: 4,
-                                        message: 'El campo debe tener al menos 6 dígitos'
+                                        message: 'El campo debe tener al menos 4 dígitos'
                                     },
                                     maxLength: {
                                         value: 4,
-                                        message: 'El campo no debe tener más de 10 dígitos'
+                                        message: 'El campo no debe tener más de 4 dígitos'
                                     },
                                     pattern: {
                                         value: /^[0-9]*$/,
@@ -247,7 +257,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                     <div className="flex gap-1">
                         <div className="Large_6 ">
                             <label htmlFor="proPerMesFin" className="">
-                                Mes:
+                                Mes Fin:
                             </label>
                             <select 
                                 className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.proPerMesFin || isSubmitted ? (errors.proPerMesFin ? 'invalid' : 'valid') : ''}`} 
@@ -280,7 +290,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                         </div>
                         <div className="Large_6 ">
                             <label htmlFor="proPerAnoFin" className="">
-                                Año:
+                                Año Fin:
                             </label>
                             <input
                                 id="proPerAnoFin"
@@ -296,13 +306,18 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                                 }}
                                 {...register('proPerAnoFin', { 
                                     required: 'El campo es requerido',
+                                    validate: value => {
+                                        if (value < currentYear - 1 || value > currentYear + 10) {
+                                            return 'El año debe estar entre ' + (currentYear - 1) + ' y ' + (currentYear + 10);
+                                        }
+                                    },
                                     minLength: {
                                         value: 4,
-                                        message: 'El campo debe tener al menos 6 dígitos'
+                                        message: 'El campo debe tener al menos 4 dígitos'
                                     },
                                     maxLength: {
                                         value: 4,
-                                        message: 'El campo no debe tener más de 10 dígitos'
+                                        message: 'El campo no debe tener más de 4 dígitos'
                                     },
                                     pattern: {
                                         value: /^[0-9]*$/,

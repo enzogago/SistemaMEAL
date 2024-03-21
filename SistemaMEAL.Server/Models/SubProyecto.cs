@@ -32,6 +32,10 @@ namespace SistemaMEAL.Server.Models
         public String? ProCod { get; set; }
         public String? ProNom { get; set; }
         public String? ProRes { get; set; }
+        public String? ProPerAnoIni { get; set; }
+        public String? ProPerMesIni { get; set; }
+        public String? ProPerAnoFin { get; set; }
+        public String? ProPerMesFin { get; set; }
         public List<Objetivo>? Objetivos { get; set; }
     }
 }

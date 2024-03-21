@@ -69,7 +69,7 @@ const Table = ({data = [], setData, openModal}) => {
                 accessorKey: "proPerAnoIni",
                 cell: ({row}) => {
                     return (
-                        <div style={{textTransform: 'capitalize'}}>{row.original.proPerAnoIni + ' - ' + row.original.proPerMesIniNombre}</div>
+                        <div style={{textTransform: 'capitalize'}}>{row.original.proPerMesIniNombre + ' - ' +  row.original.proPerAnoIni }</div>
                     );
                 },
             },
@@ -78,7 +78,7 @@ const Table = ({data = [], setData, openModal}) => {
                 accessorKey: "proPerAnoFin",
                 cell: ({row}) => {
                     return (
-                        <div style={{textTransform: 'capitalize'}}>{row.original.proPerAnoFin + ' - ' + row.original.proPerMesFinNombre}</div>
+                        <div style={{textTransform: 'capitalize'}}>{row.original.proPerMesFinNombre + ' - ' +  row.original.proPerAnoFin }</div>
                     );
                 },
             },
@@ -87,7 +87,7 @@ const Table = ({data = [], setData, openModal}) => {
                 accessorKey: "proInvSubAct",
                 cell: ({row}) => {
                     return (
-                        <>{ (row.original.proInvSubAct.trim() == 'S') ? 'Proyecto con Sub Actividades' : 'Proyecto sin Sub Actividades'}</>
+                        <>{row.original.proInvSubActNombre}</>
                     );
                 },
             },
@@ -129,6 +129,7 @@ const Table = ({data = [], setData, openModal}) => {
     data.forEach(item => {
         item.proPerMesFinNombre = new Date(2024, item.proPerMesFin - 1).toLocaleString('es-ES', { month: 'long' });
         item.proPerMesIniNombre = new Date(2024, item.proPerMesIni - 1).toLocaleString('es-ES', { month: 'long' });
+        item.proInvSubActNombre = item.proInvSubAct === 'S' ? 'Proyecto con Sub Actividades' : 'Proyecto con Sub Actividades';
     });
 
     const [sorting, setSorting] = useState([]);
@@ -142,7 +143,8 @@ const Table = ({data = [], setData, openModal}) => {
             (item.proPerAnoFin ? item.proPerAnoFin.includes(tag.toUpperCase()) : false) ||
             (item.proPerAnoIni ? item.proPerAnoIni.includes(tag.toUpperCase()) : false) ||
             (item.proPerMesFinNombre ? item.proPerMesFinNombre.toUpperCase().includes(tag.toUpperCase()) : false) ||
-            (item.proPerMesIniNombre ? item.proPerMesIniNombre.toUpperCase().includes(tag.toUpperCase()) : false) 
+            (item.proPerMesIniNombre ? item.proPerMesIniNombre.toUpperCase().includes(tag.toUpperCase()) : false) ||
+            (item.proInvSubActNombre ? item.proInvSubActNombre.toUpperCase().includes(tag.toUpperCase()) : false) 
             )
         ), [data, searchTags]
     );
@@ -167,6 +169,7 @@ const Table = ({data = [], setData, openModal}) => {
     dataExport = dataExport.map(item => ({
         ...item,
         proInvSubAct: item.proInvSubAct === 'S' ? 'SI' : 'NO',
+
     }));
     const headers = ['AÑO', 'CODIGO', 'NOMBRE', 'RESPONSABLE','AÑO_INICIO','MES_INICIO','AÑO_FIN','MES_FIN','INVOLUCRA_SUB_ACTIVIDAD', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
     const title = 'PROYECTOS';  // El título de tu archivo

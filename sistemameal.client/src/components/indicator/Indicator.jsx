@@ -15,7 +15,7 @@ const Indicator = () => {
     const controllerSelect = 'Actividad';
     // Definir controller y fieldMapping como variables
     const controller = 'Indicador';
-    const fieldMapping = { codigo: 'indNum', nombre: 'indNom', 'Código Resultado': 'resNum', 'Resultado': 'resNom', 'Código Objetivo Específico': 'objEspNum', 'Objetivo Específico': 'objEspNom', 'Código Objetivo': 'objNum', 'Objetivo': 'objNom', 'Sub Proyecto': 'subProNom', 'Proyecto': 'proNom' };
+    const fieldMapping = { codigo: 'indNum', nombre: 'indNom', 'Tipo de Indicador': 'indTipInd', 'Unidad': 'uniNom', 'Tipo de Valor': 'tipValNom', 'Actividad': 'actNom', 'Resultado': 'resNom', 'Objetivo Específico': 'objEspNom', 'Código Objetivo': 'objNum', 'Objetivo': 'objNom', 'Sub Proyecto': 'subProNom', 'Proyecto': 'proNom', 'Responsable': 'proRes','Periodo Inicio':'proPerIni','Periodo Fin': 'proPerFin' };
   
     // Toggle Modal
     const openModal = (estado = null) => {
@@ -39,13 +39,6 @@ const Indicator = () => {
         fetchData(controllerSelect, setSelect);
     }, []);
 
-    // En tu componente principal, defines el mapeo
-    const selectMapping = {
-        value: item => JSON.stringify({ actCod: item.actCod, actAno: item.actAno }),
-        display: item => item.actNom.toLowerCase(),
-        properties: ['actCod', 'actAno'] // Aquí defines las propiedades que quieres extraer
-    };
-
     return (
         <>
             <Table 
@@ -56,8 +49,9 @@ const Indicator = () => {
                 fieldMapping={fieldMapping}
                 title='Indicadores'
                 resize={false}
+                isLargePagination={true}
             />
-            <Modal
+            {/* <Modal
                 modalVisible={modalVisible}
                 setModalVisible={setModalVisible}
                 estadoEditado={estadoEditado}
@@ -69,7 +63,7 @@ const Indicator = () => {
                 controllerSelect={controllerSelect}
                 select={select}
                 selectMapping={selectMapping}
-            />
+            /> */}
         </>
     );
 };

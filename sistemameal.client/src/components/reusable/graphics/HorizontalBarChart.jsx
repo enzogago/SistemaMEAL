@@ -1,11 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
+import d3Tip from 'd3-tip';
 
 const HorizontalBarChart = ({ data, id, barColor }) => { // Añade barColor a las props
+    console.log(data)
     const ref = useRef();
 
     useEffect(() => {
-        const margin = { top: 30, right: 30, bottom: 0, left: 100 }; // Aumenta el margen inferior para hacer espacio para el eje x
+        const margin = { top: 30, right: 20, bottom: 0, left: 150 }; // Aumenta el margen inferior para hacer espacio para el eje x
         const width = ref.current.clientWidth;
         const barHeight = 50; // Aumenta la altura de la barra para más espacio entre barras
         const height = Math.ceil((data.length + 0.1) * barHeight) + margin.top + margin.bottom;
@@ -26,10 +28,24 @@ const HorizontalBarChart = ({ data, id, barColor }) => { // Añade barColor a la
             .attr("transform", `translate(${margin.left},0)`)
             .call(d3.axisLeft(y).tickFormat(i => data[i].name.toLowerCase().replace(/^\w/, (c) => c.toUpperCase())));
         
+        const tip = d3Tip()
+            .attr('class', 'd3-tip')
+            .offset([0, 0])
+            .html(function(d) {
+                return `
+                <div style="z-index: 100;">
+                    <p>${d.tip}</p>
+                </div>
+                `;
+            });
 
+            
         const svg = d3.select(`#${id}`)
             .append("svg")
             .attr("viewBox", [0, 0, width, height]);
+
+
+        svg.call(tip);
 
         svg.append("g")
             .attr("fill", barColor) // Usa barColor para el color de las barras
@@ -39,7 +55,16 @@ const HorizontalBarChart = ({ data, id, barColor }) => { // Añade barColor a la
             .attr("x", x(0))
             .attr("y", (d, i) => y(i))
             .attr("width", d => x(d.value) - x(0))
-            .attr("height", y.bandwidth());
+            .attr("height", y.bandwidth())  
+            .on('mouseover', function(event, d) {
+                if (d.tip) {  // Si 'tip' está presente en los datos...
+                    tip.show(d, this);  // ...muestra el tooltip.
+                }
+            })
+            .on('mouseleave', function(d) {
+                tip.hide();  // ...oculta el tooltip.
+            })
+            
             
 
         svg.append("g")
@@ -53,12 +78,13 @@ const HorizontalBarChart = ({ data, id, barColor }) => { // Añade barColor a la
             .attr("x", d => x(d.value) - 4)
             .attr("y", (d, i) => y(i) + y.bandwidth() / 2)
             .attr("dy", "0.35em")
-            .text(d => d.value);
+            .text(d => Number(d.value).toLocaleString());
 
 
         svg.append("g")
             .call(yAxis)
             .attr("class", "Large-f1 Medium-f_75 Small-f_75");
+            
 
     }, [data, barColor]); // Añade barColor a la lista de dependencias de useEffect
 

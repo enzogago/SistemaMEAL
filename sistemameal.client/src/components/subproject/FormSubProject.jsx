@@ -6,7 +6,6 @@ import Notiflix from "notiflix";
 import { useForm } from 'react-hook-form';
 import { GrFormPreviousLink } from "react-icons/gr";
 import { fetchData } from "../reusable/helper";
-import InputCodigoSap from "../reusable/ModalForm/Inputs/InputCodigoSap";
 
 const FormSubProject = () => {
     const navigate = useNavigate();
@@ -28,7 +27,6 @@ const FormSubProject = () => {
     const  [locationSelects, setLocationSelects ] = useState([{ count: 1, selects: [] }]);
     const [ paises, setPaises ] = useState([]);
     const [ proyectos, setProyectos ] = useState([]);
-    const [ cargando, setCargando ] = useState(false)
     
 
     const handleLocationChange = async (ubicacion, countryIndex, selectIndex) => {
@@ -43,7 +41,6 @@ const FormSubProject = () => {
         }
     
         try {
-            setCargando(true);
             const token = localStorage.getItem('token');
             const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Ubicacion/${selectedCountry.ubiAno}/${selectedCountry.ubiCod}`, {
                 headers: {
@@ -77,8 +74,6 @@ const FormSubProject = () => {
             }
         } catch (error) {
             console.error('Error:', error);
-        } finally{
-            setCargando(false);
         }
     };
 
@@ -110,7 +105,7 @@ const FormSubProject = () => {
                         try {
                             const token = localStorage.getItem('token');
                             Notiflix.Loading.pulse('Cargando...');
-                            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Proyecto/${proAno}/${proCod}`, {
+                            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/SubProyecto/${proAno}/${proCod}`, {
                                 headers: {
                                     'Authorization': `Bearer ${token}`
                                 }
@@ -134,6 +129,8 @@ const FormSubProject = () => {
                             }
                             console.log(newData);
                             reset(newData);
+                            // Establece el valor inicial del select de proyecto
+                            setValue('proyecto', JSON.stringify({ proAno: data.proAno, proCod: data.proCod }));
                         } catch (error) {
                             console.error('Error:', error);
                         } finally {
@@ -176,7 +173,9 @@ const FormSubProject = () => {
                 Implementadores: selectValues
             }
             console.log(SubProyectoImplementadorDto)
-            // handleSubmit(data, isEditing, navigate);
+            console.log(data)
+            console.log(isEditing)
+            handleSubmit(SubProyectoImplementadorDto.SubProyecto, isEditing, navigate);
     
             // Crear un array para almacenar los valores de los selects de ubicación
             locationSelects.forEach((country, countryIndex) => {
@@ -204,6 +203,48 @@ const FormSubProject = () => {
 
         })();
     }
+
+    const handleSubmit = async (data, isEditing, navigate) => {
+        const method = isEditing ? 'PUT' : 'POST';
+        let newData = {};
+        for (let key in data) {
+            if (typeof data[key] === 'string') {
+                // Convierte cada cadena a minúsculas
+                newData[key] = data[key].toUpperCase();
+            } else {
+                // Mantiene los valores no string tal como están
+                newData[key] = data[key];
+            }
+        }
+        console.log(newData)
+    
+        try {
+            Notiflix.Loading.pulse();
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/SubProyecto`, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(newData),
+            });
+            
+            const dataResult = await response.json();
+            if (!response.ok) {
+                Notiflix.Notify.failure(dataResult.message)
+                return;
+            }
+    
+            Notiflix.Notify.success(dataResult.message)
+            navigate('/subproject');
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            Notiflix.Loading.remove();
+        }
+    };
+    
     
 
     return (
@@ -217,7 +258,7 @@ const FormSubProject = () => {
                 <div className="PowerMas_Content_Form_Beneficiarie_Card Large_6 overflow-auto m1 p1">
                     <div className="m_75">
                         <label htmlFor='proyecto' className="">
-                            Proyecto:
+                            Proyecto
                         </label>
                         <select 
                             id='proyecto'
@@ -248,14 +289,55 @@ const FormSubProject = () => {
                         )}
                     </div>
                     <div className="m_75">
+                        <label className="">
+                            Codigo SAP del Sub proyecto
+                        </label>
+                        <input 
+                            id="subProSap"
+                            className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.subProSap || isSubmitted ? (errors.subProSap ? 'invalid' : 'valid') : ''}`}  
+                            type="text" 
+                            placeholder='123456' 
+                            maxLength={10} 
+                            name="subProSap" 
+                            autoComplete='disabled'
+                            onKeyDown={(event) => {
+                                if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
+                                    event.preventDefault();
+                                }
+                            }}
+                            {...register('subProSap', { 
+                                required: 'El campo es requerido',
+                                minLength: {
+                                    value: 6,
+                                    message: 'El campo debe tener al menos 6 dígitos'
+                                },
+                                maxLength: {
+                                    value: 10,
+                                    message: 'El campo no debe tener más de 10 dígitos'
+                                },
+                                pattern: {
+                                    value: /^[0-9]*$/,
+                                    message: 'El campo solo debe contener números'
+                                }
+                            })}
+                        />
+                        {errors.subProSap ? (
+                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.subProSap.message}</p>
+                        ) : (
+                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                Espacio reservado para el mensaje de error
+                            </p>
+                        )}
+                    </div>
+                    <div className="m_75">
                         <label htmlFor="subProNom" className="">
-                            Nombre
+                            Nombre del Sub proyecto
                         </label>
                         <input type="text"
                             id="subProNom"
                             style={{textTransform: 'capitalize'}}
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.subProNom || isSubmitted ? (errors.subProNom ? 'invalid' : 'valid') : ''}`} 
-                            placeholder="Enzo Fabricio"
+                            placeholder="Sub proyecto Movilidad Humana"
                             autoComplete="disabled"
                             {...register('subProNom', { 
                                 required: 'El campo es requerido',
@@ -270,38 +352,7 @@ const FormSubProject = () => {
                             </p>
                         )}
                     </div>
-                    <div className="m_75">
-                        <label className="">
-                            Codigo SAP:
-                        </label>
-                        <input 
-                            id="subProSap"
-                            className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.subProSap || isSubmitted ? (errors.subProSap ? 'invalid' : 'valid') : ''}`}  
-                            type="text" 
-                            placeholder='123456' 
-                            maxLength={100} 
-                            name="subProSap" 
-                            autoComplete='disabled'
-                            {...register(
-                                'subProSap', { 
-                                    required: 'El campo es requerido',
-                                    maxLength: { value: 100, message: 'El campo no puede tener más de 100 caracteres' },
-                                    minLength:  { value: 5, message: 'El campo no puede tener menos de 5 caracteres' },
-                                    pattern: {
-                                        value: /^[A-Za-zñÑáéíóúÁÉÍÓÚ().,;üÜ\s-_]+$/,
-                                        message: 'Por favor, introduce solo letras y espacios',
-                                    },
-                                }
-                            )}
-                        />
-                        {errors.subProSap ? (
-                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.subProSap.message}</p>
-                        ) : (
-                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                Espacio reservado para el mensaje de error
-                            </p>
-                        )}
-                    </div>
+                    
                 </div>
                 <div className="PowerMas_Info_Form_Beneficiarie Large_6 m1 p1 overflow-auto flex flex-column gap-1">
                     <div className="flex flex-column gap_5 p1_75" style={{backgroundColor: '#fff', border: '1px solid #372e2c3d'}}>
@@ -385,7 +436,7 @@ const FormSubProject = () => {
             </div>
 
             <div className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
-                <button onClick={() => navigate('/projects')} className="PowerMas_Buttom_Secondary Large_3 m_75">Atras</button>
+                <button onClick={() => navigate('/subproject')} className="PowerMas_Buttom_Secondary Large_3 m_75">Atras</button>
                 <button onClick={Guardar_Proyecto} className="PowerMas_Buttom_Primary Large_3 m_75">Grabar</button>
             </div>
 

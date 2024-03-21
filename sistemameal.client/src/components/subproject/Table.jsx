@@ -17,6 +17,7 @@ import CustomTable from "../reusable/Table/CustomTable";
 
 
 const Table = ({data = [], setData}) => {
+    console.log(data)
     const navigate = useNavigate();
     // Variables State AuthContext 
     const { authInfo } = useContext(AuthContext);
@@ -38,6 +39,10 @@ const Table = ({data = [], setData}) => {
     const columns = useMemo(() => {
         let baseColumns = [
             {
+                header: "Código SAP",
+                accessorKey: "subProSap",
+            },
+            {
                 header: "Nombre",
                 accessorKey: "subProNom",
                 cell: ({row}) => (
@@ -45,10 +50,6 @@ const Table = ({data = [], setData}) => {
                         {row.original.subProNom.toLowerCase()}
                     </div>
                 ),
-            },
-            {
-                header: "Còdigo SAP",
-                accessorKey: "subProSap",
             },
             {
                 header: "Proyecto",
@@ -67,6 +68,24 @@ const Table = ({data = [], setData}) => {
                         {row.original.proRes.toLowerCase()}
                     </div>
                 ),
+            },
+            {
+                header: "Periodo Inicio",
+                accessorKey: "proPerAnoIni",
+                cell: ({row}) => {
+                    return (
+                        <div style={{textTransform: 'capitalize'}}>{row.original.proPerMesIniNombre + ' - ' +  row.original.proPerAnoIni }</div>
+                    );
+                },
+            },
+            {
+                header: "Periodo Fin",
+                accessorKey: "proPerAnoFin",
+                cell: ({row}) => {
+                    return (
+                        <div style={{textTransform: 'capitalize'}}>{row.original.proPerMesFinNombre + ' - ' +  row.original.proPerAnoFin }</div>
+                    );
+                },
             },
         ];
 
@@ -112,6 +131,12 @@ const Table = ({data = [], setData}) => {
         navigate(`/form-subproject/${safeCiphertext}`);
     }
     
+    data.forEach(item => {
+        item.proPerMesFinNombre = new Date(2024, item.proPerMesFin - 1).toLocaleString('es-ES', { month: 'long' });
+        item.proPerMesIniNombre = new Date(2024, item.proPerMesIni - 1).toLocaleString('es-ES', { month: 'long' });
+        item.proInvSubActNombre = item.proInvSubAct === 'S' ? 'Proyecto con Sub Actividades' : 'Proyecto con Sub Actividades';
+    });
+
     const [sorting, setSorting] = useState([]);
     const filteredData = useMemo(() => 
         data.filter(item => 
@@ -119,7 +144,9 @@ const Table = ({data = [], setData}) => {
             (item.subProNom ? item.proAno.includes(tag.toUpperCase()) : false) ||
             (item.subProSap ? item.proCod.includes(tag.toUpperCase()) : false) ||
             (item.proNom ? item.proNom.includes(tag.toUpperCase()) : false) ||
-            (item.proRes ? item.proRes.includes(tag.toUpperCase()) : false)
+            (item.proRes ? item.proRes.includes(tag.toUpperCase()) : false) ||
+            (item.proPerAnoFin ? item.proPerAnoFin.includes(tag.toUpperCase()) : false) ||
+            (item.proPerAnoIni ? item.proPerAnoIni.includes(tag.toUpperCase()) : false)
             )
         ), [data, searchTags]
     );
