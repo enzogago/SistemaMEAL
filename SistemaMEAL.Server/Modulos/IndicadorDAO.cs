@@ -89,6 +89,9 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_ACTCOD", indicador.ActCod);
                 cmd.Parameters.AddWithValue("@P_INDNOM", indicador.IndNom);
                 cmd.Parameters.AddWithValue("@P_INDNUM", indicador.IndNum);
+                cmd.Parameters.AddWithValue("@P_INDTIPIND", indicador.IndTipInd);
+                cmd.Parameters.AddWithValue("@P_UNICOD", indicador.UniCod);
+                cmd.Parameters.AddWithValue("@P_TIPVALCOD", indicador.TipValCod);
                 cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
@@ -105,11 +108,11 @@ namespace SistemaMEAL.Modulos
                 pTipoMensaje.Direction = ParameterDirection.Output;
                 cmd.Parameters.Add(pTipoMensaje);
 
-                SqlParameter pAno = new SqlParameter("@P_OBJANO_OUT", SqlDbType.NVarChar, 4);
+                SqlParameter pAno = new SqlParameter("@P_INDANO_OUT", SqlDbType.NVarChar, 4);
                 pAno.Direction = ParameterDirection.Output;
                 cmd.Parameters.Add(pAno);
 
-                SqlParameter pCod = new SqlParameter("@P_OBJCOD_OUT", SqlDbType.Char, 6);
+                SqlParameter pCod = new SqlParameter("@P_INDCOD_OUT", SqlDbType.Char, 6);
                 pCod.Direction = ParameterDirection.Output;
                 cmd.Parameters.Add(pCod);
 

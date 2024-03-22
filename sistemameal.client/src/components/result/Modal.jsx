@@ -1,29 +1,23 @@
+// Importaciones necesarias
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { fetchData, handleSubmitMant } from '../reusable/helper';
-import Notiflix from 'notiflix';
-// import { handleSubmit } from './eventHandlers';
 
 const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
     // Variables de estado
-    const [ subProyectos, setSubProyectos ] = useState([])
-    const [ objetivos, setObjetivos ] = useState([])
-    const [ objetivosEspecificos, setObjetivosEspecificos ] = useState([])
-    const [ objetivoEnable, setObjetivoEnable ] = useState(false)
-    const [ objetivoEspecificoEnable, setObjetivoEspecificoEnable ] = useState(false)
+    const [subProyectos, setSubProyectos] = useState([]);
+    const [objetivos, setObjetivos] = useState([]);
+    const [objetivosEspecificos, setObjetivosEspecificos] = useState([]);
+    const [objetivoEnable, setObjetivoEnable] = useState(false);
+    const [objetivoEspecificoEnable, setObjetivoEspecificoEnable] = useState(false);
     const [objetivosLoaded, setObjetivosLoaded] = useState(false);
     const [objetivosEspecificosLoaded, setObjetivosEspecificosLoaded] = useState(false);
-    // Configuracion useForm
-    const { 
-        register, 
-        handleSubmit: validateForm, 
-        formState: { errors, dirtyFields, isSubmitted }, 
-        reset, 
-        setValue,
-        watch
-    } 
-    = useForm({ mode: "onChange"});
+    const [subProyectosLoaded, setSubProyectosLoaded] = useState(false);
 
+    // Configuración useForm
+    const { register, handleSubmit: validateForm, formState: { errors, dirtyFields, isSubmitted }, reset, setValue, watch } = useForm({ mode: "onChange" });
+
+    // Función para cerrar el modal y resetear el formulario
     const closeModalAndReset = () => {
         closeModal();
         reset({
@@ -37,76 +31,68 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
         setObjetivosEspecificosLoaded(false);
     };
 
+    // Función para manejar el envío del formulario
     const onSubmit = (data) => {
-        const {objEspAno, objEspCod} = JSON.parse(data.objetivoEspecifico);
+        const { objEspAno, objEspCod } = JSON.parse(data.objetivoEspecifico);
         data = {
             ...data,
             objEspAno,
             objEspCod
         }
-        console.log(data)
-        handleSubmitMant('Resultado',!!estadoEditado,data, setData, closeModalAndReset)
+        handleSubmitMant('Resultado', !!estadoEditado, data, setData, closeModalAndReset)
     };
 
-
-    // Efecto al editar estado
+    // Efecto para manejar la edición del estado
     useEffect(() => {
         if (estadoEditado && objetivosEspecificosLoaded) {
-            const {objEspAno,objEspCod} = estadoEditado;
-            // Establece el valor inicial del select de subproyectos
+            const { objEspAno, objEspCod } = estadoEditado;
             setValue('objetivoEspecifico', JSON.stringify({ objEspAno, objEspCod }));
         }
     }, [estadoEditado, objetivosEspecificosLoaded, setValue]);
-    
-    
 
+    // Efecto para manejar el cambio en el subproyecto seleccionado
     useEffect(() => {
         const subProyecto = watch('subProyecto');
-        if (subProyecto != '0' && subProyecto != '') {
-            const {subProAno, subProCod} = JSON.parse(subProyecto);
+        if (subProyecto !== '0' && subProyecto !== '') {
+            const { subProAno, subProCod } = JSON.parse(subProyecto);
             fetchData(`Objetivo/subproyecto/${subProAno}/${subProCod}`, (data) => {
+                setValue('objetivo', '0');
                 setObjetivos(data);
-                setObjetivosLoaded(true); // Establece objetivosLoaded en true una vez que los datos se hayan cargado
+                setObjetivosLoaded(true);
             });
             setObjetivoEnable(true);
         } else {
-            setValue('objetivo','0');
+            setValue('objetivo', '0');
             setObjetivoEnable(false);
         }
-    }, [watch('subProyecto')])
+    }, [watch('subProyecto')]);
 
+    // Efecto para manejar el cambio en el objetivo seleccionado
     useEffect(() => {
         const objetivo = watch('objetivo');
-        if (objetivo != '0' && objetivo != '') {
-            const {objAno, objCod} = JSON.parse(objetivo);
-            console.log(objetivo)
+        if (objetivo !== '0' && objetivo !== '') {
+            const { objAno, objCod } = JSON.parse(objetivo);
             fetchData(`ObjetivoEspecifico/objetivo/${objAno}/${objCod}`, (data) => {
+                setValue('objetivoEspecifico', '0');
                 setObjetivosEspecificos(data);
                 setObjetivosEspecificosLoaded(true);
             });
             setObjetivoEspecificoEnable(true);
         } else {
-            setValue('objetivoEspecifico','0');
+            setValue('objetivoEspecifico', '0');
             setObjetivoEspecificoEnable(false);
         }
-    }, [watch('objetivo')])
+    }, [watch('objetivo')]);
 
-    // Efecto al editar estado
+    // Efecto para manejar la edición del estado
     useEffect(() => {
-        console.log("Antes del if")
-        console.log(estadoEditado)
-        if (estadoEditado && objetivosLoaded) { // Solo ejecuta este código si objetivosLoaded es true
-            console.log("Dentro del if")
-            console.log(estadoEditado)
-            const {objAno,objCod} = estadoEditado;
+        if (estadoEditado && objetivosLoaded) {
+            const { objAno, objCod } = estadoEditado;
             setValue('objetivo', JSON.stringify({ objAno, objCod }));
         }
     }, [estadoEditado, objetivosLoaded, setValue]);
 
-
-    const [subProyectosLoaded, setSubProyectosLoaded] = useState(false);
-
-    // Activar focus en input
+    // Efecto para manejar la visibilidad del modal
     useEffect(() => {
         if (modalVisible) {
             fetchData('SubProyecto', (data) => {
@@ -115,28 +101,26 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
             });
             document.getElementById('resNum').focus();
         } else {
-            setSubProyectosLoaded(false); // Establece subProyectosLoaded en false cuando el modal se cierra
+            setSubProyectosLoaded(false);
         }
     }, [modalVisible]);
 
-    // Efecto al editar estado
+    // Efecto para manejar la edición del estado
     useEffect(() => {
-        if (estadoEditado && subProyectosLoaded) { // Solo ejecuta este código si subProyectosLoaded es true
-            const {subProAno,subProCod} = estadoEditado;
-            // Establece el valor inicial del select de subproyectos
+        if (estadoEditado && subProyectosLoaded) {
+            const { subProAno, subProCod } = estadoEditado;
             setValue('subProyecto', JSON.stringify({ subProAno, subProCod }));
         }
     }, [estadoEditado, subProyectosLoaded, setValue]);
 
+    // Efecto para manejar la edición del estado
     useEffect(() => {
         if (estadoEditado) {
             let newData = {};
             for (let key in estadoEditado) {
                 if (typeof estadoEditado[key] === 'string') {
-                    // Convierte cada cadena a minúsculas
                     newData[key] = estadoEditado[key].trim().toLowerCase();
                 } else {
-                    // Mantiene los valores no string tal como están
                     newData[key] = estadoEditado[key];
                 }
             }
@@ -203,7 +187,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                             <option value="0">--Seleccione Objetivo--</option>
                             {objetivos.map((item, index) => {
                                 const text = item.objNom.toLowerCase();
-                                const shortText = text.length > 40 ? text.substring(0, 40) + '...' : text;
+                                const shortText = text.length > 50 ? text.substring(0, 50) + '...' : text;
                                 return(
                                     <option 
                                         key={index} 

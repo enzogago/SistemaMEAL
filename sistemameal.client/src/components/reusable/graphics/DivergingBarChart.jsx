@@ -29,8 +29,8 @@ const DivergingBarChart = ({ rangeData, id, maleColor, femaleColor }) => {
             return { age: `${range.min}-${range.max === Infinity ? 'Infinity' : range.max}`, count };
         });
         
-        const margin = { top: 20, right: 10, bottom: 20, left: 60 };
-        const width = ref.current.clientWidth - (margin.left + margin.right)*2;
+        const margin = { top: 20, right: 0, bottom: 20, left: 60 };
+        const width = ref.current.clientWidth - (margin.left + margin.right);
         const height = Math.max(maleData.length, femaleData.length) * 40;
 
         // Limpia el div antes de añadir el nuevo gráfico
@@ -45,7 +45,7 @@ const DivergingBarChart = ({ rangeData, id, maleColor, femaleColor }) => {
 
         const x = d3.scaleLinear()
             .domain([0, d3.max([...maleData, ...femaleData], d => d.count)])
-            .range([0, width / 2.5]);
+            .range([0, width / 3]);
 
         const y = d3.scaleBand()
             .domain(d3.range(Math.max(maleData.length, femaleData.length)))

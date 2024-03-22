@@ -425,8 +425,10 @@ const Home = () => {
             <div className='flex flex-column m1 gap-1 center'>
             <div className="flex Large-flex-row Medium-flex-row Small-flex-column gap-1">
                     
-                    <div className='PowerMas_Home_Card p1 Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
-                        <h4>Beneficiarios por Sexo</h4>
+                    <div className='PowerMas_Home_Card Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
+                        <div className='Large_12 p_5 PowerMas_Tittle_Map'>
+                            <h4>Beneficiarios por Sexo</h4>
+                        </div>
                         <div className='Large_6 Medium_12 Phone_12 Large-p1 Small-p_75 flex-grow-1'>
                             <PieChart data={pieData} id='MaleFemale' />
                         </div>
@@ -439,8 +441,10 @@ const Home = () => {
                             ))}
                         </div>
                     </div>
-                    <div className='PowerMas_Home_Card Large-p1 Medium-p_75 Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
-                        <h4>Beneficiarios por Edad</h4>
+                    <div className='PowerMas_Home_Card Large-p0 Medium-p_75 Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
+                        <div className='Large_12 p_5 PowerMas_Tittle_Map'>
+                            <h4>Beneficiarios por Edad</h4>
+                        </div>
                         <div className='Large_12 Medium_12 Phone_12 Large-p1 Medium-p_75 flex-grow-1'>
                             <Suspense fallback={<div>Cargando...</div>}>
                                 <DivergingBarChart 
@@ -464,81 +468,89 @@ const Home = () => {
                     </div>
                 </div>
                 <div className="flex Large-flex-row Medium-flex-row Small-flex-column gap-1">
-                    <div className='PowerMas_Home_Card p1 Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
-                        <h4>Beneficiarios por Nacionalidad</h4>
+                    <div className='PowerMas_Home_Card Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
+                        <div className='Large_12 p_5 PowerMas_Tittle_Map'>
+                            <h4>Beneficiarios por Nacionalidad</h4>
+                        </div>
                         <div className='Large_12 Medium_12 Phone_12 Large-p1 Medium-p_75 flex-grow-1'>
                             <Suspense fallback={<div>Cargando...</div>}>
                                 <HorizontalBarChart data={dataNac} id='NacionalidadBarChart' barColor='#E5554F' />
                             </Suspense>
                         </div>
                     </div>
-                    <div className='PowerMas_Home_Card p1 Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
-                        <h4>Beneficiarios por Tipo de documento</h4>
+                    <div className='PowerMas_Home_Card Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
+                        <div className='Large_12 p_5 PowerMas_Tittle_Map'>
+                            <h4>Beneficiarios por Tipo de Documento</h4>
+                        </div>
                         <div className='Large_12 Medium_12 Phone_12 Large-p1 Medium-p_75 flex-grow-1'>
                             <Suspense fallback={<div>Cargando...</div>}>
                                 <HorizontalBarChart data={docData} id='TipoDocBarChart' barColor='#E5554F' />
                             </Suspense>
                         </div>
                     </div>
-                    
                 </div>
-                
             </div>
             
             <div className="PowerMas_RecentsSection flex Large-flex-row Medium-flex-row Small-flex-column m1 gap-1">
-                <div className="PowerMas_Home_Card flex flex-column Large_6 Medium_6 Phone_12 p1 gap_3">
-                    <h4 className="Large-f1_25 Small-f1 center p_25">Actividades recientes</h4>
-                    {recents.map((item, index) => {
-                        // Crea un objeto Date a partir de la cadena de fecha y hora
-                        const date = new Date(item.logFecIng);
-                        // Formatea la fecha y la hora
-                        const day = String(date.getDate()).padStart(2, '0');
-                        const month = String(date.getMonth() + 1).padStart(2, '0'); // Los meses en JavaScript van de 0 a 11, así que añadimos 1
-                        const year = date.getFullYear();
-                        const formattedDate = `${day}/${month}/${year}`;
+                <div className="PowerMas_Home_Card flex flex-column  Large_6 Medium_6 Phone_12 Large_p0">
+                    <div className='Large_12 p_5 PowerMas_Tittle_Map center'>
+                        <h4>Actividades recientes</h4>
+                    </div>
+                    <div className='Large-p1 flex flex-column gap_3 overflow-auto'>
+                        {recents.map((item, index) => {
+                            // Crea un objeto Date a partir de la cadena de fecha y hora
+                            const date = new Date(item.logFecIng);
+                            // Formatea la fecha y la hora
+                            const day = String(date.getDate()).padStart(2, '0');
+                            const month = String(date.getMonth() + 1).padStart(2, '0'); // Los meses en JavaScript van de 0 a 11, así que añadimos 1
+                            const year = date.getFullYear();
+                            const formattedDate = `${day}/${month}/${year}`;
 
-                        const hours = String(date.getHours()).padStart(2, '0');
-                        const minutes = String(date.getMinutes()).padStart(2, '0');
-                        const formattedTime = `${hours}:${minutes}`;
+                            const hours = String(date.getHours()).padStart(2, '0');
+                            const minutes = String(date.getMinutes()).padStart(2, '0');
+                            const formattedTime = `${hours}:${minutes}`;
 
-                        let text = item.logDes ? item.logDes : '';
-                        let shortText = text.length > 50? text.substring(0, 50) + '...' : text;
+                            let text = item.logDes ? item.logDes : '';
+                            let shortText = text.length > 50? text.substring(0, 50) + '...' : text;
 
-                        return (
-                            <Fragment  key={index}>
-                                <div className="flex ai-center gap-1">
-                                    <div>
-                                        <div className="PowerMas_ProfilePicture2 m_25" style={{width: '40px', height: '40px', border: '1px solid #000000'}}>
-                                            <img src={masculino} alt="Descripción de la imagen" />
+                            return (
+                                <Fragment  key={index}>
+                                    <div className="flex ai-center gap-1">
+                                        <div>
+                                            <div className="PowerMas_ProfilePicture2 m_25" style={{width: '40px', height: '40px', border: '1px solid #000000'}}>
+                                                <img src={masculino} alt="Descripción de la imagen" />
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-column flex-grow-1">
+                                            <span className='Large-f1 Small-f_75 bold' style={{textTransform: 'capitalize'}}>{item.usuNom.toLowerCase() + ' ' + item.usuApePat.toLowerCase() + ' ' + item.usuApeMat.toLowerCase()}</span>
+                                            <span 
+                                                data-tooltip-id="info-tooltip" 
+                                                data-tooltip-content={text} 
+                                                className='Large-f_75 Small-f_5' 
+                                                style={{textTransform: 'capitalize'}}
+                                            >
+                                                {shortText.toLowerCase()}
+                                            </span>
+                                        </div>
+                                        
+                                        <div className="flex flex-column center Large-f_75 Small-f_5">
+                                            <span>{formattedDate}</span>
+                                            <span>{formattedTime}</span>
                                         </div>
                                     </div>
-                                    <div className="flex flex-column flex-grow-1">
-                                        <span className='Large-f1 Small-f_75 bold' style={{textTransform: 'capitalize'}}>{item.usuNom.toLowerCase() + ' ' + item.usuApePat.toLowerCase() + ' ' + item.usuApeMat.toLowerCase()}</span>
-                                        <span 
-                                            data-tooltip-id="info-tooltip" 
-                                            data-tooltip-content={text} 
-                                            className='Large-f_75 Small-f_5' 
-                                            style={{textTransform: 'capitalize'}}
-                                        >
-                                            {shortText.toLowerCase()}
-                                        </span>
-                                    </div>
-                                    
-                                    <div className="flex flex-column center Large-f_75 Small-f_5">
-                                        <span>{formattedDate}</span>
-                                        <span>{formattedTime}</span>
-                                    </div>
-                                </div>
-                                {
-                                    (recents.length != (index+1)) &&
-                                    <hr className='PowerMas_Hr m0' />
-                                }
-                            </Fragment>
-                        );
-                    })}
+                                    {
+                                        (recents.length != (index+1)) &&
+                                        <hr className='PowerMas_Hr m0' />
+                                    }
+                                </Fragment>
+                            );
+                        })}
+                    </div>
                 </div>
-                <div className='PowerMas_Home_Card Large-p1 Medium-p_75 Large_6 Medium_6 Phone_12 flex flex-column ai-center gap-1'>
-                    <h4>Beneficiarios por Ubicación</h4>
+                <div className='PowerMas_Home_Card Large-p0 Medium-p_75 Large_6 Medium_6 Phone_12 flex flex-column ai-center gap_3'>
+                    <div className='Large_12 p_5 PowerMas_Tittle_Map center'>
+                        <h4>Beneficiarios por Ubicación</h4>
+                    </div>
                     <div className='flex flex-grow-1 Phone_12' style={{position: 'relative'}}>
                         <article className='flex ai-center flex-grow-1' style={{position: 'absolute', bottom: '0'}}>
                             <div className='flex flex-column p_5 gap_5 Large_12'>

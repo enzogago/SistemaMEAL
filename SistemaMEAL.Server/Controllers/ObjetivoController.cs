@@ -40,7 +40,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var data = _objetivos.Buscar(subProAno, subProCod);
+            var data = _objetivos.Buscar(subProAno:subProAno, subProCod:subProCod);
             return Ok(data);
         }
 

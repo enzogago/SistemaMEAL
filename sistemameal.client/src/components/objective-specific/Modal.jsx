@@ -222,7 +222,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                     </div>
                     <div className="">
                         <label htmlFor="objEspNom" className="">
-                            Nombre del Objetivo
+                            Nombre del Objetivo Específico
                         </label>
                         <input type="text"
                             id="objEspNom"

@@ -16,7 +16,7 @@ const HorizontalBarChart = ({ data, id, barColor }) => { // Añade barColor a la
         d3.select(`#${id}`).html("");
 
         const x = d3.scaleLinear()
-            .domain([0, d3.max(data, d => d.value)])
+            .domain([0, d3.max(data, d => Number(d.value))])
             .range([margin.left, width - margin.right]);
 
         const y = d3.scaleBand()

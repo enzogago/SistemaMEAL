@@ -12,7 +12,7 @@ body {
 input[type=text], select{
 	outline: none;
 }
-input[type=text],input[type=search]{
+input[type=text],input[type=search], select{
 	padding-right: 30px;
 }
 .PowerMas_MainHome input,.PowerMas_MainHome select{
@@ -1436,8 +1436,8 @@ textarea {
 }
 
 .PowerMas_Buttom_Map{
-	border: 1px solid #000;
-	background-color: transparent;
+	border: 1px solid #372E2C;
+	background-color: #FFFFFF;
 	color: #000;
 	transition: all 0.2s ease-in;
 	border-radius: 5px;
@@ -1445,15 +1445,16 @@ textarea {
 	padding: 0.5rem 1rem;
 }
 .PowerMas_Buttom_Map:hover{
-	color: #F7775A;
-	border: 1px solid #000;
+	background-color: #FFE8D9;
 }
 .PowerMas_Buttom_Map_Active{
-	color: #000;
-	border: 1px solid #000;
+	color: #FFFFFF;
 	background-color: #F7775A;
 }
-
+.PowerMas_Buttom_Map_Active:hover{
+	color: #FFFFFF;
+	background-color: #F7775A;
+}
 .PowerMas_Buttom_Primary{
 	background-color: #F7775A;
 	color: #F6E3D6;
@@ -1930,4 +1931,12 @@ textarea {
 .PowerMas_Resume_Home{
 	border: 1px solid #85A9AD;
 	border-radius: 5px;
+}
+.PowerMas_Tittle_Map{
+	background-color: #F3F3F3;
+	border-radius: 5px 5px 0 0;
+	border-bottom: 1px solid #372e2c60;;
+}
+.PowerMas_RecentsSection{
+	max-height: 30rem;
 }

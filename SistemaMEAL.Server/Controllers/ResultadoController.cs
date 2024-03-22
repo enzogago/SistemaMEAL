@@ -32,6 +32,18 @@ namespace SistemaMEAL.Server.Controllers
             return Ok(data);
         }
 
+        [HttpGet("objetivo-especifico/{objEspAno}/{objEspCod}")]
+        public dynamic BuscarObjetivosPorSubproyecto(string objEspAno, string objEspCod )
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var data = _resultados.Buscar(objEspAno:objEspAno, objEspCod:objEspCod);
+            return Ok(data);
+        }
+
         [HttpPost]
         public dynamic Insertar(Resultado resultado)
         {

@@ -292,6 +292,8 @@ namespace SistemaMEAL.Server.Modulos
 
                 StringBuilder jsonResult = new StringBuilder();
                 SqlDataReader reader = cmd.ExecuteReader();
+
+                Console.WriteLine(reader);
                 if (!reader.HasRows)
                 {
                     jsonResult.Append("[]");
@@ -464,11 +466,9 @@ namespace SistemaMEAL.Server.Modulos
                 {
                     while (reader.Read())
                     {
-                        Console.WriteLine("desde reader:"+reader.GetValue(0).ToString());
                         jsonResult.Append(reader.GetValue(0).ToString());
                     }
                 }
-                Console.WriteLine("desde jsonResult final:"+jsonResult);
                 // Deserializa la cadena JSON en una lista de objetos Usuario
                 temporal = JsonConvert.DeserializeObject<List<Beneficiario>>(jsonResult.ToString());
             }
@@ -507,7 +507,6 @@ namespace SistemaMEAL.Server.Modulos
                         jsonResult.Append(reader.GetValue(0).ToString());
                     }
                 }
-                Console.WriteLine(jsonResult);
                 // Deserializa la cadena JSON en una lista de objetos Usuario
                 temporal = JsonConvert.DeserializeObject<List<Beneficiario>>(jsonResult.ToString());
             }
@@ -545,7 +544,6 @@ namespace SistemaMEAL.Server.Modulos
                         jsonResult.Append(reader.GetValue(0).ToString());
                     }
                 }
-                Console.WriteLine(jsonResult);
                 // Deserializa la cadena JSON en una lista de objetos Usuario
                 temporal = JsonConvert.DeserializeObject<List<Beneficiario>>(jsonResult.ToString());
             }
@@ -583,7 +581,6 @@ namespace SistemaMEAL.Server.Modulos
                         jsonResult.Append(reader.GetValue(0).ToString());
                     }
                 }
-                Console.WriteLine(jsonResult);
                 // Deserializa la cadena JSON en una lista de objetos Usuario
                 temporal = JsonConvert.DeserializeObject<List<Beneficiario>>(jsonResult.ToString());
             }
@@ -621,7 +618,6 @@ namespace SistemaMEAL.Server.Modulos
                         jsonResult.Append(reader.GetValue(0).ToString());
                     }
                 }
-                Console.WriteLine(jsonResult);
                 // Deserializa la cadena JSON en una lista de objetos Usuario
                 temporal = JsonConvert.DeserializeObject<List<Beneficiario>>(jsonResult.ToString());
             }
@@ -634,6 +630,63 @@ namespace SistemaMEAL.Server.Modulos
                 cn.getcn.Close();
             }
             return temporal?? new List<Beneficiario>();
+        }
+
+
+        public IEnumerable<Beneficiario> ListadoNormal()
+        {
+            List<Beneficiario> temporal = new List<Beneficiario>();
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_LISTAR_BENEFICIARIO", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                SqlDataReader rd = cmd.ExecuteReader();
+                Console.WriteLine("INICII");
+                while (rd.Read())
+                {
+                    temporal.Add(new Beneficiario()
+                    {
+                        BenAno = rd.GetString(0),
+                        BenCod = rd.GetString(1),
+                        BenNom = rd.GetString(2),
+                        BenApe = rd.GetString(3),
+                        BenFecNac = rd.GetString(4),
+                        BenTel = rd.GetString(5),
+                        BenCorEle = rd.GetString(6),
+                        BenSex = rd.GetString(7),
+                        GenCod = rd.GetString(8),
+                        GenNom = rd.GetString(9),
+                        BenCodUni = rd.GetString(11),
+                        BenTelCon = rd.GetString(12),
+                        BenNomApo = rd.GetString(13),
+                        BenApeApo = rd.GetString(14),
+                        NacCod = rd.GetString(15),
+                        NacNom = rd.GetString(16),
+                        BenDir = rd.GetString(17),
+                        BenAut = rd.GetString(18),
+                        UsuIng = rd.GetString(19),
+                        FecIng = rd.IsDBNull(20) ? (DateTime?)null : rd.GetDateTime(20),
+                        UsuMod = rd.GetString(21),
+                        FecMod = rd.IsDBNull(22) ? (DateTime?)null : rd.GetDateTime(22),
+                        EstReg = rd.GetString(23)[0]
+                    });
+                }
+                rd.Close();
+                Console.WriteLine(temporal);
+                Console.WriteLine("Fin");
+            }
+            catch (SqlException ex)
+            {
+                temporal = new List<Beneficiario>();
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return temporal;
         }
 
     }

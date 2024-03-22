@@ -40,7 +40,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var data = _objetivosEspecificos.Buscar(objAno, objCod);
+            var data = _objetivosEspecificos.Buscar(objAno:objAno, objCod:objCod);
             return Ok(data);
         }
 

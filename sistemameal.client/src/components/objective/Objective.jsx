@@ -13,8 +13,20 @@ const Objective = () => {
 
     // Definir controller y fieldMapping como variables
     const controller = 'Objetivo';
-    const fieldMapping = { codigo: 'objNum', nombre: 'objNom', 'Subproyecto': 'subProNomSap', 'Proyecto': 'proNom', 'Responsable': 'proRes','Periodo Inicio':'proPerIni','Periodo Fin': 'proPerFin' };
-  
+    const fieldMapping = { codigo: 'objNum', nombre: 'objNom', 'Subproyecto': 'subProNom', 'Proyecto': 'proNom', 'Responsable': 'proRes','Periodo Inicio':'proPerAnoIni','Periodo Fin': 'proPerAnoFin' };
+    const filterProperties = {
+        'CODIGO': 'objNum',
+        'OBJETIVO': 'objNom',
+        'SUBPROYECTO': 'subProNom',
+        'CODIGO_SAP': 'subProSap',
+        'SUBPROYECTO': 'proNom',
+        'RESPONSABLE': 'proRes',
+        'AÑO_INICIO': 'proPerAnoIni',
+        'MES_INICIO': 'proPerMesIniNombre',
+        'AÑO_FIN': 'proPerAnoFin',
+        'MES_FIN': 'proPerMesFinNombre',
+    };
+
     // Toggle Modal
     const openModal = (estado = null) => {
         for (let key in estado) {
@@ -46,6 +58,8 @@ const Objective = () => {
                 fieldMapping={fieldMapping}
                 title='Objetivos'
                 resize={false}
+                format='A2'
+                filterProperties={filterProperties}
             />
             <Modal
                 modalVisible={modalVisible}

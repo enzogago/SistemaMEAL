@@ -12,6 +12,7 @@ const InfoGoal = ({metaData, openModal}) => {
                             percentage={(metaData ? metaData.metPorAvaTec : 0) == 0 ? 0.1 : (metaData ? metaData.metPorAvaTec : 0)} 
                             wh={150}
                             rad={20}
+                            newId={'MetaBeneficiario'}
                         />
                     </div>
                     <div className="Large_6 flex flex-column gap_3">

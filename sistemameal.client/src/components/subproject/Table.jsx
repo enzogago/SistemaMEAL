@@ -141,8 +141,8 @@ const Table = ({data = [], setData}) => {
     const filteredData = useMemo(() => 
         data.filter(item => 
             searchTags.every(tag => 
-            (item.subProNom ? item.proAno.includes(tag.toUpperCase()) : false) ||
-            (item.subProSap ? item.proCod.includes(tag.toUpperCase()) : false) ||
+            (item.subProNom ? item.subProNom.includes(tag.toUpperCase()) : false) ||
+            (item.subProSap ? item.subProSap.includes(tag.toUpperCase()) : false) ||
             (item.proNom ? item.proNom.includes(tag.toUpperCase()) : false) ||
             (item.proRes ? item.proRes.includes(tag.toUpperCase()) : false) ||
             (item.proPerAnoFin ? item.proPerAnoFin.includes(tag.toUpperCase()) : false) ||

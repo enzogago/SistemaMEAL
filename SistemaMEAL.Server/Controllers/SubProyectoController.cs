@@ -29,7 +29,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var data = _subproyectos.Buscar(proAno, proCod);
+            var data = _subproyectos.Buscar(proAno:proAno, proCod:proCod);
             return Ok(data);
         }
 
@@ -54,7 +54,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var data = _subproyectos.Buscar(subProAno, subProCod);
+            var data = _subproyectos.Buscar(subProAno:subProAno, subProCod:subProCod);
             return Ok(data.FirstOrDefault());
         }
 
