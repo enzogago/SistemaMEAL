@@ -21,7 +21,7 @@ const ObjectiveSpecific = () => {
         'OBJETIVO': 'objNom',
         'SUBPROYECTO': 'subProNom',
         'CODIGO_SAP': 'subProSap',
-        'SUBPROYECTO': 'proNom',
+        'PROYECTO': 'proNom',
         'RESPONSABLE': 'proRes',
         'AÑO_INICIO': 'proPerAnoIni',
         'MES_INICIO': 'proPerMesIniNombre',

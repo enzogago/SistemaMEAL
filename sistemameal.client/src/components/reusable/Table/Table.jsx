@@ -186,9 +186,13 @@ const Table = ({ data, openModal, setData, controller, fieldMapping, title, resi
     };
 
     data.forEach(item => {
-        item.proPerMesFinNombre = (new Date(2024, item.proPerMesFin - 1).toLocaleString('es-ES', { month: 'long' })).toUpperCase();
-        item.proPerMesIniNombre = (new Date(2024, item.proPerMesIni - 1).toLocaleString('es-ES', { month: 'long' })).toUpperCase();
-        item.indTipIndNombre = tipoIndicadorMapping[item.indTipInd].toUpperCase();
+        if (item.proPerMesFin && item.proPerMesIni) {
+            item.proPerMesFinNombre = (new Date(2024, item.proPerMesFin - 1).toLocaleString('es-ES', { month: 'long' })).toUpperCase();
+            item.proPerMesIniNombre = (new Date(2024, item.proPerMesIni - 1).toLocaleString('es-ES', { month: 'long' })).toUpperCase();
+        }
+        if (item.indTipInd) {
+            item.indTipIndNombre = tipoIndicadorMapping[item.indTipInd].toUpperCase();
+        }
     });
     
 
