@@ -82,7 +82,7 @@ const Indicator = () => {
                 estadoEditado={estadoEditado}
                 closeModal={closeModal} 
                 setData={setData}
-                title='Resultado'
+                title='Indicador'
                 unidades={unidades}
                 tiposDeValor={tiposDeValor}
             />  

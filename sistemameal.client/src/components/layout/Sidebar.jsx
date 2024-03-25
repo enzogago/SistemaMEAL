@@ -2,7 +2,7 @@
 import { Link } from 'react-router-dom';
 import {  useContext, useEffect, useState } from 'react';
 // sources
-import logo from '../../img/PowerMas_LogoAyudaEnAccionSidebar.svg';
+import logo from '../../img/Logo_Blanco.webp';
 // Libraries
 import { FaCog, FaHome, FaSignOutAlt } from "react-icons/fa";
 import { IoMenu } from "react-icons/io5";
@@ -108,7 +108,7 @@ const Sidebar = () => {
     return (
         <div className="PowerMas_Menu Large_2 Medium_3 Small_12 flex flex-column">
             <div className="PowerMas_SidebarHeader Large-p1 Medium-p_75 Small-p1 center Medium-block Small-flex flex Small-jc-space-between jc-space-between">
-                <img className='Large_12 Medium_10 Phone_6' height="auto"  title="Sistema MEAL Ayuda en Acción" src={logo} alt="Logo Ayuda En Accion" />
+                <img className='Large_8 Medium_10 Phone_6' height="auto"  title="Sistema MEAL Ayuda en Acción" src={logo} alt="Logo Ayuda En Accion" />
                 <IoMenu className='Large-f0 Medium-f0 Small-f2_5 Phone_1' />
             </div>
             <div className="PowerMas_MenuContainer Large-f1 flex-grow-1 overflow-auto">

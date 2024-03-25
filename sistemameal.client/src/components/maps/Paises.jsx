@@ -97,7 +97,7 @@ const Paises = ({mapData, beneficiariosData}) => {
             .attr('d', path)
             .attr('fill', d => poblacionPorPais[d.properties.name_es.toUpperCase()] ? color(poblacionPorPais[d.properties.name_es.toUpperCase()]) : '#FDE7BD ')
             .attr('stroke', '#000')  // Esto establece el color del borde
-            .attr('stroke-width', 5)  // Esto establece el grosor del borde
+            .attr('stroke-width', 1)  // Esto establece el grosor del borde
             .on('mouseover', function(event, d) {
                 d3.select(this).style('cursor', 'pointer');
                 if (poblacionPorPais[d.properties.name_es.toUpperCase()]) {

@@ -225,7 +225,7 @@ namespace SistemaMEAL.Modulos
             return (mensaje, tipoMensaje);
         }
 
-         public (string? message, string? messageType) InsertarSubProyectoImplementadorUbicacion(SubProyecto subProyecto, List<Implementador> implementadores, List<Ubicacion> ubicaciones)
+        public (string? message, string? messageType) InsertarSubProyectoImplementadorUbicacion(SubProyecto subProyecto, List<Implementador> implementadores, List<Ubicacion> ubicaciones)
         {
             string? mensaje = "";
             string? tipoMensaje = "";

@@ -3,8 +3,8 @@ import { AuthContext } from '../../context/AuthContext';
 // Librerias
 import Notiflix from 'notiflix';
 // Source
-import logo from '../../img/PowerMas_LogoAyudaEnAccion.svg';
-import portadaLogin from '../../img/PowerMas_PortadaLogin.webp';
+import logo from '../../img/Logo_Normal.webp';
+import portadaLogin from '../../img/PowerMas_Portada_Login.webp';
 
 import CryptoJS from 'crypto-js';
 
@@ -98,15 +98,12 @@ const Login = () => {
                             </picture>
                             <article className="PowerMas_FormLogin Small-p0">
                                 <p className="Small-p0">
-                                    <font className="Large-f2 Small-f1_5 Medium-f1_75 bold Powermas_FontTitle">¡Hola de nuevo!</font>
+                                    <font className="Large-f1_75 Small-f1_5 Medium-f1_75 bold Powermas_FontTitle">¡Bienvenidos al Sistema MEAL!</font>
                                 </p>
                                 <br />
-                                <p className="Small-p0 justify">
-                                    <font className="Large-f1_2 Small-f1 Medium-f1_2">
-                                        Horem ipsum dolor sit amet,
-                                        consectetur elit vulputate libero
-                                        et velit interdum, ac aliquet odio
-                                        mattis
+                                <p className="Small-p0">
+                                    <font className="Large-f1 Medium-f1 Small-f_75">
+                                        Tu plataforma central para gestionar y monitorear proyectos de AEA Ecuador. Explora de forma intuitiva el registro y seguimiento de beneficiarios, metas y presupuestos, garantizando una experiencia fácil y eficiente.
                                     </font>
                                 </p>
 
@@ -166,7 +163,7 @@ const Login = () => {
                     <div className="item  Phone_12  Medium_5 Small_5 Large_5 Tablet_6 Large-m0 Small-m1 p0 PowerMas_ImageLogin">
                         <article>
                             <img 
-                                title="Imagen niños" 
+                                title="Portada Login" 
                                 src={portadaLogin} 
                                 alt="Portada Login" 
                                 width="auto" 

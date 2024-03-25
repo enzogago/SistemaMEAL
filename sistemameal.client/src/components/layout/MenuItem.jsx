@@ -7,13 +7,13 @@ const MenuItem = ({ menu, level }) => {
     const toggleActive = (event, level) => {
         event.stopPropagation();
         const className = `active-level-${level}`;
-        event.currentTarget.closest(`.PowerMas_LinkMenuContainer.level-${level}`).classList.toggle(className);
+        event.currentTarget.classList.toggle(className);
     };
     
     const isDashboard = menu.menRef === 'dashboard';
     
     return (
-        <div className={` PowerMas_LinkMenuContainer level-${level}`} key={menu.menCod}>
+        <div className={`PowerMas_LinkMenuContainer level-${level}`} onClick={(event) => toggleActive(event, level)} key={menu.menCod}>
             <div className="Phone_12 flex ai-center overflow-hidden">
                 <Link 
                     className="menu-item flex ai-center flex-grow-1 gap-1" 
@@ -23,7 +23,7 @@ const MenuItem = ({ menu, level }) => {
                     {IconName && <IconName style={{marginLeft: '1rem'}} />}
                     <span className="Large-f1 Medium-f_75 Small-f_75"> {menu.menNom} </span>
                 </Link>
-                {menu.subMenus.length > 0 && <span className="arrow Large_1 flex ai-center jc-center" onClick={(event) => toggleActive(event, level)}> &gt; </span>}
+                {menu.subMenus.length > 0 && <span className="arrow Large_1 flex ai-center jc-center"> &gt; </span>}
             </div>
             <div className="PowerMas_Submenu">
                 {menu.subMenus.map((subMenu, index) => (

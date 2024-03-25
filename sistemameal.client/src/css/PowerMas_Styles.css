@@ -174,11 +174,11 @@ input::placeholder,select::placeholder{
 
 @media screen and (min-width: 64em) {
 	.PowerMas_FormLogin {
-		padding: 1rem 6rem;
+		padding: 1rem 4rem;
 	}
 
 	.PowerMas_ButtomLogin {
-		margin: 2rem auto;
+		margin: 1rem auto;
 	}
 
 	.PowerMas_ImageLogin img {
@@ -208,6 +208,7 @@ input::placeholder,select::placeholder{
 .PowerMas_ImageLogin img {
 	object-fit: cover;
 	min-height: 520px;
+	object-position: center;
 }
 
 
@@ -247,7 +248,7 @@ input::placeholder,select::placeholder{
 }
 
 .PowerMas_Menu {
-	background-color: #0A515C;
+	background-color: #F87C56;
 	height: 100%;
 	box-sizing: border-box;
 }
@@ -262,7 +263,7 @@ input::placeholder,select::placeholder{
 }
 
 .PowerMas_MenuContainer::-webkit-scrollbar-track {
-	background: #0A515C;
+	background: #F87C56;
 }
 
 .PowerMas_MenuContainer::-webkit-scrollbar-thumb {
@@ -365,7 +366,7 @@ input::placeholder,select::placeholder{
 
 
 .PowerMas_MenuOptions > div, .PowerMas_Submenu div.menu-item, .PowerMas_MenuContainer a{
-    color: #eaeaea; /* Un blanco no tan claro */
+    color: #fff; /* Un blanco no tan claro */
 	transition: 0.2s ease-in-out;
 }
 .PowerMas_MenuOptions > div:hover, .PowerMas_Submenu div.menu-item:hover, .PowerMas_MenuOptions a:hover {
@@ -651,18 +652,19 @@ input::placeholder,select::placeholder{
 	align-items: center;
 	justify-content: center;
 	border-radius: 5px;
-	background-color: #85A9AD;
-	border: 1px solid #006776;
+	background-color: #FFC65860;
+	border: 1px solid #FFC658;
 	width: 20%;
 	gap: 0.5rem;
 }
 .PowerMas_KPIRow > p {
 	text-align: center;
-	color: #FFFFFF;
+	color: #372E2C;
+	font-weight: 500;
 }
 
 .PowerMas_KPIRow > span {
-	color: #195C66;
+	color: #372E2C;
 }
 .PowerMas_TableHome {
 	width: 100%;
@@ -1080,7 +1082,8 @@ textarea {
 	font-weight: lighter;
 }
 .PowerMas_TableStatus thead th {
-	color: #F7775A;
+	font-weight: bold;
+	color: #372E2C;
 	white-space: nowrap;
 }
 .PowerMas_TableStatus tbody td {
@@ -1172,6 +1175,13 @@ textarea {
 }
 .PowerMas_TableEmpty:hover{
 	background-color: #fff!important;
+}
+
+.PowerMas_Cadena_Form_invalid{
+	border: 2px solid #E5554F!important;
+}
+.PowerMas_Cadena_Form_valid {
+	border: 2px solid #25848F!important;
 }
 
 .PowerMas_Modal_Form_invalid{
@@ -1433,23 +1443,23 @@ textarea {
 
 .PowerMas_Buttom_Map{
 	border: 1px solid #372E2C;
-	background-color: #FFFFFF;
 	color: #000;
+	background-color: #FFFFFF;
 	transition: all 0.2s ease-in;
 	border-radius: 5px;
 	font-size: 0.75rem;
 	padding: 0.5rem 1rem;
 }
 .PowerMas_Buttom_Map:hover{
-	background-color: #FFE8D9;
+	background-color: #00677620;
 }
 .PowerMas_Buttom_Map_Active{
-	color: #FFFFFF;
-	background-color: #F7775A;
+	color: #fff;
+	background-color: #006776;
 }
 .PowerMas_Buttom_Map_Active:hover{
-	color: #FFFFFF;
-	background-color: #F7775A;
+	color: #fff;
+	background-color: #006776;
 }
 .PowerMas_Buttom_Primary{
 	background-color: #F7775A;

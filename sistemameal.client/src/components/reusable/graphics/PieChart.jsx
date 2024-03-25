@@ -3,8 +3,8 @@ import * as d3 from 'd3';
 
 const PieChart = ({ data, id }) => {
     const colorMapping = {
-        "MASCULINO": "#E5554F",
-        "FEMENINO": "#FFE8D9"
+        "MASCULINO": "#FFC65860",
+        "FEMENINO": "#F87C56"
     };
     const ref = useRef();
 
@@ -58,7 +58,7 @@ const PieChart = ({ data, id }) => {
             .join("text")
             .attr("transform", d => `translate(${arc.centroid(d)})`)
             .style("font-size", "1.25rem")
-            .style("fill", d => d.data.name === 'MASCULINO' ? '#FFE8D9' : '#E5554F') // Cambia 'color1' y 'color2' por los colores que quieras
+            .style("fill", d => d.data.name === 'MASCULINO' ? '#000' : '#fff') // Cambia 'color1' y 'color2' por los colores que quieras
             .call(text => text.filter(d => (d.endAngle - d.startAngle) > 0.25).append("tspan")
                 .attr("fill-opacity", 1)
                 .text(d => `${(d.data.value / total * 100).toFixed(2)}%`));

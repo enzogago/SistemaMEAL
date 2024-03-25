@@ -13,6 +13,7 @@ const InfoGoal = ({metaData, openModal}) => {
                             wh={150}
                             rad={20}
                             newId={'MetaBeneficiario'}
+                            colorText={'#000'} colorPc={'#F87C56'} colorSpc={'#F7775A20'}
                         />
                     </div>
                     <div className="Large_6 flex flex-column gap_3">

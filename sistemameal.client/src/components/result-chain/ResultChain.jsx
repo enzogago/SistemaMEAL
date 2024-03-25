@@ -12,6 +12,8 @@ const ResultChain = () => {
     const [indicadores, setIndicadores] = useState([]);
     const [transformedData, setTransformedData] = useState({});
     const [activeButton, setActiveButton] = useState('Por Año');
+    const [initialValues, setInitialValues] = useState({});
+    const [headersNew, setHeaders] = useState([]);
 
     const { 
         register, 
@@ -50,53 +52,75 @@ const ResultChain = () => {
             }
     
             fetchData(endpoint, (data) => {
-                console.log(data)
-                setTransformedData(transformData(data, activeButton));
-            })
+                const transformedData = transformData(data, activeButton);
+                setTransformedData(transformedData);
+            
+                // Guardar los valores iniciales
+                let newInitialValues = { ...initialValues };  // Copia los valores iniciales existentes
+                for (let key in transformedData) {
+                    for (let subKey in transformedData[key]) {
+                        newInitialValues[`${key}_${subKey}`] = {
+                            metTec: transformedData[key][subKey].metTec,
+                            metPre: transformedData[key][subKey].metPre
+                        };
+                    }
+                }
+                setInitialValues(newInitialValues);  // Guarda los nuevos valores iniciales
+            });
         }
     }, [watch('subproyecto'), activeButton]);
 
     function transformData(data, activeButton) {
         const transformedData = {};
-      
+        const newHeaders = [];
+    
         data.forEach(item => {
             // Crear la clave única para cada indicador
-            const key = item.indAno + item.indCod;
-        
+            const key = `${item.indAno}_${item.indCod}`;
+    
             // Si la clave no existe en el objeto transformado, la inicializamos
             if (!transformedData[key]) {
                 transformedData[key] = {};
             }
-        
+    
             // Determinar la clave y las propiedades en función del botón activo
-            let groupKey, metTecProp, metPreProp;
+            let groupKey, metTecProp, metPreProp, registerKey;
             switch (activeButton) {
                 case 'Por Año':
                     groupKey = item.cadResPerAno;
                     metTecProp = 'cadResPerMetTec';
                     metPreProp = 'cadResPerMetPre';
+                    registerKey = item.cadResPerAno;  // Usar el año para registrar la entrada
                     break;
                 case 'Por Implementador':
                     groupKey = item.impNom;
                     metTecProp = 'cadResImpMetTec';
                     metPreProp = 'cadResImpMetPre';
+                    registerKey = item.impCod;  // Usar el código del implementador para registrar la entrada
                     break;
                 case 'Por Ubicación':
                     groupKey = item.ubiNom;
                     metTecProp = 'cadResUbiMetTec';
                     metPreProp = 'cadResUbiMetPre';
+                    registerKey = item.ubiAno + item.ubiCod;  // Usar el año y el código de la ubicación para registrar la entrada
                     break;
                 default:
                     return;
             }
-        
+    
             // Agregar los datos del grupo al objeto del indicador
-            transformedData[key][groupKey] = {
+            transformedData[key][registerKey] = {
                 metTec: item[metTecProp],
                 metPre: item[metPreProp]
             };
+    
+            // Agregar el nombre del grupo a los encabezados si aún no está presente
+            if (!newHeaders.includes(groupKey)) {
+                newHeaders.push(groupKey);
+            }
         });
     
+        setHeaders(newHeaders);
         return transformedData;
     }
     
@@ -121,6 +145,64 @@ const ResultChain = () => {
             return;
     }
 
+    const onSubmit = (data) => {
+        delete data.subproyecto;
+        console.log(data)
+        // Crear los arreglos para almacenar los cambios
+        let cambiosPorAno = [];
+        let cambiosPorImplementador = [];
+        let cambiosPorUbicacion = [];
+        
+        // Iterar sobre los datos del formulario
+        for (let key in data) {
+            // Obtener el valor inicial y el valor actual de la celda
+            let valorInicial = initialValues[key].metTec;
+            let valorActual = data[key];
+    
+            // Si el valor ha cambiado, agregar el cambio al arreglo correspondiente
+            if (valorInicial !== valorActual) {
+                // Obtener la parte de la clave que corresponde al 'ano', 'implementador' o 'ubicacion'
+                let keyParts = key.split('_');
+                let indAno = keyParts[0];
+                let indCod = keyParts[1];
+                let keyType = keyParts[2];
+    
+                let cambio = {
+                    indAno: indAno,
+                    indCod: indCod,
+                };
+    
+                if (keyType.length === 4) {  // Si la longitud es 4, entonces es un 'ano'
+                    cambio.cadResPerAno = keyType;
+                    cambio.cadResPerMetTec = valorActual;
+                    cambio.cadResPerMetPre = initialValues[key].metPre;
+                    cambiosPorAno.push(cambio);
+                } else if (keyType.length === 2) {  // Si la longitud es 2, entonces es un 'implementador'
+                    cambio.impCod = keyType;
+                    cambio.cadResImpMetTec = valorActual;
+                    cambio.cadResImpMetPre = initialValues[key].metPre;
+                    cambiosPorImplementador.push(cambio);
+                } else if (keyType.length === 10) {  // Si la longitud es 10, entonces es una 'ubicacion'
+                    cambio.ubiAno = keyType.substring(0, 4);
+                    cambio.ubiCod = keyType.substring(4);
+                    cambio.cadResUbiMetTec = valorActual;
+                    cambio.cadResUbiMetPre = initialValues[key].metPre;
+                    cambiosPorUbicacion.push(cambio);
+                }
+            }
+        }
+    
+        const CadenaIndicadorDto = {
+            CadenaPeriodos: cambiosPorAno,
+            CadenaImplementadores: cambiosPorImplementador,
+            CadenaUbicaciones: cambiosPorUbicacion
+        }
+    
+        console.log(CadenaIndicadorDto);
+    };
+    
+    
+    
 
     return (
         <div className='p1 flex flex-column flex-grow-1 overflow-auto'>
@@ -189,19 +271,20 @@ const ResultChain = () => {
             </div>
             <div className="PowerMas_TableContainer flex-column overflow-auto">
                 <table className="PowerMas_TableStatus">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Proyecto</th>
-                            <th>Código</th>
-                            <th>Nombre</th>
-                            {headers.map(year => <th key={year}>{year}</th>)}
-                        </tr>
-                    </thead>
+                <thead>
+    <tr>
+        <th>#</th>
+        <th>Proyecto</th>
+        <th>Código</th>
+        <th>Nombre</th>
+        {headersNew.map(header => <th key={header}>{header}</th>)}
+    </tr>
+</thead>
+
                     <tbody>
                         {
                         indicadores.map((item, index) => {
-                            const indicatorData = transformedData[item.indAno + item.indCod] || {};
+                            const indicatorData = transformedData[`${item.indAno}_${item.indCod}`] || {};
                             const text = item.indNom.charAt(0).toUpperCase() + item.indNom.slice(1).toLowerCase();
                             const shortText = text.length > 100 ? text.substring(0, 100) + '...' : text;
 
@@ -223,8 +306,13 @@ const ResultChain = () => {
                                         return(
                                         <td key={key}>
                                             <input
-                                                className='Large_12 f_75'
-                                                {...register(`indicator_${item.indAno}_${item.indCod}_${key}`)}
+                                                className={`Large_12 f_75 PowerMas_Cadena_Form_${dirtyFields[`${item.indAno}_${item.indCod}_${key}`] || isSubmitted ? (errors[`${item.indAno}_${item.indCod}_${key}`] ? 'invalid' : 'valid') : ''}`} 
+                                                {...register(`${item.indAno}_${item.indCod}_${key}`, {
+                                                    pattern: {
+                                                        value: /^(?:[1-9]\d*|)$/,
+                                                        message: 'Valor no válido'
+                                                    }
+                                                })}
                                                 defaultValue={indicatorData[key]?.metTec || ''}
                                             />
                                         </td>
@@ -237,7 +325,12 @@ const ResultChain = () => {
                 </table>
             </div>
             <div className='flex jc-center'>
-                <button className='PowerMas_Buttom_Primary Large_3'>Grabar</button>
+                <button 
+                    className='PowerMas_Buttom_Primary Large_3'
+                    onClick={handleSubmit(onSubmit)}
+                >
+                    Grabar
+                </button>
             </div>
         </div>
     )

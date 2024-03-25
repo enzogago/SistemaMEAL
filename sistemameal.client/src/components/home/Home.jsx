@@ -355,8 +355,8 @@ const Home = () => {
             MapComponent = Paises;
     }
 
-    const maleColor = '#E5554F';
-    const femaleColor = '#FFE8D9';
+    const maleColor = '#FFC65860';
+    const femaleColor = '#F87C56';
 
     const data = [
         { name: 'Masculino', value: 39489, color: maleColor },
@@ -408,13 +408,13 @@ const Home = () => {
                     <div className="PowerMas_KPIRow gap_3 flex-column Large-f1_25">
                         <p className=" f1_25" style={{whiteSpace: 'nowrap'}}>Avance Presupuesto</p>
                         <Suspense fallback={<div>Cargando...</div>}>
-                            <DonutChart percentage={avanceTecnico} wh={140} rad={20} newId={'Dona_Presupuesto'} />
+                            <DonutChart percentage={avanceTecnico} wh={140} rad={20} newId={'Dona_Presupuesto'} colorText={'#000'} colorPc={'#F87C56'} colorSpc={'#F7775A20'} />
                         </Suspense>
                     </div>
                     <div className="PowerMas_KPIRow gap_3 flex-column Large-f1_25">
                         <p className=" f1_25">Avance Técnico</p>
                         <Suspense fallback={<div>Cargando...</div>}>
-                            <DonutChart percentage={avanceTecnico} wh={140} rad={20} newId={'Dona_Tecnico'} />
+                            <DonutChart percentage={avanceTecnico} wh={140} rad={20} newId={'Dona_Tecnico'} colorText={'#000'} colorPc={'#F87C56'} colorSpc={'#F7775A20'} />
                         </Suspense>
                     </div>
                 </div>
@@ -474,7 +474,7 @@ const Home = () => {
                         </div>
                         <div className='Large_12 Medium_12 Phone_12 Large-p1 Medium-p_75 flex-grow-1'>
                             <Suspense fallback={<div>Cargando...</div>}>
-                                <HorizontalBarChart data={dataNac} id='NacionalidadBarChart' barColor='#E5554F' />
+                                <HorizontalBarChart data={dataNac} id='NacionalidadBarChart' barColor='#F7775A' />
                             </Suspense>
                         </div>
                     </div>
@@ -484,7 +484,7 @@ const Home = () => {
                         </div>
                         <div className='Large_12 Medium_12 Phone_12 Large-p1 Medium-p_75 flex-grow-1'>
                             <Suspense fallback={<div>Cargando...</div>}>
-                                <HorizontalBarChart data={docData} id='TipoDocBarChart' barColor='#E5554F' />
+                                <HorizontalBarChart data={docData} id='TipoDocBarChart' barColor='#F7775A' />
                             </Suspense>
                         </div>
                     </div>

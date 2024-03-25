@@ -43,6 +43,7 @@ namespace SistemaMEAL.Server.Controllers
             var data = _indicadores.BuscarIndicadorPorSubproyecto(subProAno,subProCod);
             return Ok(data);
         }
+        
         [HttpGet("cadena/{subProAno}/{subProCod}")]
         public dynamic BuscarCadenaPorPeriodo(string subProAno, string subProCod)
         {
@@ -54,6 +55,19 @@ namespace SistemaMEAL.Server.Controllers
             var data = _indicadores.BuscarCadenaPorPeriodo(subProAno,subProCod);
             return Ok(data);
         }
+        
+        [HttpGet("jerarquia/{indAno}/{indCod}")]
+        public dynamic BuscarIndicador(string indAno, string indCod)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var data = _indicadores.Buscar(indAno:indAno,indCod:indCod);
+            return Ok(data.FirstOrDefault());
+        }
+
         [HttpGet("implementador/{subProAno}/{subProCod}")]
         public dynamic BuscarCadenaPorImplementador(string subProAno, string subProCod)
         {

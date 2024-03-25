@@ -59,6 +59,15 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                 resCod
             }
         }
+        const { subProAno, subProCod } = JSON.parse(data.subProyecto);
+        console.log(subProAno)
+        console.log(subProCod)
+        data = {
+            ...data,
+            subProAno,
+            subProCod
+        }
+        console.log(data)
         handleSubmitMant('Indicador', !!estadoEditado, data, setData, closeModalAndReset)
     };
 

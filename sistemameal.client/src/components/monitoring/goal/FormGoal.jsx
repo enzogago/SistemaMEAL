@@ -91,7 +91,7 @@ const FormGoal = () => {
             Notiflix.Loading.pulse('Cargando...');
             await Promise.all([
                 fetchData('Proyecto', setProyectos),
-                fetchData('Implementador', setImplementadores),
+                // fetchData('Implementador', setImplementadores),
                 fetchData('Ubicacion', setPaises),
                 fetchUsuariosTecnico()
             ]);
@@ -146,7 +146,6 @@ const FormGoal = () => {
     }, [watch('proNom')]);
 
     useEffect(() => {
-        // Si el valor de 'indActResNom' está vacío, entonces limpia los datos
         if (!watch('indNom')) {
             setJerarquia(null);
         }
@@ -578,10 +577,13 @@ const FormGoal = () => {
                             setValue('indAno',option.indAno)
                             setValue('indCod',option.indCod)
                             setValue('indTipInd',option.indTipInd)
-                            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/jerarquia/${option.indAno}/${option.indCod}`);
-                            const data = await response.json();
-                            console.log(data)
-                            setJerarquia(data);
+
+                            fetchData(`Indicador/jerarquia/${option.indAno}/${option.indCod}`, (data) => {
+                                setJerarquia(data);
+                                if (data.subProAno && data.subProCod) {
+                                    fetchData(`Indicador/implementador/${data.subProAno}/${data.subProCod}`, setImplementadores)
+                                }
+                            })
                             
                             if(option.indTipInd === 'IAC'){
                                 setEsActividad(true);

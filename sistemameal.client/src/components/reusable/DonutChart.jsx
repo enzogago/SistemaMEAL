@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
-const DonutChart = ({ percentage, wh, rad, newId }) => {
+const DonutChart = ({ percentage, wh, rad, newId, colorText, colorPc, colorSpc }) => {
     const width = wh;
     const height = wh;
     const radius = Math.min(width, height) / 2;
@@ -12,7 +12,7 @@ const DonutChart = ({ percentage, wh, rad, newId }) => {
         d3.select(`#${newId}`).html("");
     
         const color = d3.scaleOrdinal()
-            .range(["#20737B", "#d3d3d3"]); 
+            .range([colorPc, colorSpc]); 
     
         const data = [
             { value: percentage },
@@ -52,7 +52,7 @@ const DonutChart = ({ percentage, wh, rad, newId }) => {
         svg.append("text")
             .attr("text-anchor", "middle")
             .attr("dy", ".35em")
-            .style("fill", "#fff")
+            .style("fill", colorText)
             .text((percentage == 0.1 ? 0 : percentage) + "%");
 
     }, [percentage]);
