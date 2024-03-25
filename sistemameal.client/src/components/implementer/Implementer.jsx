@@ -14,6 +14,10 @@ const Implementer = () => {
     // Definir controller y fieldMapping como variables
     const controller = 'Implementador';
     const fieldMapping = { codigo: 'impCod', nombre: 'impNom' };
+    const filterProperties = {
+        'CODIGO': 'impCod',
+        'NOMBRE': 'impNom',
+    };
     const { codigo, ...restFieldMapping } = fieldMapping;
   
     // Toggle Modal
@@ -40,6 +44,7 @@ const Implementer = () => {
                 controller={controller}
                 fieldMapping={fieldMapping}
                 title='Implementadores'
+                filterProperties={filterProperties}
             />
 
             <Modal

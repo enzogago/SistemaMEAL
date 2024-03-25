@@ -18,17 +18,21 @@ const FormSubProject = () => {
         const bytes  = CryptoJS.AES.decrypt(ciphertext, 'secret key 123');
         id = bytes.toString(CryptoJS.enc.Utf8);
     }
-
     const isEditing = id && id.length === 10;
 
     // Estados locales
+    const [ implementadoresEdit, setImplementadoresEdit ] = useState([])
+    const [ ubicacionesEdit, setUbicacionesEdit ] = useState([])
     const [ implementadores, setImplementadores ] = useState([])
     const [ selectCount, setSelectCount ] = useState(1);
-    const  [locationSelects, setLocationSelects ] = useState([{ count: 1, selects: [] }]);
+    const [ locationSelects, setLocationSelects ] = useState([{ count: 1, selects: [] }]);
     const [ paises, setPaises ] = useState([]);
     const [ proyectos, setProyectos ] = useState([]);
-    
 
+    const [selectedValues, setSelectedValues] = useState([]);
+    const [selectedCountryValues, setSelectedCountryValues] = useState([]);
+
+    
     const handleLocationChange = async (ubicacion, countryIndex, selectIndex) => {
         const selectedCountry = JSON.parse(ubicacion);
         if (ubicacion === '0') {
@@ -97,54 +101,141 @@ const FormSubProject = () => {
     
         fetchOptions().then(() => {
             if (isEditing) {
-                const proAno = id.slice(0, 4);
-                const proCod = id.slice(4,10);
+                const ano = id.slice(0, 4);
+                const cod = id.slice(4,10);
                 // Ejecuta la función para traer los datos del registro a modificar
-                if(isEditing){
-                    const fetchProyecto = async () => {
-                        try {
-                            const token = localStorage.getItem('token');
-                            Notiflix.Loading.pulse('Cargando...');
-                            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/SubProyecto/${proAno}/${proCod}`, {
-                                headers: {
-                                    'Authorization': `Bearer ${token}`
-                                }
-                            });
-                            console.log(response)
-                            const data = await response.json();
-                            if (!response.ok) {
-                                Notiflix.Notify.failure(data.message);
-                                return;
+                const fetchEdit = async () => {
+                    try {
+                        const token = localStorage.getItem('token');
+                        Notiflix.Loading.pulse('Cargando...');
+                        const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/SubProyecto/${ano}/${cod}`, {
+                            headers: {
+                                'Authorization': `Bearer ${token}`
                             }
-                            console.log(data)
-                            let newData = {};
-                            for (let key in data) {
-                                if (typeof data[key] === 'string') {
-                                    // Convierte cada cadena a minúsculas
-                                    newData[key] = data[key].trim().toLowerCase();
-                                } else {
-                                    // Mantiene los valores no string tal como están
-                                    newData[key] = data[key];
-                                }
-                            }
-                            console.log(newData);
-                            reset(newData);
-                            // Establece el valor inicial del select de proyecto
-                            setValue('proyecto', JSON.stringify({ proAno: data.proAno, proCod: data.proCod }));
-                        } catch (error) {
-                            console.error('Error:', error);
-                        } finally {
-                            Notiflix.Loading.remove();
+                        });
+                        console.log(response)
+                        const data = await response.json();
+                        if (!response.ok) {
+                            Notiflix.Notify.failure(data.message);
+                            return;
                         }
+                        console.log(data)
+                        let newData = {};
+                        for (let key in data) {
+                            if (typeof data[key] === 'string') {
+                                // Convierte cada cadena a minúsculas
+                                newData[key] = data[key].trim().toLowerCase();
+                            } else {
+                                // Mantiene los valores no string tal como están
+                                newData[key] = data[key];
+                            }
+                        }
+                        console.log(newData);
+                        reset(newData);
+                        // Establece el valor inicial del select de proyecto
+                        setValue('proyecto', JSON.stringify({ proAno: data.proAno, proCod: data.proCod }));
+                    } catch (error) {
+                        console.error('Error:', error);
+                    } finally {
+                        Notiflix.Loading.remove();
                     }
-                    fetchProyecto();
-                };
+                }
+                fetchEdit();
+                fetchData(`Implementador/subproyecto/${ano}/${cod}`,setImplementadoresEdit);
+                fetchData(`Ubicacion/subproyecto/${ano}/${cod}`,setUbicacionesEdit);
             }
         });
     }, [isEditing]);
 
+    useEffect(() => {
+        if (implementadoresEdit.length > 0) {
+            // Establecer la cantidad de selects
+            setSelectCount(implementadoresEdit.length);
+            
+            // Establecer el valor de cada select
+            implementadoresEdit.forEach((implementador, index) => {
+                setValue(`impCod${index}`, implementador.impCod);
+            });
+        }
+    }, [implementadoresEdit]);
+
+    useEffect(() => {
+        if (ubicacionesEdit.length > 0) {
+            setLocationSelects(ubicacionesEdit.map(() => ({ count: 1, selects: [] })));
+    
+            ubicacionesEdit.forEach(async (ubicacion, index) => {
+                const data = await fetchSelect(ubicacion.ubiAno, ubicacion.ubiCod);
+                console.log(data)
+                let newSelectedValues = [...selectedValues];
+                let newSelectedCountryValues = [...selectedCountryValues];
+                data.forEach((location, locationIndex) => {
+                    console.log(location)
+                    console.log(index)
+                    console.log(locationIndex)
+                    handleLocationChange(JSON.stringify({ubiAno: location.ubiAno, ubiCod: location.ubiCod}), index, locationIndex);
+                    if (locationIndex > 0) {
+                        newSelectedValues[index] = JSON.stringify({ubiAno: location.ubiAno, ubiCod: location.ubiCod});
+                    } else {
+                        newSelectedCountryValues[index] = JSON.stringify({ubiAno: location.ubiAno, ubiCod: location.ubiCod});
+                    }
+                });
+                setSelectedValues(newSelectedValues);
+                setSelectedCountryValues(newSelectedCountryValues);
+            });
+        }
+    }, [ubicacionesEdit]);
+    
+    
+
+    const fetchSelect = async (ubiAno,ubiCod) => {
+        try {
+            const token = localStorage.getItem('token');
+            Notiflix.Loading.pulse('Cargando...');
+            
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Ubicacion/select/${ubiAno}/${ubiCod}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                Notiflix.Notify.failure(data.message);
+                return;
+            }
+            console.log(data)
+            return data; // Devuelve los datos obtenidos
+    
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            Notiflix.Loading.remove();
+        }
+    };
+
+    const validarUbicaciones = () => {
+        let nivel = -1;
+        for (let i = 0; i < locationSelects.length; i++) {
+            const paisSelectElement = document.querySelector(`select[name=select${i}]`);
+            if (paisSelectElement.value === '0') {
+                Notiflix.Notify.failure('Debe seleccionar un país.');
+                return false;
+            }
+            const nivelActual = locationSelects[i].selects.length;
+            if (nivel === -1) {
+                nivel = nivelActual;
+            } else if (nivel !== nivelActual) {
+                Notiflix.Notify.failure('Las ubicaciones deben tener el mismo nivel.');
+                return false;
+            }
+        }
+        return true;
+    }
+    
 
     const Guardar_Proyecto = () => {
+        if (!validarUbicaciones()) {
+            return;
+        }
         validateForm((data) => {
             // Crear un array para almacenar los valores de los selects
             const selectValues = [];
@@ -163,21 +254,8 @@ const FormSubProject = () => {
                 }
             }
             
-            const {proAno, proCod} = JSON.parse(data.proyecto)
-            const SubProyectoImplementadorDto = {
-                SubProyecto: {
-                    ...data,
-                    proAno,
-                    proCod
-                },
-                Implementadores: selectValues
-            }
-            console.log(SubProyectoImplementadorDto)
-            console.log(data)
-            console.log(isEditing)
-            handleSubmit(SubProyectoImplementadorDto.SubProyecto, isEditing, navigate);
-    
             // Crear un array para almacenar los valores de los selects de ubicación
+            let ubicaciones = [];
             locationSelects.forEach((country, countryIndex) => {
                 // Obtener el último select del grupo
                 const lastSelectElement = document.querySelector(`select[name=select${countryIndex}${country.selects.length - 1}]`);
@@ -192,15 +270,38 @@ const FormSubProject = () => {
                         const penultimateSelect = JSON.parse(penultimateSelectElement.value);
                         ubiAno = penultimateSelect.ubiAno;
                         ubiCod = penultimateSelect.ubiCod;
+                    } else {
+                        // Si solo hay un select (el de país) y su valor es '0', obtén el ubiAno y ubiCod del país
+                        const paisSelectElement = document.querySelector(`select[name=select${countryIndex}]`);
+                        console.log(countryIndex)
+                        console.log(paisSelectElement)
+                        const paisSelect = JSON.parse(paisSelectElement.value);
+                        ubiAno = paisSelect.ubiAno;
+                        ubiCod = paisSelect.ubiCod;
                     }
+                    ubicaciones.push({ ubiAno, ubiCod });
                 } else {
                     // Si el último select tiene un valor distinto de '0', usa ese
                     const ultimo = JSON.parse(lastSelect);
                     ubiAno = ultimo.ubiAno;
                     ubiCod = ultimo.ubiCod;
+                    ubicaciones.push({ ubiAno, ubiCod });
                 }
             });
 
+
+            const {proAno, proCod} = JSON.parse(data.proyecto)
+            const SubProyectoImplementadorDto = {
+                SubProyecto: {
+                    ...data,
+                    proAno,
+                    proCod
+                },
+                Implementadores: selectValues,
+                Ubicaciones: ubicaciones
+            }
+            console.log(SubProyectoImplementadorDto)
+            handleSubmit(SubProyectoImplementadorDto, isEditing, navigate);
         })();
     }
 
@@ -244,9 +345,22 @@ const FormSubProject = () => {
             Notiflix.Loading.remove();
         }
     };
-    
-    
 
+    const handleRemoveImplementador = (index) => {
+        if (selectCount > 1) {
+            setValue(`impCod${index}`, '0');
+            setSelectCount(prevCount => prevCount - 1);
+        }
+    }
+    
+    const handleRemoveUbicacion = (index) => {
+        if (locationSelects.length > 1) {
+            setValue(`select${index}`, '0');
+            const newLocationSelects = locationSelects.filter((_, i) => i !== index);
+            setLocationSelects(newLocationSelects);
+        }
+    }
+    
     return (
         <>
             <div className="PowerMas_Header_Form_Beneficiarie flex ai-center p_5 gap-1">
@@ -361,26 +475,28 @@ const FormSubProject = () => {
                             <FaPlus className='w-auto f1 pointer' onClick={() => setSelectCount(count => count + 1)} /> 
                         </div>
                         {Array.from({ length: selectCount }, (_, index) => (
-                            <select 
-                                key={index}
-                                id={`impCod${index}`} 
-                                style={{textTransform: 'capitalize'}}
-                                className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields[`impCod${index}`] || isSubmitted ? (errors[`impCod${index}`] ? 'invalid' : 'valid') : ''}`} 
-                                {...register(`impCod${index}`, { 
-                                    validate: value => value !== '0' || 'El campo es requerido' 
-                                })}
-                            >
-                                <option value="0">--Seleccione Implementador--</option>
-                                {implementadores.map(item => (
-                                    <option 
-                                        key={item.impCod} 
-                                        value={item.impCod}
-                                        style={{textTransform: 'capitalize'}}
-                                    > 
-                                        {item.impNom.toLowerCase()}
-                                    </option>
-                                ))}
-                            </select>
+                            <div key={index} className="flex gap_5">
+                                <select 
+                                    id={`impCod${index}`} 
+                                    style={{textTransform: 'capitalize'}}
+                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields[`impCod${index}`] || isSubmitted ? (errors[`impCod${index}`] ? 'invalid' : 'valid') : ''}`} 
+                                    {...register(`impCod${index}`, { 
+                                        validate: value => value !== '0' || 'El campo es requerido' 
+                                    })}
+                                >
+                                    <option value="0">--Seleccione Implementador--</option>
+                                    {implementadores.map(item => (
+                                        <option 
+                                            key={item.impCod} 
+                                            value={item.impCod}
+                                            style={{textTransform: 'capitalize'}}
+                                        > 
+                                            {item.impNom.toLowerCase()}
+                                        </option>
+                                    ))}
+                                </select>
+                                <button onClick={() => handleRemoveImplementador(index)}>X</button>
+                            </div>
                         ))}
                     </div>
                     <div className="p1" style={{backgroundColor: '#fff', border: '1px solid #372e2c3d'}}>
@@ -393,12 +509,16 @@ const FormSubProject = () => {
                         </div>
                         {locationSelects.map((country, countryIndex) => (
                             <div className="m_75" key={countryIndex}>
-                                <label htmlFor="pais" className="">
-                                    Pais:
-                                </label>
+                                <div className="flex ai-center jc-space-between">
+                                    <label htmlFor="pais" className="">
+                                        Pais:
+                                    </label>
+                                    <button onClick={() => handleRemoveUbicacion(countryIndex)}>X</button>
+                                </div>
                                 <select 
                                     id={`pais${countryIndex}`}
                                     style={{textTransform: 'capitalize'}}
+                                    value={selectedCountryValues[countryIndex]}
                                     name={`select${countryIndex}`}
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields[`pais${countryIndex}`] || isSubmitted ? (errors[`pais${countryIndex}`] ? 'invalid' : 'valid') : ''}`} 
                                     onChange={(event) => handleLocationChange(event.target.value, countryIndex, -1)}
@@ -417,6 +537,7 @@ const FormSubProject = () => {
                                     <select
                                         key={selectIndex}
                                         name={`select${countryIndex}${selectIndex}`}
+                                        value={selectedValues[selectIndex]}
                                         onChange={(event) => handleLocationChange(event.target.value, countryIndex, selectIndex)}
                                         style={{textTransform: 'capitalize'}}
                                         className="block Phone_12"

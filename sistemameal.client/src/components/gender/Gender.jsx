@@ -15,6 +15,10 @@ const Gender = () => {
     // Definir controller y fieldMapping como variables
     const controller = 'Genero';
     const fieldMapping = { codigo: 'genCod', nombre: 'genNom' };
+    const filterProperties = {
+        'CODIGO': 'genCod',
+        'NOMBRE': 'genNom',
+    };
     const { codigo, ...restFieldMapping } = fieldMapping;
   
     // Toggle Modal
@@ -41,6 +45,7 @@ const Gender = () => {
                 controller={controller}
                 fieldMapping={fieldMapping}
                 title={'Géneros'}
+                filterProperties={filterProperties}
             />
 
             <Modal

@@ -41,8 +41,12 @@ const Table = ({ data, openModal, setData, controller, fieldMapping, title, resi
                 accessorKey: fieldMapping[field],
                 cell: ({row}) => {
                     let text = row.original[fieldMapping[field]];
-                    if (field === 'involucra') {
-                        text = text === 'S' ? 'Si' : 'No';
+                    if (fieldMapping[field] === 'uniInvPer') {
+                        if (text === 'S') {
+                            return 'Si';
+                        } else {
+                            return 'No';
+                        }
                     } else if (field === 'color') {
                         return (
                             <div style={{color: text}}>

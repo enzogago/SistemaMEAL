@@ -14,6 +14,11 @@ const IdentityDocument = () => {
     // Definir controller y fieldMapping como variables
     const controller = 'DocumentoIdentidad';
     const fieldMapping = { codigo: 'docIdeCod', nombre: 'docIdeNom', abreviatura: 'docIdeAbr' };
+    const filterProperties = {
+        'CODIGO': 'docIdeCod',
+        'NOMBRE': 'docIdeNom',
+        'ABREVIATURA': 'docIdeAbr',
+    };
     const { codigo, ...restFieldMapping } = fieldMapping;
   
     // Toggle Modal
@@ -40,6 +45,7 @@ const IdentityDocument = () => {
                 controller={controller}
                 fieldMapping={fieldMapping}
                 title='Documentos de Identidad'
+                filterProperties={filterProperties}
             />
 
             <Modal

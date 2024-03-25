@@ -32,7 +32,7 @@ const CustomTable = ({
     searchTags,
     setSearchTags,
     sums,
-    isLargePagination
+    isLargePagination = false
 }) => {
     const navigate = useNavigate();
     
@@ -151,7 +151,7 @@ const CustomTable = ({
                     }
                 </div>
             </div>
-            <div className="PowerMas_TableContainer" ref={tableRef}>
+            <div className="PowerMas_TableContainer flex-column" ref={tableRef}>
                 <table className={`Large_12 PowerMas_TableStatus ${scrolled ? 'w-300' : ''}`}>
                     <thead>
                         {

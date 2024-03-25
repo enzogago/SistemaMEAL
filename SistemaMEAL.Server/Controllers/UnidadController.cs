@@ -60,20 +60,20 @@ namespace SistemaMEAL.Server.Controllers
             var (message, messageType) = _unidades.Insertar(unidad);
             if (messageType == "1") // Error
             {
-                return BadRequest(message);
+                return new BadRequestObjectResult(new { success = false, message });
             }
             else if (messageType == "2") // Registro ya existe
             {
-                return Conflict(message);
+                return new ConflictObjectResult(new { success = false, message });
             }
-            else // Registro insertado correctamente
+            else // Registro modificado correctamente
             {
-                return Ok(message);
+                return new OkObjectResult(new { success = true, message });
             }
         }
 
-        [HttpPut("{uniCod}")]
-        public dynamic Modificar(string uniCod, Unidad unidad)
+        [HttpPut]
+        public dynamic Modificar(Unidad unidad)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
@@ -97,24 +97,23 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            unidad.UniCod = uniCod;
             var (message, messageType) = _unidades.Modificar(unidad);
             if (messageType == "1") // Error
             {
-                return BadRequest(message);
+                return new BadRequestObjectResult(new { success = false, message });
             }
             else if (messageType == "2") // Registro ya existe
             {
-                return Conflict(message);
+                return new ConflictObjectResult(new { success = false, message });
             }
             else // Registro modificado correctamente
             {
-                return Ok(message);
+                return new OkObjectResult(new { success = true, message });
             }
         }
 
-        [HttpDelete("{uniCod}")]
-        public dynamic Eliminar(string uniCod)
+        [HttpDelete]
+        public dynamic Eliminar(Unidad unidad)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
@@ -138,18 +137,18 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _unidades.Eliminar(uniCod);
+            var (message, messageType) = _unidades.Eliminar(unidad);
             if (messageType == "1") // Error
             {
-                return BadRequest(message);
+                return new BadRequestObjectResult(new { success = false, message });
             }
             else if (messageType == "2") // Registro ya existe
             {
-                return Conflict(message);
+                return new ConflictObjectResult(new { success = false, message });
             }
-            else // Registro eliminado correctamente
+            else // Registro modificado correctamente
             {
-                return Ok(message);
+                return new OkObjectResult(new { success = true, message });
             }
         }
     }

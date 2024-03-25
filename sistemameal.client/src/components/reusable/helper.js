@@ -393,7 +393,6 @@ export const fetchData = async (controller, setData) => {
         Notiflix.Loading.pulse('Cargando...');
         // Valores del storage
         const token = localStorage.getItem('token');
-        console.log("peteppet")
         // Obtenemos los datos
         const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/${controller}`, {
             headers: {

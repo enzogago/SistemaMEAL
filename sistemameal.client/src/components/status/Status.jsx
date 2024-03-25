@@ -14,6 +14,11 @@ const Status = () => {
     // Definir controller y fieldMapping como variables
     const controller = 'Estado';
     const fieldMapping = { codigo: 'estCod', nombre: 'estNom', color: 'estCol' };
+    const filterProperties = {
+        'CODIGO': 'estCod',
+        'NOMBRE': 'estNom',
+        'COLOR': 'estCol',
+    };
     const { codigo, ...restFieldMapping } = fieldMapping;
   
     // Toggle Modal
@@ -40,6 +45,7 @@ const Status = () => {
                 controller={controller}
                 fieldMapping={fieldMapping}
                 title='Estados'
+                filterProperties={filterProperties}
             />
 
             <Modal

@@ -157,7 +157,7 @@ namespace SistemaMEAL.Modulos
             return (mensaje, tipoMensaje);
         }
 
-        public (string? message, string? messageType) Eliminar(string tipValCod)
+        public (string? message, string? messageType) Eliminar(TipoValor tipoValor)
         {
             string? mensaje = "";
             string? tipoMensaje = "";
@@ -168,7 +168,7 @@ namespace SistemaMEAL.Modulos
                 SqlCommand cmd = new SqlCommand("SP_ELIMINAR_TIPO_VALOR", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
 
-                cmd.Parameters.AddWithValue("@P_TIPVALCOD", tipValCod);
+                cmd.Parameters.AddWithValue("@P_TIPVALCOD", tipoValor.TipValCod);
                 cmd.Parameters.AddWithValue("@P_USUMOD", "Usuario");
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");

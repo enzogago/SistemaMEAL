@@ -5,6 +5,7 @@ import './js/notiflixConfig';
 // Context
 import { AuthContext } from './context/AuthContext';
 import LoadingComponent from './components/LoadingComponent';
+import ResultChain from './components/result-chain/ResultChain';
 // import Login from './components/auth/Login';
 // import Layout from './components/router/Layout';
 // Componentes
@@ -120,6 +121,7 @@ const App = () => {
         "unit": Unit,
         "beneficiarie": Beneficiarie,
         "upload-project": FormatProject,
+        "result-chain": ResultChain,
     };
 
     let defaultRoute;

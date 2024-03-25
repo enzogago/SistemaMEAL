@@ -14,6 +14,10 @@ const Charge = () => {
     // Definir controller y fieldMapping como variables
     const controller = 'Nacionalidad';
     const fieldMapping = { codigo: 'nacCod', nombre: 'nacNom' };
+    const filterProperties = {
+        'CODIGO': 'nacCod',
+        'NOMBRE': 'nacNom',
+    };
     const { codigo, ...restFieldMapping } = fieldMapping;
   
     // Toggle Modal
@@ -40,6 +44,7 @@ const Charge = () => {
                 controller={controller}
                 fieldMapping={fieldMapping}
                 title='Nacionalidades'
+                filterProperties={filterProperties}
             />
 
             <Modal

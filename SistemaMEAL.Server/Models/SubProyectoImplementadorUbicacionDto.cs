@@ -1,8 +1,8 @@
 namespace SistemaMEAL.Server.Models
 {
-    public class ProyectoImplementadorUbicacionDto
+    public class SubProyectoImplementadorUbicacionDto
     {
-        public Proyecto? Proyecto { get; set; }
+        public SubProyecto? SubProyecto { get; set; }
         public List<Ubicacion>? Ubicaciones { get; set; }
         public List<Implementador>? Implementadores { get; set; }
 

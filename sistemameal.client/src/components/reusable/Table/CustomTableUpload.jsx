@@ -134,7 +134,7 @@ const CustomTableUpload = ({
                     }
                 </div>
             </div>
-            <div className="PowerMas_TableContainer" ref={tableRef}>
+            <div className="PowerMas_TableContainer flex-column" ref={tableRef}>
                 <table className={`Large_12 PowerMas_TableStatus ${scrolled ? 'w-300' : ''}`}>
                     <thead>
                         {

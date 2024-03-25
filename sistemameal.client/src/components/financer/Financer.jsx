@@ -14,6 +14,10 @@ const Financer = () => {
     // Definir controller y fieldMapping como variables
     const controller = 'Financiador';
     const fieldMapping = { codigo: 'finCod', nombre: 'finNom' };
+    const filterProperties = {
+        'CODIGO': 'finCod',
+        'NOMBRE': 'finNom',
+    };
     const { codigo, ...restFieldMapping } = fieldMapping;
   
     // Toggle Modal
@@ -40,6 +44,7 @@ const Financer = () => {
                 controller={controller}
                 fieldMapping={fieldMapping}
                 title='Financiadores'
+                filterProperties={filterProperties}
             />
 
             <Modal

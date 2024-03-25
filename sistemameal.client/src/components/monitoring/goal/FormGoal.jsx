@@ -927,7 +927,7 @@ const FormGoal = () => {
                         </>
                         :
                         <>
-                            <div className="PowerMas_TableContainer">
+                            <div className="PowerMas_TableContainer flex-column">
                                 <table className="PowerMas_TableStatus">
                                     <thead>
                                         <tr>

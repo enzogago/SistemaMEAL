@@ -14,6 +14,11 @@ const Unit = () => {
     // Definir controller y fieldMapping como variables
     const controller = 'Unidad';
     const fieldMapping = { codigo: 'uniCod', nombre: 'uniNom', involucra: 'uniInvPer' };
+    const filterProperties = {
+        'CODIGO': 'uniCod',
+        'NOMBRE': 'uniNom',
+        'INVOLUCRA_PERSONA': 'uniInvPer',
+    };
     const { codigo, ...restFieldMapping } = fieldMapping;
   
     // Toggle Modal
@@ -40,6 +45,7 @@ const Unit = () => {
                 controller={controller}
                 fieldMapping={fieldMapping}
                 title='Unidades'
+                filterProperties={filterProperties}
             />
 
             <Modal

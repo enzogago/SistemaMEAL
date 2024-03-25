@@ -5,8 +5,6 @@ import { fetchData, handleSubmitMant } from '../reusable/helper';
 
 const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidades, tiposDeValor }) => {
     // Variables de estado
-    
-
     const [involucraSubActividad, setInvolucraSubActividad] = useState(false);
     const [subProyectos, setSubProyectos] = useState([]);
     const [objetivos, setObjetivos] = useState([]);
@@ -53,10 +51,17 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                 actAno,
                 actCod
             }
+        } else {
+            const { resAno, resCod } = JSON.parse(data.resultado);
+            data = {
+                ...data,
+                resAno,
+                resCod
+            }
         }
-        console.log(data)
         handleSubmitMant('Indicador', !!estadoEditado, data, setData, closeModalAndReset)
     };
+
 
     // Efecto para manejar la edición del estado
     useEffect(() => {
@@ -91,7 +96,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                         const {actAno, actCod} = data[0]; 
                         setValue('actAno',actAno);
                         setValue('actCod',actCod);
-                    }
+                    } 
                 }
             });
         }

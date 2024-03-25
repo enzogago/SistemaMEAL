@@ -14,6 +14,10 @@ const Role = () => {
     // Definir controller y fieldMapping como variables
     const controller = 'Rol';
     const fieldMapping = { codigo: 'rolCod', nombre: 'rolNom' };
+    const filterProperties = {
+        'CODIGO': 'rolCod',
+        'NOMBRE': 'rolNom',
+    };
     const { codigo, ...restFieldMapping } = fieldMapping;
   
     // Toggle Modal
@@ -40,6 +44,7 @@ const Role = () => {
                 controller={controller}
                 fieldMapping={fieldMapping}
                 title='Roles'
+                filterProperties={filterProperties}
             />
 
             <Modal

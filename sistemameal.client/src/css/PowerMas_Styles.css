@@ -1056,7 +1056,6 @@ textarea {
 	flex-grow: 1;
     overflow: auto;
 	display: flex;
-	flex-direction: column;
 }
 .PowerMas_TableContainerHome{
 	flex-grow: 1;
@@ -1086,9 +1085,6 @@ textarea {
 }
 .PowerMas_TableStatus tbody td {
 	white-space: nowrap;
-}
-.PowerMas_TableStatus tbody input{
-	width: 70%;
 }
 
 .PowerMas_TableStatus thead th div svg {
@@ -1939,4 +1935,14 @@ textarea {
 }
 .PowerMas_RecentsSection{
 	max-height: 30rem;
+}
+
+.PowerMas_Buttom_Tab{
+	background-color: #fff;
+	padding: 0.25rem 0.5rem;
+}
+
+.PowerMas_Buttom_Tab_Active{
+	background-color: #F87C56;
+	color: #fff;
 }

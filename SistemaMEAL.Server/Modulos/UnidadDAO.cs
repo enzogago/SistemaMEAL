@@ -158,7 +158,7 @@ namespace SistemaMEAL.Modulos
             return (mensaje, tipoMensaje);
         }
 
-        public (string? message, string? messageType) Eliminar(string uniCod)
+        public (string? message, string? messageType) Eliminar(Unidad unidad)
         {
             string? mensaje = "";
             string? tipoMensaje = "";
@@ -169,7 +169,7 @@ namespace SistemaMEAL.Modulos
                 SqlCommand cmd = new SqlCommand("SP_ELIMINAR_UNIDAD", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
 
-                cmd.Parameters.AddWithValue("@P_UNICOD", uniCod);
+                cmd.Parameters.AddWithValue("@P_UNICOD", unidad.UniCod);
                 cmd.Parameters.AddWithValue("@P_USUMOD", "Usuario");
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");

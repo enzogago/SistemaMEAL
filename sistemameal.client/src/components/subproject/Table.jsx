@@ -17,16 +17,14 @@ import CustomTable from "../reusable/Table/CustomTable";
 
 
 const Table = ({data = [], setData}) => {
-    console.log(data)
     const navigate = useNavigate();
     // Variables State AuthContext 
     const { authInfo } = useContext(AuthContext);
     const { userPermissions } = authInfo;
     // States locales
-    const [searchTags, setSearchTags] = useState([]);
+    const [searchFilter, setSearchFilter] = useState('');
     const [dropdownOpen, setDropdownOpen] = useState(false);
-    const [isInputEmpty, setIsInputEmpty] = useState(true);
-    const [inputValue, setInputValue] = useState('');
+
 
      /* TANSTACK */
      const actions = {
@@ -140,16 +138,17 @@ const Table = ({data = [], setData}) => {
     const [sorting, setSorting] = useState([]);
     const filteredData = useMemo(() => 
         data.filter(item => 
-            searchTags.every(tag => 
-            (item.subProNom ? item.subProNom.includes(tag.toUpperCase()) : false) ||
-            (item.subProSap ? item.subProSap.includes(tag.toUpperCase()) : false) ||
-            (item.proNom ? item.proNom.includes(tag.toUpperCase()) : false) ||
-            (item.proRes ? item.proRes.includes(tag.toUpperCase()) : false) ||
-            (item.proPerAnoFin ? item.proPerAnoFin.includes(tag.toUpperCase()) : false) ||
-            (item.proPerAnoIni ? item.proPerAnoIni.includes(tag.toUpperCase()) : false)
-            )
-        ), [data, searchTags]
+            (item.subProNom ? item.subProNom.includes(searchFilter.toUpperCase()) : false) ||
+            (item.subProSap ? item.subProSap.includes(searchFilter.toUpperCase()) : false) ||
+            (item.proNom ? item.proNom.includes(searchFilter.toUpperCase()) : false) ||
+            (item.proRes ? item.proRes.includes(searchFilter.toUpperCase()) : false) ||
+            (item.proPerAnoFin ? item.proPerAnoFin.includes(searchFilter.toUpperCase()) : false) ||
+            (item.proPerAnoIni ? item.proPerAnoIni.includes(searchFilter.toUpperCase()) : false) ||
+            (item.proPerMesFinNombre ? item.proPerMesFinNombre.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
+            (item.proPerMesIniNombre ? item.proPerMesIniNombre.toUpperCase().includes(searchFilter.toUpperCase()) : false)
+        ), [data, searchFilter]
     );
+
 
     const table = useReactTable({
         data: filteredData,
@@ -168,7 +167,7 @@ const Table = ({data = [], setData}) => {
     // Preparar los datos
     let dataExport = [...table.options.data]; 
     const headers = ['NOMBRE', 'CODIGO_SAP', 'PROYECTO', 'RESPONSABLE', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
-    const title = 'SUB_PROYECTOS';  // El título de tu archivo
+    const title = 'SUB PROYECTOS';  // El título de tu archivo
     const properties = ['subProNom', 'subProSap', 'proNom', 'proRes', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
     const format = 'a3';  // El tamaño del formato que quieres establecer para el PDF
 
@@ -184,27 +183,6 @@ const Table = ({data = [], setData}) => {
         setDropdownOpen(false);
     };
 
-    // Añade una nueva etiqueta al presionar Enter
-    const handleKeyDown = (e) => {
-        if (e.key === 'Enter' && inputValue && !searchTags.includes(inputValue)) {
-            setSearchTags(prevTags => [...prevTags, inputValue]);
-            setInputValue('');  // borra el valor del input
-            setIsInputEmpty(true);
-        } else if (e.key === 'Backspace' && isInputEmpty && searchTags.length > 0) {
-            setSearchTags(prevTags => prevTags.slice(0, -1));
-        }
-    }
-
-    const handleInputChange = (e) => {
-        setInputValue(e.target.value);  // actualiza el valor del input
-        setIsInputEmpty(e.target.value === '');
-    }
-
-    // Elimina una etiqueta
-    const removeTag = (tag) => {
-        setSearchTags(searchTags.filter(t => t !== tag));
-    }
-
     return (
         <CustomTable
             title='Sub Proyectos'
@@ -216,12 +194,8 @@ const Table = ({data = [], setData}) => {
             table={table}
             navigatePath='form-subproject'
             resize={false}
-            handleInputChange={handleInputChange}
-            handleKeyDown={handleKeyDown}
-            inputValue={inputValue}
-            removeTag={removeTag}
-            searchTags={searchTags}
-            setSearchTags={setSearchTags}
+            searchFilter={searchFilter} 
+            setSearchFilter={setSearchFilter} 
         />
     )
 }

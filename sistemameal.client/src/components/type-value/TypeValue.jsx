@@ -14,6 +14,10 @@ const TypeValue = () => {
     // Definir controller y fieldMapping como variables
     const controller = 'TipoValor';
     const fieldMapping = { codigo: 'tipValCod', nombre: 'tipValNom' };
+    const filterProperties = {
+        'CODIGO': 'tipValCod',
+        'NOMBRE': 'tipValNom',
+    };
     const { codigo, ...restFieldMapping } = fieldMapping;
   
     // Toggle Modal
@@ -40,6 +44,7 @@ const TypeValue = () => {
                 controller={controller}
                 fieldMapping={fieldMapping}
                 title='Tipos de Valor'
+                filterProperties={filterProperties}
             />
 
             <Modal

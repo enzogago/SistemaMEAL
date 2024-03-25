@@ -31,6 +31,18 @@ namespace SistemaMEAL.Server.Controllers
             return Ok(paises);
         }
 
+        [HttpGet("subproyecto/{subProAno}/{subProCod}")]
+        public dynamic BuscarUbicacionesSubProyecto(string subProAno, string subProCod)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+            
+            var implementadores = _ubicaciones.BuscarUbicacionesSubProyecto(subProAno:subProAno, subProCod:subProCod);
+            return Ok(implementadores);
+        }
+
 
         [HttpGet("{ubiAno}/{ubiCod}")]
         public dynamic ListadoJerarquiaUbicacion(string ubiAno, string ubiCod)

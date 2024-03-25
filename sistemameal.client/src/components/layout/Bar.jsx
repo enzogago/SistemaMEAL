@@ -16,7 +16,6 @@ import femenino from '../../img/PowerMas_Avatar_Femenino.svg';
 import Logo from '../../img/PowerMas_LogoAyudaEnAccion.png';
 
 const Bar = ({showSidebarAndBar}) => {
-    console.log(showSidebarAndBar)
     const navigate = useNavigate();
     // Variables state AuthContext
     const { authInfo, authActions } = useContext(AuthContext);

@@ -52,7 +52,6 @@ const Activity = () => {
     // Cargar los registros
     useEffect(() => {
         fetchData(controller, setData);
-        fetchData(controllerSelect, setSelect);
     }, []);
 
     return (

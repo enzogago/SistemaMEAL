@@ -60,20 +60,20 @@ namespace SistemaMEAL.Server.Controllers
             var (message, messageType) = _tipos.Insertar(tipoValor);
             if (messageType == "1") // Error
             {
-                return BadRequest(message);
+                return new BadRequestObjectResult(new { success = false, message });
             }
             else if (messageType == "2") // Registro ya existe
             {
-                return Conflict(message);
+                return new ConflictObjectResult(new { success = false, message });
             }
-            else // Registro insertado correctamente
+            else // Registro modificado correctamente
             {
-                return Ok(message);
+                return new OkObjectResult(new { success = true, message });
             }
         }
 
-        [HttpPut("{tipValCod}")]
-        public dynamic Modificar(string tipValCod, TipoValor tipoValor)
+        [HttpPut]
+        public dynamic Modificar(TipoValor tipoValor)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
@@ -97,25 +97,24 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            tipoValor.TipValCod = tipValCod; // Asegúrate de que el código del estado en el objeto estado sea el correcto
             var (message, messageType) = _tipos.Modificar(tipoValor);
             if (messageType == "1") // Error
             {
-                return BadRequest(message);
+                return new BadRequestObjectResult(new { success = false, message });
             }
             else if (messageType == "2") // Registro ya existe
             {
-                return Conflict(message);
+                return new ConflictObjectResult(new { success = false, message });
             }
             else // Registro modificado correctamente
             {
-                return Ok(message);
+                return new OkObjectResult(new { success = true, message });
             }
         }
 
 
-        [HttpDelete("{tipValCod}")]
-        public dynamic Eliminar(string tipValCod)
+        [HttpDelete]
+        public dynamic Eliminar(TipoValor tipoValor)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
@@ -139,18 +138,18 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _tipos.Eliminar(tipValCod);
+            var (message, messageType) = _tipos.Eliminar(tipoValor);
             if (messageType == "1") // Error
             {
-                return BadRequest(message);
+                return new BadRequestObjectResult(new { success = false, message });
             }
             else if (messageType == "2") // Registro ya existe
             {
-                return Conflict(message);
+                return new ConflictObjectResult(new { success = false, message });
             }
-            else // Registro eliminado correctamente
+            else // Registro modificado correctamente
             {
-                return Ok(message);
+                return new OkObjectResult(new { success = true, message });
             }
         }
 

@@ -31,6 +31,18 @@ namespace SistemaMEAL.Server.Controllers
             return Ok(implementadores);
         }
 
+        [HttpGet("subproyecto/{subProAno}/{subProCod}")]
+        public dynamic BuscarImplementadoresSubProyecto(string subProAno, string subProCod)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+            
+            var implementadores = _implementadores.BuscarImplementadoresSubProyecto(subProAno:subProAno, subProCod:subProCod);
+            return Ok(implementadores);
+        }
+
         [HttpPost]
         public dynamic Insertar(Implementador implementador)
         {

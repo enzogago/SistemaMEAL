@@ -58,45 +58,45 @@ namespace SistemaMEAL.Server.Controllers
             return Ok(data.FirstOrDefault());
         }
 
-        [HttpPost]
-        public dynamic Insertar(SubProyecto subProyecto)
-        {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+        // [HttpPost]
+        // public dynamic Insertar(SubProyecto subProyecto)
+        // {
+        //     var identity = HttpContext.User.Identity as ClaimsIdentity;
+        //     var rToken = Jwt.validarToken(identity, _usuarios);
 
-            if (!rToken.success) return rToken;
+        //     if (!rToken.success) return rToken;
 
-            dynamic data = rToken.result;
-            Usuario usuarioActual = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (usuarioActual.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para realizar esta accion",
-                    result = ""
-                };
-            }
+        //     dynamic data = rToken.result;
+        //     Usuario usuarioActual = new Usuario
+        //     {
+        //         UsuAno = data.UsuAno,
+        //         UsuCod = data.UsuCod,
+        //         RolCod = data.RolCod
+        //     };
+        //     if (usuarioActual.RolCod != "01")
+        //     {
+        //         return new
+        //         {
+        //             success = false,
+        //             message = "No tienes permisos para realizar esta accion",
+        //             result = ""
+        //         };
+        //     }
 
-            var (subProAno, subProCod, message, messageType) = _subproyectos.Insertar(subProyecto);
-            if (messageType == "1") // Error
-            {
-                return new BadRequestObjectResult(new { success = false, message });
-            }
-            else if (messageType == "2") // Registro ya existe
-            {
-                return new ConflictObjectResult(new { success = false, message });
-            }
-            else // Registro modificado correctamente
-            {
-                return new OkObjectResult(new { subProAno, subProCod, success = true, message });
-            }
-        }
+        //     var (subProAno, subProCod, message, messageType) = _subproyectos.Insertar(subProyecto);
+        //     if (messageType == "1") // Error
+        //     {
+        //         return new BadRequestObjectResult(new { success = false, message });
+        //     }
+        //     else if (messageType == "2") // Registro ya existe
+        //     {
+        //         return new ConflictObjectResult(new { success = false, message });
+        //     }
+        //     else // Registro modificado correctamente
+        //     {
+        //         return new OkObjectResult(new { subProAno, subProCod, success = true, message });
+        //     }
+        // }
 
         [HttpPut]
         public dynamic Modificar(SubProyecto subProyecto)
@@ -175,6 +175,46 @@ namespace SistemaMEAL.Server.Controllers
             else // Registro modificado correctamente
             {
                 return new OkObjectResult(new { success = true, message });
+            }
+        }
+
+        [HttpPost]
+        public dynamic Insertar(SubProyectoImplementadorUbicacionDto subProyectoImplementadorUbicacionDto)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return rToken;
+
+            dynamic data = rToken.result;
+            Usuario usuarioActual = new Usuario
+            {
+                UsuAno = data.UsuAno,
+                UsuCod = data.UsuCod,
+                RolCod = data.RolCod
+            };
+            if (usuarioActual.RolCod != "01")
+            {
+                return new
+                {
+                    success = false,
+                    message = "No tienes permisos para insertar usuarios",
+                    result = ""
+                };
+            }
+            var (message, messageType) = _subproyectos.InsertarSubProyectoImplementadorUbicacion(subProyectoImplementadorUbicacionDto.SubProyecto, subProyectoImplementadorUbicacionDto.Implementadores, subProyectoImplementadorUbicacionDto.Ubicaciones);
+                if (messageType == "1") // Error
+                {
+                    return new BadRequestObjectResult(new { success = false, message });
+                }
+                else if (messageType == "2") // Registro ya existe
+                {
+                    return new ConflictObjectResult(new { success = false, message });
+                }
+                else // Registro modificado correctamente
+                {
+                    return new OkObjectResult(new { success = true, message });
+
             }
         }
     }

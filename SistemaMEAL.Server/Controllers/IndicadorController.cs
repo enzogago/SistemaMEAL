@@ -32,6 +32,51 @@ namespace SistemaMEAL.Server.Controllers
             return Ok(data);
         }
 
+        [HttpGet("subproyecto/{subProAno}/{subProCod}")]
+        public dynamic BuscarIndicadorPorSubproyecto(string subProAno, string subProCod)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var data = _indicadores.BuscarIndicadorPorSubproyecto(subProAno,subProCod);
+            return Ok(data);
+        }
+        [HttpGet("cadena/{subProAno}/{subProCod}")]
+        public dynamic BuscarCadenaPorPeriodo(string subProAno, string subProCod)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var data = _indicadores.BuscarCadenaPorPeriodo(subProAno,subProCod);
+            return Ok(data);
+        }
+        [HttpGet("implementador/{subProAno}/{subProCod}")]
+        public dynamic BuscarCadenaPorImplementador(string subProAno, string subProCod)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var data = _indicadores.BuscarCadenaPorImplementador(subProAno,subProCod);
+            return Ok(data);
+        }
+        [HttpGet("ubicacion/{subProAno}/{subProCod}")]
+        public dynamic BuscarCadenaPorUbicacion(string subProAno, string subProCod)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var data = _indicadores.BuscarCadenaPorUbicacion(subProAno,subProCod);
+            return Ok(data);
+        }
+
         [HttpPost]
         public dynamic Insertar(Indicador indicador)
         {

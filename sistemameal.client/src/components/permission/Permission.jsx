@@ -14,6 +14,10 @@ const Permission = () => {
     // Definir controller y fieldMapping como variables
     const controller = 'Permiso';
     const fieldMapping = { codigo: 'perCod', nombre: 'perNom' };
+    const filterProperties = {
+        'CODIGO': 'perCod',
+        'NOMBRE': 'perNom',
+    };
     const { codigo, ...restFieldMapping } = fieldMapping;
   
     // Toggle Modal
@@ -40,6 +44,7 @@ const Permission = () => {
                 controller={controller}
                 fieldMapping={fieldMapping}
                 title='Permisos'
+                filterProperties={filterProperties}
             />
 
             <Modal
