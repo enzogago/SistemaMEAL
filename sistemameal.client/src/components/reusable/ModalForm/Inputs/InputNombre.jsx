@@ -14,7 +14,7 @@ const InputNombre = ({register, errors, dirtyFields, isSubmitted}) => {
         </label>
         <input 
             id="nombre"
-            className={`p1 PowerMas_Modal_Form_${dirtyFields.nombre || isSubmitted ? (errors.nombre ? 'invalid' : 'valid') : ''}`}  
+            className={`p_5 PowerMas_Modal_Form_${dirtyFields.nombre || isSubmitted ? (errors.nombre ? 'invalid' : 'valid') : ''}`}  
             type="text" 
             placeholder='Nuevo' 
             maxLength={300} 

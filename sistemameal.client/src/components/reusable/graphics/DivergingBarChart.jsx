@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
+import { formatter } from '../../monitoring/goal/helper';
 
 const DivergingBarChart = ({ rangeData, id, maleColor, femaleColor }) => {
     const ageRanges = [
@@ -94,7 +95,7 @@ const DivergingBarChart = ({ rangeData, id, maleColor, femaleColor }) => {
             .attr("y", (d, i) => y(i) + y.bandwidth() / 2) // Usa el índice en lugar de d.age
             .attr("text-anchor", "end")
             .attr("dy", "0.35em")
-            .text(d => d.count.toLocaleString());
+            .text(d => formatter.format(d.count));
             
             svg.append("g")
             .selectAll("text")
@@ -103,7 +104,7 @@ const DivergingBarChart = ({ rangeData, id, maleColor, femaleColor }) => {
             .attr("x", d => width / 2 + x(d.count) + margin.left/2 + 5)
             .attr("y", (d, i) => y(i) + y.bandwidth() / 2) // Usa el índice en lugar de d.age
             .attr("dy", "0.35em")
-            .text(d => d.count.toLocaleString());
+            .text(d => formatter.format(d.count));
             
     }, [rangeData]);
 

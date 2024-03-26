@@ -1,9 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import d3Tip from 'd3-tip';
+import { formatter } from '../../monitoring/goal/helper';
 
 const HorizontalBarChart = ({ data, id, barColor }) => { // Añade barColor a las props
-    console.log(data)
     const ref = useRef();
 
     useEffect(() => {
@@ -78,7 +78,7 @@ const HorizontalBarChart = ({ data, id, barColor }) => { // Añade barColor a la
             .attr("x", d => x(d.value) - 4)
             .attr("y", (d, i) => y(i) + y.bandwidth() / 2)
             .attr("dy", "0.35em")
-            .text(d => Number(d.value).toLocaleString());
+            .text(d => formatter.format(Number(d.value)));
 
 
         svg.append("g")

@@ -12,6 +12,7 @@ const DivergingBarChart = lazy(() => import('../reusable/graphics/DivergingBarCh
 const HorizontalBarChart = lazy(() => import('../reusable/graphics/HorizontalBarChart'));
 import masculino from '../../img/PowerMas_Avatar_Masculino.svg';
 import femenino from '../../img/PowerMas_Avatar_Femenino.svg';
+import { formatter } from '../monitoring/goal/helper';
 
 
 const Home = () => {
@@ -54,7 +55,6 @@ const Home = () => {
                 return;
             }
             const data = await response.json();
-            console.log(data)
             if (data.success === false) {
                 Notiflix.Notify.failure(data.message);
                 return;
@@ -79,7 +79,6 @@ const Home = () => {
                         'Authorization': `Bearer ${token}`
                     }
                 });
-                console.log(response)
                 if (!response.ok) {
                     if(response.status == 401 || response.status == 403){
                         const data = await response.json();
@@ -88,7 +87,6 @@ const Home = () => {
                     return;
                 }
                 const data = await response.json();
-                console.log(data)
                 if (data.success == false) {
                     Notiflix.Notify.failure(data.message);
                     return;
@@ -215,7 +213,6 @@ const Home = () => {
                     return;
                 }
                 const data = await response.json();
-                console.log(data)
                 // Convierte el objeto a un array para usarlo en el gráfico
                 const dataFormat = data.map(item => ({ name: item.nacNom, value: item.cantidad }));
 
@@ -243,7 +240,6 @@ const Home = () => {
                     return;
                 }
                 const data = await response.json();
-                console.log(data)
                 // Convierte el objeto a un array para usarlo en el gráfico
                 const dataFormat = data.map(item => ({ name: item.benSex, value: item.cantidad }));
 
@@ -271,7 +267,6 @@ const Home = () => {
                     return;
                 }
                 const data = await response.json();
-                console.log(data)
                 setRangeData(data)
             } catch (error) {
                 console.error('Error:', error);
@@ -296,7 +291,6 @@ const Home = () => {
                     return;
                 }
                 const data = await response.json();
-                console.log(data)
                 setMapData(data)
             } catch (error) {
                 console.error('Error:', error);
@@ -366,7 +360,7 @@ const Home = () => {
     return(
     <>
         <div className="PowerMas_Search_Container_Home " style={{paddingBottom: '1rem'}} >
-            <div className="PowerMas_Input_Filter_Container flex" style={{border: '1px solid #85A9AD'}}>
+            <div className="PowerMas_Input_Filter_Container flex" style={{border: '1px solid #FFC658'}}>
                 <div className="flex ai-center">
                     {searchTags.map(tag => (
                         <span key={tag} className="PowerMas_InputTag flex">
@@ -389,30 +383,30 @@ const Home = () => {
             </div>
         </div>
 
-        <div className='PowerMas_Resume_Home'>
+        <div className='PowerMas_Resume_Home overflow-auto'>
             <div className="PowerMas_ResumeHome m1 flex flex-column">
                 <div className="PowerMas_RightSection flex Large_12 Medium_12 Phone_12 bg-white gap_5">
                     {/* <h2 className="Large-m_75 Large-f1_5 Powermas_FontTitle">Principales KPI</h2> */}
                     <div className="PowerMas_KPIRow Large-f1_25 Large-p1 Medium-p_5">
-                        <p className=" f1_25">Atenciones brindadas</p>
-                        <span className='f2'>{totalAtenciones.toLocaleString()}</span>
+                        <p className="f1_25">Atenciones brindadas</p>
+                        <span className='f2'>{formatter.format(totalAtenciones)}</span>
                     </div>
                     <div className="PowerMas_KPIRow Large-f1_25 Large-p1 Medium-p_5">
-                        <p className=" f1_25">Beneficiarios totales</p>
-                        <span className='f2'>{Number(totalBeneficiarios).toLocaleString()}</span>
+                        <p className="f1_25">Beneficiarios totales</p>
+                        <span className='f2'>{formatter.format(Number(totalBeneficiarios))}</span>
                     </div>
                     <div className="PowerMas_KPIRow Large-f1_25 Large-p1 Medium-p_5">
-                        <p className=" f1_25">Beneficiarios recurrentes</p>
-                        <span className='f2'>{0}</span>
+                        <p className="f1_25">Beneficiarios recurrentes</p>
+                        <span className='f2'>{formatter.format(0)}</span>
                     </div>
                     <div className="PowerMas_KPIRow gap_3 flex-column Large-f1_25">
-                        <p className=" f1_25" style={{whiteSpace: 'nowrap'}}>Avance Presupuesto</p>
+                        <p className="f1_25" style={{whiteSpace: 'nowrap'}}>Avance presupuesto</p>
                         <Suspense fallback={<div>Cargando...</div>}>
                             <DonutChart percentage={avanceTecnico} wh={140} rad={20} newId={'Dona_Presupuesto'} colorText={'#000'} colorPc={'#F87C56'} colorSpc={'#F7775A20'} />
                         </Suspense>
                     </div>
                     <div className="PowerMas_KPIRow gap_3 flex-column Large-f1_25">
-                        <p className=" f1_25">Avance Técnico</p>
+                        <p className="f1_25">Avance técnico</p>
                         <Suspense fallback={<div>Cargando...</div>}>
                             <DonutChart percentage={avanceTecnico} wh={140} rad={20} newId={'Dona_Tecnico'} colorText={'#000'} colorPc={'#F87C56'} colorSpc={'#F7775A20'} />
                         </Suspense>
@@ -423,11 +417,10 @@ const Home = () => {
                 </div>
             </div>
             <div className='flex flex-column m1 gap-1 center'>
-            <div className="flex Large-flex-row Medium-flex-row Small-flex-column gap-1">
-                    
+                <div className="flex Large-flex-row Medium-flex-row Small-flex-column gap-1">
                     <div className='PowerMas_Home_Card Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
                         <div className='Large_12 p_5 PowerMas_Tittle_Map'>
-                            <h4>Beneficiarios por Sexo</h4>
+                            <h4>Beneficiarios por sexo</h4>
                         </div>
                         <div className='Large_6 Medium_12 Phone_12 Large-p1 Small-p_75 flex-grow-1'>
                             <PieChart data={pieData} id='MaleFemale' />
@@ -443,7 +436,7 @@ const Home = () => {
                     </div>
                     <div className='PowerMas_Home_Card Large-p0 Medium-p_75 Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
                         <div className='Large_12 p_5 PowerMas_Tittle_Map'>
-                            <h4>Beneficiarios por Edad</h4>
+                            <h4>Beneficiarios por edad</h4>
                         </div>
                         <div className='Large_12 Medium_12 Phone_12 Large-p1 Medium-p_75 flex-grow-1'>
                             <Suspense fallback={<div>Cargando...</div>}>
@@ -470,7 +463,7 @@ const Home = () => {
                 <div className="flex Large-flex-row Medium-flex-row Small-flex-column gap-1">
                     <div className='PowerMas_Home_Card Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
                         <div className='Large_12 p_5 PowerMas_Tittle_Map'>
-                            <h4>Beneficiarios por Nacionalidad</h4>
+                            <h4>Beneficiarios por nacionalidad</h4>
                         </div>
                         <div className='Large_12 Medium_12 Phone_12 Large-p1 Medium-p_75 flex-grow-1'>
                             <Suspense fallback={<div>Cargando...</div>}>
@@ -480,7 +473,7 @@ const Home = () => {
                     </div>
                     <div className='PowerMas_Home_Card Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
                         <div className='Large_12 p_5 PowerMas_Tittle_Map'>
-                            <h4>Beneficiarios por Tipo de Documento</h4>
+                            <h4>Beneficiarios por tipo de documento</h4>
                         </div>
                         <div className='Large_12 Medium_12 Phone_12 Large-p1 Medium-p_75 flex-grow-1'>
                             <Suspense fallback={<div>Cargando...</div>}>
@@ -549,42 +542,48 @@ const Home = () => {
                 </div>
                 <div className='PowerMas_Home_Card Large-p0 Medium-p_75 Large_6 Medium_6 Phone_12 flex flex-column ai-center gap_3'>
                     <div className='Large_12 p_5 PowerMas_Tittle_Map center'>
-                        <h4>Beneficiarios por Ubicación</h4>
+                        <h4>Beneficiarios por ubicación</h4>
                     </div>
                     <div className='flex flex-grow-1 Phone_12' style={{position: 'relative'}}>
-                        <article className='flex ai-center flex-grow-1' style={{position: 'absolute', bottom: '0'}}>
+                        <article className='flex ai-center flex-grow-1' style={{position: 'absolute', bottom: '0', zIndex: '1'}}>
                             <div className='flex flex-column p_5 gap_5 Large_12'>
-                                <button 
-                                    className={`PowerMas_Buttom_Map PowerMas_Buttom_Map_${currentMap === 'Todos' ? 'Active' : ''}`} 
-                                    onClick={() => setCurrentMap('Todos')}
-                                >
-                                    Todos
-                                </button>
-                                <button 
-                                    className={`PowerMas_Buttom_Map PowerMas_Buttom_Map_${currentMap === 'Perú' ? 'Active' : ''}`} 
-                                    onClick={() => setCurrentMap('Perú')}
-                                >
-                                    Perú
-                                </button>
-                                <button 
-                                    className={`PowerMas_Buttom_Map PowerMas_Buttom_Map_${currentMap === 'Ecuador' ? 'Active' : ''}`} 
-                                    onClick={() => setCurrentMap('Ecuador')}
-                                >
-                                    Ecuador
-                                </button>
-                                <button 
-                                    className={`PowerMas_Buttom_Map PowerMas_Buttom_Map_${currentMap === 'Colombia' ? 'Active' : ''}`} 
-                                    onClick={() => setCurrentMap('Colombia')}
-                                >
-                                    Colombia
-                                </button>
+                                <div className='bg-white' style={{borderRadius: '6px'}}>
+                                    <button 
+                                        className={`PowerMas_Buttom_Map PowerMas_Buttom_Map_${currentMap === 'Todos' ? 'Active' : ''}`} 
+                                        onClick={() => setCurrentMap('Todos')}
+                                    >
+                                        Todos
+                                    </button>
+                                </div>
+                                <div className='bg-white' style={{borderRadius: '6px'}}>
+                                    <button 
+                                        className={`PowerMas_Buttom_Map PowerMas_Buttom_Map_${currentMap === 'Perú' ? 'Active' : ''}`} 
+                                        onClick={() => setCurrentMap('Perú')}
+                                    >
+                                        Perú
+                                    </button>
+                                </div>
+                                <div className='bg-white' style={{borderRadius: '6px'}}>
+                                    <button 
+                                        className={`PowerMas_Buttom_Map PowerMas_Buttom_Map_${currentMap === 'Ecuador' ? 'Active' : ''}`} 
+                                        onClick={() => setCurrentMap('Ecuador')}
+                                    >
+                                        Ecuador
+                                    </button>
+                                </div>
+                                <div className='bg-white' style={{borderRadius: '6px'}}>
+                                    <button 
+                                        className={`PowerMas_Buttom_Map PowerMas_Buttom_Map_${currentMap === 'Colombia' ? 'Active' : ''}`} 
+                                        onClick={() => setCurrentMap('Colombia')}
+                                    >
+                                        Colombia
+                                    </button>
+                                </div>
                             </div>
                         </article>
-                        <div className='Large_6 Medium_12 Phone_12 flex-grow-1'>
-                            <Suspense fallback={<div>Cargando...</div>}>
-                                <MapComponent mapData={mapData} beneficiariosData={beneficiariosData} />
-                            </Suspense>
-                        </div>
+                        <Suspense fallback={<div>Cargando...</div>}>
+                            <MapComponent mapData={mapData} beneficiariosData={beneficiariosData} />
+                        </Suspense>
                     </div>
                 </div>
             </div>

@@ -97,7 +97,7 @@ const Colombia = () => {
             .enter()
             .append("text")
             .text(function(d) {
-                return capitalize(d.properties.NOMBRE_DPT);
+                return poblacionPorDepartamento[d.properties.NOMBRE_DPT] ? capitalize(d.properties.NOMBRE_DPT) : '';
             })
             .attr("x", function(d) {
                 return path.centroid(d)[0];
@@ -132,7 +132,10 @@ const Colombia = () => {
             }
     }, []);
 
-    return <svg id='Colombia' ref={ref} />;
+    return (
+        <div style={{width: '100%', height: '100%', position: 'relative'}}>
+           <svg id='Colombia' ref={ref} style={{width: '100%', height: '100%', position: 'absolute'}} />
+       </div>)
 };
 
 export default Colombia;

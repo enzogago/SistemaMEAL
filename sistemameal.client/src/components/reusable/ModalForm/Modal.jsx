@@ -167,8 +167,8 @@ const Modal = ({ estadoEditado, modalVisible, setModalVisible, closeModal, setDa
                                 return null;
                         }
                     })}
-                    <div className='PowerMas_StatusSubmit flex jc-center ai-center'>
-                        <input className='' type="submit" value="Guardar" />
+                    <div className='flex jc-center ai-center'>
+                        <button className='PowerMas_Buttom_Primary Large_3 p_5' type="submit"> Guardar </button>
                     </div>
                 </form>
             </div>

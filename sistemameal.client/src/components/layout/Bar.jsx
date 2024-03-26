@@ -84,18 +84,20 @@ const Bar = ({showSidebarAndBar}) => {
     return (
         <div style={{backgroundColor: '#fff', boxShadow: 'inset 10px 0px 10px rgba(0, 0, 0, 0.2)'}}>
             <div 
-                className="PowerMas_BarContainer flex ai-center jc-space-between p1" 
+                className={`PowerMas_BarContainer flex ai-center ${showSidebarAndBar ? 'jc-space-between' : 'jc-flex-end'} c p1`}
                 style={{
                     backgroundColor: `${showSidebarAndBar? '#FFC65860' : '#ffffff'}`,
                     color: `${showSidebarAndBar? '#372E2C' : '#000000'}`,
                     borderBottom:`${showSidebarAndBar? '' : '2px solid #C6D5D7'}`,
+                    padding:`${showSidebarAndBar? '' : '0.5rem 1rem'}`,
+
                 }}
             >
                 {
                     showSidebarAndBar ?
                     <h1 className="Powermas_FontTitle Large-f2_5 Medium-f1_5 Small-f1">Hola de nuevo</h1>
                     :
-                    <img className='Large_1 Medium_10 Phone_6' height="auto"  title="Sistema MEAL Ayuda en Acción" src={Logo} alt="Logo Ayuda En Accion" />
+                    '' // <img className='Large_1 Medium_10 Phone_6' height="auto"  title="Sistema MEAL Ayuda en Acción" src={Logo} alt="Logo Ayuda En Accion" />
                 }
                 <div className="PowerMas_ProfileContainer">
                     <div className="PowerMas_ProfilePicture">
@@ -126,7 +128,7 @@ const Bar = ({showSidebarAndBar}) => {
                             {
                                 showSidebarAndBar &&
                                 <>
-                                    <Link className='flex ai-center p_25' to={`/form-profile/${encryptId(`${userLogged.usuAno}${userLogged.usuCod}`)}`}>
+                                    <Link className='flex ai-center p_25' onClick={() => setIsOpen(false)} to={`/form-profile/${encryptId(`${userLogged.usuAno}${userLogged.usuCod}`)}`}>
                                         <FaUserAlt className='w-auto m_5' />
                                         <span className='flex'>Perfil</span>
                                     </Link>
@@ -134,7 +136,7 @@ const Bar = ({showSidebarAndBar}) => {
                                         <FaUnlockKeyhole className='w-auto m_5' />
                                         <span className='flex'>Contraseña</span>
                                     </Link>
-                                    <Link className='flex ai-center p_25' to="/configurar">
+                                    <Link className='flex ai-center p_25' onClick={() => setIsOpen(false)}  to="/tutorial">
                                         <IoPlayCircleSharp className='w-auto m_5' />
                                         <span className='flex'>Tutoriales</span>
                                     </Link>

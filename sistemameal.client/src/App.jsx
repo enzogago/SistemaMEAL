@@ -6,6 +6,7 @@ import './js/notiflixConfig';
 import { AuthContext } from './context/AuthContext';
 import LoadingComponent from './components/LoadingComponent';
 import ResultChain from './components/result-chain/ResultChain';
+import Tutorial from './components/tutorial/Tutorial';
 // import Login from './components/auth/Login';
 // import Layout from './components/router/Layout';
 // Componentes
@@ -85,6 +86,7 @@ const App = () => {
                     }
         
                     const data = await response.json();
+                    console.log(data)
                     setMenuData(data);
                 } catch (error) {
                     console.error(error);
@@ -180,6 +182,7 @@ const App = () => {
                                                         <Route path="form-goal/:id?" element={<FormGoal />} />
                                                     </>
                                                 )}
+                                                <Route path="tutorial" element={<Tutorial />} />
                                                 <Route path="form-profile/:id" element={<FormProfile />} />
                                                 <Route path="*" element={<NotFound />} />
                                             </Routes>

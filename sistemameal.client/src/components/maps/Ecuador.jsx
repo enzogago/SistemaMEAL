@@ -91,7 +91,7 @@ const Ecuador = () => {
             .enter()
             .append("text")
             .text(function(d) {
-                return capitalize(d.properties.province);
+                return poblacionPorDepartamento[d.properties.province] ? capitalize(d.properties.province) : '';
             })
             .attr("x", function(d) {
                 return path.centroid(d)[0];
@@ -126,7 +126,10 @@ const Ecuador = () => {
             }
     }, []);
 
-    return <svg id='Ecuador' ref={ref} />;
+    return (
+        <div style={{width: '100%', height: '100%', position: 'relative'}}>
+           <svg id='Ecuador' ref={ref} style={{width: '100%', height: '100%', position: 'absolute'}} />
+       </div>)
 };
 
 export default Ecuador;

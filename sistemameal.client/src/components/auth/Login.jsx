@@ -11,7 +11,7 @@ import CryptoJS from 'crypto-js';
 const Login = () => {
     // Variables State AuthContext 
     const { authActions } = useContext(AuthContext);
-    const { setIsLoggedIn, setUserLogged } = authActions;
+    const { setIsLoggedIn, setUserLogged, setMenuData } = authActions;
     // States locales
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -19,6 +19,7 @@ const Login = () => {
     const [rememberMe, setRememberMe] = useState(false);
 
     useEffect(() => {
+        setMenuData([]);
         const savedCredentials = JSON.parse(localStorage.getItem('credentials'));
         if (savedCredentials) {
             console.log(savedCredentials)

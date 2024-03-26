@@ -6,6 +6,7 @@ import {
 } from '@tanstack/react-table';
 // Componentes
 import CustomTable from "../reusable/Table/CustomTable";
+import { formatter } from "../monitoring/goal/helper";
 
 const Table = ({ data }) => {
     // States locales
@@ -43,7 +44,7 @@ const Table = ({ data }) => {
                 accessorKey: "metMetTec",
                 cell: ({row}) => {
                     // Convierte el número a una cadena y añade las comas de miles
-                    const formattedNumber = Number(row.original.metMetTec).toLocaleString();
+                    const formattedNumber = formatter.format(Number(row.original.metMetTec));
                     return (
                         <div className="center">
                             {formattedNumber}
@@ -56,7 +57,7 @@ const Table = ({ data }) => {
                 accessorKey: "metEjeTec",
                 cell: ({row}) => {
                     // Convierte el número a una cadena y añade las comas de miles
-                    const formattedNumber = Number(row.original.metEjeTec).toLocaleString();
+                    const formattedNumber = formatter.format(Number(row.original.metEjeTec));
                     return (
                         <div className="center">
                             {formattedNumber}
@@ -90,7 +91,7 @@ const Table = ({ data }) => {
                 cell: ({row}) => {
                     if(row.original.metMetPre){
                         // Convierte el número a una cadena y añade las comas de miles
-                        const formattedNumber = Number(row.original.metMetPre).toLocaleString();
+                        const formattedNumber = formatter.format(Number(row.original.metMetPre));
                         return (
                             <div className="center">
                                 ${formattedNumber}
@@ -105,7 +106,7 @@ const Table = ({ data }) => {
                 cell: ({row}) => {
                     if (row.original.metEjePre) {
                         // Convierte el número a una cadena y añade las comas de miles
-                        const formattedNumber = Number(row.original.metEjePre).toLocaleString();
+                        const formattedNumber = formatter.format(Number(row.original.metEjePre));
                         return (
                             <div className="center">
                                 ${formattedNumber}

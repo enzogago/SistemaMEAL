@@ -991,14 +991,14 @@ textarea {
     display: inline-block;
 }
 .PowerMas_Dropdown_Export button{
-	background-color: #FFF7F3;
-	border: 1px solid #F7775A;
-	color: #F7775A;
+	background-color: #00677633;
+	border: 1px solid #006776;
+	color: #006776;
 	border-radius: 5px;
 	transition: background-color 0.3s ease;
 }
 .PowerMas_Dropdown_Export button:hover{
-	background-color: #ffeadf;
+	background-color: #00677666;
 }
 
 .PowerMas_Dropdown_Export_Content {
@@ -1167,7 +1167,7 @@ textarea {
 }
 
 .PowerMas_TableStatus tbody tr:hover{
-	background-color: #FDF6F2; 
+	background-color: #ffc65833; 
 }
 
 .PowerMas_TableEmpty td{
@@ -1301,12 +1301,12 @@ textarea {
 .PowerMas_IconsTable svg{
 	width: 29px;
 	height: 29px;
-	color: #F7775A;
+	color: #006776;
 	transition: color 0.2s ease;
 }
 .PowerMas_IconsTable svg:hover{
 	cursor: pointer;
-	color: #D03F1E;
+	color: #006776cc;
 }
 .PowerMas_Tooltip{
 	padding: 10rem;
@@ -1375,13 +1375,13 @@ textarea {
 }
 
 .sort-icon {
-    color: #ff5f3c; /* color para el estado inactivo */
+    color: #006776; /* color para el estado inactivo */
 	width: 10px;
 	height: 10px;
 }
 
 .sort-icon.active {
-    color: #ff5f3c; /* color para el estado activo */
+    color: #006776; /* color para el estado activo */
 }
 .search-icon{
 	width: auto;
@@ -1441,35 +1441,40 @@ textarea {
 	gap: 0.3rem;
 }
 
+/*---------------*/
 .PowerMas_Buttom_Map{
+	width: 100%;
 	border: 1px solid #372E2C;
-	color: #000;
-	background-color: #FFFFFF;
+	color: #372E2C;
+	background-color: #fff;
 	transition: all 0.2s ease-in;
-	border-radius: 5px;
+	border-radius: 4px;
 	font-size: 0.75rem;
 	padding: 0.5rem 1rem;
 }
 .PowerMas_Buttom_Map:hover{
-	background-color: #00677620;
+	background-color: #F87C5640;
 }
 .PowerMas_Buttom_Map_Active{
 	color: #fff;
-	background-color: #006776;
+	background-color: #F87C56;
 }
 .PowerMas_Buttom_Map_Active:hover{
 	color: #fff;
-	background-color: #006776;
+	background-color: #F87C56;
 }
+
+
+
 .PowerMas_Buttom_Primary{
-	background-color: #F7775A;
-	color: #F6E3D6;
+	background-color: #006776;
+	color: #fff;
 	border-radius: 5px;
 	border: 1px solid;
 	transition: background-color 0.2s ease-in;
 }
 .PowerMas_Buttom_Primary:hover{
-	background-color: #D03F1E;
+	background-color: #006776cc;
 }
 .PowerMas_Buttom_Secondary{
 	background-color: #FFFDFD;
@@ -1955,4 +1960,16 @@ textarea {
 .PowerMas_Buttom_Tab_Active{
 	background-color: #F87C56;
 	color: #fff;
+}
+
+.PowerMas_Video_Tutoriales > div{
+	box-shadow: 0px 8px 8px 0px rgba(0,0,0,0.2);
+}
+.PowerMas_Video_Tutoriales > div > h3{
+	padding: 1rem;
+}
+
+.PowerMas_Video_Tutoriales > div > p{
+	padding: 1rem;
+	text-align: center;
 }

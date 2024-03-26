@@ -121,7 +121,7 @@ const CustomTable = ({
                         actions && actions.add && 
                         <>
                             <button 
-                                className='flex jc-space-between Large_3 Large-m_5 Large-p_5 PowerMas_ButtonStatus'
+                                className='flex jc-space-between Large_3 Large-m_5 Large-p_5 PowerMas_Buttom_Primary'
                                 onClick={() => {openModal ? openModal() : navigate(`/${navigatePath}`)}} 
                                 disabled={!actions.add}
                             >
@@ -173,7 +173,9 @@ const CustomTable = ({
                                             >
                                                 <div>
                                                     {
-                                                        flexRender(header.column.columnDef.header, header.getContext())
+                                                        <span className='bold'>
+                                                            {flexRender(header.column.columnDef.header, header.getContext())}
+                                                        </span>
                                                     }
                                                     <div className='flex flex-column ai-center jc-center PowerMas_Icons_Sorter'>
                                                         {header.column.getIsSorted() === 'asc' && !header.column.columnDef.disableSorting ? 

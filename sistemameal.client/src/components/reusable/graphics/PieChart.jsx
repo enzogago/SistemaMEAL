@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
+import { formatter } from '../../monitoring/goal/helper';
 
 const PieChart = ({ data, id }) => {
     const colorMapping = {
@@ -76,7 +77,7 @@ const PieChart = ({ data, id }) => {
                     <span style="text-transform: capitalize;">${d.data.name.toLowerCase()}</span>
                 </div>
                 <div class="tooltip-value">
-                    <span>${Number(d.data.value).toLocaleString()}</span>
+                    <span>${formatter.format(Number(d.data.value))}</span>
                 </div>
             `);
         }

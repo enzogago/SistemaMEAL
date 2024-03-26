@@ -95,7 +95,7 @@ const Peru = () => {
             .enter()
             .append("text")
             .text(function(d) {
-                return capitalize(d.properties.NOMBDEP);
+                return poblacionPorDepartamento[d.properties.NOMBDEP] ? capitalize(d.properties.NOMBDEP) : '';
             })
             .attr("x", function(d) {
                 return path.centroid(d)[0];
@@ -130,7 +130,11 @@ const Peru = () => {
             }
     }, []);
 
-    return <svg id='Peru' ref={ref} />;
+    
+    return (
+     <div style={{width: '100%', height: '100%', position: 'relative'}}>
+        <svg id='Peru' ref={ref} style={{width: '100%', height: '100%', position: 'absolute'}} />
+    </div>)
 };
 
 export default Peru;

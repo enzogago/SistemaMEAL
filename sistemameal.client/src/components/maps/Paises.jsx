@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import d3Tip from 'd3-tip';
 import data from './geojson/paises.json';
+import { formatter } from '../monitoring/goal/helper';
 
 const Paises = ({mapData, beneficiariosData}) => {
     const combinedData = mapData.map(ubicacion => {
@@ -40,7 +41,7 @@ const Paises = ({mapData, beneficiariosData}) => {
             .attr('width', '100%')
             .attr('height', '100%')
             .attr('viewBox', [0, 0, 975, 610])
-            .style('background', '#FFFFFF')
+            .style('background', '#1d6776')
             .style('border-radius', '5px');
         
         const width = ref.current.clientWidth;
@@ -72,17 +73,17 @@ const Paises = ({mapData, beneficiariosData}) => {
                 return `
                 <div style="z-index: 100;">
                     <p class="center Large-f1_25 bold">${d.name}</p>
-                    <p>Beneficiarios: ${Number(cantidad).toLocaleString()} </p>
-                    <p>Atenciones: ${metEjeTec.toLocaleString()}</p>
+                    <p>Beneficiarios: ${formatter.format(Number(cantidad))} </p>
+                    <p>Atenciones: ${formatter.format(metEjeTec)}</p>
                     <hr style="border:1px solid #fff;margin: 0.5rem 0" />
                     <p class="" style="text-decoration: underline;">Técnico</p>
-                    <p>Meta: ${metMetTec} </p>
-                    <p>Ejecución: ${metEjeTec} </p>
+                    <p>Meta: ${formatter.format(metMetTec)} </p>
+                    <p>Ejecución: ${formatter.format(metEjeTec)} </p>
                     <p>Avance: ${formatNumber(metPorAvaTec)}% </p>
                     <hr style="border:1px solid #fff;margin: 0.5rem 0" />
                     <p style="text-decoration: underline;">Presupuesto</p>
-                    <p>Meta: $${metMetPre} </p>
-                    <p>Ejecución: $${metEjePre} </p>
+                    <p>Meta: $${formatter.format(metMetPre)} </p>
+                    <p>Ejecución: $${formatter.format(metEjePre)} </p>
                     <p>Avance: ${formatNumber(metPorAvaPre)}% </p>
                 </div>
                 `;
@@ -129,7 +130,11 @@ const Paises = ({mapData, beneficiariosData}) => {
             return poblacionPorPais[d.properties.name_es.toUpperCase()] ? d.properties.name_es : '';
         })
         .attr("x", function(d) {
-            return path.centroid(d)[0];
+            let centroid = path.centroid(d);
+            if (d.properties.name_es.toUpperCase() === 'PERÚ') {
+                centroid[0] = centroid[0] - 30;  // Ajusta este valor según sea necesario
+            }
+            return centroid[0];
         })
         .attr("y", function(d) {
             return path.centroid(d)[1];
@@ -158,7 +163,12 @@ const Paises = ({mapData, beneficiariosData}) => {
         }
     }, [mapData, beneficiariosData]);
 
-    return <svg id='Paises' ref={ref} />;
+    return (
+        <div style={{width: '100%', height: '100%', position: 'relative'}}>
+            <svg id='Paises' ref={ref} style={{width: '100%', height: '100%', position: 'absolute'}} />
+        </div>
+    );
+    
 };
 
 export default Paises;

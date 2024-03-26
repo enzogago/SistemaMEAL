@@ -4,6 +4,7 @@ import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
 import Pdf_Icon from '../../img/PowerMas_Pdf_Icon.svg';
 import { fetchData } from '../reusable/helper';
 import { useForm } from 'react-hook-form';
+import Notiflix, { Notify } from 'notiflix';
 
 const ResultChain = () => {
 
@@ -156,7 +157,7 @@ const ResultChain = () => {
         // Iterar sobre los datos del formulario
         for (let key in data) {
             // Obtener el valor inicial y el valor actual de la celda
-            let valorInicial = initialValues[key].metTec;
+            let valorInicial = initialValues[key]?.metTec || '';
             let valorActual = data[key];
     
             // Si el valor ha cambiado, agregar el cambio al arreglo correspondiente
@@ -171,7 +172,8 @@ const ResultChain = () => {
                     indAno: indAno,
                     indCod: indCod,
                 };
-    
+                console.log(initialValues)
+                console.log(keyType)
                 if (keyType.length === 4) {  // Si la longitud es 4, entonces es un 'ano'
                     cambio.cadResPerAno = keyType;
                     cambio.cadResPerMetTec = valorActual;
@@ -191,6 +193,11 @@ const ResultChain = () => {
                 }
             }
         }
+
+        if (cambiosPorAno.length === 0 && cambiosPorImplementador.length === 0 && cambiosPorUbicacion.length === 0) {
+            Notiflix.Notify.warning('No se realizaron cambios.');
+            return;
+        }
     
         const CadenaIndicadorDto = {
             CadenaPeriodos: cambiosPorAno,
@@ -198,9 +205,76 @@ const ResultChain = () => {
             CadenaUbicaciones: cambiosPorUbicacion
         }
     
-        console.log(CadenaIndicadorDto);
+        handleInsert(CadenaIndicadorDto);
     };
     
+    
+    const handleInsert = async (cadena) => {
+        try {
+            Notiflix.Loading.pulse();
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Indicador/cadena-indicador`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(cadena),
+            });
+    
+            const data = await response.json();
+            
+            if (!response.ok) {
+                Notiflix.Notify.failure(data.message);
+                return;
+            }
+            console.log(data)
+            Notiflix.Notify.success(data.message);
+            
+            // Aquí es donde actualizamos los datos
+            const subproyecto = watch('subproyecto');
+            if (subproyecto && subproyecto !== '0') {
+                const { subProAno, subProCod } = JSON.parse(subproyecto);
+                let endpoint;
+                switch (activeButton) {
+                    case 'Por Año':
+                        endpoint = `Indicador/cadena/${subProAno}/${subProCod}`;
+                        break;
+                    case 'Por Implementador':
+                        endpoint = `Indicador/implementador/${subProAno}/${subProCod}`;
+                        break;
+                    case 'Por Ubicación':
+                        endpoint = `Indicador/ubicacion/${subProAno}/${subProCod}`;
+                        break;
+                    default:
+                        return;
+                }
+        
+                fetchData(endpoint, (data) => {
+                    const transformedData = transformData(data, activeButton);
+                    setTransformedData(transformedData);
+                
+                    // Guardar los valores iniciales
+                    let newInitialValues = {};  // Inicializamos un nuevo objeto para los valores iniciales
+                    for (let key in transformedData) {
+                        for (let subKey in transformedData[key]) {
+                            newInitialValues[`${key}_${subKey}`] = {
+                                metTec: transformedData[key][subKey].metTec,
+                                metPre: transformedData[key][subKey].metPre
+                            };
+                        }
+                    }
+                    setInitialValues(newInitialValues);  // Guarda los nuevos valores iniciales
+                });
+            }
+            
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            Notiflix.Loading.remove();
+        }
+    };
+
     
     
 
@@ -271,16 +345,15 @@ const ResultChain = () => {
             </div>
             <div className="PowerMas_TableContainer flex-column overflow-auto">
                 <table className="PowerMas_TableStatus">
-                <thead>
-    <tr>
-        <th>#</th>
-        <th>Proyecto</th>
-        <th>Código</th>
-        <th>Nombre</th>
-        {headersNew.map(header => <th key={header}>{header}</th>)}
-    </tr>
-</thead>
-
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Proyecto</th>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            {headersNew.map(header => <th key={header}>{header}</th>)}
+                        </tr>
+                    </thead>
                     <tbody>
                         {
                         indicadores.map((item, index) => {

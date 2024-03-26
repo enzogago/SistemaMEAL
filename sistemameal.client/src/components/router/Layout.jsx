@@ -67,8 +67,7 @@ const Layout = ({ children }) => {
                 </>
                 :
                 <div className='flex flex-column Large_12'>
-                    {/* <Bar showSidebarAndBar={showSidebarAndBar} />
-                    <br /> */}
+                    <Bar showSidebarAndBar={showSidebarAndBar} />
                     {children}
                 </div>
             }
