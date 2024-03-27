@@ -2,9 +2,15 @@ import React, { useEffect, useState } from 'react'
 import { FaSortDown } from 'react-icons/fa';
 import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
 import Pdf_Icon from '../../img/PowerMas_Pdf_Icon.svg';
-import { fetchData } from '../reusable/helper';
+import { Export_Excel_Basic, Export_Excel_Helper, fetchData } from '../reusable/helper';
 import { useForm } from 'react-hook-form';
 import Notiflix, { Notify } from 'notiflix';
+import userIcon from '../../icons/user.svg';
+import userIconActive from '../../icons/user-active.svg';
+import calendarIcon from '../../icons/calendar.svg';
+import calendarIconActive from '../../icons/calendar-active.svg';
+import locationIcon from '../../icons/location.svg';
+import locationIconActive from '../../icons/location-active.svg';
 
 const ResultChain = () => {
 
@@ -15,6 +21,11 @@ const ResultChain = () => {
     const [activeButton, setActiveButton] = useState('Por Año');
     const [initialValues, setInitialValues] = useState({});
     const [headersNew, setHeaders] = useState([]);
+    const [viewTotals, setViewTotals] = useState({});
+    const [sumasPorAno, setSumasPorAno] = useState({});
+    const [errorMessage, setErrorMessage] = useState('');
+    const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
+
 
     const { 
         register, 
@@ -30,6 +41,14 @@ const ResultChain = () => {
     useEffect(() => {
         fetchData('SubProyecto',setSubProyectos)
     }, []);
+    
+    useEffect(() => {
+        const subproyecto = watch('subproyecto');
+        if (subproyecto && subproyecto !== '0') {
+            setActiveButton('Por Año')
+        }
+    }, [watch('subproyecto')])
+    
     
     useEffect(() => {
         const subproyecto = watch('subproyecto');
@@ -58,18 +77,27 @@ const ResultChain = () => {
             
                 // Guardar los valores iniciales
                 let newInitialValues = { ...initialValues };  // Copia los valores iniciales existentes
+                let newViewTotals = { ...viewTotals };  // Copia los totales de la vista existentes
                 for (let key in transformedData) {
                     for (let subKey in transformedData[key]) {
                         newInitialValues[`${key}_${subKey}`] = {
                             metTec: transformedData[key][subKey].metTec,
                             metPre: transformedData[key][subKey].metPre
                         };
+                        // Verificar si ya existe un valor para la clave
+                        if (!newViewTotals[`${key}_${subKey}_${activeButton}`]) {
+                            // Si no existe un valor, inicializar los totales de la vista con los valores iniciales
+                            newViewTotals[`${key}_${subKey}_${activeButton}`] = transformedData[key][subKey].metTec;
+                        }
+
                     }
                 }
                 setInitialValues(newInitialValues);  // Guarda los nuevos valores iniciales
+                setViewTotals(newViewTotals);  // Guarda los nuevos totales de la vista
             });
         }
     }, [watch('subproyecto'), activeButton]);
+    
 
     function transformData(data, activeButton) {
         const transformedData = {};
@@ -116,14 +144,15 @@ const ResultChain = () => {
             };
     
             // Agregar el nombre del grupo a los encabezados si aún no está presente
-            if (!newHeaders.includes(groupKey)) {
-                newHeaders.push(groupKey);
+            if (!newHeaders.some(header => header.name === groupKey)) {
+                newHeaders.push({name: groupKey, code: registerKey});
             }
         });
     
         setHeaders(newHeaders);
         return transformedData;
-    }
+    };
+    
     
     
 
@@ -147,8 +176,8 @@ const ResultChain = () => {
     }
 
     const onSubmit = (data) => {
+        if (isSubmitDisabled) return;
         delete data.subproyecto;
-        console.log(data)
         // Crear los arreglos para almacenar los cambios
         let cambiosPorAno = [];
         let cambiosPorImplementador = [];
@@ -172,8 +201,6 @@ const ResultChain = () => {
                     indAno: indAno,
                     indCod: indCod,
                 };
-                console.log(initialValues)
-                console.log(keyType)
                 if (keyType.length === 4) {  // Si la longitud es 4, entonces es un 'ano'
                     cambio.cadResPerAno = keyType;
                     cambio.cadResPerMetTec = valorActual;
@@ -207,7 +234,7 @@ const ResultChain = () => {
     
         handleInsert(CadenaIndicadorDto);
     };
-    
+
     
     const handleInsert = async (cadena) => {
         try {
@@ -228,46 +255,36 @@ const ResultChain = () => {
                 Notiflix.Notify.failure(data.message);
                 return;
             }
-            console.log(data)
             Notiflix.Notify.success(data.message);
-            
             // Aquí es donde actualizamos los datos
             const subproyecto = watch('subproyecto');
             if (subproyecto && subproyecto !== '0') {
                 const { subProAno, subProCod } = JSON.parse(subproyecto);
-                let endpoint;
-                switch (activeButton) {
-                    case 'Por Año':
-                        endpoint = `Indicador/cadena/${subProAno}/${subProCod}`;
-                        break;
-                    case 'Por Implementador':
-                        endpoint = `Indicador/implementador/${subProAno}/${subProCod}`;
-                        break;
-                    case 'Por Ubicación':
-                        endpoint = `Indicador/ubicacion/${subProAno}/${subProCod}`;
-                        break;
-                    default:
-                        return;
-                }
-        
-                fetchData(endpoint, (data) => {
-                    const transformedData = transformData(data, activeButton);
-                    setTransformedData(transformedData);
+                let endpoints = {
+                    'Por Año': cadena.CadenaPeriodos.length > 0 ? `Indicador/cadena/${subProAno}/${subProCod}` : null,
+                    'Por Implementador': cadena.CadenaImplementadores.length > 0 ? `Indicador/implementador/${subProAno}/${subProCod}` : null,
+                    'Por Ubicación': cadena.CadenaUbicaciones.length > 0 ? `Indicador/ubicacion/${subProAno}/${subProCod}` : null
+                };
                 
-                    // Guardar los valores iniciales
-                    let newInitialValues = {};  // Inicializamos un nuevo objeto para los valores iniciales
-                    for (let key in transformedData) {
-                        for (let subKey in transformedData[key]) {
-                            newInitialValues[`${key}_${subKey}`] = {
-                                metTec: transformedData[key][subKey].metTec,
-                                metPre: transformedData[key][subKey].metPre
-                            };
-                        }
+                let newInitialValues = {...initialValues};  // Inicializamos un nuevo objeto para los valores iniciales
+                for (let button in endpoints) {
+                    if (endpoints[button] !== null) {
+                        fetchData(endpoints[button], (data) => {
+                            const transformedData = transformData(data, button);
+                            // Guardar los valores iniciales
+                            for (let key in transformedData) {
+                                for (let subKey in transformedData[key]) {
+                                    newInitialValues[`${key}_${subKey}`] = {
+                                        metTec: transformedData[key][subKey].metTec,
+                                        metPre: transformedData[key][subKey].metPre
+                                    };
+                                }
+                            }
+                        });
                     }
-                    setInitialValues(newInitialValues);  // Guarda los nuevos valores iniciales
-                });
+                }
+                setInitialValues(newInitialValues);  // Guarda los nuevos valores iniciales
             }
-            
         } catch (error) {
             console.error('Error:', error);
         } finally {
@@ -276,8 +293,39 @@ const ResultChain = () => {
     };
 
     
+    const calculateTotal = (indAno, indCod, activeButton, totals) => {
+        return Object.entries(totals)
+            .filter(([key]) => key.startsWith(`${indAno}_${indCod}_`) && key.endsWith(`_${activeButton}`))
+            .reduce((total, [key, value]) => total + Number(value), 0);
+    }
     
-
+    const Export_Excel = () => {
+        let data = indicadores.map((item, index) => {
+            const indicatorData = transformedData[`${item.indAno}_${item.indCod}`] || {};
+            let rowData = {
+                '#': index+1,
+                'Proyecto': item.proNom.toLowerCase(),
+                'Código': item.indNum,
+                'Nombre': item.indNom.charAt(0).toUpperCase() + item.indNom.slice(1).toLowerCase(),
+            };
+            headers.forEach(key => {
+                const inputValue = document.querySelector(`input[name="${item.indAno}_${item.indCod}_${key}"]`).value;
+                rowData[key] = inputValue !== '' ? inputValue : '0';
+            });
+            rowData['Total'] = calculateTotal(item.indAno, item.indCod, activeButton, viewTotals);
+            return rowData;
+        });
+    
+        // Definir los encabezados
+        let headersExcel = ['#', 'Proyecto', 'Código', 'Nombre', ...headersNew.map(header => ({name: header.name, code: header.code})), 'Total'];
+    
+        Export_Excel_Basic(data,headersExcel);
+    };
+    
+    
+    
+    
+    
     return (
         <div className='p1 flex flex-column flex-grow-1 overflow-auto'>
             <h1 className="Large-f1_5"> Cadena de resultado </h1>
@@ -314,12 +362,12 @@ const ResultChain = () => {
                 <div className={`PowerMas_Dropdown_Export Large_3 Large-m_25 ${dropdownOpen ? 'open' : ''}`}>
                     <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>Exportar <FaSortDown className='Large_1' /></button>
                     <div className="PowerMas_Dropdown_Export_Content Phone_12">
-                        {true &&
+                        {/* {true &&
                             <a onClick={() => {
                                 Export_PDF();
                                 setDropdownOpen(false);
                             }} className='flex jc-space-between p_5'>PDF <img className='Large_1' src={Pdf_Icon} alt="" /></a>
-                        }
+                        } */}
                         {true &&
                             <a onClick={() => {
                                 Export_Excel();
@@ -329,29 +377,60 @@ const ResultChain = () => {
                     </div>
                 </div>
             </div>
-            <div>
-                <button 
-                    className={`PowerMas_Buttom_Tab PowerMas_Buttom_Tab_${activeButton === 'Por Año' ? 'Active' : ''}`} 
-                    onClick={() => setActiveButton('Por Año')}
-                >Por Año</button>
-                <button 
-                    className={`PowerMas_Buttom_Tab PowerMas_Buttom_Tab_${activeButton === 'Por Implementador' ? 'Active' : ''}`} 
-                    onClick={() => setActiveButton('Por Implementador')}
-                >Por Implementador</button>
-                <button 
-                    className={`PowerMas_Buttom_Tab PowerMas_Buttom_Tab_${activeButton === 'Por Ubicación' ? 'Active' : ''}`} 
-                    onClick={() => setActiveButton('Por Ubicación')}
-                >Por Ubicación</button>
+            <div className='flex jc-space-between'>
+                <div className='flex gap_5'>
+                    <button 
+                        className={`PowerMas_Buttom_Tab PowerMas_Buttom_Tab_${activeButton === 'Por Año' ? 'Active' : ''} flex ai-center gap-1`} 
+                        onClick={() => setActiveButton('Por Año')}
+                    >
+                        <span>
+                            Por Año
+                        </span>
+                        {
+                            activeButton === 'Por Año'
+                            ? <img className='w-auto' src={calendarIconActive} alt="" />
+                            : <img className='w-auto' src={calendarIcon} alt="" />
+                        }
+                    </button>
+                    <button 
+                        className={`PowerMas_Buttom_Tab PowerMas_Buttom_Tab_${activeButton === 'Por Implementador' ? 'Active' : ''} flex ai-center gap-1`} 
+                        onClick={() => setActiveButton('Por Implementador')}
+                    >
+                        <span>
+                            Por Implementador
+                        </span>
+                        {
+                            activeButton === 'Por Implementador'
+                            ? <img className='w-auto' src={userIconActive} alt="" />
+                            : <img className='w-auto' src={userIcon} alt="" />
+                        }
+                    </button>
+                    <button 
+                        className={`PowerMas_Buttom_Tab PowerMas_Buttom_Tab_${activeButton === 'Por Ubicación' ? 'Active' : ''} flex ai-center gap-1`} 
+                        onClick={() => setActiveButton('Por Ubicación')}
+                    >
+                        <span>
+                            Por Ubicación
+                        </span>
+                        {
+                            activeButton === 'Por Ubicación'
+                            ? <img className='w-auto' src={locationIconActive} alt="" />
+                            : <img className='w-auto' src={locationIcon} alt="" />
+                        }
+                    </button>
+                </div>
+                
             </div>
-            <div className="PowerMas_TableContainer flex-column overflow-auto">
-                <table className="PowerMas_TableStatus">
+            <div className="PowerMas_TableContainer flex-column overflow-auto borde-ayuda">
+                <table className="PowerMas_TableStatus ">
                     <thead>
                         <tr>
                             <th>#</th>
                             <th>Proyecto</th>
                             <th>Código</th>
                             <th>Nombre</th>
-                            {headersNew.map(header => <th key={header}>{header}</th>)}
+                            {headersNew.map((header, index) => <th key={index}>{header.name}</th>)}
+                            <th>Total</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -359,15 +438,17 @@ const ResultChain = () => {
                         indicadores.map((item, index) => {
                             const indicatorData = transformedData[`${item.indAno}_${item.indCod}`] || {};
                             const text = item.indNom.charAt(0).toUpperCase() + item.indNom.slice(1).toLowerCase();
-                            const shortText = text.length > 100 ? text.substring(0, 100) + '...' : text;
-
+                            const shortText = text.length > 60 ? text.substring(0, 60) + '...' : text;
+                            
+                            // Calcular el total "Por Año" para esta fila
+                            const totalPorAno = calculateTotal(item.indAno, item.indCod, 'Por Año', viewTotals);
                             return (
                                 <tr key={index}>
                                     <td>{index+1}</td>
                                     <td style={{textTransform: 'capitalize'}}>{item.proNom.toLowerCase()}</td>
                                     <td>{item.indNum}</td>
                                     {
-                                        text.length > 100 ?
+                                        text.length > 60 ?
                                         <td 
                                             data-tooltip-id="info-tooltip" 
                                             data-tooltip-content={text} 
@@ -379,28 +460,103 @@ const ResultChain = () => {
                                         return(
                                         <td key={key}>
                                             <input
-                                                className={`Large_12 f_75 PowerMas_Cadena_Form_${dirtyFields[`${item.indAno}_${item.indCod}_${key}`] || isSubmitted ? (errors[`${item.indAno}_${item.indCod}_${key}`] ? 'invalid' : 'valid') : ''}`} 
+                                                onKeyDown={(event) => {
+                                                    if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
+                                                        event.preventDefault();
+                                                    }
+                                                }}
+                                                maxLength={10}
+                                                style={{margin: 0}}
+                                                className={`PowerMas_Input_Cadena Large_12 f_75 PowerMas_Cadena_Form_${dirtyFields[`${item.indAno}_${item.indCod}_${key}`] || isSubmitted ? (errors[`${item.indAno}_${item.indCod}_${key}`] ? 'invalid' : 'valid') : ''}`} 
+                                                onInput={e => {
+                                                    // Actualizar el valor en los totales de la vista
+                                                    const newValue = e.target.value;
+                                                    setViewTotals(prevTotals => {
+                                                        const newTotals = {
+                                                            ...prevTotals,
+                                                            [`${item.indAno}_${item.indCod}_${key}_${activeButton}`]: newValue
+                                                        };
+                                                
+                                                        if (activeButton === 'Por Año') {
+                                                            // Calcular el nuevo total "Por Año" para esta fila
+                                                            const nuevoTotalPorAno = calculateTotal(item.indAno, item.indCod, 'Por Año', newTotals);
+                                                
+                                                            // Comprobar si hay algún error en "Por Implementador" o "Por Ubicación"
+                                                            const hasErrorInAnyContext = ['Por Implementador', 'Por Ubicación'].some(context => {
+                                                                const totalInContext = calculateTotal(item.indAno, item.indCod, context, newTotals);
+                                                                return totalInContext > nuevoTotalPorAno;
+                                                            });
+                                                
+                                                            setIsSubmitDisabled(hasErrorInAnyContext);
+                                                        } else {
+                                                            // Calcular el nuevo total para esta fila
+                                                            const nuevoTotal = calculateTotal(item.indAno, item.indCod, activeButton, newTotals);
+                                                
+                                                            // Si el nuevo total es mayor que el total "Por Año", mostrar un error
+                                                            if (nuevoTotal > totalPorAno) {
+                                                                setIsSubmitDisabled(true);
+                                                            } else {
+                                                                // Comprobar si hay algún error en cualquier otro contexto
+                                                                const hasErrorInAnyContext = ['Por Año', 'Por Implementador', 'Por Ubicación'].some(context => {
+                                                                    return indicadores.some(indicador => {
+                                                                        const totalInContext = calculateTotal(indicador.indAno, indicador.indCod, context, newTotals);
+                                                                        const totalPorAnoInContext = calculateTotal(indicador.indAno, indicador.indCod, 'Por Año', newTotals);
+                                                                        return totalInContext > totalPorAnoInContext;
+                                                                    });
+                                                                });
+                                                
+                                                                setIsSubmitDisabled(hasErrorInAnyContext);
+                                                            }
+                                                        }
+                                                        return newTotals;
+                                                    });
+                                                }}
                                                 {...register(`${item.indAno}_${item.indCod}_${key}`, {
                                                     pattern: {
                                                         value: /^(?:[1-9]\d*|)$/,
-                                                        message: 'Valor no válido'
+                                                        message: 'Valor no válido',
+                                                    },
+                                                    maxLength: {
+                                                        value: 10,
+                                                        message: ''
                                                     }
                                                 })}
                                                 defaultValue={indicatorData[key]?.metTec || ''}
                                             />
                                         </td>
                                     )})}
+                                    <td className={`center bold ${calculateTotal(item.indAno, item.indCod, activeButton, viewTotals) > totalPorAno ? 'invalid' : ''}`}>
+                                        {calculateTotal(item.indAno, item.indCod, activeButton, viewTotals)}
+                                    </td>
+
                                 </tr>
                             )
                         })
                         }
+                        {/* <tr>
+                            <td className='right' colSpan="4">Total:</td>
+                            {headers.map(key => {
+                                let total = indicadores.reduce((total, item) => {
+                                    const indicatorData = transformedData[`${item.indAno}_${item.indCod}`] || {};
+                                    return total + Number(indicatorData[key]?.metTec || 0);
+                                }, 0);
+                                return <td className='center bold' key={key}>{total}</td>
+                            })}
+                            <td className='center bold'>
+                                {indicadores.reduce((total, item) => {
+                                    const indicatorData = transformedData[`${item.indAno}_${item.indCod}`] || {};
+                                    return total + Object.values(indicatorData).reduce((total, {metTec}) => total + Number(metTec), 0);
+                                }, 0)}
+                            </td>
+                        </tr> */}
                     </tbody>
                 </table>
             </div>
-            <div className='flex jc-center'>
+            <div className='PowerMas_Footer_Box flex flex-column jc-center ai-center p_5 gap_5'>    
                 <button 
-                    className='PowerMas_Buttom_Primary Large_3'
+                    className='PowerMas_Buttom_Primary Large_3 p_5'
                     onClick={handleSubmit(onSubmit)}
+                    disabled={isSubmitDisabled}
                 >
                     Grabar
                 </button>

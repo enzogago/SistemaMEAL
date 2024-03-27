@@ -8,7 +8,7 @@ import {
 } from '@tanstack/react-table';
 import { useNavigate } from 'react-router-dom';
 import { GrNext, GrPrevious } from 'react-icons/gr';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 const CustomTable = ({ 
     title, 
@@ -32,14 +32,16 @@ const CustomTable = ({
     searchTags,
     setSearchTags,
     sums,
-    isLargePagination = false
+    isLargePagination = false,
+    actionsColumnWidth,
+    setActionsColumnWidth
 }) => {
     const navigate = useNavigate();
     
     const toggleDropdown = () => {
         setDropdownOpen(!dropdownOpen);
     }
-
+    const actionsColumnRef = useRef();
     const tableRef = useRef(); 
 
     const animateScroll = (element, to, duration) => {
@@ -57,6 +59,15 @@ const CustomTable = ({
             }
         };
         animateScroll();
+    }
+
+    if (setActionsColumnWidth) {
+        useEffect(() => {
+            if (actionsColumnRef.current) {
+                setActionsColumnWidth(actionsColumnRef.current.offsetWidth);
+                console.log(actionsColumnRef.current.offsetWidth)
+            }
+        }, [sums]);
     }
     
     Math.easeInOutQuad = function (t, b, c, d) {
@@ -160,6 +171,7 @@ const CustomTable = ({
                                     {
                                         headerGroup.headers.map((header, index, array) => (
                                             <th 
+                                                ref={actionsColumnRef}
                                                 className='ws-nowrap' 
                                                 style={{ 
                                                     width: resize ? header.getSize():  '', 

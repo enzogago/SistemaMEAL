@@ -5,6 +5,12 @@
 	Description: Custom Style Page for Ayuda en Acción
 */
 
+:root {
+	--naranja-ayuda: #F87C56;
+	--naranja-fuerte: #EC5251;
+}
+  
+
 
 body {
 	font-family: DMMono;
@@ -991,14 +997,14 @@ textarea {
     display: inline-block;
 }
 .PowerMas_Dropdown_Export button{
-	background-color: #00677633;
-	border: 1px solid #006776;
-	color: #006776;
+	background-color: #FFF7F3;
+	border: 1px solid var(--naranja-ayuda);
+	color: var(--naranja-ayuda);
 	border-radius: 5px;
 	transition: background-color 0.3s ease;
 }
 .PowerMas_Dropdown_Export button:hover{
-	background-color: #00677666;
+	background-color: #FEE5DD;
 }
 
 .PowerMas_Dropdown_Export_Content {
@@ -1301,12 +1307,12 @@ textarea {
 .PowerMas_IconsTable svg{
 	width: 29px;
 	height: 29px;
-	color: #006776;
+	color: var(--naranja-ayuda);
 	transition: color 0.2s ease;
 }
 .PowerMas_IconsTable svg:hover{
 	cursor: pointer;
-	color: #006776cc;
+	color: var(--naranja-fuerte);
 }
 .PowerMas_Tooltip{
 	padding: 10rem;
@@ -1467,24 +1473,26 @@ textarea {
 
 
 .PowerMas_Buttom_Primary{
-	background-color: #006776;
-	color: #fff;
+	background-color: var(--naranja-ayuda);
+	color: #FFFFFF;
 	border-radius: 5px;
-	border: 1px solid;
 	transition: background-color 0.2s ease-in;
+	border: none;
 }
 .PowerMas_Buttom_Primary:hover{
-	background-color: #006776cc;
+	background-color: var(--naranja-fuerte);
 }
+
 .PowerMas_Buttom_Secondary{
-	background-color: #FFFDFD;
-	color: #F7775A;
+	background-color: #FFF7F3;
+	border: 1px solid var(--naranja-ayuda);
+	color: var(--naranja-ayuda);
 	border-radius: 5px;
 	border: 1px solid;
 	transition: background-color 0.2s ease-in;
 }
 .PowerMas_Buttom_Secondary:hover{
-	background-color: #ffeadf;
+	background-color: #FEE5DD;
 }
 
 .PowerMas_Hover_Grey:hover{
@@ -1953,13 +1961,25 @@ textarea {
 }
 
 .PowerMas_Buttom_Tab{
-	background-color: #fff;
+	font-size: 0.75rem;
+	background-color: #FFFFFF;
 	padding: 0.25rem 0.5rem;
+	border-radius: 5px 5px 0 0;
+	border-width: 1px 1px 0px 1px;
+	border-style: solid;
+	border-color: var(--naranja-ayuda);
+	transition: all 0.1s ease-in;
 }
 
 .PowerMas_Buttom_Tab_Active{
 	background-color: #F87C56;
 	color: #fff;
+}
+
+.borde-ayuda{
+	border-width: 1px 1px 0px 1px;
+	border-style: solid;
+	border-color: var(--naranja-ayuda);
 }
 
 .PowerMas_Video_Tutoriales > div{
@@ -1972,4 +1992,27 @@ textarea {
 .PowerMas_Video_Tutoriales > div > p{
 	padding: 1rem;
 	text-align: center;
+}
+
+
+
+.PowerMas_Footer_Box{
+	background-color: #FFFFFF;
+	box-shadow: 0 -10px 10px rgba(0, 0, 0, 0.1);
+}
+
+.PowerMas_Input_Cadena{
+	min-width: 4rem;
+}
+
+.PowerMas_Error_Message{
+	border: 1px solid red;
+	padding: 0.5rem;
+	color: red;
+	background-color: rgba(255, 0, 0, 0.184);
+}
+
+.invalid {
+    color: red;
+	font-size: 1rem;
 }

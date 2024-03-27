@@ -199,6 +199,32 @@ export const handleSubmitMant = async (controller, objetoEditado, objeto, setReg
     }
 };
 
+export const Export_Excel_Basic = async (data, headersExcel) => {
+    let workbook = new ExcelJS.Workbook();
+    let worksheet = workbook.addWorksheet('CADENA DE RESULTADOS');
+
+    // Añadir los encabezados al libro de trabajo
+    worksheet.columns = headersExcel.map(header => {
+        if (typeof header === 'string') {
+            return {header, key: header};
+        } else {
+            return {header: header.name, key: header.code};
+        }
+    });
+
+    // Añadir los datos al libro de trabajo
+    data.forEach(item => {
+        worksheet.addRow(item);
+    });
+
+    // Generar el archivo Excel
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    saveAs(blob, `CADENA DE RESULTADOS_${Date.now()}.xlsx`);
+};
+
+
+
 export const Export_Excel_Helper = async (data, headers, title, properties) => {
     // Crear un nuevo libro de trabajo
     const workbook = new ExcelJS.Workbook();

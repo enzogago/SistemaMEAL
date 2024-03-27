@@ -495,7 +495,14 @@ const FormSubProject = () => {
                                         </option>
                                     ))}
                                 </select>
-                                <button onClick={() => handleRemoveImplementador(index)}>X</button>
+                                <div className='PowerMas_IconsTable flex jc-center ai-center'>
+                                    <FaRegTrashAlt 
+                                        data-tooltip-id="delete-tooltip" 
+                                        data-tooltip-content="Eliminar" 
+                                        className='Large-p_25' 
+                                        onClick={() => handleRemoveImplementador(index)} 
+                                    />
+                                </div>
                             </div>
                         ))}
                     </div>
@@ -513,7 +520,14 @@ const FormSubProject = () => {
                                     <label htmlFor="pais" className="">
                                         Pais:
                                     </label>
-                                    <button onClick={() => handleRemoveUbicacion(countryIndex)}>X</button>
+                                    <div className='PowerMas_IconsTable flex jc-center ai-center'>
+                                        <FaRegTrashAlt 
+                                            data-tooltip-id="delete-tooltip" 
+                                            data-tooltip-content="Eliminar" 
+                                            className='Large-p_25' 
+                                            onClick={() => handleRemoveUbicacion(countryIndex)} 
+                                        />
+                                    </div>
                                 </div>
                                 <select 
                                     id={`pais${countryIndex}`}

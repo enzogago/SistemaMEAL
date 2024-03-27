@@ -91,7 +91,7 @@ const FormGoal = () => {
             Notiflix.Loading.pulse('Cargando...');
             await Promise.all([
                 fetchData('Proyecto', setProyectos),
-                // fetchData('Implementador', setImplementadores),
+                fetchData('Implementador', setImplementadores),
                 fetchData('Ubicacion', setPaises),
                 fetchUsuariosTecnico()
             ]);
@@ -580,9 +580,9 @@ const FormGoal = () => {
 
                             fetchData(`Indicador/jerarquia/${option.indAno}/${option.indCod}`, (data) => {
                                 setJerarquia(data);
-                                if (data.subProAno && data.subProCod) {
-                                    fetchData(`Indicador/implementador/${data.subProAno}/${data.subProCod}`, setImplementadores)
-                                }
+                                // if (data.subProAno && data.subProCod) {
+                                //     fetchData(`Indicador/implementador/${data.subProAno}/${data.subProCod}`, setImplementadores)
+                                // }
                             })
                             
                             if(option.indTipInd === 'IAC'){

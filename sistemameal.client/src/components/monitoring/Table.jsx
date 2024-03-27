@@ -27,7 +27,7 @@ const Table = ({ data, setMonitoringData }) => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [isInputEmpty, setIsInputEmpty] = useState(true);
     const [inputValue, setInputValue] = useState('');
-
+    const [actionsColumnWidth, setActionsColumnWidth] = useState(0);
     
     const [sums, setSums] = useState(null);
 
@@ -433,7 +433,7 @@ const Table = ({ data, setMonitoringData }) => {
                 header: () => <div style={{textAlign: 'center', flexGrow: '1'}}>Añadir</div>,
                 accessorKey: "añadir",
                 disableSorting: true,
-                stickyRight: 95,
+                stickyRight: actionsColumnWidth-20,
                 cell: ({row}) => {
                     return (
                         row.original.uniInvPer === 'S' ?
@@ -545,6 +545,8 @@ const Table = ({ data, setMonitoringData }) => {
                 searchTags={searchTags}
                 setSearchTags={setSearchTags}
                 sums={sums}
+                actionsColumnWidth={actionsColumnWidth}
+                setActionsColumnWidth={setActionsColumnWidth}
             />
             
         </>

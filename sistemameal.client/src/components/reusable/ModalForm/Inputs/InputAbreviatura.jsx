@@ -14,7 +14,7 @@ const InputAbreviatura = ({register, errors, dirtyFields, isSubmitted}) => {
             </label>
             <input 
                 id="abreviatura"
-                className={`p1 PowerMas_Modal_Form_${dirtyFields.abreviatura || isSubmitted ? (errors.abreviatura ? 'invalid' : 'valid') : ''}`}  
+                className={`p_5 PowerMas_Modal_Form_${dirtyFields.abreviatura || isSubmitted ? (errors.abreviatura ? 'invalid' : 'valid') : ''}`}  
                 type="text" 
                 placeholder='Dni' 
                 maxLength={100} 
@@ -26,7 +26,7 @@ const InputAbreviatura = ({register, errors, dirtyFields, isSubmitted}) => {
                         maxLength: { value: 50, message: 'El campo no puede tener más de 50 caracteres' },
                         minLength:  { value: 2, message: 'El campo no puede tener menos de 2 caracteres' },
                         pattern: {
-                            value: /^[A-Za-zñÑ\s]+$/,
+                            value: /^[A-Za-zñÑáéíóúÁÉÍÓÚ().üÜ/\s-_]+$/,
                             message: 'Por favor, introduce solo letras y espacios',
                         },
                         validate: validateNoLeadingSpaces,
