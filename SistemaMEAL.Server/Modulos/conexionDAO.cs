@@ -1,6 +1,4 @@
 ﻿using Microsoft.Data.SqlClient;
-using System.Text;
-using System.Security.Cryptography;
 namespace SistemaMEAL.Server.Modulos
 {
     public class conexionDAO

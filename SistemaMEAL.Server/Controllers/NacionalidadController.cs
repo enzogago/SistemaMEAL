@@ -27,7 +27,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var data = _nacionalidades.Listado();
+            var data = _nacionalidades.Listado(identity);
             return Ok(data);
         }
 
@@ -56,7 +56,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _nacionalidades.Insertar(nacionalidad);
+            var (message, messageType) = _nacionalidades.Insertar(identity, nacionalidad);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -96,7 +96,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _nacionalidades.Modificar(nacionalidad);
+            var (message, messageType) = _nacionalidades.Modificar(identity, nacionalidad);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -136,7 +136,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _nacionalidades.Eliminar(nacionalidad);
+            var (message, messageType) = _nacionalidades.Eliminar(identity, nacionalidad);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });

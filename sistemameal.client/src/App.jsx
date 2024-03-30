@@ -7,6 +7,8 @@ import { AuthContext } from './context/AuthContext';
 import LoadingComponent from './components/LoadingComponent';
 import ResultChain from './components/result-chain/ResultChain';
 import Tutorial from './components/tutorial/Tutorial';
+import ResultBudget from './components/result-budget/ResultBudget';
+import RegisterProject from './components/upload/project/RegisterProject';
 // import Login from './components/auth/Login';
 // import Layout from './components/router/Layout';
 // Componentes
@@ -122,8 +124,9 @@ const App = () => {
         "nationality": Nationality,
         "unit": Unit,
         "beneficiarie": Beneficiarie,
-        "upload-project": FormatProject,
+        "upload-project": UploadProject,
         "result-chain": ResultChain,
+        "result-budget": ResultBudget,
     };
 
     let defaultRoute;
@@ -172,8 +175,8 @@ const App = () => {
                                                 )}
                                                 {menuData.some(menu => menu.menRef === 'upload-project') && (
                                                     <>
-                                                        <Route path="subir-proyecto" element={<UploadProject />} />
                                                         <Route path="guardar-proyecto" element={<SaveProject />} />
+                                                        <Route path="registrar-proyecto/:id" element={<RegisterProject />} />
                                                     </>
                                                 )}
                                                 {menuData.some(menu => menu.menRef === 'monitoring') && (

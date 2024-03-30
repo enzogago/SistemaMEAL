@@ -67,7 +67,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var permisos = _permisos.Listado();
+            var permisos = _permisos.Listado(identity);
             Console.WriteLine(permisos);
             return Ok(permisos);
         }
@@ -109,7 +109,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _permisos.Insertar(permiso);
+            var (message, messageType) = _permisos.Insertar(identity, permiso);
             if (messageType == "1") // Error
             {
                 return BadRequest(message);
@@ -150,7 +150,7 @@ namespace SistemaMEAL.Server.Controllers
             }
 
             permiso.PerCod = perCod; 
-            var (message, messageType) = _permisos.Modificar(permiso);
+            var (message, messageType) = _permisos.Modificar(identity, permiso);
             if (messageType == "1") // Error
             {
                 return BadRequest(message);
@@ -191,7 +191,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _permisos.Eliminar(perCod);
+            var (message, messageType) = _permisos.Eliminar(identity, perCod);
             if (messageType == "1") // Error
             {
                 return BadRequest(message);

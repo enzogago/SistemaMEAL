@@ -39,7 +39,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
             
-            var implementadores = _ubicaciones.BuscarUbicacionesSubProyecto(subProAno:subProAno, subProCod:subProCod);
+            var implementadores = _ubicaciones.BuscarUbicacionesSubProyecto(identity, subProAno:subProAno, subProCod:subProCod);
             return Ok(implementadores);
         }
 

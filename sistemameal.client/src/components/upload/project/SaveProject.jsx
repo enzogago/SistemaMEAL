@@ -11,26 +11,30 @@ import {
 import CustomTableUpload from "../../reusable/Table/CustomTableUpload";
 import { expectedHeaders } from "./handleUpload";
 import Notiflix from "notiflix";
+import CryptoJS from 'crypto-js';
 
 const SaveProject = () => {
+    const navigate = useNavigate();
     // Variables State AuthContext 
     const { statusInfo } = useContext(StatusContext);
     const { tableData, postData, isValid, errorCells } = statusInfo;
-    if(tableData.length === 0) return;
     const [transformedData, setTransformedData] = useState([])
-    const navigate = useNavigate();
 
     useEffect(() => {
-        // Transforma tableData a un arreglo de objetos
-        const transformedData = tableData.map((row, rowIndex) => {
-            return expectedHeaders.reduce((obj, headerInfo, index) => {
-                const dbKey = headerInfo.dbKey;
-                const cell = row[index];
-                obj[dbKey] = cell;
-                return obj;
-            }, {});
-        });
-        setTransformedData(transformedData)
+        if (tableData.length > 0) {
+            // Transforma tableData a un arreglo de objetos
+            const transformedData = tableData.map((row, rowIndex) => {
+                return expectedHeaders.reduce((obj, headerInfo, index) => {
+                    const dbKey = headerInfo.dbKey;
+                    const cell = row[index];
+                    obj[dbKey] = cell;
+                    return obj;
+                }, {});
+            });
+            setTransformedData(transformedData)
+        } else {
+            navigate('/upload-project');
+        }
     }, [tableData]);
     
     
@@ -70,7 +74,7 @@ const SaveProject = () => {
             alert('Los datos son inválidos o no hay datos para procesar');
             return;
         }
-    
+        
         // Aquí puedes procesar los datos y enviarlos al servidor
         console.log('Procesando datos...');
         console.log(postData);
@@ -94,7 +98,14 @@ const SaveProject = () => {
             }
             console.log(data)
             Notiflix.Notify.success(data.message)
-            navigate('/upload-project');
+            const {subProAnoOut, subProCodOut} = data;
+
+            const id = `${subProAnoOut}${subProCodOut}`;
+            // Encripta el ID
+            const ciphertext = CryptoJS.AES.encrypt(id, 'secret key 123').toString();
+            // Codifica la cadena cifrada para que pueda ser incluida de manera segura en una URL
+            const safeCiphertext = btoa(ciphertext).replace('+', '-').replace('/', '_').replace(/=+$/, '');
+            navigate(`/registrar-proyecto/${safeCiphertext}`);
         } catch (error) {
             console.error('Error:', error);
         } finally {
@@ -104,15 +115,15 @@ const SaveProject = () => {
 
     return (
         <>
-            <Bar currentStep={3} type='upload' />
+            <Bar currentStep={2} type='upload' />
             <CustomTableUpload
                 table={table}
                 errorCells={errorCells}
                 isLargePagination={true}
             />
             <footer className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
-                <button onClick={() => navigate('/subir-proyecto')} className="Large_3 m_75 PowerMas_Buttom_Secondary">Atras</button>
-                <button disabled={!isValid} onClick={processValidData} className="Large_3 m_75 PowerMas_Buttom_Primary">Guardar</button>
+                <button onClick={() => navigate('/upload-project')} className="Large_3 m_75 PowerMas_Buttom_Secondary">Atras</button>
+                <button disabled={!isValid} onClick={processValidData} className="Large_3 m_75 PowerMas_Buttom_Primary">Siguiente</button>
             </footer>
         </>
     )

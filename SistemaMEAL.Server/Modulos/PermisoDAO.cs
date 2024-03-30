@@ -4,13 +4,13 @@ using SistemaMEAL.Server.Models;
 using SistemaMEAL.Server.Modulos;
 using Newtonsoft.Json;
 using System.Text;
+using System.Security.Claims;
 
 namespace SistemaMEAL.Modulos
 {
     public class PermisoDAO
     {
         private conexionDAO cn = new conexionDAO();
-
 
         public bool InsertarPermisoUsuario(string usuAno, string usuCod, string perCod)
         {
@@ -64,8 +64,10 @@ namespace SistemaMEAL.Modulos
             }
         }
 
-        public IEnumerable<Permiso> Listado(string? perCod = null, string? perNom = null, string? perRef = null)
+        public IEnumerable<Permiso> Listado(ClaimsIdentity? identity, string? perCod = null, string? perNom = null, string? perRef = null)
         {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
             List<Permiso>? temporal = new List<Permiso>();
             try
             {
@@ -77,11 +79,11 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_PERCOD", string.IsNullOrEmpty(perCod) ? (object)DBNull.Value : perCod);
                 cmd.Parameters.AddWithValue("@P_PERNOM", string.IsNullOrEmpty(perNom) ? (object)DBNull.Value : perNom);
                 cmd.Parameters.AddWithValue("@P_PERREF", string.IsNullOrEmpty(perRef) ? (object)DBNull.Value : perRef);
-                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
-                cmd.Parameters.AddWithValue("@P_USUANO_U", "2024");
-                cmd.Parameters.AddWithValue("@P_USUCOD_U", "0001");
-                cmd.Parameters.AddWithValue("@P_USUNOM_U", "Juan");
-                cmd.Parameters.AddWithValue("@P_USUAPE_U", "Perez");
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
 
                 SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                 pDescripcionMensaje.Direction = ParameterDirection.Output;
@@ -118,8 +120,10 @@ namespace SistemaMEAL.Modulos
             return temporal?? new List<Permiso>();
         }
 
-        public (string? message, string? messageType) Insertar(Permiso permiso)
+        public (string? message, string? messageType) Insertar(ClaimsIdentity? identity, Permiso permiso)
         {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
             string? mensaje = "";
             string? tipoMensaje = "";
             try
@@ -130,12 +134,12 @@ namespace SistemaMEAL.Modulos
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 cmd.Parameters.AddWithValue("@P_PERNOM", permiso.PerNom);
-                cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
-                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
-                cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
-                cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
-                cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
-                cmd.Parameters.AddWithValue("@P_USUAPE_U", "GAGO");
+                cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
 
                 SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                 pDescripcionMensaje.Direction = ParameterDirection.Output;
@@ -161,8 +165,10 @@ namespace SistemaMEAL.Modulos
             return (mensaje, tipoMensaje);
         }
 
-        public (string? message, string? messageType) Modificar(Permiso permiso)
+        public (string? message, string? messageType) Modificar(ClaimsIdentity? identity, Permiso permiso)
         {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
             string? mensaje = "";
             string? tipoMensaje = "";
             try
@@ -174,12 +180,12 @@ namespace SistemaMEAL.Modulos
 
                 cmd.Parameters.AddWithValue("@P_PERCOD", permiso.PerCod);
                 cmd.Parameters.AddWithValue("@P_PERNOM", permiso.PerNom);
-                cmd.Parameters.AddWithValue("@P_USUMOD", "Usuario");
-                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
-                cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
-                cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
-                cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
-                cmd.Parameters.AddWithValue("@P_USUAPE_U", "GAGO");
+                cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
 
                 SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                 pDescripcionMensaje.Direction = ParameterDirection.Output;
@@ -205,8 +211,10 @@ namespace SistemaMEAL.Modulos
             return (mensaje, tipoMensaje);
         }
 
-        public (string? message, string? messageType) Eliminar(string perCod)
+        public (string? message, string? messageType) Eliminar(ClaimsIdentity? identity, string perCod)
         {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
             string? mensaje = "";
             string? tipoMensaje = "";
             try
@@ -217,12 +225,12 @@ namespace SistemaMEAL.Modulos
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 cmd.Parameters.AddWithValue("@P_PERCOD", perCod);
-                cmd.Parameters.AddWithValue("@P_USUMOD", "Usuario");
-                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
-                cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
-                cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
-                cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
-                cmd.Parameters.AddWithValue("@P_USUAPE_U", "GAGO");
+                cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
 
                 SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                 pDescripcionMensaje.Direction = ParameterDirection.Output;

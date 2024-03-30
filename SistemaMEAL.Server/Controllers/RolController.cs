@@ -27,7 +27,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var roles = _roles.Listado();
+            var roles = _roles.Listado(identity);
             Console.WriteLine(roles);
             return Ok(roles);
         }
@@ -57,7 +57,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _roles.Insertar(rol);
+            var (message, messageType) = _roles.Insertar(identity, rol);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -97,7 +97,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _roles.Modificar(rol);
+            var (message, messageType) = _roles.Modificar(identity, rol);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -137,7 +137,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _roles.Eliminar(rol);
+            var (message, messageType) = _roles.Eliminar(identity, rol);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });

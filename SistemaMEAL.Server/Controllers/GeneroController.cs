@@ -29,7 +29,7 @@ namespace SistemaMEAL.Server.Controllers
             if (!rToken.success) return Unauthorized(rToken);
 
             // Pasa los parámetros al método Listado
-            var generos = _generos.Listado();
+            var generos = _generos.Listado(identity);
             
             return Ok(generos);
         }
@@ -60,7 +60,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _generos.Insertar(genero);
+            var (message, messageType) = _generos.Insertar(identity, genero);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -100,7 +100,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _generos.Modificar(genero);
+            var (message, messageType) = _generos.Modificar(identity, genero);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -141,7 +141,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _generos.Eliminar(genero);
+            var (message, messageType) = _generos.Eliminar(identity, genero);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });

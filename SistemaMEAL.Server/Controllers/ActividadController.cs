@@ -28,7 +28,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var data = _actividades.Buscar();
+            var data = _actividades.Buscar(identity);
             return Ok(data);
         }
 
@@ -40,7 +40,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var data = _actividades.Buscar(resAno:resAno, resCod:resCod);
+            var data = _actividades.Buscar(identity, resAno:resAno, resCod:resCod);
             return Ok(data);
         }
 
@@ -69,7 +69,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (ano, cod, message, messageType) = _actividades.Insertar(actividad);
+            var (ano, cod, message, messageType) = _actividades.Insertar(identity, actividad);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -109,7 +109,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _actividades.Modificar(actividad);
+            var (message, messageType) = _actividades.Modificar(identity, actividad);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -149,7 +149,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _actividades.Eliminar(actividad);
+            var (message, messageType) = _actividades.Eliminar(identity, actividad);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });

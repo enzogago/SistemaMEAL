@@ -28,7 +28,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var data = _proyectos.Listado();
+            var data = _proyectos.Listado(identity);
             return Ok(data);
         }
         
@@ -41,7 +41,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var data = _proyectos.Listado(proAno, proCod);
+            var data = _proyectos.Listado(identity, proAno, proCod);
             return Ok(data.FirstOrDefault());
         }
 
@@ -151,7 +151,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (proAno, proCod, message, messageType) = _proyectos.Insertar(proyecto);
+            var (proAno, proCod, message, messageType) = _proyectos.Insertar(identity, proyecto);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -191,7 +191,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _proyectos.Modificar(proyecto);
+            var (message, messageType) = _proyectos.Modificar(identity, proyecto);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -231,7 +231,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _proyectos.Eliminar(proyecto);
+            var (message, messageType) = _proyectos.Eliminar(identity, proyecto);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -251,9 +251,29 @@ namespace SistemaMEAL.Server.Controllers
         [Route("Masivo")]
         public dynamic InsertarEstadosMasivo(List<Proyecto> proyectos)
         {
-            // Aquí va la misma lógica de validación de token y permisos que tienes en tu método Insertar...
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
 
-            var (message, messageType, errorCells) = _proyectos.InsertarMasivo(proyectos);
+            if (!rToken.success) return rToken;
+
+            dynamic data = rToken.result;
+            Usuario usuarioActual = new Usuario
+            {
+                UsuAno = data.UsuAno,
+                UsuCod = data.UsuCod,
+                RolCod = data.RolCod
+            };
+            if (usuarioActual.RolCod != "01")
+            {
+                return new
+                {
+                    success = false,
+                    message = "No tienes permisos para realizar esta accion",
+                    result = ""
+                };
+            }
+
+            var (subProAnoOut, subProCodOut, message, messageType, errorCells) = _proyectos.InsertarMasivo(identity, proyectos);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message, errorCells });
@@ -264,49 +284,8 @@ namespace SistemaMEAL.Server.Controllers
             }
             else // Registros insertados correctamente
             {
-                return new OkObjectResult(new { success = true, message, errorCells });
+                return new OkObjectResult(new { subProAnoOut, subProCodOut, success = true, message, errorCells });
             }
         }
-
-        // [HttpPost]
-        // public dynamic Insertar(ProyectoImplementadorUbicacionDto proyectoImplementadorUbicacionDto)
-        // {
-        //     var identity = HttpContext.User.Identity as ClaimsIdentity;
-        //     var rToken = Jwt.validarToken(identity, _usuarios);
-
-        //     if (!rToken.success) return rToken;
-
-        //     dynamic data = rToken.result;
-        //     Usuario usuarioActual = new Usuario
-        //     {
-        //         UsuAno = data.UsuAno,
-        //         UsuCod = data.UsuCod,
-        //         RolCod = data.RolCod
-        //     };
-        //     if (usuarioActual.RolCod != "01")
-        //     {
-        //         return new
-        //         {
-        //             success = false,
-        //             message = "No tienes permisos para insertar usuarios",
-        //             result = ""
-        //         };
-        //     }
-        //     var (message, messageType) = _proyectos.InsertarProyectoImplementadorUbicacion(proyectoImplementadorUbicacionDto.Proyecto, proyectoImplementadorUbicacionDto.Implementadores, proyectoImplementadorUbicacionDto.Ubicaciones);
-        //     if (messageType == "1") // Error
-        //     {
-        //         return new BadRequestObjectResult(new { success = false, message });
-        //     }
-        //     else if (messageType == "2") // Registro ya existe
-        //     {
-        //         return new ConflictObjectResult(new { success = false, message });
-        //     }
-        //     else // Registro modificado correctamente
-        //     {
-        //         return new OkObjectResult(new { success = true, message });
-
-        // }
-        // }
-
     }
 }

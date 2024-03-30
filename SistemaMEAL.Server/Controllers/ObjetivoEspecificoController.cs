@@ -28,7 +28,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var data = _objetivosEspecificos.Buscar();
+            var data = _objetivosEspecificos.Buscar(identity);
             return Ok(data);
         }
 
@@ -40,7 +40,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var data = _objetivosEspecificos.Buscar(objAno:objAno, objCod:objCod);
+            var data = _objetivosEspecificos.Buscar(identity, objAno:objAno, objCod:objCod);
             return Ok(data);
         }
 
@@ -69,7 +69,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (ano, cod, message, messageType) = _objetivosEspecificos.Insertar(objetivoEspecifico);
+            var (ano, cod, message, messageType) = _objetivosEspecificos.Insertar(identity, objetivoEspecifico);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -109,7 +109,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _objetivosEspecificos.Modificar(objetivoEspecifico);
+            var (message, messageType) = _objetivosEspecificos.Modificar(identity, objetivoEspecifico);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -149,7 +149,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _objetivosEspecificos.Eliminar(objetivoEspecifico);
+            var (message, messageType) = _objetivosEspecificos.Eliminar(identity, objetivoEspecifico);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });

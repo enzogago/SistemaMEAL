@@ -123,18 +123,18 @@ namespace SistemaMEAL.Server.Controllers
                     result = ""
                 };
             }
-            var (message, messageType) = _monitoreos.InsertarBeneficiarioMonitoreo(beneficiarioMonitoreo.Beneficiario, beneficiarioMonitoreo.MetaBeneficiario, beneficiarioMonitoreo.DocumentoBeneficiario);
-            if (messageType == "1") // Error
+            var (message, messageType) = _monitoreos.InsertarBeneficiarioMonitoreo(identity, beneficiarioMonitoreo.Beneficiario, beneficiarioMonitoreo.MetaBeneficiario, beneficiarioMonitoreo.DocumentoBeneficiario);
+            if (messageType == "1")
             {
-                return new BadRequestObjectResult(new { success = false, message = message });
+                return new BadRequestObjectResult(new { success = false, message });
             }
-            else if (messageType == "2") // Registro ya existe
+            else if (messageType == "2")
             {
-                return new ConflictObjectResult(new { success = false, message = message });
+                return new ConflictObjectResult(new { success = false, message });
             }
-            else // Registro modificado correctamente
+            else
             {
-                return new OkObjectResult(new { success = true, message = message });
+                return new OkObjectResult(new { success = true, message });
             }
         }
 
@@ -163,16 +163,16 @@ namespace SistemaMEAL.Server.Controllers
                     result = ""
                 };
             }
-            var (message, messageType) = _monitoreos.InsertarMetaBeneficiarioExiste(metaBeneficiario);
-            if (messageType == "1") // Error
+            var (message, messageType) = _monitoreos.InsertarMetaBeneficiarioExiste(identity, metaBeneficiario);
+            if (messageType == "1")
             {
                 return new BadRequestObjectResult(new { success = false, message });
             }
-            else if (messageType == "2") // Registro ya existe
+            else if (messageType == "2")
             {
                 return new ConflictObjectResult(new { success = false, message });
             }
-            else // Registro modificado correctamente
+            else
             {
                 return new OkObjectResult(new { success = true, message });
             }
@@ -204,16 +204,16 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _monitoreos.EliminarBeneficiarioMonitoreo(metAno, metCod, benAno, benCod, ubiAno, ubiCod, metBenAnoEjeTec, metBenMesEjeTec );
-            if (messageType == "1") // Error
+            var (message, messageType) = _monitoreos.EliminarBeneficiarioMonitoreo(identity, metAno, metCod, benAno, benCod, ubiAno, ubiCod, metBenAnoEjeTec, metBenMesEjeTec );
+            if (messageType == "1")
             {
                 return new BadRequestObjectResult(new { success = false, message });
             }
-            else if (messageType == "2") // Registro ya existe
+            else if (messageType == "2")
             {
                 return new ConflictObjectResult(new { success = false, message });
             }
-            else // Registro modificado correctamente
+            else
             {
                 return new OkObjectResult(new {success = true, message });
             }
@@ -241,7 +241,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var monitoreos = _monitoreos.BuscarMonitoreoForm(metAno, metCod, benAno, benCod, ubiAno, ubiCod, metBenAnoEjeTec, metBenMesEjeTec);
+            var monitoreos = _monitoreos.BuscarMonitoreoForm(identity, metAno, metCod, benAno, benCod, ubiAno, ubiCod, metBenAnoEjeTec, metBenMesEjeTec);
             var monitoreo = monitoreos.FirstOrDefault();
             return Ok(monitoreo);
         }
@@ -270,16 +270,16 @@ namespace SistemaMEAL.Server.Controllers
                     result = ""
                 };
             }
-            var (message, messageType) = _monitoreos.ModificarMetaBeneficiario(metaBeneficiario);
-            if (messageType == "1") // Error
+            var (message, messageType) = _monitoreos.ModificarMetaBeneficiario(identity, metaBeneficiario);
+            if (messageType == "1")
             {
                 return new BadRequestObjectResult(new { success = false, message });
             }
-            else if (messageType == "2") // Registro ya existe
+            else if (messageType == "2")
             {
                 return new ConflictObjectResult(new { success = false, message });
             }
-            else // Registro modificado correctamente
+            else
             {
                 return new OkObjectResult(new { success = true, message });
             }
@@ -310,18 +310,18 @@ namespace SistemaMEAL.Server.Controllers
                     result = ""
                 };
             }
-            var (message, messageType) = _monitoreos.ModificarBeneficiarioMonitoreo(beneficiarioMonitoreo.Beneficiario, beneficiarioMonitoreo.MetaBeneficiario);
-            if (messageType == "1") // Error
+            var (message, messageType) = _monitoreos.ModificarBeneficiarioMonitoreo(identity, beneficiarioMonitoreo.Beneficiario, beneficiarioMonitoreo.MetaBeneficiario);
+            if (messageType == "1")
             {
-                return new BadRequestObjectResult(new { success = false, message = message });
+                return new BadRequestObjectResult(new { success = false, message });
             }
-            else if (messageType == "2") // Registro ya existe
+            else if (messageType == "2")
             {
-                return new ConflictObjectResult(new { success = false, message = message });
+                return new ConflictObjectResult(new { success = false, message });
             }
-            else // Registro modificado correctamente
+            else
             {
-                return new OkObjectResult(new { success = true, message = message });
+                return new OkObjectResult(new { success = true, message });
             }
         }
 
@@ -350,16 +350,16 @@ namespace SistemaMEAL.Server.Controllers
                     result = ""
                 };
             }
-            var (message, messageType) = _monitoreos.InsertarMetaMonitoreo(metaIndicadorDto.Meta, metaIndicadorDto.MetaIndicador);
-            if (messageType == "1") // Error
+            var (message, messageType) = _monitoreos.InsertarMetaMonitoreo(identity, metaIndicadorDto.Meta, metaIndicadorDto.MetaIndicador);
+            if (messageType == "1")
             {
                 return new BadRequestObjectResult(new { success = false, message });
             }
-            else if (messageType == "2") // Registro ya existe
+            else if (messageType == "2")
             {
                 return new ConflictObjectResult(new { success = false, message });
             }
-            else // Registro modificado correctamente
+            else
             {
                 return new OkObjectResult(new { success = true, message });
             }
@@ -374,7 +374,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var data = _monitoreos.BuscarMetaIndicador(metAno, metCod, indAno, indCod);
+            var data = _monitoreos.BuscarMetaIndicador(identity, metAno, metCod, indAno, indCod);
             
             return Ok(data.FirstOrDefault());
         }
@@ -405,12 +405,12 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _monitoreos.EliminarMetaIndicador(metAno, metCod, metIndAno, metIndCod);
-            if (messageType == "1") // Error
+            var (message, messageType) = _monitoreos.EliminarMetaIndicador(identity, metAno, metCod, metIndAno, metIndCod);
+            if (messageType == "1")
             {
                 return BadRequest(message);
             }
-            else if (messageType == "2") // Registro ya existe
+            else if (messageType == "2")
             {
                 return Conflict(message);
             }
@@ -446,16 +446,16 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _monitoreos.ModificarMeta(meta);
-            if (messageType == "1") // Error
+            var (message, messageType) = _monitoreos.ModificarMeta(identity, meta);
+            if (messageType == "1")
             {
                 return new BadRequestObjectResult(new { success = false, message });
             }
-            else if (messageType == "2") // Registro ya existe
+            else if (messageType == "2")
             {
                 return new ConflictObjectResult(new { success = false, message });
             }
-            else // Registro modificado correctamente
+            else
             {
                 return new OkObjectResult(new { success = true, message });
             }
@@ -486,16 +486,16 @@ namespace SistemaMEAL.Server.Controllers
                     result = ""
                 };
             }
-            var (message, messageType) = _monitoreos.ModificarMetaIndicador(metaIndicador);
-            if (messageType == "1") // Error
+            var (message, messageType) = _monitoreos.ModificarMetaIndicador(identity, metaIndicador);
+            if (messageType == "1")
             {
                 return new BadRequestObjectResult(new { success = false, message });
             }
-            else if (messageType == "2") // Registro ya existe
+            else if (messageType == "2")
             {
                 return new ConflictObjectResult(new { success = false, message });
             }
-            else // Registro modificado correctamente
+            else
             {
                 return new OkObjectResult(new { success = true, message });
             }
@@ -526,16 +526,16 @@ namespace SistemaMEAL.Server.Controllers
                     result = ""
                 };
             }
-            var (message, messageType) = _monitoreos.ModificarMetaIndicadorTransaction(metaIndicadorDto.Meta, metaIndicadorDto.MetaIndicador);
-            if (messageType == "1") // Error
+            var (message, messageType) = _monitoreos.ModificarMetaIndicadorTransaction(identity, metaIndicadorDto.Meta, metaIndicadorDto.MetaIndicador);
+            if (messageType == "1")
             {
                 return new BadRequestObjectResult(new { success = false, message });
             }
-            else if (messageType == "2") // Registro ya existe
+            else if (messageType == "2")
             {
                 return new ConflictObjectResult(new { success = false, message });
             }
-            else // Registro modificado correctamente
+            else
             {
                 return new OkObjectResult(new { success = true, message });
             }

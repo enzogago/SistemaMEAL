@@ -27,7 +27,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var tipos = _tipos.Listado();
+            var tipos = _tipos.Listado(identity);
             Console.WriteLine(tipos);
             return Ok(tipos);
         }
@@ -57,7 +57,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _tipos.Insertar(tipoValor);
+            var (message, messageType) = _tipos.Insertar(identity, tipoValor);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -97,7 +97,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _tipos.Modificar(tipoValor);
+            var (message, messageType) = _tipos.Modificar(identity, tipoValor);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -138,7 +138,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _tipos.Eliminar(tipoValor);
+            var (message, messageType) = _tipos.Eliminar(identity, tipoValor);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });

@@ -27,6 +27,24 @@ namespace SistemaMEAL.Server.Controllers
             Console.WriteLine(rToken);
             if (!rToken.success) return Unauthorized(rToken);
 
+            dynamic data = rToken.result;
+            Usuario usuarioActual = new Usuario
+            {
+                UsuAno = data.UsuAno,
+                UsuCod = data.UsuCod,
+                RolCod = data.RolCod
+            };
+
+            if (usuarioActual.RolCod != "01")
+            {
+                return new
+                {
+                    success = false,
+                    message = "No tienes permisos para insertar usuarios",
+                    result = ""
+                };
+            }
+
             // Pasa los parámetros al método Listado
             var result = _logs.ActividadesRecientes();
             

@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import Bar from "../../user/Bar";
 import { useContext, useRef, useState } from "react";
-import { FaRegFileExcel } from "react-icons/fa";
+import { FaDownload, FaRegFileExcel } from "react-icons/fa";
 import Notiflix from "notiflix";
 import ExcelJS from 'exceljs';
 import { handleUpload } from "./handleUpload";
@@ -78,9 +78,16 @@ const UploadProject = () => {
     
     return (
         <>
-            <Bar currentStep={2} type='upload' />
+            <Bar currentStep={1} type='upload' />
             <div className="flex-grow-1 flex jc-center ai-center overflow-auto">
+                
                 <div className="Large_8">
+                <div className="flex jc-center p_5">
+                <button className="PowerMas_Buttom_Secondary flex ai-center jc-space-between p_5 Phone_3"> 
+                    Descargar formato 
+                    <FaDownload className="w-auto" /> 
+                </button>
+                </div>
                     <article className="PowerMas_Article_Upload center">
                         <p style={{color: '#878280'}}>Solo se puede subir documentos en formato Excel</p>
                         <h3>Subir Archivo</h3>
@@ -119,6 +126,7 @@ const UploadProject = () => {
                     </div>
                 </div>
             </div>
+           
             {/* <UploadTransactionProyecto
                 expectedHeaders={expectedHeaders}
                 controller='Proyecto'

@@ -49,7 +49,7 @@ namespace SistemaMEAL.Server.Controllers
                 });
             }
            
-            var resultado = _beneficiarios.Listado();
+            var resultado = _beneficiarios.Listado(identity);
             return Ok(resultado);
         }
 
@@ -80,7 +80,7 @@ namespace SistemaMEAL.Server.Controllers
                 });
             }
            
-            var resultados = _beneficiarios.Listado(benAno, benCod);
+            var resultados = _beneficiarios.Listado(identity, benAno, benCod);
             var resultado = resultados.FirstOrDefault();
             return Ok(resultado);
         }
@@ -112,7 +112,7 @@ namespace SistemaMEAL.Server.Controllers
                 });
             }
            
-            var resultado = _beneficiarios.BuscarMetaBeneficiario(metAno, metCod);
+            var resultado = _beneficiarios.BuscarMetaBeneficiario(identity, metAno, metCod);
             return Ok(resultado);
         }
 
@@ -141,7 +141,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _beneficiarios.InsertarBeneficiarioDocumento(documentoBeneficiarioDto.Beneficiario, documentoBeneficiarioDto.DocumentoBeneficiario);
+            var (message, messageType) = _beneficiarios.InsertarBeneficiarioDocumento(identity, documentoBeneficiarioDto.Beneficiario, documentoBeneficiarioDto.DocumentoBeneficiario);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -180,7 +180,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _beneficiarios.Modificar(beneficiario);
+            var (message, messageType) = _beneficiarios.Modificar(identity, beneficiario);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -194,45 +194,6 @@ namespace SistemaMEAL.Server.Controllers
                 return new OkObjectResult(new { success = true, message });
             }
         }
-        // [HttpPost]
-        // public dynamic Insertar(Beneficiario beneficiario)
-        // {
-        //     var identity = HttpContext.User.Identity as ClaimsIdentity;
-        //     var rToken = Jwt.validarToken(identity, _usuarios);
-
-        //     if (!rToken.success) return rToken;
-
-        //     dynamic data = rToken.result;
-        //     Usuario usuarioActual = new Usuario
-        //     {
-        //         UsuAno = data.UsuAno,
-        //         UsuCod = data.UsuCod,
-        //         RolCod = data.RolCod
-        //     };
-        //     if (usuarioActual.RolCod != "01")
-        //     {
-        //         return new
-        //         {
-        //             success = false,
-        //             message = "No tienes permisos para insertar usuarios",
-        //             result = ""
-        //         };
-        //     }
-
-        //     var (benAno, benCod, message, messageType) = _beneficiarios.Insertar(beneficiario);
-        //     if (messageType == "1") // Error
-        //     {
-        //         return new BadRequestObjectResult(new { success = false, message });
-        //     }
-        //     else if (messageType == "2") // Registro ya existe
-        //     {
-        //         return new ConflictObjectResult(new { success = false, message });
-        //     }
-        //     else // Registro modificado correctamente
-        //     {
-        //         return new OkObjectResult(new { benAno, benCod, success = true, message });
-        //     }
-        // }
 
         [HttpGet]
         [Route("documento/{docIdeCod}/{docIdeBenNum}")]
@@ -261,7 +222,7 @@ namespace SistemaMEAL.Server.Controllers
                 });
             }
            
-            var beneficiarios = _beneficiarios.BuscarBeneficiarioPorDocumento(docIdeCod, docIdeBenNum);
+            var beneficiarios = _beneficiarios.BuscarBeneficiarioPorDocumento(identity, docIdeCod, docIdeBenNum);
             var beneficiario = beneficiarios.FirstOrDefault();
             return Ok(beneficiario);
         }

@@ -28,7 +28,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var data = _indicadores.Buscar();
+            var data = _indicadores.Buscar(identity);
             return Ok(data);
         }
 
@@ -64,7 +64,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var data = _indicadores.Buscar(indAno:indAno,indCod:indCod);
+            var data = _indicadores.Buscar(identity, indAno:indAno,indCod:indCod);
             return Ok(data.FirstOrDefault());
         }
 
@@ -116,7 +116,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (ano, cod, message, messageType) = _indicadores.Insertar(indicador);
+            var (ano, cod, message, messageType) = _indicadores.Insertar(identity, indicador);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -156,7 +156,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _indicadores.Modificar(indicador);
+            var (message, messageType) = _indicadores.Modificar(identity, indicador);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -196,7 +196,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _indicadores.Eliminar(indicador);
+            var (message, messageType) = _indicadores.Eliminar(identity, indicador);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -235,7 +235,7 @@ namespace SistemaMEAL.Server.Controllers
                     result = ""
                 };
             }
-            var (message, messageType) = _indicadores.ModificarCadenaIndicador(cadenaIndicadorDto.CadenaPeriodos, cadenaIndicadorDto.CadenaImplementadores, cadenaIndicadorDto.CadenaUbicaciones);
+            var (message, messageType) = _indicadores.ModificarCadenaIndicador(identity, cadenaIndicadorDto.CadenaPeriodos, cadenaIndicadorDto.CadenaImplementadores, cadenaIndicadorDto.CadenaUbicaciones);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });

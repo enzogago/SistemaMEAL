@@ -27,7 +27,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var cargos = _cargos.Listado();
+            var cargos = _cargos.Listado(identity);
             Console.WriteLine(cargos);
             return Ok(cargos);
         }
@@ -57,18 +57,18 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _cargos.Insertar(cargo);
+            var (message, messageType) = _cargos.Insertar(identity, cargo);
             if (messageType == "1") // Error
             {
-                return BadRequest(message);
+                return new BadRequestObjectResult(new { success = false, message });
             }
             else if (messageType == "2") // Registro ya existe
             {
-                return Conflict(message);
+                return new ConflictObjectResult(new { success = false, message });
             }
-            else // Registro insertado correctamente
+            else // Registro modificado correctamente
             {
-                return Ok(message);
+                return new OkObjectResult(new { success = true, message });
             }
         }
 
@@ -97,7 +97,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _cargos.Modificar(cargo);
+            var (message, messageType) = _cargos.Modificar(identity, cargo);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -137,7 +137,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _cargos.Eliminar(cargo);
+            var (message, messageType) = _cargos.Eliminar(identity, cargo);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });

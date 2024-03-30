@@ -199,28 +199,87 @@ export const handleSubmitMant = async (controller, objetoEditado, objeto, setReg
     }
 };
 
-export const Export_Excel_Basic = async (data, headersExcel) => {
+export const Export_Excel_Basic = async (data, headersExcel, active) => {
+    console.log(data)
+    console.log(headersExcel)
     let workbook = new ExcelJS.Workbook();
-    let worksheet = workbook.addWorksheet('CADENA DE RESULTADOS');
+    let worksheet = workbook.addWorksheet(`CADENA DE RESULTADOS ${active.toUpperCase()}`);
 
-    // Añadir los encabezados al libro de trabajo
-    worksheet.columns = headersExcel.map(header => {
-        if (typeof header === 'string') {
-            return {header, key: header};
+    // Añadir una imagen (opcional)
+    const imageId = workbook.addImage({base64: logoBase64, extension: 'png' });
+    worksheet.addImage(imageId, {
+        tl: { col: 0, row: 1 },
+        ext: { width: 200, height: 50 }
+    });
+  
+    // Añadir filas vacías
+    for (let i = 0; i < 5; i++) {
+        worksheet.addRow([]);
+    }
+
+    // Crear la fila para los encabezados
+    let headerRow = worksheet.addRow([]);
+
+    // Añadir los encabezados a la fila
+    headersExcel.forEach((header, index) => {
+        let cell = headerRow.getCell(index + 1);
+        cell.value = typeof header === 'string' ? header.toUpperCase() : header.name.toUpperCase();
+        if (index < 4) {
+            cell.font = { color: { argb: '000000'}, bold: true }; 
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FFCA53' }  // Color original
+            };
         } else {
-            return {header: header.name, key: header.code};
+            cell.font = { color: { argb: 'FFFFFF'}, bold: true }; 
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: '25848F' }
+            };
+        }
+        if (index === 0 || index >= 4) {
+            cell.alignment = { horizontal: 'center' };
         }
     });
 
+
     // Añadir los datos al libro de trabajo
     data.forEach(item => {
-        worksheet.addRow(item);
+        let dataRow = worksheet.addRow([]);
+        headersExcel.forEach((header, index) => {
+            let cell = dataRow.getCell(index + 1);
+            let value = item[typeof header === 'string' ? header : header.code];
+            cell.value = typeof value === 'string' ? value.toUpperCase() : value;
+            if (index === 0 || index >= 4) {
+                cell.alignment = { horizontal: 'center' };
+            }
+        });
     });
+
+
+
+    // Personalizar el ancho de las columnas
+    worksheet.columns.forEach(column => {
+        column.width = 20;  // Ancho por defecto para todas las columnas
+    });
+
+    // Insertar una columna vacía al principio
+    worksheet.spliceColumns(1, 0, []);
+
+    // Añadir el título en la celda B6 y combinar las celdas hasta la última columna con datos
+    const lastColumnLetter = worksheet.lastColumn.letter;  // Obtener la letra de la última columna
+    const titleCell = worksheet.getCell('B6');
+    titleCell.font = { size: 14, bold: true };
+    titleCell.alignment = { horizontal: 'center' };
+    titleCell.value = `CADENA DE RESULTADO ${active.toUpperCase()}`;
+    worksheet.mergeCells(`B6:${lastColumnLetter}6`);
 
     // Generar el archivo Excel
     const buffer = await workbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    saveAs(blob, `CADENA DE RESULTADOS_${Date.now()}.xlsx`);
+    saveAs(blob, `CADENA_DE_RESULTADOS_${active.toUpperCase()}_${Date.now()}.xlsx`);
 };
 
 

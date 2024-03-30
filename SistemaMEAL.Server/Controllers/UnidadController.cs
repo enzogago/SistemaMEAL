@@ -27,7 +27,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var unidades = _unidades.Listado();
+            var unidades = _unidades.Listado(identity);
             Console.WriteLine(unidades);
             return Ok(unidades);
         }
@@ -57,7 +57,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _unidades.Insertar(unidad);
+            var (message, messageType) = _unidades.Insertar(identity, unidad);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -97,7 +97,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _unidades.Modificar(unidad);
+            var (message, messageType) = _unidades.Modificar(identity, unidad);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -137,7 +137,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _unidades.Eliminar(unidad);
+            var (message, messageType) = _unidades.Eliminar(identity, unidad);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });

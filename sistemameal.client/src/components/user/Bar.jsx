@@ -8,9 +8,9 @@ const Bar = ({ currentStep, type }) => {
             { title: 'Acceso a la Información', description: 'Ingresa los datos' },
         ],
         upload: [
-            { title: 'Formato de Archivo', description: 'Ingresa los datos' },
             { title: 'Subir Archivo', description: 'Selecciona el archivo a subir' },
             { title: 'Confirmación', description: 'Confirma la subida del archivo' },
+            { title: 'Registro', description: 'Registro de implementadores y ubicación' },
         ],
         // Agrega aquí más tipos si los necesitas
     };

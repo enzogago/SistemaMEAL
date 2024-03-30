@@ -59,18 +59,18 @@ namespace SistemaMEAL.Server.Controllers
                 usuario.UsuPas = builder.ToString();
             }
 
-            var (usuAno, usuCod, message, messageType) = _usuarios.Insertar(usuario);
+            var (usuAno, usuCod, message, messageType) = _usuarios.Insertar(identity, usuario);
             if (messageType == "1") // Error
             {
-                return new BadRequestObjectResult(new { success = false, message = message });
+                return new BadRequestObjectResult(new { success = false, message });
             }
             else if (messageType == "2") // Registro ya existe
             {
-                return new ConflictObjectResult(new { success = false, message = message });
+                return new ConflictObjectResult(new { success = false, message });
             }
             else // Registro modificado correctamente
             {
-                return new OkObjectResult(new { usuAno, usuCod, success = true, message = message });
+                return new OkObjectResult(new { usuAno, usuCod, success = true, message });
             }
         }
 
@@ -101,18 +101,18 @@ namespace SistemaMEAL.Server.Controllers
 
             usuario.UsuAno = usuAno;
             usuario.UsuCod = usuCod;
-            var (message, messageType) = _usuarios.Modificar(usuario);
+            var (message, messageType) = _usuarios.Modificar(identity, usuario);
             if (messageType == "1") // Error
             {
-                return new BadRequestObjectResult(new { success = false, message = message });
+                return new BadRequestObjectResult(new { success = false, message });
             }
             else if (messageType == "2") // Registro ya existe
             {
-                return new ConflictObjectResult(new { success = false, message = message });
+                return new ConflictObjectResult(new { success = false, message });
             }
             else // Registro modificado correctamente
             {
-                return new OkObjectResult(new { success = true, message = message });
+                return new OkObjectResult(new { success = true, message });
             }
         }
 
@@ -144,18 +144,18 @@ namespace SistemaMEAL.Server.Controllers
                 usuario.UsuPas = builder.ToString();
             }
             Console.WriteLine("rest"+usuario.UsuPas);
-            var (message, messageType) = _usuarios.RestablecerPassword(usuario);
+            var (message, messageType) = _usuarios.RestablecerPassword(identity, usuario);
             if (messageType == "1") // Error
             {
-                return new BadRequestObjectResult(new { success = false, message = message });
+                return new BadRequestObjectResult(new { success = false, message });
             }
             else if (messageType == "2") // Registro ya existe
             {
-                return new ConflictObjectResult(new { success = false, message = message });
+                return new ConflictObjectResult(new { success = false, message });
             }
             else // Registro modificado correctamente
             {
-                return new OkObjectResult(new {success = true, message = message });
+                return new OkObjectResult(new {success = true, message });
             }
         }
 
@@ -186,7 +186,7 @@ namespace SistemaMEAL.Server.Controllers
                 });
             }
            
-            var usuarios = _usuarios.Listado();
+            var usuarios = _usuarios.Listado(identity);
             return Ok(usuarios);
         }
 
@@ -216,7 +216,7 @@ namespace SistemaMEAL.Server.Controllers
                     result = ""
                 });
             }
-            var usuarios = _usuarios.Listado(rolCod: "04");
+            var usuarios = _usuarios.Listado(identity, rolCod: "04");
             return Ok(usuarios);
         }
 
@@ -247,7 +247,7 @@ namespace SistemaMEAL.Server.Controllers
                 });
             }
            
-            var usuarios = _usuarios.Listado(usuAno, usuCod);
+            var usuarios = _usuarios.Listado(identity, usuAno, usuCod);
             var usuarioData = usuarios.FirstOrDefault();
             return Ok(usuarioData);
         }
@@ -259,9 +259,9 @@ namespace SistemaMEAL.Server.Controllers
         {
             var data = JsonConvert.DeserializeObject<dynamic>(optData.ToString());
 
-            string email = data.email.ToString();
-            string password = data.password.ToString();
-            string clientIp = data.clientIp.ToString();
+            string? email = data?.email.ToString();
+            string? password = data?.password.ToString();
+            string? clientIp = data?.clientIp.ToString();
 
             // Haz hash de la contraseña proporcionada
             using (SHA256 sha256Hash = SHA256.Create())
@@ -297,9 +297,12 @@ namespace SistemaMEAL.Server.Controllers
                 new Claim(JwtRegisteredClaimNames.Sub, jwt.Subject),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Iat, secondsSinceEpoch.ToString(), ClaimValueTypes.Integer64),
-                new Claim("ANO", usuario.UsuAno),
-                new Claim("COD", usuario.UsuCod),
-                new Claim("IP", clientIp)
+                new Claim("USUANO", usuario.UsuAno),
+                new Claim("USUCOD", usuario.UsuCod),
+                new Claim("USUIP", clientIp),
+                new Claim("USUNOM", usuario.UsuNom),
+                new Claim("USUAPE", usuario.UsuApe),
+                new Claim("USUNOMUSU", usuario.UsuNomUsu)
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.Key));
@@ -316,7 +319,6 @@ namespace SistemaMEAL.Server.Controllers
             return new
             {
                 success = true,
-                // token,
                 result = new JwtSecurityTokenHandler().WriteToken(token),
                 user = usuario,
                 message = "Usuario autenticado correctamente"
@@ -368,7 +370,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _usuarios.Eliminar(usuAno, usuCod);
+            var (message, messageType) = _usuarios.Eliminar(identity, usuAno, usuCod);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });

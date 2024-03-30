@@ -29,7 +29,7 @@ namespace SistemaMEAL.Server.Controllers
             if (!rToken.success) return Unauthorized(rToken);
 
             // Pasa los parámetros al método Listado
-            var estados = _estados.Listado();
+            var estados = _estados.Listado(identity);
             
             return Ok(estados);
         }
@@ -59,7 +59,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _estados.Insertar(estado);
+            var (message, messageType) = _estados.Insertar(identity, estado);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -94,12 +94,12 @@ namespace SistemaMEAL.Server.Controllers
                 return new
                 {
                     success = false,
-                    message = "No tienes permisos para modificar estados",
+                    message = "No tienes permisos para realizar esta acción.",
                     result = ""
                 };
             }
 
-            var (message, messageType) = _estados.Modificar(estado);
+            var (message, messageType) = _estados.Modificar(identity, estado);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -140,7 +140,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _estados.Eliminar(estado);
+            var (message, messageType) = _estados.Eliminar(identity, estado);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -154,29 +154,6 @@ namespace SistemaMEAL.Server.Controllers
                 return new OkObjectResult(new { success = true, message });
             }
         }
-
-        [HttpPost]
-        [Route("Masivo")]
-        public dynamic InsertarEstadosMasivo(List<Estado> estados)
-        {
-            // Aquí va la misma lógica de validación de token y permisos que tienes en tu método Insertar...
-
-            var (message, messageType) = _estados.InsertarEstadosMasivo(estados);
-            if (messageType == "1") // Error
-            {
-                return new BadRequestObjectResult(new { success = false, message });
-            }
-            else if (messageType == "2") // Registro ya existe
-            {
-                return new ConflictObjectResult(new { success = false, message });
-            }
-            else // Registros insertados correctamente
-            {
-                return new OkObjectResult(new { success = true, message });
-            }
-        }
-
-
 
     }
 }

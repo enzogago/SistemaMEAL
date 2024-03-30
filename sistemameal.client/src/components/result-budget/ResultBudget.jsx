@@ -11,7 +11,7 @@ import calendarIconActive from '../../icons/calendar-active.svg';
 import locationIcon from '../../icons/location.svg';
 import locationIconActive from '../../icons/location-active.svg';
 
-const ResultChain = () => {
+const ResultBudget = () => {
 
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [subproyectos, setSubProyectos] = useState([]);
@@ -21,8 +21,6 @@ const ResultChain = () => {
     const [initialValues, setInitialValues] = useState({});
     const [headersNew, setHeaders] = useState([]);
     const [viewTotals, setViewTotals] = useState({});
-    const [sumasPorAno, setSumasPorAno] = useState({});
-    const [errorMessage, setErrorMessage] = useState('');
     const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
 
 
@@ -185,7 +183,7 @@ const ResultChain = () => {
         // Iterar sobre los datos del formulario
         for (let key in data) {
             // Obtener el valor inicial y el valor actual de la celda
-            let valorInicial = initialValues[key]?.metTec || '';
+            let valorInicial = initialValues[key]?.metPre || '';
             let valorActual = data[key];
     
             // Si el valor ha cambiado, agregar el cambio al arreglo correspondiente
@@ -202,19 +200,19 @@ const ResultChain = () => {
                 };
                 if (keyType.length === 4) {  // Si la longitud es 4, entonces es un 'ano'
                     cambio.cadResPerAno = keyType;
-                    cambio.cadResPerMetTec = valorActual;
-                    cambio.cadResPerMetPre = initialValues[key].metPre;
+                    cambio.cadResPerMetTec = initialValues[key].metPre;
+                    cambio.cadResPerMetPre = valorActual;
                     cambiosPorAno.push(cambio);
                 } else if (keyType.length === 2) {  // Si la longitud es 2, entonces es un 'implementador'
                     cambio.impCod = keyType;
-                    cambio.cadResImpMetTec = valorActual;
-                    cambio.cadResImpMetPre = initialValues[key].metPre;
+                    cambio.cadResImpMetTec = initialValues[key].metPre;
+                    cambio.cadResImpMetPre = valorActual;
                     cambiosPorImplementador.push(cambio);
                 } else if (keyType.length === 10) {  // Si la longitud es 10, entonces es una 'ubicacion'
                     cambio.ubiAno = keyType.substring(0, 4);
                     cambio.ubiCod = keyType.substring(4);
-                    cambio.cadResUbiMetTec = valorActual;
-                    cambio.cadResUbiMetPre = initialValues[key].metPre;
+                    cambio.cadResUbiMetTec = initialValues[key].metPre;
+                    cambio.cadResUbiMetPre = valorActual;
                     cambiosPorUbicacion.push(cambio);
                 }
             }
@@ -230,7 +228,7 @@ const ResultChain = () => {
             CadenaImplementadores: cambiosPorImplementador,
             CadenaUbicaciones: cambiosPorUbicacion
         }
-    
+        console.log(CadenaIndicadorDto)
         handleInsert(CadenaIndicadorDto);
     };
 
@@ -327,7 +325,7 @@ const ResultChain = () => {
     
     return (
         <div className='p1 flex flex-column flex-grow-1 overflow-auto'>
-            <h1 className="Large-f1_5"> Cadena de resultado | Metas técnicas programáticas </h1>
+            <h1 className="Large-f1_5"> Cadena de resultado | Metas presupuesto </h1>
             <div className='flex jc-space-between'>
                 <div className="m_25 flex-grow-1">
                     <select 
@@ -520,7 +518,7 @@ const ResultChain = () => {
                                                         message: ''
                                                     }
                                                 })}
-                                                defaultValue={indicatorData[key]?.metTec || ''}
+                                                defaultValue={indicatorData[key]?.metPre || ''}
                                             />
                                         </td>
                                     )})}
@@ -564,4 +562,4 @@ const ResultChain = () => {
     )
 }
 
-export default ResultChain
+export default ResultBudget

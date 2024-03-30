@@ -27,7 +27,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var financiadores = _financiadores.Listado();
+            var financiadores = _financiadores.Listado(identity);
             Console.WriteLine(financiadores);
             return Ok(financiadores);
         }
@@ -57,7 +57,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _financiadores.Insertar(financiador);
+            var (message, messageType) = _financiadores.Insertar(identity, financiador);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -97,7 +97,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _financiadores.Modificar(financiador);
+            var (message, messageType) = _financiadores.Modificar(identity, financiador);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -138,7 +138,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _financiadores.Eliminar(financiador);
+            var (message, messageType) = _financiadores.Eliminar(identity, financiador);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });

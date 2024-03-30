@@ -27,7 +27,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
             
-            var implementadores = _implementadores.Listado();
+            var implementadores = _implementadores.Listado(identity);
             return Ok(implementadores);
         }
 
@@ -39,7 +39,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
             
-            var implementadores = _implementadores.BuscarImplementadoresSubProyecto(subProAno:subProAno, subProCod:subProCod);
+            var implementadores = _implementadores.BuscarImplementadoresSubProyecto(identity, subProAno:subProAno, subProCod:subProCod);
             return Ok(implementadores);
         }
 
@@ -68,7 +68,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _implementadores.Insertar(implementador);
+            var (message, messageType) = _implementadores.Insertar(identity, implementador);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -108,7 +108,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _implementadores.Modificar(implementador);
+            var (message, messageType) = _implementadores.Modificar(identity, implementador);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -149,7 +149,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _implementadores.Eliminar(implementador);
+            var (message, messageType) = _implementadores.Eliminar(identity, implementador);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });

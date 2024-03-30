@@ -5,6 +5,7 @@ using SistemaMEAL.Server.Modulos;
 using Newtonsoft.Json;
 using System.Text;
 using System.Transactions;
+using System.Security.Claims;
 
 namespace SistemaMEAL.Modulos
 {
@@ -12,8 +13,10 @@ namespace SistemaMEAL.Modulos
     {
         private conexionDAO cn = new conexionDAO();
 
-        public IEnumerable<SubProyecto> Buscar(string? subProAno = null, string? subProCod = null,string? proAno = null, string? proCod = null, string? subProNom = null, string? subProSap = null)
+        public IEnumerable<SubProyecto> Buscar(ClaimsIdentity? identity, string? subProAno = null, string? subProCod = null,string? proAno = null, string? proCod = null, string? subProNom = null, string? subProSap = null)
         {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
             List<SubProyecto>? temporal = new List<SubProyecto>();
             try
             {
@@ -28,11 +31,11 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_PROCOD", string.IsNullOrEmpty(proCod) ? (object)DBNull.Value : proCod);
                 cmd.Parameters.AddWithValue("@P_SUBPRONOM", string.IsNullOrEmpty(subProNom) ? (object)DBNull.Value : subProNom);
                 cmd.Parameters.AddWithValue("@P_SUBPROSAP", string.IsNullOrEmpty(subProSap) ? (object)DBNull.Value : subProSap);
-                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
-                cmd.Parameters.AddWithValue("@P_USUANO_U", "2024");
-                cmd.Parameters.AddWithValue("@P_USUCOD_U", "0001");
-                cmd.Parameters.AddWithValue("@P_USUNOM_U", "Juan");
-                cmd.Parameters.AddWithValue("@P_USUAPE_U", "Perez");
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
 
                 SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                 pDescripcionMensaje.Direction = ParameterDirection.Output;
@@ -69,8 +72,10 @@ namespace SistemaMEAL.Modulos
             return temporal?? new List<SubProyecto>();
         }
 
-         public (string? anoOut,string? codOut,string? message, string? messageType) Insertar(SubProyecto subProyecto)
+        public (string? anoOut,string? codOut,string? message, string? messageType) Insertar(ClaimsIdentity? identity, SubProyecto subProyecto)
         {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
             string? mensaje = "";
             string? tipoMensaje = "";
             string? anoOut = "";
@@ -86,12 +91,12 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_PROCOD", subProyecto.ProCod);
                 cmd.Parameters.AddWithValue("@P_SUBPRONOM", subProyecto.SubProNom);
                 cmd.Parameters.AddWithValue("@P_SUBPROSAP", subProyecto.SubProSap);
-                cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
-                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
-                cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
-                cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
-                cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
-                cmd.Parameters.AddWithValue("@P_USUAPE_U", "GAGO");
+                cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
 
                 SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                 pDescripcionMensaje.Direction = ParameterDirection.Output;
@@ -128,8 +133,10 @@ namespace SistemaMEAL.Modulos
             return (anoOut, codOut, mensaje, tipoMensaje);
         }
 
-        public (string? message, string? messageType) Modificar(SubProyecto subProyecto)
+        public (string? message, string? messageType) Modificar(ClaimsIdentity? identity, SubProyecto subProyecto)
         {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
             string? mensaje = "";
             string? tipoMensaje = "";
             try
@@ -145,12 +152,12 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_SUBPROCOD", subProyecto.SubProCod);
                 cmd.Parameters.AddWithValue("@P_SUBPRONOM", subProyecto.SubProNom);
                 cmd.Parameters.AddWithValue("@P_SUBPROSAP", subProyecto.SubProSap);
-                cmd.Parameters.AddWithValue("@P_USUMOD", "Usuario");
-                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
-                cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
-                cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
-                cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
-                cmd.Parameters.AddWithValue("@P_USUAPE_U", "GAGO");
+                cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
 
                 SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                 pDescripcionMensaje.Direction = ParameterDirection.Output;
@@ -176,8 +183,10 @@ namespace SistemaMEAL.Modulos
             }
             return (mensaje, tipoMensaje);
         }
-        public (string? message, string? messageType) Eliminar(SubProyecto subProyecto)
+        public (string? message, string? messageType) Eliminar(ClaimsIdentity? identity, SubProyecto subProyecto)
         {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+            
             string? mensaje = "";
             string? tipoMensaje = "";
             try
@@ -189,12 +198,12 @@ namespace SistemaMEAL.Modulos
 
                 cmd.Parameters.AddWithValue("@P_SUBPROANO", subProyecto.SubProAno);
                 cmd.Parameters.AddWithValue("@P_SUBPROCOD", subProyecto.SubProCod);
-                cmd.Parameters.AddWithValue("@P_USUMOD", "Usuario");
-                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
-                cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
-                cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
-                cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
-                cmd.Parameters.AddWithValue("@P_USUAPE_U", "GAGO");
+                cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
 
                 SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                 pDescripcionMensaje.Direction = ParameterDirection.Output;
@@ -221,8 +230,10 @@ namespace SistemaMEAL.Modulos
             return (mensaje, tipoMensaje);
         }
 
-        public (string? message, string? messageType) InsertarSubProyectoImplementadorUbicacion(SubProyecto subProyecto, List<Implementador> implementadores, List<Ubicacion> ubicaciones)
+        public (string? message, string? messageType) InsertarSubProyectoImplementadorUbicacion(ClaimsIdentity? identity, SubProyecto subProyecto, List<Implementador> implementadores, List<Ubicacion> ubicaciones)
         {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
             string? mensaje = "";
             string? tipoMensaje = "";
 
@@ -254,12 +265,12 @@ namespace SistemaMEAL.Modulos
                         cmd.Parameters.AddWithValue("@P_PROCOD", subProyecto.ProCod);
                         cmd.Parameters.AddWithValue("@P_SUBPRONOM", subProyecto.SubProNom);
                         cmd.Parameters.AddWithValue("@P_SUBPROSAP", subProyecto.SubProSap);
-                        cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
-                        cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
-                        cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
-                        cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
-                        cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
-                        cmd.Parameters.AddWithValue("@P_USUAPE_U", "GAGO");
+                        cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
+                        cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                        cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                        cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                        cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                        cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
 
                         pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                         pDescripcionMensaje.Direction = ParameterDirection.Output;
@@ -298,12 +309,12 @@ namespace SistemaMEAL.Modulos
                             cmd.Parameters.AddWithValue("@P_SUBPROANO", subProAno);
                             cmd.Parameters.AddWithValue("@P_SUBPROCOD", subProCod);
                             cmd.Parameters.AddWithValue("@P_IMPCOD", implementador.ImpCod);
-                            cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
-                            cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
-                            cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
-                            cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
-                            cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
-                            cmd.Parameters.AddWithValue("@P_USUAPE_U", "GAGO");
+                            cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
+                            cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                            cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                            cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                            cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                            cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
 
                             pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                             pDescripcionMensaje.Direction = ParameterDirection.Output;
@@ -336,12 +347,12 @@ namespace SistemaMEAL.Modulos
                             cmd.Parameters.AddWithValue("@P_SUBPROCOD", subProCod);
                             cmd.Parameters.AddWithValue("@P_UBIANO", ubicacion.UbiAno);
                             cmd.Parameters.AddWithValue("@P_UBICOD", ubicacion.UbiCod);
-                            cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
-                            cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
-                            cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
-                            cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
-                            cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
-                            cmd.Parameters.AddWithValue("@P_USUAPE_U", "GAGO");
+                            cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
+                            cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                            cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                            cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                            cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                            cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
 
                             pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                             pDescripcionMensaje.Direction = ParameterDirection.Output;
@@ -361,6 +372,274 @@ namespace SistemaMEAL.Modulos
                             {
                                 Console.WriteLine(message);
                                 throw new Exception(message);
+                            }
+                        }
+
+                        // Si todas las operaciones fueron exitosas, confirma la transacción
+                        scope.Complete();
+                        mensaje = message;
+                        tipoMensaje = "3";
+                    }
+                    catch (Exception ex)
+                    {
+                        // Si alguna operación falló, la transacción se revierte.
+                        mensaje = ex.Message;
+                        tipoMensaje = "1";
+                        Console.WriteLine(ex);
+                    }
+                }
+            }
+
+            return (mensaje, tipoMensaje);
+        }
+
+        public (string? message, string? messageType) InsertarSubProyectoImplementadorUbicacionMasivo(ClaimsIdentity? identity, SubProyecto subProyecto, List<Implementador> implementadores, List<Ubicacion> ubicaciones)
+        {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
+            string? mensaje = "";
+            string? tipoMensaje = "";
+
+            string? message= "";
+            string? messageType;
+
+            using (TransactionScope scope = new TransactionScope(TransactionScopeOption.Required, TimeSpan.FromMinutes(5)))
+            {
+                using (SqlConnection connection = cn.getcn)
+                {
+                    try
+                    {
+                        SqlCommand cmd;
+                        SqlParameter pDescripcionMensaje;
+                        SqlParameter pTipoMensaje;
+                        SqlParameter pAno;
+                        SqlParameter pCod;
+
+                        if (connection.State == ConnectionState.Closed)
+                        {
+                            connection.Open();
+                        }
+
+                        cmd = new SqlCommand("SP_BUSCAR_INDICADOR_SUB_PROYECTO", cn.getcn);
+                        cmd.CommandType = CommandType.StoredProcedure;
+
+                        cmd.Parameters.AddWithValue("@P_SUBPROANO", subProyecto.SubProAno);
+                        cmd.Parameters.AddWithValue("@P_SUBPROCOD", subProyecto.SubProCod);
+
+                        StringBuilder jsonResult = new StringBuilder();
+                        SqlDataReader reader = cmd.ExecuteReader();
+                        if (!reader.HasRows)
+                        {
+                            jsonResult.Append("[]");
+                        }
+                        else
+                        {
+                            while (reader.Read())
+                            {
+                                jsonResult.Append(reader.GetValue(0).ToString());
+                            }
+                        }
+                        // Deserializa la cadena JSON en una lista de objetos Estado
+                        List<Indicador>? indicadores = JsonConvert.DeserializeObject<List<Indicador>>(jsonResult.ToString());
+
+
+                        // Convierte los años a enteros
+                        int anoIni = int.Parse(subProyecto.ProPerAnoIni);
+                        int anoFin = int.Parse(subProyecto.ProPerAnoFin);
+                        for (int ano = anoIni; ano <= anoFin; ano++)
+                        {
+                            if (indicadores.Count > 0)
+                            {
+                                foreach (var indicador in indicadores)
+                                {
+                                    Console.WriteLine("Desde Periodo");
+                                    cmd = new SqlCommand("SP_INSERTAR_CADENA_RESULTADO_PERIODO", cn.getcn);
+                                    cmd.CommandType = CommandType.StoredProcedure;
+                                    cmd.Parameters.AddWithValue("@P_INDANO", indicador.IndAno);
+                                    cmd.Parameters.AddWithValue("@P_INDCOD", indicador.IndCod);
+                                    cmd.Parameters.AddWithValue("@P_CADRESPERANO", ano);
+                                    cmd.Parameters.AddWithValue("@P_CADRESPERMETTEC", "");
+                                    cmd.Parameters.AddWithValue("@P_CADRESPERMETPRE", "");
+                                    cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
+                                    cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                                    cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                                    cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                                    cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                                    cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                                    pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                                    pDescripcionMensaje.Direction = ParameterDirection.Output;
+                                    cmd.Parameters.Add(pDescripcionMensaje);
+
+                                    pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                                    pTipoMensaje.Direction = ParameterDirection.Output;
+                                    cmd.Parameters.Add(pTipoMensaje);
+
+                                    cmd.ExecuteNonQuery();
+
+                                    message = pDescripcionMensaje.Value.ToString();
+                                    messageType = pTipoMensaje.Value.ToString();
+
+                                    if (messageType != "3")
+                                    {
+                                        Console.WriteLine(message);
+                                        throw new Exception(message);
+                                    }
+                                }
+                            }
+                        }
+
+                        foreach (var implementador in implementadores)
+                        {
+                            cmd = new SqlCommand("SP_INSERTAR_SUB_PROYECTO_IMPLEMENTADOR", cn.getcn);
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.Parameters.AddWithValue("@P_SUBPROANO", subProyecto.SubProAno);
+                            cmd.Parameters.AddWithValue("@P_SUBPROCOD", subProyecto.SubProCod);
+                            cmd.Parameters.AddWithValue("@P_IMPCOD", implementador.ImpCod);
+                            cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
+                            cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                            cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                            cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                            cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                            cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                            pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                            pDescripcionMensaje.Direction = ParameterDirection.Output;
+                            cmd.Parameters.Add(pDescripcionMensaje);
+
+                            pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                            pTipoMensaje.Direction = ParameterDirection.Output;
+                            cmd.Parameters.Add(pTipoMensaje);
+
+                            cmd.ExecuteNonQuery();
+
+                            message = pDescripcionMensaje.Value.ToString();
+                            messageType = pTipoMensaje.Value.ToString();
+
+                            // Inserta el DocumentoBeneficiario
+                            if (messageType != "3")
+                            {
+                                Console.WriteLine(message);
+                                throw new Exception(message);
+                            }
+                            if (indicadores.Count > 0)
+                            {
+                                foreach (var indicador in indicadores)
+                                {
+                                    Console.WriteLine("Desde Implementadores");
+                                    cmd = new SqlCommand("SP_INSERTAR_CADENA_RESULTADO_IMPLEMENTADOR", cn.getcn);
+                                    cmd.CommandType = CommandType.StoredProcedure;
+                                    cmd.Parameters.AddWithValue("@P_INDANO", indicador.IndAno);
+                                    cmd.Parameters.AddWithValue("@P_INDCOD", indicador.IndCod);
+                                    cmd.Parameters.AddWithValue("@P_IMPCOD", implementador.ImpCod);
+                                    cmd.Parameters.AddWithValue("@P_CADRESIMPMETTEC", "");
+                                    cmd.Parameters.AddWithValue("@P_CADRESIMPMETPRE", "");
+                                    cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
+                                    cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                                    cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                                    cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                                    cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                                    cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                                    pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                                    pDescripcionMensaje.Direction = ParameterDirection.Output;
+                                    cmd.Parameters.Add(pDescripcionMensaje);
+
+                                    pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                                    pTipoMensaje.Direction = ParameterDirection.Output;
+                                    cmd.Parameters.Add(pTipoMensaje);
+
+                                    cmd.ExecuteNonQuery();
+
+                                    message = pDescripcionMensaje.Value.ToString();
+                                    messageType = pTipoMensaje.Value.ToString();
+
+                                    // Inserta el DocumentoBeneficiario
+                                    if (messageType != "3")
+                                    {
+                                        Console.WriteLine(message);
+                                        throw new Exception(message);
+                                    }
+                                }
+                            }
+                        }
+
+                        // Inserta cada DocumentoBeneficiario
+                        foreach (var ubicacion in ubicaciones)
+                        {
+                            cmd = new SqlCommand("SP_INSERTAR_SUB_PROYECTO_UBICACION", cn.getcn);
+                            cmd.CommandType = CommandType.StoredProcedure;
+
+                            cmd.Parameters.AddWithValue("@P_SUBPROANO", subProyecto.SubProAno);
+                            cmd.Parameters.AddWithValue("@P_SUBPROCOD", subProyecto.SubProCod);
+                            cmd.Parameters.AddWithValue("@P_UBIANO", ubicacion.UbiAno);
+                            cmd.Parameters.AddWithValue("@P_UBICOD", ubicacion.UbiCod);
+                            cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
+                            cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                            cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                            cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                            cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                            cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                            pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                            pDescripcionMensaje.Direction = ParameterDirection.Output;
+                            cmd.Parameters.Add(pDescripcionMensaje);
+
+                            pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                            pTipoMensaje.Direction = ParameterDirection.Output;
+                            cmd.Parameters.Add(pTipoMensaje);
+
+                            cmd.ExecuteNonQuery();
+
+                            message = pDescripcionMensaje.Value.ToString();
+                            messageType = pTipoMensaje.Value.ToString();
+
+                            // Inserta el DocumentoBeneficiario
+                            if (messageType != "3")
+                            {
+                                Console.WriteLine(message);
+                                throw new Exception(message);
+                            }
+                            if (indicadores.Count > 0)
+                            {
+                                foreach (var indicador in indicadores)
+                                {
+                                    Console.WriteLine("Desde Ubicaciones");
+                                    cmd = new SqlCommand("SP_INSERTAR_CADENA_RESULTADO_UBICACION", cn.getcn);
+                                    cmd.CommandType = CommandType.StoredProcedure;
+                                    cmd.Parameters.AddWithValue("@P_INDANO", indicador.IndAno);
+                                    cmd.Parameters.AddWithValue("@P_INDCOD", indicador.IndCod);
+                                    cmd.Parameters.AddWithValue("@P_UBIANO", ubicacion.UbiAno);
+                                    cmd.Parameters.AddWithValue("@P_UBICOD", ubicacion.UbiCod);
+                                    cmd.Parameters.AddWithValue("@P_CADRESUBIMETTEC", "");
+                                    cmd.Parameters.AddWithValue("@P_CADRESUBIMETPRE", "");
+                                    cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
+                                    cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                                    cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                                    cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                                    cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                                    cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                                    pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                                    pDescripcionMensaje.Direction = ParameterDirection.Output;
+                                    cmd.Parameters.Add(pDescripcionMensaje);
+
+                                    pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                                    pTipoMensaje.Direction = ParameterDirection.Output;
+                                    cmd.Parameters.Add(pTipoMensaje);
+
+                                    cmd.ExecuteNonQuery();
+
+                                    message = pDescripcionMensaje.Value.ToString();
+                                    messageType = pTipoMensaje.Value.ToString();
+
+                                    // Inserta el DocumentoBeneficiario
+                                    if (messageType != "3")
+                                    {
+                                        Console.WriteLine(message);
+                                        throw new Exception(message);
+                                    }
+                                }
                             }
                         }
 

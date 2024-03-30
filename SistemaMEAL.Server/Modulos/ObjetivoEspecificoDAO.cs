@@ -4,6 +4,7 @@ using SistemaMEAL.Server.Models;
 using SistemaMEAL.Server.Modulos;
 using Newtonsoft.Json;
 using System.Text;
+using System.Security.Claims;
 
 namespace SistemaMEAL.Modulos
 {
@@ -11,8 +12,10 @@ namespace SistemaMEAL.Modulos
     {
         private conexionDAO cn = new conexionDAO();
 
-        public IEnumerable<ObjetivoEspecifico> Buscar(string? objEspAno = null, string? objEspCod = null,string? objAno = null, string? objCod = null, string? objEspNom = null, string? objEspNum = null)
+        public IEnumerable<ObjetivoEspecifico> Buscar(ClaimsIdentity? identity, string? objEspAno = null, string? objEspCod = null,string? objAno = null, string? objCod = null, string? objEspNom = null, string? objEspNum = null)
         {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
             List<ObjetivoEspecifico>? temporal = new List<ObjetivoEspecifico>();
             try
             {
@@ -27,11 +30,11 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_OBJCOD", string.IsNullOrEmpty(objCod) ? (object)DBNull.Value : objCod);
                 cmd.Parameters.AddWithValue("@P_OBJESPNOM", string.IsNullOrEmpty(objEspNom) ? (object)DBNull.Value : objEspNom);
                 cmd.Parameters.AddWithValue("@P_OBJESPNUM", string.IsNullOrEmpty(objEspNum) ? (object)DBNull.Value : objEspNum);
-                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
-                cmd.Parameters.AddWithValue("@P_USUANO_U", "2024");
-                cmd.Parameters.AddWithValue("@P_USUCOD_U", "0001");
-                cmd.Parameters.AddWithValue("@P_USUNOM_U", "Juan");
-                cmd.Parameters.AddWithValue("@P_USUAPE_U", "Perez");
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
 
                 SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                 pDescripcionMensaje.Direction = ParameterDirection.Output;
@@ -68,8 +71,10 @@ namespace SistemaMEAL.Modulos
             return temporal?? new List<ObjetivoEspecifico>();
         }
 
-         public (string? anoOut,string? codOut,string? message, string? messageType) Insertar(ObjetivoEspecifico objetivoEspecifico)
+        public (string? anoOut,string? codOut,string? message, string? messageType) Insertar(ClaimsIdentity? identity, ObjetivoEspecifico objetivoEspecifico)
         {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
             string? mensaje = "";
             string? tipoMensaje = "";
             string? anoOut = "";
@@ -85,12 +90,12 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_OBJCOD", objetivoEspecifico.ObjCod);
                 cmd.Parameters.AddWithValue("@P_OBJESPNOM", objetivoEspecifico.ObjEspNom);
                 cmd.Parameters.AddWithValue("@P_OBJESPNUM", objetivoEspecifico.ObjEspNum);
-                cmd.Parameters.AddWithValue("@P_USUING", "Usuario");
-                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
-                cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
-                cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
-                cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
-                cmd.Parameters.AddWithValue("@P_USUAPE_U", "GAGO");
+                cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
 
                 SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                 pDescripcionMensaje.Direction = ParameterDirection.Output;
@@ -127,8 +132,10 @@ namespace SistemaMEAL.Modulos
             return (anoOut, codOut, mensaje, tipoMensaje);
         }
 
-        public (string? message, string? messageType) Modificar(ObjetivoEspecifico objetivoEspecifico)
+        public (string? message, string? messageType) Modificar(ClaimsIdentity? identity, ObjetivoEspecifico objetivoEspecifico)
         {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
             string? mensaje = "";
             string? tipoMensaje = "";
             try
@@ -144,12 +151,12 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_OBJESPCOD", objetivoEspecifico.ObjEspCod);
                 cmd.Parameters.AddWithValue("@P_OBJESPNOM", objetivoEspecifico.ObjEspNom);
                 cmd.Parameters.AddWithValue("@P_OBJESPNUM", objetivoEspecifico.ObjEspNum);
-                cmd.Parameters.AddWithValue("@P_USUMOD", "Usuario");
-                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
-                cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
-                cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
-                cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
-                cmd.Parameters.AddWithValue("@P_USUAPE_U", "GAGO");
+                cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
 
                 SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                 pDescripcionMensaje.Direction = ParameterDirection.Output;
@@ -175,8 +182,10 @@ namespace SistemaMEAL.Modulos
             }
             return (mensaje, tipoMensaje);
         }
-        public (string? message, string? messageType) Eliminar(ObjetivoEspecifico objetivoEspecifico)
+        public (string? message, string? messageType) Eliminar(ClaimsIdentity? identity, ObjetivoEspecifico objetivoEspecifico)
         {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+            
             string? mensaje = "";
             string? tipoMensaje = "";
             try
@@ -188,12 +197,12 @@ namespace SistemaMEAL.Modulos
 
                 cmd.Parameters.AddWithValue("@P_OBJESPANO", objetivoEspecifico.ObjEspAno);
                 cmd.Parameters.AddWithValue("@P_OBJESPCOD", objetivoEspecifico.ObjEspCod);
-                cmd.Parameters.AddWithValue("@P_USUMOD", "Usuario");
-                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
-                cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
-                cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
-                cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
-                cmd.Parameters.AddWithValue("@P_USUAPE_U", "GAGO");
+                cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
 
                 SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                 pDescripcionMensaje.Direction = ParameterDirection.Output;

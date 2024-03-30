@@ -29,7 +29,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var data = _subproyectos.Buscar(proAno:proAno, proCod:proCod);
+            var data = _subproyectos.Buscar(identity, proAno:proAno, proCod:proCod);
             return Ok(data);
         }
 
@@ -41,7 +41,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var data = _subproyectos.Buscar();
+            var data = _subproyectos.Buscar(identity);
             return Ok(data);
         }
         
@@ -54,49 +54,50 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var data = _subproyectos.Buscar(subProAno:subProAno, subProCod:subProCod);
+            var data = _subproyectos.Buscar(identity, subProAno:subProAno, subProCod:subProCod);
             return Ok(data.FirstOrDefault());
         }
 
-        // [HttpPost]
-        // public dynamic Insertar(SubProyecto subProyecto)
-        // {
-        //     var identity = HttpContext.User.Identity as ClaimsIdentity;
-        //     var rToken = Jwt.validarToken(identity, _usuarios);
+        [HttpPost]
+        [Route("masivo")]
+        public dynamic InsertarMasivo(SubProyectoImplementadorUbicacionDto subProyectoImplementadorUbicacionDto)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
 
-        //     if (!rToken.success) return rToken;
+            if (!rToken.success) return rToken;
 
-        //     dynamic data = rToken.result;
-        //     Usuario usuarioActual = new Usuario
-        //     {
-        //         UsuAno = data.UsuAno,
-        //         UsuCod = data.UsuCod,
-        //         RolCod = data.RolCod
-        //     };
-        //     if (usuarioActual.RolCod != "01")
-        //     {
-        //         return new
-        //         {
-        //             success = false,
-        //             message = "No tienes permisos para realizar esta accion",
-        //             result = ""
-        //         };
-        //     }
+            dynamic data = rToken.result;
+            Usuario usuarioActual = new Usuario
+            {
+                UsuAno = data.UsuAno,
+                UsuCod = data.UsuCod,
+                RolCod = data.RolCod
+            };
+            if (usuarioActual.RolCod != "01")
+            {
+                return new
+                {
+                    success = false,
+                    message = "No tienes permisos para realizar esta accion",
+                    result = ""
+                };
+            }
 
-        //     var (subProAno, subProCod, message, messageType) = _subproyectos.Insertar(subProyecto);
-        //     if (messageType == "1") // Error
-        //     {
-        //         return new BadRequestObjectResult(new { success = false, message });
-        //     }
-        //     else if (messageType == "2") // Registro ya existe
-        //     {
-        //         return new ConflictObjectResult(new { success = false, message });
-        //     }
-        //     else // Registro modificado correctamente
-        //     {
-        //         return new OkObjectResult(new { subProAno, subProCod, success = true, message });
-        //     }
-        // }
+            var (message, messageType) = _subproyectos.InsertarSubProyectoImplementadorUbicacionMasivo(identity,subProyectoImplementadorUbicacionDto.SubProyecto , subProyectoImplementadorUbicacionDto.Implementadores,subProyectoImplementadorUbicacionDto.Ubicaciones);
+            if (messageType == "1") // Error
+            {
+                return new BadRequestObjectResult(new { success = false, message });
+            }
+            else if (messageType == "2") // Registro ya existe
+            {
+                return new ConflictObjectResult(new { success = false, message });
+            }
+            else // Registro modificado correctamente
+            {
+                return new OkObjectResult(new { success = true, message });
+            }
+        }
 
         [HttpPut]
         public dynamic Modificar(SubProyecto subProyecto)
@@ -123,7 +124,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _subproyectos.Modificar(subProyecto);
+            var (message, messageType) = _subproyectos.Modificar(identity, subProyecto);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -163,7 +164,7 @@ namespace SistemaMEAL.Server.Controllers
                 };
             }
 
-            var (message, messageType) = _subproyectos.Eliminar(subProyecto);
+            var (message, messageType) = _subproyectos.Eliminar(identity, subProyecto);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -202,7 +203,7 @@ namespace SistemaMEAL.Server.Controllers
                     result = ""
                 };
             }
-            var (message, messageType) = _subproyectos.InsertarSubProyectoImplementadorUbicacion(subProyectoImplementadorUbicacionDto.SubProyecto, subProyectoImplementadorUbicacionDto.Implementadores, subProyectoImplementadorUbicacionDto.Ubicaciones);
+            var (message, messageType) = _subproyectos.InsertarSubProyectoImplementadorUbicacion(identity, subProyectoImplementadorUbicacionDto.SubProyecto, subProyectoImplementadorUbicacionDto.Implementadores, subProyectoImplementadorUbicacionDto.Ubicaciones);
                 if (messageType == "1") // Error
                 {
                     return new BadRequestObjectResult(new { success = false, message });

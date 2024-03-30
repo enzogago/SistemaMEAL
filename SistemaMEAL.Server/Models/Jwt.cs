@@ -12,8 +12,18 @@ namespace SistemaMEAL.Server.Models
         public String? Audience { get; set; }
         public String? Subject { get; set; }
 
-        public static dynamic validarToken(ClaimsIdentity identity, UsuarioDAO usuarios)
+        public static dynamic validarToken(ClaimsIdentity? identity, UsuarioDAO usuarios)
         {
+            if (identity == null)
+            {
+                return new
+                {
+                    success = false,
+                    message = "No se pudo obtener la identidad del usuario",
+                    result = ""
+                };
+            }
+
             try
             {
                 var tokenValidationResult = ValidateToken(identity);
@@ -47,16 +57,6 @@ namespace SistemaMEAL.Server.Models
 
         private static dynamic ValidateToken(ClaimsIdentity identity)
         {
-            if (identity.Claims.Count() == 0)
-            {
-                return new
-                {
-                    success = false,
-                    message = "Sesion inválida",
-                    result = ""
-                };
-            }
-
             var expClaim = identity.Claims.FirstOrDefault(x => x.Type == "exp");
             if (expClaim != null)
             {
@@ -84,8 +84,8 @@ namespace SistemaMEAL.Server.Models
 
         private static dynamic ValidateUser(ClaimsIdentity identity, UsuarioDAO usuarios)
         {
-            var ano = identity.Claims.FirstOrDefault(x => x.Type == "ANO").Value;
-            var cod = identity.Claims.FirstOrDefault(x => x.Type == "COD").Value;
+            var ano = identity.Claims.FirstOrDefault(x => x.Type == "USUANO")?.Value;
+            var cod = identity.Claims.FirstOrDefault(x => x.Type == "USUCOD")?.Value;
 
             // Buscar usuario
             var usuario = usuarios.BuscarUsuario(ano, cod);
