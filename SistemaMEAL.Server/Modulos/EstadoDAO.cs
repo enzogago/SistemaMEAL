@@ -29,8 +29,7 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2024");
                 cmd.Parameters.AddWithValue("@P_USUCOD_U", "0001");
                 cmd.Parameters.AddWithValue("@P_USUNOM_U", "Juan");
-                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "Perez");
-                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "Gomez");
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", "Perez");
 
                 SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                 pDescripcionMensaje.Direction = ParameterDirection.Output;
@@ -85,8 +84,7 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
                 cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
                 cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
-                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "GAGO");
-                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "AGUIRRE");
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", "GAGO");
 
                 SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                 pDescripcionMensaje.Direction = ParameterDirection.Output;
@@ -131,8 +129,7 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
                 cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
                 cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
-                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "GAGO");
-                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "AGUIRRE");
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", "GAGO");
 
                 SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                 pDescripcionMensaje.Direction = ParameterDirection.Output;
@@ -175,8 +172,7 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
                 cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
                 cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
-                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "GAGO");
-                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "AGUIRRE");
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", "GAGO");
 
                 SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                 pDescripcionMensaje.Direction = ParameterDirection.Output;
@@ -230,8 +226,7 @@ namespace SistemaMEAL.Modulos
                             cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
                             cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
                             cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
-                            cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "GAGO");
-                            cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "AGUIRRE");
+                            cmd.Parameters.AddWithValue("@P_USUAPE_U", "GAGO");
 
                             SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                             pDescripcionMensaje.Direction = ParameterDirection.Output;

@@ -491,7 +491,8 @@ const Home = () => {
                     </div>
                     <div className='Large-p1 flex flex-column gap_3 overflow-auto'>
                         {recents.map((item, index) => {
-                            // Crea un objeto Date a partir de la cadena de fecha y hora
+                            // Crea un objeto Date a partir de la cadena de fecha y horacon
+                            console.log(item)
                             const date = new Date(item.logFecIng);
                             // Formatea la fecha y la hora
                             const day = String(date.getDate()).padStart(2, '0');
@@ -515,7 +516,7 @@ const Home = () => {
                                             </div>
                                         </div>
                                         <div className="flex flex-column flex-grow-1">
-                                            <span className='Large-f1 Small-f_75 bold' style={{textTransform: 'capitalize'}}>{item.usuNom.toLowerCase() + ' ' + item.usuApePat.toLowerCase() + ' ' + item.usuApeMat.toLowerCase()}</span>
+                                            <span className='Large-f1 Small-f_75 bold' style={{textTransform: 'capitalize'}}>{item.usuNom.toLowerCase() + ' ' + item.usuApe.toLowerCase()}</span>
                                             <span 
                                                 data-tooltip-id="info-tooltip" 
                                                 data-tooltip-content={text} 

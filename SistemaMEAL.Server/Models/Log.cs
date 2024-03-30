@@ -23,7 +23,6 @@ namespace SistemaMEAL.Server.Models
         public String? UsuAno { get; set; }
         public String? UsuCod { get; set; }
         public String? UsuNom { get; set; }
-        public String? UsuApePat { get; set; }
-        public String? UsuApeMat { get; set; }
+        public String? UsuApe { get; set; }
     }
 }

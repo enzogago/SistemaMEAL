@@ -83,13 +83,14 @@ namespace SistemaMEAL.Modulos
                         MenNom = rd.GetString(2),
                         MenRef = rd.GetString(3),
                         MenIco = rd.IsDBNull(4) ? null : rd.GetString(4),
-                        MenAnoPad = rd.IsDBNull(5) ? null : rd.GetString(5),
-                        MenCodPad = rd.IsDBNull(6) ? null : rd.GetString(6),
-                        UsuIng = rd.GetString(7),
-                        FecIng = rd.IsDBNull(8) ? (DateTime?)null : rd.GetDateTime(8),
-                        UsuMod = rd.GetString(9),
-                        FecMod = rd.IsDBNull(10) ? (DateTime?)null : rd.GetDateTime(10),
-                        EstReg = rd.GetString(11)[0]
+                        MenOrd = rd.IsDBNull(5) ? null : rd.GetString(5),
+                        MenAnoPad = rd.IsDBNull(6) ? null : rd.GetString(6),
+                        MenCodPad = rd.IsDBNull(7) ? null : rd.GetString(7),
+                        UsuIng = rd.GetString(8),
+                        FecIng = rd.IsDBNull(9) ? (DateTime?)null : rd.GetDateTime(9),
+                        UsuMod = rd.GetString(10),
+                        FecMod = rd.IsDBNull(11) ? (DateTime?)null : rd.GetDateTime(11),
+                        EstReg = rd.GetString(12)[0]
                     });
                 }
                 rd.Close();
@@ -169,13 +170,14 @@ namespace SistemaMEAL.Modulos
                         MenNom = rd.GetString(2),
                         MenRef = rd.GetString(3),
                         MenIco = rd.IsDBNull(4) ? null : rd.GetString(4),
-                        MenAnoPad = rd.IsDBNull(5) ? null : rd.GetString(5),
-                        MenCodPad = rd.IsDBNull(6) ? null : rd.GetString(6),
-                        UsuIng = rd.GetString(7),
-                        FecIng = rd.IsDBNull(8) ? (DateTime?)null : rd.GetDateTime(8),
-                        UsuMod = rd.GetString(9),
-                        FecMod = rd.IsDBNull(10) ? (DateTime?)null : rd.GetDateTime(10),
-                        EstReg = rd.GetString(11)[0]
+                        MenOrd = rd.IsDBNull(5) ? null : rd.GetString(5),
+                        MenAnoPad = rd.IsDBNull(6) ? null : rd.GetString(6),
+                        MenCodPad = rd.IsDBNull(7) ? null : rd.GetString(7),
+                        UsuIng = rd.GetString(8),
+                        FecIng = rd.IsDBNull(9) ? (DateTime?)null : rd.GetDateTime(9),
+                        UsuMod = rd.GetString(10),
+                        FecMod = rd.IsDBNull(11) ? (DateTime?)null : rd.GetDateTime(11),
+                        EstReg = rd.GetString(12)[0]
                     });
                 }
                 rd.Close();

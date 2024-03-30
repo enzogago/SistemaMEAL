@@ -45,8 +45,7 @@ namespace SistemaMEAL.Server.Modulos
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
                 cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
                 cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
-                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "GAGO");
-                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "AGUIRRE");
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", "GAGO");
 
                 SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                 pDescripcionMensaje.Direction = ParameterDirection.Output;
@@ -116,8 +115,7 @@ namespace SistemaMEAL.Server.Modulos
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
                 cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
                 cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
-                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "GAGO");
-                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "AGUIRRE");
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", "GAGO");
 
                 SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                 pDescripcionMensaje.Direction = ParameterDirection.Output;
@@ -178,8 +176,7 @@ namespace SistemaMEAL.Server.Modulos
                     cmdBeneficiario.Parameters.AddWithValue("@P_USUANO_U", "2023");
                     cmdBeneficiario.Parameters.AddWithValue("@P_USUCOD_U", "000001");
                     cmdBeneficiario.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
-                    cmdBeneficiario.Parameters.AddWithValue("@P_USUAPEPAT_U", "GAGO");
-                    cmdBeneficiario.Parameters.AddWithValue("@P_USUAPEMAT_U", "AGUIRRE");
+                    cmdBeneficiario.Parameters.AddWithValue("@P_USUAPE_U", "GAGO");
 
                     SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                     pDescripcionMensaje.Direction = ParameterDirection.Output;
@@ -214,8 +211,7 @@ namespace SistemaMEAL.Server.Modulos
                     cmdDocumento.Parameters.AddWithValue("@P_USUANO_U", "2023");
                     cmdDocumento.Parameters.AddWithValue("@P_USUCOD_U", "000001");
                     cmdDocumento.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
-                    cmdDocumento.Parameters.AddWithValue("@P_USUAPEPAT_U", "GAGO");
-                    cmdDocumento.Parameters.AddWithValue("@P_USUAPEMAT_U", "AGUIRRE");
+                    cmdDocumento.Parameters.AddWithValue("@P_USUAPE_U", "GAGO");
 
                     pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                     pDescripcionMensaje.Direction = ParameterDirection.Output;
@@ -279,8 +275,7 @@ namespace SistemaMEAL.Server.Modulos
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2024");
                 cmd.Parameters.AddWithValue("@P_USUCOD_U", "0001");
                 cmd.Parameters.AddWithValue("@P_USUNOM_U", "Juan");
-                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "Perez");
-                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "Gomez");
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", "Perez");
 
                 SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                 pDescripcionMensaje.Direction = ParameterDirection.Output;
@@ -293,7 +288,6 @@ namespace SistemaMEAL.Server.Modulos
                 StringBuilder jsonResult = new StringBuilder();
                 SqlDataReader reader = cmd.ExecuteReader();
 
-                Console.WriteLine(reader);
                 if (!reader.HasRows)
                 {
                     jsonResult.Append("[]");
@@ -305,7 +299,6 @@ namespace SistemaMEAL.Server.Modulos
                         jsonResult.Append(reader.GetValue(0).ToString());
                     }
                 }
-                Console.WriteLine(jsonResult);
                 // Deserializa la cadena JSON en una lista de objetos Usuario
                 temporal = JsonConvert.DeserializeObject<List<Beneficiario>>(jsonResult.ToString());
             }
@@ -337,8 +330,7 @@ namespace SistemaMEAL.Server.Modulos
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2024");
                 cmd.Parameters.AddWithValue("@P_USUCOD_U", "0001");
                 cmd.Parameters.AddWithValue("@P_USUNOM_U", "Juan");
-                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "Perez");
-                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "Gomez");
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", "Perez");
 
                 SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                 pDescripcionMensaje.Direction = ParameterDirection.Output;
@@ -445,8 +437,7 @@ namespace SistemaMEAL.Server.Modulos
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2024");
                 cmd.Parameters.AddWithValue("@P_USUCOD_U", "0001");
                 cmd.Parameters.AddWithValue("@P_USUNOM_U", "Juan");
-                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "Perez");
-                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "Gomez");
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", "Perez");
 
                 SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                 pDescripcionMensaje.Direction = ParameterDirection.Output;
@@ -643,7 +634,6 @@ namespace SistemaMEAL.Server.Modulos
                 SqlCommand cmd = new SqlCommand("SP_LISTAR_BENEFICIARIO", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 SqlDataReader rd = cmd.ExecuteReader();
-                Console.WriteLine("INICII");
                 while (rd.Read())
                 {
                     temporal.Add(new Beneficiario()
@@ -674,8 +664,6 @@ namespace SistemaMEAL.Server.Modulos
                     });
                 }
                 rd.Close();
-                Console.WriteLine(temporal);
-                Console.WriteLine("Fin");
             }
             catch (SqlException ex)
             {

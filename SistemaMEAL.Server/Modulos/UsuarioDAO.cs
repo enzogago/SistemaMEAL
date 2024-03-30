@@ -76,13 +76,7 @@ namespace SistemaMEAL.Server.Modulos
                 cmd.Parameters.AddWithValue("@P_USUANO_U", usuarioActual.UsuAno);
                 cmd.Parameters.AddWithValue("@P_USUCOD_U", usuarioActual.UsuCod);
                 cmd.Parameters.AddWithValue("@P_USUNOM_U", usuarioActual.UsuNom);
-
-                string[] apellidos = usuarioActual.UsuApe.Split(' ');
-                string apellidoPaterno = apellidos[0];
-                string apellidoMaterno = apellidos.Length > 1 ? apellidos[1] : "";
-
-                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", apellidoPaterno);
-                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", apellidoMaterno);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", usuarioActual.UsuApe);
 
                 SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                 pDescripcionMensaje.Direction = ParameterDirection.Output;
@@ -146,12 +140,7 @@ namespace SistemaMEAL.Server.Modulos
                 cmd.Parameters.AddWithValue("@P_USUANO_U", usuarioActual.UsuAno);
                 cmd.Parameters.AddWithValue("@P_USUCOD_U", usuarioActual.UsuCod);
                 cmd.Parameters.AddWithValue("@P_USUNOM_U", usuarioActual.UsuNom);
-                string[] apellidos = usuarioActual.UsuApe.Split(' ');
-                string apellidoPaterno = apellidos[0];
-                string apellidoMaterno = apellidos.Length > 1 ? apellidos[1] : "";
-
-                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", apellidoPaterno);
-                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", apellidoMaterno);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", usuarioActual.UsuApe);
 
                 SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                 pDescripcionMensaje.Direction = ParameterDirection.Output;
@@ -221,9 +210,6 @@ namespace SistemaMEAL.Server.Modulos
 
         public IEnumerable<Usuario> Listado(string? usuAno = null, string? usuCod = null, string? docIdeCod = null, string? usuNumDoc = null, string? usuNom = null, string? usuApe = null, string? usuFecNac = null, string? usuSex = null, string? usuCorEle = null, string? usuCarCod = null, string? usuFecInc = null, string? usuTel = null, string? usuNomUsu = null, string? usuPas = null, string? usuEst = null, string? rolCod = null, string? ubiAno = null, string? ubiCod = null)
         {
-            Console.WriteLine(rolCod);
-            Console.WriteLine(usuAno);
-            Console.WriteLine(usuCod);
             List<Usuario>? temporal = new List<Usuario>();
             try
             {
@@ -254,8 +240,7 @@ namespace SistemaMEAL.Server.Modulos
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2024");
                 cmd.Parameters.AddWithValue("@P_USUCOD_U", "0001");
                 cmd.Parameters.AddWithValue("@P_USUNOM_U", "Juan");
-                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "Perez");
-                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "Gomez");
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", "jUAN");
 
                 SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                 pDescripcionMensaje.Direction = ParameterDirection.Output;
@@ -278,7 +263,6 @@ namespace SistemaMEAL.Server.Modulos
                         jsonResult.Append(reader.GetValue(0).ToString());
                     }
                 }
-                Console.WriteLine(jsonResult);
                 // Deserializa la cadena JSON en una lista de objetos Usuario
                 temporal = JsonConvert.DeserializeObject<List<Usuario>>(jsonResult.ToString());
             }
@@ -480,8 +464,6 @@ namespace SistemaMEAL.Server.Modulos
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
                 cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
                 cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
-                cmd.Parameters.AddWithValue("@P_USUAPEPAT_U", "GAGO");
-                cmd.Parameters.AddWithValue("@P_USUAPEMAT_U", "AGUIRRE");
 
                 SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                 pDescripcionMensaje.Direction = ParameterDirection.Output;

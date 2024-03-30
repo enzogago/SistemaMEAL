@@ -14,12 +14,13 @@ namespace SistemaMEAL.Server.Models
         public String? MenNom { get; set; }
         public String? MenRef { get; set; }
         public String? MenAnoPad { get; set; }
+        public String? MenIco { get; set; }
+        public String? MenOrd { get; set; }
         public String? MenCodPad { get; set; }
         public String? UsuIng { get; set; }
         public DateTime? FecIng { get; set; }
         public String? UsuMod { get; set; }
         public DateTime? FecMod { get; set; }
         public Char? EstReg { get; set; }
-        public String? MenIco { get; set; }
     }
 }
