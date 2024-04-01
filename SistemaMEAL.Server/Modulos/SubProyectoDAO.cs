@@ -133,56 +133,56 @@ namespace SistemaMEAL.Modulos
             return (anoOut, codOut, mensaje, tipoMensaje);
         }
 
-        public (string? message, string? messageType) Modificar(ClaimsIdentity? identity, SubProyecto subProyecto)
-        {
-            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+        // public (string? message, string? messageType) Modificar(ClaimsIdentity? identity, SubProyecto subProyecto)
+        // {
+        //     var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 
-            string? mensaje = "";
-            string? tipoMensaje = "";
-            try
-            {
-                cn.getcn.Open();
+        //     string? mensaje = "";
+        //     string? tipoMensaje = "";
+        //     try
+        //     {
+        //         cn.getcn.Open();
 
-                SqlCommand cmd = new SqlCommand("SP_MODIFICAR_SUB_PROYECTO", cn.getcn);
-                cmd.CommandType = CommandType.StoredProcedure;
+        //         SqlCommand cmd = new SqlCommand("SP_MODIFICAR_SUB_PROYECTO", cn.getcn);
+        //         cmd.CommandType = CommandType.StoredProcedure;
 
-                cmd.Parameters.AddWithValue("@P_PROANO", subProyecto.ProAno);
-                cmd.Parameters.AddWithValue("@P_PROCOD", subProyecto.ProCod);
-                cmd.Parameters.AddWithValue("@P_SUBPROANO", subProyecto.SubProAno);
-                cmd.Parameters.AddWithValue("@P_SUBPROCOD", subProyecto.SubProCod);
-                cmd.Parameters.AddWithValue("@P_SUBPRONOM", subProyecto.SubProNom);
-                cmd.Parameters.AddWithValue("@P_SUBPROSAP", subProyecto.SubProSap);
-                cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
-                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
-                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
-                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
-                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
-                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+        //         cmd.Parameters.AddWithValue("@P_PROANO", subProyecto.ProAno);
+        //         cmd.Parameters.AddWithValue("@P_PROCOD", subProyecto.ProCod);
+        //         cmd.Parameters.AddWithValue("@P_SUBPROANO", subProyecto.SubProAno);
+        //         cmd.Parameters.AddWithValue("@P_SUBPROCOD", subProyecto.SubProCod);
+        //         cmd.Parameters.AddWithValue("@P_SUBPRONOM", subProyecto.SubProNom);
+        //         cmd.Parameters.AddWithValue("@P_SUBPROSAP", subProyecto.SubProSap);
+        //         cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
+        //         cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+        //         cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+        //         cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+        //         cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+        //         cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
 
-                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
-                pDescripcionMensaje.Direction = ParameterDirection.Output;
-                cmd.Parameters.Add(pDescripcionMensaje);
+        //         SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+        //         pDescripcionMensaje.Direction = ParameterDirection.Output;
+        //         cmd.Parameters.Add(pDescripcionMensaje);
 
-                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
-                pTipoMensaje.Direction = ParameterDirection.Output;
-                cmd.Parameters.Add(pTipoMensaje);
+        //         SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+        //         pTipoMensaje.Direction = ParameterDirection.Output;
+        //         cmd.Parameters.Add(pTipoMensaje);
 
-                cmd.ExecuteNonQuery();
+        //         cmd.ExecuteNonQuery();
 
-                mensaje = pDescripcionMensaje.Value.ToString();
-                tipoMensaje = pTipoMensaje.Value.ToString();
-            }
-            catch (SqlException ex)
-            {
-                mensaje = ex.Message;
-                tipoMensaje = "1";
-            }
-            finally
-            {
-                cn.getcn.Close();
-            }
-            return (mensaje, tipoMensaje);
-        }
+        //         mensaje = pDescripcionMensaje.Value.ToString();
+        //         tipoMensaje = pTipoMensaje.Value.ToString();
+        //     }
+        //     catch (SqlException ex)
+        //     {
+        //         mensaje = ex.Message;
+        //         tipoMensaje = "1";
+        //     }
+        //     finally
+        //     {
+        //         cn.getcn.Close();
+        //     }
+        //     return (mensaje, tipoMensaje);
+        // }
         public (string? message, string? messageType) Eliminar(ClaimsIdentity? identity, SubProyecto subProyecto)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
@@ -230,7 +230,7 @@ namespace SistemaMEAL.Modulos
             return (mensaje, tipoMensaje);
         }
 
-        public (string? message, string? messageType) InsertarSubProyectoImplementadorUbicacion(ClaimsIdentity? identity, SubProyecto subProyecto, List<Implementador> implementadores, List<Ubicacion> ubicaciones)
+        public (string? message, string? messageType) InsertarSubProyectoImplementadorUbicacion(ClaimsIdentity? identity, SubProyecto subProyecto, List<SubProyectoImplementador> subProyectoImplementadores, List<SubProyectoUbicacion> subProyectoUbicaciones)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 
@@ -302,7 +302,7 @@ namespace SistemaMEAL.Modulos
                             throw new Exception(message);
                         }
 
-                        foreach (var implementador in implementadores)
+                        foreach (var implementador in subProyectoImplementadores)
                         {
                             cmd = new SqlCommand("SP_INSERTAR_SUB_PROYECTO_IMPLEMENTADOR", cn.getcn);
                             cmd.CommandType = CommandType.StoredProcedure;
@@ -338,7 +338,7 @@ namespace SistemaMEAL.Modulos
                         }
 
                         // Inserta cada DocumentoBeneficiario
-                        foreach (var ubicacion in ubicaciones)
+                        foreach (var ubicacion in subProyectoUbicaciones)
                         {
                             cmd = new SqlCommand("SP_INSERTAR_SUB_PROYECTO_UBICACION", cn.getcn);
                             cmd.CommandType = CommandType.StoredProcedure;
@@ -392,8 +392,230 @@ namespace SistemaMEAL.Modulos
 
             return (mensaje, tipoMensaje);
         }
+        public (string? message, string? messageType) ModificarSubProyectoImplementadorUbicacion(ClaimsIdentity? identity, SubProyecto subProyecto, List<SubProyectoImplementador> subProyectoImplementadores, List<SubProyectoUbicacion> subProyectoUbicaciones)
+        {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 
-        public (string? message, string? messageType) InsertarSubProyectoImplementadorUbicacionMasivo(ClaimsIdentity? identity, SubProyecto subProyecto, List<Implementador> implementadores, List<Ubicacion> ubicaciones)
+            string? mensaje = "";
+            string? tipoMensaje = "";
+
+            string? message="";
+            string? messageType;
+
+            using (TransactionScope scope = new TransactionScope())
+            {
+                using (SqlConnection connection = cn.getcn)
+                {
+                    try
+                    {
+                        SqlCommand cmd;
+                        SqlParameter pDescripcionMensaje;
+                        SqlParameter pTipoMensaje;
+
+                        if (connection.State == ConnectionState.Closed)
+                        {
+                            connection.Open();
+                        }
+
+                        if (subProyecto != null)
+                        {
+                            cmd = new SqlCommand("SP_MODIFICAR_SUB_PROYECTO", cn.getcn);
+                            cmd.CommandType = CommandType.StoredProcedure;
+
+                            cmd.Parameters.AddWithValue("@P_SUBPROANO", subProyecto.SubProAno);
+                            cmd.Parameters.AddWithValue("@P_SUBPROCOD", subProyecto.SubProCod);
+                            cmd.Parameters.AddWithValue("@P_PROANO", subProyecto.ProAno);
+                            cmd.Parameters.AddWithValue("@P_PROCOD", subProyecto.ProCod);
+                            cmd.Parameters.AddWithValue("@P_SUBPRONOM", subProyecto.SubProNom);
+                            cmd.Parameters.AddWithValue("@P_SUBPROSAP", subProyecto.SubProSap);
+                            cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
+                            cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                            cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                            cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                            cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                            cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                            pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                            pDescripcionMensaje.Direction = ParameterDirection.Output;
+                            cmd.Parameters.Add(pDescripcionMensaje);
+
+                            pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                            pTipoMensaje.Direction = ParameterDirection.Output;
+                            cmd.Parameters.Add(pTipoMensaje);
+
+                            cmd.ExecuteNonQuery();
+
+                            message = pDescripcionMensaje.Value.ToString();
+                            messageType = pTipoMensaje.Value.ToString();
+
+                            // Inserta el beneficiario
+                            if (messageType != "3")
+                            {
+                                Console.WriteLine(message);
+                                throw new Exception(message);
+                            }
+                        }
+
+                        if (subProyectoImplementadores.Count > 0)
+                        {
+                            cmd = new SqlCommand("SP_ELIMINAR_SUB_PROYECTO_IMPLEMENTADOR", cn.getcn);
+                            cmd.CommandType = CommandType.StoredProcedure;
+
+                            cmd.Parameters.AddWithValue("@P_SUBPROANO", subProyectoImplementadores[0].SubProAno);
+                            cmd.Parameters.AddWithValue("@P_SUBPROCOD", subProyectoImplementadores[0].SubProCod);
+                            cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
+                            cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                            cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                            cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                            cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                            cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                            pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                            pDescripcionMensaje.Direction = ParameterDirection.Output;
+                            cmd.Parameters.Add(pDescripcionMensaje);
+
+                            pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                            pTipoMensaje.Direction = ParameterDirection.Output;
+                            cmd.Parameters.Add(pTipoMensaje);
+
+                            cmd.ExecuteNonQuery();
+
+                            message = pDescripcionMensaje.Value.ToString();
+                            messageType = pTipoMensaje.Value.ToString();
+                            
+                            // Inserta el beneficiario
+                            if (messageType != "3")
+                            {
+                                Console.WriteLine(message);
+                                throw new Exception(message);
+                            }
+
+                            foreach (var implementador in subProyectoImplementadores)
+                            {
+                                cmd = new SqlCommand("SP_INSERTAR_SUB_PROYECTO_IMPLEMENTADOR", cn.getcn);
+                                cmd.CommandType = CommandType.StoredProcedure;
+                                cmd.Parameters.AddWithValue("@P_SUBPROANO", implementador.SubProAno);
+                                cmd.Parameters.AddWithValue("@P_SUBPROCOD", implementador.SubProCod);
+                                cmd.Parameters.AddWithValue("@P_IMPCOD", implementador.ImpCod);
+                                cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
+                                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                                pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                                cmd.Parameters.Add(pDescripcionMensaje);
+
+                                pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                                pTipoMensaje.Direction = ParameterDirection.Output;
+                                cmd.Parameters.Add(pTipoMensaje);
+
+                                cmd.ExecuteNonQuery();
+
+                                message = pDescripcionMensaje.Value.ToString();
+                                messageType = pTipoMensaje.Value.ToString();
+                                
+                                // Inserta el beneficiario
+                                if (messageType != "3")
+                                {
+                                    Console.WriteLine(message);
+                                    throw new Exception(message);
+                                }
+                            }
+                        }
+
+                        if (subProyectoUbicaciones.Count > 0)
+                        {
+                            cmd = new SqlCommand("SP_ELIMINAR_SUB_PROYECTO_UBICACION", cn.getcn);
+                            cmd.CommandType = CommandType.StoredProcedure;
+
+                            cmd.Parameters.AddWithValue("@P_SUBPROANO", subProyectoUbicaciones[0].SubProAno);
+                            cmd.Parameters.AddWithValue("@P_SUBPROCOD", subProyectoUbicaciones[0].SubProCod);
+                            cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
+                            cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                            cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                            cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                            cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                            cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                            pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                            pDescripcionMensaje.Direction = ParameterDirection.Output;
+                            cmd.Parameters.Add(pDescripcionMensaje);
+
+                            pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                            pTipoMensaje.Direction = ParameterDirection.Output;
+                            cmd.Parameters.Add(pTipoMensaje);
+
+                            cmd.ExecuteNonQuery();
+
+                            message = pDescripcionMensaje.Value.ToString();
+                            messageType = pTipoMensaje.Value.ToString();
+                            
+                            // Inserta el beneficiario
+                            if (messageType != "3")
+                            {
+                                Console.WriteLine(message);
+                                throw new Exception(message);
+                            }
+
+                            foreach (var ubicaciones in subProyectoUbicaciones)
+                            {
+                                cmd = new SqlCommand("SP_INSERTAR_SUB_PROYECTO_UBICACION", cn.getcn);
+                                cmd.CommandType = CommandType.StoredProcedure;
+                                cmd.Parameters.AddWithValue("@P_SUBPROANO", ubicaciones.SubProAno);
+                                cmd.Parameters.AddWithValue("@P_SUBPROCOD", ubicaciones.SubProCod);
+                                cmd.Parameters.AddWithValue("@P_UBIANO", ubicaciones.UbiAno);
+                                cmd.Parameters.AddWithValue("@P_UBICOD", ubicaciones.UbiCod);
+                                cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
+                                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                                pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                                cmd.Parameters.Add(pDescripcionMensaje);
+
+                                pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                                pTipoMensaje.Direction = ParameterDirection.Output;
+                                cmd.Parameters.Add(pTipoMensaje);
+
+                                cmd.ExecuteNonQuery();
+
+                                message = pDescripcionMensaje.Value.ToString();
+                                messageType = pTipoMensaje.Value.ToString();
+                                
+                                // Inserta el beneficiario
+                                if (messageType != "3")
+                                {
+                                    Console.WriteLine(message);
+                                    throw new Exception(message);
+                                }
+                            }
+                        }
+
+                        // Si todas las operaciones fueron exitosas, confirma la transacción
+                        scope.Complete();
+                        mensaje = message;
+                        tipoMensaje = "3";
+                    }
+                    catch (Exception ex)
+                    {
+                        // Si alguna operación falló, la transacción se revierte.
+                        mensaje = ex.Message;
+                        tipoMensaje = "1";
+                        Console.WriteLine(ex);
+                    }
+                }
+            }
+
+            return (mensaje, tipoMensaje);
+        }
+
+        public (string? message, string? messageType) InsertarSubProyectoImplementadorUbicacionMasivo(ClaimsIdentity? identity, SubProyecto subProyecto, List<SubProyectoImplementador> subProyectoImplementadores, List<SubProyectoUbicacion> subProyectoUbicaciones)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 
@@ -489,7 +711,7 @@ namespace SistemaMEAL.Modulos
                             }
                         }
 
-                        foreach (var implementador in implementadores)
+                        foreach (var implementador in subProyectoImplementadores)
                         {
                             cmd = new SqlCommand("SP_INSERTAR_SUB_PROYECTO_IMPLEMENTADOR", cn.getcn);
                             cmd.CommandType = CommandType.StoredProcedure;
@@ -565,7 +787,7 @@ namespace SistemaMEAL.Modulos
                         }
 
                         // Inserta cada DocumentoBeneficiario
-                        foreach (var ubicacion in ubicaciones)
+                        foreach (var ubicacion in subProyectoUbicaciones)
                         {
                             cmd = new SqlCommand("SP_INSERTAR_SUB_PROYECTO_UBICACION", cn.getcn);
                             cmd.CommandType = CommandType.StoredProcedure;

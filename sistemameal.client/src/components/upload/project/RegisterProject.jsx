@@ -238,8 +238,8 @@ const RegisterProject = () => {
             console.log(subproyecto)
             const SubProyectoImplementadorDto = {
                 SubProyecto: subproyecto,
-                Implementadores: selectValues,
-                Ubicaciones: ubicaciones
+                SubProyectoImplementadores: selectValues,
+                SubProyectoUbicaciones: ubicaciones
             }
             console.log(SubProyectoImplementadorDto)
             handleSubmit(SubProyectoImplementadorDto, navigate);
