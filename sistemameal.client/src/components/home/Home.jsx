@@ -9,7 +9,8 @@ const Ecuador = lazy(() => import('../maps/Ecuador'));
 const Colombia = lazy(() => import('../maps/Colombia'));
 const PieChart = lazy(() => import('../reusable/graphics/PieChart'));
 const DivergingBarChart = lazy(() => import('../reusable/graphics/DivergingBarChart'));
-const HorizontalBarChart = lazy(() => import('../reusable/graphics/HorizontalBarChart'));
+// const HorizontalBarChart = lazy(() => import('../reusable/graphics/HorizontalBarChart'));
+import HorizontalBarChart from '../reusable/graphics/HorizontalBarChart';
 import masculino from '../../img/PowerMas_Avatar_Masculino.svg';
 import femenino from '../../img/PowerMas_Avatar_Femenino.svg';
 import { formatter } from '../monitoring/goal/helper';
@@ -25,19 +26,17 @@ const Home = () => {
     const [ avanceTecnico, setAvanceTecnico] = useState(0);
     const [ currentMap, setCurrentMap] = useState('Todos');
     const [ recents, setRecents ] = useState([]);
-    const [ nacionalidades, setNacionalidades ] = useState([]);
     const [ dataNac, setDataNac ] = useState([]);
-    const [ nacionalidadesLoaded, setNacionalidadesLoaded ] = useState(false);
     const [ pieData, setPieData ] = useState([]);
 
-    const [docData, setDocData] = useState([]);
-    const [rangeData, setRangeData] = useState([]);
-    const [mapData, setMapData] = useState([]);
-    const [beneficiariosData, setBeneficiariosData] = useState([]);
+    const [ docData, setDocData ] = useState([]);
+    const [ rangeData, setRangeData ] = useState([]);
+    const [ mapData, setMapData ] = useState([]);
+    const [ beneficiariosData, setBeneficiariosData ] = useState([]);
+    const [ disabledFilter, setDisabledFilter ] = useState(false);
 
     const fetchData = async (controller, setData) => {
         try {
-            Notiflix.Loading.pulse('Cargando...');
             // Valores del storage
             const token = localStorage.getItem('token');
             
@@ -63,252 +62,275 @@ const Home = () => {
         } catch (error) {
             console.error('Error:', error);
         } finally {
-            Notiflix.Loading.remove();
         }
     };
 
-    // EFECTO AL CARGAR COMPONENTE GET - LISTAR ESTADOS
-    useEffect(() => {
-        const fetchMonitoreo = async () => {
-            setMonitoringData(null); 
-            try {
-                Notiflix.Loading.pulse('Cargando...');
-                const token = localStorage.getItem('token');
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/Filter/${searchTags.join(',')}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                if (!response.ok) {
-                    if(response.status == 401 || response.status == 403){
-                        const data = await response.json();
-                        Notiflix.Notify.failure(data.message);
-                    }
-                    return;
+   
+    const fetchMonitoreo = async () => {
+        setMonitoringData(null); 
+        try {
+            Notiflix.Block.pulse('.js-element5', {
+                svgSize: '100px',
+                svgColor: '#F87C56',
+            });
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/Filter/${searchTags.join(',')}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
                 }
-                const data = await response.json();
-                if (data.success == false) {
+            });
+            if (!response.ok) {
+                if(response.status == 401 || response.status == 403){
+                    const data = await response.json();
                     Notiflix.Notify.failure(data.message);
-                    return;
                 }
-                setMonitoringData(data);
-                const totalMeta = data.reduce((sum, item) => sum + Number(item.metMetTec), 0);
-                const totalAtenciones = data.reduce((sum, item) => sum + Number(item.metEjeTec), 0);
-                const porcentaje = totalMeta !== 0 ? (totalAtenciones / totalMeta) * 100 : 0;
-                setTotalAtenciones(totalAtenciones);
-                setAvanceTecnico(porcentaje.toFixed(2));
-            } catch (error) {
-                console.error('Error:', error);
-                setMonitoringData([]); 
-            } finally {
-                Notiflix.Loading.remove();
+                return;
             }
-        };
+            const data = await response.json();
+            if (data.success == false) {
+                Notiflix.Notify.failure(data.message);
+                return;
+            }
+            setMonitoringData(data);
+            const totalMeta = data.reduce((sum, item) => sum + Number(item.metMetTec), 0);
+            const totalAtenciones = data.reduce((sum, item) => sum + Number(item.metEjeTec), 0);
+            const porcentaje = totalMeta !== 0 ? (totalAtenciones / totalMeta) * 100 : 0;
+            setTotalAtenciones(totalAtenciones);
+            setAvanceTecnico(porcentaje.toFixed(2));
+        } catch (error) {
+            console.error('Error:', error);
+            setMonitoringData([]); 
+        } finally {
+            Notiflix.Block.remove('.js-element5');
+        }
+    };
 
-        fetchData('Nacionalidad', data => {
-            setNacionalidades(data);
-            setNacionalidadesLoaded(true);
-        });
+    const fetchContarBeneficiariosHome = async () => {
+        try {
+            Notiflix.Block.pulse('.js-element6', {
+                svgSize: '100px',
+                svgColor: '#F87C56',
+            });
+            Notiflix.Block.pulse('.js-element', {
+                svgSize: '100px',
+                svgColor: '#F87C56',
+            });
+            Notiflix.Block.pulse('.js-element2', {
+                svgSize: '100px',
+                svgColor: '#F87C56',
+            });
+            Notiflix.Block.pulse('.js-element3', {
+                svgSize: '100px',
+                svgColor: '#F87C56',
+            });
+            Notiflix.Block.pulse('.js-element4', {
+                svgSize: '100px',
+                svgColor: '#F87C56',
+            });
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Beneficiario/contar-home/${searchTags.join(',')}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (!response.ok) {
+                if(response.status == 401 || response.status == 403){
+                    const data = await response.json();
+                    Notiflix.Notify.failure(data.message);
+                }
+                return;
+            }
+            const data = await response.json();
+            // Suma de la propiedad 'cantidad' en todos los objetos
+            setTotalBeneficiarios(data.cantidad);
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            Notiflix.Block.remove('.js-element6');
+        }
+    };
+    
+    const fetchBeneficiariosHome = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Beneficiario/home/${searchTags.join(',')}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (!response.ok) {
+                if(response.status == 401 || response.status == 403){
+                    const data = await response.json();
+                    Notiflix.Notify.failure(data.message);
+                }
+                return;
+            }
+            const data = await response.json();
+            // Suma de la propiedad 'cantidad' en todos los objetos
+            setBeneficiariosData(data);
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+        }
+    };
 
-        fetchData('Log',setRecents);
-        fetchMonitoreo();
-    }, [searchTags]);
+    const fetchDocumentosHome = async () => {
+        try {
+            Notiflix.Block.pulse('.js-element4', {
+                svgSize: '100px',
+                svgColor: '#F87C56',
+            });
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/DocumentoIdentidad/home/${searchTags.join(',')}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (!response.ok) {
+                if(response.status == 401 || response.status == 403){
+                    const data = await response.json();
+                    Notiflix.Notify.failure(data.message);
+                }
+                return;
+            }
+            const data = await response.json();
+            
+            // Convierte el objeto a un array para usarlo en el gráfico
+            const docData = data.map(item => ({ name: item.docIdeAbr, value: item.cantidad, tip: item.docIdeNom }));
 
+            setDocData(docData);
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            Notiflix.Block.remove('.js-element4');
+        }
+    };
+    const fetchNacionalidadesHome = async () => {
+        try {
+            Notiflix.Block.pulse('.js-element2', {
+                svgSize: '100px',
+                svgColor: '#F87C56',
+            });
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Nacionalidad/home/${searchTags.join(',')}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (!response.ok) {
+                if(response.status == 401 || response.status == 403){
+                    const data = await response.json();
+                    Notiflix.Notify.failure(data.message);
+                }
+                return;
+            }
+            const data = await response.json();
+            // Convierte el objeto a un array para usarlo en el gráfico
+            const dataFormat = data.map(item => ({ name: item.nacNom, value: item.cantidad }));
+
+            setDataNac(dataFormat);
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            Notiflix.Block.remove('.js-element2');
+        }
+    };
+    const fetchSexosHome = async () => {
+        try {
+            Notiflix.Block.pulse('.js-element', {
+                svgSize: '100px',
+                svgColor: '#F87C56',
+            });
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Beneficiario/sexo-home/${searchTags.join(',')}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (!response.ok) {
+                if(response.status == 401 || response.status == 403){
+                    const data = await response.json();
+                    Notiflix.Notify.failure(data.message);
+                }
+                return;
+            }
+            const data = await response.json();
+            // Convierte el objeto a un array para usarlo en el gráfico
+            const dataFormat = data.map(item => ({ name: item.benSex, value: item.cantidad }));
+
+            setPieData(dataFormat);
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            Notiflix.Block.remove('.js-element');
+        }
+    };
+    const fetchRangoHome = async () => {
+        try {
+            Notiflix.Block.pulse('.js-element3', {
+                svgSize: '100px',
+                svgColor: '#F87C56',
+            });
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Beneficiario/rango-home/${searchTags.join(',')}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (!response.ok) {
+                if(response.status == 401 || response.status == 403){
+                    const data = await response.json();
+                    Notiflix.Notify.failure(data.message);
+                }
+                return;
+            }
+            const data = await response.json();
+            
+            console.log(data)
+            setRangeData(data)
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            Notiflix.Block.remove('.js-element3');
+        }
+    };
+    const fetchUbicacionesHome = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/paises-home/${searchTags.join(',')}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (!response.ok) {
+                if(response.status == 401 || response.status == 403){
+                    const data = await response.json();
+                    Notiflix.Notify.failure(data.message);
+                }
+                return;
+            }
+            const data = await response.json();
+            setMapData(data)
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+        }
+    };
 
     useEffect(() => {
-        const fetchContarBeneficiariosHome = async () => {
-            try {
-                Notiflix.Loading.pulse('Cargando...');
-                const token = localStorage.getItem('token');
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Beneficiario/contar-home/${searchTags.join(',')}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                if (!response.ok) {
-                    if(response.status == 401 || response.status == 403){
-                        const data = await response.json();
-                        Notiflix.Notify.failure(data.message);
-                    }
-                    return;
-                }
-                const data = await response.json();
-                // Suma de la propiedad 'cantidad' en todos los objetos
-                setTotalBeneficiarios(data.cantidad);
-            } catch (error) {
-                console.error('Error:', error);
-            } finally {
-                Notiflix.Loading.remove();
-            }
+        const fetchAllData = async () => {
+            setDisabledFilter(true);
+            await Promise.all([fetchContarBeneficiariosHome(), fetchMonitoreo()]);
+            await Promise.all([fetchSexosHome(), fetchRangoHome()]);
+            await Promise.all([fetchNacionalidadesHome(), fetchDocumentosHome()]);
+            await Promise.all([fetchBeneficiariosHome(), fetchUbicacionesHome()]);
+            fetchData('Log',setRecents);
+            setDisabledFilter(false);
         };
-        
-        const fetchBeneficiariosHome = async () => {
-            try {
-                Notiflix.Loading.pulse('Cargando...');
-                const token = localStorage.getItem('token');
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Beneficiario/home/${searchTags.join(',')}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                if (!response.ok) {
-                    if(response.status == 401 || response.status == 403){
-                        const data = await response.json();
-                        Notiflix.Notify.failure(data.message);
-                    }
-                    return;
-                }
-                const data = await response.json();
-                // Suma de la propiedad 'cantidad' en todos los objetos
-                setBeneficiariosData(data);
-            } catch (error) {
-                console.error('Error:', error);
-            } finally {
-                Notiflix.Loading.remove();
-            }
-        };
-
-        const fetchDocumentosHome = async () => {
-            try {
-                Notiflix.Loading.pulse('Cargando...');
-                const token = localStorage.getItem('token');
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/DocumentoIdentidad/home/${searchTags.join(',')}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                if (!response.ok) {
-                    if(response.status == 401 || response.status == 403){
-                        const data = await response.json();
-                        Notiflix.Notify.failure(data.message);
-                    }
-                    return;
-                }
-                const data = await response.json();
-                
-                // Convierte el objeto a un array para usarlo en el gráfico
-                const docData = data.map(item => ({ name: item.docIdeAbr, value: item.cantidad, tip: item.docIdeNom }));
-
-                setDocData(docData);
-            } catch (error) {
-                console.error('Error:', error);
-            } finally {
-                Notiflix.Loading.remove();
-            }
-        };
-        const fetchNacionalidadesHome = async () => {
-            try {
-                Notiflix.Loading.pulse('Cargando...');
-                const token = localStorage.getItem('token');
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Nacionalidad/home/${searchTags.join(',')}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                if (!response.ok) {
-                    if(response.status == 401 || response.status == 403){
-                        const data = await response.json();
-                        Notiflix.Notify.failure(data.message);
-                    }
-                    return;
-                }
-                const data = await response.json();
-                // Convierte el objeto a un array para usarlo en el gráfico
-                const dataFormat = data.map(item => ({ name: item.nacNom, value: item.cantidad }));
-
-                setDataNac(dataFormat);
-            } catch (error) {
-                console.error('Error:', error);
-            } finally {
-                Notiflix.Loading.remove();
-            }
-        };
-        const fetchSexosHome = async () => {
-            try {
-                Notiflix.Loading.pulse('Cargando...');
-                const token = localStorage.getItem('token');
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Beneficiario/sexo-home/${searchTags.join(',')}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                if (!response.ok) {
-                    if(response.status == 401 || response.status == 403){
-                        const data = await response.json();
-                        Notiflix.Notify.failure(data.message);
-                    }
-                    return;
-                }
-                const data = await response.json();
-                // Convierte el objeto a un array para usarlo en el gráfico
-                const dataFormat = data.map(item => ({ name: item.benSex, value: item.cantidad }));
-
-                setPieData(dataFormat);
-            } catch (error) {
-                console.error('Error:', error);
-            } finally {
-                Notiflix.Loading.remove();
-            }
-        };
-        const fetchRangoHome = async () => {
-            try {
-                Notiflix.Loading.pulse('Cargando...');
-                const token = localStorage.getItem('token');
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Beneficiario/rango-home/${searchTags.join(',')}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                if (!response.ok) {
-                    if(response.status == 401 || response.status == 403){
-                        const data = await response.json();
-                        Notiflix.Notify.failure(data.message);
-                    }
-                    return;
-                }
-                const data = await response.json();
-                setRangeData(data)
-            } catch (error) {
-                console.error('Error:', error);
-            } finally {
-                Notiflix.Loading.remove();
-            }
-        };
-        const fetchUbicacionesHome = async () => {
-            try {
-                Notiflix.Loading.pulse('Cargando...');
-                const token = localStorage.getItem('token');
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/paises-home/${searchTags.join(',')}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                if (!response.ok) {
-                    if(response.status == 401 || response.status == 403){
-                        const data = await response.json();
-                        Notiflix.Notify.failure(data.message);
-                    }
-                    return;
-                }
-                const data = await response.json();
-                setMapData(data)
-            } catch (error) {
-                console.error('Error:', error);
-            } finally {
-                Notiflix.Loading.remove();
-            }
-        };
-
-        if (nacionalidadesLoaded) {
-            fetchContarBeneficiariosHome();
-            fetchBeneficiariosHome();
-            fetchDocumentosHome();
-            fetchNacionalidadesHome();
-            fetchSexosHome();
-            fetchRangoHome();
-            fetchUbicacionesHome();
-        }
-    }, [nacionalidadesLoaded, searchTags]);
+    
+        fetchAllData();
+    }, [searchTags]);
+    
 
     // Añade una nueva etiqueta al presionar Enter
     const handleKeyDown = (e) => {
@@ -365,7 +387,7 @@ const Home = () => {
                     {searchTags.map(tag => (
                         <span key={tag} className="PowerMas_InputTag flex">
                             <span className="f_75 flex ai-center">{tag}</span>
-                            <button className="f_75" onClick={() => removeTag(tag)}>x</button>
+                            <button className="f_75" onClick={() => removeTag(tag)} disabled={disabledFilter}>x</button>
                         </span>
                     ))}
                 </div>
@@ -373,8 +395,10 @@ const Home = () => {
                     <FaSearch className="search-icon" />
                     <input 
                         className='PowerMas_Input_Filter Phone_12 Large-p_5'
+                        style={{cursor: `${disabledFilter ? 'progress' : ''}`}}
                         type="search"
                         placeholder='Buscar'
+                        disabled={disabledFilter}
                         onChange={handleInputChange}
                         onKeyDown={handleKeyDown}
                         value={inputValue}
@@ -382,28 +406,24 @@ const Home = () => {
                 </div>
             </div>
         </div>
-
         <div className='PowerMas_Resume_Home overflow-auto'>
             <div className="PowerMas_ResumeHome m1 flex flex-column">
                 <div className="PowerMas_RightSection flex Large_12 Medium_12 Phone_12 bg-white gap_5">
-                    {/* <h2 className="Large-m_75 Large-f1_5 Powermas_FontTitle">Principales KPI</h2> */}
                     <div className="PowerMas_KPIRow Large-f1_25 Large-p1 Medium-p_5">
                         <p className="f1_25">Atenciones brindadas</p>
                         <span className='f2'>{formatter.format(totalAtenciones)}</span>
                     </div>
-                    <div className="PowerMas_KPIRow Large-f1_25 Large-p1 Medium-p_5">
+                    <div className="PowerMas_KPIRow js-element6 Large-f1_25 Large-p1 Medium-p_5">
                         <p className="f1_25">Beneficiarios totales</p>
                         <span className='f2'>{formatter.format(Number(totalBeneficiarios))}</span>
                     </div>
-                    <div className="PowerMas_KPIRow Large-f1_25 Large-p1 Medium-p_5">
+                    <div className="PowerMas_KPIRow js-element6 Large-f1_25 Large-p1 Medium-p_5">
                         <p className="f1_25">Beneficiarios recurrentes</p>
                         <span className='f2'>{formatter.format(0)}</span>
                     </div>
                     <div className="PowerMas_KPIRow gap_3 flex-column Large-f1_25">
                         <p className="f1_25" style={{whiteSpace: 'nowrap'}}>Avance presupuesto</p>
-                        <Suspense fallback={<div>Cargando...</div>}>
-                            <DonutChart percentage={avanceTecnico} wh={140} rad={20} newId={'Dona_Presupuesto'} colorText={'#000'} colorPc={'#F87C56'} colorSpc={'#F7775A20'} />
-                        </Suspense>
+                        <DonutChart percentage={avanceTecnico} wh={140} rad={20} newId={'Dona_Presupuesto'} colorText={'#000'} colorPc={'#F87C56'} colorSpc={'#F7775A20'} />
                     </div>
                     <div className="PowerMas_KPIRow gap_3 flex-column Large-f1_25">
                         <p className="f1_25">Avance técnico</p>
@@ -412,8 +432,8 @@ const Home = () => {
                         </Suspense>
                     </div>
                 </div>
-                <div className=" PowerMas_Home_Card PowerMas_LeftSection flex Large_12 Medium_12 Phone_12 bg-white">
-                    {monitoringData ? <Table data={monitoringData} /> : <p>Cargando datos...</p>}
+                <div className="PowerMas_Home_Card PowerMas_LeftSection flex Large_12 Medium_12 Phone_12 bg-white js-element5">
+                    {monitoringData && <Table data={monitoringData} />}
                 </div>
             </div>
             <div className='flex flex-column m1 gap-1 center'>
@@ -422,40 +442,42 @@ const Home = () => {
                         <div className='Large_12 p_5 PowerMas_Tittle_Map'>
                             <h4>Beneficiarios por sexo</h4>
                         </div>
-                        <div className='Large_6 Medium_12 Phone_12 Large-p1 Small-p_75 flex-grow-1'>
-                            <PieChart data={pieData} id='MaleFemale' />
-                        </div>
-                        <div className='flex flex-wrap gap-1'>
-                            {data.map((item, index) => (
-                                <div key={index} className='flex ai-center gap_5'>
-                                    <div className='legend-color' style={{ backgroundColor: item.color, width: '15px', height: '15px' }}></div>
-                                    <span className='legend-label'>{item.name}</span>
-                                </div>
-                            ))}
+                        <div className='Large_12 flex flex-column jc-center ai-center js-element'>
+                            <div className='Large_6 Medium_12 Phone_12 Large-p1 Small-p_75 flex-grow-1'>
+                                <PieChart data={pieData} id='MaleFemale' />
+                            </div>
+                            <div className='flex flex-wrap gap-1'>
+                                {data.map((item, index) => (
+                                    <div key={index} className='flex ai-center gap_5'>
+                                        <div className='legend-color' style={{ backgroundColor: item.color, width: '15px', height: '15px' }}></div>
+                                        <span className='legend-label'>{item.name}</span>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
                     <div className='PowerMas_Home_Card Large-p0 Medium-p_75 Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
                         <div className='Large_12 p_5 PowerMas_Tittle_Map'>
                             <h4>Beneficiarios por edad</h4>
                         </div>
-                        <div className='Large_12 Medium_12 Phone_12 Large-p1 Medium-p_75 flex-grow-1'>
-                            <Suspense fallback={<div>Cargando...</div>}>
+                        <div className='Large_12 flex flex-column ai-center jc-center js-element3'>
+                            <div className='Large_12 Medium_12 Phone_12 Large-p1 Medium-p_75 flex-grow-1'>
                                 <DivergingBarChart 
                                     rangeData={rangeData}
                                     maleColor={maleColor} 
                                     femaleColor={femaleColor} 
                                     id='Diverging' 
                                 />
-                            </Suspense>
-                        </div>
-                        <div className='flex flex-wrap gap-1'>
-                            <div className='flex ai-center gap_5'>
-                                <div className='legend-color' style={{ backgroundColor: maleColor, width: '15px', height: '15px' }}></div>
-                                <span className='legend-label'>Masculino</span>
                             </div>
-                            <div className='flex ai-center gap_5'>
-                                <div className='legend-color' style={{ backgroundColor: femaleColor, width: '15px', height: '15px' }}></div>
-                                <span className='legend-label'>Femenino</span>
+                            <div className='flex flex-wrap gap-1'>
+                                <div className='flex ai-center gap_5'>
+                                    <div className='legend-color' style={{ backgroundColor: maleColor, width: '15px', height: '15px' }}></div>
+                                    <span className='legend-label'>Masculino</span>
+                                </div>
+                                <div className='flex ai-center gap_5'>
+                                    <div className='legend-color' style={{ backgroundColor: femaleColor, width: '15px', height: '15px' }}></div>
+                                    <span className='legend-label'>Femenino</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -465,20 +487,16 @@ const Home = () => {
                         <div className='Large_12 p_5 PowerMas_Tittle_Map'>
                             <h4>Beneficiarios por nacionalidad</h4>
                         </div>
-                        <div className='Large_12 Medium_12 Phone_12 Large-p1 Medium-p_75 flex-grow-1'>
-                            <Suspense fallback={<div>Cargando...</div>}>
-                                <HorizontalBarChart data={dataNac} id='NacionalidadBarChart' barColor='#F7775A' />
-                            </Suspense>
+                        <div className='Large_12 Medium_12 Phone_12 Large-p1 Medium-p_75 flex-grow-1 js-element2'>
+                            <HorizontalBarChart data={dataNac} id='NacionalidadBarChart' barColor='#F7775A' />
                         </div>
                     </div>
                     <div className='PowerMas_Home_Card Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
                         <div className='Large_12 p_5 PowerMas_Tittle_Map'>
                             <h4>Beneficiarios por tipo de documento</h4>
                         </div>
-                        <div className='Large_12 Medium_12 Phone_12 Large-p1 Medium-p_75 flex-grow-1'>
-                            <Suspense fallback={<div>Cargando...</div>}>
-                                <HorizontalBarChart data={docData} id='TipoDocBarChart' barColor='#F7775A' />
-                            </Suspense>
+                        <div className='Large_12 Medium_12 Phone_12 Large-p1 Medium-p_75 flex-grow-1 js-element4'>
+                            <HorizontalBarChart data={docData} id='TipoDocBarChart' barColor='#F7775A' />
                         </div>
                     </div>
                 </div>
@@ -492,7 +510,6 @@ const Home = () => {
                     <div className='Large-p1 flex flex-column gap_3 overflow-auto'>
                         {recents.map((item, index) => {
                             // Crea un objeto Date a partir de la cadena de fecha y horacon
-                            console.log(item)
                             const date = new Date(item.logFecIng);
                             // Formatea la fecha y la hora
                             const day = String(date.getDate()).padStart(2, '0');

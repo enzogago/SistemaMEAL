@@ -10,6 +10,7 @@ import calendarIcon from '../../icons/calendar.svg';
 import calendarIconActive from '../../icons/calendar-active.svg';
 import locationIcon from '../../icons/location.svg';
 import locationIconActive from '../../icons/location-active.svg';
+import { formatter } from '../monitoring/goal/helper';
 
 const ResultBudget = () => {
 
@@ -84,7 +85,7 @@ const ResultBudget = () => {
                         // Verificar si ya existe un valor para la clave
                         if (!newViewTotals[`${key}_${subKey}_${activeButton}`]) {
                             // Si no existe un valor, inicializar los totales de la vista con los valores iniciales
-                            newViewTotals[`${key}_${subKey}_${activeButton}`] = transformedData[key][subKey].metTec;
+                            newViewTotals[`${key}_${subKey}_${activeButton}`] = transformedData[key][subKey].metPre;
                         }
 
                     }
@@ -316,7 +317,7 @@ const ResultBudget = () => {
         // Definir los encabezados
         let headersExcel = ['#', 'Proyecto', 'Código', 'Nombre', ...headersNew.map(header => ({name: header.name, code: header.code})), 'Total'];
     
-        Export_Excel_Basic(data,headersExcel, activeButton);
+        Export_Excel_Basic(data,headersExcel, activeButton, true);
     };
     
     
@@ -426,7 +427,7 @@ const ResultBudget = () => {
                             <th>Proyecto</th>
                             <th>Código</th>
                             <th>Nombre</th>
-                            {headersNew.map((header, index) => <th key={index}>{header.name}</th>)}
+                            {headersNew.map((header, index) => <th key={index}>{header.name} (€)</th>)}
                             <th>Total</th>
                         </tr>
                     </thead>
@@ -458,7 +459,7 @@ const ResultBudget = () => {
                                         <td key={key}>
                                             <input
                                                 onKeyDown={(event) => {
-                                                    if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
+                                                    if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter' && event.key !== '.') {
                                                         event.preventDefault();
                                                     }
                                                 }}
@@ -510,7 +511,7 @@ const ResultBudget = () => {
                                                 }}
                                                 {...register(`${item.indAno}_${item.indCod}_${key}`, {
                                                     pattern: {
-                                                        value: /^(?:[1-9]\d*|)$/,
+                                                        value: /^(?:[1-9]\d*(\.\d+)?|0\.\d*[1-9]\d*)$/,
                                                         message: 'Valor no válido',
                                                     },
                                                     maxLength: {
@@ -523,7 +524,7 @@ const ResultBudget = () => {
                                         </td>
                                     )})}
                                     <td className={`center bold ${calculateTotal(item.indAno, item.indCod, activeButton, viewTotals) > totalPorAno ? 'invalid' : ''}`}>
-                                        {calculateTotal(item.indAno, item.indCod, activeButton, viewTotals)}
+                                        {formatter.format(calculateTotal(item.indAno, item.indCod, activeButton, viewTotals))} €
                                     </td>
 
                                 </tr>

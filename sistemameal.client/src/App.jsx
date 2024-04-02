@@ -9,6 +9,7 @@ import ResultChain from './components/result-chain/ResultChain';
 import Tutorial from './components/tutorial/Tutorial';
 import ResultBudget from './components/result-budget/ResultBudget';
 import RegisterProject from './components/upload/project/RegisterProject';
+import ResultGoal from './components/monitoring/goal/ResultGoal';
 // import Login from './components/auth/Login';
 // import Layout from './components/router/Layout';
 // Componentes
@@ -127,6 +128,7 @@ const App = () => {
         "upload-project": UploadProject,
         "result-chain": ResultChain,
         "result-budget": ResultBudget,
+        "result-goal": ResultGoal,
     };
 
     let defaultRoute;

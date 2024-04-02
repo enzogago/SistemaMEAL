@@ -1,6 +1,10 @@
 import Notiflix from "notiflix";
 
-export const formatter = new Intl.NumberFormat("en-US");
+export const formatter = new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 2, 
+    maximumFractionDigits: 2
+});
+
 
 export const fetchRegistroAModificar = async (metAno, metCod, indAno, indCod, reset, fetchSelects, setValue, fetchIndicadorActividad,setIsSecondInputEnabled, setSelectedOption, setJerarquia, setInitialData, setEsActividad) => {
     try {

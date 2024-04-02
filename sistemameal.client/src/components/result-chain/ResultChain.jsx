@@ -318,7 +318,7 @@ const ResultChain = () => {
         // Definir los encabezados
         let headersExcel = ['#', 'Proyecto', 'Código', 'Nombre', ...headersNew.map(header => ({name: header.name, code: header.code})), 'Total'];
     
-        Export_Excel_Basic(data,headersExcel, activeButton);
+        Export_Excel_Basic(data,headersExcel, activeButton, false);
     };
     
     

@@ -1568,6 +1568,7 @@ textarea {
 .PowerMas_Home_Card{
 	border: 1px solid #372e2c60;
 	border-radius: 5px;
+	min-height: 20rem;
 }
 .PowerMas_Hr{
 	height: 1px;
@@ -2015,4 +2016,14 @@ textarea {
 .invalid {
     color: red;
 	font-size: 1rem;
+}
+
+.row-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+}
+
+.expanded .row-content {
+    max-height: 100px; /* Ajusta este valor según el contenido de tus filas */
 }

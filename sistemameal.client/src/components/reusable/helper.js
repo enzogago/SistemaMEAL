@@ -199,7 +199,7 @@ export const handleSubmitMant = async (controller, objetoEditado, objeto, setReg
     }
 };
 
-export const Export_Excel_Basic = async (data, headersExcel, active) => {
+export const Export_Excel_Basic = async (data, headersExcel, active, isPresupuesto) => {
     console.log(data)
     console.log(headersExcel)
     let workbook = new ExcelJS.Workbook();
@@ -251,12 +251,22 @@ export const Export_Excel_Basic = async (data, headersExcel, active) => {
         headersExcel.forEach((header, index) => {
             let cell = dataRow.getCell(index + 1);
             let value = item[typeof header === 'string' ? header : header.code];
-            cell.value = typeof value === 'string' ? value.toUpperCase() : value;
+            // Si isPresupuesto es true y la columna es la 5 o posterior, formatear como euros
+            if (isPresupuesto && index >= 4) {
+                // Convertir el valor a un número antes de asignarlo a la celda
+                cell.value = typeof value === 'string' ? parseFloat(value) : value;
+                cell.numFmt = '#,##0.00 €';
+            } else if( index >= 4){
+                cell.value = typeof value === 'string' ? parseFloat(value) : value;
+            } else {
+                cell.value = typeof value === 'string' ? value.toUpperCase() : value;
+            }
             if (index === 0 || index >= 4) {
                 cell.alignment = { horizontal: 'center' };
             }
         });
     });
+
 
 
 
