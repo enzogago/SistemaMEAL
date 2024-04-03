@@ -14,19 +14,24 @@ const ResultGoal = () => {
     const [subproyectos, setSubProyectos] = useState([]);
     const [selectedSubProyecto, setSelectedSubProyecto] = useState(null);
     const [indicadores, setIndicadores] = useState([]);
+    const [ usersTecnicos, setUsersTecnicos ] = useState([]);
     
     const [implementadoresSelect, setImplementadoresSelect] = useState([]);
-    const [ubicacionesSelect, setUbicacionesSelect] = useState([]);
     const [additionalRows, setAdditionalRows] = useState([]);
     const [expandedIndicators, setExpandedIndicators] = useState([]);
-
+    
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingRow, setEditingRow] = useState(null);
-
+    
     const [totals, setTotals] = useState({});
     const [prevValues, setPrevValues] = useState({});
+    
+    const [ubicacionesSelect, setUbicacionesSelect] = useState([]); // Options de paises
+    const [selects, setSelects] = useState([]); // Slects dinamicos
+    const [loadginSelect, setLoadingSelect] = useState(false)
 
-    const [ selects, setSelects ] = useState([]);
+    const [rowIdCounter, setRowIdCounter] = useState(0);
+
 
     const { 
         register, 
@@ -45,6 +50,7 @@ const ResultGoal = () => {
         watch: watch2, 
         handleSubmit: handleSubmit2, 
         formState: { errors: errors2, dirtyFields:dirtyFields2, isSubmitted:isSubmitted2 }, 
+        setValue:setValue2,
     } = 
     useForm({ mode: "onChange"});
 
@@ -62,12 +68,59 @@ const ResultGoal = () => {
     }, [watch2('pais')]);
 
     useEffect(() => {
-        fetchData('SubProyecto',setSubProyectos)
+        fetchData('SubProyecto',setSubProyectos);
+        fetchUsuariosTecnico();
     }, []);
+
+    const fetchUsuariosTecnico = async () => {
+        try {
+            Notiflix.Loading.pulse('Cargando...');
+            // Valores del storage
+            const token = localStorage.getItem('token');
+            
+            // Obtenemos los datos
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/usuario/tecnico`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            console.log(response)
+            if (!response.ok) {
+                if(response.status === 401 || response.status === 403){
+                    const data = await response.json();
+                    Notiflix.Notify.failure(data.message);
+                }
+                return;
+            }
+            const data = await response.json();
+            if (data.success === false) {
+                Notiflix.Notify.failure(data.message);
+                return;
+            }
+            setUsersTecnicos(data);
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            Notiflix.Loading.remove();
+        }
+    };
     
     useEffect(() => {
         const subproyecto = watch('subproyecto');
         if (subproyecto && subproyecto !== '0') {
+            const { subProAno, subProCod } = JSON.parse(subproyecto);
+            const selected = subproyectos.find(item => item.subProAno === subProAno && item.subProCod === subProCod);
+            setSelectedSubProyecto(selected);
+        } else {
+            setSelectedSubProyecto(null)
+        }
+    }, [watch('subproyecto')]);
+    
+    useEffect(() => {
+        const subproyecto = watch('subproyecto');
+        const ano = watch('metAnoPlaTec');
+
+        if (subproyecto && subproyecto !== '0'&& ano && ano !== '0') {
             const { subProAno, subProCod } = JSON.parse(subproyecto);
             fetchData(`Indicador/subproyecto/${subProAno}/${subProCod}`,setIndicadores)
             fetchData(`Implementador/subproyecto/${subProAno}/${subProCod}`,setImplementadoresSelect)
@@ -77,14 +130,10 @@ const ResultGoal = () => {
                     fetchSelect(ubi.ubiAno, ubi.ubiCod);
                 })
             })
-            
-            const selected = subproyectos.find(item => item.subProAno === subProAno && item.subProCod === subProCod);
-            setSelectedSubProyecto(selected);
         } else {
-            setSelectedSubProyecto(null)
             setIndicadores([]);
         }
-    }, [watch('subproyecto')]);
+    }, [watch('metAnoPlaTec')]);
     
     
     const toggleDropdown = () => {
@@ -92,23 +141,59 @@ const ResultGoal = () => {
     }
 
     const onSubmit = (data) => {
-        console.log(data)
+        let metas = [];
+        additionalRows.forEach((row, rowIndex) => {
+            meses.forEach((mes, mesIndex) => {
+                let mesValue = data[`mes_${row.indAno}_${row.indCod}_${String(mesIndex+1).padStart(2, '0')}_${row.id}`];
+                let implementadorValue = data[`implementador_${row.indAno}_${row.indCod}_${row.id}`];
+                let tecnicoValue = data[`tecnico_${row.indAno}_${row.indCod}_${row.id}`];
+                let ubicacionValue = data[`ubicacion_${row.indAno}_${row.indCod}${row.id !== undefined ? `_${row.id}` : ''}`];
+                if (mesValue && mesValue !== '' && implementadorValue && implementadorValue !== '0' && tecnicoValue && tecnicoValue !== '0' && ubicacionValue && ubicacionValue !== '') {
+                    metas.push({
+                        indAno: row.indAno,
+                        indCod: row.indCod,
+                        metMesPlaTec: (mesIndex + 1).toString().padStart(2, '0'),
+                        metMetTec: mesValue,
+                        implementador: implementadorValue,
+                        tecnico: tecnicoValue,
+                        ubicacion: ubicacionValue,
+                        metAnoPlaTec: data.metAnoPlaTec
+                    });
+                }
+            });
+        });
+    
+        console.log(data);
+        console.log(metas);
+        // Submit
     };
+    
+
+    const getUbicacionName = (ubiAno, ubiCod) => {
+        for (const options of selects) {
+            const option = options.find(o => o.ubiAno === ubiAno && o.ubiCod === ubiCod);
+            console.log(options)
+            if (option) {
+                return option.ubiNom;
+            }
+        }
+        const ubicacion = ubicacionesSelect.find(u => u.ubiAno === ubiAno && u.ubiCod === ubiCod);
+        return ubicacion ? ubicacion.ubiNom : '';
+    };
+
     const onSubmit2 = (data) => {
         let ubiAno, ubiCod;
+        let nombreUbicacion = '';
         // Si los selects dinamicos son mayor a 1
         if (selects.length > 1) {
-            // Obtiene el ubiAno y ubiCod del último select
             const lastSelectElement = document.querySelector(`select[name=select${selects.length - 1}]`);
             const lastSelect = lastSelectElement.value;
             if (lastSelect === '0') {
-                // Si el último select tiene un valor de '0', obtén el ubiAno y ubiCod del penúltimo select
                 const penultimateSelectElement = document.querySelector(`select[name=select${selects.length - 2}]`);
                 const penultimateSelect = JSON.parse(penultimateSelectElement.value);
                 ubiAno = penultimateSelect.ubiAno;
                 ubiCod = penultimateSelect.ubiCod;
             } else {
-                // Si el último select tiene un valor distinto de '0', usa ese
                 const ultimo = JSON.parse(lastSelect);
                 ubiAno = ultimo.ubiAno;
                 ubiCod = ultimo.ubiCod;
@@ -116,22 +201,44 @@ const ResultGoal = () => {
         } else {
             const lastSelectElement = document.querySelector(`select[name=select${selects.length - 1}]`);
             const lastSelect = lastSelectElement.value;
-
-            // Si luego del siguiente nivel de Pais no se selecciona nada
             if(lastSelect === '0'){
-                // Se toman los valores pasados del select pais
                 const { ubiAno: paisUbiAno, ubiCod: paisUbiCod } = JSON.parse(data.pais);
                 ubiAno = paisUbiAno;
                 ubiCod = paisUbiCod;
+                // Buscar en ubicacionesSelect
+                const selectedOption = ubicacionesSelect.find(option => option.ubiAno === ubiAno && option.ubiCod === ubiCod);
+                nombreUbicacion = selectedOption.ubiNom;
             } else{
-                // Caso contrario se toma el unico valor que tiene ese select ya que no tiene más niveles por debajo
                 const ultimo = JSON.parse(lastSelect);
                 ubiAno = ultimo.ubiAno;
                 ubiCod = ultimo.ubiCod;
             }
         }
-        console.log(selects)
-        setValue(`ubicacion_${editingRow}`,'Ubicacion')
+
+        // Si el usuario seleccionó más que solo el país, construir la cadena de ubicación
+        if (selects.length > 1 || (selects.length === 1 && selects[0].length > 1)) {
+            let currentUbiAno = ubiAno;
+            let currentUbiCod = ubiCod;
+            while (currentUbiAno && currentUbiCod) {
+                const ubicacionName = getUbicacionName(currentUbiAno, currentUbiCod);
+                if (nombreUbicacion) {
+                    nombreUbicacion = ubicacionName + ', ' + nombreUbicacion;
+                } else {
+                    nombreUbicacion = ubicacionName;
+                }
+                const ubicacion = selects.flat().find(u => u.ubiAno === currentUbiAno && u.ubiCod === currentUbiCod);
+                if (ubicacion) {
+                    currentUbiAno = ubicacion.ubiAnoPad;
+                    currentUbiCod = ubicacion.ubiCodPad;
+                } else {
+                    break;
+                }
+            }
+        }
+        
+        setValue(`ubicacion_${editingRow}`, JSON.stringify({ ubiAno, ubiCod }));
+        setValue(`nombreUbicacion_${editingRow}`, nombreUbicacion.toLocaleLowerCase());
+        closeModal();
     };
 
     const fetchSelect = async (ubiAno,ubiCod) => {
@@ -163,19 +270,11 @@ const ResultGoal = () => {
         if (ubicacion === '0') {
             setSelects(prevSelects => prevSelects.slice(0, index + 1));  // Reinicia los selects por debajo del nivel actual
 
-            // Aquí actualizamos selectedValues para los selectores de nivel inferior
-            // setSelectedValues(prevSelectedValues => {
-            //     const newSelectedValues = [...prevSelectedValues];
-            //     for (let i = index; i < newSelectedValues.length; i++) {
-            //         newSelectedValues[i] = '0';
-            //     }
-            //     return newSelectedValues;
-            // });
-
             return;
         }
 
         try {
+            setLoadingSelect(true);
             const token = localStorage.getItem('token');
             const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Ubicacion/${selectedCountry.ubiAno}/${selectedCountry.ubiCod}`, {
                 headers: {
@@ -201,20 +300,27 @@ const ResultGoal = () => {
             }
         } catch (error) {
             console.error('Error:', error);
+        } finally {
+            setLoadingSelect(false);
         }
     };
 
     const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setValue2('pais','0');
+    }
     
     return (
         <div className='p1 flex flex-column flex-grow-1 overflow-auto'>
-            <h1 className="Large-f1_5"> Cadena de resultado | Metas técnicas programáticas </h1>
-            <div className='flex jc-space-between gap-1'>
+            <h1 className="Large-f1_5"> Metas técnicas programáticas </h1>
+            <div className='flex jc-space-between gap-1 p_5'>
                 <div className="flex-grow-1">
                     <select 
                         id='subproyecto'
-                        style={{textTransform: 'capitalize'}}
-                        className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.subproyecto || isSubmitted ? (errors.subproyecto ? 'invalid' : 'valid') : ''}`} 
+                        style={{textTransform: 'capitalize', margin: '0'}}
+                        className={`p_5 block Phone_12 PowerMas_Modal_Form_${dirtyFields.subproyecto || isSubmitted ? (errors.subproyecto ? 'invalid' : 'valid') : ''}`} 
                         {...register('subproyecto', { 
                             validate: {
                                 required: value => value !== '0' || 'El campo es requerido',
@@ -231,18 +337,19 @@ const ResultGoal = () => {
                             </option>
                         ))}
                     </select>
-                    {errors.subproyecto ? (
+                    {/* {errors.subproyecto ? (
                         <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.subproyecto.message}</p>
                     ) : (
                         <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
                             Espacio reservado para el mensaje de error
                         </p>
-                    )}
+                    )} */}
                 </div>
                 <div>
                     <select 
                         id='metAnoPlaTec'
-                        className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.metAnoPlaTec || isSubmitted ? (errors.metAnoPlaTec ? 'invalid' : 'valid') : ''}`} 
+                        style={{margin: '0'}}
+                        className={`p_5 block Phone_12 PowerMas_Modal_Form_${dirtyFields.metAnoPlaTec || isSubmitted ? (errors.metAnoPlaTec ? 'invalid' : 'valid') : ''}`} 
                         {...register('metAnoPlaTec', { 
                             validate: {
                                 required: value => value !== '0' || 'El campo es requerido',
@@ -254,15 +361,15 @@ const ResultGoal = () => {
                             <option key={metAnoPlaTec} value={metAnoPlaTec}>{metAnoPlaTec}</option>
                         ))}
                     </select>
-                    {errors.metAnoPlaTec ? (
+                    {/* {errors.metAnoPlaTec ? (
                         <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.metAnoPlaTec.message}</p>
                     ) : (
                         <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
                             Espacio reservado para el mensaje de error
                         </p>
-                    )}
+                    )} */}
                 </div>
-                <div className={`PowerMas_Dropdown_Export Large_3 Large-m_25 ${dropdownOpen ? 'open' : ''}`}>
+                <div className={`PowerMas_Dropdown_Export Large_3 ${dropdownOpen ? 'open' : ''}`}>
                     <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>Exportar <FaSortDown className='Large_1' /></button>
                     <div className="PowerMas_Dropdown_Export_Content Phone_12">
                         <a onClick={() => {
@@ -272,13 +379,13 @@ const ResultGoal = () => {
                     </div>
                 </div>
             </div>
-            <div className="PowerMas_TableContainer flex-column overflow-auto borde-ayuda">
+            <div className="PowerMas_TableContainer flex-column overflow-auto">
                 <table className="PowerMas_TableStatus ">
                     <thead>
                         <tr style={{zIndex: '1'}}>
                             <th className='center' colSpan={2}></th>
                             <th style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}>Código</th>
-                            <th colSpan={2}>Nombre</th>
+                            <th colSpan={3}>Nombre</th>
                             {meses.map((mes, i) => (
                                 <th className='center' key={i+1}>{mes}</th>
                             ))}
@@ -309,21 +416,33 @@ const ResultGoal = () => {
                                         </div>
                                     </td>
                                     <td>
-                                        <button className='p_25' style={{backgroundColor: 'transparent', border: 'none'}} onClick={() => setAdditionalRows([...additionalRows, { indAno: item.indAno, indCod: item.indCod }])}>+</button>
+                                        <button 
+                                            className='p_25' 
+                                            style={{backgroundColor: 'transparent', border: 'none'}} 
+                                            onClick={() => {
+                                                setRowIdCounter(rowIdCounter + 1);
+                                                setAdditionalRows([...additionalRows, { id: `${item.indAno}_${item.indCod}_${rowIdCounter}`, indAno: item.indAno, indCod: item.indCod }]);
+                                                if (!expandedIndicators.includes(`${item.indAno}_${item.indCod}`)) {
+                                                    setExpandedIndicators([...expandedIndicators, `${item.indAno}_${item.indCod}`]);
+                                                }
+                                            }}
+                                        >
+                                            +
+                                        </button>
                                     </td>
                                     <td style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}>{item.indNum}</td>
                                     {
                                         text.length > 60 ?
                                         <td
-                                        colSpan={2}
+                                        colSpan={3}
                                             data-tooltip-id="info-tooltip" 
                                             data-tooltip-content={text} 
                                         >{shortText}</td>
                                         :
-                                        <td colSpan={2}>{text}</td>
+                                        <td colSpan={3}>{text}</td>
                                     }
                                     {meses.map((mes, i) => (
-                                        <td key={i+1} className='center' style={{position: 'sticky', right: '0', backgroundColor: '#fff'}}>
+                                        <td key={i+1} className='center'>
                                             {formatter.format(Object.entries(totals)
                                                 .filter(([key]) => key.startsWith(`${item.indAno}_${item.indCod}_${String(i+1).padStart(2, '0')}`))
                                                 .reduce((sum, [, value]) => sum + value, 0))}
@@ -336,53 +455,99 @@ const ResultGoal = () => {
                                     </td>
                                 </tr>
                                 {expandedIndicators.includes(`${item.indAno}_${item.indCod}`) && additionalRows.filter(row => row.indAno === item.indAno && row.indCod === item.indCod).map((row, rowIndex) => (
-                                    <tr key={`${row.indAno}_${row.indCod}_${rowIndex}`} >
+                                    <tr key={`${row.indAno}_${row.indCod}_${row.id}`} >
                                         <td ></td>
                                         <td>
-                                            <button style={{backgroundColor: 'transparent', border: 'none'}} onClick={() => setAdditionalRows(additionalRows.filter((_, i) => i !== rowIndex))}>-</button>
+                                            <button 
+                                                style={{backgroundColor: 'transparent', border: 'none'}} 
+                                                onClick={() => {
+                                                    // Antes de eliminar la fila, actualizamos los totales
+                                                    meses.forEach((mes, i) => {
+                                                        const key = `${item.indAno}_${item.indCod}_${String(i+1).padStart(2, '0')}_${row.id}`;
+                                                        const totalKey = `${item.indAno}_${item.indCod}_${row.id}_total`;
+                                                        const value = Number(watch(`mes_${item.indAno}_${item.indCod}_${String(i+1).padStart(2, '0')}_${row.id}`));
+                                                        setTotals(prevTotals => ({
+                                                            ...prevTotals,
+                                                            [key]: (prevTotals[key] || 0) - value,
+                                                            [totalKey]: (prevTotals[totalKey] || 0) - value
+                                                        }));
+                                                    });
+                                                    // Ahora sí eliminamos la fila
+                                                    setAdditionalRows(prevRows => prevRows.filter((prevRow) => prevRow.id !== row.id));
+                                                }}
+                                            >
+                                                -
+                                            </button>
                                         </td>
                                         <td style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}></td>
                                         <td>
                                             <select 
-                                                id={`implementador_${item.indAno}_${item.indCod}_${rowIndex}`}
-                                                className={`PowerMas_Input_Cadena f_75 PowerMas_Modal_Form_${dirtyFields[`implementador_${item.indAno}_${item.indCod}_${rowIndex}`] || isSubmitted ? (errors[`implementador_${item.indAno}_${item.indCod}_${rowIndex}`] ? 'invalid' : 'valid') : ''}`} 
-                                                {...register(`implementador_${item.indAno}_${item.indCod}_${rowIndex}`, { 
-                                                    
+                                                style={{textTransform: 'capitalize', margin: '0'}}
+                                                id={`tecnico${item.indAno}_${item.indCod}_${row.id}`}
+                                                className={`PowerMas_Input_Cadena f_75 PowerMas_Modal_Form_${dirtyFields[`tecnico_${item.indAno}_${item.indCod}_${row.id}`] || isSubmitted ? (errors[`tecnico_${item.indAno}_${item.indCod}_${row.id}`] ? 'invalid' : 'valid') : ''}`} 
+                                                {...register(`tecnico_${item.indAno}_${item.indCod}_${row.id}`, { 
                                                 })}
                                             >
-                                                <option value="0">--Seleccione Implementador--</option>
+                                                <option value="0">--Técnico--</option>
+                                                {usersTecnicos.map((tecnico, index) => (
+                                                    <option
+                                                        className='f_75'
+                                                        key={index} 
+                                                        value={JSON.stringify({ usuCod: tecnico.usuCod, usuAno: tecnico.usuAno })}
+                                                    > 
+                                                        {tecnico.usuNom.toLowerCase() + ' ' + tecnico.usuApe.toLowerCase() }
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select 
+                                                style={{textTransform: 'capitalize', margin: '0'}}
+                                                id={`implementador_${item.indAno}_${item.indCod}_${row.id}`}
+                                                className={`PowerMas_Input_Cadena f_75 PowerMas_Modal_Form_${dirtyFields[`implementador_${item.indAno}_${item.indCod}_${row.id}`] || isSubmitted ? (errors[`implementador_${item.indAno}_${item.indCod}_${row.id}`] ? 'invalid' : 'valid') : ''}`} 
+                                                {...register(`implementador_${item.indAno}_${item.indCod}_${row.id}`, { 
+                                                })}
+                                            >
+                                                <option value="0">--Implementador--</option>
                                                 {implementadoresSelect.map((imp, index) => (
                                                     <option
                                                         className='f_75'
                                                         key={index} 
                                                         value={imp.impCod}
                                                     > 
-                                                        {imp.impNom}
+                                                        {imp.impNom.toLowerCase()}
                                                     </option>
                                                 ))}
                                             </select>
                                         </td>
                                         <td>
-                                            <input
-                                                placeholder='Sin ubicación'
-                                                className='f_75'
-                                                disabled
-                                                {...register(`ubicacion_${item.indAno}_${item.indCod}${rowIndex !== undefined ? `_${rowIndex}` : ''}`)}
-                                            />
-                                            <button style={{backgroundColor: 'transparent', border: 'none'}} onClick={() => {
-                                                setIsModalOpen(true);
-                                                setEditingRow(`${item.indAno}_${item.indCod}${rowIndex !== undefined ? `_${rowIndex}` : ''}`);
-                                            }}>+</button>
+                                            <div className='flex gap_3'>
+                                                <input
+                                                    style={{margin: '0', textTransform: 'capitalize'}}
+                                                    placeholder='Sin ubicación'
+                                                    className='f_75 w-auto'
+                                                    disabled
+                                                    {...register(`nombreUbicacion_${item.indAno}_${item.indCod}${row.id !== undefined ? `_${row.id}` : ''}`)}
+                                                />
+                                                <input
+                                                    type="hidden"
+                                                    {...register(`ubicacion_${item.indAno}_${item.indCod}${row.id !== undefined ? `_${row.id}` : ''}`)}
+                                                />
+                                                <button className='p0' style={{backgroundColor: 'transparent', border: 'none'}} onClick={() => {
+                                                    setIsModalOpen(true);
+                                                    setEditingRow(`${item.indAno}_${item.indCod}${row.id !== undefined ? `_${row.id}` : ''}`);
+                                                }}>+</button>
+                                            </div>
                                         </td>
                                         {meses.map((mes, i) => (
                                             <td key={i+1}>
                                                 <input
-                                                    className={`PowerMas_Input_Cadena Large_12 f_75 PowerMas_Cadena_Form_${dirtyFields[`${item.indAno}_${item.indCod}_${String(i+1).padStart(2, '0')}_${rowIndex}`] || isSubmitted ? (errors[`${item.indAno}_${item.indCod}_${String(i+1).padStart(2, '0')}_${rowIndex}`] ? 'invalid' : 'valid') : ''}`} 
+                                                    className={`PowerMas_Input_Cadena Large_12 f_75 PowerMas_Cadena_Form_${dirtyFields[`mes_${item.indAno}_${item.indCod}_${String(i+1).padStart(2, '0')}_${row.id}`] || isSubmitted ? (errors[`mes_${item.indAno}_${item.indCod}_${String(i+1).padStart(2, '0')}_${row.id}`] ? 'invalid' : 'valid') : ''}`} 
                                                     style={{margin: '0'}}
                                                     onInput={(e) => {
-                                                        if (rowIndex !== undefined) {
-                                                            const key = `${item.indAno}_${item.indCod}_${String(i+1).padStart(2, '0')}_${rowIndex}`;
-                                                            const totalKey = `${item.indAno}_${item.indCod}_${rowIndex}_total`;
+                                                        if (row.id !== undefined) {
+                                                            const key = `${item.indAno}_${item.indCod}_${String(i+1).padStart(2, '0')}_${row.id}`;
+                                                            const totalKey = `${item.indAno}_${item.indCod}_${row.id}_total`;
                                                             const prevValue = prevValues[key] || 0;
                                                             const newValue = Number(e.target.value);
                                                             setTotals(prevTotals => ({
@@ -402,7 +567,7 @@ const ResultGoal = () => {
                                                         }
                                                     }}
                                                     maxLength={10}
-                                                    {...register(`${item.indAno}_${item.indCod}_${String(i+1).padStart(2, '0')}_${rowIndex}`, { 
+                                                    {...register(`mes_${item.indAno}_${item.indCod}_${String(i+1).padStart(2, '0')}_${row.id}`, { 
                                                         pattern: {
                                                             value: /^(?:[1-9]\d*|)$/,
                                                             message: 'Valor no válido',
@@ -416,7 +581,7 @@ const ResultGoal = () => {
                                             </td>
                                         ))}
                                         <td className='bold center' style={{position: 'sticky', right: '0', backgroundColor: '#fff'}}>
-                                            {formatter.format(totals[`${item.indAno}_${item.indCod}_${rowIndex}_total`] || 0) }
+                                            {formatter.format(totals[`${item.indAno}_${item.indCod}_${row.id}_total`] || 0) }
                                         </td>
                                     </tr>
                                 ))}
@@ -438,7 +603,7 @@ const ResultGoal = () => {
             <Modal
                 ariaHideApp={false}
                 isOpen={isModalOpen}
-                onRequestClose={() => setIsModalOpen(false)}
+                onRequestClose={closeModal}
                 closeTimeoutMS={200}
                 style={{
                     content: {
@@ -446,8 +611,8 @@ const ResultGoal = () => {
                         left: '50%',
                         right: 'auto',
                         bottom: 'auto',
-                        width: '80%',
-                        height: '50%',
+                        minWidth: '40%',
+                        minHeight: '80%',
                         marginRight: '-50%',
                         transform: 'translate(-50%, -50%)',
                         backgroundColor: '#fff',
@@ -464,7 +629,9 @@ const ResultGoal = () => {
                 }}
             > 
             {isModalOpen && 
-                <div className='Large_6 flex flex-column ai-center jc-center flex-grow-1'>
+                <div className='Large_12 flex flex-column ai-center jc-center flex-grow-1'>
+                    <span className="PowerMas_CloseModal" style={{position: 'absolute',right: 20, top: 10}} onClick={closeModal}>×</span>
+                    <h2 className='Large_12 PowerMas_Title_Modal f1_5 center'>Selecciona una ubicación</h2>
                     <div className='Phone_12 flex-grow-1'>
                         <div className="m_75">
                             <label htmlFor="pais" className="">
@@ -522,7 +689,12 @@ const ResultGoal = () => {
                                 </select>
                             </div>
                         ))}
+                        {
+                            loadginSelect &&
+                            <div id="loading" className="m_75">Cargando...</div>
+                        }
                     </div>
+                    <br />
                     <button 
                         className='PowerMas_Buttom_Primary Large_6'
                         onClick={handleSubmit2(onSubmit2)}

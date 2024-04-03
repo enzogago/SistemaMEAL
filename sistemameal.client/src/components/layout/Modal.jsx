@@ -83,7 +83,7 @@ const Modal = ({ isOpen, closeModal, user }) => {
                     </label>
                     <input 
                         id="nuevaContraseña"
-                        className={`p1 PowerMas_Modal_Form_${dirtyFields.nuevaContraseña || isSubmitted ? (errors.nuevaContraseña ? 'invalid' : 'valid') : ''}`}  
+                        className={`PowerMas_Modal_Form_${dirtyFields.nuevaContraseña || isSubmitted ? (errors.nuevaContraseña ? 'invalid' : 'valid') : ''}`}  
                         type="password" 
                         placeholder='Ingresa nueva contraseña' 
                         maxLength={50} 
@@ -117,7 +117,7 @@ const Modal = ({ isOpen, closeModal, user }) => {
                     </label>
                     <input 
                         id="confirmarContraseña"
-                        className={`p1 PowerMas_Modal_Form_${dirtyFields.confirmarContraseña || isSubmitted ? (errors.confirmarContraseña ? 'invalid' : 'valid') : ''}`}  
+                        className={`PowerMas_Modal_Form_${dirtyFields.confirmarContraseña || isSubmitted ? (errors.confirmarContraseña ? 'invalid' : 'valid') : ''}`}  
                         type="password" 
                         placeholder='Confirma la contraseña' 
                         maxLength={50} 

@@ -23,7 +23,6 @@ const FormGoal = () => {
     const [ selects, setSelects ] = useState([]);
     const [ cargando, setCargando ] = useState(false)
 
-
     const [initialData, setInitialData] = useState(null);
     const [firstEdit, setFirstEdit] = useState(false);
     const [selectedValues, setSelectedValues] = useState([]);

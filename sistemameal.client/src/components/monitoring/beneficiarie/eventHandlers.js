@@ -190,7 +190,7 @@ export const initPhoneInput = (inputRef, setIsValid, setTelefono, setErrorMessag
                 maxLength = 11;  
                 break;
             case 'ec':  // Ecuador
-                maxLength = 9;  
+                maxLength = 12;  
                 break;
             case 'co':  // Colombia
                 maxLength = 11;

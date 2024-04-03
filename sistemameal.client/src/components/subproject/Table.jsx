@@ -37,7 +37,7 @@ const Table = ({data = [], setData}) => {
     const columns = useMemo(() => {
         let baseColumns = [
             {
-                header: "Código SAP",
+                header: "Código de financiación",
                 accessorKey: "subProSap",
             },
             {

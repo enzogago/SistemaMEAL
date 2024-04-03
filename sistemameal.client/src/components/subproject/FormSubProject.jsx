@@ -339,7 +339,6 @@ const FormSubProject = () => {
         }
         return true;
     }
-    
 
     const Guardar_Proyecto = () => {
         if (!validarUbicaciones()) {
@@ -419,6 +418,9 @@ const FormSubProject = () => {
             // Elimina las propiedades de los implementadores
             for (let key in subProjectData) {
                 if (key.startsWith('impCod')) {
+                    delete subProjectData[key];
+                }
+                if (key.startsWith('select')) {
                     delete subProjectData[key];
                 }
             }
@@ -551,7 +553,7 @@ const FormSubProject = () => {
                     </div>
                     <div className="m_75">
                         <label className="">
-                            Codigo SAP del Sub proyecto
+                            Codigo de financiación
                         </label>
                         <input 
                             id="subProSap"

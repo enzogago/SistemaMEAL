@@ -65,6 +65,8 @@ namespace SistemaMEAL.Modulos
                         UbiCod = rd.GetString(1),
                         UbiNom = rd.GetString(2),
                         UbiTip = rd.GetString(3),
+                        UbiAnoPad = rd.GetString(4),
+                        UbiCodPad = rd.GetString(5),
                     });
                 }
                 rd.Close();

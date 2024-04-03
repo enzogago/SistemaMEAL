@@ -1198,6 +1198,7 @@ textarea {
 .PowerMas_Modal_Form_valid {
 	background: #fff url("../Img/PowerMas_Correcto.svg") no-repeat 98% center;
 	background-size: 24px 24px;
+	background-position: 96%;
 	border: 1px solid #25848F!important;
 }
 .PowerMas_Modal_Form_Calendar_Enable {
