@@ -51,6 +51,7 @@ const FormGoal = () => {
         trigger 
     } = 
     useForm({ mode: "onChange"});
+    
 
     const fetchUsuariosTecnico = async () => {
         try {

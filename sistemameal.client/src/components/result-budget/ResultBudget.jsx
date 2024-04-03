@@ -10,7 +10,7 @@ import calendarIcon from '../../icons/calendar.svg';
 import calendarIconActive from '../../icons/calendar-active.svg';
 import locationIcon from '../../icons/location.svg';
 import locationIconActive from '../../icons/location-active.svg';
-import { formatter } from '../monitoring/goal/helper';
+import { formatterBudget } from '../monitoring/goal/helper';
 
 const ResultBudget = () => {
 
@@ -524,7 +524,7 @@ const ResultBudget = () => {
                                         </td>
                                     )})}
                                     <td className={`center bold ${calculateTotal(item.indAno, item.indCod, activeButton, viewTotals) > totalPorAno ? 'invalid' : ''}`}>
-                                        {formatter.format(calculateTotal(item.indAno, item.indCod, activeButton, viewTotals))} €
+                                        {formatterBudget.format(calculateTotal(item.indAno, item.indCod, activeButton, viewTotals))} €
                                     </td>
 
                                 </tr>

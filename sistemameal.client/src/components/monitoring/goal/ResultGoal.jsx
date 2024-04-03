@@ -5,6 +5,7 @@ import { Export_Excel_Basic, fetchData } from '../../reusable/helper';
 import { useForm } from 'react-hook-form';
 import Notiflix, { Notify } from 'notiflix';
 import Modal from 'react-modal';
+import { formatter } from './helper';
 
 const ResultGoal = () => {
 
@@ -22,7 +23,10 @@ const ResultGoal = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingRow, setEditingRow] = useState(null);
 
+    const [totals, setTotals] = useState({});
+    const [prevValues, setPrevValues] = useState({});
 
+    const [ selects, setSelects ] = useState([]);
 
     const { 
         register, 
@@ -35,6 +39,28 @@ const ResultGoal = () => {
     } = 
     useForm({ mode: "onChange"});
 
+    // Configuracion del formulario 2
+    const { 
+        register: register2, 
+        watch: watch2, 
+        handleSubmit: handleSubmit2, 
+        formState: { errors: errors2, dirtyFields:dirtyFields2, isSubmitted:isSubmitted2 }, 
+    } = 
+    useForm({ mode: "onChange"});
+
+    useEffect(() => {
+        const pais = watch2('pais');
+
+        if (pais) {
+            if (pais === '0') {
+                setSelects([]);
+                return;
+            }
+
+            handleCountryChange(pais);
+        }
+    }, [watch2('pais')]);
+
     useEffect(() => {
         fetchData('SubProyecto',setSubProyectos)
     }, []);
@@ -46,6 +72,7 @@ const ResultGoal = () => {
             fetchData(`Indicador/subproyecto/${subProAno}/${subProCod}`,setIndicadores)
             fetchData(`Implementador/subproyecto/${subProAno}/${subProCod}`,setImplementadoresSelect)
             fetchData(`Ubicacion/subproyecto/${subProAno}/${subProCod}`, (data) => {
+                setUbicacionesSelect([]);
                 data.map(ubi => {
                     fetchSelect(ubi.ubiAno, ubi.ubiCod);
                 })
@@ -60,13 +87,51 @@ const ResultGoal = () => {
     }, [watch('subproyecto')]);
     
     
-
     const toggleDropdown = () => {
         setDropdownOpen(!dropdownOpen);
     }
 
     const onSubmit = (data) => {
         console.log(data)
+    };
+    const onSubmit2 = (data) => {
+        let ubiAno, ubiCod;
+        // Si los selects dinamicos son mayor a 1
+        if (selects.length > 1) {
+            // Obtiene el ubiAno y ubiCod del último select
+            const lastSelectElement = document.querySelector(`select[name=select${selects.length - 1}]`);
+            const lastSelect = lastSelectElement.value;
+            if (lastSelect === '0') {
+                // Si el último select tiene un valor de '0', obtén el ubiAno y ubiCod del penúltimo select
+                const penultimateSelectElement = document.querySelector(`select[name=select${selects.length - 2}]`);
+                const penultimateSelect = JSON.parse(penultimateSelectElement.value);
+                ubiAno = penultimateSelect.ubiAno;
+                ubiCod = penultimateSelect.ubiCod;
+            } else {
+                // Si el último select tiene un valor distinto de '0', usa ese
+                const ultimo = JSON.parse(lastSelect);
+                ubiAno = ultimo.ubiAno;
+                ubiCod = ultimo.ubiCod;
+            }
+        } else {
+            const lastSelectElement = document.querySelector(`select[name=select${selects.length - 1}]`);
+            const lastSelect = lastSelectElement.value;
+
+            // Si luego del siguiente nivel de Pais no se selecciona nada
+            if(lastSelect === '0'){
+                // Se toman los valores pasados del select pais
+                const { ubiAno: paisUbiAno, ubiCod: paisUbiCod } = JSON.parse(data.pais);
+                ubiAno = paisUbiAno;
+                ubiCod = paisUbiCod;
+            } else{
+                // Caso contrario se toma el unico valor que tiene ese select ya que no tiene más niveles por debajo
+                const ultimo = JSON.parse(lastSelect);
+                ubiAno = ultimo.ubiAno;
+                ubiCod = ultimo.ubiCod;
+            }
+        }
+        console.log(selects)
+        setValue(`ubicacion_${editingRow}`,'Ubicacion')
     };
 
     const fetchSelect = async (ubiAno,ubiCod) => {
@@ -84,8 +149,8 @@ const ResultGoal = () => {
                 Notiflix.Notify.failure(data.message);
                 return;
             }
-            
-            console.log(data);
+            console.log(data)
+            setUbicacionesSelect(prevUbicaciones => [...prevUbicaciones, data[0]]);
         } catch (error) {
             console.error('Error:', error);
         } finally {
@@ -99,19 +164,18 @@ const ResultGoal = () => {
             setSelects(prevSelects => prevSelects.slice(0, index + 1));  // Reinicia los selects por debajo del nivel actual
 
             // Aquí actualizamos selectedValues para los selectores de nivel inferior
-            setSelectedValues(prevSelectedValues => {
-                const newSelectedValues = [...prevSelectedValues];
-                for (let i = index; i < newSelectedValues.length; i++) {
-                    newSelectedValues[i] = '0';
-                }
-                return newSelectedValues;
-            });
+            // setSelectedValues(prevSelectedValues => {
+            //     const newSelectedValues = [...prevSelectedValues];
+            //     for (let i = index; i < newSelectedValues.length; i++) {
+            //         newSelectedValues[i] = '0';
+            //     }
+            //     return newSelectedValues;
+            // });
 
             return;
         }
 
         try {
-            setCargando(true);
             const token = localStorage.getItem('token');
             const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Ubicacion/${selectedCountry.ubiAno}/${selectedCountry.ubiCod}`, {
                 headers: {
@@ -137,14 +201,10 @@ const ResultGoal = () => {
             }
         } catch (error) {
             console.error('Error:', error);
-        } finally{
-            setCargando(false);
         }
     };
 
-
     const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-
     
     return (
         <div className='p1 flex flex-column flex-grow-1 overflow-auto'>
@@ -217,11 +277,8 @@ const ResultGoal = () => {
                     <thead>
                         <tr style={{zIndex: '1'}}>
                             <th className='center' colSpan={2}></th>
-                            <th>Proyecto</th>
-                            <th>Código</th>
-                            <th>Nombre</th>
-                            <th>Implementador</th>
-                            <th>Ubicación</th>
+                            <th style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}>Código</th>
+                            <th colSpan={2}>Nombre</th>
                             {meses.map((mes, i) => (
                                 <th className='center' key={i+1}>{mes}</th>
                             ))}
@@ -251,97 +308,40 @@ const ResultGoal = () => {
                                             &gt;
                                         </div>
                                     </td>
-                                    {/* <td>
-                                        {additionalRows.some(row => row.indAno === item.indAno && row.indCod === item.indCod) && (
-                                            <div 
-                                                className={`pointer round p_25 PowerMas_MenuIcon ${expandedIndicators.includes(`${item.indAno}_${item.indCod}`) ? 'PowerMas_MenuIcon--rotated' : ''}`} 
-                                                onClick={() => {
-                                                    if (expandedIndicators.includes(`${item.indAno}_${item.indCod}`)) {
-                                                        setExpandedIndicators(expandedIndicators.filter(indicator => indicator !== `${item.indAno}_${item.indCod}`));
-                                                    } else {
-                                                        setExpandedIndicators([...expandedIndicators, `${item.indAno}_${item.indCod}`]);
-                                                    }
-                                                }}
-                                            >
-                                                &gt;
-                                            </div>
-                                        )}
-                                    </td> */}
                                     <td>
                                         <button className='p_25' style={{backgroundColor: 'transparent', border: 'none'}} onClick={() => setAdditionalRows([...additionalRows, { indAno: item.indAno, indCod: item.indCod }])}>+</button>
                                     </td>
-                                    <td style={{textTransform: 'capitalize'}}>{item.proNom.toLowerCase()}</td>
-                                    <td>{item.indNum}</td>
+                                    <td style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}>{item.indNum}</td>
                                     {
                                         text.length > 60 ?
-                                        <td 
+                                        <td
+                                        colSpan={2}
                                             data-tooltip-id="info-tooltip" 
                                             data-tooltip-content={text} 
                                         >{shortText}</td>
                                         :
-                                        <td>{text}</td>
+                                        <td colSpan={2}>{text}</td>
                                     }
-                                    <td>
-                                        <select 
-                                            id={`implementador_${item.indAno}_${item.indCod}`}
-                                            className={`f_75 PowerMas_Input_Cadena PowerMas_Modal_Form_${dirtyFields[`implementador_${item.indAno}_${item.indCod}`] || isSubmitted ? (errors[`implementador_${item.indAno}_${item.indCod}`] ? 'invalid' : 'valid') : ''}`} 
-                                            {...register(`implementador_${item.indAno}_${item.indCod}`, { 
-                                            })}
-                                        >
-                                            <option className='f_75' value="0">--Seleccione--</option>
-                                            {implementadoresSelect.map((imp, index) => (
-                                                <option 
-                                                    key={index}
-                                                    className='f_75'
-                                                    value={JSON.stringify({ impAno: imp.impAno, impCod: imp.impCod })}
-                                                > 
-                                                    {imp.impNom}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <input
-                                            disabled
-                                            {...register(`ubicacion_${item.indAno}_${item.indCod}`)}
-                                        />
-                                        <button style={{backgroundColor: 'transparent', border: 'none'}} onClick={() => {
-                                            setIsModalOpen(true);
-                                            setEditingRow(`${item.indAno}_${item.indCod}`);
-                                        }}>+</button>
-                                    </td>
                                     {meses.map((mes, i) => (
-                                        <td key={i+1}>
-                                            <input
-                                                className='PowerMas_Input_Cadena Large_12'
-                                                type="text"
-                                                {...register(`${item.indAno}_${item.indCod}_${String(i+1).padStart(2, '0')}`, { 
-                                                    validate: {
-                                                        required: value => value !== null || 'El campo es requerido',
-                                                    }
-                                                })}
-                                            />
+                                        <td key={i+1} className='center' style={{position: 'sticky', right: '0', backgroundColor: '#fff'}}>
+                                            {formatter.format(Object.entries(totals)
+                                                .filter(([key]) => key.startsWith(`${item.indAno}_${item.indCod}_${String(i+1).padStart(2, '0')}`))
+                                                .reduce((sum, [, value]) => sum + value, 0))}
                                         </td>
                                     ))}
-                                    <td  className='center' style={{position: 'sticky', right: '0', backgroundColor: '#fff'}}>0</td>
+                                    <td  className='bold center' style={{position: 'sticky', right: '0', backgroundColor: '#fff'}}>
+                                        {formatter.format(Object.entries(totals)
+                                            .filter(([key]) => key.startsWith(`${item.indAno}_${item.indCod}`) && key.endsWith('_total'))
+                                            .reduce((sum, [, value]) => sum + value, 0))}
+                                    </td>
                                 </tr>
                                 {expandedIndicators.includes(`${item.indAno}_${item.indCod}`) && additionalRows.filter(row => row.indAno === item.indAno && row.indCod === item.indCod).map((row, rowIndex) => (
                                     <tr key={`${row.indAno}_${row.indCod}_${rowIndex}`} >
-                                        <td></td>
+                                        <td ></td>
                                         <td>
                                             <button style={{backgroundColor: 'transparent', border: 'none'}} onClick={() => setAdditionalRows(additionalRows.filter((_, i) => i !== rowIndex))}>-</button>
                                         </td>
-                                        <td style={{textTransform: 'capitalize'}}>{item.proNom.toLowerCase()}</td>
-                                        <td>{item.indNum}</td>
-                                        {
-                                            text.length > 60 ?
-                                            <td 
-                                                data-tooltip-id="info-tooltip" 
-                                                data-tooltip-content={text} 
-                                            >{shortText}</td>
-                                            :
-                                            <td>{text}</td>
-                                        }
+                                        <td style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}></td>
                                         <td>
                                             <select 
                                                 id={`implementador_${item.indAno}_${item.indCod}_${rowIndex}`}
@@ -350,12 +350,12 @@ const ResultGoal = () => {
                                                     
                                                 })}
                                             >
-                                                <option value="0">--Seleccione--</option>
+                                                <option value="0">--Seleccione Implementador--</option>
                                                 {implementadoresSelect.map((imp, index) => (
                                                     <option
                                                         className='f_75'
                                                         key={index} 
-                                                        value={JSON.stringify({ impAno: imp.impAno, impCod: imp.impCod })}
+                                                        value={imp.impCod}
                                                     > 
                                                         {imp.impNom}
                                                     </option>
@@ -364,6 +364,8 @@ const ResultGoal = () => {
                                         </td>
                                         <td>
                                             <input
+                                                placeholder='Sin ubicación'
+                                                className='f_75'
                                                 disabled
                                                 {...register(`ubicacion_${item.indAno}_${item.indCod}${rowIndex !== undefined ? `_${rowIndex}` : ''}`)}
                                             />
@@ -375,17 +377,47 @@ const ResultGoal = () => {
                                         {meses.map((mes, i) => (
                                             <td key={i+1}>
                                                 <input
-                                                    className='PowerMas_Input_Cadena Large_12'
-                                                    type="text"
-                                                    {...register(`${item.indAno}_${item.indCod}_${rowIndex}_${String(i+1).padStart(2, '0')}`, { 
-                                                        validate: {
-                                                            required: value => value !== null || 'El campo es requerido',
+                                                    className={`PowerMas_Input_Cadena Large_12 f_75 PowerMas_Cadena_Form_${dirtyFields[`${item.indAno}_${item.indCod}_${String(i+1).padStart(2, '0')}_${rowIndex}`] || isSubmitted ? (errors[`${item.indAno}_${item.indCod}_${String(i+1).padStart(2, '0')}_${rowIndex}`] ? 'invalid' : 'valid') : ''}`} 
+                                                    style={{margin: '0'}}
+                                                    onInput={(e) => {
+                                                        if (rowIndex !== undefined) {
+                                                            const key = `${item.indAno}_${item.indCod}_${String(i+1).padStart(2, '0')}_${rowIndex}`;
+                                                            const totalKey = `${item.indAno}_${item.indCod}_${rowIndex}_total`;
+                                                            const prevValue = prevValues[key] || 0;
+                                                            const newValue = Number(e.target.value);
+                                                            setTotals(prevTotals => ({
+                                                                ...prevTotals,
+                                                                [key]: (prevTotals[key] || 0) - prevValue + newValue,
+                                                                [totalKey]: (prevTotals[totalKey] || 0) - prevValue + newValue
+                                                            }));
+                                                            setPrevValues(prevValues => ({
+                                                                ...prevValues,
+                                                                [key]: newValue
+                                                            }));
+                                                        }
+                                                    }}
+                                                    onKeyDown={(event) => {
+                                                        if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
+                                                            event.preventDefault();
+                                                        }
+                                                    }}
+                                                    maxLength={10}
+                                                    {...register(`${item.indAno}_${item.indCod}_${String(i+1).padStart(2, '0')}_${rowIndex}`, { 
+                                                        pattern: {
+                                                            value: /^(?:[1-9]\d*|)$/,
+                                                            message: 'Valor no válido',
+                                                        },
+                                                        maxLength: {
+                                                            value: 10,
+                                                            message: ''
                                                         }
                                                     })}
                                                 />
                                             </td>
                                         ))}
-                                        <td  className='center' style={{position: 'sticky', right: '0', backgroundColor: '#fff'}}>0</td>
+                                        <td className='bold center' style={{position: 'sticky', right: '0', backgroundColor: '#fff'}}>
+                                            {formatter.format(totals[`${item.indAno}_${item.indCod}_${rowIndex}_total`] || 0) }
+                                        </td>
                                     </tr>
                                 ))}
                             </Fragment>
@@ -414,13 +446,14 @@ const ResultGoal = () => {
                         left: '50%',
                         right: 'auto',
                         bottom: 'auto',
-                        width: '90%',
-                        height: '90%',
+                        width: '80%',
+                        height: '50%',
                         marginRight: '-50%',
                         transform: 'translate(-50%, -50%)',
                         backgroundColor: '#fff',
                         border: '1px solid #ccc',
                         display: 'flex',
+                        alignItems: 'center',
                         flexDirection: 'column',
                         
                     },
@@ -431,9 +464,72 @@ const ResultGoal = () => {
                 }}
             > 
             {isModalOpen && 
-                <>
-                    <button onClick={() => setIsModalOpen(false)}>Cerrar</button>
-                </>
+                <div className='Large_6 flex flex-column ai-center jc-center flex-grow-1'>
+                    <div className='Phone_12 flex-grow-1'>
+                        <div className="m_75">
+                            <label htmlFor="pais" className="">
+                                Pais:
+                            </label>
+                            <select 
+                                id="pais"
+                                style={{textTransform: 'capitalize'}}
+                                className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields2.pais || isSubmitted2 ? (errors2.pais ? 'invalid' : 'valid') : ''}`} 
+                                {...register2('pais', { 
+                                    validate: {
+                                        required: value => value !== '0' || 'El campo es requerido',
+                                    }
+                                })}
+                            >
+                                <option value="0">--Seleccione País--</option>
+                                {ubicacionesSelect.map(pais => (
+                                    <option 
+                                        key={pais.ubiCod} 
+                                        value={JSON.stringify({ ubiCod: pais.ubiCod, ubiAno: pais.ubiAno })}
+                                    > 
+                                        {pais.ubiNom.toLowerCase()}
+                                    </option>
+                                ))}
+                            </select>
+                            {errors2.pais ? (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors2.pais.message}</p>
+                            ) : (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                    Espacio reservado para el mensaje de error
+                                </p>
+                            )}
+                        </div>
+                        {selects.map((options, index) => (
+                            <div className="m_75" key={index}>
+                                <label style={{textTransform: 'capitalize'}} htmlFor={index} className="">
+                                    {options[0].ubiTip.toLowerCase()}
+                                </label>
+                                <select
+                                    id={index}
+                                    key={index} 
+                                    name={`select${index}`} 
+                                    onChange={(event) => {
+                                        handleCountryChange(event.target.value, index);
+                                    }} 
+                                    style={{textTransform: 'capitalize'}}
+                                    className="block Phone_12"
+                                >
+                                    <option style={{textTransform: 'capitalize'}} value="0">--Seleccione {options[0].ubiTip.toLowerCase()}--</option>
+                                    {options.map(option => (
+                                        <option key={option.ubiCod} value={JSON.stringify({ ubiCod: option.ubiCod, ubiAno: option.ubiAno })}>
+                                            {option.ubiNom.toLowerCase()}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        ))}
+                    </div>
+                    <button 
+                        className='PowerMas_Buttom_Primary Large_6'
+                        onClick={handleSubmit2(onSubmit2)}
+                    >
+                        Guardar
+                    </button>
+                </div>
             }
             </Modal>
         </div>
