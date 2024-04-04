@@ -23,10 +23,6 @@ namespace SistemaMEAL.Server.Models
         public String? MetPorAvaPre { get; set; }
         public String? MetMesPlaPre { get; set; }
         public String? MetAnoPlaPre { get; set; }
-       
-        [ForeignKey("Financiador")]
-        public String? FinCod { get; set; }
-        public String? FinNom { get; set; }
 
         [ForeignKey("Implementador")]
         public String? ImpCod { get; set; }
@@ -35,6 +31,9 @@ namespace SistemaMEAL.Server.Models
         [ForeignKey("Ubicacion")]
         public String? UbiAno { get; set; }
         public String? UbiCod { get; set; }
+        [ForeignKey("Indicador")]
+        public String? IndAno { get; set; }
+        public String? IndCod { get; set; }
         public String? UsuIng { get; set; }
         public DateTime? FecIng { get; set; }
         public String? UsuMod { get; set; }
