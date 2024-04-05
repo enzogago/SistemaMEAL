@@ -28,7 +28,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var monitoreos = _monitoreos.Listado(tags);
+            var monitoreos = _monitoreos.Listado(identity, tags);
             return Ok(monitoreos);
         }
 

@@ -13,8 +13,9 @@ namespace SistemaMEAL.Modulos
     {
         private conexionDAO cn = new conexionDAO();
 
-        public IEnumerable<Monitoreo> Listado(string? tags)
+        public IEnumerable<Monitoreo> Listado(ClaimsIdentity? identity, string? tags)
         {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
             List<Monitoreo>? temporal = new List<Monitoreo>();
             try
             {
@@ -23,6 +24,8 @@ namespace SistemaMEAL.Modulos
                 SqlCommand cmd = new SqlCommand("SP_LISTAR_MONITOREO", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
+                cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
 
                 StringBuilder jsonResult = new StringBuilder();
                 SqlDataReader reader = cmd.ExecuteReader();

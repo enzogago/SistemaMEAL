@@ -31,9 +31,14 @@ namespace SistemaMEAL.Server.Models
         [ForeignKey("Ubicacion")]
         public String? UbiAno { get; set; }
         public String? UbiCod { get; set; }
+        public String? UbiNom { get; set; }
         [ForeignKey("Indicador")]
         public String? IndAno { get; set; }
         public String? IndCod { get; set; }
+        public String? IndNom { get; set; }
+        public String? IndNum { get; set; }
+        public String? UsuAno { get; set; }
+        public String? UsuCod { get; set; }
         public String? UsuIng { get; set; }
         public DateTime? FecIng { get; set; }
         public String? UsuMod { get; set; }

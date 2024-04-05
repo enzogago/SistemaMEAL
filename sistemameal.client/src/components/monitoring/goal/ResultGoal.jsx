@@ -1,20 +1,19 @@
 import React, { Fragment, useEffect, useState } from 'react'
 import { FaSortDown } from 'react-icons/fa';
 import Excel_Icon from '../../../img/PowerMas_Excel_Icon.svg';
-import { Export_Excel_Basic, fetchData } from '../../reusable/helper';
+import { fetchData } from '../../reusable/helper';
 import { useForm } from 'react-hook-form';
-import Notiflix, { Notify } from 'notiflix';
+import Notiflix from 'notiflix';
 import Modal from 'react-modal';
 import { formatter } from './helper';
 
 const ResultGoal = () => {
-
     const [dropdownOpen, setDropdownOpen] = useState(false);
 
     const [subproyectos, setSubProyectos] = useState([]);
     const [selectedSubProyecto, setSelectedSubProyecto] = useState(null);
     const [indicadores, setIndicadores] = useState([]);
-    const [ usersTecnicos, setUsersTecnicos ] = useState([]);
+    const [usersTecnicos, setUsersTecnicos] = useState([]);
     
     const [implementadoresSelect, setImplementadoresSelect] = useState([]);
     const [additionalRows, setAdditionalRows] = useState([]);
@@ -32,6 +31,7 @@ const ResultGoal = () => {
 
     const [rowIdCounter, setRowIdCounter] = useState(0);
 
+    const [initialMetas, setInitialMetas] = useState([]);
 
     const { 
         register, 
@@ -130,6 +130,66 @@ const ResultGoal = () => {
                     fetchSelect(ubi.ubiAno, ubi.ubiCod);
                 })
             })
+            fetchData(`Meta/${subProAno}/${subProCod}/${ano}`, (data) => {
+                setInitialMetas(data);
+                setTotals({});
+                const rows = {};
+                let counter = rowIdCounter;
+                data.forEach(meta => {
+                    // Usa meta.impCod, la ubicación y el indicador para crear una clave única para cada fila
+                    const rowKey = `${meta.impCod}_${JSON.stringify({ ubiAno: meta.ubiAno, ubiCod: meta.ubiCod })}_${meta.indAno}_${meta.indCod}`;
+
+                    if (!rows[rowKey]) {
+                        counter++;
+                    }
+                    // Crea un objeto con los valores que necesitas para tus inputs
+                    const inputValues = {
+                        tecnico: JSON.stringify({ usuAno: meta.usuAno, usuCod: meta.usuCod }),
+                        mes: meta.metMetTec,
+                        implementador: meta.impCod,
+                        ubicacion: JSON.stringify({ ubiAno: meta.ubiAno, ubiCod: meta.ubiCod }),
+                        meta: JSON.stringify({ metAno: meta.metAno, metCod: meta.metCod }),
+                    };
+                        
+                    setValue(`tecnico_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.tecnico);
+                    setValue(`implementador_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.implementador);
+                    setValue(`ubicacion_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.ubicacion);
+                    setValue(`mes_${meta.metMesPlaTec}_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.mes);
+                    setValue(`nombreUbicacion_${meta.indAno}_${meta.indCod}_${counter}`, meta.ubiNom.toLowerCase());
+                    setValue(`meta_${meta.metMesPlaTec}_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.meta);
+
+                    // Calcula los totales aquí
+                    const key = `${meta.indAno}_${meta.indCod}_${counter}_${meta.metMesPlaTec}`;
+                    const totalKey = `${meta.indAno}_${meta.indCod}_${counter}_total`;
+                    const newValue = Number(inputValues.mes);
+                    setTotals(prevTotals => ({
+                        ...prevTotals,
+                        [key]: (prevTotals[key] || 0) + newValue,
+                        [totalKey]: (prevTotals[totalKey] || 0) + newValue
+                    }));
+                    setPrevValues(prevValues => ({
+                        ...prevValues,
+                        [key]: newValue
+                    }));
+
+                    if (!rows[rowKey]) {
+                        // Si la fila no existe todavía, crea una nueva
+                        rows[rowKey] = {
+                            id: `${meta.indAno}_${meta.indCod}_${counter}`, // Usa el contador para generar un ID único
+                            indAno: meta.indAno,
+                            indCod: meta.indCod,
+                            indNum: meta.indNum,
+                            cells: [],
+                        };
+                    }
+
+                    // Agrega la celda a la fila
+                    rows[rowKey].cells.push(inputValues);
+                });
+                const filas = Object.values(rows);
+                setAdditionalRows(filas);
+                setRowIdCounter(counter+1);
+            });
         } else {
             setIndicadores([]);
         }
@@ -141,44 +201,159 @@ const ResultGoal = () => {
     }
 
     const onSubmit = (data) => {
+
         let metas = [];
+        let metasIniciales = [];
         additionalRows.forEach((row, rowIndex) => {
             meses.forEach((mes, mesIndex) => {
-                let mesValue = data[`mes_${row.indAno}_${row.indCod}_${String(mesIndex+1).padStart(2, '0')}_${row.id}`];
-                let implementadorValue = data[`implementador_${row.indAno}_${row.indCod}_${row.id}`];
-                let tecnicoValue = data[`tecnico_${row.indAno}_${row.indCod}_${row.id}`];
-                let ubicacionValue = data[`ubicacion_${row.indAno}_${row.indCod}${row.id !== undefined ? `_${row.id}` : ''}`];
+                let mesValue = data[`mes_${String(mesIndex+1).padStart(2, '0')}_${row.id}`];
+                let implementadorValue = data[`implementador_${row.id}`];
+                let tecnicoValue = data[`tecnico_${row.id}`];
+                let ubicacionValue = data[`ubicacion_${row.id}`];
+                let meta = data[`meta_${String(mesIndex+1).padStart(2, '0')}_${row.id}`];
                 if (mesValue && mesValue !== '' && implementadorValue && implementadorValue !== '0' && tecnicoValue && tecnicoValue !== '0' && ubicacionValue && ubicacionValue !== '') {
-                    metas.push({
-                        indAno: row.indAno,
-                        indCod: row.indCod,
-                        metMesPlaTec: (mesIndex + 1).toString().padStart(2, '0'),
-                        metMetTec: mesValue,
+                    const currentValue = {
+                        mes: mesValue,
                         implementador: implementadorValue,
-                        tecnico: tecnicoValue,
                         ubicacion: ubicacionValue,
-                        metAnoPlaTec: data.metAnoPlaTec
-                    });
+                        meta: meta,
+                    };
+                    const {ubiAno,ubiCod} = JSON.parse(ubicacionValue);
+                    const {usuAno,usuCod} = JSON.parse(tecnicoValue);
+                    if (meta != undefined) {
+                        const {metAno,metCod} = JSON.parse(meta);
+
+                        metasIniciales.push({
+                            indAno: row.indAno,
+                            indCod: row.indCod,
+                            metMesPlaTec: (mesIndex + 1).toString().padStart(2, '0'),
+                            metMetTec: mesValue,
+                            implementador: implementadorValue,
+                            usuAno,
+                            usuCod,
+                            ubiAno,
+                            ubiCod,
+                            metAnoPlaTec: data.metAnoPlaTec,
+                            metAno,
+                            metCod
+                        });
+
+                        // Buscar la meta inicial correspondiente
+                        const initialValue = initialMetas.find(initialMeta => 
+                            initialMeta.metAno === metAno &&
+                            initialMeta.metCod === metCod &&
+                            initialMeta.metMesPlaTec === String(mesIndex+1).padStart(2, '0')
+                        );
+
+                        if (initialValue && (
+                            initialValue.impCod !== implementadorValue ||
+                            JSON.stringify({ubiAno:initialValue.ubiAno,ubiCod:initialValue.ubiCod}) !== ubicacionValue ||
+                            initialValue.metMetTec !== mesValue
+                        )) {
+                            // Aquí, la meta es nueva o ha cambiado desde su valor inicial
+                            metas.push({
+                                indAno: row.indAno,
+                                indCod: row.indCod,
+                                metMesPlaTec: (mesIndex + 1).toString().padStart(2, '0'),
+                                metMetTec: mesValue,
+                                impCod: implementadorValue,
+                                usuAno,
+                                usuCod,
+                                ubiAno,
+                                ubiCod,
+                                metAnoPlaTec: data.metAnoPlaTec,
+                                metAno,
+                                metCod
+                            });
+                        }
+                        
+                    }
+                    if (meta === undefined) {
+                        // Aquí, la meta es nueva o ha cambiado desde su valor inicial
+                        metas.push({
+                            indAno: row.indAno,
+                            indCod: row.indCod,
+                            metMesPlaTec: (mesIndex + 1).toString().padStart(2, '0'),
+                            metMetTec: mesValue,
+                            impCod: implementadorValue,
+                            usuAno,
+                            usuCod,
+                            ubiAno,
+                            ubiCod,
+                            metAnoPlaTec: data.metAnoPlaTec,
+                        });
+                    }
                 }
             });
         });
-    
+        
+        const metasInicialesObject = {};
+        metasIniciales.forEach(meta => {
+            const key = `${meta.metAno}_${meta.metCod}`;
+            metasInicialesObject[key] = meta;
+        });
+        
+        // Crear un nuevo arreglo para las metas a eliminar
+        let metasEliminar = [];
+        
+        // Recorrer cada meta en initialMetas
+        initialMetas.forEach(initialMeta => {
+            const key = `${initialMeta.metAno}_${initialMeta.metCod}`;
+            
+            // Si la meta inicial no está en metasIniciales, agregarla a metasAEliminar
+            if (!metasInicialesObject[key]) {
+                metasEliminar.push(initialMeta);
+            }
+        });
+        
+        const Metas = {
+            metas,
+            metasEliminar
+        }
         console.log(data);
-        console.log(metas);
-        // Submit
+        console.log(additionalRows);
+        console.log(Metas);
+        handleUpdate(Metas);
+        
+    };
+
+    const handleUpdate = async (cadena) => {
+        try {
+            Notiflix.Loading.pulse();
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Meta`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(cadena),
+            });
+    
+            const data = await response.json();
+            
+            if (!response.ok) {
+                Notiflix.Notify.failure(data.message);
+                return;
+            }
+            reset();
+            Notiflix.Notify.success(data.message);
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            Notiflix.Loading.remove();
+        }
     };
     
-
     const getUbicacionName = (ubiAno, ubiCod) => {
         for (const options of selects) {
             const option = options.find(o => o.ubiAno === ubiAno && o.ubiCod === ubiCod);
-            console.log(options)
             if (option) {
                 return option.ubiNom;
             }
         }
         const ubicacion = ubicacionesSelect.find(u => u.ubiAno === ubiAno && u.ubiCod === ubiCod);
-        return ubicacion ? ubicacion.ubiNom : '';
+        return ubicacion ? ubicacion.ubiNom.toLowerCase() : '';
     };
 
     const onSubmit2 = (data) => {
@@ -237,6 +412,7 @@ const ResultGoal = () => {
         }
         
         setValue(`ubicacion_${editingRow}`, JSON.stringify({ ubiAno, ubiCod }));
+        trigger(`ubicacion_${editingRow}`);
         setValue(`nombreUbicacion_${editingRow}`, nombreUbicacion.toLocaleLowerCase());
         closeModal();
     };
@@ -337,13 +513,6 @@ const ResultGoal = () => {
                             </option>
                         ))}
                     </select>
-                    {/* {errors.subproyecto ? (
-                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.subproyecto.message}</p>
-                    ) : (
-                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                            Espacio reservado para el mensaje de error
-                        </p>
-                    )} */}
                 </div>
                 <div>
                     <select 
@@ -361,13 +530,6 @@ const ResultGoal = () => {
                             <option key={metAnoPlaTec} value={metAnoPlaTec}>{metAnoPlaTec}</option>
                         ))}
                     </select>
-                    {/* {errors.metAnoPlaTec ? (
-                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.metAnoPlaTec.message}</p>
-                    ) : (
-                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                            Espacio reservado para el mensaje de error
-                        </p>
-                    )} */}
                 </div>
                 <div className={`PowerMas_Dropdown_Export Large_3 ${dropdownOpen ? 'open' : ''}`}>
                     <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>Exportar <FaSortDown className='Large_1' /></button>
@@ -411,9 +573,7 @@ const ResultGoal = () => {
                                                     setExpandedIndicators([...expandedIndicators, `${item.indAno}_${item.indCod}`]);
                                                 }
                                             }}
-                                        >
-                                            &gt;
-                                        </div>
+                                        > &gt; </div>
                                     </td>
                                     <td>
                                         <button 
@@ -421,14 +581,12 @@ const ResultGoal = () => {
                                             style={{backgroundColor: 'transparent', border: 'none'}} 
                                             onClick={() => {
                                                 setRowIdCounter(rowIdCounter + 1);
-                                                setAdditionalRows([...additionalRows, { id: `${item.indAno}_${item.indCod}_${rowIdCounter}`, indAno: item.indAno, indCod: item.indCod }]);
+                                                setAdditionalRows([...additionalRows, { id: `${item.indAno}_${item.indCod}_${rowIdCounter}`, indAno: item.indAno, indCod: item.indCod, indNum: item.indNum }]);
                                                 if (!expandedIndicators.includes(`${item.indAno}_${item.indCod}`)) {
                                                     setExpandedIndicators([...expandedIndicators, `${item.indAno}_${item.indCod}`]);
                                                 }
                                             }}
-                                        >
-                                            +
-                                        </button>
+                                        > + </button>
                                     </td>
                                     <td style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}>{item.indNum}</td>
                                     {
@@ -444,7 +602,7 @@ const ResultGoal = () => {
                                     {meses.map((mes, i) => (
                                         <td key={i+1} className='center'>
                                             {formatter.format(Object.entries(totals)
-                                                .filter(([key]) => key.startsWith(`${item.indAno}_${item.indCod}_${String(i+1).padStart(2, '0')}`))
+                                                .filter(([key]) => key.startsWith(`${item.indAno}_${item.indCod}`) && key.endsWith(String(i+1).padStart(2, '0')))
                                                 .reduce((sum, [, value]) => sum + value, 0))}
                                         </td>
                                     ))}
@@ -454,8 +612,8 @@ const ResultGoal = () => {
                                             .reduce((sum, [, value]) => sum + value, 0))}
                                     </td>
                                 </tr>
-                                {expandedIndicators.includes(`${item.indAno}_${item.indCod}`) && additionalRows.filter(row => row.indAno === item.indAno && row.indCod === item.indCod).map((row, rowIndex) => (
-                                    <tr key={`${row.indAno}_${row.indCod}_${row.id}`} >
+                                {additionalRows.filter(row => row.indAno === item.indAno && row.indCod === item.indCod).map((row, rowIndex) => (
+                                    <tr key={`${row.indAno}_${row.indCod}_${row.id}`} style={{visibility: expandedIndicators.includes(`${item.indAno}_${item.indCod}`) ? 'visible' : 'collapse'}}>
                                         <td ></td>
                                         <td>
                                             <button 
@@ -463,9 +621,9 @@ const ResultGoal = () => {
                                                 onClick={() => {
                                                     // Antes de eliminar la fila, actualizamos los totales
                                                     meses.forEach((mes, i) => {
-                                                        const key = `${item.indAno}_${item.indCod}_${String(i+1).padStart(2, '0')}_${row.id}`;
-                                                        const totalKey = `${item.indAno}_${item.indCod}_${row.id}_total`;
-                                                        const value = Number(watch(`mes_${item.indAno}_${item.indCod}_${String(i+1).padStart(2, '0')}_${row.id}`));
+                                                        const key = `${row.id}_${String(i+1).padStart(2, '0')}`;
+                                                        const totalKey = `${row.id}_total`;
+                                                        const value = Number(watch(`mes_${String(i+1).padStart(2, '0')}_${row.id}`));
                                                         setTotals(prevTotals => ({
                                                             ...prevTotals,
                                                             [key]: (prevTotals[key] || 0) - value,
@@ -475,17 +633,16 @@ const ResultGoal = () => {
                                                     // Ahora sí eliminamos la fila
                                                     setAdditionalRows(prevRows => prevRows.filter((prevRow) => prevRow.id !== row.id));
                                                 }}
-                                            >
-                                                -
-                                            </button>
+                                            > - </button>
                                         </td>
                                         <td style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}></td>
                                         <td>
                                             <select 
                                                 style={{textTransform: 'capitalize', margin: '0'}}
-                                                id={`tecnico${item.indAno}_${item.indCod}_${row.id}`}
-                                                className={`PowerMas_Input_Cadena f_75 PowerMas_Modal_Form_${dirtyFields[`tecnico_${item.indAno}_${item.indCod}_${row.id}`] || isSubmitted ? (errors[`tecnico_${item.indAno}_${item.indCod}_${row.id}`] ? 'invalid' : 'valid') : ''}`} 
-                                                {...register(`tecnico_${item.indAno}_${item.indCod}_${row.id}`, { 
+                                                id={`tecnico_${row.id}`}
+                                                className={`PowerMas_Input_Cadena f_75 PowerMas_Modal_Form_${dirtyFields[`tecnico_${row.id}`] || isSubmitted ? (errors[`tecnico_${row.id}`] ? 'invalid' : 'valid') : ''}`} 
+                                                {...register(`tecnico_${row.id}`, {
+                                                    validate: value => value !== '0' || 'El campo es requerido'
                                                 })}
                                             >
                                                 <option value="0">--Técnico--</option>
@@ -493,7 +650,7 @@ const ResultGoal = () => {
                                                     <option
                                                         className='f_75'
                                                         key={index} 
-                                                        value={JSON.stringify({ usuCod: tecnico.usuCod, usuAno: tecnico.usuAno })}
+                                                        value={JSON.stringify({ usuAno: tecnico.usuAno, usuCod: tecnico.usuCod })}
                                                     > 
                                                         {tecnico.usuNom.toLowerCase() + ' ' + tecnico.usuApe.toLowerCase() }
                                                     </option>
@@ -503,9 +660,34 @@ const ResultGoal = () => {
                                         <td>
                                             <select 
                                                 style={{textTransform: 'capitalize', margin: '0'}}
-                                                id={`implementador_${item.indAno}_${item.indCod}_${row.id}`}
-                                                className={`PowerMas_Input_Cadena f_75 PowerMas_Modal_Form_${dirtyFields[`implementador_${item.indAno}_${item.indCod}_${row.id}`] || isSubmitted ? (errors[`implementador_${item.indAno}_${item.indCod}_${row.id}`] ? 'invalid' : 'valid') : ''}`} 
-                                                {...register(`implementador_${item.indAno}_${item.indCod}_${row.id}`, { 
+                                                id={`implementador_${row.id}`}
+                                                className={`PowerMas_Input_Cadena f_75 PowerMas_Modal_Form_${dirtyFields[`implementador_${row.id}`] || isSubmitted ? (errors[`implementador_${row.id}`] ? 'invalid' : 'valid') : ''}`} 
+                                                {...register(`implementador_${row.id}`, {
+                                                    validate: {
+                                                        unique: value => {
+                                                            const ubicacionValue = watch(`ubicacion_${row.id}`);
+                                                            if (value === '0' || ubicacionValue === '') {
+                                                                return true;
+                                                            }
+                                                            const duplicate = additionalRows.find(r => 
+                                                                r.indAno === row.indAno && 
+                                                                r.indCod === row.indCod && 
+                                                                r.id !== row.id && 
+                                                                watch(`implementador_${r.id}`) === value && 
+                                                                watch(`ubicacion_${r.id}`) === ubicacionValue
+                                                            );
+                                                            if (duplicate) {
+                                                                Notiflix.Report.failure(
+                                                                    'Error de Validación',
+                                                                    `Verifica que no se repita implementador y ubicación para el indicador ${row.indNum}`,
+                                                                    'Vale',
+                                                                );
+                                                                return false;
+                                                            }
+                                                            return true;
+                                                        },
+                                                        notZero: value => value !== '0' || 'El cargo es requerido'
+                                                    }
                                                 })}
                                             >
                                                 <option value="0">--Implementador--</option>
@@ -524,30 +706,56 @@ const ResultGoal = () => {
                                             <div className='flex gap_3'>
                                                 <input
                                                     style={{margin: '0', textTransform: 'capitalize'}}
+                                                    className={`PowerMas_Input_Cadena f_75 PowerMas_Modal_Form_${dirtyFields[`ubicacion_${row.id}`] || isSubmitted ? (errors[`ubicacion_${row.id}`] ? 'invalid' : 'valid') : ''}`} 
                                                     placeholder='Sin ubicación'
-                                                    className='f_75 w-auto'
                                                     disabled
-                                                    {...register(`nombreUbicacion_${item.indAno}_${item.indCod}${row.id !== undefined ? `_${row.id}` : ''}`)}
+                                                    {...register(`nombreUbicacion_${row.id}`, {
+                                                        required: 'El campo es requerido',
+                                                    })}
                                                 />
                                                 <input
                                                     type="hidden"
-                                                    {...register(`ubicacion_${item.indAno}_${item.indCod}${row.id !== undefined ? `_${row.id}` : ''}`)}
+                                                    {...register(`ubicacion_${row.id}`, { 
+                                                        required: 'El campo es requerido',
+                                                        validate: {
+                                                            unique: value => {
+                                                                const implementadorValue = watch(`implementador_${row.id}`);
+                                                                const duplicate = additionalRows.find(r => 
+                                                                    r.indAno === row.indAno && 
+                                                                    r.indCod === row.indCod && 
+                                                                    r.id !== row.id && 
+                                                                    watch(`implementador_${r.id}`) === implementadorValue && 
+                                                                    watch(`ubicacion_${r.id}`) === value
+                                                                );
+                                                                
+                                                                if (duplicate) {
+                                                                    Notiflix.Report.failure(
+                                                                        'Error de Validación',
+                                                                        '"Verifica que no se repita el implementador y ubicación en más de una fila." <br/><br/><br/><br/>- Indicador '+ row.indNum,
+                                                                        'Vale',
+                                                                    );
+                                                                    return false;
+                                                                }
+                                                                return true;
+                                                            }
+                                                        }
+                                                    })}
                                                 />
                                                 <button className='p0' style={{backgroundColor: 'transparent', border: 'none'}} onClick={() => {
                                                     setIsModalOpen(true);
-                                                    setEditingRow(`${item.indAno}_${item.indCod}${row.id !== undefined ? `_${row.id}` : ''}`);
+                                                    setEditingRow(`${row.id}`);
                                                 }}>+</button>
                                             </div>
                                         </td>
                                         {meses.map((mes, i) => (
                                             <td key={i+1}>
                                                 <input
-                                                    className={`PowerMas_Input_Cadena Large_12 f_75 PowerMas_Cadena_Form_${dirtyFields[`mes_${item.indAno}_${item.indCod}_${String(i+1).padStart(2, '0')}_${row.id}`] || isSubmitted ? (errors[`mes_${item.indAno}_${item.indCod}_${String(i+1).padStart(2, '0')}_${row.id}`] ? 'invalid' : 'valid') : ''}`} 
+                                                    className={`PowerMas_Input_Cadena Large_12 f_75 PowerMas_Cadena_Form_${dirtyFields[`mes_${String(i+1).padStart(2, '0')}_${row.id}`] || isSubmitted ? (errors[`mes_${String(i+1).padStart(2, '0')}_${row.id}`] ? 'invalid' : 'valid') : ''}`} 
                                                     style={{margin: '0'}}
                                                     onInput={(e) => {
                                                         if (row.id !== undefined) {
-                                                            const key = `${item.indAno}_${item.indCod}_${String(i+1).padStart(2, '0')}_${row.id}`;
-                                                            const totalKey = `${item.indAno}_${item.indCod}_${row.id}_total`;
+                                                            const key = `${row.id}_${String(i+1).padStart(2, '0')}`;
+                                                            const totalKey = `${row.id}_total`;
                                                             const prevValue = prevValues[key] || 0;
                                                             const newValue = Number(e.target.value);
                                                             setTotals(prevTotals => ({
@@ -567,7 +775,7 @@ const ResultGoal = () => {
                                                         }
                                                     }}
                                                     maxLength={10}
-                                                    {...register(`mes_${item.indAno}_${item.indCod}_${String(i+1).padStart(2, '0')}_${row.id}`, { 
+                                                    {...register(`mes_${String(i+1).padStart(2, '0')}_${row.id}`, { 
                                                         pattern: {
                                                             value: /^(?:[1-9]\d*|)$/,
                                                             message: 'Valor no válido',
@@ -581,7 +789,7 @@ const ResultGoal = () => {
                                             </td>
                                         ))}
                                         <td className='bold center' style={{position: 'sticky', right: '0', backgroundColor: '#fff'}}>
-                                            {formatter.format(totals[`${item.indAno}_${item.indCod}_${row.id}_total`] || 0) }
+                                            {formatter.format(totals[`${row.id}_total`] || 0) }
                                         </td>
                                     </tr>
                                 ))}
