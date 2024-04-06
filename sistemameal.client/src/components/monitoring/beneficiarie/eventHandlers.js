@@ -139,7 +139,7 @@ export const handleDeleteBeneficiarioMeta = async (controller,metAno,metCod,benA
                 Notiflix.Notify.success(data.message);
                 
                 setUpdateData(!updateData);
-                // fetchBeneficiarie();
+                fetchBeneficiarie();
             } catch (error) {
                 console.error('Error:', error);
             }

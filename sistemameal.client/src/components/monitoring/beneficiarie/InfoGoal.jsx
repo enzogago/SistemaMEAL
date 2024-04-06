@@ -2,6 +2,14 @@ import React from 'react'
 import DonutChart from '../../reusable/DonutChart'
 
 const InfoGoal = ({metaData, openModal}) => {
+    const indTipIndMap = {
+        'IAC': 'Indicador Actividad',
+        'IRE': 'Indicador Resultado',
+        'IOB': 'Indicador Objetivo',
+        'IOE': 'Indicador Objetivo Especifico',
+        'ISA': 'Indicador Sub Actividad',
+    };
+
     return (
         <div className="Large_6 overflow-auto flex flex-column"> 
             <div className="PowerMas_Info_Form_Beneficiarie m1" >
@@ -34,7 +42,9 @@ const InfoGoal = ({metaData, openModal}) => {
                 </div>
                 <div>
                     <article>
-                        <h3 className="Large-f1 m_5" style={{textTransform: 'capitalize'}}>{metaData && metaData.tipInd.toLowerCase()}</h3>
+                        <h3 className="Large-f1 m_5" style={{textTransform: 'capitalize'}}>
+                            {metaData && (indTipIndMap[metaData.tipInd] || metaData.tipInd.toLowerCase())}
+                        </h3>
                         <p className="m_5">{metaData && metaData.indActResNum + ' - ' + metaData.indActResNom.charAt(0).toUpperCase() + metaData.indActResNom.slice(1).toLowerCase()}</p>
                     </article>
                     <article>

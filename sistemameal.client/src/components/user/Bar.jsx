@@ -12,6 +12,10 @@ const Bar = ({ currentStep, type }) => {
             { title: 'Confirmación', description: 'Confirma la subida del archivo' },
             { title: 'Registro', description: 'Registro de implementadores y ubicación' },
         ],
+        uploadBeneficiarie: [
+            { title: 'Subir Archivo', description: 'Selecciona el archivo a subir' },
+            { title: 'Confirmación', description: 'Confirma la subida del archivo' },
+        ],
         // Agrega aquí más tipos si los necesitas
     };
 

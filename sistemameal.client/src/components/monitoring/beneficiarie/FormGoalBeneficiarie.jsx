@@ -672,6 +672,8 @@ const FormGoalBeneficiarie = () => {
         setDocumentosAgregados(nuevosDocumentos);
     }
 
+    
+
     return (
         <>
             <div className="PowerMas_Header_Form_Beneficiarie flex ai-center p_5 gap-1">

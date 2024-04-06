@@ -6,6 +6,7 @@ import { saveAs } from 'file-saver';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
+
 export const handleDeleteMant = async (controller, obj, setRegistros) => {
     Notiflix.Confirm.show(
         'Eliminar Registro',
@@ -182,7 +183,6 @@ export const handleSubmitMant = async (controller, objetoEditado, objeto, setReg
             return;
         }
         
-        closeModalAndReset(); // Cierra el Modal y resetea los campos
         // Actualiza los datos después de insertar o modificar un registro
         const updateResponse = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/${controller}`, {
             headers: {
@@ -192,6 +192,7 @@ export const handleSubmitMant = async (controller, objetoEditado, objeto, setReg
         const updateData = await updateResponse.json();
         setRegistros(updateData);
         Notiflix.Notify.success(data.message);
+        closeModalAndReset();
     } catch (error) {
         console.error('Error:', error);
     } finally {

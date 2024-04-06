@@ -65,7 +65,7 @@ const Modal = ({ estadoEditado, modalVisible, setModalVisible, closeModal, setDa
                         ...Object.keys(data).reduce((obj, key) => ({...obj, [fieldMapping[key]]: data[key]}), {}),
                     };
         }
-        handleSubmitMant(controller, estadoEditado, objeto, setData, setModalVisible, closeModalAndReset);
+        handleSubmitMant(controller, estadoEditado, objeto, setData, closeModalAndReset);
     };
 
     // Activar focus en input

@@ -52,18 +52,18 @@ const ResultBudget = () => {
         const subproyecto = watch('subproyecto');
         if (subproyecto && subproyecto !== '0') {
             const { subProAno, subProCod } = JSON.parse(subproyecto);
-            fetchData(`Indicador/subproyecto/${subProAno}/${subProCod}`,setIndicadores)
+            fetchData(`Indicador/subproyecto-actividad/${subProAno}/${subProCod}`,setIndicadores)
             
             let endpoint;
             switch (activeButton) {
                 case 'Por Año':
-                    endpoint = `Indicador/cadena/${subProAno}/${subProCod}`;
+                    endpoint = `Indicador/cadena-actividad/${subProAno}/${subProCod}`;
                     break;
                 case 'Por Implementador':
-                    endpoint = `Indicador/implementador/${subProAno}/${subProCod}`;
+                    endpoint = `Indicador/implementador-actividad/${subProAno}/${subProCod}`;
                     break;
                 case 'Por Ubicación':
-                    endpoint = `Indicador/ubicacion/${subProAno}/${subProCod}`;
+                    endpoint = `Indicador/ubicacion-actividad/${subProAno}/${subProCod}`;
                     break;
                 default:
                     return;
@@ -310,12 +310,11 @@ const ResultBudget = () => {
                 const inputValue = document.querySelector(`input[name="${item.indAno}_${item.indCod}_${key}"]`).value;
                 rowData[key] = inputValue !== '' ? inputValue : '0';
             });
-            rowData['Total'] = calculateTotal(item.indAno, item.indCod, activeButton, viewTotals);
             return rowData;
         });
     
         // Definir los encabezados
-        let headersExcel = ['#', 'Proyecto', 'Código', 'Nombre', ...headersNew.map(header => ({name: header.name, code: header.code})), 'Total'];
+        let headersExcel = ['#', 'Proyecto', 'Código', 'Nombre', ...headersNew.map(header => ({name: header.name, code: header.code}))];
     
         Export_Excel_Basic(data,headersExcel, activeButton, true);
     };
@@ -428,7 +427,7 @@ const ResultBudget = () => {
                             <th>Código</th>
                             <th>Nombre</th>
                             {headersNew.map((header, index) => <th key={index}>{header.name} (€)</th>)}
-                            <th>Total</th>
+                            {/* <th>Total</th> */}
                         </tr>
                     </thead>
                     <tbody>
@@ -523,10 +522,9 @@ const ResultBudget = () => {
                                             />
                                         </td>
                                     )})}
-                                    <td className={`center bold ${calculateTotal(item.indAno, item.indCod, activeButton, viewTotals) > totalPorAno ? 'invalid' : ''}`}>
+                                    {/* <td className={`center bold ${calculateTotal(item.indAno, item.indCod, activeButton, viewTotals) > totalPorAno ? 'invalid' : ''}`}>
                                         {formatterBudget.format(calculateTotal(item.indAno, item.indCod, activeButton, viewTotals))} €
-                                    </td>
-
+                                    </td> */}
                                 </tr>
                             )
                         })

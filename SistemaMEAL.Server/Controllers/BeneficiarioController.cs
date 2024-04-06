@@ -93,25 +93,6 @@ namespace SistemaMEAL.Server.Controllers
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return Unauthorized(rToken);
-
-            dynamic data = rToken.result;
-            Usuario usuario = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-
-            };
-            if (usuario.RolCod != "01")
-            {
-                return StatusCode(403, new
-                {
-                    success = false,
-                    message = "No tienes permisos para realizar esta acción",
-                    result = ""
-                });
-            }
-           
             var resultado = _beneficiarios.BuscarMetaBeneficiario(identity, metAno, metCod);
             return Ok(resultado);
         }
@@ -203,24 +184,6 @@ namespace SistemaMEAL.Server.Controllers
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return Unauthorized(rToken);
-
-            dynamic data = rToken.result;
-            Usuario usuario = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-
-            };
-            if (usuario.RolCod != "01")
-            {
-                return StatusCode(403, new
-                {
-                    success = false,
-                    message = "No tienes permisos para realizar esta acción",
-                    result = ""
-                });
-            }
            
             var beneficiarios = _beneficiarios.BuscarBeneficiarioPorDocumento(identity, docIdeCod, docIdeBenNum);
             var beneficiario = beneficiarios.FirstOrDefault();
@@ -235,24 +198,6 @@ namespace SistemaMEAL.Server.Controllers
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return Unauthorized(rToken);
-
-            dynamic data = rToken.result;
-            Usuario usuario = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-
-            };
-            if (usuario.RolCod != "01")
-            {
-                return StatusCode(403, new
-                {
-                    success = false,
-                    message = "No tienes permisos para realizar esta acción",
-                    result = ""
-                });
-            }
            
             var beneficiarios = _beneficiarios.BuscarBeneficiarioPorNombres(nombres);
             return Ok(beneficiarios);

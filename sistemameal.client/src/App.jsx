@@ -10,6 +10,8 @@ import Tutorial from './components/tutorial/Tutorial';
 import ResultBudget from './components/result-budget/ResultBudget';
 import RegisterProject from './components/upload/project/RegisterProject';
 import ResultGoal from './components/monitoring/goal/ResultGoal';
+import UploadBeneficiarie from './components/beneficiarie/UploadBeneficiarie';
+import UploadValidate from './components/beneficiarie/UploadValidate';
 // import Login from './components/auth/Login';
 // import Layout from './components/router/Layout';
 // Componentes
@@ -166,7 +168,10 @@ const App = () => {
                                                     <Route path="form-subproject/:id?" element={<FormSubProject />} />
                                                 )}
                                                 {menuData.some(menu => menu.menRef === 'beneficiarie') && (
-                                                    <Route path="form-beneficiarie/:id?" element={<FormBeneficiarie />} />
+                                                    <>
+                                                        <Route path="form-beneficiarie/:id?" element={<FormBeneficiarie />} />
+                                                        
+                                                    </>
                                                     )}
                                                 {menuData.some(menu => menu.menRef === 'user') && (
                                                     <>
@@ -185,6 +190,8 @@ const App = () => {
                                                     <>
                                                         <Route path="form-goal-beneficiarie/:id" element={<FormGoalBeneficiarie />} />
                                                         <Route path="form-goal/:id?" element={<FormGoal />} />
+                                                        <Route path="upload-beneficiarie" element={<UploadBeneficiarie />} />
+                                                        <Route path="validate-beneficiarie" element={<UploadValidate />} />
                                                     </>
                                                 )}
                                                 <Route path="tutorial" element={<Tutorial />} />

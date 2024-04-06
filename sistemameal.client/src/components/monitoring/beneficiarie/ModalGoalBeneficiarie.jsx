@@ -37,7 +37,7 @@ const ModalGoalBeneficiarie = ({modalGoalBeneficiarie, closeModal, dataGoalBenef
             <span className="PowerMas_CloseModal" style={{position: 'absolute',right: 20, top: 10}} onClick={closeModal}>×</span>
             <h2 className='PowerMas_Title_Modal f1_5 center'>Datos de Intervención del Beneficiario</h2>
             <div className='flex overflow-auto flex-grow-1 Large_12'>
-                <div className="PowerMas_Info_User PowerMas_Form_Card p1 Large_8" style={{backgroundColor: '#f7f7f7'}}>
+                <div className="PowerMas_Info_User PowerMas_Form_Card p1 Large_8 overflow-auto" style={{backgroundColor: '#f7f7f7'}}>
                     <h2 className="f1_25">Datos del Beneficiario </h2>
                     <br />
                     <article className="flex flex-column" style={{gap: 0}}>

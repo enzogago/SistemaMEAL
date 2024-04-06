@@ -408,24 +408,24 @@ const Home = () => {
         </div>
         <div className='PowerMas_Resume_Home overflow-auto'>
             <div className="PowerMas_ResumeHome m1 flex flex-column">
-                <div className="PowerMas_RightSection flex Large_12 Medium_12 Phone_12 bg-white gap_5">
-                    <div className="PowerMas_KPIRow Large-f1_25 Large-p1 Medium-p_5">
+                <div className="PowerMas_RightSection flex Medium-flex-row Small-flex-column bg-white gap_5">
+                    <div className="PowerMas_KPIRow Large_2 Medium_4 Small_12 Large-f1_25 Large-p1 Medium-p_5">
                         <p className="f1_25">Atenciones brindadas</p>
                         <span className='f2'>{formatter.format(totalAtenciones)}</span>
                     </div>
-                    <div className="PowerMas_KPIRow js-element6 Large-f1_25 Large-p1 Medium-p_5">
+                    <div className="PowerMas_KPIRow Large_2 Medium_4 Small_12 js-element6 Large-f1_25 Large-p1 Medium-p_5">
                         <p className="f1_25">Beneficiarios totales</p>
                         <span className='f2'>{formatter.format(Number(totalBeneficiarios))}</span>
                     </div>
-                    <div className="PowerMas_KPIRow js-element6 Large-f1_25 Large-p1 Medium-p_5">
+                    <div className="PowerMas_KPIRow Large_2 Medium_4 Small_12 js-element6 Large-f1_25 Large-p1 Medium-p_5">
                         <p className="f1_25">Beneficiarios recurrentes</p>
                         <span className='f2'>{formatter.format(0)}</span>
                     </div>
-                    <div className="PowerMas_KPIRow gap_3 flex-column Large-f1_25">
+                    <div className="PowerMas_KPIRow Large_3 Medium_6 Small_12 gap_3 flex-column Large-f1_25">
                         <p className="f1_25" style={{whiteSpace: 'nowrap'}}>Avance presupuesto</p>
                         <DonutChart percentage={avanceTecnico} wh={140} rad={20} newId={'Dona_Presupuesto'} colorText={'#000'} colorPc={'#F87C56'} colorSpc={'#F7775A20'} />
                     </div>
-                    <div className="PowerMas_KPIRow gap_3 flex-column Large-f1_25">
+                    <div className="PowerMas_KPIRow Large_3 Medium_6 Small_12 gap_3 flex-column Large-f1_25">
                         <p className="f1_25">Avance técnico</p>
                         <Suspense fallback={<div>Cargando...</div>}>
                             <DonutChart percentage={avanceTecnico} wh={140} rad={20} newId={'Dona_Tecnico'} colorText={'#000'} colorPc={'#F87C56'} colorSpc={'#F7775A20'} />

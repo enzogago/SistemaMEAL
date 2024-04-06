@@ -32,6 +32,18 @@ namespace SistemaMEAL.Server.Controllers
             return Ok(data);
         }
 
+        [HttpGet("jerarquia/{indAno}/{indCod}")]
+        public dynamic BuscarIndicador(string indAno, string indCod)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var data = _indicadores.Buscar(identity, indAno:indAno,indCod:indCod);
+            return Ok(data.FirstOrDefault());
+        }
+
         [HttpGet("subproyecto/{subProAno}/{subProCod}")]
         public dynamic BuscarIndicadorPorSubproyecto(string subProAno, string subProCod)
         {
@@ -55,18 +67,6 @@ namespace SistemaMEAL.Server.Controllers
             var data = _indicadores.BuscarCadenaPorPeriodo(subProAno,subProCod);
             return Ok(data);
         }
-        
-        [HttpGet("jerarquia/{indAno}/{indCod}")]
-        public dynamic BuscarIndicador(string indAno, string indCod)
-        {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
-
-            if (!rToken.success) return Unauthorized(rToken);
-
-            var data = _indicadores.Buscar(identity, indAno:indAno,indCod:indCod);
-            return Ok(data.FirstOrDefault());
-        }
 
         [HttpGet("implementador/{subProAno}/{subProCod}")]
         public dynamic BuscarCadenaPorImplementador(string subProAno, string subProCod)
@@ -88,6 +88,54 @@ namespace SistemaMEAL.Server.Controllers
             if (!rToken.success) return Unauthorized(rToken);
 
             var data = _indicadores.BuscarCadenaPorUbicacion(subProAno,subProCod);
+            return Ok(data);
+        }
+
+        // CASO PRESUPUESTO
+        [HttpGet("subproyecto-actividad/{subProAno}/{subProCod}")]
+        public dynamic BuscarIndicadorPorSubproyectoActividad(string subProAno, string subProCod)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var data = _indicadores.BuscarIndicadorPorSubproyectoActividad(subProAno,subProCod);
+            return Ok(data);
+        }
+        
+        [HttpGet("cadena-actividad/{subProAno}/{subProCod}")]
+        public dynamic BuscarCadenaPorPeriodoActividad(string subProAno, string subProCod)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var data = _indicadores.BuscarCadenaPorPeriodoActividad(subProAno,subProCod);
+            return Ok(data);
+        }
+
+        [HttpGet("implementador-actividad/{subProAno}/{subProCod}")]
+        public dynamic BuscarCadenaPorImplementadorActividad(string subProAno, string subProCod)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var data = _indicadores.BuscarCadenaPorImplementadorActividad(subProAno,subProCod);
+            return Ok(data);
+        }
+        [HttpGet("ubicacion-actividad/{subProAno}/{subProCod}")]
+        public dynamic BuscarCadenaPorUbicacionActividad(string subProAno, string subProCod)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var data = _indicadores.BuscarCadenaPorUbicacionActividad(subProAno,subProCod);
             return Ok(data);
         }
 

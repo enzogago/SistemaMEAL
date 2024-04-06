@@ -105,24 +105,8 @@ namespace SistemaMEAL.Server.Controllers
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
 
-            if (!rToken.success) return rToken;
+            if (!rToken.success) return Unauthorized(rToken);
 
-            dynamic data = rToken.result;
-            Usuario usuarioActual = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (usuarioActual.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para insertar usuarios",
-                    result = ""
-                };
-            }
             var (message, messageType) = _monitoreos.InsertarBeneficiarioMonitoreo(identity, beneficiarioMonitoreo.Beneficiario, beneficiarioMonitoreo.MetaBeneficiario, beneficiarioMonitoreo.DocumentoBeneficiario);
             if (messageType == "1")
             {
@@ -145,24 +129,8 @@ namespace SistemaMEAL.Server.Controllers
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
 
-            if (!rToken.success) return rToken;
+            if (!rToken.success) return Unauthorized(rToken);
 
-            dynamic data = rToken.result;
-            Usuario usuarioActual = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (usuarioActual.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para insertar usuarios",
-                    result = ""
-                };
-            }
             var (message, messageType) = _monitoreos.InsertarMetaBeneficiarioExiste(identity, metaBeneficiario);
             if (messageType == "1")
             {

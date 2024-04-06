@@ -6,6 +6,8 @@ import { useForm } from 'react-hook-form';
 import Notiflix from 'notiflix';
 import Modal from 'react-modal';
 import { formatter } from './helper';
+import ExcelJS from 'exceljs';
+import { saveAs } from 'file-saver';
 
 const ResultGoal = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -487,6 +489,59 @@ const ResultGoal = () => {
         setIsModalOpen(false);
         setValue2('pais','0');
     }
+
+    const exportToExcel = async (indicadores, totales, additionalRows) => {
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Indicadores');
+    
+        // Definir los encabezados
+        const headers = ['Código', 'Nombre', ...meses, 'Total'];
+        worksheet.columns = headers.map(header => ({ header, key: header, width: 10 }));
+    
+        // Llenar la hoja con los datos de los indicadores
+        indicadores.forEach(indicador => {
+            const row = {
+                'Código': indicador.indNum,
+                'Nombre': indicador.indNom,
+                ...meses.reduce((obj, mes, i) => {
+                    obj[mes] = Object.entries(totales)
+                        .filter(([key]) => key.startsWith(`${indicador.indAno}_${indicador.indCod}`) && key.endsWith(String(i+1).padStart(2, '0')))
+                        .reduce((sum, [, value]) => sum + value, 0);
+                        console.log(totales)
+                    return obj;
+                }, {}),
+                'Total': Object.entries(totales)
+                    .filter(([key]) => key.startsWith(`${indicador.indAno}_${indicador.indCod}`) && key.endsWith('_total'))
+                    .reduce((sum, [, value]) => sum + value, 0)
+            };
+            worksheet.addRow(row);
+    
+            // Agregar las filas adicionales para este indicador
+            additionalRows.filter(row => row.indAno === indicador.indAno && row.indCod === indicador.indCod).forEach(additionalRow => {
+                const additionalRowData = {
+                    'Código': additionalRow.indNum,
+                    'Nombre': 'Valor adicional',  // Aquí debes reemplazar 'Valor adicional' con el valor correcto
+                    ...meses.reduce((obj, mes, i) => {
+                        obj[mes] = Object.entries(totales)
+                            .filter(([key]) => key.startsWith(`${additionalRow.indAno}_${additionalRow.indCod}`) && key.endsWith(String(i+1).padStart(2, '0')))
+                            .reduce((sum, [, value]) => sum + value, 0);
+                        return obj;
+                    }, {}),
+                    'Total': Object.entries(totales)
+                        .filter(([key]) => key.startsWith(`${additionalRow.indAno}_${additionalRow.indCod}`) && key.endsWith('_total'))
+                        .reduce((sum, [, value]) => sum + value, 0)
+                };
+                worksheet.addRow(additionalRowData);
+            });
+        });
+    
+        // Crear el archivo de Excel y descargarlo
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        saveAs(blob, 'indicadores.xlsx');
+    };
+    
+    
     
     return (
         <div className='p1 flex flex-column flex-grow-1 overflow-auto'>
@@ -535,7 +590,7 @@ const ResultGoal = () => {
                     <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>Exportar <FaSortDown className='Large_1' /></button>
                     <div className="PowerMas_Dropdown_Export_Content Phone_12">
                         <a onClick={() => {
-                            Export_Excel();
+                            exportToExcel(indicadores, totals, additionalRows);
                             setDropdownOpen(false);
                         }} className='flex jc-space-between p_5'>Excel <img className='Large_1' src={Excel_Icon} alt="" /> </a>
                     </div>

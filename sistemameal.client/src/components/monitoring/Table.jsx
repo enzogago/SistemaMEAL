@@ -4,7 +4,6 @@ import CryptoJS from 'crypto-js';
 import {
     useReactTable, 
     getCoreRowModel, 
-    flexRender, 
     getPaginationRowModel,
     getSortedRowModel, 
 } from '@tanstack/react-table';
@@ -17,7 +16,7 @@ import { AuthContext } from "../../context/AuthContext";
 import CustomTable from "../reusable/Table/CustomTable";
 import Notiflix from "notiflix";
 
-const Table = ({ data, setMonitoringData }) => {
+const Table = ({ data, setMonitoringData, setModalIsOpen }) => {
     const navigate = useNavigate();
     // Variables State AuthContext 
     const { authInfo } = useContext(AuthContext);
@@ -53,13 +52,24 @@ const Table = ({ data, setMonitoringData }) => {
     }
 
     const Register_Beneficiarie = (row) => {
-        console.log(row);
-        const id = `${row.original.metAno}${row.original.metCod}`;
-        // Encripta el ID
-        const ciphertext = CryptoJS.AES.encrypt(id, 'secret key 123').toString();
-        // Codifica la cadena cifrada para que pueda ser incluida de manera segura en una URL
-        const safeCiphertext = btoa(ciphertext).replace('+', '-').replace('/', '_').replace(/=+$/, '');
-        navigate(`/form-goal-beneficiarie/${safeCiphertext}`);
+
+        Notiflix.Confirm.show(
+            'Registrar Beneficiario',
+            '¿Como deseas registrar a los benefiriacios?',
+            'Masivo',
+            'Individual',
+            () => {
+                navigate(`/upload-beneficiarie`);
+            },
+            () => {
+                const id = `${row.original.metAno}${row.original.metCod}`;
+                // Encripta el ID
+                const ciphertext = CryptoJS.AES.encrypt(id, 'secret key 123').toString();
+                // Codifica la cadena cifrada para que pueda ser incluida de manera segura en una URL
+                const safeCiphertext = btoa(ciphertext).replace('+', '-').replace('/', '_').replace(/=+$/, '');
+                navigate(`/form-goal-beneficiarie/${safeCiphertext}`);
+            }
+        )
     }
     
     const actions = {
@@ -430,10 +440,29 @@ const Table = ({ data, setMonitoringData }) => {
                 }
             },
             {
+                header: () => <div style={{textAlign: 'center', flexGrow: '1'}}>FFVV</div>,
+                accessorKey: "ffvv",
+                disableSorting: true,
+                stickyRight: actionsColumnWidth*2-20,
+                cell: ({row}) => {
+                    return (
+                        <div className="flex jc-center ai-center" >
+                            <button  
+                                className="PowerMas_Add_Beneficiarie f_75 p_25 flex-grow-1" 
+                                onClick={() => setModalIsOpen(true)}
+                            >
+                                FFVV
+                            </button>
+                        </div>
+
+                    )
+                }
+            },
+            {
                 header: () => <div style={{textAlign: 'center', flexGrow: '1'}}>Añadir</div>,
                 accessorKey: "añadir",
                 disableSorting: true,
-                stickyRight: actionsColumnWidth-30,
+                stickyRight: actionsColumnWidth-20,
                 cell: ({row}) => {
                     return (
                         row.original.uniInvPer === 'S' ?
