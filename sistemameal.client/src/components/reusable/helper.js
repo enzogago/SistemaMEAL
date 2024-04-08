@@ -256,7 +256,7 @@ export const Export_Excel_Basic = async (data, headersExcel, active, isPresupues
             if (isPresupuesto && index >= 4) {
                 // Convertir el valor a un número antes de asignarlo a la celda
                 cell.value = typeof value === 'string' ? parseFloat(value) : value;
-                cell.numFmt = '#,##0.00 €';
+                cell.numFmt = '#,##0.00 $';
             } else if( index >= 4){
                 cell.value = typeof value === 'string' ? parseFloat(value) : value;
             } else {

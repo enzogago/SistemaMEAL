@@ -13,6 +13,8 @@ import ResultGoal from './components/monitoring/goal/ResultGoal';
 import UploadBeneficiarie from './components/beneficiarie/UploadBeneficiarie';
 import UploadValidate from './components/beneficiarie/UploadValidate';
 import ExecutionBugdet from './components/result-budget/ExecutionBugdet';
+import ForgotPassword from './components/auth/ForgotPassword';
+import UploadGoalBudget from './components/result-budget/UploadGoalBudget';
 // import Login from './components/auth/Login';
 // import Layout from './components/router/Layout';
 // Componentes
@@ -133,6 +135,7 @@ const App = () => {
         "result-budget": ResultBudget,
         "result-goal": ResultGoal,
         "execution-budget": ExecutionBugdet,
+        "upload-goal-budget": UploadGoalBudget,
     };
 
     let defaultRoute;
@@ -151,6 +154,13 @@ const App = () => {
                             <PublicRoute>
                                 <Suspense fallback={<LoadingComponent />}>
                                     <Login />
+                                </Suspense>
+                            </PublicRoute>
+                        } />
+                        <Route path='/forgot-password' element={
+                            <PublicRoute>
+                                <Suspense fallback={<LoadingComponent />}>
+                                    <ForgotPassword />
                                 </Suspense>
                             </PublicRoute>
                         } />

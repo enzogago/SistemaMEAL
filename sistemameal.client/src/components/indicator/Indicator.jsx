@@ -7,8 +7,8 @@ import { fetchData } from '../reusable/helper';
 
 const Indicator = () => {
     // States locales
-    const [unidades, setUnidades] = useState([]);
-    const [tiposDeValor, setTiposDeValor] = useState([]);
+    const [ unidades, setUnidades] = useState([]);
+    const [ tiposDeValor, setTiposDeValor] = useState([]);
     const [ data, setData ] = useState([])
     const [ modalVisible, setModalVisible ] = useState(false)
     const [ estadoEditado, setEstadoEditado ] = useState(false)

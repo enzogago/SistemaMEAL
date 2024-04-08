@@ -197,6 +197,26 @@ const Table = ({ data, setMonitoringData, setModalIsOpen }) => {
                 ),
             },
             {
+                header: "Indicador",
+                accessorKey: "indActResNom",
+                cell: ({row}) => {
+                    if (row.original.indActResNum && row.original.indActResNom) {
+                        const text = row.original.indActResNum + ' - ' + row.original.indActResNom.charAt(0).toUpperCase() + row.original.indActResNom.slice(1).toLowerCase();
+                        const shortText = text.length > 50 ? text.substring(0, 50) + '...' : text;
+                        return (
+                            <>
+                                <span 
+                                    data-tooltip-id="info-tooltip" 
+                                    data-tooltip-content={text} 
+                                >{shortText}</span>
+                            </>
+                        );
+                    } else {
+                        return null;
+                    }
+                },
+            },
+            {
                 header: () => <div className="center" style={{whiteSpace: 'normal'}}>Meta Programática</div>,
                 accessorKey: "metMetTec",
                 cell: ({row}) => {
@@ -251,7 +271,7 @@ const Table = ({ data, setMonitoringData, setModalIsOpen }) => {
                         const formattedNumber = Number(row.original.metMetPre).toLocaleString();
                         return (
                             <div className="center">
-                                ${formattedNumber}
+                                {formattedNumber} $
                             </div>
                         );
                     }
@@ -266,7 +286,7 @@ const Table = ({ data, setMonitoringData, setModalIsOpen }) => {
                         const formattedNumber = Number(row.original.metEjePre).toLocaleString();
                         return (
                             <div className="center">
-                                ${formattedNumber}
+                                {formattedNumber} $
                             </div>
                         );
                     }
@@ -311,26 +331,7 @@ const Table = ({ data, setMonitoringData, setModalIsOpen }) => {
                 header: "Sub Actividad",
                 accessorKey: "subActResNom",
             },
-            {
-                header: "Indicador",
-                accessorKey: "indActResNom",
-                cell: ({row}) => {
-                    if (row.original.indActResNum && row.original.indActResNom) {
-                        const text = row.original.indActResNum + ' - ' + row.original.indActResNom.charAt(0).toUpperCase() + row.original.indActResNom.slice(1).toLowerCase();
-                        const shortText = text.length > 50 ? text.substring(0, 50) + '...' : text;
-                        return (
-                            <>
-                                <span 
-                                    data-tooltip-id="info-tooltip" 
-                                    data-tooltip-content={text} 
-                                >{shortText}</span>
-                            </>
-                        );
-                    } else {
-                        return null;
-                    }
-                },
-            },
+            
             {
                 header: "Tipo Indicador",
                 accessorKey: "tipInd",
@@ -524,6 +525,10 @@ const Table = ({ data, setMonitoringData, setModalIsOpen }) => {
         return baseColumns;
     }, [actions]);
 
+    const [pagination, setPagination] = useState({
+        pageIndex: 0, //initial page index
+        pageSize: 100, //default page size
+    });
     
     const table = useReactTable({
         data: filteredData,
@@ -531,8 +536,10 @@ const Table = ({ data, setMonitoringData, setModalIsOpen }) => {
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
+        onPaginationChange: setPagination,
         state: {
-            sorting
+            sorting,
+            pagination,
         },
         onSortingChange: setSorting,
         columnResizeMode: "onChange"
@@ -576,6 +583,7 @@ const Table = ({ data, setMonitoringData, setModalIsOpen }) => {
                 sums={sums}
                 actionsColumnWidth={actionsColumnWidth}
                 setActionsColumnWidth={setActionsColumnWidth}
+                isLargePagination={true}
             />
             
         </>

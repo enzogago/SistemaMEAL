@@ -319,10 +319,6 @@ const ResultBudget = () => {
         Export_Excel_Basic(data,headersExcel, activeButton, true);
     };
     
-    
-    
-    
-    
     return (
         <div className='p1 flex flex-column flex-grow-1 overflow-auto'>
             <h1 className="Large-f1_5"> Cadena de resultado | Metas presupuesto </h1>
@@ -426,7 +422,7 @@ const ResultBudget = () => {
                             <th>Proyecto</th>
                             <th>Código</th>
                             <th>Nombre</th>
-                            {headersNew.map((header, index) => <th key={index}>{header.name} (€)</th>)}
+                            {headersNew.map((header, index) => <th key={index}>{header.name} ($)</th>)}
                             {/* <th>Total</th> */}
                         </tr>
                     </thead>
@@ -523,7 +519,7 @@ const ResultBudget = () => {
                                         </td>
                                     )})}
                                     {/* <td className={`center bold ${calculateTotal(item.indAno, item.indCod, activeButton, viewTotals) > totalPorAno ? 'invalid' : ''}`}>
-                                        {formatterBudget.format(calculateTotal(item.indAno, item.indCod, activeButton, viewTotals))} €
+                                        {formatterBudget.format(calculateTotal(item.indAno, item.indCod, activeButton, viewTotals))} $
                                     </td> */}
                                 </tr>
                             )

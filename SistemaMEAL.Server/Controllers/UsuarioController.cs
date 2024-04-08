@@ -50,7 +50,7 @@ namespace SistemaMEAL.Server.Controllers
 
             using (SHA256 sha256Hash = SHA256.Create())
             {
-                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(usuario.UsuPas));
+                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(usuario.UsuPas.ToLower()));
                 StringBuilder builder = new StringBuilder();
                 for (int i = 0; i < bytes.Length; i++)
                 {
@@ -132,7 +132,6 @@ namespace SistemaMEAL.Server.Controllers
                 UsuCod = data.UsuCod,
                 RolCod = data.RolCod
             };
-            Console.WriteLine("restable"+usuario.UsuPas);
             using (SHA256 sha256Hash = SHA256.Create())
             {
                 byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(usuario.UsuPas));
@@ -143,8 +142,38 @@ namespace SistemaMEAL.Server.Controllers
                 }
                 usuario.UsuPas = builder.ToString();
             }
-            Console.WriteLine("rest"+usuario.UsuPas);
             var (message, messageType) = _usuarios.RestablecerPassword(identity, usuario);
+            if (messageType == "1") // Error
+            {
+                return new BadRequestObjectResult(new { success = false, message });
+            }
+            else if (messageType == "2") // Registro ya existe
+            {
+                return new ConflictObjectResult(new { success = false, message });
+            }
+            else // Registro modificado correctamente
+            {
+                return new OkObjectResult(new {success = true, message });
+            }
+        }
+
+        [HttpPut]
+        [Route("forgot-restablecer")]
+        public dynamic RestablecerPasswordOlvidada(Usuario usuario)
+        {
+            Console.WriteLine(usuario.UsuPas);
+            using (SHA256 sha256Hash = SHA256.Create())
+            {
+                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(usuario.UsuPas));
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    builder.Append(bytes[i].ToString("x2"));
+                }
+                usuario.UsuPas = builder.ToString();
+            }
+            Console.WriteLine(usuario.UsuPas);
+            var (message, messageType) = _usuarios.RestablecerPasswordOlvidada(usuario);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -221,6 +250,14 @@ namespace SistemaMEAL.Server.Controllers
         }
 
         [HttpGet]
+        [Route("forgot-password/{usuCorEle}")]
+        public dynamic BuscarUsuarioPorCorreo(string usuCorEle)
+        {
+            var result = _usuarios.BuscarUsuarioPorCorreo(usuCorEle);
+            return Ok(result);
+        }
+
+        [HttpGet]
         [Route("{usuAno}/{usuCod}")]
         public dynamic ObtenerUsuario(string usuAno, string usuCod)
         {
@@ -262,7 +299,6 @@ namespace SistemaMEAL.Server.Controllers
             string? email = data?.email.ToString();
             string? password = data?.password.ToString();
             string? clientIp = data?.clientIp.ToString();
-
             // Haz hash de la contraseña proporcionada
             using (SHA256 sha256Hash = SHA256.Create())
             {
@@ -332,7 +368,6 @@ namespace SistemaMEAL.Server.Controllers
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             dynamic rToken = Jwt.validarToken(identity, _usuarios);
-            Console.WriteLine(rToken);
 
             if (!rToken.success) // Error
             {

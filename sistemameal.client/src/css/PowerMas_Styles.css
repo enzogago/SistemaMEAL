@@ -122,6 +122,10 @@ input::placeholder,select::placeholder{
 	cursor: pointer;
 }
 
+.PowerMas_Forgot_Footer font:hover{
+	text-decoration: underline;
+}
+
 .PowerMas_LabelError{
 	min-height: 20px;
 
@@ -1400,8 +1404,14 @@ textarea {
 .bg-white{
 	background-color: #fff;
 }
+.h-80{
+	height: 80%;
+}
 .h-100{
 	height: 100%;
+}
+.vh-100{
+	height: 100vh;
 }
 .w-300{
 	min-width: 300%;

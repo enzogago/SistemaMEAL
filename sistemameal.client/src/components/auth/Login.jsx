@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 // Librerias
@@ -9,6 +10,7 @@ import portadaLogin from '../../img/PowerMas_Portada_Login.webp';
 import CryptoJS from 'crypto-js';
 
 const Login = () => {
+    const navigate = useNavigate();
     // Variables State AuthContext 
     const { authActions } = useContext(AuthContext);
     const { setIsLoggedIn, setUserLogged, setMenuData } = authActions;
@@ -145,7 +147,7 @@ const Login = () => {
                                             />
                                             Recordar
                                         </label>
-                                        <font href="#" className="">Olvidé mi contraseña</font>
+                                        <font onClick={() => {navigate('/forgot-password')}} className="pointer">Olvidé mi contraseña</font>
                                     </p>
                                     <button 
                                         id="btnAcceso" 

@@ -250,8 +250,8 @@ const ResultGoal = () => {
                             initialMeta.metCod === metCod &&
                             initialMeta.metMesPlaTec === String(mesIndex+1).padStart(2, '0')
                         );
-
                         if (initialValue && (
+                            JSON.stringify({usuAno:initialValue.usuAno,usuCod:initialValue.usuCod}) !== tecnicoValue ||
                             initialValue.impCod !== implementadorValue ||
                             JSON.stringify({ubiAno:initialValue.ubiAno,ubiCod:initialValue.ubiCod}) !== ubicacionValue ||
                             initialValue.metMetTec !== mesValue

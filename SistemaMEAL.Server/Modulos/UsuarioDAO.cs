@@ -180,6 +180,76 @@ namespace SistemaMEAL.Server.Modulos
             return (mensaje, tipoMensaje);
         }
 
+        public (string? message, string? messageType) RestablecerPasswordOlvidada(Usuario usuario)
+        {
+            string? mensaje = "";
+            string? tipoMensaje = "";
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_RESTABLECER_PASSWORD", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@P_USUANO", usuario.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD", usuario.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUPAS", usuario.UsuPas);
+
+                cmd.ExecuteNonQuery();
+
+                mensaje = "Se restableció la contraseña";
+                tipoMensaje = "3";
+            }
+            catch (SqlException ex)
+            {
+                mensaje = ex.Message;
+                tipoMensaje = "1";
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return (mensaje, tipoMensaje);
+        }
+
+        public IEnumerable<Usuario> BuscarUsuarioPorCorreo(string usuCorEle)
+        {
+            List<Usuario>? temporal = new List<Usuario>();
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_VALIDAR_EMAIL", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@P_USUCORELE", usuCorEle);
+
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (!reader.HasRows)
+                {
+                    jsonResult.Append("[]");
+                }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                // Deserializa la cadena JSON en una lista de objetos Usuario
+                temporal = JsonConvert.DeserializeObject<List<Usuario>>(jsonResult.ToString());
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return temporal?? new List<Usuario>();
+        }
+
         public IEnumerable<Usuario> Listado(ClaimsIdentity? identity, string? usuAno = null, string? usuCod = null, string? docIdeCod = null, string? usuNumDoc = null, string? usuNom = null, string? usuApe = null, string? usuFecNac = null, string? usuSex = null, string? usuCorEle = null, string? usuCarCod = null, string? usuFecInc = null, string? usuTel = null, string? usuNomUsu = null, string? usuPas = null, string? usuEst = null, string? rolCod = null, string? ubiAno = null, string? ubiCod = null)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);

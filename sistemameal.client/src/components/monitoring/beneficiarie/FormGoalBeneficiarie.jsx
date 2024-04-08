@@ -661,6 +661,7 @@ const FormGoalBeneficiarie = () => {
 
     // Observar Cambios de campos registrados
     const selectedValue = watch('genCod', '0');
+    const selectedValue2 = watch('nacCod', '0');
     const benSex = watch('benSex');
     const benAut = watch('benAut');
     const metBenAnoEjeTec = watch('metBenAnoEjeTec');
@@ -1137,7 +1138,7 @@ const FormGoalBeneficiarie = () => {
                                 )}
                             </div>
                             <div className="m_75">
-                                <label style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}}htmlFor="benFecNac" className="">
+                                <label style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} htmlFor="benFecNac" className="">
                                     Fecha de nacimiento:
                                 </label>
                                 <input 
@@ -1176,7 +1177,7 @@ const FormGoalBeneficiarie = () => {
                                 <select 
                                     id="nacCod" 
                                     disabled={fieldsDisabled}
-                                    style={{ color: selectedValue == '0' ? '#372e2c60' : '#000000', textTransform: 'capitalize'}}
+                                    style={{ color: selectedValue2 == '0' ? '#372e2c60' : '#000000', textTransform: 'capitalize'}}
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.nacCod || isSubmitted ? (errors.nacCod ? 'invalid' : 'valid') : ''}`} 
                                     {...register('nacCod', { 
                                         validate: value => value !== '0' || 'El campo es requerido' 

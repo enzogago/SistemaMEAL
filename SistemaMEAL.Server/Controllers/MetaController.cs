@@ -74,6 +74,46 @@ namespace SistemaMEAL.Server.Controllers
             }
         }
 
+        [HttpPut]
+        public dynamic ActualizarMetasPresupuesto(List<Meta> metas)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return rToken;
+
+            dynamic data = rToken.result;
+            Usuario usuario = new Usuario
+            {
+                UsuAno = data.UsuAno,
+                UsuCod = data.UsuCod,
+                RolCod = data.RolCod
+            };
+            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "INSERTAR ESTADO") && usuario.RolCod != "01")
+            {
+                return new
+                {
+                    success = false,
+                    message = "No tienes permisos para insertar estados",
+                    result = ""
+                };
+            }
+
+            var (message, messageType) = _metas.ActualizarMetasPresupuesto(identity, metas);
+            if (messageType == "1")
+            {
+                return new BadRequestObjectResult(new { success = false, message });
+            }
+            else if (messageType == "2")
+            {
+                return new ConflictObjectResult(new { success = false, message });
+            }
+            else
+            {
+                return new OkObjectResult(new { success = true, message });
+            }
+        }
+
 
     }
 }

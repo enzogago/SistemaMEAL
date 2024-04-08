@@ -1,5 +1,6 @@
 import Notiflix from "notiflix";
 import CryptoJS from 'crypto-js';
+import { Send_Email_New_User } from "../auth/PowerMas_EmailJs";
 
 export const handleSubmit = async (data, isEditing, navigate, safeCiphertext) => {
     const url = isEditing ? `${import.meta.env.VITE_APP_API_URL}/usuario/${data.usuAno}/${data.usuCod}` : `${import.meta.env.VITE_APP_API_URL}/usuario`;
@@ -32,8 +33,6 @@ export const handleSubmit = async (data, isEditing, navigate, safeCiphertext) =>
         }
 
         const successData = await response.json();
-        Notiflix.Notify.success(successData.message);
-        console.log(successData)
         // Si se está creando un nuevo usuario, obtén el usuAno y usuCod del último usuario
         if (!isEditing) {
             const { usuAno, usuCod } = successData;
@@ -42,10 +41,12 @@ export const handleSubmit = async (data, isEditing, navigate, safeCiphertext) =>
             const ciphertext = CryptoJS.AES.encrypt(id, 'secret key 123').toString();
             // Codifica la cadena cifrada para que pueda ser incluida de manera segura en una URL
             const safeCiphertext = btoa(ciphertext).replace('+', '-').replace('/', '_').replace(/=+$/, '');
+            await Send_Email_New_User(data.usuNom, data.usuCorEle, data.usuPas);
             navigate(`/menu-user/${safeCiphertext}`);
         } else {
             navigate(`/menu-user/${safeCiphertext}`);
         }
+        Notiflix.Notify.success(successData.message);
     } catch (error) {
         console.error('Error:', error);
     } finally {
