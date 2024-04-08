@@ -12,6 +12,7 @@ import RegisterProject from './components/upload/project/RegisterProject';
 import ResultGoal from './components/monitoring/goal/ResultGoal';
 import UploadBeneficiarie from './components/beneficiarie/UploadBeneficiarie';
 import UploadValidate from './components/beneficiarie/UploadValidate';
+import ExecutionBugdet from './components/result-budget/ExecutionBugdet';
 // import Login from './components/auth/Login';
 // import Layout from './components/router/Layout';
 // Componentes
@@ -131,6 +132,7 @@ const App = () => {
         "result-chain": ResultChain,
         "result-budget": ResultBudget,
         "result-goal": ResultGoal,
+        "execution-budget": ExecutionBugdet,
     };
 
     let defaultRoute;

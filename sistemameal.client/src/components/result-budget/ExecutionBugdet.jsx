@@ -1,16 +1,16 @@
 import React, { Fragment, useEffect, useState } from 'react'
 import { FaSortDown } from 'react-icons/fa';
-import Excel_Icon from '../../../img/PowerMas_Excel_Icon.svg';
-import { fetchData } from '../../reusable/helper';
+import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
+import { fetchData } from '../reusable/helper';
 import { useForm } from 'react-hook-form';
 import Notiflix from 'notiflix';
 import Modal from 'react-modal';
-import { formatter } from './helper';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
-import { logoBase64 } from "../../../img/Powermas_Logo_Ayuda_En_Accion";
+import { logoBase64 } from "../../img/Powermas_Logo_Ayuda_En_Accion";
+import { formatter } from '../monitoring/goal/helper';
 
-const ResultGoal = () => {
+const ExecutionBudget = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
 
     const [subproyectos, setSubProyectos] = useState([]);
@@ -614,12 +614,12 @@ const ResultGoal = () => {
         // Crear el archivo de Excel y descargarlo
         const buffer = await workbook.xlsx.writeBuffer();
         const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        saveAs(blob, `METAS_PROGRAMATICAS_${Date.now()}.xlsx`);
+        saveAs(blob, `METAS_PRESUPUESTO_${Date.now()}.xlsx`);
     };
      
     return (
         <div className='p1 flex flex-column flex-grow-1 overflow-auto'>
-            <h1 className="Large-f1_5"> Metas técnicas programáticas </h1>
+            <h1 className="Large-f1_5"> Metas Presupuesto </h1>
             <div className='flex jc-space-between gap-1 p_5'>
                 <div className="flex-grow-1">
                     <select 
@@ -674,7 +674,7 @@ const ResultGoal = () => {
                 <table className="PowerMas_TableStatus ">
                     <thead>
                         <tr style={{zIndex: '1'}}>
-                            <th className='center' colSpan={2}></th>
+                            <th className='center'></th>
                             <th style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}>Código</th>
                             <th colSpan={3}>Nombre</th>
                             {meses.map((mes, i) => (
@@ -704,19 +704,6 @@ const ResultGoal = () => {
                                             }}
                                         > &gt; </div>
                                     </td>
-                                    <td>
-                                        <button 
-                                            className='p_25' 
-                                            style={{backgroundColor: 'transparent', border: 'none'}} 
-                                            onClick={() => {
-                                                setRowIdCounter(rowIdCounter + 1);
-                                                setAdditionalRows([...additionalRows, { id: `${item.indAno}_${item.indCod}_${rowIdCounter}`, indAno: item.indAno, indCod: item.indCod, indNum: item.indNum }]);
-                                                if (!expandedIndicators.includes(`${item.indAno}_${item.indCod}`)) {
-                                                    setExpandedIndicators([...expandedIndicators, `${item.indAno}_${item.indCod}`]);
-                                                }
-                                            }}
-                                        > + </button>
-                                    </td>
                                     <td style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}>{item.indNum}</td>
                                     {
                                         text.length > 60 ?
@@ -744,29 +731,10 @@ const ResultGoal = () => {
                                 {additionalRows.filter(row => row.indAno === item.indAno && row.indCod === item.indCod).map((row, rowIndex) => (
                                     <tr key={`${row.indAno}_${row.indCod}_${row.id}`} style={{visibility: expandedIndicators.includes(`${item.indAno}_${item.indCod}`) ? 'visible' : 'collapse'}}>
                                         <td ></td>
-                                        <td>
-                                            <button 
-                                                style={{backgroundColor: 'transparent', border: 'none'}} 
-                                                onClick={() => {
-                                                    // Antes de eliminar la fila, actualizamos los totales
-                                                    meses.forEach((mes, i) => {
-                                                        const key = `${row.id}_${String(i+1).padStart(2, '0')}`;
-                                                        const totalKey = `${row.id}_total`;
-                                                        const value = Number(watch(`mes_${String(i+1).padStart(2, '0')}_${row.id}`));
-                                                        setTotals(prevTotals => ({
-                                                            ...prevTotals,
-                                                            [key]: (prevTotals[key] || 0) - value,
-                                                            [totalKey]: (prevTotals[totalKey] || 0) - value
-                                                        }));
-                                                    });
-                                                    // Ahora sí eliminamos la fila
-                                                    setAdditionalRows(prevRows => prevRows.filter((prevRow) => prevRow.id !== row.id));
-                                                }}
-                                            > - </button>
-                                        </td>
                                         <td style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}></td>
                                         <td>
-                                            <select 
+                                            <select
+                                                disabled={true}
                                                 style={{textTransform: 'capitalize', margin: '0'}}
                                                 id={`tecnico_${row.id}`}
                                                 className={`PowerMas_Input_Cadena f_75 PowerMas_Modal_Form_${dirtyFields[`tecnico_${row.id}`] || isSubmitted ? (errors[`tecnico_${row.id}`] ? 'invalid' : 'valid') : ''}`} 
@@ -787,7 +755,8 @@ const ResultGoal = () => {
                                             </select>
                                         </td>
                                         <td>
-                                            <select 
+                                            <select
+                                                disabled={true}
                                                 style={{textTransform: 'capitalize', margin: '0'}}
                                                 id={`implementador_${row.id}`}
                                                 className={`PowerMas_Input_Cadena f_75 PowerMas_Modal_Form_${dirtyFields[`implementador_${row.id}`] || isSubmitted ? (errors[`implementador_${row.id}`] ? 'invalid' : 'valid') : ''}`} 
@@ -825,6 +794,7 @@ const ResultGoal = () => {
                                                         className='f_75'
                                                         key={index} 
                                                         value={imp.impCod}
+                                                        
                                                     > 
                                                         {imp.impNom.toLowerCase()}
                                                     </option>
@@ -842,7 +812,7 @@ const ResultGoal = () => {
                                                         required: 'El campo es requerido',
                                                     })}
                                                 />
-                                                <input
+                                                {/* <input
                                                     type="hidden"
                                                     {...register(`ubicacion_${row.id}`, { 
                                                         required: 'El campo es requerido',
@@ -869,11 +839,7 @@ const ResultGoal = () => {
                                                             }
                                                         }
                                                     })}
-                                                />
-                                                <button className='p0' style={{backgroundColor: 'transparent', border: 'none'}} onClick={() => {
-                                                    setIsModalOpen(true);
-                                                    setEditingRow(`${row.id}`);
-                                                }}>+</button>
+                                                /> */}
                                             </div>
                                         </td>
                                         {meses.map((mes, i) => (
@@ -937,112 +903,8 @@ const ResultGoal = () => {
                     Grabar
                 </button>
             </div>
-            <Modal
-                ariaHideApp={false}
-                isOpen={isModalOpen}
-                onRequestClose={closeModal}
-                closeTimeoutMS={200}
-                style={{
-                    content: {
-                        top: '50%',
-                        left: '50%',
-                        right: 'auto',
-                        bottom: 'auto',
-                        minWidth: '40%',
-                        minHeight: '80%',
-                        marginRight: '-50%',
-                        transform: 'translate(-50%, -50%)',
-                        backgroundColor: '#fff',
-                        border: '1px solid #ccc',
-                        display: 'flex',
-                        alignItems: 'center',
-                        flexDirection: 'column',
-                        
-                    },
-                    overlay: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                        zIndex: 30
-                    }
-                }}
-            > 
-            {isModalOpen && 
-                <div className='Large_12 flex flex-column ai-center jc-center flex-grow-1'>
-                    <span className="PowerMas_CloseModal" style={{position: 'absolute',right: 20, top: 10}} onClick={closeModal}>×</span>
-                    <h2 className='Large_12 PowerMas_Title_Modal f1_5 center'>Selecciona una ubicación</h2>
-                    <div className='Phone_12 flex-grow-1'>
-                        <div className="m_75">
-                            <label htmlFor="pais" className="">
-                                Pais:
-                            </label>
-                            <select 
-                                id="pais"
-                                style={{textTransform: 'capitalize'}}
-                                className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields2.pais || isSubmitted2 ? (errors2.pais ? 'invalid' : 'valid') : ''}`} 
-                                {...register2('pais', { 
-                                    validate: {
-                                        required: value => value !== '0' || 'El campo es requerido',
-                                    }
-                                })}
-                            >
-                                <option value="0">--Seleccione País--</option>
-                                {ubicacionesSelect.map(pais => (
-                                    <option 
-                                        key={pais.ubiCod} 
-                                        value={JSON.stringify({ ubiCod: pais.ubiCod, ubiAno: pais.ubiAno })}
-                                    > 
-                                        {pais.ubiNom.toLowerCase()}
-                                    </option>
-                                ))}
-                            </select>
-                            {errors2.pais ? (
-                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors2.pais.message}</p>
-                            ) : (
-                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                    Espacio reservado para el mensaje de error
-                                </p>
-                            )}
-                        </div>
-                        {selects.map((options, index) => (
-                            <div className="m_75" key={index}>
-                                <label style={{textTransform: 'capitalize'}} htmlFor={index} className="">
-                                    {options[0].ubiTip.toLowerCase()}
-                                </label>
-                                <select
-                                    id={index}
-                                    key={index} 
-                                    name={`select${index}`} 
-                                    onChange={(event) => {
-                                        handleCountryChange(event.target.value, index);
-                                    }} 
-                                    style={{textTransform: 'capitalize'}}
-                                    className="block Phone_12"
-                                >
-                                    <option style={{textTransform: 'capitalize'}} value="0">--Seleccione {options[0].ubiTip.toLowerCase()}--</option>
-                                    {options.map(option => (
-                                        <option key={option.ubiCod} value={JSON.stringify({ ubiCod: option.ubiCod, ubiAno: option.ubiAno })}>
-                                            {option.ubiNom.toLowerCase()}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        ))}
-                        {
-                            loadginSelect &&
-                            <div id="loading" className="m_75">Cargando...</div>
-                        }
-                    </div>
-                    <br />
-                    <button 
-                        className='PowerMas_Buttom_Primary Large_6'
-                        onClick={handleSubmit2(onSubmit2)}
-                    >
-                        Guardar
-                    </button>
-                </div>
-            }
-            </Modal>
         </div>
     )
 }
 
-export default ResultGoal
+export default ExecutionBudget

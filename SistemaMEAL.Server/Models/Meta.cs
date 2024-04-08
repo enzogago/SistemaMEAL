@@ -39,6 +39,7 @@ namespace SistemaMEAL.Server.Models
         public String? IndNum { get; set; }
         public String? UsuAno { get; set; }
         public String? UsuCod { get; set; }
+        public String? UsuNom { get; set; }
         public String? UsuIng { get; set; }
         public DateTime? FecIng { get; set; }
         public String? UsuMod { get; set; }
