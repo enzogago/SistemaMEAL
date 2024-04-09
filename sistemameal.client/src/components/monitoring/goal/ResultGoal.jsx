@@ -128,74 +128,77 @@ const ResultGoal = () => {
 
         if (subproyecto && subproyecto !== '0'&& ano && ano !== '0') {
             const { subProAno, subProCod } = JSON.parse(subproyecto);
-            fetchData(`Indicador/subproyecto/${subProAno}/${subProCod}`,setIndicadores)
-            fetchData(`Implementador/subproyecto/${subProAno}/${subProCod}`,setImplementadoresSelect)
-            fetchData(`Ubicacion/subproyecto/${subProAno}/${subProCod}`, (data) => {
-                setUbicacionesSelect([]);
-                data.map(ubi => {
-                    fetchSelect(ubi.ubiAno, ubi.ubiCod);
+            const fetchDataInOrder = async () => {
+                await fetchData(`Indicador/subproyecto/${subProAno}/${subProCod}`,setIndicadores)
+                await fetchData(`Implementador/subproyecto/${subProAno}/${subProCod}`,setImplementadoresSelect)
+                fetchData(`Ubicacion/subproyecto/${subProAno}/${subProCod}`, (data) => {
+                    setUbicacionesSelect([]);
+                    data.map(ubi => {
+                        fetchSelect(ubi.ubiAno, ubi.ubiCod);
+                    })
                 })
-            })
-            fetchData(`Meta/${subProAno}/${subProCod}/${ano}`, (data) => {
-                setInitialMetas(data);
-                setTotals({});
-                const rows = {};
-                let counter = rowIdCounter;
-                data.forEach(meta => {
-                    // Usa meta.impCod, la ubicación y el indicador para crear una clave única para cada fila
-                    const rowKey = `${meta.impCod}_${JSON.stringify({ ubiAno: meta.ubiAno, ubiCod: meta.ubiCod })}_${meta.indAno}_${meta.indCod}`;
+                fetchData(`Meta/${subProAno}/${subProCod}/${ano}`, (data) => {
+                    setInitialMetas(data);
+                    setTotals({});
+                    const rows = {};
+                    let counter = rowIdCounter;
+                    data.forEach(meta => {
+                        // Usa meta.impCod, la ubicación y el indicador para crear una clave única para cada fila
+                        const rowKey = `${meta.impCod}_${JSON.stringify({ ubiAno: meta.ubiAno, ubiCod: meta.ubiCod })}_${meta.indAno}_${meta.indCod}`;
 
-                    if (!rows[rowKey]) {
-                        counter++;
-                    }
-                    // Crea un objeto con los valores que necesitas para tus inputs
-                    const inputValues = {
-                        tecnico: JSON.stringify({ usuAno: meta.usuAno, usuCod: meta.usuCod }),
-                        mes: meta.metMetTec,
-                        implementador: meta.impCod,
-                        ubicacion: JSON.stringify({ ubiAno: meta.ubiAno, ubiCod: meta.ubiCod }),
-                        meta: JSON.stringify({ metAno: meta.metAno, metCod: meta.metCod }),
-                    };
-                        
-                    setValue(`tecnico_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.tecnico);
-                    setValue(`implementador_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.implementador);
-                    setValue(`ubicacion_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.ubicacion);
-                    setValue(`mes_${meta.metMesPlaTec}_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.mes);
-                    setValue(`nombreUbicacion_${meta.indAno}_${meta.indCod}_${counter}`, meta.ubiNom.toLowerCase());
-                    setValue(`meta_${meta.metMesPlaTec}_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.meta);
-
-                    // Calcula los totales aquí
-                    const key = `${meta.indAno}_${meta.indCod}_${counter}_${meta.metMesPlaTec}`;
-                    const totalKey = `${meta.indAno}_${meta.indCod}_${counter}_total`;
-                    const newValue = Number(inputValues.mes);
-                    setTotals(prevTotals => ({
-                        ...prevTotals,
-                        [key]: (prevTotals[key] || 0) + newValue,
-                        [totalKey]: (prevTotals[totalKey] || 0) + newValue
-                    }));
-                    setPrevValues(prevValues => ({
-                        ...prevValues,
-                        [key]: newValue
-                    }));
-
-                    if (!rows[rowKey]) {
-                        // Si la fila no existe todavía, crea una nueva
-                        rows[rowKey] = {
-                            id: `${meta.indAno}_${meta.indCod}_${counter}`, // Usa el contador para generar un ID único
-                            indAno: meta.indAno,
-                            indCod: meta.indCod,
-                            indNum: meta.indNum,
-                            cells: [],
+                        if (!rows[rowKey]) {
+                            counter++;
+                        }
+                        // Crea un objeto con los valores que necesitas para tus inputs
+                        const inputValues = {
+                            tecnico: JSON.stringify({ usuAno: meta.usuAno, usuCod: meta.usuCod }),
+                            mes: meta.metMetTec,
+                            implementador: meta.impCod,
+                            ubicacion: JSON.stringify({ ubiAno: meta.ubiAno, ubiCod: meta.ubiCod }),
+                            meta: JSON.stringify({ metAno: meta.metAno, metCod: meta.metCod }),
                         };
-                    }
+                            
+                        setValue(`tecnico_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.tecnico);
+                        setValue(`implementador_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.implementador);
+                        setValue(`ubicacion_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.ubicacion);
+                        setValue(`mes_${meta.metMesPlaTec}_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.mes);
+                        setValue(`nombreUbicacion_${meta.indAno}_${meta.indCod}_${counter}`, meta.ubiNom.toLowerCase());
+                        setValue(`meta_${meta.metMesPlaTec}_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.meta);
 
-                    // Agrega la celda a la fila
-                    rows[rowKey].cells.push(inputValues);
+                        // Calcula los totales aquí
+                        const key = `${meta.indAno}_${meta.indCod}_${counter}_${meta.metMesPlaTec}`;
+                        const totalKey = `${meta.indAno}_${meta.indCod}_${counter}_total`;
+                        const newValue = Number(inputValues.mes);
+                        setTotals(prevTotals => ({
+                            ...prevTotals,
+                            [key]: (prevTotals[key] || 0) + newValue,
+                            [totalKey]: (prevTotals[totalKey] || 0) + newValue
+                        }));
+                        setPrevValues(prevValues => ({
+                            ...prevValues,
+                            [key]: newValue
+                        }));
+
+                        if (!rows[rowKey]) {
+                            // Si la fila no existe todavía, crea una nueva
+                            rows[rowKey] = {
+                                id: `${meta.indAno}_${meta.indCod}_${counter}`, // Usa el contador para generar un ID único
+                                indAno: meta.indAno,
+                                indCod: meta.indCod,
+                                indNum: meta.indNum,
+                                cells: [],
+                            };
+                        }
+
+                        // Agrega la celda a la fila
+                        rows[rowKey].cells.push(inputValues);
+                    });
+                    const filas = Object.values(rows);
+                    setAdditionalRows(filas);
+                    setRowIdCounter(counter+1);
                 });
-                const filas = Object.values(rows);
-                setAdditionalRows(filas);
-                setRowIdCounter(counter+1);
-            });
+            }
+            fetchDataInOrder();
         } else {
             setIndicadores([]);
         }

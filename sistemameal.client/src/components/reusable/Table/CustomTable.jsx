@@ -254,8 +254,8 @@ const CustomTable = ({
                                     {
                                         sums &&
                                         <tr className='PowerMas_Totales_Monitoreo'>
-                                            <td></td>
-                                            <td>Totales</td>
+                                            <td colSpan={4} ></td>
+                                            <td style={{textAlign: 'right'}}>Totales:</td>
                                             <td>{sums.metMetTec.toLocaleString()}</td>
                                             <td>{sums.metEjeTec.toLocaleString()}</td>
                                             <td>{((sums.metEjeTec/sums.metMetTec)*100).toFixed(2)}%</td>

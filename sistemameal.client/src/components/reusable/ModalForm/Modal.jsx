@@ -7,6 +7,7 @@ import InputAbreviatura from './Inputs/InputAbreviatura';
 import InputColor from './Inputs/InputColor';
 import InputCodigoSap from './Inputs/InputCodigoSap';
 import InputNumero from './Inputs/InputNumero';
+import InputIdentificador from './Inputs/InputIdentificador';
 
 const Modal = ({ estadoEditado, modalVisible, setModalVisible, closeModal, setData, fieldMapping, controller, title, controllerSelect, select, selectMapping }) => {
     //
@@ -152,7 +153,7 @@ const Modal = ({ estadoEditado, modalVisible, setModalVisible, closeModal, setDa
                     {Object.keys(fieldMapping).map(field => {
                         switch (field) {
                             case 'codigo':
-                                return <InputNumero key={field} register={register} errors={errors} dirtyFields={dirtyFields} isSubmitted={isSubmitted} />;
+                                return <InputIdentificador key={field} register={register} errors={errors} dirtyFields={dirtyFields} isSubmitted={isSubmitted} />;
                             case 'nombre':
                                 return <InputNombre key={field} register={register} errors={errors} dirtyFields={dirtyFields} isSubmitted={isSubmitted} />;
                             case 'abreviatura':

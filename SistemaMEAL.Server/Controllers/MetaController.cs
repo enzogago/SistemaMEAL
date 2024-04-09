@@ -114,6 +114,30 @@ namespace SistemaMEAL.Server.Controllers
             }
         }
 
+        [HttpPut]
+        [Route("ejecucion-presupuesto")]
+        public dynamic ActualizarEjecucionPresupuesto(List<Meta> metas)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return rToken;
+
+            var (message, messageType) = _metas.ActualizarEjecucionPresupuesto(identity, metas);
+            if (messageType == "1")
+            {
+                return new BadRequestObjectResult(new { success = false, message });
+            }
+            else if (messageType == "2")
+            {
+                return new ConflictObjectResult(new { success = false, message });
+            }
+            else
+            {
+                return new OkObjectResult(new { success = true, message });
+            }
+        }
+
 
     }
 }

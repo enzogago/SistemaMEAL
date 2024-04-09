@@ -1,4 +1,5 @@
-import React, { Fragment, useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import React, { Fragment, useContext, useEffect, useState } from 'react'
 import { FaSortDown } from 'react-icons/fa';
 import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
 import { fetchData } from '../reusable/helper';
@@ -8,15 +9,25 @@ import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { logoBase64 } from "../../img/Powermas_Logo_Ayuda_En_Accion";
 import { formatter } from '../monitoring/goal/helper';
+import { StatusContext } from '../../context/StatusContext';
 
-const ExecutionBudget = () => {
+const SaveGoalBudget = () => {
+    const navigate = useNavigate();
+    // Variables State AuthContext 
+    const { statusInfo } = useContext(StatusContext);
+    const { tableData } = statusInfo;
+
+    useEffect(() => {
+        // Si tableData está vacío, navega a otra ruta
+        if (tableData.length === 0) {
+            navigate('/upload-goal-budget');
+        }
+    }, [tableData, navigate]);
+
     const [dropdownOpen, setDropdownOpen] = useState(false);
 
-    const [subproyectos, setSubProyectos] = useState([]);
-    const [selectedSubProyecto, setSelectedSubProyecto] = useState(null);
     const [indicadores, setIndicadores] = useState([]);
     
-    const [financiadoresSelect, setFinanciadoresSelect] = useState([]);
     const [additionalRows, setAdditionalRows] = useState([]);
     const [expandedIndicators, setExpandedIndicators] = useState([]);
     
@@ -37,100 +48,79 @@ const ExecutionBudget = () => {
         getValues
     } = 
     useForm({ mode: "onChange"});
-
-    useEffect(() => {
-        fetchData('SubProyecto',setSubProyectos);
-    }, []);
-
     
     useEffect(() => {
-        const subproyecto = watch('subproyecto');
-        if (subproyecto && subproyecto !== '0') {
-            const { subProAno, subProCod } = JSON.parse(subproyecto);
-            const selected = subproyectos.find(item => item.subProAno === subProAno && item.subProCod === subProCod);
-            setSelectedSubProyecto(selected);
-        } else {
-            setIndicadores([]);
-            setValue('metAnoPlaTec','0');
-            setSelectedSubProyecto(null);
-        }
-    }, [watch('subproyecto')]);
-    
-    useEffect(() => {
-        const subproyecto = watch('subproyecto');
-        const ano = watch('metAnoPlaTec');
+            fetchData(`Indicador/subproyecto-actividad/${'2024'}/${'000001'}`,setIndicadores)
+            fetchData(`Meta/${'2024'}/${'000001'}/${'2023'}`, (data) => {
+                setInitialMetas(tableData); //
+                setTotals({});
+                const rows = {};
+                let counter = rowIdCounter;
+                data.forEach(meta => {
+                    // Usa meta.impCod, la ubicación y el indicador para crear una clave única para cada fila
+                    const rowKey = `${meta.finCod}_${meta.impCod}_${JSON.stringify({ ubiAno: meta.ubiAno, ubiCod: meta.ubiCod })}_${meta.indAno}_${meta.indCod}`;
 
-        if (subproyecto && subproyecto !== '0'&& ano && ano !== '0') {
-            const { subProAno, subProCod } = JSON.parse(subproyecto);
-            const fetchDataInOrder = async () => {
-                await fetchData(`Indicador/subproyecto-actividad/${subProAno}/${subProCod}`,setIndicadores)
-                await fetchData(`Financiador`,setFinanciadoresSelect)
-                fetchData(`Meta/${subProAno}/${subProCod}/${ano}`, (data) => {
-                    setInitialMetas(data);
-                    setTotals({});
-                    const rows = {};
-                    let counter = rowIdCounter;
-                    data.forEach(meta => {
-                        // Usa meta.impCod, la ubicación y el indicador para crear una clave única para cada fila
-                        const rowKey = `${meta.finCod}_${meta.impCod}_${JSON.stringify({ ubiAno: meta.ubiAno, ubiCod: meta.ubiCod })}_${meta.indAno}_${meta.indCod}`;
+                    if (!rows[rowKey]) {
+                        counter++;
+                    }
 
-                        if (!rows[rowKey]) {
-                            counter++;
-                        }
-                        // Crea un objeto con los valores que necesitas para tus inputs
-                        const inputValues = {
-                            mes: meta.metMetPre,
-                            financiador: meta.finCod,
-                            implementador: meta.impNom,
-                            ubicacion: JSON.stringify({ ubiAno: meta.ubiAno, ubiCod: meta.ubiCod }),
-                            meta: JSON.stringify({ metAno: meta.metAno, metCod: meta.metCod }),
+                    // Buscar el objeto correspondiente en tableData
+                    const tableDataObject = tableData.find(obj => 
+                        obj.metAno === meta.metAno &&
+                        obj.metCod === meta.metCod
+                    );
+                    const valueToSet = tableDataObject ? tableDataObject.metEjePre : '';
+
+                    // Crea un objeto con los valores que necesitas para tus inputs
+                    const inputValues = {
+                        mes: valueToSet,
+                        financiador: meta.finNom,
+                        implementador: meta.impNom,
+                        ubicacion: JSON.stringify({ ubiAno: meta.ubiAno, ubiCod: meta.ubiCod }),
+                        meta: JSON.stringify({ metAno: meta.metAno, metCod: meta.metCod }),
+                    };
+                        
+                    setValue(`financiador_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.financiador);
+                    setValue(`implementador_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.implementador);
+                    setValue(`ubicacion_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.ubicacion);
+                    setValue(`mes_${meta.metMesPlaTec}_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.mes);
+                    setValue(`nombreUbicacion_${meta.indAno}_${meta.indCod}_${counter}`, meta.ubiNom.toLowerCase());
+                    setValue(`meta_${meta.metMesPlaTec}_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.meta);
+
+                    // Calcula los totales aquí
+                    const key = `${meta.indAno}_${meta.indCod}_${counter}_${meta.metMesPlaTec}`;
+                    const totalKey = `${meta.indAno}_${meta.indCod}_${counter}_total`;
+                    const newValue = Number(inputValues.mes);
+                    setTotals(prevTotals => ({
+                        ...prevTotals,
+                        [key]: (prevTotals[key] || 0) + newValue,
+                        [totalKey]: (prevTotals[totalKey] || 0) + newValue
+                    }));
+                    setPrevValues(prevValues => ({
+                        ...prevValues,
+                        [key]: newValue
+                    }));
+
+                    if (!rows[rowKey]) {
+                        // Si la fila no existe todavía, crea una nueva
+                        rows[rowKey] = {
+                            id: `${meta.indAno}_${meta.indCod}_${counter}`, // Usa el contador para generar un ID único
+                            indAno: meta.indAno,
+                            indCod: meta.indCod,
+                            indNum: meta.indNum,
+                            cells: [],
                         };
-                            
-                        setValue(`financiador_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.financiador);
-                        setValue(`implementador_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.implementador);
-                        setValue(`ubicacion_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.ubicacion);
-                        setValue(`mes_${meta.metMesPlaTec}_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.mes);
-                        setValue(`nombreUbicacion_${meta.indAno}_${meta.indCod}_${counter}`, meta.ubiNom.toLowerCase());
-                        setValue(`meta_${meta.metMesPlaTec}_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.meta);
+                    }
 
-                        // Calcula los totales aquí
-                        const key = `${meta.indAno}_${meta.indCod}_${counter}_${meta.metMesPlaTec}`;
-                        const totalKey = `${meta.indAno}_${meta.indCod}_${counter}_total`;
-                        const newValue = Number(inputValues.mes);
-                        setTotals(prevTotals => ({
-                            ...prevTotals,
-                            [key]: (prevTotals[key] || 0) + newValue,
-                            [totalKey]: (prevTotals[totalKey] || 0) + newValue
-                        }));
-                        setPrevValues(prevValues => ({
-                            ...prevValues,
-                            [key]: newValue
-                        }));
-
-                        if (!rows[rowKey]) {
-                            // Si la fila no existe todavía, crea una nueva
-                            rows[rowKey] = {
-                                id: `${meta.indAno}_${meta.indCod}_${counter}`, // Usa el contador para generar un ID único
-                                indAno: meta.indAno,
-                                indCod: meta.indCod,
-                                indNum: meta.indNum,
-                                cells: [],
-                            };
-                        }
-
-                        // Agrega la celda a la fila
-                        rows[rowKey].cells.push(inputValues);
-                    });
-                    const filas = Object.values(rows);
-                    setAdditionalRows(filas);
-                    setRowIdCounter(counter+1);
+                    // Agrega la celda a la fila
+                    rows[rowKey].cells.push(inputValues);
                 });
-            }
-            fetchDataInOrder();
-        } else {
-            setIndicadores([]);
-        }
-    }, [watch('metAnoPlaTec')]);
+                const filas = Object.values(rows);
+                setAdditionalRows(filas);
+                setRowIdCounter(counter+1);
+            });
+
+    }, []);
     
     
     const toggleDropdown = () => {
@@ -143,60 +133,30 @@ const ExecutionBudget = () => {
         additionalRows.forEach((row, rowIndex) => {
             meses.forEach((mes, mesIndex) => {
                 let mesValue = data[`mes_${String(mesIndex+1).padStart(2, '0')}_${row.id}`];
-                let financiadorValue = data[`financiador_${row.id}`];
                 let meta = data[`meta_${String(mesIndex+1).padStart(2, '0')}_${row.id}`];
                 if (meta && meta !== '') {
                     const currentValue = {
                         mes: mesValue,
                         meta: meta,
-                        financiador: financiadorValue
                     };
 
-                    if (meta != undefined) {
+                    if (meta != undefined && mesValue != '') {
                         const {metAno,metCod} = JSON.parse(meta);
 
-                        metasIniciales.push({
+                        metas.push({
                             indAno: row.indAno,
                             indCod: row.indCod,
                             metMesPlaTec: (mesIndex + 1).toString().padStart(2, '0'),
-                            metMetPre: mesValue,
+                            metEjePre: mesValue,
                             metAnoPlaTec: data.metAnoPlaTec,
                             metAno,
                             metCod,
-                            financiador: financiadorValue
                         });
-
-                        // Buscar la meta inicial correspondiente
-                        const initialValue = initialMetas.find(initialMeta => 
-                            initialMeta.metAno === metAno &&
-                            initialMeta.metCod === metCod &&
-                            initialMeta.metMesPlaTec === String(mesIndex+1).padStart(2, '0')
-                        );
-                        console.log(initialValue)
-                        console.log(financiadorValue)
-                        if (initialValue && (
-                            initialValue.metMetPre !== mesValue || initialValue.finCod !== financiadorValue
-                        )) {
-                            // Aquí, la meta es nueva o ha cambiado desde su valor inicial
-                            metas.push({
-                                indAno: row.indAno,
-                                indCod: row.indCod,
-                                metMesPlaTec: (mesIndex + 1).toString().padStart(2, '0'),
-                                metMetPre: mesValue,
-                                metAnoPlaTec: data.metAnoPlaTec,
-                                metAno,
-                                metCod,
-                                finCod: financiadorValue
-                            });
-                        }
-                        
                     }
                 }
             });
         });
 
-        console.log(data);
-        console.log(additionalRows);
         console.log(metas);
         handleUpdate(metas);
         
@@ -206,7 +166,7 @@ const ExecutionBudget = () => {
         try {
             Notiflix.Loading.pulse();
             const token = localStorage.getItem('token');
-            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Meta`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Meta/ejecucion-presupuesto`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -221,7 +181,6 @@ const ExecutionBudget = () => {
                 Notiflix.Notify.failure(data.message);
                 return;
             }
-            reset();
             Notiflix.Notify.success(data.message);
         } catch (error) {
             console.error('Error:', error);
@@ -318,13 +277,10 @@ const ExecutionBudget = () => {
 
             // Agregar las filas adicionales para este indicador
             additionalRows.filter(row => row.indAno === indicador.indAno && row.indCod === indicador.indCod).forEach(additionalRow => {
-                const finCod = getValues(`financiador_${additionalRow.id}`);
-                const financiador = financiadoresSelect.find(fin => fin.finCod === finCod);
-
 
                 const additionalRowData = {
                     'CODIGO': indicador.indNum,
-                    'NOMBRE': financiador ? financiador.finNom : '',
+                    'NOMBRE': getValues(`financiador_${additionalRow.id}`)?.toUpperCase(),
                     'NOMBRE2': getValues(`implementador_${additionalRow.id}`)?.toUpperCase(),
                     'NOMBRE3': getValues(`nombreUbicacion_${additionalRow.id}`)?.toUpperCase(),
                     ...meses.reduce((obj, mes, i) => {
@@ -361,47 +317,8 @@ const ExecutionBudget = () => {
      
     return (
         <div className='p1 flex flex-column flex-grow-1 overflow-auto'>
-            <h1 className="Large-f1_5"> Metas Presupuesto </h1>
+            <h1 className="Large-f1_5"> Ejecución Presupuestal </h1>
             <div className='flex jc-space-between gap-1 p_5'>
-                <div className="flex-grow-1">
-                    <select 
-                        id='subproyecto'
-                        style={{textTransform: 'capitalize', margin: '0'}}
-                        className={`p_5 block Phone_12 PowerMas_Modal_Form_${dirtyFields.subproyecto || isSubmitted ? (errors.subproyecto ? 'invalid' : 'valid') : ''}`} 
-                        {...register('subproyecto', { 
-                            validate: {
-                                required: value => value !== '0' || 'El campo es requerido',
-                            }
-                        })}
-                    >
-                        <option value="0">--Seleccione Sub Proyecto--</option>
-                        {subproyectos.map((item, index) => (
-                            <option 
-                                key={index} 
-                                value={JSON.stringify({ subProAno: item.subProAno, subProCod: item.subProCod })}
-                            > 
-                                {item.subProSap + ' - ' + item.subProNom.toLowerCase() + ' | ' + item.proNom.toLowerCase()}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-                <div>
-                    <select 
-                        id='metAnoPlaTec'
-                        style={{margin: '0'}}
-                        className={`p_5 block Phone_12 PowerMas_Modal_Form_${dirtyFields.metAnoPlaTec || isSubmitted ? (errors.metAnoPlaTec ? 'invalid' : 'valid') : ''}`} 
-                        {...register('metAnoPlaTec', { 
-                            validate: {
-                                required: value => value !== '0' || 'El campo es requerido',
-                            }
-                        })}
-                    >
-                        <option value="0">--Seleccione un Año--</option>
-                        {selectedSubProyecto && Array.from({length: selectedSubProyecto.proPerAnoFin - selectedSubProyecto.proPerAnoIni + 1}, (_, i) => i + Number(selectedSubProyecto.proPerAnoIni)).map(metAnoPlaTec => (
-                            <option key={metAnoPlaTec} value={metAnoPlaTec}>{metAnoPlaTec}</option>
-                        ))}
-                    </select>
-                </div>
                 <div className={`PowerMas_Dropdown_Export Large_3 ${dropdownOpen ? 'open' : ''}`}>
                     <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>Exportar <FaSortDown className='Large_1' /></button>
                     <div className="PowerMas_Dropdown_Export_Content Phone_12">
@@ -474,25 +391,11 @@ const ExecutionBudget = () => {
                                     <tr key={`${row.indAno}_${row.indCod}_${row.id}`} style={{visibility: expandedIndicators.includes(`${item.indAno}_${item.indCod}`) ? 'visible' : 'collapse'}}>
                                         <td ></td>
                                         <td style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}></td>
-                                        <td>
-                                            <select 
-                                                style={{textTransform: 'capitalize', margin: '0'}}
-                                                id={`financiador_${row.id}`}
-                                                className={`PowerMas_Input_Cadena f_75 PowerMas_Modal_Form_${dirtyFields[`financiador_${row.id}`] || isSubmitted ? (errors[`financiador_${row.id}`] ? 'invalid' : 'valid') : ''}`} 
-                                                {...register(`financiador_${row.id}`, {
-                                                })}
-                                            >
-                                                {financiadoresSelect.map((item, index) => (
-                                                    <option
-                                                        className='f_75'
-                                                        key={index} 
-                                                        value={item.finCod}
-                                                    > 
-                                                        {item.finNom.toLowerCase()}
-                                                    </option>
-                                                ))}
-                                            </select>
+
+                                        <td className='' style={{textTransform: 'capitalize'}}>
+                                            {getValues(`financiador_${row.id}`)}
                                         </td>
+
                                         <td className='' style={{textTransform: 'capitalize'}}>
                                             {getValues(`implementador_${row.id}`)}
                                         </td>
@@ -567,4 +470,4 @@ const ExecutionBudget = () => {
     )
 }
 
-export default ExecutionBudget
+export default SaveGoalBudget

@@ -122,6 +122,7 @@ namespace SistemaMEAL.Modulos
                                     cmd.Parameters.AddWithValue("@P_INDCOD", meta.IndCod);
                                     cmd.Parameters.AddWithValue("@P_USUANO", meta.UsuAno);
                                     cmd.Parameters.AddWithValue("@P_USUCOD", meta.UsuCod);
+                                    cmd.Parameters.AddWithValue("@P_FINCOD", "00");
                                     cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
                                     cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                                     cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
@@ -260,7 +261,7 @@ namespace SistemaMEAL.Modulos
 
             return (mensaje, tipoMensaje);
         }
-         public (string? message, string? messageType) ActualizarMetasPresupuesto(ClaimsIdentity? identity, List<Meta> metas)
+        public (string? message, string? messageType) ActualizarMetasPresupuesto(ClaimsIdentity? identity, List<Meta> metas)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 
@@ -294,7 +295,90 @@ namespace SistemaMEAL.Modulos
 
                                     cmd.Parameters.AddWithValue("@P_METANO", meta.MetAno);
                                     cmd.Parameters.AddWithValue("@P_METCOD", meta.MetCod);
+                                    cmd.Parameters.AddWithValue("@P_FINCOD", meta.FinCod);
                                     cmd.Parameters.AddWithValue("@P_METMETPRE", meta.MetMetPre);
+                                    cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
+                                    cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                                    cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                                    cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                                    cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                                    cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                                    pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                                    pDescripcionMensaje.Direction = ParameterDirection.Output;
+                                    cmd.Parameters.Add(pDescripcionMensaje);
+
+                                    pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                                    pTipoMensaje.Direction = ParameterDirection.Output;
+                                    cmd.Parameters.Add(pTipoMensaje);
+
+                                    cmd.ExecuteNonQuery();
+
+                                    mensaje = pDescripcionMensaje.Value.ToString();
+                                    tipoMensaje = pTipoMensaje.Value.ToString();
+
+                                    // Inserta el beneficiario
+                                    if (tipoMensaje != "3")
+                                    {
+                                        Console.WriteLine(mensaje);
+                                        throw new Exception(mensaje);
+                                    }
+                                }
+                            }
+                        }
+                        
+                        mensaje = "Registros actualizados correctamente.";
+                        tipoMensaje = "3";
+                        scope.Complete();
+                    }
+                    catch (Exception ex)
+                    {
+                        // Si alguna operación falló, la transacción se revierte.
+                        mensaje = ex.Message;
+                        tipoMensaje = "1";
+                        Console.WriteLine(ex);
+                    }
+                }
+            }
+
+            return (mensaje, tipoMensaje);
+        }
+
+        public (string? message, string? messageType) ActualizarEjecucionPresupuesto(ClaimsIdentity? identity, List<Meta> metas)
+        {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
+            string? mensaje = "";
+            string? tipoMensaje = "";
+
+            using (TransactionScope scope = new TransactionScope())
+            {
+                using (SqlConnection connection = cn.getcn)
+                {
+                    try
+                    {
+                        if (connection.State == ConnectionState.Closed)
+                        {
+                            connection.Open();
+                        }
+
+                        SqlCommand cmd;
+                        SqlParameter pDescripcionMensaje;
+                        SqlParameter pTipoMensaje;
+
+                        if (metas.Count > 0)
+                        {
+                            foreach (var meta in metas)
+                            {
+                                if (!meta.MetAno.IsNullOrEmpty() && !meta.MetCod.IsNullOrEmpty())
+                                {
+                                    // Insert
+                                    cmd = new SqlCommand("SP_MODIFICAR_META_EJECUCION_PRESUPUESTO", cn.getcn);
+                                    cmd.CommandType = CommandType.StoredProcedure;
+
+                                    cmd.Parameters.AddWithValue("@P_METANO", meta.MetAno);
+                                    cmd.Parameters.AddWithValue("@P_METCOD", meta.MetCod);
+                                    cmd.Parameters.AddWithValue("@P_METEJEPRE", meta.MetEjePre);
                                     cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
                                     cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                                     cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);

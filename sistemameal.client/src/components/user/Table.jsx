@@ -208,6 +208,8 @@ const Table = ({data, setUsersTable}) => {
         return baseColumns;
     }, [actions]);
 
+    
+    
     const [sorting, setSorting] = useState([]);
     const filteredData = useMemo(() => 
     data.filter(item => 
@@ -228,6 +230,11 @@ const Table = ({data, setUsersTable}) => {
         )
     ), [data, searchTags]
 );
+
+    const [pagination, setPagination] = useState({
+        pageIndex: 0, //initial page index
+        pageSize: 100, //default page size
+    });
     
     const table = useReactTable({
         data: filteredData,
@@ -235,8 +242,10 @@ const Table = ({data, setUsersTable}) => {
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
+        onPaginationChange: setPagination,
         state: {
-            sorting
+            sorting,
+            pagination,
         },
         onSortingChange: setSorting,
         columnResizeMode: "onChange"
@@ -319,6 +328,7 @@ const Table = ({data, setUsersTable}) => {
                 removeTag={removeTag}
                 searchTags={searchTags}
                 setSearchTags={setSearchTags}
+                isLargePagination={true}
             />
             <Modal 
                 isOpen={isOpen}

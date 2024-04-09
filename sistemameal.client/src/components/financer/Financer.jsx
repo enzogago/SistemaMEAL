@@ -13,9 +13,9 @@ const Financer = () => {
 
     // Definir controller y fieldMapping como variables
     const controller = 'Financiador';
-    const fieldMapping = { codigo: 'finCod', nombre: 'finNom' };
+    const fieldMapping = { codigo: 'finIde', nombre: 'finNom'};
     const filterProperties = {
-        'CODIGO': 'finCod',
+        'CODIGO': 'finIde',
         'NOMBRE': 'finNom',
     };
     const { codigo, ...restFieldMapping } = fieldMapping;
@@ -53,7 +53,7 @@ const Financer = () => {
                 estadoEditado={estadoEditado}
                 closeModal={closeModal} 
                 setData={setData}
-                fieldMapping={restFieldMapping}
+                fieldMapping={fieldMapping}
                 controller={controller}
                 codeField={codigo}
                 title='Financiador'

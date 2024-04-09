@@ -17,6 +17,14 @@ import CustomTable from "../reusable/Table/CustomTable";
 import Notiflix from "notiflix";
 
 const Table = ({ data, setMonitoringData, setModalIsOpen }) => {
+    const indTipIndMap = {
+        'IAC': 'Indicador Actividad',
+        'IRE': 'Indicador Resultado',
+        'IOB': 'Indicador Objetivo',
+        'IOE': 'Indicador Objetivo Especifico',
+        'ISA': 'Indicador Sub Actividad',
+    };
+    
     const navigate = useNavigate();
     // Variables State AuthContext 
     const { authInfo } = useContext(AuthContext);
@@ -217,6 +225,30 @@ const Table = ({ data, setMonitoringData, setModalIsOpen }) => {
                 },
             },
             {
+                header: "Año",
+                accessorKey: "metAnoPlaTec"
+            },
+            {
+                header: "Mes",
+                accessorKey: "metMesPlaTecNombre", // Usa la nueva propiedad como accessorKey
+                cell: ({row}) => (
+                    <div style={{textTransform: 'capitalize'}}>
+                        {row.original.metMesPlaTecNombre}
+                    </div>
+                ),
+            },
+            {
+                header: "Implementador",
+                accessorKey: "impNom",
+                cell: ({row}) => {
+                    return (
+                        <div style={{textTransform: 'capitalize'}}>
+                            {row.original.impNom.toLowerCase()}
+                        </div>
+                    )
+                }
+            },
+            {
                 header: () => <div className="center" style={{whiteSpace: 'normal'}}>Meta Programática</div>,
                 accessorKey: "metMetTec",
                 cell: ({row}) => {
@@ -314,32 +346,19 @@ const Table = ({ data, setMonitoringData, setModalIsOpen }) => {
                             </div>
                 )}},
             },
-            {
-                header: "Año",
-                accessorKey: "metAnoPlaTec"
-            },
-            {
-                header: "Mes",
-                accessorKey: "metMesPlaTecNombre", // Usa la nueva propiedad como accessorKey
-                cell: ({row}) => (
-                    <div style={{textTransform: 'capitalize'}}>
-                        {row.original.metMesPlaTecNombre}
-                    </div>
-                ),
-            },
+           
             {
                 header: "Sub Actividad",
                 accessorKey: "subActResNom",
             },
-            
             {
                 header: "Tipo Indicador",
                 accessorKey: "tipInd",
                 cell: ({row}) => {
-                    const text = row.original.tipInd.charAt(0).toUpperCase() + row.original.tipInd.slice(1).toLowerCase();
+                    const text = row.original.tipInd;
                     return (
                         <>
-                            {text}
+                             {text && (indTipIndMap[text] || text.toLowerCase())}
                         </>
                     )
                 },
@@ -429,17 +448,7 @@ const Table = ({ data, setMonitoringData, setModalIsOpen }) => {
                     )
                 }
             },
-            {
-                header: "Implementador",
-                accessorKey: "impNom",
-                cell: ({row}) => {
-                    return (
-                        <div style={{textTransform: 'capitalize'}}>
-                            {row.original.impNom.toLowerCase()}
-                        </div>
-                    )
-                }
-            },
+           
             {
                 header: () => <div style={{textAlign: 'center', flexGrow: '1'}}>FFVV</div>,
                 accessorKey: "ffvv",

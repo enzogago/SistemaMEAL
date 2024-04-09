@@ -28,7 +28,6 @@ namespace SistemaMEAL.Server.Controllers
             if (!rToken.success) return Unauthorized(rToken);
 
             var financiadores = _financiadores.Listado(identity);
-            Console.WriteLine(financiadores);
             return Ok(financiadores);
         }
 

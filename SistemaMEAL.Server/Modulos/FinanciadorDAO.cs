@@ -12,7 +12,7 @@ namespace SistemaMEAL.Modulos
     {
         private conexionDAO cn = new conexionDAO();
 
-        public IEnumerable<Financiador> Listado(ClaimsIdentity? identity, string? finCod = null, string? finNom = null)
+        public IEnumerable<Financiador> Listado(ClaimsIdentity? identity, string? finCod = null, string? finNom = null, string? finIde = null)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 
@@ -26,6 +26,7 @@ namespace SistemaMEAL.Modulos
 
                 cmd.Parameters.AddWithValue("@P_FINCOD", string.IsNullOrEmpty(finCod) ? (object)DBNull.Value : finCod);
                 cmd.Parameters.AddWithValue("@P_FINNOM", string.IsNullOrEmpty(finNom) ? (object)DBNull.Value : finNom);
+                cmd.Parameters.AddWithValue("@P_FINIDE", string.IsNullOrEmpty(finIde) ? (object)DBNull.Value : finIde);
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                 cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
                 cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
@@ -81,6 +82,7 @@ namespace SistemaMEAL.Modulos
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 cmd.Parameters.AddWithValue("@P_FINNOM", financiador.FinNom);
+                cmd.Parameters.AddWithValue("@P_FINIDE", financiador.FinIde);
                 cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                 cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
@@ -127,6 +129,7 @@ namespace SistemaMEAL.Modulos
 
                 cmd.Parameters.AddWithValue("@P_FINCOD", financiador.FinCod);
                 cmd.Parameters.AddWithValue("@P_FINNOM", financiador.FinNom);
+                cmd.Parameters.AddWithValue("@P_FINIDE", financiador.FinIde);
                 cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                 cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);

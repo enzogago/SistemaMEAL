@@ -3,18 +3,18 @@ import Bar from "../user/Bar";
 import { useContext, useRef, useState } from "react";
 import { FaDownload, FaRegFileExcel } from "react-icons/fa";
 import Notiflix from "notiflix";
-import ExcelJS from 'exceljs';
 import { StatusContext } from "../../context/StatusContext";
+import { handleUpload } from "./handleUpload";
 
 const UploadGoalBudget = () => {
     // Variables State AuthContext 
     const { statusActions } = useContext(StatusContext);
-    const { setTableData, setPostData, setIsValid, setErrorCells } = statusActions;
+    const { setTableData } = statusActions;
 
     const navigate = useNavigate();
 
     const handleFileUpload = () => {
-        // handleUpload(selectedFile, setTableData, setPostData, setIsValid, setErrorCells, navigate);
+        handleUpload(selectedFile, setTableData, navigate);
     };
 
     const [dragging, setDragging] = useState(false);
@@ -55,7 +55,7 @@ const UploadGoalBudget = () => {
             // Verificar si el archivo es un Excel
             const file = e.dataTransfer.files[0];
             const fileType = file.name.split('.').pop();
-            if (fileType === 'xls' || fileType === 'xlsx') {
+            if (fileType === 'xls' || fileType === 'xlsm') {
                 fileInputRef.current.files = e.dataTransfer.files;
                 setSelectedFile(e.dataTransfer.files[0]); // Aquí se actualiza el estado selectedFile
             } else {
@@ -73,7 +73,6 @@ const UploadGoalBudget = () => {
     const handleFileChange = (event) => {
         setSelectedFile(event.target.files[0]);
     };
-
     
     return (
         <>
@@ -106,7 +105,7 @@ const UploadGoalBudget = () => {
                             ref={fileInputRef} 
                             style={{display: 'none'}} 
                             onChange={handleFileChange} 
-                            accept=".xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                            accept=".xlsm,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                         />
                         <FaRegFileExcel className="Large-f5 w-auto" />
                         {
@@ -125,11 +124,6 @@ const UploadGoalBudget = () => {
                     </div>
                 </div>
             </div>
-           
-            {/* <UploadTransactionProyecto
-                expectedHeaders={expectedHeaders}
-                controller='Proyecto'
-            /> */}
             <footer className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
                 <button onClick={() => navigate('/upload-project')} className="Large_3 m_75 PowerMas_Buttom_Secondary">Atras</button>
                 <button 

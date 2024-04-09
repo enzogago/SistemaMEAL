@@ -204,7 +204,7 @@ export const Export_Excel_Basic = async (data, headersExcel, active, isPresupues
     console.log(data)
     console.log(headersExcel)
     let workbook = new ExcelJS.Workbook();
-    let worksheet = workbook.addWorksheet(`CADENA DE RESULTADOS ${active.toUpperCase()}`);
+    let worksheet = workbook.addWorksheet(`CADENA DE ${isPresupuesto ? 'PRESUPUESTO' : 'RESULTADO'} ${active.toUpperCase()}`);
 
     // Añadir una imagen (opcional)
     const imageId = workbook.addImage({base64: logoBase64, extension: 'png' });

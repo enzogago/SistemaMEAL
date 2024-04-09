@@ -15,6 +15,7 @@ import UploadValidate from './components/beneficiarie/UploadValidate';
 import ExecutionBugdet from './components/result-budget/ExecutionBugdet';
 import ForgotPassword from './components/auth/ForgotPassword';
 import UploadGoalBudget from './components/result-budget/UploadGoalBudget';
+import SaveGoalBudget from './components/result-budget/SaveGoalBudget';
 // import Login from './components/auth/Login';
 // import Layout from './components/router/Layout';
 // Componentes
@@ -135,7 +136,7 @@ const App = () => {
         "result-budget": ResultBudget,
         "result-goal": ResultGoal,
         "execution-budget": ExecutionBugdet,
-        // "upload-goal-budget": UploadGoalBudget,
+        "upload-goal-budget": UploadGoalBudget,
     };
 
     let defaultRoute;
@@ -196,6 +197,11 @@ const App = () => {
                                                     <>
                                                         <Route path="guardar-proyecto" element={<SaveProject />} />
                                                         <Route path="registrar-proyecto/:id" element={<RegisterProject />} />
+                                                    </>
+                                                )}
+                                                {menuData.some(menu => menu.menRef === 'upload-goal-budget') && (
+                                                    <>
+                                                        <Route path="save-goal-budget" element={<SaveGoalBudget />} />
                                                     </>
                                                 )}
                                                 {menuData.some(menu => menu.menRef === 'monitoring') && (
