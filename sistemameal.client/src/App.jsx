@@ -135,7 +135,7 @@ const App = () => {
         "result-budget": ResultBudget,
         "result-goal": ResultGoal,
         "execution-budget": ExecutionBugdet,
-        "upload-goal-budget": UploadGoalBudget,
+        // "upload-goal-budget": UploadGoalBudget,
     };
 
     let defaultRoute;

@@ -531,14 +531,14 @@ const ExecutionBudget = () => {
                                                         }
                                                     }}
                                                     onKeyDown={(event) => {
-                                                        if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
+                                                        if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter' && event.key !== '.') {
                                                             event.preventDefault();
                                                         }
                                                     }}
                                                     maxLength={10}
                                                     {...register(`mes_${String(i+1).padStart(2, '0')}_${row.id}`, { 
                                                         pattern: {
-                                                            value: /^(?:[1-9]\d*|)$/,
+                                                            value: /^(?:[1-9]\d*(\.\d+)?|0\.\d*[1-9]\d*)$/,
                                                             message: 'Valor no válido',
                                                         },
                                                         maxLength: {
