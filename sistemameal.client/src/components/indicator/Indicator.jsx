@@ -22,6 +22,7 @@ const Indicator = () => {
         'TIPO_INDICADOR': 'indTipIndNombre',
         'UNIDAD': 'uniNom',
         'TIPO_VALOR': 'tipValNom',
+        
         'CODIGO_ACTIVIDAD': 'actNum',
         'ACTIVIDAD': 'actNom',
         'CODIGO_RESULTADO': 'resNum',

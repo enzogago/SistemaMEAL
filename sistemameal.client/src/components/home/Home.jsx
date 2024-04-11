@@ -24,6 +24,7 @@ const Home = () => {
     const [ totalBeneficiarios, setTotalBeneficiarios] = useState(0);
     const [ totalAtenciones, setTotalAtenciones] = useState(0);
     const [ avanceTecnico, setAvanceTecnico] = useState(0);
+    const [ avancePresupuesto, setAvancePresupuesto] = useState(0);
     const [ currentMap, setCurrentMap] = useState('Todos');
     const [ recents, setRecents ] = useState([]);
     const [ dataNac, setDataNac ] = useState([]);
@@ -94,9 +95,14 @@ const Home = () => {
             setMonitoringData(data);
             const totalMeta = data.reduce((sum, item) => sum + Number(item.metMetTec), 0);
             const totalAtenciones = data.reduce((sum, item) => sum + Number(item.metEjeTec), 0);
-            const porcentaje = totalMeta !== 0 ? (totalAtenciones / totalMeta) * 100 : 0;
+            const totalMetaPre = data.reduce((sum, item) => sum + Number(item.metMetPre), 0);
+            const totalAtencionesPre = data.reduce((sum, item) => sum + Number(item.metEjePre), 0);
             setTotalAtenciones(totalAtenciones);
+            
+            const porcentaje = totalMeta !== 0 ? (totalAtenciones / totalMeta) * 100 : 0;
             setAvanceTecnico(porcentaje.toFixed(2));
+            const porcentajePre = totalMetaPre !== 0 ? (totalAtencionesPre / totalMetaPre) * 100 : 0;
+            setAvancePresupuesto(porcentajePre.toFixed(2));
         } catch (error) {
             console.error('Error:', error);
             setMonitoringData([]); 
@@ -418,12 +424,12 @@ const Home = () => {
                         <span className='f2'>{formatter.format(Number(totalBeneficiarios))}</span>
                     </div>
                     <div className="PowerMas_KPIRow Large_2 Medium_4 Small_12 js-element6 Large-f1_25 Large-p1 Medium-p_5">
-                        <p className="f1_25">Beneficiarios recurrentes</p>
+                        <p className="f1_25">Beneficiarios duplicados</p>
                         <span className='f2'>{formatter.format(0)}</span>
                     </div>
                     <div className="PowerMas_KPIRow Large_3 Medium_6 Small_12 gap_3 flex-column Large-f1_25">
                         <p className="f1_25" style={{whiteSpace: 'nowrap'}}>Avance presupuesto</p>
-                        <DonutChart percentage={avanceTecnico} wh={140} rad={20} newId={'Dona_Presupuesto'} colorText={'#000'} colorPc={'#F87C56'} colorSpc={'#F7775A20'} />
+                        <DonutChart percentage={avancePresupuesto} wh={140} rad={20} newId={'Dona_Presupuesto'} colorText={'#000'} colorPc={'#F87C56'} colorSpc={'#F7775A20'} />
                     </div>
                     <div className="PowerMas_KPIRow Large_3 Medium_6 Small_12 gap_3 flex-column Large-f1_25">
                         <p className="f1_25">Avance técnico</p>

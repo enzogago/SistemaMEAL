@@ -26,6 +26,7 @@ namespace SistemaMEAL.Server.Models
         [ForeignKey("Financiador")]
         public String? FinCod { get; set; }
         public String? FinNom { get; set; }
+        public String? FinIde { get; set; }
         [ForeignKey("Implementador")]
         public String? ImpCod { get; set; }
         public String? ImpNom { get; set; }

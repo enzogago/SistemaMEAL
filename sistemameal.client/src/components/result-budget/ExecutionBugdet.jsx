@@ -28,7 +28,8 @@ const ExecutionBudget = () => {
     const [initialMetas, setInitialMetas] = useState([]);
 
     const { 
-        register, 
+        register,
+        unregister,
         watch, 
         handleSubmit, 
         formState: { errors, dirtyFields, isSubmitted }, 
@@ -67,6 +68,22 @@ const ExecutionBudget = () => {
                 await fetchData(`Indicador/subproyecto-actividad/${subProAno}/${subProCod}`,setIndicadores)
                 await fetchData(`Financiador`,setFinanciadoresSelect)
                 fetchData(`Meta/${subProAno}/${subProCod}/${ano}`, (data) => {
+                    // Obtén todos los nombres de los campos registrados
+                    const fieldNames = Object.keys(getValues());
+
+                    // Define los patrones de los campos que deseas desregistrar
+                    const patterns = ['financiador_', 'implementador_', 'ubicacion_', 'mes_', 'nombreUbicacion_', 'meta_', 'metMetTec_'];
+
+                    // Filtra los nombres de los campos que coincidan con alguno de los patrones
+                    const fieldsToUnregister = fieldNames.filter(fieldName =>
+                        patterns.some(pattern => fieldName.startsWith(pattern))
+                    );
+
+                    // Desregistra los campos
+                    fieldsToUnregister.forEach(fieldName => {
+                        unregister(fieldName);
+                    });
+
                     setInitialMetas(data);
                     setTotals({});
                     const rows = {};
@@ -93,6 +110,13 @@ const ExecutionBudget = () => {
                         setValue(`mes_${meta.metMesPlaTec}_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.mes);
                         setValue(`nombreUbicacion_${meta.indAno}_${meta.indCod}_${counter}`, meta.ubiNom.toLowerCase());
                         setValue(`meta_${meta.metMesPlaTec}_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.meta);
+                        setValue(`metMetTec_${meta.metMesPlaTec}_${meta.indAno}_${meta.indCod}_${counter}`, meta.metMetTec);
+                        
+                        setValue(`implementadorValue_${meta.indAno}_${meta.indCod}_${counter}`, meta.impCod);
+                        setValue(`ubiAno_${meta.indAno}_${meta.indCod}_${counter}`, meta.ubiAno);
+                        setValue(`ubiCod_${meta.indAno}_${meta.indCod}_${counter}`, meta.ubiCod);
+                        setValue(`usuAno_${meta.indAno}_${meta.indCod}_${counter}`, meta.usuAno);
+                        setValue(`usuCod_${meta.indAno}_${meta.indCod}_${counter}`, meta.usuCod);
 
                         // Calcula los totales aquí
                         const key = `${meta.indAno}_${meta.indCod}_${counter}_${meta.metMesPlaTec}`;
@@ -152,10 +176,10 @@ const ExecutionBudget = () => {
                         meta: meta,
                         financiador: financiadorValue
                     };
-
+                    
                     if (meta != undefined) {
                         const {metAno,metCod} = JSON.parse(meta);
-
+                        
                         metasIniciales.push({
                             indAno: row.indAno,
                             indCod: row.indCod,
@@ -166,15 +190,13 @@ const ExecutionBudget = () => {
                             metCod,
                             financiador: financiadorValue
                         });
-
+                        
                         // Buscar la meta inicial correspondiente
                         const initialValue = initialMetas.find(initialMeta => 
                             initialMeta.metAno === metAno &&
                             initialMeta.metCod === metCod &&
                             initialMeta.metMesPlaTec === String(mesIndex+1).padStart(2, '0')
                         );
-                        console.log(initialValue)
-                        console.log(financiadorValue)
                         if (initialValue && (
                             initialValue.metMetPre !== mesValue || initialValue.finCod !== financiadorValue
                         )) {
@@ -191,14 +213,34 @@ const ExecutionBudget = () => {
                             });
                         }
                         
+                    } 
+                } else {
+                    if (mesValue && mesValue !== '' ) {
+                        let impCod= data[`implementadorValue_${row.id}`];
+                        let ubiAno= data[`ubiAno_${row.id}`];
+                        let ubiCod= data[`ubiCod_${row.id}`];
+                        let usuAno= data[`usuAno_${row.id}`];
+                        let usuCod= data[`usuCod_${row.id}`];
+
+
+                        metas.push({
+                            indAno: row.indAno,
+                            indCod: row.indCod,
+                            metMesPlaTec: (mesIndex + 1).toString().padStart(2, '0'),
+                            metMetPre: mesValue,
+                            metAnoPlaTec: data.metAnoPlaTec,
+                            finCod: financiadorValue,
+                            impCod,
+                            ubiAno,
+                            ubiCod,
+                            usuAno,
+                            usuCod
+                        });
                     }
                 }
             });
         });
 
-        console.log(data);
-        console.log(additionalRows);
-        console.log(metas);
         handleUpdate(metas);
         
     };
@@ -465,7 +507,7 @@ const ExecutionBudget = () => {
                                                 .reduce((sum, [, value]) => sum + value, 0))} $
                                         </td>
                                     ))}
-                                    <td  className='bold center' style={{position: 'sticky', right: '0', backgroundColor: '#fff'}}>
+                                    <td className='bold center' style={{position: 'sticky', right: '0', backgroundColor: '#fff'}}>
                                         {formatter.format(Object.entries(totals)
                                             .filter(([key]) => key.startsWith(`${item.indAno}_${item.indCod}`) && key.endsWith('_total'))
                                             .reduce((sum, [, value]) => sum + value, 0))} $
@@ -500,12 +542,17 @@ const ExecutionBudget = () => {
                                         <td className='' style={{textTransform: 'capitalize'}}>
                                             {getValues(`nombreUbicacion_${row.id}`)}
                                         </td>
-                                        {meses.map((mes, i) => (
+                                        {meses.map((mes, i) =>{
+                                        return(
                                             <td key={i+1}>
-                                            {
-                                                getValues(`meta_${String(i+1).padStart(2, '0')}_${row.id}`) &&
                                                 <input
-                                                    className={`PowerMas_Input_Cadena Large_12 f_75 PowerMas_Cadena_Form_${dirtyFields[`mes_${String(i+1).padStart(2, '0')}_${row.id}`] || isSubmitted ? (errors[`mes_${String(i+1).padStart(2, '0')}_${row.id}`] ? 'invalid' : 'valid') : ''}`} 
+                                                    data-tooltip-id="info-tooltip" 
+                                                    data-tooltip-content={getValues(`meta_${String(i+1).padStart(2, '0')}_${row.id}`) && `Meta técnica: ${getValues(`metMetTec_${String(i+1).padStart(2, '0')}_${row.id}`)}`} 
+                                                    className={`
+                                                        PowerMas_Input_Cadena Large_12 f_75 
+                                                        PowerMas_Cadena_Form_${dirtyFields[`mes_${String(i+1).padStart(2, '0')}_${row.id}`] || isSubmitted ? (errors[`mes_${String(i+1).padStart(2, '0')}_${row.id}`] ? 'invalid' : 'valid') : ''}
+                                                        ${getValues(`meta_${String(i+1).padStart(2, '0')}_${row.id}`) && 'PowerMas_Tooltip_Active'}
+                                                    `} 
                                                     style={{margin: '0'}}
                                                     onInput={(e) => {
                                                         if (row.id !== undefined) {
@@ -541,9 +588,8 @@ const ExecutionBudget = () => {
                                                         }
                                                     })}
                                                 />
-                                            }
                                             </td>
-                                        ))}
+                                        )})}
                                         <td className='bold center' style={{position: 'sticky', right: '0', backgroundColor: '#fff'}}>
                                             {formatter.format(totals[`${row.id}_total`] || 0) } $
                                         </td>

@@ -2037,3 +2037,12 @@ textarea {
 .expanded .row-content {
     max-height: 100px; /* Ajusta este valor según el contenido de tus filas */
 }
+
+
+
+
+.PowerMas_Tooltip_Active {
+	background: #fff url("../Img/PowerMas_Correcto.svg") no-repeat 98% center;
+	background-size: 16px 16px;
+	background-position: 96%;
+}

@@ -33,7 +33,6 @@ const CustomTable = ({
     setSearchTags,
     sums,
     isLargePagination = false,
-    actionsColumnWidth,
     setActionsColumnWidth
 }) => {
     const navigate = useNavigate();

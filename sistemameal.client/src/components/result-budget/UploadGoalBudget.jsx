@@ -5,6 +5,7 @@ import { FaDownload, FaRegFileExcel } from "react-icons/fa";
 import Notiflix from "notiflix";
 import { StatusContext } from "../../context/StatusContext";
 import { handleUpload } from "./handleUpload";
+import template from '../../templates/GASTO_MENSUAL.xlsm';
 
 const UploadGoalBudget = () => {
     // Variables State AuthContext 
@@ -72,8 +73,22 @@ const UploadGoalBudget = () => {
 
      
     const handleFileChange = (event) => {
-        setSelectedFile(event.target.files[0]);
+        console.log(event.target.files[0])
+        if (event.target.files[0].type === 'application/vnd.ms-excel.sheet.macroEnabled.12') {
+            setSelectedFile(event.target.files[0]);
+        } else {
+            Notiflix.Notify.failure("Formato no soportado")
+        }
     };
+
+    const handleDownload = () => {
+        fetch(template)
+            .then(response => response.blob())
+            .then(blob => {
+                saveAs(blob, 'GASTO_MENSUAL.xlsm');
+            });
+    }
+    
     
     return (
         <>
@@ -82,14 +97,14 @@ const UploadGoalBudget = () => {
                 
                 <div className="Large_8">
                 <div className="flex jc-center p_5">
-                <button className="PowerMas_Buttom_Secondary flex ai-center jc-space-between p_5 Phone_3"> 
+                <button className="PowerMas_Buttom_Secondary flex ai-center jc-space-between p_5 Phone_3" onClick={handleDownload}> 
                     Descargar formato 
                     <FaDownload className="w-auto" /> 
                 </button>
                 </div>
                     <article className="PowerMas_Article_Upload center">
                         <p style={{color: '#878280'}}>Solo se puede subir documentos en formato Excel</p>
-                        <h3>Subir Archivo</h3>
+                        <h3>Subir Ejecución Presupuestal</h3>
                     </article>
                     <br />
                     <div

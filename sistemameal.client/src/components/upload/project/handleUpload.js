@@ -46,7 +46,6 @@ const validateCell = (value, validationRules) => {
     return true;
 };
 
-
 const validationRules = {
     'nombreResultado': {
         required: false,

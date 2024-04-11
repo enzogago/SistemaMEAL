@@ -37,7 +37,8 @@ const ResultGoal = () => {
     const [initialMetas, setInitialMetas] = useState([]);
 
     const { 
-        register, 
+        register,
+        unregister,
         watch, 
         handleSubmit, 
         formState: { errors, dirtyFields, isSubmitted }, 
@@ -138,6 +139,22 @@ const ResultGoal = () => {
                     })
                 })
                 fetchData(`Meta/${subProAno}/${subProCod}/${ano}`, (data) => {
+                    // Obtén todos los nombres de los campos registrados
+                    const fieldNames = Object.keys(getValues());
+
+                    // Define los patrones de los campos que deseas desregistrar
+                    const patterns = ['financiador_', 'implementador_', 'ubicacion_', 'mes_', 'nombreUbicacion_', 'meta_', 'metMetTec_'];
+
+                    // Filtra los nombres de los campos que coincidan con alguno de los patrones
+                    const fieldsToUnregister = fieldNames.filter(fieldName =>
+                        patterns.some(pattern => fieldName.startsWith(pattern))
+                    );
+
+                    // Desregistra los campos
+                    fieldsToUnregister.forEach(fieldName => {
+                        unregister(fieldName);
+                    });
+
                     setInitialMetas(data);
                     setTotals({});
                     const rows = {};
@@ -164,7 +181,8 @@ const ResultGoal = () => {
                         setValue(`mes_${meta.metMesPlaTec}_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.mes);
                         setValue(`nombreUbicacion_${meta.indAno}_${meta.indCod}_${counter}`, meta.ubiNom.toLowerCase());
                         setValue(`meta_${meta.metMesPlaTec}_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.meta);
-
+                        
+                        setValue(`metMetPre_${meta.metMesPlaTec}_${meta.indAno}_${meta.indCod}_${counter}`, meta.metMetPre);
                         // Calcula los totales aquí
                         const key = `${meta.indAno}_${meta.indCod}_${counter}_${meta.metMesPlaTec}`;
                         const totalKey = `${meta.indAno}_${meta.indCod}_${counter}_total`;
@@ -882,7 +900,13 @@ const ResultGoal = () => {
                                         {meses.map((mes, i) => (
                                             <td key={i+1}>
                                                 <input
-                                                    className={`PowerMas_Input_Cadena Large_12 f_75 PowerMas_Cadena_Form_${dirtyFields[`mes_${String(i+1).padStart(2, '0')}_${row.id}`] || isSubmitted ? (errors[`mes_${String(i+1).padStart(2, '0')}_${row.id}`] ? 'invalid' : 'valid') : ''}`} 
+                                                    data-tooltip-id="info-tooltip" 
+                                                    data-tooltip-content={getValues(`meta_${String(i+1).padStart(2, '0')}_${row.id}`) && `Meta presupuesto: ${getValues(`metMetPre_${String(i+1).padStart(2, '0')}_${row.id}`)? getValues(`metMetPre_${String(i+1).padStart(2, '0')}_${row.id}`): '0'} $`} 
+                                                    className={`
+                                                        PowerMas_Input_Cadena Large_12 f_75 
+                                                        PowerMas_Cadena_Form_${dirtyFields[`mes_${String(i+1).padStart(2, '0')}_${row.id}`] || isSubmitted ? (errors[`mes_${String(i+1).padStart(2, '0')}_${row.id}`] ? 'invalid' : 'valid') : ''}
+                                                        ${getValues(`meta_${String(i+1).padStart(2, '0')}_${row.id}`) && 'PowerMas_Tooltip_Active'}
+                                                    `} 
                                                     style={{margin: '0'}}
                                                     onInput={(e) => {
                                                         if (row.id !== undefined) {

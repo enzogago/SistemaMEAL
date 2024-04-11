@@ -16,6 +16,7 @@ import ExecutionBugdet from './components/result-budget/ExecutionBugdet';
 import ForgotPassword from './components/auth/ForgotPassword';
 import UploadGoalBudget from './components/result-budget/UploadGoalBudget';
 import SaveGoalBudget from './components/result-budget/SaveGoalBudget';
+import ViewExecution from './components/result-budget/ViewExecution';
 // import Login from './components/auth/Login';
 // import Layout from './components/router/Layout';
 // Componentes
@@ -135,8 +136,9 @@ const App = () => {
         "result-chain": ResultChain,
         "result-budget": ResultBudget,
         "result-goal": ResultGoal,
-        "execution-budget": ExecutionBugdet,
+        "goal-budget": ExecutionBugdet,
         "upload-goal-budget": UploadGoalBudget,
+        "execution-budget": ViewExecution,
     };
 
     let defaultRoute;
