@@ -47,11 +47,12 @@ namespace SistemaMEAL.Server.Models
         public String? ProAno { get; set; }
         public String? ProCod { get; set; }
         public String? ProNom { get; set; }
-        public String? ProRes { get; set; }
-        public String? ProPerAnoIni { get; set; }
-        public String? ProPerMesIni { get; set; }
-        public String? ProPerAnoFin { get; set; }
-        public String? ProPerMesFin { get; set; }
-        public String? ProInvSubAct { get; set; }
+        public String? ProIde { get; set; }
+        public String? SubProRes { get; set; }
+        public String? SubProPerAnoIni { get; set; }
+        public String? SubProPerMesIni { get; set; }
+        public String? SubProPerAnoFin { get; set; }
+        public String? SubProPerMesFin { get; set; }
+        public String? SubProInvSubAct { get; set; }
     }
 }

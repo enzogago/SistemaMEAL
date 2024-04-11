@@ -67,23 +67,6 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return rToken;
 
-            dynamic data = rToken.result;
-            Usuario usuarioActual = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (usuarioActual.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para realizar esta accion",
-                    result = ""
-                };
-            }
-
             var (message, messageType) = _subproyectos.InsertarSubProyectoImplementadorUbicacionMasivo(identity,subProyectoImplementadorUbicacionDto.SubProyecto , subProyectoImplementadorUbicacionDto.SubProyectoImplementadores,subProyectoImplementadorUbicacionDto.SubProyectoUbicaciones);
             if (messageType == "1") // Error
             {
@@ -106,23 +89,6 @@ namespace SistemaMEAL.Server.Controllers
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return rToken;
-
-            dynamic data = rToken.result;
-            Usuario usuarioActual = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (usuarioActual.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para realizar esta accion",
-                    result = ""
-                };
-            }
 
             var (message, messageType) = _subproyectos.Eliminar(identity, subProyecto);
             if (messageType == "1") // Error
@@ -147,22 +113,6 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return rToken;
 
-            dynamic data = rToken.result;
-            Usuario usuarioActual = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (usuarioActual.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para insertar usuarios",
-                    result = ""
-                };
-            }
             var (message, messageType) = _subproyectos.InsertarSubProyectoImplementadorUbicacion(identity, subProyectoImplementadorUbicacionDto.SubProyecto, subProyectoImplementadorUbicacionDto.SubProyectoImplementadores, subProyectoImplementadorUbicacionDto.SubProyectoUbicaciones);
                 if (messageType == "1") // Error
                 {
@@ -187,22 +137,6 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return rToken;
 
-            dynamic data = rToken.result;
-            Usuario usuarioActual = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (usuarioActual.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para insertar usuarios",
-                    result = ""
-                };
-            }
             var (message, messageType) = _subproyectos.ModificarSubProyectoImplementadorUbicacion(identity, subProyectoImplementadorUbicacionDto.SubProyecto, subProyectoImplementadorUbicacionDto.SubProyectoImplementadores, subProyectoImplementadorUbicacionDto.SubProyectoUbicaciones);
             if (messageType == "1") // Error
             {

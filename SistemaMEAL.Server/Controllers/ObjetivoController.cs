@@ -52,22 +52,6 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return rToken;
 
-            dynamic data = rToken.result;
-            Usuario usuarioActual = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (usuarioActual.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para realizar esta accion",
-                    result = ""
-                };
-            }
 
             var (subProAno, subProCod, message, messageType) = _objetivos.Insertar(identity, objetivo);
             if (messageType == "1") // Error
@@ -92,22 +76,6 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return rToken;
 
-            dynamic data = rToken.result;
-            Usuario usuarioActual = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (usuarioActual.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para realizar esta accion",
-                    result = ""
-                };
-            }
 
             var (message, messageType) = _objetivos.Modificar(identity, objetivo);
             if (messageType == "1") // Error
@@ -131,23 +99,6 @@ namespace SistemaMEAL.Server.Controllers
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return rToken;
-
-            dynamic data = rToken.result;
-            Usuario usuarioActual = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (usuarioActual.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para realizar esta accion",
-                    result = ""
-                };
-            }
 
             var (message, messageType) = _objetivos.Eliminar(identity, objetivo);
             if (messageType == "1") // Error

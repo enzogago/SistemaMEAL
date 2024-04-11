@@ -48,6 +48,7 @@ const ExecutionBudget = () => {
         if (subproyecto && subproyecto !== '0') {
             const { subProAno, subProCod } = JSON.parse(subproyecto);
             const selected = subproyectos.find(item => item.subProAno === subProAno && item.subProCod === subProCod);
+            console.log(selected)
             setSelectedSubProyecto(selected);
         } else {
             setIndicadores([]);
@@ -397,7 +398,7 @@ const ExecutionBudget = () => {
                         })}
                     >
                         <option value="0">--Seleccione un Año--</option>
-                        {selectedSubProyecto && Array.from({length: selectedSubProyecto.proPerAnoFin - selectedSubProyecto.proPerAnoIni + 1}, (_, i) => i + Number(selectedSubProyecto.proPerAnoIni)).map(metAnoPlaTec => (
+                        {selectedSubProyecto && Array.from({length: selectedSubProyecto.subProPerAnoFin - selectedSubProyecto.subProPerAnoIni + 1}, (_, i) => i + Number(selectedSubProyecto.subProPerAnoIni)).map(metAnoPlaTec => (
                             <option key={metAnoPlaTec} value={metAnoPlaTec}>{metAnoPlaTec}</option>
                         ))}
                     </select>
@@ -488,7 +489,7 @@ const ExecutionBudget = () => {
                                                         key={index} 
                                                         value={item.finCod}
                                                     > 
-                                                        {item.finNom.toLowerCase()}
+                                                        {item.finIde + ' - ' + item.finNom.toLowerCase()}
                                                     </option>
                                                 ))}
                                             </select>

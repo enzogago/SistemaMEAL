@@ -210,7 +210,7 @@ const Table = ({ data, setMonitoringData, setModalIsOpen }) => {
                 cell: ({row}) => {
                     if (row.original.indActResNum && row.original.indActResNom) {
                         const text = row.original.indActResNum + ' - ' + row.original.indActResNom.charAt(0).toUpperCase() + row.original.indActResNom.slice(1).toLowerCase();
-                        const shortText = text.length > 50 ? text.substring(0, 50) + '...' : text;
+                        const shortText = text.length > 30 ? text.substring(0, 30) + '...' : text;
                         return (
                             <>
                                 <span 
@@ -225,15 +225,11 @@ const Table = ({ data, setMonitoringData, setModalIsOpen }) => {
                 },
             },
             {
-                header: "Año",
-                accessorKey: "metAnoPlaTec"
-            },
-            {
                 header: "Mes",
-                accessorKey: "metMesPlaTecNombre", // Usa la nueva propiedad como accessorKey
+                accessorKey: "metMesPlaTecNombre",
                 cell: ({row}) => (
                     <div style={{textTransform: 'capitalize'}}>
-                        {row.original.metMesPlaTecNombre}
+                        {row.original.metMesPlaTecNombre + ' - ' + row.original.metAnoPlaTec}
                     </div>
                 ),
             },
@@ -244,6 +240,17 @@ const Table = ({ data, setMonitoringData, setModalIsOpen }) => {
                     return (
                         <div style={{textTransform: 'capitalize'}}>
                             {row.original.impNom.toLowerCase()}
+                        </div>
+                    )
+                }
+            },
+            {
+                header: "Ubicaciòn",
+                accessorKey: "ubiNom",
+                cell: ({row}) => {
+                    return (
+                        <div style={{textTransform: 'capitalize'}}>
+                            {row.original.ubiNom.toLowerCase()}
                         </div>
                     )
                 }
@@ -437,18 +444,6 @@ const Table = ({ data, setMonitoringData, setModalIsOpen }) => {
                     )
                 }
             },
-            {
-                header: "Ubicaciòn",
-                accessorKey: "ubiNom",
-                cell: ({row}) => {
-                    return (
-                        <div style={{textTransform: 'capitalize'}}>
-                            {row.original.ubiNom.toLowerCase()}
-                        </div>
-                    )
-                }
-            },
-           
             {
                 header: () => <div style={{textAlign: 'center', flexGrow: '1'}}>FFVV</div>,
                 accessorKey: "ffvv",

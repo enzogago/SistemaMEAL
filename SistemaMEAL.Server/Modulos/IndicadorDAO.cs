@@ -529,6 +529,12 @@ namespace SistemaMEAL.Modulos
                         cmd.Parameters.AddWithValue("@P_PROCOD", (object)DBNull.Value);
                         cmd.Parameters.AddWithValue("@P_SUBPRONOM", (object)DBNull.Value);
                         cmd.Parameters.AddWithValue("@P_SUBPROSAP", (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@P_SUBPROINVSUBACT", (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@P_SUBPRORES", (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@P_SUBPROPERANOINI", (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@P_SUBPROPERMESINI", (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@P_SUBPROPERANOFIN", (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@P_SUBPROPERMESFIN", (object)DBNull.Value);
                         cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                         cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
                         cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
@@ -564,8 +570,8 @@ namespace SistemaMEAL.Modulos
                             SubProyecto? subProyecto = subProyectos[0];
 
                             // Convierte los años a enteros
-                            int anoIni = int.Parse(subProyecto.ProPerAnoIni);
-                            int anoFin = int.Parse(subProyecto.ProPerAnoFin);
+                            int anoIni = int.Parse(subProyecto.SubProPerAnoIni);
+                            int anoFin = int.Parse(subProyecto.SubProPerAnoFin);
 
                             // Itera a través de los años desde anoIni hasta anoFin
                             for (int ano = anoIni; ano <= anoFin; ano++)

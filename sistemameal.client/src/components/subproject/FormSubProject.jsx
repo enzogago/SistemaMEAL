@@ -246,6 +246,7 @@ const FormSubProject = () => {
                 }
                 fetchEdit();
                 fetchData(`Implementador/subproyecto/${ano}/${cod}`,(data) => {
+                    console.log(data)
                     setImplementadoresEdit(data);
                 });
                 fetchData(`Ubicacion/subproyecto/${ano}/${cod}`,setUbicacionesEdit);
@@ -509,6 +510,9 @@ const FormSubProject = () => {
             setLocationSelects(newLocationSelects);
         }
     }
+
+    const currentYear = new Date().getFullYear();
+    
     
     return (
         <>
@@ -569,7 +573,6 @@ const FormSubProject = () => {
                                 }
                             }}
                             {...register('subProSap', { 
-                                required: 'El campo es requerido',
                                 minLength: {
                                     value: 6,
                                     message: 'El campo debe tener al menos 6 dígitos'
@@ -615,7 +618,227 @@ const FormSubProject = () => {
                             </p>
                         )}
                     </div>
-                    
+                    <div className="m_75">
+                        <label htmlFor="subProRes" className="">
+                            Responsable del Sub proyecto
+                        </label>
+                        <input type="text"
+                            id="subProRes"
+                            className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.subProRes || isSubmitted ? (errors.subProRes ? 'invalid' : 'valid') : ''}`} 
+                            placeholder="Andres Eras"
+                            autoComplete="disabled"
+                            style={{textTransform: 'capitalize'}}
+                            {...register('subProRes', { 
+                                required: 'El campo es requerido',
+                                pattern: {
+                                    value: /^[A-Za-zñÑáéíóúÁÉÍÓÚüÜ/\s-_]+$/,
+                                    message: 'Por favor, introduce solo letras y espacios',
+                                },
+                                minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
+                            })} 
+                        />
+                        {errors.subProRes ? (
+                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.subProRes.message}</p>
+                        ) : (
+                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                            Espacio reservado para el mensaje de error
+                            </p>
+                        )}
+                    </div>
+                    <div className="m_75">
+                        <label className="block f1">
+                            ¿El Sub proyecto involucra sub actividades?
+                        </label>
+                        <div className="flex gap-1">
+                            <div className="flex gap_5">
+                                <input 
+                                    type="radio" 
+                                    id="si" 
+                                    name="subProInvSubAct" 
+                                    value="s"
+                                    {...register('subProInvSubAct', { required: 'Por favor, selecciona una opción' })}
+                                />
+                                <label htmlFor="si">Si</label>
+                            </div>
+                            <div className="flex gap_5">
+                                <input 
+                                    type="radio" 
+                                    id="no" 
+                                    name="subProInvSubAct" 
+                                    value="n"
+                                    {...register('subProInvSubAct', { required: 'Por favor, selecciona una opción' })}
+                                />
+                                <label htmlFor="no">No</label>
+                            </div>
+                        </div>
+                        {errors.subProInvSubAct ? (
+                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.subProInvSubAct.message}</p>
+                        ) : (
+                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                Espacio reservado para el mensaje de error
+                            </p>
+                        )}
+                    </div>
+                    <div className="flex gap-1 m_75">
+                        <div className="Large_6 ">
+                            <label htmlFor="subProPerMesIni" className="">
+                                Mes Inicio:
+                            </label>
+                            <select 
+                                className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.subProPerMesIni || isSubmitted ? (errors.subProPerMesIni ? 'invalid' : 'valid') : ''}`} 
+                                {...register('subProPerMesIni', { 
+                                    validate: value => value !== '0' || 'El mes es requerido' 
+                                })}
+                                id="subProPerMesIni" 
+                            >
+                                <option value="0">--Seleccione Mes--</option>
+                                <option value="01">Enero</option>
+                                <option value="02">Febrero</option>
+                                <option value="03">Marzo</option>
+                                <option value="04">Abril</option>
+                                <option value="05">Mayo</option>
+                                <option value="06">Junio</option>
+                                <option value="07">Julio</option>
+                                <option value="08">Agosto</option>
+                                <option value="09">Septiembre</option>
+                                <option value="10">Octubre</option>
+                                <option value="11">Noviembre</option>
+                                <option value="12">Diciembre</option>
+                            </select>
+                            {errors.subProPerMesIni ? (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.subProPerMesIni.message}</p>
+                            ) : (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                Espacio reservado para el mensaje de error
+                                </p>
+                            )}
+                        </div>
+                        <div className="Large_6 ">
+                            <label htmlFor="subProPerAnoIni" className="">
+                                Año Inicio:
+                            </label>
+                            <input
+                                id="subProPerAnoIni"
+                                className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.subProPerAnoIni || isSubmitted ? (errors.subProPerAnoIni ? 'invalid' : 'valid') : ''}`} 
+                                type="text" 
+                                placeholder="2023"
+                                autoComplete="disabled"
+                                maxLength={4}
+                                onKeyDown={(event) => {
+                                    if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
+                                        event.preventDefault();
+                                    }
+                                }}
+                                {...register('subProPerAnoIni', { 
+                                    required: 'El campo es requerido',
+                                    validate: value => {
+                                        if (value < currentYear - 1 || value > currentYear + 10) {
+                                            return 'El año debe estar entre ' + (currentYear - 1) + ' y ' + (currentYear + 10);
+                                        }
+                                    },
+                                    minLength: {
+                                        value: 4,
+                                        message: 'El campo debe tener al menos 4 dígitos'
+                                    },
+                                    maxLength: {
+                                        value: 4,
+                                        message: 'El campo no debe tener más de 4 dígitos'
+                                    },
+                                    pattern: {
+                                        value: /^[0-9]*$/,
+                                        message: 'El campo solo debe contener números'
+                                    }
+                                })}
+                                />
+                                {errors.subProPerAnoIni ? (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.subProPerAnoIni.message}</p>
+                                ) : (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                    Espacio reservado para el mensaje de error
+                                    </p>
+                                )}
+                        </div>
+                    </div>
+                    <div className="flex gap-1 m_75">
+                        <div className="Large_6 ">
+                            <label htmlFor="subProPerMesFin" className="">
+                                Mes Fin:
+                            </label>
+                            <select 
+                                className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.subProPerMesFin || isSubmitted ? (errors.subProPerMesFin ? 'invalid' : 'valid') : ''}`} 
+                                {...register('subProPerMesFin', { 
+                                    validate: value => value !== '0' || 'El mes es requerido' 
+                                })}
+                                id="subProPerMesFin" 
+                            >
+                                <option value="0">--Seleccione Mes--</option>
+                                <option value="01">Enero</option>
+                                <option value="02">Febrero</option>
+                                <option value="03">Marzo</option>
+                                <option value="04">Abril</option>
+                                <option value="05">Mayo</option>
+                                <option value="06">Junio</option>
+                                <option value="07">Julio</option>
+                                <option value="08">Agosto</option>
+                                <option value="09">Septiembre</option>
+                                <option value="10">Octubre</option>
+                                <option value="11">Noviembre</option>
+                                <option value="12">Diciembre</option>
+                            </select>
+                            {errors.subProPerMesFin ? (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.subProPerMesFin.message}</p>
+                            ) : (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                Espacio reservado para el mensaje de error
+                                </p>
+                            )}
+                        </div>
+                        <div className="Large_6 ">
+                            <label htmlFor="subProPerAnoFin" className="">
+                                Año Fin:
+                            </label>
+                            <input
+                                id="subProPerAnoFin"
+                                className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.subProPerAnoFin || isSubmitted ? (errors.subProPerAnoFin ? 'invalid' : 'valid') : ''}`} 
+                                type="text" 
+                                placeholder="2023"
+                                autoComplete="disabled"
+                                maxLength={4}
+                                onKeyDown={(event) => {
+                                    if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
+                                        event.preventDefault();
+                                    }
+                                }}
+                                {...register('subProPerAnoFin', { 
+                                    required: 'El campo es requerido',
+                                    validate: value => {
+                                        if (value < currentYear - 1 || value > currentYear + 10) {
+                                            return 'El año debe estar entre ' + (currentYear - 1) + ' y ' + (currentYear + 10);
+                                        }
+                                    },
+                                    minLength: {
+                                        value: 4,
+                                        message: 'El campo debe tener al menos 4 dígitos'
+                                    },
+                                    maxLength: {
+                                        value: 4,
+                                        message: 'El campo no debe tener más de 4 dígitos'
+                                    },
+                                    pattern: {
+                                        value: /^[0-9]*$/,
+                                        message: 'El campo solo debe contener números'
+                                    }
+                                })}
+                            />
+                            {errors.subProPerAnoFin ? (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.subProPerAnoFin.message}</p>
+                            ) : (
+                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                Espacio reservado para el mensaje de error
+                                </p>
+                            )}
+                        </div>
+                    </div>
                 </div>
                 <div className="PowerMas_Info_Form_Beneficiarie Large_6 m1 p1 overflow-auto flex flex-column gap-1">
                     <div className="flex flex-column gap_5 p1_75" style={{backgroundColor: '#fff', border: '1px solid #372e2c3d'}}>

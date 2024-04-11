@@ -3,9 +3,10 @@ import Bar from "../../user/Bar";
 import { useContext, useRef, useState } from "react";
 import { FaDownload, FaRegFileExcel } from "react-icons/fa";
 import Notiflix from "notiflix";
-import ExcelJS from 'exceljs';
 import { handleUpload } from "./handleUpload";
 import { StatusContext } from "../../../context/StatusContext";
+import { saveAs } from 'file-saver';
+import template from '../../../templates/MARCO_LOGICO.xlsm';
 
 const UploadProject = () => {
     // Variables State AuthContext 
@@ -56,7 +57,7 @@ const UploadProject = () => {
             // Verificar si el archivo es un Excel
             const file = e.dataTransfer.files[0];
             const fileType = file.name.split('.').pop();
-            if (fileType === 'xls' || fileType === 'xlsx') {
+            if (fileType === 'xlsm') {
                 fileInputRef.current.files = e.dataTransfer.files;
                 setSelectedFile(e.dataTransfer.files[0]); // Aquí se actualiza el estado selectedFile
             } else {
@@ -72,9 +73,22 @@ const UploadProject = () => {
     };
 
     const handleFileChange = (event) => {
-        setSelectedFile(event.target.files[0]);
+        console.log(event.target.files[0])
+        if (event.target.files[0].type === 'application/vnd.ms-excel.sheet.macroEnabled.12') {
+            setSelectedFile(event.target.files[0]);
+        } else {
+            Notiflix.Notify.failure("Formato no soportado")
+        }
     };
 
+    const handleDownload = () => {
+        fetch(template)
+            .then(response => response.blob())
+            .then(blob => {
+                saveAs(blob, 'MARCO_LOGICO.xlsm');
+            });
+    }
+    
     
     return (
         <>
@@ -83,14 +97,14 @@ const UploadProject = () => {
                 
                 <div className="Large_8">
                 <div className="flex jc-center p_5">
-                <button className="PowerMas_Buttom_Secondary flex ai-center jc-space-between p_5 Phone_3"> 
+                <button className="PowerMas_Buttom_Secondary flex ai-center jc-space-between p_5 Phone_3" onClick={handleDownload}> 
                     Descargar formato 
                     <FaDownload className="w-auto" /> 
                 </button>
                 </div>
                     <article className="PowerMas_Article_Upload center">
                         <p style={{color: '#878280'}}>Solo se puede subir documentos en formato Excel</p>
-                        <h3>Subir Archivo</h3>
+                        <h3>Subir Marco Lógico</h3>
                     </article>
                     <br />
                     <div
@@ -107,7 +121,7 @@ const UploadProject = () => {
                             ref={fileInputRef} 
                             style={{display: 'none'}} 
                             onChange={handleFileChange} 
-                            accept=".xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                            accept=".xlsm,application/vnd.ms-excel.sheet.macroEnabled.12"
                         />
                         <FaRegFileExcel className="Large-f5 w-auto" />
                         {
@@ -127,10 +141,6 @@ const UploadProject = () => {
                 </div>
             </div>
            
-            {/* <UploadTransactionProyecto
-                expectedHeaders={expectedHeaders}
-                controller='Proyecto'
-            /> */}
             <footer className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
                 <button onClick={() => navigate('/upload-project')} className="Large_3 m_75 PowerMas_Buttom_Secondary">Atras</button>
                 <button 

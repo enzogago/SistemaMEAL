@@ -13,7 +13,7 @@ const ObjectiveSpecific = () => {
 
     // Definir controller y fieldMapping como variables
     const controller = 'ObjetivoEspecifico';
-    const fieldMapping = { codigo: 'objEspNum', nombre: 'objEspNom', 'Objetivo': 'objNom', 'Subproyecto': 'subProNomSap', 'Proyecto': 'proNom', 'Responsable': 'proRes','Periodo Inicio':'proPerIni','Periodo Fin': 'proPerFin' };
+    const fieldMapping = { codigo: 'objEspNum', nombre: 'objEspNom', 'Objetivo': 'objNom', 'Subproyecto': 'subProNomSap', 'Proyecto': 'proNom', 'Responsable': 'subProRes','Periodo Inicio':'subProPerIni','Periodo Fin': 'subProPerFin' };
     const filterProperties = {
         'CODIGO_OBJETIVO_ESPECIFICO': 'objEspNum',
         'OBJETIVO_ESPECIFICO': 'objEspNom',
@@ -22,11 +22,11 @@ const ObjectiveSpecific = () => {
         'SUBPROYECTO': 'subProNom',
         'CODIGO_SAP': 'subProSap',
         'PROYECTO': 'proNom',
-        'RESPONSABLE': 'proRes',
-        'AÑO_INICIO': 'proPerAnoIni',
-        'MES_INICIO': 'proPerMesIniNombre',
-        'AÑO_FIN': 'proPerAnoFin',
-        'MES_FIN': 'proPerMesFinNombre',
+        'RESPONSABLE': 'subProRes',
+        'AÑO_INICIO': 'subProPerAnoIni',
+        'MES_INICIO': 'subProPerMesIniNombre',
+        'AÑO_FIN': 'subProPerAnoFin',
+        'MES_FIN': 'subProPerMesFinNombre',
     };
 
     // Toggle Modal

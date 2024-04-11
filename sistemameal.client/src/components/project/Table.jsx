@@ -36,6 +36,10 @@ const Table = ({data = [], setData, openModal}) => {
     const columns = useMemo(() => {
         let baseColumns = [
             {
+                header: "Código",
+                accessorKey: "proIde",
+            },
+            {
                 header: "Nombre",
                 accessorKey: "proNom",
                 cell: ({row}) => (
@@ -53,43 +57,6 @@ const Table = ({data = [], setData, openModal}) => {
                     </div>
                 ),
             },
-            {
-                header: "Responsable",
-                accessorKey: "proRes",
-                cell: ({row}) => (
-                    <div style={{textTransform: 'capitalize'}}>
-                        {row.original.proRes.toLowerCase()}
-                    </div>
-                ),
-            },
-            {
-                header: "Periodo Inicio",
-                accessorKey: "proPerAnoIni",
-                cell: ({row}) => {
-                    return (
-                        <div style={{textTransform: 'capitalize'}}>{row.original.proPerMesIniNombre + ' - ' +  row.original.proPerAnoIni }</div>
-                    );
-                },
-            },
-            {
-                header: "Periodo Fin",
-                accessorKey: "proPerAnoFin",
-                cell: ({row}) => {
-                    return (
-                        <div style={{textTransform: 'capitalize'}}>{row.original.proPerMesFinNombre + ' - ' +  row.original.proPerAnoFin }</div>
-                    );
-                },
-            },
-            {
-                header: "Involucra Sub Acvtidad",
-                accessorKey: "proInvSubAct",
-                cell: ({row}) => {
-                    return (
-                        <>{row.original.proInvSubActNombre}</>
-                    );
-                },
-            },
-            
         ];
 
         if (actions.edit || actions.delete) {
@@ -124,22 +91,14 @@ const Table = ({data = [], setData, openModal}) => {
         return baseColumns;
     }, [actions]);
 
-    data.forEach(item => {
-        item.proPerMesFinNombre = new Date(2024, item.proPerMesFin - 1).toLocaleString('es-ES', { month: 'long' });
-        item.proPerMesIniNombre = new Date(2024, item.proPerMesIni - 1).toLocaleString('es-ES', { month: 'long' });
-        item.proInvSubActNombre = item.proInvSubAct === 'S' ? 'Proyecto con Sub Actividades' : 'Proyecto con Sub Actividades';
-    });
+    
 
     const [sorting, setSorting] = useState([]);
     const filteredData = useMemo(() => 
         data.filter(item => 
             (item.proNom ? item.proNom.includes(searchFilter.toUpperCase()) : false) ||
-            (item.proRes ? item.proRes.includes(searchFilter.toUpperCase()) : false) ||
-            (item.proPerAnoFin ? item.proPerAnoFin.includes(searchFilter.toUpperCase()) : false) ||
-            (item.proPerAnoIni ? item.proPerAnoIni.includes(searchFilter.toUpperCase()) : false) ||
-            (item.proPerMesFinNombre ? item.proPerMesFinNombre.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
-            (item.proPerMesIniNombre ? item.proPerMesIniNombre.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
-            (item.proInvSubActNombre ? item.proInvSubActNombre.toUpperCase().includes(searchFilter.toUpperCase()) : false) 
+            (item.proDes ? item.proRes.includes(searchFilter.toUpperCase()) : false) ||
+            (item.proIde ? item.proIde.includes(searchFilter.toUpperCase()) : false)
         ), [data, searchFilter]
     );
 
@@ -166,9 +125,9 @@ const Table = ({data = [], setData, openModal}) => {
         proInvSubAct: item.proInvSubAct === 'S' ? 'SI' : 'NO',
 
     }));
-    const headers = ['AÑO', 'CODIGO', 'NOMBRE', 'RESPONSABLE','AÑO_INICIO','MES_INICIO','AÑO_FIN','MES_FIN','INVOLUCRA_SUB_ACTIVIDAD', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
+    const headers = ['CODIGO', 'NOMBRE', 'DESCRIPCION', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
     const title = 'PROYECTOS';  // El título de tu archivo
-    const properties = ['proAno', 'proCod', 'proNom', 'proRes', 'proPerAnoIni', 'proPerMesIni', 'proPerAnoFin', 'proPerMesFin', 'proInvSubAct', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
+    const properties = ['proIde', 'proNom', 'proDes', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
     const format = 'a3';  // El tamaño del formato que quieres establecer para el PDF
 
     const Export_Excel = () => {

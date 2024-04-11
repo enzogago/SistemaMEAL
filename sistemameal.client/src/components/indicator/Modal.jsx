@@ -115,7 +115,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
     useEffect(() => {
         const subProyecto = watch('subProyecto');
         if (subProyecto !== '0' && subProyecto !== '') {
-            const { subProAno, subProCod, proInvSubAct } = JSON.parse(subProyecto);
+            const { subProAno, subProCod, subProInvSubAct } = JSON.parse(subProyecto);
             fetchData(`Objetivo/subproyecto/${subProAno}/${subProCod}`, (data) => {
                 setValue('objetivo', '0');
                 if(data.length > 0 ) {
@@ -124,7 +124,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                     setObjetivosLoaded(true);
                 }
             });
-            if (proInvSubAct.trim() === 'S') {
+            if (subProInvSubAct.trim() === 'S') {
                 setInvolucraSubActividad(true);
             }
         } else {
@@ -196,8 +196,8 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
     // Efecto para manejar la edición del estado
     useEffect(() => {
         if (estadoEditado && subProyectosLoaded) {
-            const { subProAno, subProCod, proInvSubAct } = estadoEditado;
-            setValue('subProyecto', JSON.stringify({ subProAno, subProCod, proInvSubAct:proInvSubAct.trim() }));
+            const { subProAno, subProCod, subProInvSubAct } = estadoEditado;
+            setValue('subProyecto', JSON.stringify({ subProAno, subProCod, subProInvSubAct:subProInvSubAct.trim() }));
         }
     }, [estadoEditado, subProyectosLoaded, setValue]);
 
@@ -243,7 +243,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                             {subProyectos.map((item, index) => (
                                 <option 
                                     key={index} 
-                                    value={JSON.stringify({ subProAno: item.subProAno, subProCod: item.subProCod, proInvSubAct: item.proInvSubAct.trim() })}
+                                    value={JSON.stringify({ subProAno: item.subProAno, subProCod: item.subProCod, subProInvSubAct: item.subProInvSubAct.trim() })}
                                 > 
                                     {item.subProSap + ' - ' + item.subProNom.toLowerCase() + ' | ' + item.proNom.toLowerCase()}
                                 </option>
@@ -416,7 +416,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                             id="indNum"
                             className={`PowerMas_Modal_Form_${dirtyFields.indNum || isSubmitted ? (errors.indNum ? 'invalid' : 'valid') : ''}`}  
                             type="text" 
-                            style={{textTransform: 'capitalize'}}
+                            style={{textTransform: 'uppercase'}}
                             placeholder='123456' 
                             maxLength={100} 
                             name="indNum" 

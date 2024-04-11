@@ -13,18 +13,18 @@ const Objective = () => {
 
     // Definir controller y fieldMapping como variables
     const controller = 'Objetivo';
-    const fieldMapping = { codigo: 'objNum', nombre: 'objNom', 'Subproyecto': 'subProNom', 'Proyecto': 'proNom', 'Responsable': 'proRes','Periodo Inicio':'proPerAnoIni','Periodo Fin': 'proPerAnoFin' };
+    const fieldMapping = { codigo: 'objNum', nombre: 'objNom', 'Subproyecto': 'subProNom', 'Proyecto': 'proNom', 'Responsable': 'subProRes','Periodo Inicio':'subProPerAnoIni','Periodo Fin': 'subProPerAnoFin' };
     const filterProperties = {
         'CODIGO': 'objNum',
         'OBJETIVO': 'objNom',
         'SUBPROYECTO': 'subProNom',
         'CODIGO_SAP': 'subProSap',
         'PROYECTO': 'proNom',
-        'RESPONSABLE': 'proRes',
-        'AÑO_INICIO': 'proPerAnoIni',
-        'MES_INICIO': 'proPerMesIniNombre',
-        'AÑO_FIN': 'proPerAnoFin',
-        'MES_FIN': 'proPerMesFinNombre',
+        'RESPONSABLE': 'subProRes',
+        'AÑO_INICIO': 'subProPerAnoIni',
+        'MES_INICIO': 'subProPerMesIniNombre',
+        'AÑO_FIN': 'subProPerAnoFin',
+        'MES_FIN': 'subProPerMesFinNombre',
     };
 
     // Toggle Modal

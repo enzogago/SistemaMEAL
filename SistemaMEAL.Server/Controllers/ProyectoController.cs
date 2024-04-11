@@ -134,23 +134,6 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return rToken;
 
-            dynamic data = rToken.result;
-            Usuario usuarioActual = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (usuarioActual.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para realizar esta accion",
-                    result = ""
-                };
-            }
-
             var (proAno, proCod, message, messageType) = _proyectos.Insertar(identity, proyecto);
             if (messageType == "1") // Error
             {
@@ -174,22 +157,6 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return rToken;
 
-            dynamic data = rToken.result;
-            Usuario usuarioActual = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (usuarioActual.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para realizar esta accion",
-                    result = ""
-                };
-            }
 
             var (message, messageType) = _proyectos.Modificar(identity, proyecto);
             if (messageType == "1") // Error
@@ -213,23 +180,6 @@ namespace SistemaMEAL.Server.Controllers
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return rToken;
-
-            dynamic data = rToken.result;
-            Usuario usuarioActual = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (usuarioActual.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para realizar esta accion",
-                    result = ""
-                };
-            }
 
             var (message, messageType) = _proyectos.Eliminar(identity, proyecto);
             if (messageType == "1") // Error
@@ -255,23 +205,6 @@ namespace SistemaMEAL.Server.Controllers
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return rToken;
-
-            dynamic data = rToken.result;
-            Usuario usuarioActual = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (usuarioActual.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para realizar esta accion",
-                    result = ""
-                };
-            }
 
             var (subProAnoOut, subProCodOut, message, messageType, errorCells) = _proyectos.InsertarMasivo(identity, proyectos);
             if (messageType == "1") // Error

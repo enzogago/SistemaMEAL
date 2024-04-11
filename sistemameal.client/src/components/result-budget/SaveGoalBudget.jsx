@@ -50,8 +50,8 @@ const SaveGoalBudget = () => {
     useForm({ mode: "onChange"});
     
     useEffect(() => {
-            fetchData(`Indicador/subproyecto-actividad/${'2024'}/${'000001'}`,setIndicadores)
-            fetchData(`Meta/${'2024'}/${'000001'}/${'2023'}`, (data) => {
+            fetchData(`Indicador/subproyecto-actividad/${'2024'}/${'000002'}`,setIndicadores)
+            fetchData(`Meta/${'2024'}/${'000002'}/${'2024'}`, (data) => {
                 setInitialMetas(tableData); //
                 setTotals({});
                 const rows = {};
@@ -129,7 +129,6 @@ const SaveGoalBudget = () => {
 
     const onSubmit = (data) => {
         let metas = [];
-        let metasIniciales = [];
         additionalRows.forEach((row, rowIndex) => {
             meses.forEach((mes, mesIndex) => {
                 let mesValue = data[`mes_${String(mesIndex+1).padStart(2, '0')}_${row.id}`];
@@ -140,7 +139,7 @@ const SaveGoalBudget = () => {
                         meta: meta,
                     };
 
-                    if (meta != undefined && mesValue != '') {
+                    if (meta != undefined) {
                         const {metAno,metCod} = JSON.parse(meta);
 
                         metas.push({

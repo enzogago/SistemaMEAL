@@ -20,7 +20,6 @@ namespace SistemaMEAL.Server.Controllers
         }
 
 
-
         [HttpGet]
         [Route("{subProAno}/{subProCod}/{metAnoPlaTec}")]
         public dynamic BuscarMonitoreoForm(string subProAno, string subProCod, string metAnoPlaTec)
@@ -39,25 +38,6 @@ namespace SistemaMEAL.Server.Controllers
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
-
-            if (!rToken.success) return rToken;
-
-            dynamic data = rToken.result;
-            Usuario usuario = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "INSERTAR ESTADO") && usuario.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para insertar estados",
-                    result = ""
-                };
-            }
 
             var (message, messageType) = _metas.ActualizarMetas(identity, metasDto.Metas,metasDto.MetasEliminar);
             if (messageType == "1")
@@ -81,23 +61,6 @@ namespace SistemaMEAL.Server.Controllers
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return rToken;
-
-            dynamic data = rToken.result;
-            Usuario usuario = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "INSERTAR ESTADO") && usuario.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para insertar estados",
-                    result = ""
-                };
-            }
 
             var (message, messageType) = _metas.ActualizarMetasPresupuesto(identity, metas);
             if (messageType == "1")

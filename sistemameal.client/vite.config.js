@@ -38,6 +38,7 @@ if (!fs.existsSync(certFilePath) || !fs.existsSync(keyFilePath)) {
 
 // https://vitejs.dev/config/
 export default defineConfig({
+    assetsInclude: ['**/*.xlsm'],
     plugins: [plugin()],
     resolve: {
         alias: {

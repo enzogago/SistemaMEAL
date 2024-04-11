@@ -37,15 +37,11 @@ const Table = ({data = [], setData}) => {
     const columns = useMemo(() => {
         let baseColumns = [
             {
-                header: "Código de financiación",
-                accessorKey: "subProSap",
-            },
-            {
-                header: "Nombre",
+                header: "Sub Proyecto",
                 accessorKey: "subProNom",
                 cell: ({row}) => (
                     <div style={{textTransform: 'capitalize'}}>
-                        {row.original.subProNom.toLowerCase()}
+                        {row.original.subProSap + ' - ' +row.original.subProNom.toLowerCase()}
                     </div>
                 ),
             },
@@ -54,34 +50,43 @@ const Table = ({data = [], setData}) => {
                 accessorKey: "proNom",
                 cell: ({row}) => (
                     <div style={{textTransform: 'capitalize'}}>
-                        {row.original.proNom.toLowerCase()}
+                        {row.original.proIde + ' - ' +row.original.proNom.toLowerCase()}
                     </div>
                 ),
             },
             {
                 header: "Responsable",
-                accessorKey: "proRes",
+                accessorKey: "subProRes",
                 cell: ({row}) => (
                     <div style={{textTransform: 'capitalize'}}>
-                        {row.original.proRes.toLowerCase()}
+                        {row.original.subProRes.toLowerCase()}
                     </div>
                 ),
             },
             {
                 header: "Periodo Inicio",
-                accessorKey: "proPerAnoIni",
+                accessorKey: "subProPerAnoIni",
                 cell: ({row}) => {
                     return (
-                        <div style={{textTransform: 'capitalize'}}>{row.original.proPerMesIniNombre + ' - ' +  row.original.proPerAnoIni }</div>
+                        <div style={{textTransform: 'capitalize'}}>{row.original.subProPerMesIniNombre + ' - ' +  row.original.subProPerAnoIni }</div>
                     );
                 },
             },
             {
                 header: "Periodo Fin",
-                accessorKey: "proPerAnoFin",
+                accessorKey: "subProPerAnoFin",
                 cell: ({row}) => {
                     return (
-                        <div style={{textTransform: 'capitalize'}}>{row.original.proPerMesFinNombre + ' - ' +  row.original.proPerAnoFin }</div>
+                        <div style={{textTransform: 'capitalize'}}>{row.original.subProPerMesFinNombre + ' - ' +  row.original.subProPerAnoFin }</div>
+                    );
+                },
+            },
+            {
+                header: "Involucra Sub Acvtidad",
+                accessorKey: "subProInvSubAct",
+                cell: ({row}) => {
+                    return (
+                        <>{row.original.subProInvSubActNombre}</>
                     );
                 },
             },
@@ -130,9 +135,9 @@ const Table = ({data = [], setData}) => {
     }
     
     data.forEach(item => {
-        item.proPerMesFinNombre = new Date(2024, item.proPerMesFin - 1).toLocaleString('es-ES', { month: 'long' });
-        item.proPerMesIniNombre = new Date(2024, item.proPerMesIni - 1).toLocaleString('es-ES', { month: 'long' });
-        item.proInvSubActNombre = item.proInvSubAct === 'S' ? 'Proyecto con Sub Actividades' : 'Proyecto con Sub Actividades';
+        item.subProPerMesFinNombre = new Date(2024, item.subProPerMesFin - 1).toLocaleString('es-ES', { month: 'long' });
+        item.subProPerMesIniNombre = new Date(2024, item.subProPerMesIni - 1).toLocaleString('es-ES', { month: 'long' });
+        item.subProInvSubActNombre = item.subProInvSubAct === 'S' ? 'Proyecto con Sub Actividades' : 'Proyecto sin Sub Actividades';
     });
 
     const [sorting, setSorting] = useState([]);
@@ -140,12 +145,14 @@ const Table = ({data = [], setData}) => {
         data.filter(item => 
             (item.subProNom ? item.subProNom.includes(searchFilter.toUpperCase()) : false) ||
             (item.subProSap ? item.subProSap.includes(searchFilter.toUpperCase()) : false) ||
+            (item.proIde ? item.proIde.includes(searchFilter.toUpperCase()) : false) ||
             (item.proNom ? item.proNom.includes(searchFilter.toUpperCase()) : false) ||
-            (item.proRes ? item.proRes.includes(searchFilter.toUpperCase()) : false) ||
-            (item.proPerAnoFin ? item.proPerAnoFin.includes(searchFilter.toUpperCase()) : false) ||
-            (item.proPerAnoIni ? item.proPerAnoIni.includes(searchFilter.toUpperCase()) : false) ||
-            (item.proPerMesFinNombre ? item.proPerMesFinNombre.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
-            (item.proPerMesIniNombre ? item.proPerMesIniNombre.toUpperCase().includes(searchFilter.toUpperCase()) : false)
+            (item.subProRes ? item.subProRes.includes(searchFilter.toUpperCase()) : false) ||
+            (item.subProPerAnoFin ? item.subProPerAnoFin.includes(searchFilter.toUpperCase()) : false) ||
+            (item.subProPerAnoIni ? item.subProPerAnoIni.includes(searchFilter.toUpperCase()) : false) ||
+            (item.subProPerMesFinNombre ? item.subProPerMesFinNombre.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
+            (item.subProPerMesIniNombre ? item.subProPerMesIniNombre.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
+            (item.subProInvSubActNombre ? item.subProInvSubActNombre.toUpperCase().includes(searchFilter.toUpperCase()) : false)
         ), [data, searchFilter]
     );
 
@@ -166,9 +173,15 @@ const Table = ({data = [], setData}) => {
 
     // Preparar los datos
     let dataExport = [...table.options.data]; 
-    const headers = ['NOMBRE', 'CODIGO_SAP', 'PROYECTO', 'RESPONSABLE', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
+    // Modificar el campo 'uniInvPer' en los datos
+    dataExport = dataExport.map(item => ({
+        ...item,
+        subProInvSubAct: item.subProInvSubAct === 'S' ? 'SI' : 'NO',
+
+    }));
+    const headers = ['CODIGO_FINANCIACION', 'NOMBRE', 'RESPONSABLE','AÑO_INICIO','MES_INICIO','AÑO_FIN','MES_FIN','INVOLUCRA_SUB_ACTIVIDAD', 'PROYECTO', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
     const title = 'SUB PROYECTOS';  // El título de tu archivo
-    const properties = ['subProNom', 'subProSap', 'proNom', 'proRes', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
+    const properties = ['subProSap', 'subProNom', 'subProRes', 'subProPerAnoIni', 'subProPerMesIni', 'subProPerAnoFin', 'subProPerMesFin', 'subProInvSubAct', 'proNom', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
     const format = 'a3';  // El tamaño del formato que quieres establecer para el PDF
 
     const Export_Excel = () => {

@@ -14,14 +14,15 @@ export const expectedHeaders = [
     { display: 'OBJETIVO', dbKey: 'objNom', entity: 'Objetivo', validation: 'nombre' },
     { display: 'CODIGO_SAP', dbKey: 'subProSap', entity: 'Subproyecto', validation: 'numero' },
     { display: 'NOMBRE SUBPROYECTO', dbKey: 'subProNom', entity: 'Subproyecto', validation: 'nombre' },
+    { display: 'CODIGO PROYECTO', dbKey: 'proIde', entity: 'Proyecto', validation: 'numero' },
     { display: 'NOMBRE PROYECTO', dbKey: 'proNom', entity: 'Proyecto', validation: 'nombre' },
     { display: 'DESCRIPCION PROYECTO', dbKey: 'proDes', entity: 'Proyecto', validation: 'descripcion' },
-    { display: 'RESPONSABLE-COORDINADOR', dbKey: 'proRes', entity: 'Proyecto', validation: 'nombre' },
-    { display: 'MES_INICIO', dbKey: 'proPerMesIni', entity: 'Proyecto', validation: 'nombre' },
-    { display: 'AÑO_INICIO', dbKey: 'proPerAnoIni', entity: 'Proyecto', validation: 'año' },
-    { display: 'MES_FIN', dbKey: 'proPerMesFin', entity: 'Proyecto', validation: 'nombre' },
-    { display: 'AÑO_FIN', dbKey: 'proPerAnoFin', entity: 'Proyecto', validation: 'año' },
-    { display: 'INVOLUCRA_SUB_ACTIVIDAD', dbKey: 'proInvSubAct', entity: 'Proyecto', validation: 'descripcion' },
+    { display: 'RESPONSABLE-COORDINADOR', dbKey: 'subProRes', entity: 'Subproyecto', validation: 'nombre' },
+    { display: 'MES_INICIO', dbKey: 'subProPerMesIni', entity: 'Subproyecto', validation: 'nombre' },
+    { display: 'AÑO_INICIO', dbKey: 'subProPerAnoIni', entity: 'Subproyecto', validation: 'año' },
+    { display: 'MES_FIN', dbKey: 'subProPerMesFin', entity: 'Subproyecto', validation: 'nombre' },
+    { display: 'AÑO_FIN', dbKey: 'subProPerAnoFin', entity: 'Subproyecto', validation: 'año' },
+    { display: 'INVOLUCRA_SUB_ACTIVIDAD', dbKey: 'subProInvSubAct', entity: 'Subproyecto', validation: 'descripcion' },
 ];
 
 const validateCell = (value, validationRules) => {
@@ -119,9 +120,8 @@ export const handleUpload = async (file, setTableData, setPostData, setIsValid, 
     setIsValid(true);
     setErrorCells([]);
 
-    // const file = fileInput.current.files[0];
     // Comprueba si el archivo es un Excel
-    if (!['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel'].includes(file.type)) {
+    if (!['application/vnd.ms-excel.sheet.macroEnabled.12'].includes(file.type)) {
         alert('Por favor, sube un archivo Excel');
         return;
     }
@@ -129,7 +129,7 @@ export const handleUpload = async (file, setTableData, setPostData, setIsValid, 
     // Comprueba el nombre del archivo
     const fileName = file.name;
     console.log(fileName)
-    const expectedFileName = 'MARCO_LOGICO.xlsx'; // Reemplaza esto con el nombre de archivo esperado
+    const expectedFileName = 'MARCO_LOGICO.xlsm'; // Reemplaza esto con el nombre de archivo esperado
     if (fileName !== expectedFileName) {
         alert(`El nombre del archivo debe ser "${expectedFileName}"`);
         return;
@@ -157,7 +157,7 @@ export const handleUpload = async (file, setTableData, setPostData, setIsValid, 
         const expectedHeaderDisplays = expectedHeaders.map(header => header.display.toUpperCase());
         console.log(expectedHeaderDisplays);
         // Verifica que los encabezados son correctos
-        const headers = worksheet.getRow(12).values.slice(3, 24); // Tomando en cuenta los encabezados estan en la fila 4 a partir de la columna 2
+        const headers = worksheet.getRow(12).values.slice(3, 25); // Tomando en cuenta los encabezados estan en la fila 4 a partir de la columna 2
         console.log(headers);
         if (!arraysEqual(headers, expectedHeaderDisplays)) {
             alert('Los encabezados no son válidos');
@@ -174,7 +174,7 @@ export const handleUpload = async (file, setTableData, setPostData, setIsValid, 
             const row = worksheet.getRow(rowNumber);
 
             // Verifica si todas las celdas en la fila están vacías
-            const isEmptyRow = row.values.slice(3, 24).every(cell => !cell || cell.trim() === '');
+            const isEmptyRow = row.values.slice(3, 25).every(cell => !cell || cell.trim() === '');
             // Si la fila está vacía, detiene la iteración
             if (isEmptyRow) {
                 break;
@@ -190,13 +190,13 @@ export const handleUpload = async (file, setTableData, setPostData, setIsValid, 
             const resultData  = {}; // Inicializa los datos del subproyecto
             const IndicatorData  = {}; // Inicializa los datos del subproyecto
 
-            for (let colNumber = 3; colNumber <= 23; colNumber++) { // Itera desde la columna B (2) hasta la F (6)
-                const cellValueForIndTipInd = row.getCell(24).text.trim();
-                const cellValueForProMesIni = row.getCell(25).text.trim();
-                const cellValueForProMesFin = row.getCell(26).text.trim();
-                const cellValueForUni = row.getCell(27).text.trim();
-                const cellValueForTipVal = row.getCell(28).text.trim();
-                const cellValueForInvSubAct = row.getCell(29).text.trim();
+            for (let colNumber = 3; colNumber <= 24; colNumber++) { // Itera desde la columna B (2) hasta la F (6)
+                const cellValueForIndTipInd = row.getCell(25).text.trim();
+                const cellValueForProMesIni = row.getCell(26).text.trim();
+                const cellValueForProMesFin = row.getCell(27).text.trim();
+                const cellValueForUni = row.getCell(28).text.trim();
+                const cellValueForTipVal = row.getCell(29).text.trim();
+                const cellValueForInvSubAct = row.getCell(30).text.trim();
 
                 const cell = row.getCell(colNumber);
                 const cellValue = cell.text.trim();
@@ -207,6 +207,8 @@ export const handleUpload = async (file, setTableData, setPostData, setIsValid, 
 
                 // Dependiendo de la entidad, agrega los datos al objeto correspondiente
                 if (entity === 'Proyecto') {
+                    projectData[databaseKey] = cellValue;
+                } else if (entity === 'Subproyecto') {
                     if (databaseKey === 'proPerMesIni') {
                         projectData[databaseKey] = cellValueForProMesIni;
                     } else if (databaseKey === 'proPerMesFin') {
@@ -214,10 +216,8 @@ export const handleUpload = async (file, setTableData, setPostData, setIsValid, 
                     } else if (databaseKey === 'proInvSubAct') {
                         projectData[databaseKey] = cellValueForInvSubAct;
                     } else {
-                        projectData[databaseKey] = cellValue;
+                        subprojectData[databaseKey] = cellValue;
                     }
-                } else if (entity === 'Subproyecto') {
-                    subprojectData[databaseKey] = cellValue;
                 } else if (entity === 'Objetivo') {
                     objectiveData[databaseKey] = cellValue; // Agrega los datos del objetivo
                 } else if (entity === 'ObjetivoEspecifico') {

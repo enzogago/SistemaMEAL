@@ -132,7 +132,7 @@ const CustomTable = ({
                         actions && actions.add && 
                         <>
                             <button 
-                                className='flex jc-space-between Large_3 Large-m_5 Large-p_5 PowerMas_Buttom_Primary'
+                                className='flex jc-space-between ai-center Large_3 Large-m_5 Large-p_5 PowerMas_Buttom_Primary'
                                 onClick={() => {openModal ? openModal() : navigate(`/${navigatePath}`)}} 
                                 disabled={!actions.add}
                             >

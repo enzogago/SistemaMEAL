@@ -658,7 +658,7 @@ const ResultGoal = () => {
                         })}
                     >
                         <option value="0">--Seleccione un Año--</option>
-                        {selectedSubProyecto && Array.from({length: selectedSubProyecto.proPerAnoFin - selectedSubProyecto.proPerAnoIni + 1}, (_, i) => i + Number(selectedSubProyecto.proPerAnoIni)).map(metAnoPlaTec => (
+                        {selectedSubProyecto && Array.from({length: selectedSubProyecto.subProPerAnoFin - selectedSubProyecto.subProPerAnoIni + 1}, (_, i) => i + Number(selectedSubProyecto.subProPerAnoIni)).map(metAnoPlaTec => (
                             <option key={metAnoPlaTec} value={metAnoPlaTec}>{metAnoPlaTec}</option>
                         ))}
                     </select>

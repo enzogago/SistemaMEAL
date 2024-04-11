@@ -120,9 +120,9 @@ const Table = ({ data, openModal, setData, controller, fieldMapping, title, resi
                     } else if (field === 'Subproyecto') {
                         return row.original.subProSap + ' - ' + row.original.subProNom.charAt(0).toUpperCase() + row.original.subProNom.slice(1).toLowerCase();
                     } else if (field === 'Periodo Inicio') {
-                        return <div style={{textTransform: 'capitalize'}}>{row.original.proPerMesIniNombre.toLowerCase() + ' - ' +  row.original.proPerAnoIni }</div>;
+                        return <div style={{textTransform: 'capitalize'}}>{row.original.subProPerMesIniNombre.toLowerCase() + ' - ' +  row.original.subProPerAnoIni }</div>;
                     } else if (field === 'Periodo Fin') {
-                        return <div style={{textTransform: 'capitalize'}}>{row.original.proPerMesFinNombre.toLowerCase() + ' - ' +  row.original.proPerAnoFin }</div>;
+                        return <div style={{textTransform: 'capitalize'}}>{row.original.subProPerMesFinNombre.toLowerCase() + ' - ' +  row.original.subProPerAnoFin }</div>;
                     } else if (field === 'Responsable') {
                         return <div style={{textTransform: 'capitalize'}}>{ text.toLowerCase() }</div>;
                     } else if (field === 'Tipo de Indicador') {
@@ -190,11 +190,12 @@ const Table = ({ data, openModal, setData, controller, fieldMapping, title, resi
     };
 
     data.forEach(item => {
-        if (item.proPerMesFin && item.proPerMesIni) {
-            item.proPerMesFinNombre = (new Date(2024, item.proPerMesFin - 1).toLocaleString('es-ES', { month: 'long' })).toUpperCase();
-            item.proPerMesIniNombre = (new Date(2024, item.proPerMesIni - 1).toLocaleString('es-ES', { month: 'long' })).toUpperCase();
+        if (item.subProPerMesFin && item.subProPerMesIni) {
+            item.subProPerMesFinNombre = (new Date(2024, item.subProPerMesFin - 1).toLocaleString('es-ES', { month: 'long' })).toUpperCase();
+            item.subProPerMesIniNombre = (new Date(2024, item.subProPerMesIni - 1).toLocaleString('es-ES', { month: 'long' })).toUpperCase();
         }
         if (item.indTipInd) {
+            console.log(item.indTipInd)
             item.indTipIndNombre = tipoIndicadorMapping[item.indTipInd].toUpperCase();
         }
     });
