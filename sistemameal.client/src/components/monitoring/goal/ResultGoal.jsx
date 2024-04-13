@@ -460,7 +460,16 @@ const ResultGoal = () => {
                 return;
             }
             console.log(data)
-            setUbicacionesSelect(prevUbicaciones => [...prevUbicaciones, data[0]]);
+            setUbicacionesSelect(prevUbicaciones => {
+                // Verifica si el arreglo ya contiene un objeto con el mismo ubiAno y ubiCod
+                const isAlreadyIncluded = prevUbicaciones.some(ubicacion => ubicacion.ubiAno === data[0].ubiAno && ubicacion.ubiCod === data[0].ubiCod);
+                // Si no está incluido, agrega el nuevo objeto al arreglo
+                if (!isAlreadyIncluded) {
+                    return [...prevUbicaciones, data[0]];
+                }
+                // Si ya está incluido, devuelve el arreglo sin cambios
+                return prevUbicaciones;
+            });
         } catch (error) {
             console.error('Error:', error);
         } finally {

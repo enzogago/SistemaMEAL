@@ -26,16 +26,23 @@ const SaveProject = () => {
             const transformedData = tableData.map((row, rowIndex) => {
                 return expectedHeaders.reduce((obj, headerInfo, index) => {
                     const dbKey = headerInfo.dbKey;
-                    const cell = row[index];
+                    let cell = row[index];
+                    // Si la key no contiene 'Num', convierte el valor a minúsculas
+                    console.log(dbKey)
+                    if (!dbKey.includes('Num') && !dbKey.includes('Ide')) {
+                        cell = cell.toLowerCase();
+                    }
                     obj[dbKey] = cell;
                     return obj;
                 }, {});
             });
+            console.log(transformedData)
             setTransformedData(transformedData)
         } else {
             navigate('/upload-project');
         }
     }, [tableData]);
+    
     
     
     const [sorting, setSorting] = useState([]);

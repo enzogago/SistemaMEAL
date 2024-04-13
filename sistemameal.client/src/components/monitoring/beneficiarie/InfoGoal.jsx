@@ -17,7 +17,7 @@ const InfoGoal = ({metaData, openModal}) => {
                     <div className="Large_6 flex flex-column ai-center">
                         <h3 className="f1_25 center">Avance Técnico</h3>
                         <DonutChart 
-                            percentage={(metaData ? metaData.metPorAvaTec : 0) == 0 ? 0.1 : (metaData ? metaData.metPorAvaTec : 0)} 
+                            percentage={(metaData ? metaData.metPorAvaTec : 0)} 
                             wh={150}
                             rad={20}
                             newId={'MetaBeneficiario'}

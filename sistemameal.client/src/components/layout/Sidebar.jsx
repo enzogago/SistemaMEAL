@@ -95,47 +95,60 @@ const Sidebar = () => {
         }
     }, [menuData]);
     
-    
-    // Cerrar sesión
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        setIsLoggedIn(false);
-        resetStatus();
-        setUsers([]);
+
+    // Detectar el tamaño de la ventana
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+    useEffect(() => {
+        const handleResize = () => setWindowWidth(window.innerWidth);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    // Establecer el estado inicial de isOpen en función del tamaño de la ventana
+    const [isOpen, setIsOpen] = useState(windowWidth > 768);
+
+    const handleMenuClick = () => {
+        setIsOpen(!isOpen);
     };
 
+    const closeSidebar = () => {
+        setIsOpen(false);
+    };
     
     return (
-        <div className="PowerMas_Menu Large_2 Medium_3 Small_12 flex flex-column">
+        <div className={`PowerMas_Menu Large_2 Medium_3 flex flex-column`}>
             <div className="PowerMas_SidebarHeader Large-p1 Medium-p_75 Small-p1 center Medium-block Small-flex flex Small-jc-space-between jc-space-between">
                 <img className='Large_8 Medium_10 Phone_6' height="auto"  title="Sistema MEAL Ayuda en Acción" src={logo} alt="Logo Ayuda En Accion" />
-                <IoMenu className='Large-f0 Medium-f0 Small-f2_5 Phone_1' />
+                <IoMenu className='Large-f0 Medium-f0 Small-f2_5 Phone_1' onClick={handleMenuClick} style={{color: '#fff'}} />
             </div>
-            <div className="PowerMas_MenuContainer Large-f1 flex-grow-1 overflow-auto">
-                <div className="PowerMas_MenuOptions overflow-auto">
-                    <div className='PowerMas_MainSingleLink'>
-                        <Link to='/'>
-                            <div className="PowerMas_SingleLink Large-f1">
-                                <FaHome />
-                                <span > Home </span>
-                            </div>
-                        </Link>
+            <div className={`PowerMas_SidebarResponsive flex flex-column flex-grow-1 overflow-auto ${isOpen ? 'open' : 'closed'}`}>
+                <div className="PowerMas_MenuContainer Large-f1 flex-grow-1 overflow-auto">
+                    <div className="PowerMas_MenuOptions overflow-auto">
+                        <div className='PowerMas_MainSingleLink'>
+                            <Link to='/'>
+                                <div className="PowerMas_SingleLink Large-f1">
+                                    <FaHome />
+                                    <span > Home </span>
+                                </div>
+                            </Link>
+                        </div>
+                        {menuGroup.map((menuItem, index) => (
+                            <MenuItem key={index} menu={menuItem} level={1} closeSidebar={closeSidebar} />
+                        ))}
                     </div>
-                    {menuGroup.map((menuItem, index) => (
-                        <MenuItem key={index} menu={menuItem} level={1} />
-                    ))}
                 </div>
-            </div>
-            <div className="PowerMas_MenuBottom center p1">
-                <article className='p_5'>
-                    <p>Sistema MEAL</p>
-                    <p className='Large-f_75'>Version 0.0.1</p>
-                </article>
-                <hr className='p0 m0' style={{ border: '1px solid #fff'}} />  
-                <article className='p_5'>
-                    <p className='Large-f_75'>31 de Enero del 2024</p>
-                    <p className='Large-f_75'>05:20 PM</p>
-                </article>                   
+                <div className="PowerMas_MenuBottom center p1">
+                    <article className='p_5'>
+                        <p>Sistema MEAL</p>
+                        <p className='Large-f_75'>Version 0.0.1</p>
+                    </article>
+                    <hr className='p0 m0' style={{ border: '1px solid #fff'}} />  
+                    <article className='p_5'>
+                        <p className='Large-f_75'>31 de Enero del 2024</p>
+                        <p className='Large-f_75'>05:20 PM</p>
+                    </article>                   
+                </div>
             </div>
         </div>)
 };

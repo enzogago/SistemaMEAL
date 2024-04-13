@@ -15,7 +15,7 @@ const DonutChart = ({ percentage, wh, rad, newId, colorText, colorPc, colorSpc }
             .range([colorPc, colorSpc]); 
     
         const data = [
-            { value: percentage },
+            { value: (percentage == 0 ? 0.00001 : percentage) },
             { value: 0 }
         ];
     
@@ -29,15 +29,17 @@ const DonutChart = ({ percentage, wh, rad, newId, colorText, colorPc, colorSpc }
     
         const svg = d3.select(`#${newId}`)
             .append("svg")
-            .attr("width", width)
-            .attr("height", height)
+            .attr("width", width+5)
+            .attr("height", height+5)
             .append("g")
-            .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+            .attr("transform", "translate(" + (width+5) / 2 + "," + (height+5) / 2 + ")");
     
         const path = svg.selectAll("path")
             .data(pie(data))
             .enter().append("path")
-            .attr("fill", (d, i) => color(i));
+            .attr("fill", (d, i) => color(i))
+            .attr("stroke", colorPc) // Color del borde
+            .attr("stroke-width", 1); // Ancho del borde
     
         path.transition() // Inicia la transición
             .duration(1000) // Duración de la transición en milisegundos
@@ -53,7 +55,7 @@ const DonutChart = ({ percentage, wh, rad, newId, colorText, colorPc, colorSpc }
             .attr("text-anchor", "middle")
             .attr("dy", ".35em")
             .style("fill", colorText)
-            .text((percentage == 0.1 ? 0 : percentage) + "%");
+            .text(percentage + "%");
 
     }, [percentage]);
 

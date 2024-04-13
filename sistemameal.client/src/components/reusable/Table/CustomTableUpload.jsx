@@ -205,7 +205,7 @@ const CustomTableUpload = ({
                                             const errorCell = errorCells.find(errorCell => errorCell.row === row.index && errorCell.column === cell.column.columnDef.index);
                                             const errorMessage = errorCell ? errorCell.message : '';
 
-                                            const cellText = cell.getValue().charAt(0) + cell.getValue().slice(1).toLowerCase();
+                                            const cellText = cell.getValue().charAt(0).toUpperCase() + cell.getValue().slice(1);
                                             const shortText = cellText.length > 50 ? cellText.substring(0, 50) + '...' : cellText;
 
                                             return (

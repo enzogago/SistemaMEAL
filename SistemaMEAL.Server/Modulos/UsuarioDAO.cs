@@ -22,6 +22,15 @@ namespace SistemaMEAL.Server.Modulos
             {
                 cn.getcn.Open();
 
+                // Obtén el primer carácter de usuario.usuNom
+                string? primerCaracterUsuNom = usuario.UsuNom?.Substring(0, 1);
+
+                // Obtén la primera palabra de usuario.usuApe
+                string? primeraPalabraUsuApe = usuario.UsuApe?.Split(' ')[0];
+
+                // Concatena el primer carácter de usuario.usuNom y la primera palabra de usuario.usuApe
+                string usuNomUsu = primerCaracterUsuNom + primeraPalabraUsuApe;
+
                 SqlCommand cmd = new SqlCommand("SP_MODIFICAR_USUARIO", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 // Aquí debes agregar todos los parámetros que necesita tu procedimiento almacenado
@@ -37,7 +46,7 @@ namespace SistemaMEAL.Server.Modulos
                 cmd.Parameters.AddWithValue("@P_CARCOD", usuario.CarCod);
                 cmd.Parameters.AddWithValue("@P_USUFECINC", usuario.UsuFecInc);
                 cmd.Parameters.AddWithValue("@P_USUTEL", usuario.UsuTel);
-                cmd.Parameters.AddWithValue("@P_USUNOMUSU", usuario.UsuNomUsu);
+                cmd.Parameters.AddWithValue("@P_USUNOMUSU", usuNomUsu);
                 cmd.Parameters.AddWithValue("@P_USUPAS", usuario.UsuPas);
                 cmd.Parameters.AddWithValue("@P_USUEST", usuario.UsuEst);
                 cmd.Parameters.AddWithValue("@P_ROLCOD", usuario.RolCod);
@@ -86,6 +95,18 @@ namespace SistemaMEAL.Server.Modulos
             {
                 cn.getcn.Open();
 
+                // Obtén la fecha actual y formátala como una cadena en el formato "dd-MM-yyyy"
+                string fechaActual = DateTime.Now.ToString("dd-MM-yyyy");
+
+                // Obtén el primer carácter de usuario.usuNom
+                string? primerCaracterUsuNom = usuario.UsuNom?.Substring(0, 1);
+
+                // Obtén la primera palabra de usuario.usuApe
+                string? primeraPalabraUsuApe = usuario.UsuApe?.Split(' ')[0];
+
+                // Concatena el primer carácter de usuario.usuNom y la primera palabra de usuario.usuApe
+                string usuNomUsu = primerCaracterUsuNom + primeraPalabraUsuApe;
+
                 SqlCommand cmd = new SqlCommand("SP_INSERTAR_USUARIO", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
 
@@ -97,9 +118,9 @@ namespace SistemaMEAL.Server.Modulos
                 cmd.Parameters.AddWithValue("@P_USUSEX", usuario.UsuSex);
                 cmd.Parameters.AddWithValue("@P_USUCORELE", usuario.UsuCorEle);
                 cmd.Parameters.AddWithValue("@P_CARCOD", usuario.CarCod);
-                cmd.Parameters.AddWithValue("@P_USUFECINC", "17-03-2003");
+                cmd.Parameters.AddWithValue("@P_USUFECINC", fechaActual);
                 cmd.Parameters.AddWithValue("@P_USUTEL", usuario.UsuTel);
-                cmd.Parameters.AddWithValue("@P_USUNOMUSU", "EGAGO");
+                cmd.Parameters.AddWithValue("@P_USUNOMUSU", usuNomUsu);
                 cmd.Parameters.AddWithValue("@P_USUPAS", usuario.UsuPas);
                 cmd.Parameters.AddWithValue("@P_USUEST", usuario.UsuEst);
                 cmd.Parameters.AddWithValue("@P_ROLCOD", usuario.RolCod);

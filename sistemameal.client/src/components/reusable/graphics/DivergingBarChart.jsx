@@ -31,7 +31,7 @@ const DivergingBarChart = ({ rangeData, id, maleColor, femaleColor }) => {
         });
         
         const margin = { top: 20, right: 0, bottom: 20, left: 60 };
-        const width = ref.current.clientWidth - (margin.left + margin.right);
+        const width = ref.current.clientWidth;
         const height = Math.max(maleData.length, femaleData.length) * 40;
 
         // Limpia el div antes de añadir el nuevo gráfico
@@ -64,7 +64,7 @@ const DivergingBarChart = ({ rangeData, id, maleColor, femaleColor }) => {
 
 
         const barsGroup = svg.append("g")
-            .attr("transform", `translate(${margin.left / 2}, 0)`); // Añade un margen a las barras
+            .attr("transform", `translate(${margin.left / 20}, 0)`); // Añade un margen a las barras
 
         barsGroup.append("g")
             .selectAll("rect")
@@ -91,24 +91,24 @@ const DivergingBarChart = ({ rangeData, id, maleColor, femaleColor }) => {
             .selectAll("text")
             .data(maleData)
             .join("text")
-            .attr("x", d => width / 2 - x(d.count) + margin.left/2 - 5)
+            .attr("x", d => width / 2 - x(d.count))
             .attr("y", (d, i) => y(i) + y.bandwidth() / 2) // Usa el índice en lugar de d.age
             .attr("text-anchor", "end")
             .attr("dy", "0.35em")
             .text(d => formatter.format(d.count));
             
-            svg.append("g")
+        svg.append("g")
             .selectAll("text")
             .data(femaleData)
             .join("text")
-            .attr("x", d => width / 2 + x(d.count) + margin.left/2 + 5)
+            .attr("x", d => width / 2 + x(d.count) + 5 )
             .attr("y", (d, i) => y(i) + y.bandwidth() / 2) // Usa el índice en lugar de d.age
             .attr("dy", "0.35em")
             .text(d => formatter.format(d.count));
             
     }, [rangeData]);
 
-    return <div id={id} ref={ref}></div>;
+    return <div className='Phone_12' id={id} ref={ref}></div>;
 };
 
 export default DivergingBarChart;

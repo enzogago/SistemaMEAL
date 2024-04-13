@@ -57,7 +57,7 @@ const validationRules = {
     'nombre': {
         required: true,
         maxLength: 300,
-        minLength: 5,
+        minLength: 2,
         pattern: /^[0-9A-Za-zñÑáéíóúÁÉÍÓÚ():%/.,;üÜ\s-_]+$/,
         patternMessage: 'Por favor, introduce solo letras y espacios',
     },

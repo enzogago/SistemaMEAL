@@ -88,7 +88,7 @@ const PieChart = ({ data, id }) => {
         
     }, [data]);
 
-    return <div id={id} ref={ref} style={{position: 'relative'}}></div>;
+    return <div className='Medium_6 Phone_8' id={id} ref={ref} style={{position: 'relative'}}></div>;
 };
 
 export default PieChart;

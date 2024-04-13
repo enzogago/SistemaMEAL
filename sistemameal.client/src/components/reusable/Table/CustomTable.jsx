@@ -2,6 +2,7 @@ import { FaPlus, FaSearch, FaSortDown } from 'react-icons/fa';
 import { TiArrowSortedUp ,TiArrowSortedDown } from "react-icons/ti";
 import Excel_Icon from '../../../img/PowerMas_Excel_Icon.svg';
 import Pdf_Icon from '../../../img/PowerMas_Pdf_Icon.svg';
+import TableEmpty from '../../../img/PowerMas_TableEmpty.svg';
 import Pagination from './Pagination';
 import {
     flexRender, 
@@ -87,7 +88,8 @@ const CustomTable = ({
     return (
         <div className='TableMainContainer Large-p1 Medium-p1 Small-p_5'>
             <div className="">
-                <h1 className="Large-f1_5"> { title && `Listado de ${title}`}</h1>
+                <h1 className="Medium-f1_5 Small-f1_25"> { title && `Listado de ${title}`}</h1>
+
                 <div className="flex">
                     {setSearchFilter && 
                         <div className="PowerMas_Search_Container Large_6 Large-m_5 flex-grow-1">
@@ -226,7 +228,7 @@ const CustomTable = ({
                     </thead>
                     <tbody>
                         {
-                            table.getRowModel().rows.length > 0 ?
+                            table.getRowModel().rows.length > 0 > 0 ?
                                 <>
                                     {table.getRowModel().rows.map(row => (
                                         <tr key={row.id}>
@@ -251,11 +253,16 @@ const CustomTable = ({
                                         </tr>
                                     ))}
                                 </>
-                            :   <tr className='PowerMas_TableEmpty'>
-                                    <td colSpan={20} className='Large-p1 center'>
-                                        No se encontraron registros
-                                    </td>
-                                </tr>
+                            :    
+                            <tr className='PowerMas_TableEmpty' >
+                                <td colSpan={20} className='Large-p1 center '>
+                                    <br /><br />
+                                    <div className='Phone_12 flex flex-column ai-center jc-center'>
+                                        <img src={TableEmpty} alt="TableEmpty" className='Medium_4 Phone_12' />
+                                        <p className='PowerMas_Text_Empty'>No se encontraron datos.</p>
+                                    </div>
+                                </td>
+                            </tr>
                         }
                     </tbody>
                     <tfoot>

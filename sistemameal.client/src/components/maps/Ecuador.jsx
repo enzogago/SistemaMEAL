@@ -127,7 +127,7 @@ const Ecuador = () => {
     }, []);
 
     return (
-        <div style={{width: '100%', height: '100%', position: 'relative'}}>
+        <div className='Small-relative' style={{width: '100%', height: '100%'}}>
            <svg id='Ecuador' ref={ref} style={{width: '100%', height: '100%', position: 'absolute'}} />
        </div>)
 };

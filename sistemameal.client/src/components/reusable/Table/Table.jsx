@@ -217,8 +217,9 @@ const Table = ({ data, openModal, setData, controller, fieldMapping, title, resi
 
     const [pagination, setPagination] = useState({
         pageIndex: 0, //initial page index
-        pageSize: 100, //default page size
+        pageSize: isLargePagination ? 100 : 10, //default page size
     });
+    
 
     const table = useReactTable({
         data: filteredData,

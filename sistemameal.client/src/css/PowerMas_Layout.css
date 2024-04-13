@@ -500,6 +500,19 @@
 }
 
 @media screen and (min-width: 20em) {
+  .Small-gap_25{
+    gap: 0.25rem;
+  }
+  .Small-gap_5{
+    gap: 0.5rem;
+  }
+  .Small-gap_75{
+    gap: 0.75rem;
+  }
+  .Small-gap-1{
+    gap: 1rem;
+  }
+
   /* Técnica 1 float left/right; */
   .Small-floatl {
     float: left;
@@ -989,6 +1002,19 @@
 }
 
 @media screen and (min-width: 48em) {
+  .Medium-gap_25{
+    gap: 0.25rem;
+  }
+  .Medium-gap_5{
+    gap: 0.5rem;
+  }
+  .Medium-gap_75{
+    gap: 0.75rem;
+  }
+  .Medium-gap-1{
+    gap: 1rem;
+  }
+
   /* Técnica 1 float left/right; */
   .Medium-floatl {
     float: left;
@@ -1473,6 +1499,19 @@
 }
 
 @media screen and (min-width: 64em) {
+  .Large-gap_25{
+    gap: 0.25rem;
+  }
+  .Large-gap_5{
+    gap: 0.5rem;
+  }
+  .Large-gap_75{
+    gap: 0.75rem;
+  }
+  .Large-gap-1{
+    gap: 1rem;
+  }
+
   /* Técnica 1 float left/right; */
   .Large-floatl {
     float: left;

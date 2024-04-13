@@ -15,6 +15,9 @@ import masculino from '../../img/PowerMas_Avatar_Masculino.svg';
 import femenino from '../../img/PowerMas_Avatar_Femenino.svg';
 import { formatter } from '../monitoring/goal/helper';
 
+import DivergingEmpty from '../../img/PowerMas_DivergingEmpty.svg';
+import PieEmpty from '../../img/PowerMas_PieEmpty.svg';
+import BarEmpty from '../../img/PowerMas_BarEmpty.svg';
 
 const Home = () => {
     const [ monitoringData, setMonitoringData] = useState([])
@@ -414,18 +417,18 @@ const Home = () => {
         </div>
         <div className='PowerMas_Resume_Home overflow-auto'>
             <div className="PowerMas_ResumeHome m1 flex flex-column">
-                <div className="PowerMas_RightSection flex Medium-flex-row Small-flex-column bg-white gap_5">
+                <div className=" flex Medium-flex-row Small-flex-column bg-white gap_5">
                     <div className="PowerMas_KPIRow Large_2 Medium_4 Small_12 Large-f1_25 Large-p1 Medium-p_5">
                         <p className="f1_25">Atenciones brindadas</p>
-                        <span className='f2'>{formatter.format(totalAtenciones)}</span>
+                        <span className='Medium_f2 Small-f1_5'>{formatter.format(totalAtenciones)}</span>
                     </div>
                     <div className="PowerMas_KPIRow Large_2 Medium_4 Small_12 js-element6 Large-f1_25 Large-p1 Medium-p_5">
                         <p className="f1_25">Beneficiarios totales</p>
-                        <span className='f2'>{formatter.format(Number(totalBeneficiarios))}</span>
+                        <span className='Medium_f2 Small-f1_5'>{formatter.format(Number(totalBeneficiarios))}</span>
                     </div>
                     <div className="PowerMas_KPIRow Large_2 Medium_4 Small_12 js-element6 Large-f1_25 Large-p1 Medium-p_5">
                         <p className="f1_25">Beneficiarios duplicados</p>
-                        <span className='f2'>{formatter.format(0)}</span>
+                        <span className='Medium_f2 Small-f1_5'>{formatter.format(0)}</span>
                     </div>
                     <div className="PowerMas_KPIRow Large_3 Medium_6 Small_12 gap_3 flex-column Large-f1_25">
                         <p className="f1_25" style={{whiteSpace: 'nowrap'}}>Avance presupuesto</p>
@@ -438,53 +441,76 @@ const Home = () => {
                         </Suspense>
                     </div>
                 </div>
-                <div className="PowerMas_Home_Card PowerMas_LeftSection flex Large_12 Medium_12 Phone_12 bg-white js-element5">
+                <div className="PowerMas_Home_Card PowerMas_LeftSection flex Large_12 Medium_12 Phone_12 flex flex-column bg-white js-element5">
+                    <div className='Large_12 Phone_12 p_5 PowerMas_Tittle_Map'>
+                        <h4>Listado de Metas</h4>
+                    </div>
                     {monitoringData && <Table data={monitoringData} />}
                 </div>
             </div>
             <div className='flex flex-column m1 gap-1 center'>
                 <div className="flex Large-flex-row Medium-flex-row Small-flex-column gap-1">
                     <div className='PowerMas_Home_Card Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
-                        <div className='Large_12 p_5 PowerMas_Tittle_Map'>
+                        <div className='Large_12 Phone_12 p_5 PowerMas_Tittle_Map'>
                             <h4>Beneficiarios por sexo</h4>
                         </div>
-                        <div className='Large_12 flex flex-column jc-center ai-center js-element'>
-                            <div className='Large_6 Medium_12 Phone_12 Large-p1 Small-p_75 flex-grow-1'>
-                                <PieChart data={pieData} id='MaleFemale' />
-                            </div>
-                            <div className='flex flex-wrap gap-1'>
-                                {data.map((item, index) => (
-                                    <div key={index} className='flex ai-center gap_5'>
-                                        <div className='legend-color' style={{ backgroundColor: item.color, width: '15px', height: '15px' }}></div>
-                                        <span className='legend-label'>{item.name}</span>
+                        <div className='Large_12 Phone_12 flex flex-column flex-grow-1 Medium-p1 Small-p_75'>
+                            {
+                                pieData.length > 0 ?
+                                <>
+                                    <div className='Large_12 Phone_12 flex flex-grow-1 ai-center jc-center'>
+                                            <PieChart data={pieData} id='MaleFemale' />
                                     </div>
-                                ))}
-                            </div>
+                                    <div className='flex flex-wrap gap-1 ai-center jc-center'>
+                                        {data.map((item, index) => (
+                                            <div key={index} className='flex ai-center gap_5'>
+                                                <div className='legend-color' style={{ backgroundColor: item.color, width: '15px', height: '15px' }}></div>
+                                                <span className='legend-label'>{item.name}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </>
+                                :
+                                <div className='Phone_12 flex flex-column ai-center jc-center Medium-m1 Small-m_75'>
+                                    <img src={PieEmpty} alt="PieEmpty" className='Large_7' />
+                                    <p className='PowerMas_Text_Empty'>No se encontraron datos.</p>
+                                </div>
+                            }
                         </div>
                     </div>
                     <div className='PowerMas_Home_Card Large-p0 Medium-p_75 Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
-                        <div className='Large_12 p_5 PowerMas_Tittle_Map'>
+                        <div className='Large_12 Phone_12 p_5 PowerMas_Tittle_Map'>
                             <h4>Beneficiarios por edad</h4>
                         </div>
-                        <div className='Large_12 flex flex-column ai-center jc-center js-element3'>
-                            <div className='Large_12 Medium_12 Phone_12 Large-p1 Medium-p_75 flex-grow-1'>
-                                <DivergingBarChart 
-                                    rangeData={rangeData}
-                                    maleColor={maleColor} 
-                                    femaleColor={femaleColor} 
-                                    id='Diverging' 
-                                />
-                            </div>
-                            <div className='flex flex-wrap gap-1'>
-                                <div className='flex ai-center gap_5'>
-                                    <div className='legend-color' style={{ backgroundColor: maleColor, width: '15px', height: '15px' }}></div>
-                                    <span className='legend-label'>Masculino</span>
-                                </div>
-                                <div className='flex ai-center gap_5'>
-                                    <div className='legend-color' style={{ backgroundColor: femaleColor, width: '15px', height: '15px' }}></div>
-                                    <span className='legend-label'>Femenino</span>
-                                </div>
-                            </div>
+                        <div className='Large_12 Phone_12 flex flex-column ai-center jc-center js-element3 flex-grow-1 Medium-p1 Small-p_75'>
+                                {
+                                    rangeData.length > 0 ?
+                                    <>
+                                        <div className='Large_12 Medium_12 Phone_12 flex-grow-1 flex ai-center jc-center'>
+                                            <DivergingBarChart 
+                                                rangeData={rangeData}
+                                                maleColor={maleColor} 
+                                                femaleColor={femaleColor} 
+                                                id='Diverging' 
+                                            />
+                                        </div>
+                                        <div className='flex flex-wrap gap-1 ai-center jc-center'>
+                                            <div className='flex ai-center gap_5'>
+                                                <div className='legend-color' style={{ backgroundColor: maleColor, width: '15px', height: '15px' }}></div>
+                                                <span className='legend-label'>Masculino</span>
+                                            </div>
+                                            <div className='flex ai-center gap_5'>
+                                                <div className='legend-color' style={{ backgroundColor: femaleColor, width: '15px', height: '15px' }}></div>
+                                                <span className='legend-label'>Femenino</span>
+                                            </div>
+                                        </div>
+                                    </>
+                                    :
+                                    <div className='Phone_12 flex flex-column ai-center jc-center Medium-m1 Small-m_75'>
+                                        <img src={DivergingEmpty} alt="DivergingEmpty" className='' />
+                                        <p className='PowerMas_Text_Empty'>No se encontraron datos.</p>
+                                    </div>
+                                }
                         </div>
                     </div>
                 </div>
@@ -493,23 +519,39 @@ const Home = () => {
                         <div className='Large_12 p_5 PowerMas_Tittle_Map'>
                             <h4>Beneficiarios por nacionalidad</h4>
                         </div>
-                        <div className='Large_12 Medium_12 Phone_12 Large-p1 Medium-p_75 flex-grow-1 js-element2'>
-                            <HorizontalBarChart data={dataNac} id='NacionalidadBarChart' barColor='#F7775A' />
+                        <div className='Large_12 Medium_12 Phone_12 Large-p1 Medium-p_75 flex flex-grow-1 js-element2 Medium-p1 Small-p_75'>
+                            {
+                                dataNac.length > 0 ?
+                                    <HorizontalBarChart data={dataNac} id='NacionalidadBarChart' barColor='#F7775A' />
+                                :
+                                    <div className='Phone_12 flex flex-column ai-center jc-center Medium-m1 Small-m_75'>
+                                        <img src={BarEmpty} alt="BarEmpty" className='' />
+                                        <p className='PowerMas_Text_Empty'>No se encontraron datos.</p>
+                                    </div>
+                                }
                         </div>
                     </div>
                     <div className='PowerMas_Home_Card Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
                         <div className='Large_12 p_5 PowerMas_Tittle_Map'>
                             <h4>Beneficiarios por tipo de documento</h4>
                         </div>
-                        <div className='Large_12 Medium_12 Phone_12 Large-p1 Medium-p_75 flex-grow-1 js-element4'>
-                            <HorizontalBarChart data={docData} id='TipoDocBarChart' barColor='#F7775A' />
+                        <div className='Large_12 Medium_12 Phone_12 Large-p1 Medium-p_75 flex-grow-1 js-element4 Medium-p1 Small-p_75'>
+                            {
+                                docData.length > 0 ?
+                                <HorizontalBarChart data={docData} id='TipoDocBarChart' barColor='#F7775A' />
+                                :
+                                <div className='Phone_12 flex flex-column ai-center jc-center Medium-m1 Small-m_75'>
+                                    <img src={BarEmpty} alt="BarEmpty" className='' />
+                                    <p className='PowerMas_Text_Empty'>No se encontraron datos.</p>
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>
             </div>
             
             <div className="PowerMas_RecentsSection flex Large-flex-row Medium-flex-row Small-flex-column m1 gap-1">
-                <div className="PowerMas_Home_Card flex flex-column  Large_6 Medium_6 Phone_12 Large_p0">
+                <div className="PowerMas_Home_Card flex flex-column  Large_6 Medium_6 Phone_12 Large_p0" style={{maxHeight: '30rem'}}>
                     <div className='Large_12 p_5 PowerMas_Tittle_Map center'>
                         <h4>Actividades recientes</h4>
                     </div>
@@ -568,12 +610,12 @@ const Home = () => {
                     <div className='Large_12 p_5 PowerMas_Tittle_Map center'>
                         <h4>Beneficiarios por ubicación</h4>
                     </div>
-                    <div className='flex flex-grow-1 Phone_12' style={{position: 'relative'}}>
-                        <article className='flex ai-center flex-grow-1' style={{position: 'absolute', bottom: '0', zIndex: '1'}}>
-                            <div className='flex flex-column p_5 gap_5 Large_12'>
+                    <div className='flex flex-grow-1 Phone_12' style={{position: 'relative', minHeight: '20rem'}}>
+                        <article className='Medium_3 Phone_3 flex ai-center flex-grow-1' style={{position: 'absolute', bottom: '0', zIndex: '1'}}>
+                            <div className='flex flex-column Medium-p_5 Small-p_25 Meidum-gap_5 Small-gap_25  Large_12'>
                                 <div className='bg-white' style={{borderRadius: '6px'}}>
                                     <button 
-                                        className={`PowerMas_Buttom_Map PowerMas_Buttom_Map_${currentMap === 'Todos' ? 'Active' : ''}`} 
+                                        className={`PowerMas_Buttom_Map Medium-p_5 Small-p_5 Medium-f_75 Small-f_5 PowerMas_Buttom_Map_${currentMap === 'Todos' ? 'Active' : ''}`} 
                                         onClick={() => setCurrentMap('Todos')}
                                     >
                                         Todos
@@ -581,7 +623,7 @@ const Home = () => {
                                 </div>
                                 <div className='bg-white' style={{borderRadius: '6px'}}>
                                     <button 
-                                        className={`PowerMas_Buttom_Map PowerMas_Buttom_Map_${currentMap === 'Perú' ? 'Active' : ''}`} 
+                                        className={`PowerMas_Buttom_Map Medium-p_5 Small-p_5 Medium-f_75 Small-f_5 PowerMas_Buttom_Map_${currentMap === 'Perú' ? 'Active' : ''}`} 
                                         onClick={() => setCurrentMap('Perú')}
                                     >
                                         Perú
@@ -589,7 +631,7 @@ const Home = () => {
                                 </div>
                                 <div className='bg-white' style={{borderRadius: '6px'}}>
                                     <button 
-                                        className={`PowerMas_Buttom_Map PowerMas_Buttom_Map_${currentMap === 'Ecuador' ? 'Active' : ''}`} 
+                                        className={`PowerMas_Buttom_Map Medium-p_5 Small-p_5 Medium-f_75 Small-f_5 PowerMas_Buttom_Map_${currentMap === 'Ecuador' ? 'Active' : ''}`} 
                                         onClick={() => setCurrentMap('Ecuador')}
                                     >
                                         Ecuador
@@ -597,7 +639,7 @@ const Home = () => {
                                 </div>
                                 <div className='bg-white' style={{borderRadius: '6px'}}>
                                     <button 
-                                        className={`PowerMas_Buttom_Map PowerMas_Buttom_Map_${currentMap === 'Colombia' ? 'Active' : ''}`} 
+                                        className={`PowerMas_Buttom_Map Medium-p_5 Small-p_5 Medium-f_75 Small-f_5 PowerMas_Buttom_Map_${currentMap === 'Colombia' ? 'Active' : ''}`} 
                                         onClick={() => setCurrentMap('Colombia')}
                                     >
                                         Colombia

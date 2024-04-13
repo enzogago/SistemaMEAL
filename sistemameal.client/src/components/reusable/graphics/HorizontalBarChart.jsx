@@ -7,7 +7,7 @@ const HorizontalBarChart = ({ data, id, barColor }) => { // Añade barColor a la
     const ref = useRef();
 
     useEffect(() => {
-        const margin = { top: 30, right: 20, bottom: 0, left: 150 }; // Aumenta el margen inferior para hacer espacio para el eje x
+        const margin = { top: 15, right: 5, bottom: 15, left: 100 }; // Aumenta el margen inferior para hacer espacio para el eje x
         const width = ref.current.clientWidth;
         const barHeight = 50; // Aumenta la altura de la barra para más espacio entre barras
         const height = Math.ceil((data.length + 0.1) * barHeight) + margin.top + margin.bottom;
@@ -88,7 +88,7 @@ const HorizontalBarChart = ({ data, id, barColor }) => { // Añade barColor a la
 
     }, [data, barColor]); // Añade barColor a la lista de dependencias de useEffect
 
-    return <div id={id} ref={ref} style={{position: 'relative'}}></div>;
+    return <div className='Phone_12' id={id} ref={ref} style={{position: 'relative'}}></div>;
 };
 
 export default HorizontalBarChart;

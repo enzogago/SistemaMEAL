@@ -15,14 +15,13 @@ const Indicator = () => {
 
     // Definir controller y fieldMapping como variables
     const controller = 'Indicador';
-    const fieldMapping = { codigo: 'indNum', nombre: 'indNom', 'Tipo de Indicador': 'indTipInd', 'Unidad': 'uniNom', 'Tipo de Valor': 'tipValNom', 'Actividad': 'actNom', 'Resultado': 'resNom', 'Objetivo Específico': 'objEspNom', 'Código Objetivo': 'objNum', 'Objetivo': 'objNom', 'Sub Proyecto': 'subProNom', 'Proyecto': 'proNom', 'Responsable': 'subProRes','Periodo Inicio':'subProPerIni','Periodo Fin': 'subProPerFin' };
+    const fieldMapping = { codigo: 'indNum', nombre: 'indNom', 'Tipo de Indicador': 'indTipInd', 'Unidad': 'uniNom', 'Tipo de Valor': 'tipValNom', 'Actividad': 'actNom', 'Resultado': 'resNom', 'Objetivo Específico': 'objEspNom', 'Objetivo': 'objNom', 'Sub Proyecto': 'subProNom', 'Proyecto': 'proNom', 'Responsable': 'subProRes','Periodo Inicio':'subProPerIni','Periodo Fin': 'subProPerFin' };
     const filterProperties = {
         'CODIGO_INDICADOR': 'indNum',
         'INDICADOR': 'indNom',
         'TIPO_INDICADOR': 'indTipIndNombre',
         'UNIDAD': 'uniNom',
         'TIPO_VALOR': 'tipValNom',
-        
         'CODIGO_ACTIVIDAD': 'actNum',
         'ACTIVIDAD': 'actNom',
         'CODIGO_RESULTADO': 'resNum',
