@@ -117,7 +117,7 @@ const Bar = ({showSidebarAndBar}) => {
                         &gt;
                     </div>
                     {isOpen && (
-                        <div className={`Phone_2 PowerMas_DropdownMenu ${isOpen ? 'PowerMas_DropdownMenu--open' : ''}`}>
+                        <div className={`Medium_2 Phone_6 PowerMas_DropdownMenu ${isOpen ? 'PowerMas_DropdownMenu--open' : ''}`}>
                             <div className='PowerMas_Profile_Name p_75 flex flex-column jc-center ai-center gap_5'> 
                                 <div className="PowerMas_ProfilePicture2">
                                     <img src={userLogged && (userLogged.usuSex === 'M' ? masculino : femenino)} alt="Descripción de la imagen" />

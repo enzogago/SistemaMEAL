@@ -894,7 +894,7 @@ namespace SistemaMEAL.Modulos
             return (mensaje, tipoMensaje);
         }
 
-        public (string? message, string? messageType) ModificarCadenaIndicador(ClaimsIdentity? identity, List<CadenaPeriodo> cadenaPeriodos, List<CadenaImplementador> cadenaImplementadores, List<CadenaUbicacion> cadenaUbicaciones)
+        public (string? message, string? messageType) ModificarCadenaIndicadorTecnico(ClaimsIdentity? identity, List<CadenaPeriodo> cadenaPeriodos, List<CadenaImplementador> cadenaImplementadores, List<CadenaUbicacion> cadenaUbicaciones)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 
@@ -922,7 +922,7 @@ namespace SistemaMEAL.Modulos
                         {
                             foreach (var periodo in cadenaPeriodos)
                             {
-                                cmd = new SqlCommand("SP_MODIFICAR_CADENA_RESULTADO_PERIODO", cn.getcn);
+                                cmd = new SqlCommand("SP_MODIFICAR_CADENA_RESULTADO_PERIODO_PROGRAMATICO", cn.getcn);
                                 cmd.CommandType = CommandType.StoredProcedure;
                                 cmd.Parameters.AddWithValue("@P_INDANO", periodo.IndAno);
                                 cmd.Parameters.AddWithValue("@P_INDCOD", periodo.IndCod);
@@ -931,7 +931,6 @@ namespace SistemaMEAL.Modulos
                                 cmd.Parameters.AddWithValue("@P_INDCOD_ORIGINAL", periodo.IndCod);
                                 cmd.Parameters.AddWithValue("@P_CADRESPERANO_ORIGINAL", periodo.CadResPerAno);
                                 cmd.Parameters.AddWithValue("@P_CADRESPERMETTEC", periodo.CadResPerMetTec);
-                                cmd.Parameters.AddWithValue("@P_CADRESPERMETPRE", periodo.CadResPerMetPre);
                                 cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
                                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                                 cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
@@ -968,7 +967,7 @@ namespace SistemaMEAL.Modulos
                         {
                             foreach (var implementador in cadenaImplementadores)
                             {
-                                cmd = new SqlCommand("SP_MODIFICAR_CADENA_RESULTADO_IMPLEMENTADOR", cn.getcn);
+                                cmd = new SqlCommand("SP_MODIFICAR_CADENA_RESULTADO_IMPLEMENTADOR_PROGRAMATICO", cn.getcn);
                                 cmd.CommandType = CommandType.StoredProcedure;
                                 cmd.Parameters.AddWithValue("@P_INDANO", implementador.IndAno);
                                 cmd.Parameters.AddWithValue("@P_INDCOD", implementador.IndCod);
@@ -977,7 +976,6 @@ namespace SistemaMEAL.Modulos
                                 cmd.Parameters.AddWithValue("@P_INDCOD_ORIGINAL", implementador.IndCod);
                                 cmd.Parameters.AddWithValue("@P_IMPCOD_ORIGINAL", implementador.ImpCod);
                                 cmd.Parameters.AddWithValue("@P_CADRESIMPMETTEC", implementador.CadResImpMetTec);
-                                cmd.Parameters.AddWithValue("@P_CADRESIMPMETPRE", implementador.CadResImpMetPre);
                                 cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
                                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                                 cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
@@ -1010,7 +1008,7 @@ namespace SistemaMEAL.Modulos
                         {
                             foreach (var ubicacion in cadenaUbicaciones)
                             {
-                                cmd = new SqlCommand("SP_MODIFICAR_CADENA_RESULTADO_UBICACION", cn.getcn);
+                                cmd = new SqlCommand("SP_MODIFICAR_CADENA_RESULTADO_UBICACION_PROGRAMATICO", cn.getcn);
                                 cmd.CommandType = CommandType.StoredProcedure;
                                 cmd.Parameters.AddWithValue("@P_INDANO", ubicacion.IndAno);
                                 cmd.Parameters.AddWithValue("@P_INDCOD", ubicacion.IndCod);
@@ -1021,7 +1019,6 @@ namespace SistemaMEAL.Modulos
                                 cmd.Parameters.AddWithValue("@P_UBIANO_ORIGINAL", ubicacion.UbiAno);
                                 cmd.Parameters.AddWithValue("@P_UBICOD_ORIGINAL", ubicacion.UbiCod);
                                 cmd.Parameters.AddWithValue("@P_CADRESUBIMETTEC", ubicacion.CadResUbiMetTec);
-                                cmd.Parameters.AddWithValue("@P_CADRESUBIMETPRE", ubicacion.CadResUbiMetPre);
                                 cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
                                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                                 cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);

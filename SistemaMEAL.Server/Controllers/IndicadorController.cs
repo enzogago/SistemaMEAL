@@ -208,7 +208,7 @@ namespace SistemaMEAL.Server.Controllers
             }
         }
 
-        [HttpPut("cadena-indicador")]
+        [HttpPut("cadena-indicador-programatico")]
         public dynamic Insertar(CadenaIndicadorDto cadenaIndicadorDto)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
@@ -216,7 +216,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return rToken;
 
-            var (message, messageType) = _indicadores.ModificarCadenaIndicador(identity, cadenaIndicadorDto.CadenaPeriodos, cadenaIndicadorDto.CadenaImplementadores, cadenaIndicadorDto.CadenaUbicaciones);
+            var (message, messageType) = _indicadores.ModificarCadenaIndicadorTecnico(identity, cadenaIndicadorDto.CadenaPeriodos, cadenaIndicadorDto.CadenaImplementadores, cadenaIndicadorDto.CadenaUbicaciones);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });

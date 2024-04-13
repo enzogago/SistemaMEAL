@@ -14,15 +14,15 @@ export const expectedHeaders = [
     { display: 'OBJETIVO', dbKey: 'objNom', entity: 'Objetivo', validation: 'nombre' },
     { display: 'CODIGO_SAP', dbKey: 'subProSap', entity: 'Subproyecto', validation: 'numero' },
     { display: 'NOMBRE SUBPROYECTO', dbKey: 'subProNom', entity: 'Subproyecto', validation: 'nombre' },
-    { display: 'CODIGO PROYECTO', dbKey: 'proIde', entity: 'Proyecto', validation: 'numero' },
-    { display: 'NOMBRE PROYECTO', dbKey: 'proNom', entity: 'Proyecto', validation: 'nombre' },
-    { display: 'DESCRIPCION PROYECTO', dbKey: 'proDes', entity: 'Proyecto', validation: 'descripcion' },
     { display: 'RESPONSABLE-COORDINADOR', dbKey: 'subProRes', entity: 'Subproyecto', validation: 'nombre' },
     { display: 'MES_INICIO', dbKey: 'subProPerMesIni', entity: 'Subproyecto', validation: 'nombre' },
     { display: 'AÑO_INICIO', dbKey: 'subProPerAnoIni', entity: 'Subproyecto', validation: 'año' },
     { display: 'MES_FIN', dbKey: 'subProPerMesFin', entity: 'Subproyecto', validation: 'nombre' },
     { display: 'AÑO_FIN', dbKey: 'subProPerAnoFin', entity: 'Subproyecto', validation: 'año' },
     { display: 'INVOLUCRA_SUB_ACTIVIDAD', dbKey: 'subProInvSubAct', entity: 'Subproyecto', validation: 'descripcion' },
+    { display: 'CODIGO PROYECTO', dbKey: 'proIde', entity: 'Proyecto', validation: 'numero' },
+    { display: 'NOMBRE PROYECTO', dbKey: 'proNom', entity: 'Proyecto', validation: 'nombre' },
+    { display: 'DESCRIPCION PROYECTO', dbKey: 'proDes', entity: 'Proyecto', validation: 'descripcion' },
 ];
 
 const validateCell = (value, validationRules) => {
@@ -208,12 +208,12 @@ export const handleUpload = async (file, setTableData, setPostData, setIsValid, 
                 if (entity === 'Proyecto') {
                     projectData[databaseKey] = cellValue;
                 } else if (entity === 'Subproyecto') {
-                    if (databaseKey === 'proPerMesIni') {
-                        projectData[databaseKey] = cellValueForProMesIni;
-                    } else if (databaseKey === 'proPerMesFin') {
-                        projectData[databaseKey] = cellValueForProMesFin;
-                    } else if (databaseKey === 'proInvSubAct') {
-                        projectData[databaseKey] = cellValueForInvSubAct;
+                    if (databaseKey === 'subProPerMesIni') {
+                        subprojectData[databaseKey] = cellValueForProMesIni;
+                    } else if (databaseKey === 'subProPerMesFin') {
+                        subprojectData[databaseKey] = cellValueForProMesFin;
+                    } else if (databaseKey === 'subProInvSubAct') {
+                        subprojectData[databaseKey] = cellValueForInvSubAct;
                     } else {
                         subprojectData[databaseKey] = cellValue;
                     }

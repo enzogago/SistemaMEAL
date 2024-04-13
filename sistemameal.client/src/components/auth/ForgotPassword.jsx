@@ -46,10 +46,10 @@ const ForgotPassword = () => {
 
     return (
         <div className='PowerMas_ParentLogin vh-100 flex ai-center jc-center'>
-            <div className='Large_5 PowerMas_MainContainer flex p2'>
-                <div className='h-100 flex flex-column'>
+            <div className='Large_5 PowerMas_MainContainer flex Small-p2 Small-m1'>
+                <div className='h-100 flex flex-column Medium-p1 Small-p0'>
                     <picture className=''>
-                        <img className='Large_4' title="Sistema MEAL Ayuda en Acción" src={logo} alt="Logo Ayuda En Accion" />
+                        <img className='Large_4 Phone_8' title="Sistema MEAL Ayuda en Acción" src={logo} alt="Logo Ayuda En Accion" />
                     </picture>
                     <br />
                     <form onSubmit={handleSubmit(onSubmit)} className='flex flex-column h-100'>
@@ -58,7 +58,7 @@ const ForgotPassword = () => {
                         </h1>
                         <br />
                         <article>
-                            <p>
+                            <p className='Medium-f1 Small-f_75'>
                                No te preocupes, estamos aquí para ayudarte. Por favor, ingresa tu email con la cual te registraste, y te enviaremos un correo electrónico con tu nueva contraseña. Recuerda actualizar tu contraseña para garantizar la seguridad de tu cuenta. ¡Gracias!
                             </p>
                         </article>
@@ -68,7 +68,7 @@ const ForgotPassword = () => {
                             <input 
                                 type="text" 
                                 id="usuCorEle" 
-                                className={`PowerMas_InputLogin PowerMas_Modal_Form_${dirtyFields.usuCorEle || isSubmitted ? (errors.usuCorEle ? 'invalid' : 'valid') : ''}`} 
+                                className={`PowerMas_InputLogin PowerMas_Modal_Form_${dirtyFields.usuCorEle || isSubmitted ? (errors.usuCorEle ? 'invalid' : 'valid') : ''} Medium-f1 Small-f_75`} 
                                 placeholder="Ejm: correo@correo.es"
                                 autoComplete="disabled"
                                 maxLength={50}
@@ -88,7 +88,7 @@ const ForgotPassword = () => {
                                 </p>
                             )}
                         </div>
-                        <div className='PowerMas_Forgot_Footer center'>
+                        <div className='PowerMas_Forgot_Footer center flex flex-column gap-1'>
                             <button
                                 type='submit'
                                 id="btnAcceso" 
@@ -96,7 +96,7 @@ const ForgotPassword = () => {
                             >
                                 Enviar
                             </button>
-                            <font onClick={() => {navigate('/login')}} className="pointer">Iniciar Sesión</font>
+                            <font onClick={() => {navigate('/login')}} className="pointer Medium-f1 Small-f_75">Iniciar Sesión</font>
                         </div>
                     </form>
                 </div>

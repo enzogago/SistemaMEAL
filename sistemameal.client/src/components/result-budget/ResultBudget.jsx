@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { FaSortDown } from 'react-icons/fa';
 import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
-import { Export_Excel_Basic, fetchData } from '../reusable/helper';
+import { Export_Excel_Basic2, fetchData } from '../reusable/helper';
 import { useForm } from 'react-hook-form';
 import Notiflix, { Notify } from 'notiflix';
 import userIcon from '../../icons/user.svg';
@@ -316,7 +316,7 @@ const ResultBudget = () => {
         // Definir los encabezados
         let headersExcel = ['#', 'Proyecto', 'Código', 'Nombre', ...headersNew.map(header => ({name: header.name, code: header.code}))];
     
-        Export_Excel_Basic(data,headersExcel, activeButton, true);
+        Export_Excel_Basic2(data,headersExcel, activeButton, true);
     };
     
     return (

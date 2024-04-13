@@ -250,20 +250,6 @@ const CustomTable = ({
                                             ))}
                                         </tr>
                                     ))}
-                                    {
-                                        sums &&
-                                        <tr className='PowerMas_Totales_Monitoreo'>
-                                            <td colSpan={4} ></td>
-                                            <td style={{textAlign: 'right'}}>Totales:</td>
-                                            <td>{sums.metMetTec.toLocaleString()}</td>
-                                            <td>{sums.metEjeTec.toLocaleString()}</td>
-                                            <td>{((sums.metEjeTec/sums.metMetTec)*100).toFixed(2)}%</td>
-                                            <td>{sums.metMetPre.toLocaleString()} $</td>
-                                            <td>{sums.metEjePre.toLocaleString()} $</td>
-                                            <td>{((sums.metEjePre/sums.metMetPre)*100).toFixed(2)}%</td>
-                                            <td colSpan={50}></td>
-                                        </tr>
-                                    }
                                 </>
                             :   <tr className='PowerMas_TableEmpty'>
                                     <td colSpan={20} className='Large-p1 center'>
@@ -272,6 +258,22 @@ const CustomTable = ({
                                 </tr>
                         }
                     </tbody>
+                    <tfoot>
+                        {
+                            sums &&
+                            <tr className='PowerMas_Totales_Monitoreo'>
+                                <td colSpan={4} ></td>
+                                <td style={{textAlign: 'right'}}>Totales:</td>
+                                <td>{sums.metMetTec.toLocaleString()}</td>
+                                <td>{sums.metEjeTec.toLocaleString()}</td>
+                                <td>{((sums.metEjeTec/sums.metMetTec)*100).toFixed(2)}%</td>
+                                <td>{sums.metMetPre.toLocaleString()} $</td>
+                                <td>{sums.metEjePre.toLocaleString()} $</td>
+                                <td>{((sums.metEjePre/sums.metMetPre)*100).toFixed(2)}%</td>
+                                <td colSpan={50}></td>
+                            </tr>
+                        }
+                    </tfoot>
                 </table>
                 {
                     scrolled &&

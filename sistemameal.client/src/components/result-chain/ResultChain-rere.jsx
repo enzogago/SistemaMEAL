@@ -12,23 +12,16 @@ import locationIcon from '../../icons/location.svg';
 import locationIconActive from '../../icons/location-active.svg';
 
 const ResultChain = () => {
+
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [subproyectos, setSubProyectos] = useState([]);
     const [indicadores, setIndicadores] = useState([]);
     const [transformedData, setTransformedData] = useState({});
-    const [activeButton, setActiveButton] = useState('porAno');
+    const [activeButton, setActiveButton] = useState('Por Año');
     const [initialValues, setInitialValues] = useState({});
+    const [headersNew, setHeaders] = useState([]);
     const [viewTotals, setViewTotals] = useState({});
     const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
-
-    const [dataPorAno, setDataPorAno] = useState([]);
-    const [dataPorImplementador, setDataPorImplementador] = useState([]);
-    const [dataPorUbicacion, setDataPorUbicacion] = useState([]);
-
-    const [headers, setHeaders] = useState([]);
-    const [renderData, setRenderData] = useState([]);
-    const [totals, setTotals] = useState({});
-
 
     const { 
         register, 
@@ -43,89 +36,138 @@ const ResultChain = () => {
     }, []);
     
     useEffect(() => {
-        setActiveButton('porAno')
+        const subproyecto = watch('subproyecto');
+        if (subproyecto && subproyecto !== '0') {
+            setActiveButton('Por Año')
+        }
     }, [watch('subproyecto')])
     
     useEffect(() => {
         const subproyecto = watch('subproyecto');
         if (subproyecto && subproyecto !== '0') {
-            setHeaders([]);
             const { subProAno, subProCod } = JSON.parse(subproyecto);
             fetchData(`Indicador/subproyecto/${subProAno}/${subProCod}`,setIndicadores)
-
+            
+            let endpoint;
             switch (activeButton) {
-                case 'porAno':
-                    fetchData(`Indicador/cadena/${subProAno}/${subProCod}`, (data) => {
-                        setHeaders(generateHeaders(data,'cadResPerAno','cadResPerAno'));
-                        setRenderData(generateRenderData(data, 'cadResPerAno', 'cadResPerMetTec'));
-                    });
+                case 'Por Año':
+                    endpoint = `Indicador/cadena/${subProAno}/${subProCod}`;
                     break;
-                case 'porImplementador':
-                    fetchData(`Indicador/implementador/${subProAno}/${subProCod}`, (data) => {
-                        setHeaders(generateHeaders(data,'impNom','impCod'));
-                        setRenderData(generateRenderData(data, 'impCod', 'cadResImpMetTec'));
-                    });
+                case 'Por Implementador':
+                    endpoint = `Indicador/implementador/${subProAno}/${subProCod}`;
                     break;
-                case 'porUbicacion':
-                    fetchData(`Indicador/ubicacion/${subProAno}/${subProCod}`, (data) => {
-                        setHeaders(generateHeaders(data,'ubiNom','ubiAno', 'ubiCod'));
-                        setRenderData(generateRenderData(data, 'ubiAno', 'cadResUbiMetTec', 'ubiCod'));
-                    });
+                case 'Por Ubicación':
+                    endpoint = `Indicador/ubicacion/${subProAno}/${subProCod}`;
                     break;
-                    case 'todos':
-                        fetchData(`Indicador/cadena/${subProAno}/${subProCod}`, (dataPorAno) => {
-                            setDataPorAno(dataPorAno);
-                            fetchData(`Indicador/implementador/${subProAno}/${subProCod}`, (dataPorImplementador) => {
-                                setDataPorImplementador(dataPorImplementador);
-                                fetchData(`Indicador/ubicacion/${subProAno}/${subProCod}`, (dataPorUbicacion) => {
-                                    setDataPorUbicacion(dataPorUbicacion);
-                                    const headersPorAno = generateHeaders(dataPorAno,'cadResPerAno','cadResPerAno');
-                                    const headersPorImplementador = generateHeaders(dataPorImplementador,'impNom','impCod');
-                                    const headersPorUbicacion = generateHeaders(dataPorUbicacion,'ubiNom','ubiAno', 'ubiCod');
-                                    setHeaders([...headersPorAno, ...headersPorImplementador, ...headersPorUbicacion]);
-                                    const renderDataPorAno = generateRenderData(dataPorAno, 'cadResPerAno', 'cadResPerMetTec');
-                                    const renderDataPorImplementador = generateRenderData(dataPorImplementador, 'impCod', 'cadResImpMetTec');
-                                    const renderDataPorUbicacion = generateRenderData(dataPorUbicacion, 'ubiAno', 'cadResUbiMetTec', 'ubiCod');
-                                    setRenderData({ ...renderDataPorAno, ...renderDataPorImplementador, ...renderDataPorUbicacion });
-                                });
-                            });
-                        });
-                        break;
-                    default:
-                        return;
+                default:
+                    return;
             }
+    
+            fetchData(endpoint, (data) => {
+                const transformedData = transformData(data, activeButton);
+                setTransformedData(transformedData);
+            
+                // Guardar los valores iniciales
+                let newInitialValues = { ...initialValues };  // Copia los valores iniciales existentes
+                let newViewTotals = { ...viewTotals };  // Copia los totales de la vista existentes
+                for (let key in transformedData) {
+                    for (let subKey in transformedData[key]) {
+                        newInitialValues[`${key}_${subKey}`] = {
+                            metTec: transformedData[key][subKey].metTec,
+                            metPre: transformedData[key][subKey].metPre
+                        };
+                        // Verificar si ya existe un valor para la clave
+                        if (!newViewTotals[`${key}_${subKey}_${activeButton}`]) {
+                            // Si no existe un valor, inicializar los totales de la vista con los valores iniciales
+                            newViewTotals[`${key}_${subKey}_${activeButton}`] = transformedData[key][subKey].metTec;
+                        }
+
+                    }
+                }
+                setInitialValues(newInitialValues);  // Guarda los nuevos valores iniciales
+                setViewTotals(newViewTotals);  // Guarda los nuevos totales de la vista
+            });
         }
     }, [watch('subproyecto'), activeButton]);
     
-    function generateHeaders(data, headerNameProp, headerKeyProp, headerKeyProp2 = null) {
-        const headers = data.reduce((acc, item) => {
-            const headerName = item[headerNameProp];
-            const headerKey = headerKeyProp2 ? item[headerKeyProp] + item[headerKeyProp2] : item[headerKeyProp];
-            if (!acc.some(header => header.key === headerKey)) {
-                acc.push({ name: headerName, key: headerKey });
-            }
-            return acc;
-        }, []);
-        return headers;
-    }
-    function generateRenderData(data, headerKeyProp, valueProp, headerKeyProp2 = null) {
-        const renderData = data.reduce((acc, item) => {
-            const rowKey = `${item.indAno}_${item.indCod}`;
-            const headerKey = headerKeyProp2 ? item[headerKeyProp] + item[headerKeyProp2] : item[headerKeyProp];
-            acc[rowKey] = { ...acc[rowKey], [headerKey]: { value: item[valueProp], defaultValue: item[valueProp] } };
-            return acc;
-        }, {});
-        console.log(renderData)
-        return renderData;
-    }
+
+    function transformData(data, activeButton) {
+        const transformedData = {};
+        const newHeaders = [];
     
+        data.forEach(item => {
+            // Crear la clave única para cada indicador
+            const key = `${item.indAno}_${item.indCod}`;
+    
+            // Si la clave no existe en el objeto transformado, la inicializamos
+            if (!transformedData[key]) {
+                transformedData[key] = {};
+            }
+    
+            // Determinar la clave y las propiedades en función del botón activo
+            let groupKey, metTecProp, metPreProp, registerKey;
+            switch (activeButton) {
+                case 'Por Año':
+                    groupKey = item.cadResPerAno;
+                    metTecProp = 'cadResPerMetTec';
+                    metPreProp = 'cadResPerMetPre';
+                    registerKey = item.cadResPerAno;  // Usar el año para registrar la entrada
+                    break;
+                case 'Por Implementador':
+                    groupKey = item.impNom;
+                    metTecProp = 'cadResImpMetTec';
+                    metPreProp = 'cadResImpMetPre';
+                    registerKey = item.impCod;  // Usar el código del implementador para registrar la entrada
+                    break;
+                case 'Por Ubicación':
+                    groupKey = item.ubiNom;
+                    metTecProp = 'cadResUbiMetTec';
+                    metPreProp = 'cadResUbiMetPre';
+                    registerKey = item.ubiAno + item.ubiCod;  // Usar el año y el código de la ubicación para registrar la entrada
+                    break;
+                default:
+                    return;
+            }
+    
+            // Agregar los datos del grupo al objeto del indicador
+            transformedData[key][registerKey] = {
+                metTec: item[metTecProp],
+                metPre: item[metPreProp]
+            };
+    
+            // Agregar el nombre del grupo a los encabezados si aún no está presente
+            if (!newHeaders.some(header => header.name === groupKey)) {
+                newHeaders.push({name: groupKey, code: registerKey});
+            }
+        });
+    
+        setHeaders(newHeaders);
+        return transformedData;
+    };
+    
+    
+    
+
     const toggleDropdown = () => {
         setDropdownOpen(!dropdownOpen);
     }
 
+    // Obtén todos los años únicos de los datos
+    const headers = [...new Set(Object.values(transformedData).flatMap(obj => Object.keys(obj)))];
+
+
+    switch (activeButton) {
+        case 'Por Año':
+            break;
+        case 'Por Implementador':
+            break;
+        case 'Por Ubicación':
+            break;
+        default:
+            return;
+    }
+
     const onSubmit = (data) => {
-        console.log(data)
-        return;
         if (isSubmitDisabled) return;
         delete data.subproyecto;
         // Crear los arreglos para almacenar los cambios
@@ -242,7 +284,8 @@ const ResultChain = () => {
         }
     };
 
-    const calculateTotal = (indAno, indCod, activeButton) => {
+    
+    const calculateTotal = (indAno, indCod, activeButton, totals) => {
         return Object.entries(totals)
             .filter(([key]) => key.startsWith(`${indAno}_${indCod}_`) && key.endsWith(`_${activeButton}`))
             .reduce((total, [key, value]) => total + Number(value), 0);
@@ -270,6 +313,10 @@ const ResultChain = () => {
     
         Export_Excel_Basic(data,headersExcel, activeButton, false);
     };
+    
+    
+    
+    
     
     return (
         <div className='p1 flex flex-column flex-grow-1 overflow-auto'>
@@ -317,53 +364,40 @@ const ResultChain = () => {
             <div className='flex jc-space-between'>
                 <div className='flex gap_5'>
                     <button 
-                        className={`PowerMas_Buttom_Tab PowerMas_Buttom_Tab_${activeButton === 'porAno' ? 'Active' : ''} flex ai-center gap-1`} 
-                        onClick={() => setActiveButton('porAno')}
+                        className={`PowerMas_Buttom_Tab PowerMas_Buttom_Tab_${activeButton === 'Por Año' ? 'Active' : ''} flex ai-center gap-1`} 
+                        onClick={() => setActiveButton('Por Año')}
                     >
                         <span>
                             Por Año
                         </span>
                         {
-                            activeButton === 'porAno'
+                            activeButton === 'Por Año'
                             ? <img className='w-auto' src={calendarIconActive} alt="" />
                             : <img className='w-auto' src={calendarIcon} alt="" />
                         }
                     </button>
                     <button 
-                        className={`PowerMas_Buttom_Tab PowerMas_Buttom_Tab_${activeButton === 'porImplementador' ? 'Active' : ''} flex ai-center gap-1`} 
-                        onClick={() => setActiveButton('porImplementador')}
+                        className={`PowerMas_Buttom_Tab PowerMas_Buttom_Tab_${activeButton === 'Por Implementador' ? 'Active' : ''} flex ai-center gap-1`} 
+                        onClick={() => setActiveButton('Por Implementador')}
                     >
                         <span>
                             Por Implementador
                         </span>
                         {
-                            activeButton === 'porImplementador'
+                            activeButton === 'Por Implementador'
                             ? <img className='w-auto' src={userIconActive} alt="" />
                             : <img className='w-auto' src={userIcon} alt="" />
                         }
                     </button>
                     <button 
-                        className={`PowerMas_Buttom_Tab PowerMas_Buttom_Tab_${activeButton === 'porUbicacion' ? 'Active' : ''} flex ai-center gap-1`} 
-                        onClick={() => setActiveButton('porUbicacion')}
+                        className={`PowerMas_Buttom_Tab PowerMas_Buttom_Tab_${activeButton === 'Por Ubicación' ? 'Active' : ''} flex ai-center gap-1`} 
+                        onClick={() => setActiveButton('Por Ubicación')}
                     >
                         <span>
                             Por Ubicación
                         </span>
                         {
-                            activeButton === 'porUbicacion'
-                            ? <img className='w-auto' src={locationIconActive} alt="" />
-                            : <img className='w-auto' src={locationIcon} alt="" />
-                        }
-                    </button>
-                    <button 
-                        className={`PowerMas_Buttom_Tab PowerMas_Buttom_Tab_${activeButton === 'todos' ? 'Active' : ''} flex ai-center gap-1`} 
-                        onClick={() => setActiveButton('todos')}
-                    >
-                        <span>
-                            Todos
-                        </span>
-                        {
-                            activeButton === 'todos'
+                            activeButton === 'Por Ubicación'
                             ? <img className='w-auto' src={locationIconActive} alt="" />
                             : <img className='w-auto' src={locationIcon} alt="" />
                         }
@@ -379,19 +413,19 @@ const ResultChain = () => {
                             <th>Proyecto</th>
                             <th>Código</th>
                             <th>Nombre</th>
-                            {/* Encabezados */}
-                            {headers.map((header, index) => <th key={index}>{header.name}</th>)}
+                            {headersNew.map((header, index) => <th key={index}>{header.name}</th>)}
                             <th>Total</th>
                         </tr>
                     </thead>
                     <tbody>
                         {
                         indicadores.map((item, index) => {
-                            const rowKey = `${item.indAno}_${item.indCod}`;
-                            const rowData = renderData[rowKey] || {};
+                            const indicatorData = transformedData[`${item.indAno}_${item.indCod}`] || {};
                             const text = item.indNom.charAt(0).toUpperCase() + item.indNom.slice(1).toLowerCase();
                             const shortText = text.length > 60 ? text.substring(0, 60) + '...' : text;
-                        
+                            
+                            // Calcular el total "Por Año" para esta fila
+                            const totalPorAno = calculateTotal(item.indAno, item.indCod, 'Por Año', viewTotals);
                             return (
                                 <tr key={index}>
                                     <td>{index+1}</td>
@@ -406,25 +440,62 @@ const ResultChain = () => {
                                         :
                                         <td>{text}</td>
                                     }
-                                    {/* Data dinamica */}
-                                    {headers.map((header, i) => (
-                                        <td key={i}>
+                                    {headers.map(key => {
+                                        return(
+                                        <td key={key}>
                                             <input
                                                 onKeyDown={(event) => {
                                                     if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
                                                         event.preventDefault();
                                                     }
                                                 }}
-                                                onInput={e => {
-                                                    const newValue = e.target.value;
-                                                    const key = `${item.indAno}_${item.indCod}_${header.key}_${activeButton}`;
-                                                    setTotals(prevTotals => ({ ...prevTotals, [key]: newValue }));
-                                                }}
                                                 maxLength={10}
                                                 style={{margin: 0}}
-                                                className={`PowerMas_Input_Cadena Large_12 f_75 PowerMas_Cadena_Form_${dirtyFields[`${item.indAno}_${item.indCod}_${header.key}`] || isSubmitted ? (errors[`${item.indAno}_${item.indCod}_${header.key}`] ? 'invalid' : 'valid') : ''}`} 
-                                                type="text" 
-                                                {...register(`${item.indAno}_${item.indCod}_${header.key}`, {
+                                                className={`PowerMas_Input_Cadena Large_12 f_75 PowerMas_Cadena_Form_${dirtyFields[`${item.indAno}_${item.indCod}_${key}`] || isSubmitted ? (errors[`${item.indAno}_${item.indCod}_${key}`] ? 'invalid' : 'valid') : ''}`} 
+                                                onInput={e => {
+                                                    // Actualizar el valor en los totales de la vista
+                                                    const newValue = e.target.value;
+                                                    setViewTotals(prevTotals => {
+                                                        const newTotals = {
+                                                            ...prevTotals,
+                                                            [`${item.indAno}_${item.indCod}_${key}_${activeButton}`]: newValue
+                                                        };
+                                                
+                                                        if (activeButton === 'Por Año') {
+                                                            // Calcular el nuevo total "Por Año" para esta fila
+                                                            const nuevoTotalPorAno = calculateTotal(item.indAno, item.indCod, 'Por Año', newTotals);
+                                                
+                                                            // Comprobar si hay algún error en "Por Implementador" o "Por Ubicación"
+                                                            const hasErrorInAnyContext = ['Por Implementador', 'Por Ubicación'].some(context => {
+                                                                const totalInContext = calculateTotal(item.indAno, item.indCod, context, newTotals);
+                                                                return totalInContext > nuevoTotalPorAno;
+                                                            });
+                                                
+                                                            setIsSubmitDisabled(hasErrorInAnyContext);
+                                                        } else {
+                                                            // Calcular el nuevo total para esta fila
+                                                            const nuevoTotal = calculateTotal(item.indAno, item.indCod, activeButton, newTotals);
+                                                
+                                                            // Si el nuevo total es mayor que el total "Por Año", mostrar un error
+                                                            if (nuevoTotal > totalPorAno) {
+                                                                setIsSubmitDisabled(true);
+                                                            } else {
+                                                                // Comprobar si hay algún error en cualquier otro contexto
+                                                                const hasErrorInAnyContext = ['Por Año', 'Por Implementador', 'Por Ubicación'].some(context => {
+                                                                    return indicadores.some(indicador => {
+                                                                        const totalInContext = calculateTotal(indicador.indAno, indicador.indCod, context, newTotals);
+                                                                        const totalPorAnoInContext = calculateTotal(indicador.indAno, indicador.indCod, 'Por Año', newTotals);
+                                                                        return totalInContext > totalPorAnoInContext;
+                                                                    });
+                                                                });
+                                                
+                                                                setIsSubmitDisabled(hasErrorInAnyContext);
+                                                            }
+                                                        }
+                                                        return newTotals;
+                                                    });
+                                                }}
+                                                {...register(`${item.indAno}_${item.indCod}_${key}`, {
                                                     pattern: {
                                                         value: /^(?:[1-9]\d*|)$/,
                                                         message: 'Valor no válido',
@@ -434,16 +505,34 @@ const ResultChain = () => {
                                                         message: ''
                                                     }
                                                 })}
-                                                defaultValue={rowData[header.key]?.defaultValue}
+                                                defaultValue={indicatorData[key]?.metTec || ''}
                                             />
                                         </td>
-                                    ))}
-                                <td>
-                                    {calculateTotal(item.indAno, item.indCod, activeButton)}
-                                </td>
-                            </tr>)
+                                    )})}
+                                    <td className={`center bold ${calculateTotal(item.indAno, item.indCod, activeButton, viewTotals) > totalPorAno ? 'invalid' : ''}`}>
+                                        {calculateTotal(item.indAno, item.indCod, activeButton, viewTotals)}
+                                    </td>
+
+                                </tr>
+                            )
                         })
                         }
+                        {/* <tr>
+                            <td className='right' colSpan="4">Total:</td>
+                            {headers.map(key => {
+                                let total = indicadores.reduce((total, item) => {
+                                    const indicatorData = transformedData[`${item.indAno}_${item.indCod}`] || {};
+                                    return total + Number(indicatorData[key]?.metTec || 0);
+                                }, 0);
+                                return <td className='center bold' key={key}>{total}</td>
+                            })}
+                            <td className='center bold'>
+                                {indicadores.reduce((total, item) => {
+                                    const indicatorData = transformedData[`${item.indAno}_${item.indCod}`] || {};
+                                    return total + Object.values(indicatorData).reduce((total, {metTec}) => total + Number(metTec), 0);
+                                }, 0)}
+                            </td>
+                        </tr> */}
                     </tbody>
                 </table>
             </div>

@@ -199,8 +199,7 @@ export const handleSubmitMant = async (controller, objetoEditado, objeto, setReg
         Notiflix.Loading.remove();
     }
 };
-
-export const Export_Excel_Basic = async (data, headersExcel, active, isPresupuesto) => {
+export const Export_Excel_Basic2 = async (data, headersExcel, active, isPresupuesto) => {
     console.log(data)
     console.log(headersExcel)
     let workbook = new ExcelJS.Workbook();
@@ -291,6 +290,89 @@ export const Export_Excel_Basic = async (data, headersExcel, active, isPresupues
     const buffer = await workbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     saveAs(blob, `CADENA_DE_RESULTADOS_${active.toUpperCase()}_${Date.now()}.xlsx`);
+};
+
+export const Export_Excel_Basic = async (data, headersExcel, active, isPresupuesto) => {
+    let workbook = new ExcelJS.Workbook();
+    let worksheet = workbook.addWorksheet(`CADENA DE ${isPresupuesto ? 'PRESUPUESTO' : 'RESULTADO'} ${active.toUpperCase()}`);
+
+    // Añadir una imagen (opcional)
+    const imageId = workbook.addImage({base64: logoBase64, extension: 'png' });
+    worksheet.addImage(imageId, {
+        tl: { col: 0, row: 1 },
+        ext: { width: 200, height: 50 }
+    });
+
+    // Añadir filas vacías
+    for (let i = 0; i < 5; i++) {
+        worksheet.addRow([]);
+    }
+
+    // Crear la fila para los encabezados
+    let headerRow = worksheet.addRow([]);
+
+    // Añadir los encabezados a la fila
+    headersExcel.forEach((header, index) => {
+        let cell = headerRow.getCell(index + 1);
+        cell.value = header.toUpperCase();
+        if (index < 4) {
+            cell.font = { color: { argb: '000000'}, bold: true }; 
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FFCA53' }  // Color original
+            };
+        } else {
+            cell.font = { color: { argb: 'FFFFFF'}, bold: true }; 
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: '25848F' }
+            };
+        }
+        if (index === 0 || index >= 4) {
+            cell.alignment = { horizontal: 'center' };
+        }
+    });
+
+    // Añadir los datos al libro de trabajo
+    data.forEach(item => {
+        let dataRow = worksheet.addRow([]);
+        headersExcel.forEach((header, index) => {
+            let cell = dataRow.getCell(index + 1);
+            let value = item[header];
+            // Si isPresupuesto es true y la columna es la 5 o posterior, formatear como euros
+            if (isPresupuesto && index >= 4) {
+                // Convertir el valor a un número antes de asignarlo a la celda
+                cell.value = typeof value === 'string' ? parseFloat(value) : value;
+                cell.numFmt = '#,##0.00 $';
+            } else if( index >= 4){
+                cell.value = typeof value === 'string' ? parseFloat(value) : value;
+            } else {
+                cell.value = typeof value === 'string' ? value.toUpperCase() : value;
+            }
+            if (index === 0 || index >= 4) {
+                cell.alignment = { horizontal: 'center' };
+            }
+        });
+    });
+
+    // Personalizar el ancho de las columnas
+    worksheet.columns.forEach(column => {
+        column.width = 20;  // Ancho por defecto para todas las columnas
+    });
+
+    // Insertar una columna vacía al principio
+    worksheet.spliceColumns(1, 0, []);
+
+    // Guardar el archivo
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `CADENA DE ${isPresupuesto ? 'PRESUPUESTO' : 'RESULTADO'} ${active.toUpperCase()}.xlsx`;
+    a.click();
 };
 
 

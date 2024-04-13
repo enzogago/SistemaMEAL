@@ -116,7 +116,7 @@ const Login = () => {
                                         id="txtCorreoElectronico" 
                                         value={email}
                                         onChange={e => setEmail(e.target.value)} 
-                                        className="block PowerMas_InputLogin" 
+                                        className="block PowerMas_InputLogin Medium-f1 Small-f_75" 
                                         placeholder="Email" 
                                         type="email" 
                                         name="txtCorreoElectronico" 
@@ -128,13 +128,12 @@ const Login = () => {
                                         id="txtPassword" 
                                         value={password}
                                         onChange={e => setPassword(e.target.value)} 
-                                        className="block PowerMas_InputLogin" 
+                                        className="block PowerMas_InputLogin Medium-f1 Small-f_75" 
                                         placeholder="Password" 
                                         type="password" 
                                         name="txtPassword" 
                                         autoComplete="current-password" 
                                     />
-                                    <p id="lblErrorLogin" className="PowerMas_LabelError"></p>
                                     <p className="p2 Small-p0 Small-f_75 Large-f1 Medium-f_75 PowerMas_RememberMe">
                                         <label className='flex gap_5' >
                                             <input 
