@@ -21,16 +21,7 @@ const RegisterProject = () => {
         id = bytes.toString(CryptoJS.enc.Utf8);
     }
 
-    const [ subproyecto, setSubproyecto ] = useState({})
-
-    useEffect(() => {
-        if (id.length === 10) {
-            const ano = id.slice(0, 4);
-            const cod = id.slice(4,10);
-            fetchData(`SubProyecto/${ano}/${cod}`,setSubproyecto)
-        }
-    }, [id])
-
+    
     // Estados locales
     const [ implementadoresEdit, setImplementadoresEdit ] = useState([])
     const [ ubicacionesEdit, setUbicacionesEdit ] = useState([])
@@ -38,19 +29,138 @@ const RegisterProject = () => {
     const [ selectCount, setSelectCount ] = useState(1);
     const [ locationSelects, setLocationSelects ] = useState([{ count: 1, selects: [] }]);
     const [ paises, setPaises ] = useState([]);
+    
+    const [ subproyecto, setSubproyecto ] = useState({})
 
-    const [selectedValues, setSelectedValues] = useState([]);
+    const [selectedLocationValues, setSelectedLocationValues] = useState([]);
     const [selectedCountryValues, setSelectedCountryValues] = useState([]);
 
+
+    useEffect(() => {
+        Promise.all([
+            fetchData('Implementador',setImplementadores),
+            fetchData('Ubicacion', setPaises)
+        ]).then(() => {
+            if (id.length === 10) {
+                const ano = id.slice(0, 4);
+                const cod = id.slice(4,10);
+                fetchData(`SubProyecto/${ano}/${cod}`,setSubproyecto)
+                fetchData(`Implementador/subproyecto/${ano}/${cod}`,setImplementadoresEdit);
+                fetchData(`Ubicacion/subproyecto/${ano}/${cod}`,setUbicacionesEdit);
+            }
+        });
+    }, [id]);
     
-    const handleLocationChange = async (ubicacion, countryIndex, selectIndex) => {
+    const handleSelectChange = async (ubicacion, countryIndex, selectIndex) => {
         const selectedCountry = JSON.parse(ubicacion);
+        
         if (ubicacion === '0') {
             setLocationSelects(prevSelects => {
                 const newSelects = [...prevSelects];
                 newSelects[countryIndex].selects = newSelects[countryIndex].selects.slice(0, selectIndex + 1);
                 return newSelects;
             });
+        
+            // Actualiza selectedCountryValues a '0' solo si estás cambiando un país
+            if (selectIndex === -1) {
+                setSelectedCountryValues(prevValues => {
+                    const newValues = {...prevValues};
+                    newValues[countryIndex] = '0';
+                    return newValues;
+                });
+            }
+        
+            // Actualiza selectedLocationValues a '0' si estás cambiando una ubicación de nivel después del país
+            if (selectIndex !== -1) {
+                setSelectedLocationValues(prevValues => {
+                    const newValues = {...prevValues};
+                    newValues[`${countryIndex}-${selectIndex}`] = '0';
+                    return newValues;
+                });
+            }
+        
+            return;
+        }
+        
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Ubicacion/${selectedCountry.ubiAno}/${selectedCountry.ubiCod}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (!response.ok) {
+                if(response.status == 401 || response.status == 403){
+                    const data = await response.json();
+                    Notiflix.Notify.failure(data.message);
+                }
+                return;
+            }
+            const data = await response.json();
+            if (data.success == false) {
+                Notiflix.Notify.failure(data.message);
+                return;
+            }
+
+            // Actualiza selectedCountryValues solo si estás cambiando un país
+            if (selectIndex === -1) {
+                setSelectedCountryValues(prevValues => {
+                    const newValues = {...prevValues};
+                    newValues[countryIndex] = ubicacion;
+                    return newValues;
+                });
+
+                // Reinicia todos los selectores de niveles inferiores a '0'
+                setSelectedLocationValues(prevValues => {
+                    const newValues = {...prevValues};
+                    Object.keys(newValues).forEach(key => {
+                        if (key.startsWith(`${countryIndex}-`)) {
+                            newValues[key] = '0';
+                        }
+                    });
+                    return newValues;
+                });
+            }
+
+            // Actualiza selectedLocationValues solo si estás cambiando una ubicación de nivel después del país
+            if (selectIndex !== -1) {
+                setSelectedLocationValues(prevValues => {
+                    const newValues = {...prevValues};
+                    newValues[`${countryIndex}-${selectIndex}`] = ubicacion;
+                    return newValues;
+                });
+            }
+
+            
+            if (data.length > 0) {
+                setLocationSelects(prevSelects => {
+                    const newSelects = [...prevSelects];
+                    newSelects[countryIndex].selects = newSelects[countryIndex].selects.slice(0, selectIndex + 1).concat([data]);
+                    return newSelects;
+                });
+            } else {
+                setLocationSelects(prevSelects => {
+                    const newSelects = [...prevSelects];
+                    newSelects[countryIndex].selects = newSelects[countryIndex].selects.slice(0, selectIndex + 1);
+                    return newSelects;
+                });
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
+    
+    const handleLocationChange = async (ubicacion, countryIndex, selectIndex) => {
+        const selectedCountry = JSON.parse(ubicacion);
+        
+        if (ubicacion === '0') {
+            setLocationSelects(prevSelects => {
+                const newSelects = [...prevSelects];
+                newSelects[countryIndex].selects = newSelects[countryIndex].selects.slice(0, selectIndex + 1);
+                return newSelects;
+            });
+    
             return;
         }
     
@@ -73,6 +183,7 @@ const RegisterProject = () => {
                 Notiflix.Notify.failure(data.message);
                 return;
             }
+            
             if (data.length > 0) {
                 setLocationSelects(prevSelects => {
                     const newSelects = [...prevSelects];
@@ -100,34 +211,46 @@ const RegisterProject = () => {
         setValue 
     } = useForm({ mode: "onChange"});
 
+    
     useEffect(() => {
-        fetchData('Implementador',setImplementadores)
-        fetchData('Ubicacion', setPaises)
-    }, []);
+        if (implementadoresEdit.length > 0) {
+            // Establecer la cantidad de selects
+            setSelectCount(implementadoresEdit.length);
+            
+            // Establecer el valor de cada select
+            implementadoresEdit.forEach((implementador, index) => {
+                setValue(`impCod${index}`, implementador.impCod);
+            });
+        }
+    }, [implementadoresEdit]);
 
     useEffect(() => {
         if (ubicacionesEdit.length > 0) {
             setLocationSelects(ubicacionesEdit.map(() => ({ count: 1, selects: [] })));
+            let newSelectedCountryValues = {...selectedCountryValues}; // Crea una copia del estado actual
+            let newSelectedLocationValues = {...selectedLocationValues}; // Crea una copia del estado actual
     
-            ubicacionesEdit.forEach(async (ubicacion, index) => {
+            ubicacionesEdit.map(async (ubicacion, countryIndex) => {
                 const data = await fetchSelect(ubicacion.ubiAno, ubicacion.ubiCod);
-                console.log(data)
-                let newSelectedValues = [...selectedValues];
-                let newSelectedCountryValues = [...selectedCountryValues];
-                data.forEach((location, locationIndex) => {
-                    console.log(location)
-                    console.log(index)
-                    console.log(locationIndex)
-                    handleLocationChange(JSON.stringify({ubiAno: location.ubiAno, ubiCod: location.ubiCod}), index, locationIndex);
-                    if (locationIndex > 0) {
-                        newSelectedValues[index] = JSON.stringify({ubiAno: location.ubiAno, ubiCod: location.ubiCod});
-                    } else {
-                        newSelectedCountryValues[index] = JSON.stringify({ubiAno: location.ubiAno, ubiCod: location.ubiCod});
-                    }
-                });
-                setSelectedValues(newSelectedValues);
-                setSelectedCountryValues(newSelectedCountryValues);
+    
+                // Actualiza el valor del país correspondiente en newSelectedCountryValues
+                newSelectedCountryValues[countryIndex] = JSON.stringify({ubiCod: data[0].ubiCod, ubiAno: data[0].ubiAno});
+    
+                for (const [locationIndex, location] of data.entries()) {
+                    await handleLocationChange(JSON.stringify({ubiAno: location.ubiAno, ubiCod: location.ubiCod}), countryIndex, locationIndex + 1);
+                }
+
+                // Excluye el primer elemento de data
+                const remainingData = data.slice(1);
+
+                for (const [locationIndex, location] of remainingData.entries()) {
+                    // Actualiza selectedLocationValues con el nuevo valor seleccionado
+                    newSelectedLocationValues[`${countryIndex}-${locationIndex}`] = JSON.stringify({ubiCod: location.ubiCod, ubiAno: location.ubiAno});
+                }
             });
+    
+            setSelectedCountryValues(newSelectedCountryValues); // Actualiza el estado con los nuevos valores
+            setSelectedLocationValues(newSelectedLocationValues); // Actualiza el estado con los nuevos valores
         }
     }, [ubicacionesEdit]);
     
@@ -148,9 +271,8 @@ const RegisterProject = () => {
                 Notiflix.Notify.failure(data.message);
                 return;
             }
-            console.log(data)
-            return data; // Devuelve los datos obtenidos
-    
+            
+            return data;
         } catch (error) {
             console.error('Error:', error);
         } finally {
@@ -191,10 +313,14 @@ const RegisterProject = () => {
                 if (key.startsWith('impCod')) {
                     // Verificar si el valor ya existe en selectValues
                     const exists = selectValues.some(item => item.impCod === data[key]);
-    
                     // Si no existe, añadir el valor al array como un objeto
-                    if (!exists) {
-                        selectValues.push({ impCod: data[key] });
+                    if (!exists && data[key] !== '0') {
+                        let implementador = { impCod: data[key] };
+                        if (data.subProAno && data.subProCod) {
+                            implementador.subProAno = data.subProAno;
+                            implementador.subProCod = data.subProCod;
+                        }
+                        selectValues.push(implementador);
                     }
                 }
             }
@@ -224,18 +350,26 @@ const RegisterProject = () => {
                         ubiAno = paisSelect.ubiAno;
                         ubiCod = paisSelect.ubiCod;
                     }
-                    ubicaciones.push({ ubiAno, ubiCod });
+                    let ubicacion = { ubiAno, ubiCod };
+                    if (data.subProAno && data.subProCod) {
+                        ubicacion.subProAno = data.subProAno;
+                        ubicacion.subProCod = data.subProCod;
+                    }
+                    ubicaciones.push(ubicacion);
                 } else {
                     // Si el último select tiene un valor distinto de '0', usa ese
                     const ultimo = JSON.parse(lastSelect);
                     ubiAno = ultimo.ubiAno;
                     ubiCod = ultimo.ubiCod;
-                    ubicaciones.push({ ubiAno, ubiCod });
+                    let ubicacion = { ubiAno, ubiCod };
+                    if (data.subProAno && data.subProCod) {
+                        ubicacion.subProAno = data.subProAno;
+                        ubicacion.subProCod = data.subProCod;
+                    }
+                    ubicaciones.push(ubicacion);
                 }
             });
 
-            console.log(data)
-            console.log(subproyecto)
             const SubProyectoImplementadorDto = {
                 SubProyecto: subproyecto,
                 SubProyectoImplementadores: selectValues,
@@ -288,10 +422,19 @@ const RegisterProject = () => {
 
     const handleRemoveImplementador = (index) => {
         if (selectCount > 1) {
-            setValue(`impCod${index}`, '0');
+            // Recorre todos los selectores que vienen después del que estás eliminando
+            for (let i = index + 1; i < selectCount; i++) {
+                // Obtiene el valor del selector actual
+                const value = watch(`impCod${i}`);
+                // Asigna el valor al selector anterior
+                setValue(`impCod${i - 1}`, value);
+            }
+            // Elimina el último selector
+            setValue(`impCod${selectCount - 1}`, '0');
             setSelectCount(prevCount => prevCount - 1);
         }
-    }
+    };
+    
     
     const handleRemoveUbicacion = (index) => {
         if (locationSelects.length > 1) {
@@ -345,7 +488,7 @@ const RegisterProject = () => {
                     </div>
                 </div>
                 <div className="PowerMas_Info_Form_Beneficiarie Large_6 m1 p1 overflow-auto flex flex-column gap-1">
-                    <div className="p1" style={{backgroundColor: '#fff', border: '1px solid #372e2c3d'}}>
+                <div className="p1" style={{backgroundColor: '#fff', border: '1px solid #372e2c3d'}}>
                         <div className="flex ai-center jc-space-between">
                             <h3 className="f1_25 m1">Datos de Ubicación</h3>
                             <FaPlus 
@@ -353,7 +496,8 @@ const RegisterProject = () => {
                                 onClick={() => setLocationSelects(prevSelects => [...prevSelects, { count: 1, selects: [] }])} 
                             />
                         </div>
-                        {locationSelects.map((country, countryIndex) => (
+                        {locationSelects.map((country, countryIndex) => {
+                            return(
                             <div className="m_75" key={countryIndex}>
                                 <div className="flex ai-center jc-space-between">
                                     <label htmlFor="pais" className="">
@@ -374,7 +518,7 @@ const RegisterProject = () => {
                                     value={selectedCountryValues[countryIndex]}
                                     name={`select${countryIndex}`}
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields[`pais${countryIndex}`] || isSubmitted ? (errors[`pais${countryIndex}`] ? 'invalid' : 'valid') : ''}`} 
-                                    onChange={(event) => handleLocationChange(event.target.value, countryIndex, -1)}
+                                    onChange={(event) => handleSelectChange(event.target.value, countryIndex, -1)}
                                 >
                                     <option value="0">--Seleccione País--</option>
                                     {paises.map(pais => (
@@ -390,8 +534,8 @@ const RegisterProject = () => {
                                     <select
                                         key={selectIndex}
                                         name={`select${countryIndex}${selectIndex}`}
-                                        value={selectedValues[selectIndex]}
-                                        onChange={(event) => handleLocationChange(event.target.value, countryIndex, selectIndex)}
+                                        value={selectedLocationValues[`${countryIndex}-${selectIndex}`]}
+                                        onChange={(event) => handleSelectChange(event.target.value, countryIndex, selectIndex)}
                                         style={{textTransform: 'capitalize'}}
                                         className="block Phone_12"
                                     >
@@ -404,7 +548,7 @@ const RegisterProject = () => {
                                     </select>
                                 ))}
                             </div>
-                        ))}
+                        )})}
                     </div>
                 </div>
             </div>

@@ -444,6 +444,8 @@ namespace SistemaMEAL.Modulos
             string? tipoMensaje = "";
             string? subProAnoOut = "";
             string? subProCodOut = "";
+            int anoIni;
+            int anoFin;
             List<ErrorCell> errorCells = new List<ErrorCell>();
 
             string? message;
@@ -467,7 +469,7 @@ namespace SistemaMEAL.Modulos
                     foreach (var proyecto in proyectos)
                     {
                         // Inserta el proyecto
-                        cmd = new SqlCommand("SP_INSERTAR_PROYECTO", cn.getcn);
+                        cmd = new SqlCommand("SP_INSERTAR_PROYECTO_MASIVO", cn.getcn);
                         cmd.CommandType = CommandType.StoredProcedure;
 
                         cmd.Parameters.AddWithValue("@P_PRONOM", proyecto.ProNom);
@@ -502,10 +504,6 @@ namespace SistemaMEAL.Modulos
                         var proCod = pCod.Value.ToString();
                         message = pDescripcionMensaje.Value.ToString();
                         messageType = pTipoMensaje.Value.ToString();
-                        Console.WriteLine(proAno);
-                        Console.WriteLine(proCod);
-                        Console.WriteLine(message);
-                        Console.WriteLine(messageType);
 
                         if (messageType != "3") // Si hay un error o el proyecto ya existe, retorna el mensaje
                         {
@@ -523,7 +521,7 @@ namespace SistemaMEAL.Modulos
                             subproyecto.ProAno = proAno; // Establece la clave foránea
                             subproyecto.ProCod = proCod; // Establece la clave foránea
                             // Inserta el proyecto
-                            cmd = new SqlCommand("SP_INSERTAR_SUB_PROYECTO", cn.getcn);
+                            cmd = new SqlCommand("SP_INSERTAR_SUB_PROYECTO_MASIVO", cn.getcn);
                             cmd.CommandType = CommandType.StoredProcedure;
 
                             cmd.Parameters.AddWithValue("@P_PROANO", subproyecto.ProAno);
@@ -577,6 +575,8 @@ namespace SistemaMEAL.Modulos
                                 }
                                 errorCells.Add(new ErrorCell { Row = indiceProyecto, Column = indiceSubproyecto, Message = message });
                             }
+                            anoIni = int.Parse(subproyecto?.SubProPerAnoIni);
+                            anoFin = int.Parse(subproyecto?.SubProPerAnoFin);
                             
                             int indiceObjetivo = 0;
                             // Insertamos Objetivos
@@ -585,7 +585,7 @@ namespace SistemaMEAL.Modulos
                                 objetivo.SubProAno = subProAno; // Establece la clave foránea
                                 objetivo.SubProCod = subproCod; // Establece la clave foránea
                                 // Inserta el proyecto
-                                cmd = new SqlCommand("SP_INSERTAR_OBJETIVO", cn.getcn);
+                                cmd = new SqlCommand("SP_INSERTAR_OBJETIVO_MASIVO", cn.getcn);
                                 cmd.CommandType = CommandType.StoredProcedure;
 
                                 cmd.Parameters.AddWithValue("@P_SUBPROANO", objetivo.SubProAno);
@@ -637,7 +637,7 @@ namespace SistemaMEAL.Modulos
                                     objetivoEspecifico.ObjAno = objAno; // Establece la clave foránea
                                     objetivoEspecifico.ObjCod = objCod; // Establece la clave foránea
                                     // Inserta el proyecto
-                                    cmd = new SqlCommand("SP_INSERTAR_OBJETIVO_ESPECIFICO", cn.getcn);
+                                    cmd = new SqlCommand("SP_INSERTAR_OBJETIVO_ESPECIFICO_MASIVO", cn.getcn);
                                     cmd.CommandType = CommandType.StoredProcedure;
 
                                     cmd.Parameters.AddWithValue("@P_OBJANO", objetivoEspecifico.ObjAno);
@@ -746,7 +746,7 @@ namespace SistemaMEAL.Modulos
                                             // }
                                             // indiceIndicador++;
                                         } else {
-                                            cmd = new SqlCommand("SP_INSERTAR_RESULTADO", cn.getcn);
+                                            cmd = new SqlCommand("SP_INSERTAR_RESULTADO_MASIVO", cn.getcn);
                                             cmd.CommandType = CommandType.StoredProcedure;
 
                                             cmd.Parameters.AddWithValue("@P_OBJESPANO", resultado.ObjEspAno);
@@ -783,17 +783,15 @@ namespace SistemaMEAL.Modulos
                                             message = pDescripcionMensaje.Value.ToString();
                                             messageType = pTipoMensaje.Value.ToString();
 
-                                            if (messageType != "3")
+                                            
+                                            if (messageType == "1")
                                             {
-                                                if (messageType == "1")
-                                                {
-                                                    return (subProAnoOut, subProCodOut, message, messageType, errorCells);
-                                                }
                                                 errorCells.Add(new ErrorCell { Row = indiceObjetivoEspecifico, Column = indiceResultado, Message = message });
+                                                throw new Exception(message);
                                             }
 
                                             //
-                                            cmd = new SqlCommand("SP_INSERTAR_ACTIVIDAD", cn.getcn);
+                                            cmd = new SqlCommand("SP_INSERTAR_ACTIVIDAD_MASIVO", cn.getcn);
                                             cmd.CommandType = CommandType.StoredProcedure;
 
                                             cmd.Parameters.AddWithValue("@P_RESANO", resAno);
@@ -830,7 +828,10 @@ namespace SistemaMEAL.Modulos
                                             message = pDescripcionMensaje.Value.ToString();
                                             messageType = pTipoMensaje.Value.ToString();
 
-                                            //
+                                            Console.WriteLine(actCod);
+                                            Console.WriteLine(actCod);
+                                            Console.WriteLine(message);
+                                            Console.WriteLine(messageType);
                                             
                                             int indiceIndicador = 0;
 
@@ -865,7 +866,6 @@ namespace SistemaMEAL.Modulos
                                                 pTipoMensaje.Direction = ParameterDirection.Output;
                                                 cmd.Parameters.Add(pTipoMensaje);
 
-
                                                 pAno = new SqlParameter("@P_INDANO_OUT", SqlDbType.NVarChar, 4);
                                                 pAno.Direction = ParameterDirection.Output;
                                                 cmd.Parameters.Add(pAno);
@@ -881,13 +881,53 @@ namespace SistemaMEAL.Modulos
                                                 message = pDescripcionMensaje.Value.ToString();
                                                 messageType = pTipoMensaje.Value.ToString();
 
-                                                if (messageType != "3") // Si hay un error o el proyecto ya existe, retorna el mensaje
+                                                
+                                                if (messageType == "3")
                                                 {
-                                                    if (messageType == "1")
+                                                    for (int ano = anoIni; ano <= anoFin; ano++)
                                                     {
-                                                        return (subProAnoOut, subProCodOut, message, messageType, errorCells);
+                                                        Console.WriteLine("Desde Periodo");
+                                                        cmd = new SqlCommand("SP_INSERTAR_CADENA_RESULTADO_PERIODO", cn.getcn);
+                                                        cmd.CommandType = CommandType.StoredProcedure;
+                                                        SqlParameter param = new SqlParameter();
+
+                                                        cmd.Parameters.AddWithValue("@P_INDANO", indActResAno);
+                                                        cmd.Parameters.AddWithValue("@P_INDCOD", indActResCod);
+                                                        cmd.Parameters.AddWithValue("@P_CADRESPERANO", ano);
+                                                        cmd.Parameters.AddWithValue("@P_CADRESPERMETTEC", "");
+                                                        cmd.Parameters.AddWithValue("@P_CADRESPERMETPRE", "");
+                                                        cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
+                                                        cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                                                        cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                                                        cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                                                        cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                                                        cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                                                        pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                                                        pDescripcionMensaje.Direction = ParameterDirection.Output;
+                                                        cmd.Parameters.Add(pDescripcionMensaje);
+
+                                                        pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                                                        pTipoMensaje.Direction = ParameterDirection.Output;
+                                                        cmd.Parameters.Add(pTipoMensaje);
+
+                                                        cmd.ExecuteNonQuery();
+
+                                                        message = pDescripcionMensaje.Value.ToString();
+                                                        messageType = pTipoMensaje.Value.ToString();
+
+                                                        if (messageType != "3")
+                                                        {
+                                                            Console.WriteLine(message);
+                                                            throw new Exception(message);
+                                                        }
                                                     }
+                                                }
+
+                                                if (messageType == "1") // Si hay un error o el proyecto ya existe, retorna el mensaje
+                                                {
                                                     errorCells.Add(new ErrorCell { Row = indiceResultado, Column = indiceIndicador, Message = message });
+                                                    throw new Exception(message);
                                                 }
 
                                             }
@@ -906,7 +946,7 @@ namespace SistemaMEAL.Modulos
 
                     // Si todas las operaciones fueron exitosas, confirma la transacción
                     scope.Complete();
-                    mensaje = "Se insertó correctamente.";
+                    mensaje = "Registros actualizados correctamente.";
                     tipoMensaje = "3";
                     }
                     catch (Exception ex)

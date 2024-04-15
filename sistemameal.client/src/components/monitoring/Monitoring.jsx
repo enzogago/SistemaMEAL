@@ -2,11 +2,21 @@ import Notiflix from 'notiflix';
 import React, { useEffect, useRef, useState } from 'react'
 import Table from './Table';
 import Modal from 'react-modal';
-import { FaRegFileExcel } from 'react-icons/fa';
+import { FaRegFileExcel, FaRegTrashAlt } from 'react-icons/fa';
+import { formatterBudget } from './goal/helper';
 
 const Monitoring = () => {
+    const [selectedFiles, setSelectedFiles] = useState([]);
+
+
     const [ monitoringData, setMonitoringData] = useState([])
     const [modalIsOpen, setModalIsOpen] = useState(false)
+
+    const [dragging, setDragging] = useState(false);
+    const [selectedFile, setSelectedFile] = useState(null);
+    const dragCounter = useRef(0);
+    const dropRef = useRef(null);
+    const fileInputRef = useRef();
 
     const closeModal = () => {
         setModalIsOpen(false)
@@ -47,12 +57,44 @@ const Monitoring = () => {
     }, []);
 
 
-    const [dragging, setDragging] = useState(false);
-    const [selectedFile, setSelectedFile] = useState(null);
-    const dragCounter = useRef(0);
-    const dropRef = useRef(null);
-    const fileInputRef = useRef();
+    const handleFileUpload = (file) => {
+        const reader = new FileReader();
+    
+        reader.onloadend = async() => {
+            // Aquí tienes los datos del archivo
+            const dataUrl = reader.result;
+    
+            // Extrae los datos de la URL de los datos
+            const fileData = dataUrl.split(',')[1];
+            console.log(fileData)
+    
+            // Ahora puedes guardar los datos del archivo donde quieras
+            // Por ejemplo, podrías hacer una solicitud a tu servidor para guardar el archivo
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Meta/save-file`, {
+                method: 'POST',
+                body: JSON.stringify({ 
+                    data: fileData, 
+                    fileName: file.name // Aquí incluyes el nombre del archivo
+                }),
+                headers: { 'Content-Type': 'application/json' },
+            });
+    
+            if (!response.ok) {
+                Notiflix.Notify.failure("Error al subir el archivo.");
+                return;
+            }
+            const data = await response.json();
+    
+            Notiflix.Notify.success(data.message);
+        };
+    
+        reader.readAsDataURL(file);
+    };
 
+
+    
+    
+    
     const handleDrag = (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -84,10 +126,12 @@ const Monitoring = () => {
         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
             // Verificar si el archivo es un Excel
             const file = e.dataTransfer.files[0];
-            const fileType = file.name.split('.').pop();
-            if (fileType === 'pdf') {
+            const fileType = file.type;
+            if (['application/pdf', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel.sheet.macroEnabled.12', 'image/jpeg', 'image/png', 'image/gif', 'video/mp4', 'video/quicktime', 'video/x-msvideo'].includes(fileType)) {
                 fileInputRef.current.files = e.dataTransfer.files;
                 setSelectedFile(e.dataTransfer.files[0]); // Aquí se actualiza el estado selectedFile
+                setSelectedFiles(prevFiles => [...prevFiles, e.dataTransfer.files[0]]); // Aquí se agrega el archivo a la lista de selectedFiles
+                handleFileUpload(e.dataTransfer.files[0]); // Aquí se sube el archivo
             } else {
                 Notiflix.Notify.failure("Formato no soportado")
             }
@@ -95,19 +139,42 @@ const Monitoring = () => {
             dragCounter.current = 0;
         }
     };
-
-    const handleDivClick = () => {
-        fileInputRef.current.click();
-    };
-
+    
     const handleFileChange = (event) => {
         console.log(event.target.files[0])
-        if (event.target.files[0].type === 'application/pdf') {
-            setSelectedFile(event.target.files[0]);
+        if (['application/pdf', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel.sheet.macroEnabled.12', 'image/jpeg', 'image/png', 'image/gif', 'video/mp4', 'video/quicktime', 'video/x-msvideo'].includes(event.target.files[0].type)) {
+            setSelectedFiles(prevFiles => [...prevFiles, event.target.files[0]]);
+            handleFileUpload(event.target.files[0]); // Aquí se sube el archivo
         } else {
             Notiflix.Notify.failure("Formato no soportado")
         }
     };
+    
+    const handleDivClick = () => {
+        fileInputRef.current.click();
+    };
+
+    const eliminarDocumento = async (index) => {
+        const file = selectedFiles[index];
+        const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Meta/delete-file`, {
+            method: 'DELETE',
+            body: JSON.stringify({ 
+                fileName: file.name // Aquí incluyes el nombre del archivo
+            }),
+            headers: { 'Content-Type': 'application/json' },
+        });
+    
+        if (!response.ok) {
+            Notiflix.Notify.failure("Error al eliminar el archivo.");
+            return;
+        }
+        const data = await response.json();
+    
+        Notiflix.Notify.success(data.message);
+    
+        setSelectedFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
+    };
+    
 
     return (
         <>
@@ -128,11 +195,14 @@ const Monitoring = () => {
                         right: 'auto',
                         bottom: 'auto',
                         width: '50%',
+                        height: '90%',
                         marginRight: '-50%',
                         transform: 'translate(-50%, -50%)',
                         backgroundColor: '#fff',
                         border: '1px solid #ccc',
-                        padding: '20px'
+                        padding: '20px',
+                        display: 'flex',
+                        flexDirection: 'column'
                     },
                     overlay: {
                         backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -142,7 +212,7 @@ const Monitoring = () => {
             >
                 <span className="PowerMas_CloseModal" style={{position: 'absolute',right: 20, top: 10}} onClick={closeModal}>×</span>
                 <h2 className='PowerMas_Title_Modal f1_5 center'>Fuentes de Verificación</h2>
-                <div className="flex-grow-1 flex jc-center ai-center overflow-auto">
+                <div className="flex-grow-1 flex jc-center ai-center">
                     <div className="Large_10">
                         <article className="PowerMas_Article_Upload center">
                             <p style={{color: '#878280'}}>Solo se puede subir documentos en formato PDF</p>
@@ -163,7 +233,7 @@ const Monitoring = () => {
                                 ref={fileInputRef} 
                                 style={{display: 'none'}} 
                                 onChange={handleFileChange} 
-                                accept=".pdf"
+                                accept="*/*"
                             />
                             <FaRegFileExcel className="Large-f5 w-auto" />
                             {
@@ -182,9 +252,43 @@ const Monitoring = () => {
                         </div>
                     </div>
                 </div>
-                <br />
+                <div className='flex-grow-1 overflow-auto m1'>
+                    <table className="PowerMas_Modal_Documentos Large_12">
+                        <thead className="">
+                            <tr style={{position: 'sticky', top: '0', backgroundColor: '#fff'}}>
+                                <th className=''>Nombre</th>
+                                <th className='center'>Tamaño</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {selectedFiles.map((file, index) => (
+                                <tr key={index}>
+                                    <td className='f_75' style={{whiteSpace: 'nowrap'}}>{file.name}</td>
+                                    <td className='f_75' style={{whiteSpace: 'nowrap'}}>{formatterBudget.format(file.size / 1024)} KB</td>
+                                    <td className="PowerMas_IconsTable">
+                                        <div className='flex ai-center jc-center'>
+                                            <FaRegTrashAlt
+                                                style={{width: '20px'}}
+                                                data-tooltip-id="delete-tooltip" 
+                                                data-tooltip-content="Eliminar"
+                                                onClick={() => eliminarDocumento(index)}
+                                            />
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                            {
+                                selectedFiles.length == 0 &&
+                                <tr className="center">
+                                    <td colSpan={3} className="p1 f_75"> No se registraron documentos</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
                 <div className="center">
-                    <button className="PowerMas_Buttom_Primary Large_3 center p_5 m_25" onClick={closeModal}>Guardar</button>
+                    <button className="PowerMas_Buttom_Primary Large_3 center p_5 m_25"  onClick={handleFileUpload}>Guardar</button>
                 </div>
             </Modal>
         </>
