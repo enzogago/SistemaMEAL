@@ -128,7 +128,7 @@ const Bar = ({showSidebarAndBar}) => {
                             {
                                 showSidebarAndBar &&
                                 <>
-                                    <Link className='flex ai-center p_25' onClick={() => setIsOpen(false)} to={`/form-profile/${encryptId(`${userLogged.usuAno}${userLogged.usuCod}`)}`}>
+                                    <Link className='flex ai-center p_25' onClick={() => setIsOpen(false)}>
                                         <FaUserAlt className='w-auto m_5' />
                                         <span className='flex'>Perfil</span>
                                     </Link>

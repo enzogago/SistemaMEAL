@@ -66,14 +66,14 @@ const Modal = ({ isOpen, closeModal, user }) => {
 
     return (
         <div className={`PowerMas_Modal ${isOpen ? 'show' : ''}`}>
-            <div className="PowerMas_ModalContent">
+            <div className="bg-white Small-p1_5 Phone_10 Medium_3" style={{borderRadius: '5px'}}>
                 <span 
                     className="PowerMas_CloseModal" 
                     onClick={closeModalAndReset}
                 >
                     ×
                 </span>
-                <h2 className="PowerMas_Title_Modal center f1_5"> Cambiar Contraseña </h2>
+                <h2 className="PowerMas_Title_Modal center Medium-f1_5 Small-f1_25"> Cambiar Contraseña </h2>
                 <form className='Large-f1_25 PowerMas_FormStatus color-black' onSubmit={validateForm(onSubmit)}>
                     <label
                         htmlFor='nuevaContraseña'
