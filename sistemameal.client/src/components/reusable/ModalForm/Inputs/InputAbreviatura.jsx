@@ -16,10 +16,10 @@ const InputAbreviatura = ({register, errors, dirtyFields, isSubmitted}) => {
                 id="abreviatura"
                 className={`p_5 PowerMas_Modal_Form_${dirtyFields.abreviatura || isSubmitted ? (errors.abreviatura ? 'invalid' : 'valid') : ''}`}  
                 type="text" 
-                placeholder='Dni' 
-                maxLength={100} 
+                placeholder='Ingresa Abreviatura' 
+                maxLength={10} 
                 name="abreviatura" 
-                autoComplete='disabled'
+                autoComplete='off'
                 {...register(
                     'abreviatura', { 
                         required: 'La abreviatura es requerido',

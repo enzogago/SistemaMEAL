@@ -164,71 +164,75 @@ const CustomTable = ({
                 </div>
             </div>
             <div className="PowerMas_TableContainer flex-column" ref={tableRef}>
-                <table className={`Large_12 PowerMas_TableStatus ${scrolled ? 'w-300' : ''}`}>
-                    <thead>
-                        {
-                            table.getHeaderGroups().map(headerGroup => (
-                                <tr key={headerGroup.id} style={{zIndex: 10}}>
-                                    {
-                                        headerGroup.headers.map((header, index, array) => (
-                                            <th 
-                                                ref={actionsColumnRef}
-                                                className='ws-nowrap' 
-                                                style={{ 
-                                                    width: resize ? header.getSize():  '', 
-                                                    position: header.column.columnDef.stickyRight !== undefined ? 'sticky' : 'relative', 
-                                                    textTransform: 'capitalize',
-                                                    right: header.column.columnDef.stickyRight !== undefined ? `${header.column.columnDef.stickyRight}px` : 'auto',
-                                                    backgroundColor: '#fff', 
-                                                }} 
-                                                key={header.id} 
-                                                onClick={header.column.getToggleSortingHandler()}
-                                            >
-                                                <div>
-                                                    {
-                                                        <span className='bold'>
-                                                            {flexRender(header.column.columnDef.header, header.getContext())}
+                <table className={`Large_12 PowerMas_TableStatus ${table.getRowModel().rows.length > 0 && scrolled ? 'w-300' : ''}`}>
+                    {
+                        table.getRowModel().rows.length > 0 &&
+
+                        <thead>
+                            {
+                                table.getHeaderGroups().map(headerGroup => (
+                                    <tr key={headerGroup.id} style={{zIndex: 10}}>
+                                        {
+                                            headerGroup.headers.map((header, index, array) => (
+                                                <th 
+                                                    ref={actionsColumnRef}
+                                                    className='ws-nowrap' 
+                                                    style={{ 
+                                                        width: resize ? header.getSize():  '', 
+                                                        position: header.column.columnDef.stickyRight !== undefined ? 'sticky' : 'relative', 
+                                                        textTransform: 'capitalize',
+                                                        right: header.column.columnDef.stickyRight !== undefined ? `${header.column.columnDef.stickyRight}px` : 'auto',
+                                                        backgroundColor: '#fff', 
+                                                    }} 
+                                                    key={header.id} 
+                                                    onClick={header.column.getToggleSortingHandler()}
+                                                >
+                                                    <div>
+                                                        {
+                                                            <span className='bold'>
+                                                                {flexRender(header.column.columnDef.header, header.getContext())}
+                                                            </span>
+                                                        }
+                                                        <div className='flex flex-column ai-center jc-center PowerMas_Icons_Sorter'>
+                                                            {header.column.getIsSorted() === 'asc' && !header.column.columnDef.disableSorting ? 
+                                                                <TiArrowSortedUp className={`sort-icon active`} /> :
+                                                                header.column.getIsSorted() === 'desc' && !header.column.columnDef.disableSorting ? 
+                                                                <TiArrowSortedDown className={`sort-icon active`} /> :
+                                                                !header.column.columnDef.disableSorting &&
+                                                                <>
+                                                                    <TiArrowSortedUp className={`sort-icon`} />
+                                                                    <TiArrowSortedDown className={`sort-icon`} />
+                                                                </>
+                                                            }
+                                                        </div>
+                                                    </div>
+
+                                                    {header.column.columnDef.stickyRight === undefined && resize && index !== array.length - 1 &&  // Muestra el elemento <span> solo si la columna no es "sticky" y no es el último encabezado
+                                                        <span 
+                                                            onMouseDown={
+                                                                header.getResizeHandler()
+                                                            }
+                                                            onTouchStart={
+                                                                header.getResizeHandler()
+                                                            }
+                                                            
+                                                            className={header.column.getIsResizing() 
+                                                            ? "resizer isResizing" 
+                                                            : "resizer"} >
                                                         </span>
                                                     }
-                                                    <div className='flex flex-column ai-center jc-center PowerMas_Icons_Sorter'>
-                                                        {header.column.getIsSorted() === 'asc' && !header.column.columnDef.disableSorting ? 
-                                                            <TiArrowSortedUp className={`sort-icon active`} /> :
-                                                            header.column.getIsSorted() === 'desc' && !header.column.columnDef.disableSorting ? 
-                                                            <TiArrowSortedDown className={`sort-icon active`} /> :
-                                                            !header.column.columnDef.disableSorting &&
-                                                            <>
-                                                                <TiArrowSortedUp className={`sort-icon`} />
-                                                                <TiArrowSortedDown className={`sort-icon`} />
-                                                            </>
-                                                        }
-                                                    </div>
-                                                </div>
 
-                                                {header.column.columnDef.stickyRight === undefined && resize && index !== array.length - 1 &&  // Muestra el elemento <span> solo si la columna no es "sticky" y no es el último encabezado
-                                                    <span 
-                                                        onMouseDown={
-                                                            header.getResizeHandler()
-                                                        }
-                                                        onTouchStart={
-                                                            header.getResizeHandler()
-                                                        }
-                                                        
-                                                        className={header.column.getIsResizing() 
-                                                        ? "resizer isResizing" 
-                                                        : "resizer"} >
-                                                    </span>
-                                                }
-
-                                            </th>
-                                        ))
-                                    }
-                                </tr>
-                            ))
-                        }
-                    </thead>
+                                                </th>
+                                            ))
+                                        }
+                                    </tr>
+                                ))
+                            }
+                        </thead>
+                    }
                     <tbody>
                         {
-                            table.getRowModel().rows.length > 0 > 0 ?
+                            table.getRowModel().rows.length > 0 ?
                                 <>
                                     {table.getRowModel().rows.map(row => (
                                         <tr key={row.id}>
@@ -267,7 +271,7 @@ const CustomTable = ({
                     </tbody>
                     <tfoot>
                         {
-                            sums &&
+                            table.getRowModel().rows.length > 0 && sums &&
                             <tr className='PowerMas_Totales_Monitoreo'>
                                 <td colSpan={4} ></td>
                                 <td style={{textAlign: 'right'}}>Totales:</td>
@@ -283,7 +287,7 @@ const CustomTable = ({
                     </tfoot>
                 </table>
                 {
-                    scrolled &&
+                    table.getRowModel().rows.length > 0 && scrolled &&
                     <>
                         <GrPrevious className="slider" style={{left: '0'}} onClick={() => scrollTable(-1)} />
                         <GrNext className="slider" style={{right: '0'}} onClick={() => scrollTable(1)} />

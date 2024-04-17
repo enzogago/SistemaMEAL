@@ -503,7 +503,7 @@ namespace SistemaMEAL.Modulos
 
                 // Aquí tienes los datos del archivo
                 var data = fileData.Data;
-                var fileName = fileData.FileName;
+                var fileName = metaFuente.MetAno + metaFuente.MetCod + "_" + fileData.FileName;
                 var fileSize = fileData.FileSize;
 
                 System.IO.Directory.CreateDirectory(uploadsDirectory); // Crea el directorio si no existe
@@ -516,7 +516,7 @@ namespace SistemaMEAL.Modulos
 
                 cmd.Parameters.AddWithValue("@P_METANO", metaFuente.MetAno);
                 cmd.Parameters.AddWithValue("@P_METCOD", metaFuente.MetCod);
-                cmd.Parameters.AddWithValue("@P_METFUEVERNOM", fileName);
+                cmd.Parameters.AddWithValue("@P_METFUEVERNOM", fileData.FileName);
                 cmd.Parameters.AddWithValue("@P_METFUEVERPES", fileSize);
                 cmd.Parameters.AddWithValue("@P_USUING", "asd");
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "asd");
@@ -562,7 +562,7 @@ namespace SistemaMEAL.Modulos
 
                 // Aquí tienes los datos del archivo
                 var data = fileData.Data;
-                var fileName = fileData.FileName;
+                var fileName = metaFuente.MetAno + metaFuente.MetCod + "_" + fileData.FileName;
                 var fileSize = fileData.FileSize;
 
                 var path = Path.Combine(uploadsDirectory, fileName);
@@ -581,7 +581,7 @@ namespace SistemaMEAL.Modulos
 
                 cmd.Parameters.AddWithValue("@P_METANO", metaFuente.MetAno);
                 cmd.Parameters.AddWithValue("@P_METCOD", metaFuente.MetCod);
-                cmd.Parameters.AddWithValue("@P_METFUEVERNOM", fileName);
+                cmd.Parameters.AddWithValue("@P_METFUEVERNOM", fileData.FileName);
                 cmd.Parameters.AddWithValue("@P_USUMOD", "asd");
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "asd");
                 cmd.Parameters.AddWithValue("@P_USUANO_U", "asd");

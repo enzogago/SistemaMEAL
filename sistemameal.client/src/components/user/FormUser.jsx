@@ -241,18 +241,19 @@ const FormUser = () => {
                             <label htmlFor="docIdeCod">Documento Identidad</label>
                             <select 
                                 id="docIdeCod" 
-                                className={`p1 PowerMas_Modal_Form_${dirtyFields.docIdeCod || isSubmitted ? (errors.docIdeCod ? 'invalid' : 'valid') : ''}`} 
+                                className={`f_75 p1 PowerMas_Modal_Form_${dirtyFields.docIdeCod || isSubmitted ? (errors.docIdeCod ? 'invalid' : 'valid') : ''}`} 
                                 {...register('docIdeCod', { 
                                     validate: value => value !== '0' || 'El documento de identidad es requerido' 
                                 })}
                                 style={{ textTransform: 'capitalize'}}
                             >
-                                <option value="0">--Seleccione Documento Identidad--</option>
+                                <option className="f_75" value="0">--Seleccione Documento Identidad--</option>
                                 {documentos.map(documento => (
-                                    <option 
+                                    <option
+                                        className="f_75"
                                         key={documento.docIdeCod}
                                         style={{textTransform: 'capitalize'}}
-                                        value={documento.docIdeCod}> ({documento.docIdeAbr}) {documento.docIdeNom.toLowerCase()}
+                                        value={documento.docIdeCod}> ({documento.docIdeAbr}) {documento.docIdeNom}
                                     </option>
                                 ))}
                             </select>
@@ -272,7 +273,7 @@ const FormUser = () => {
                                 type="text" 
                                 placeholder="Ejm: 74301932"
                                 maxLength={10}
-                                autoComplete="disabled"
+                                autoComplete='off'
                                 onKeyDown={(event) => {
                                     if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
                                         event.preventDefault();
@@ -309,7 +310,7 @@ const FormUser = () => {
                                 className={`p1 PowerMas_Modal_Form_${dirtyFields.usuNom || isSubmitted ? (errors.usuNom ? 'invalid' : 'valid') : ''}`} 
                                 placeholder="Ejm: Andres"
                                 maxLength={50}
-                                autoComplete="disabled"
+                                autoComplete='off'
                                 style={{ textTransform: 'capitalize'}}
                                 {...register('usuNom', { 
                                     required: 'El nombre es requerido',
@@ -334,7 +335,7 @@ const FormUser = () => {
                             <input 
                                 type="text" 
                                 id="usuApe"
-                                autoComplete="disabled"
+                                autoComplete='off'
                                 style={{ textTransform: 'capitalize'}}
                                 className={`p1 PowerMas_Modal_Form_${dirtyFields.usuApe || isSubmitted ? (errors.usuApe ? 'invalid' : 'valid') : ''}`} 
                                 placeholder="Ejm: Eras"
@@ -397,7 +398,7 @@ const FormUser = () => {
                                     className={`p1 PowerMas_Modal_Form_${dirtyFields.usuFecNac || isSubmitted ? (errors.usuFecNac ? 'invalid' : 'valid') : ''}`} 
                                     placeholder="Ejm: 17-03-2003 (DD-MM-YYYY)"
                                     maxLength={10}
-                                    autoComplete="disabled"
+                                    autoComplete='off'
                                     onKeyDown={(event) => {
                                         if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
                                             event.preventDefault();
@@ -426,7 +427,7 @@ const FormUser = () => {
                                 id="usuCorEle" 
                                 className={`p1 PowerMas_Modal_Form_${dirtyFields.usuCorEle || isSubmitted ? (errors.usuCorEle ? 'invalid' : 'valid') : ''}`} 
                                 placeholder="Ejm: correo@correo.es"
-                                autoComplete="disabled"
+                                autoComplete='off'
                                 maxLength={50}
                                 {...register('usuCorEle', { 
                                     required: 'El Email es requerido',
@@ -459,18 +460,19 @@ const FormUser = () => {
                             <select 
                                 id="pais"
                                 style={{textTransform: 'capitalize'}}
-                                className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.pais || isSubmitted ? (errors.pais ? 'invalid' : 'valid') : ''}`} 
+                                className={`f_75 block Phone_12 PowerMas_Modal_Form_${dirtyFields.pais || isSubmitted ? (errors.pais ? 'invalid' : 'valid') : ''}`} 
                                 {...register('pais', { 
                                     validate: value => value !== '0' || 'El País es requerido' 
                                 })}
                             >
-                                <option value="0">--Seleccione País--</option>
+                                <option className="f_75" value="0">--Seleccione País--</option>
                                 {paises.map(pais => (
-                                    <option 
+                                    <option
+                                        className="f_75"
                                         key={pais.ubiCod} 
                                         value={JSON.stringify({ ubiCod: pais.ubiCod, ubiAno: pais.ubiAno })}
                                     > 
-                                        {pais.ubiNom.toLowerCase()}
+                                        {pais.ubiNom}
                                     </option>
                                 ))}
                             </select>
@@ -513,7 +515,7 @@ const FormUser = () => {
                                 id="usuTel" 
                                 className={`p1 PowerMas_Modal_Form_${dirtyFields.usuTel || isSubmitted ? (errors.usuTel ? 'invalid' : 'valid') : ''}`} 
                                 placeholder="Ejm: 922917351"
-                                autoComplete="disabled"
+                                autoComplete='off'
                                 onKeyDown={(event) => {
                                     console.log(event.target.value)
                                     console.log(phoneCodeInput)
@@ -549,7 +551,7 @@ const FormUser = () => {
                             <label htmlFor="rolCod">Rol</label>
                             <select 
                                 id="rolCod"
-                                className={`p1 PowerMas_Modal_Form_${dirtyFields.rolCod || isSubmitted ? (errors.rolCod ? 'invalid' : 'valid') : ''}`}
+                                className={`f_75 p1 PowerMas_Modal_Form_${dirtyFields.rolCod || isSubmitted ? (errors.rolCod ? 'invalid' : 'valid') : ''}`}
                                 {...register('rolCod', { 
                                     validate: value => value !== '0' || 'El rol es requerido' 
                                 })}

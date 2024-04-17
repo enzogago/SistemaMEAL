@@ -179,6 +179,7 @@ export const handleSubmitMant = async (controller, objetoEditado, objeto, setReg
         console.log(response)
         const data = await response.json();
         if (!response.ok) {
+            console.log(data.message)
             Notiflix.Notify.failure(data.message);
             return;
         }
@@ -359,7 +360,7 @@ export const Export_Excel_Basic = async (data, headersExcel, active, isPresupues
 
     // Personalizar el ancho de las columnas
     worksheet.columns.forEach(column => {
-        column.width = 20;  // Ancho por defecto para todas las columnas
+        column.width = 15;  // Ancho por defecto para todas las columnas
     });
 
     // Insertar una columna vacía al principio

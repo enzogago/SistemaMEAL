@@ -87,7 +87,7 @@ const Modal = ({ isOpen, closeModal, user }) => {
                         type="password" 
                         placeholder='Ingresa nueva contraseña' 
                         maxLength={50} 
-                        autoComplete='disabled'
+                        autoComplete='off'
                         name="nuevaContraseña"
                         {...register(
                             'nuevaContraseña', { 
@@ -121,7 +121,7 @@ const Modal = ({ isOpen, closeModal, user }) => {
                         type="password" 
                         placeholder='Confirma la contraseña' 
                         maxLength={50} 
-                        autoComplete='disabled'
+                        autoComplete='off'
                         name="confirmarContraseña"
                         {...register(
                             'confirmarContraseña', { 

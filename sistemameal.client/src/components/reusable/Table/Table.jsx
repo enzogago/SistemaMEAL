@@ -16,6 +16,7 @@ import { Export_Excel_Helper, Export_PDF_Helper, handleDeleteMant, orthographicC
 import CustomTable from './CustomTable';
 
 const Table = ({ data, openModal, setData, controller, fieldMapping, title, resize, isLargePagination=false,format='A4',filterProperties }) => {
+    console.log(data)
     // Variables State AuthContext 
     const { authInfo } = useContext(AuthContext);
     const { userPermissions } = authInfo;
@@ -35,7 +36,7 @@ const Table = ({ data, openModal, setData, controller, fieldMapping, title, resi
     const columns = useMemo(() => {
         let baseColumns = Object.keys(fieldMapping).map(field => {
             // Usa el objeto de mapeo para obtener la versión corregida ortográficamente de la palabra
-            const correctedHeader = orthographicCorrections[field.toLowerCase()] || field;
+            const correctedHeader = orthographicCorrections[field] || field;
             return {
                 header: correctedHeader,
                 accessorKey: fieldMapping[field],
@@ -43,9 +44,9 @@ const Table = ({ data, openModal, setData, controller, fieldMapping, title, resi
                     let text = row.original[fieldMapping[field]];
                     if (fieldMapping[field] === 'uniInvPer') {
                         if (text === 'S') {
-                            return 'Si';
+                            return 'SI';
                         } else {
-                            return 'No';
+                            return 'NO';
                         }
                     } else if (field === 'color') {
                         return (
@@ -54,7 +55,7 @@ const Table = ({ data, openModal, setData, controller, fieldMapping, title, resi
                             </div>
                         );
                     } else if (field === 'Objetivo') {
-                        const text = row.original.objNum + ' - ' + row.original.objNom.charAt(0).toUpperCase() + row.original.objNom.slice(1).toLowerCase();
+                        const text = row.original.objNum + ' - ' + row.original.objNom.charAt(0).toUpperCase() + row.original.objNom.slice(1);
                         const shortText = text.length > 60 ? text.substring(0, 60) + '...' : text;
                         if(text.length >= 60){
                             return (
@@ -69,7 +70,7 @@ const Table = ({ data, openModal, setData, controller, fieldMapping, title, resi
                             return text;
                         }
                     } else if (field === 'Objetivo Específico') {
-                        const text = row.original.objEspNum + ' - ' + row.original.objEspNom.charAt(0).toUpperCase() + row.original.objEspNom.slice(1).toLowerCase();
+                        const text = row.original.objEspNum + ' - ' + row.original.objEspNom.charAt(0).toUpperCase() + row.original.objEspNom.slice(1);
                         const shortText = text.length > 60 ? text.substring(0, 60) + '...' : text;
                         if(text.length >= 60){
                             return (
@@ -84,7 +85,7 @@ const Table = ({ data, openModal, setData, controller, fieldMapping, title, resi
                             return text;
                         }
                     } else if (field === 'Resultado') {
-                        const text = row.original.resNum + ' - ' + row.original.resNom.charAt(0).toUpperCase() + row.original.resNom.slice(1).toLowerCase();
+                        const text = row.original.resNum + ' - ' + row.original.resNom.charAt(0).toUpperCase() + row.original.resNom.slice(1);
                         const shortText = text.length > 60 ? text.substring(0, 60) + '...' : text;
                         if(text.length >= 60){
                             return (
@@ -102,7 +103,7 @@ const Table = ({ data, openModal, setData, controller, fieldMapping, title, resi
                         if (row.original.actNom === 'NA') {
                             return '';
                         } else {
-                            const text = row.original.actNum + ' - ' + row.original.actNom.charAt(0).toUpperCase() + row.original.actNom.slice(1).toLowerCase();
+                            const text = row.original.actNum + ' - ' + row.original.actNom.charAt(0).toUpperCase() + row.original.actNom.slice(1);
                             const shortText = text.length > 60 ? text.substring(0, 60) + '...' : text;
                             if(text.length >= 60){
                                 return (
@@ -118,19 +119,19 @@ const Table = ({ data, openModal, setData, controller, fieldMapping, title, resi
                             }
                         }
                     } else if (field === 'Subproyecto') {
-                        return row.original.subProSap + ' - ' + row.original.subProNom.charAt(0).toUpperCase() + row.original.subProNom.slice(1).toLowerCase();
+                        return row.original.subProSap + ' - ' + row.original.subProNom.charAt(0).toUpperCase() + row.original.subProNom.slice(1);
                     } else if (field === 'Periodo Inicio') {
-                        return <div style={{textTransform: 'capitalize'}}>{row.original.subProPerMesIniNombre.toLowerCase() + ' - ' +  row.original.subProPerAnoIni }</div>;
+                        return <div style={{textTransform: 'capitalize'}}>{row.original.subProPerMesIniNombre + ' - ' +  row.original.subProPerAnoIni }</div>;
                     } else if (field === 'Periodo Fin') {
-                        return <div style={{textTransform: 'capitalize'}}>{row.original.subProPerMesFinNombre.toLowerCase() + ' - ' +  row.original.subProPerAnoFin }</div>;
+                        return <div style={{textTransform: 'capitalize'}}>{row.original.subProPerMesFinNombre + ' - ' +  row.original.subProPerAnoFin }</div>;
                     } else if (field === 'Responsable') {
-                        return <div style={{textTransform: 'capitalize'}}>{ text.toLowerCase() }</div>;
+                        return <div style={{textTransform: 'capitalize'}}>{ text }</div>;
                     } else if (field === 'Tipo de Indicador') {
-                        return <div style={{textTransform: 'capitalize'}}>{ row.original.indTipIndNombre.toLowerCase() }</div>;
+                        return <div style={{textTransform: 'capitalize'}}>{ row.original.indTipIndNombre }</div>;
                     } else if (field === 'codigo') {
                         return <div>{ text }</div>;
                     } else {
-                        text = text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+                        text = text.charAt(0).toUpperCase() + text.slice(1);
                         const shortText = text.length > 60 ? text.substring(0, 60) + '...' : text;
                         if(text.length >= 60){
                             return (

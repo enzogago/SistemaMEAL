@@ -5,6 +5,7 @@ namespace SistemaMEAL.Server.Models
         public SubProyecto? SubProyecto { get; set; }
         public List<SubProyectoUbicacion>? SubProyectoUbicaciones { get; set; }
         public List<SubProyectoImplementador>? SubProyectoImplementadores { get; set; }
+        public List<SubProyectoFinanciador>? SubProyectoFinanciadores { get; set; }
 
     }
 }

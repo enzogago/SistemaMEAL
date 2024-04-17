@@ -3,14 +3,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SistemaMEAL.Server.Models
 {
-    public class Financiador
+    public class Moneda
     {
         [Key]
-        public String? FinCod { get; set; }
-        public String? FinNom { get; set; }
-        public String? FinIde { get; set; }
-        public String? FinSap { get; set; }
-        [ForeignKey("Moneda")]
         public String? MonCod { get; set; }
         public String? MonNom { get; set; }
         public String? MonAbr { get; set; }

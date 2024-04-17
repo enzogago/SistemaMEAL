@@ -40,6 +40,10 @@ const Table = ({data = [], setData, openModal}) => {
                 accessorKey: "proIde",
             },
             {
+                header: "Linea de Intervención",
+                accessorKey: "proLinInt",
+            },
+            {
                 header: "Nombre",
                 accessorKey: "proNom",
                 cell: ({row}) => (

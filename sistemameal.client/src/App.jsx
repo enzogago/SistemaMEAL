@@ -35,6 +35,7 @@ const IdentityDocumento = lazy(() => import('./components/document/IdentityDocum
 const Charge = lazy(() => import('./components/charge/Charge'));
 const Role = lazy(() => import('./components/role/Role'));
 const Financer = lazy(() => import('./components/financer/Financer'));
+const Currency = lazy(() => import('./components/currency/Currency'));
 const Implementer = lazy(() => import('./components/implementer/Implementer'));
 const Permission = lazy(() => import('./components/permission/Permission'));
 const TypeValue = lazy(() => import('./components/type-value/TypeValue'));
@@ -117,6 +118,7 @@ const App = () => {
         'role': Role,
         'charge': Charge,
         'financer': Financer,
+        'currency': Currency,
         'implementer': Implementer,
         'permission': Permission,
         'type-value': TypeValue,

@@ -8,14 +8,14 @@ namespace SistemaMEAL.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class FinanciadorController : ControllerBase
+    public class MonedaController : ControllerBase
     {
-        private readonly FinanciadorDAO _financiadores;
+        private readonly MonedaDAO _monedas;
         private readonly UsuarioDAO _usuarios;
 
-        public FinanciadorController(FinanciadorDAO financiadores, UsuarioDAO usuarios)
+        public MonedaController(MonedaDAO monedas, UsuarioDAO usuarios)
         {
-            _financiadores = financiadores;
+            _monedas = monedas;
             _usuarios = usuarios;
         }
 
@@ -27,31 +27,19 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var financiadores = _financiadores.Listado(identity);
-            return Ok(financiadores);
-        }
-
-        [HttpGet("subproyecto/{subProAno}/{subProCod}")]
-        public dynamic BuscarFinanciadoresSubProyecto(string subProAno, string subProCod)
-        {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
-
-            if (!rToken.success) return Unauthorized(rToken);
-            
-            var result = _financiadores.BuscarFinanciadoresSubProyecto(identity, subProAno:subProAno, subProCod:subProCod);
+            var result = _monedas.Listado(identity);
             return Ok(result);
         }
 
         [HttpPost]
-        public dynamic Insertar(Financiador financiador)
+        public dynamic Insertar(Moneda moneda)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return rToken;
 
-            var (message, messageType) = _financiadores.Insertar(identity, financiador);
+            var (message, messageType) = _monedas.Insertar(identity, moneda);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -67,14 +55,14 @@ namespace SistemaMEAL.Server.Controllers
         }
 
         [HttpPut]
-        public dynamic Modificar(Financiador financiador)
+        public dynamic Modificar(Moneda moneda)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return rToken;
 
-            var (message, messageType) = _financiadores.Modificar(identity, financiador);
+            var (message, messageType) = _monedas.Modificar(identity, moneda);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });
@@ -91,14 +79,14 @@ namespace SistemaMEAL.Server.Controllers
 
 
         [HttpDelete]
-        public dynamic Eliminar(Financiador financiador)
+        public dynamic Eliminar(Moneda moneda)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return rToken;
 
-            var (message, messageType) = _financiadores.Eliminar(identity, financiador);
+            var (message, messageType) = _monedas.Eliminar(identity, moneda);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });

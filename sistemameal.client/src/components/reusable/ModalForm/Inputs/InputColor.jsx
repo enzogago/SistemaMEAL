@@ -16,7 +16,7 @@ const InputColor = ({register, errors, dirtyFields, isSubmitted, setValue, color
                     type="text" 
                     placeholder='EJM: #000000' 
                     maxLength={50} 
-                    autoComplete='disabled'
+                    autoComplete='off'
                     name="color" 
                     {...register(
                         'color', { 

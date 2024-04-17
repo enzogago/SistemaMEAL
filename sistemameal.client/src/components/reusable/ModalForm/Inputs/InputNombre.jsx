@@ -19,7 +19,7 @@ const InputNombre = ({register, errors, dirtyFields, isSubmitted}) => {
             placeholder='Nuevo' 
             maxLength={300} 
             name="nombre" 
-            autoComplete='disabled'
+            autoComplete='off'
             {...register(
                 'nombre', { 
                     required: 'El campo es requerido',

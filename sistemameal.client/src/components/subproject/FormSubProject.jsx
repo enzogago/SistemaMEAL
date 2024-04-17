@@ -22,9 +22,12 @@ const FormSubProject = () => {
 
     // Estados locales
     const [ implementadoresEdit, setImplementadoresEdit ] = useState([])
+    const [ financiaodresEdit, setFinanciadoresEdit ] = useState([])
     const [ ubicacionesEdit, setUbicacionesEdit ] = useState([])
     const [ implementadores, setImplementadores ] = useState([])
+    const [ financiadores, setFinanciadores ] = useState([])
     const [ selectCount, setSelectCount ] = useState(1);
+    const [ selectCountFin, setSelectCountFin ] = useState(1);
     const [ locationSelects, setLocationSelects ] = useState([{ count: 1, selects: [] }]);
     const [ paises, setPaises ] = useState([]);
     const [ proyectos, setProyectos ] = useState([]);
@@ -198,6 +201,7 @@ const FormSubProject = () => {
         const fetchOptions = async () => {
             await Promise.all([
                 fetchData('Implementador',setImplementadores),
+                fetchData('Financiador',setFinanciadores),
                 fetchData('Ubicacion', setPaises),
                 fetchData('Proyecto', setProyectos),
             ]);
@@ -249,6 +253,10 @@ const FormSubProject = () => {
                     console.log(data)
                     setImplementadoresEdit(data);
                 });
+                fetchData(`Financiador/subproyecto/${ano}/${cod}`,(data) => {
+                    console.log(data)
+                    setFinanciadoresEdit(data);
+                });
                 fetchData(`Ubicacion/subproyecto/${ano}/${cod}`,setUbicacionesEdit);
             }
         });
@@ -265,6 +273,18 @@ const FormSubProject = () => {
             });
         }
     }, [implementadoresEdit]);
+
+    useEffect(() => {
+        if (financiaodresEdit.length > 0) {
+            // Establecer la cantidad de selects
+            setSelectCountFin(financiaodresEdit.length);
+            
+            // Establecer el valor de cada select
+            financiaodresEdit.forEach((financiador, index) => {
+                setValue(`finCod${index}`, financiador.finCod);
+            });
+        }
+    }, [financiaodresEdit]);
 
     useEffect(() => {
         if (ubicacionesEdit.length > 0) {
@@ -366,6 +386,26 @@ const FormSubProject = () => {
                     }
                 }
             }
+            // Crear un array para almacenar los valores de los selects
+            const selectValuesFin = [];
+    
+            // Iterar sobre los campos del formulario
+            for (let key in data) {
+                // Si el campo es uno de los selects
+                if (key.startsWith('finCod')) {
+                    // Verificar si el valor ya existe en selectValuesFin
+                    const exists = selectValuesFin.some(item => item.finCod === data[key]);
+                    // Si no existe, añadir el valor al array como un objeto
+                    if (!exists && data[key] !== '0') {
+                        let financiador = { finCod: data[key] };
+                        if (data.subProAno && data.subProCod) {
+                            financiador.subProAno = data.subProAno;
+                            financiador.subProCod = data.subProCod;
+                        }
+                        selectValuesFin.push(financiador);
+                    }
+                }
+            }
             
             // Crear un array para almacenar los valores de los selects de ubicación
             let ubicaciones = [];
@@ -438,6 +478,7 @@ const FormSubProject = () => {
                     proAno,
                     proCod
                 } : null,
+                SubProyectoFinanciadores: selectValuesFin,
                 SubProyectoImplementadores: selectValues,
                 SubProyectoUbicaciones: ubicaciones
             }
@@ -487,6 +528,21 @@ const FormSubProject = () => {
         }
     };
 
+
+    const handleRemoveFinanciador = (index) => {
+        if (selectCountFin > 1) {
+            // Recorre todos los selectores que vienen después del que estás eliminando
+            for (let i = index + 1; i < selectCountFin; i++) {
+                // Obtiene el valor del selector actual
+                const value = watch(`finCod${i}`);
+                // Asigna el valor al selector anterior
+                setValue(`finCod${i - 1}`, value);
+            }
+            // Elimina el último selector
+            setValue(`finCod${selectCountFin - 1}`, '0');
+            setSelectCountFin(prevCount => prevCount - 1);
+        }
+    };
     const handleRemoveImplementador = (index) => {
         if (selectCount > 1) {
             // Recorre todos los selectores que vienen después del que estás eliminando
@@ -539,11 +595,11 @@ const FormSubProject = () => {
                         >
                             <option value="0">--Seleccione Proyecto--</option>
                             {proyectos.map((item, index) => (
-                                <option 
+                                <option
                                     key={index} 
                                     value={JSON.stringify({ proAno: item.proAno, proCod: item.proCod })}
                                 > 
-                                    {item.proNom.toLowerCase()}
+                                    {item.proIde + ' - ' + item.proNom}
                                 </option>
                             ))}
                         </select>
@@ -566,7 +622,7 @@ const FormSubProject = () => {
                             placeholder='123456' 
                             maxLength={10} 
                             name="subProSap" 
-                            autoComplete='disabled'
+                            autoComplete='off'
                             onKeyDown={(event) => {
                                 if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
                                     event.preventDefault();
@@ -604,7 +660,7 @@ const FormSubProject = () => {
                             style={{textTransform: 'capitalize'}}
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.subProNom || isSubmitted ? (errors.subProNom ? 'invalid' : 'valid') : ''}`} 
                             placeholder="Sub proyecto Movilidad Humana"
-                            autoComplete="disabled"
+                            autoComplete='off'
                             {...register('subProNom', { 
                                 required: 'El campo es requerido',
                                 minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
@@ -626,7 +682,7 @@ const FormSubProject = () => {
                             id="subProRes"
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.subProRes || isSubmitted ? (errors.subProRes ? 'invalid' : 'valid') : ''}`} 
                             placeholder="Andres Eras"
-                            autoComplete="disabled"
+                            autoComplete='off'
                             style={{textTransform: 'capitalize'}}
                             {...register('subProRes', { 
                                 required: 'El campo es requerido',
@@ -722,7 +778,7 @@ const FormSubProject = () => {
                                 className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.subProPerAnoIni || isSubmitted ? (errors.subProPerAnoIni ? 'invalid' : 'valid') : ''}`} 
                                 type="text" 
                                 placeholder="2023"
-                                autoComplete="disabled"
+                                autoComplete='off'
                                 maxLength={4}
                                 onKeyDown={(event) => {
                                     if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
@@ -802,7 +858,7 @@ const FormSubProject = () => {
                                 className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.subProPerAnoFin || isSubmitted ? (errors.subProPerAnoFin ? 'invalid' : 'valid') : ''}`} 
                                 type="text" 
                                 placeholder="2023"
-                                autoComplete="disabled"
+                                autoComplete='off'
                                 maxLength={4}
                                 onKeyDown={(event) => {
                                     if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
@@ -863,7 +919,7 @@ const FormSubProject = () => {
                                             value={item.impCod}
                                             style={{textTransform: 'capitalize'}}
                                         > 
-                                            {item.impNom.toLowerCase()}
+                                            {item.impNom}
                                         </option>
                                     ))}
                                 </select>
@@ -873,6 +929,43 @@ const FormSubProject = () => {
                                         data-tooltip-content="Eliminar" 
                                         className='Large-p_25' 
                                         onClick={() => handleRemoveImplementador(index)} 
+                                    />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="flex flex-column gap_5 p1_75" style={{backgroundColor: '#fff', border: '1px solid #372e2c3d'}}>
+                        <div className="flex ai-center jc-space-between">
+                            <h3 className="f1_25">Financiadores</h3>
+                            <FaPlus className='w-auto f1 pointer' onClick={() => setSelectCountFin(count => count + 1)} /> 
+                        </div>
+                        {Array.from({ length: selectCountFin }, (_, index) => (
+                            <div key={index} className="flex gap_5">
+                                <select 
+                                    id={`finCod${index}`} 
+                                    style={{textTransform: 'capitalize'}}
+                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields[`finCod${index}`] || isSubmitted ? (errors[`finCod${index}`] ? 'invalid' : 'valid') : ''}`} 
+                                    {...register(`finCod${index}`, { 
+                                        validate: value => value !== '0' || 'El campo es requerido' 
+                                    })}
+                                >
+                                    <option value="0">--Seleccione Financiador--</option>
+                                    {financiadores.filter(item => item.finCod !== "00").map(item => (
+                                        <option 
+                                            key={item.finCod} 
+                                            value={item.finCod}
+                                            style={{textTransform: 'capitalize'}}
+                                        > 
+                                            {`${item.finIde}-${item.finSap}-${item.monAbr}(${item.monSim})`}
+                                        </option>
+                                    ))}
+                                </select>
+                                <div className='PowerMas_IconsTable flex jc-center ai-center'>
+                                    <FaRegTrashAlt 
+                                        data-tooltip-id="delete-tooltip" 
+                                        data-tooltip-content="Eliminar" 
+                                        className='Large-p_25' 
+                                        onClick={() => handleRemoveFinanciador(index)} 
                                     />
                                 </div>
                             </div>
@@ -916,7 +1009,7 @@ const FormSubProject = () => {
                                             key={pais.ubiCod} 
                                             value={JSON.stringify({ ubiCod: pais.ubiCod, ubiAno: pais.ubiAno })}
                                         > 
-                                            {pais.ubiNom.toLowerCase()}
+                                            {pais.ubiNom}
                                         </option>
                                     ))}
                                 </select>
@@ -932,7 +1025,7 @@ const FormSubProject = () => {
                                         <option style={{textTransform: 'capitalize'}} value="0">--Seleccione {select[0].ubiTip.toLowerCase()}--</option>
                                         {select.map(option => (
                                             <option key={option.ubiCod} value={JSON.stringify({ ubiCod: option.ubiCod, ubiAno: option.ubiAno })}>
-                                                {option.ubiNom.toLowerCase()}
+                                                {option.ubiNom}
                                             </option>
                                         ))}
                                     </select>

@@ -16,6 +16,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
     const closeModalAndReset = () => {
         closeModal();
         reset({
+            proLinInt: '',
             proIde: '',
             proNom: '',
             proDes: '',
@@ -30,7 +31,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
     // Activar focus en input
     useEffect(() => {
         if (modalVisible) {
-            document.getElementById('proIde').focus();
+            document.getElementById('proLinInt').focus();
         }
     }, [modalVisible]);
 
@@ -62,6 +63,38 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                 <form className='Large-f1 PowerMas_FormStatus flex flex-column gap_3' onSubmit={validateForm(onSubmit)}>
                     <div className="">
                         <label className="block">
+                            Linea de Intervención:
+                        </label>
+                        <input 
+                            id="proLinInt"
+                            className={`PowerMas_Modal_Form_${dirtyFields['proLinInt'] || isSubmitted ? (errors['proLinInt'] ? 'invalid' : 'valid') : ''}`}  
+                            type="text" 
+                            placeholder='PRO.1.0' 
+                            maxLength={10} 
+                            name="proLinInt" 
+                            autoComplete='off'
+                            {...register(
+                                'proLinInt', { 
+                                    required: 'El campo es requerido',
+                                    minLength: { value: 6, message: 'El campo no puede tener menos de 6 caracteres' },
+                                    maxLength: { value: 10, message: 'El campo no puede tener más de 10 caracteres' },
+                                    pattern: {
+                                        value: /^[A-Za-z0-9.]+$/,
+                                        message: 'Por favor, introduce solo letras y espacios',
+                                    },
+                                }
+                            )}
+                        />
+                        {errors['proLinInt'] ? (
+                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors['proLinInt'].message}</p>
+                        ) : (
+                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                Espacio reservado para el mensaje de error
+                            </p>
+                        )}
+                    </div>
+                    <div className="">
+                        <label className="block">
                             Código Proyecto:
                         </label>
                         <input 
@@ -71,7 +104,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                             placeholder='12345' 
                             maxLength={10} 
                             name="proIde" 
-                            autoComplete='disabled'
+                            autoComplete='off'
                             {...register(
                                 'proIde', { 
                                     required: 'El campo es requerido',
@@ -101,7 +134,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                             style={{textTransform: 'capitalize'}}
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.proNom || isSubmitted ? (errors.proNom ? 'invalid' : 'valid') : ''}`} 
                             placeholder="Movilidad Humana"
-                            autoComplete="disabled"
+                            autoComplete='off'
                             {...register('proNom', { 
                                 required: 'El campo es requerido',
                                 minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
@@ -123,10 +156,9 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                             id="proDes"
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.proDes || isSubmitted ? (errors.proDes ? 'invalid' : 'valid') : ''}`} 
                             placeholder="Descripción del proyecto"
-                            autoComplete="disabled"
+                            autoComplete='off'
                             style={{textTransform: 'capitalize'}}
                             {...register('proDes', { 
-                                minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
                             })} 
                         />
                         {errors.proDes ? (

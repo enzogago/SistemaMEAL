@@ -784,7 +784,7 @@ const FormGoal = () => {
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.metAnoPlaTec || isSubmitted ? (errors.metAnoPlaTec ? 'invalid' : 'valid') : ''}`} 
                                     type="text" 
                                     placeholder="2023"
-                                    autoComplete="disabled"
+                                    autoComplete='off'
                                     maxLength={4}
                                     onKeyDown={(event) => {
                                         if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
@@ -858,7 +858,7 @@ const FormGoal = () => {
                                 className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.metMetTec || isSubmitted ? (errors.metMetTec ? 'invalid' : 'valid') : ''}`} 
                                 type="text" 
                                 placeholder="500"
-                                autoComplete="disabled"
+                                autoComplete='off'
                                 maxLength={10}
                                 onKeyDown={(event) => {
                                     if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
@@ -897,7 +897,7 @@ const FormGoal = () => {
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.metMetPre || isSubmitted ? (errors.metMetPre ? 'invalid' : 'valid') : ''}`} 
                                     type="text" 
                                     placeholder="500"
-                                    autoComplete="disabled"
+                                    autoComplete='off'
                                     maxLength={10}
                                     onKeyDown={(event) => {
                                         if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {

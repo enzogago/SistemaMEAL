@@ -2,7 +2,7 @@ import Notiflix from 'notiflix';
 import React, { useEffect, useRef, useState } from 'react'
 import Table from './Table';
 import Modal from 'react-modal';
-import { FaRegFileExcel, FaRegTrashAlt } from 'react-icons/fa';
+import { FaRegFileExcel, FaRegTrashAlt, FaDownload, FaFile  } from 'react-icons/fa';
 import { formatterBudget } from './goal/helper';
 import { fetchData } from '../reusable/helper';
 
@@ -43,8 +43,8 @@ const Monitoring = () => {
         fetchData('Monitoreo/Filter', setMonitoringData)
     }, []);
 
-
     const handleFileUpload = (file) => {
+        Notiflix.Loading.pulse();
         const reader = new FileReader();
     
         reader.onloadend = async() => {
@@ -88,6 +88,8 @@ const Monitoring = () => {
                 Notiflix.Notify.success(data.message);
             } catch (error) {
                 Notiflix.Notify.failure(error.message);
+            } finally {
+                Notiflix.Loading.remove();
             }
         };
     
@@ -127,7 +129,19 @@ const Monitoring = () => {
             // Verificar si el archivo es un Excel
             const file = e.dataTransfer.files[0];
             const fileType = file.type;
-            if (['application/pdf', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel.sheet.macroEnabled.12', 'image/jpeg', 'image/png', 'image/gif', 'video/mp4', 'video/quicktime', 'video/x-msvideo'].includes(fileType)) {
+            if ([
+                'application/pdf', 
+                'application/vnd.ms-excel', 
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 
+                'application/vnd.ms-excel.sheet.macroEnabled.12', 
+                'image/jpeg', 
+                'image/png', 
+                'image/gif', 
+                'video/mp4', 
+                'video/quicktime', 
+                'video/x-msvideo',
+                'application/vnd.openxmlformats-officedocument.presentationml.presentation' // Aquí se agrega el tipo MIME para .pptx
+            ].includes(fileType)) {
                 fileInputRef.current.files = e.dataTransfer.files;
                 handleFileUpload(e.dataTransfer.files[0]); // Aquí se sube el archivo
             } else {
@@ -140,41 +154,64 @@ const Monitoring = () => {
     
     const handleFileChange = (event) => {
         console.log(event.target.files[0])
-        if (['application/pdf', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel.sheet.macroEnabled.12', 'image/jpeg', 'image/png', 'image/gif', 'video/mp4', 'video/quicktime', 'video/x-msvideo'].includes(event.target.files[0].type)) {
+        if ([
+            'application/pdf', 
+            'application/vnd.ms-excel', 
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 
+            'application/vnd.ms-excel.sheet.macroEnabled.12', 
+            'image/jpeg', 
+            'image/png', 
+            'image/gif', 
+            'video/mp4', 
+            'video/quicktime', 
+            'video/x-msvideo',
+            'application/vnd.openxmlformats-officedocument.presentationml.presentation' // Aquí se agrega el tipo MIME para .pptx
+        ].includes(event.target.files[0].type)) {
             handleFileUpload(event.target.files[0]); // Aquí se sube el archivo
         } else {
             Notiflix.Notify.failure("Formato no soportado")
         }
     };
     
+    
     const handleDivClick = () => {
         fileInputRef.current.click();
     };
 
-    // const eliminarDocumento = async (index) => {
-    //     const file = selectedFiles[index];
-    //     const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Meta/delete-file`, {
-    //         method: 'DELETE',
-    //         body: JSON.stringify({ 
-    //             fileName: file.name // Aquí incluyes el nombre del archivo
-    //         }),
-    //         headers: { 'Content-Type': 'application/json' },
-    //     });
+    const downloadFile = async (fileName) => {
+        const url = `https://meal.ddns.net/uploads/${fileName}`
+        try {
+            Notiflix.Loading.pulse('Descargando...');
+            // Obtenemos los datos
+            const response = await fetch(url);
+            if (!response.ok) {
+                Notiflix.Notify.failure('Error al descargar el archivo');
+                return;
+            }
+            response.blob().then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                // Divide el nombre del archivo en el primer "_"
+                const splitFileName = fileName.split("_");
+                // Toma la parte del nombre del archivo después del primer "_"
+                const newFileName = splitFileName.length > 1 ? splitFileName.slice(1).join('_') : fileName;
+                link.setAttribute('download', newFileName);
+                document.body.appendChild(link);
+                link.click();
+                link.parentNode.removeChild(link);
+            });
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            Notiflix.Loading.remove();
+        }
+    };
     
-    //     if (!response.ok) {
-    //         Notiflix.Notify.failure("Error al eliminar el archivo.");
-    //         return;
-    //     }
-    //     const data = await response.json();
     
-    //     Notiflix.Notify.success(data.message);
     
-    //     setSelectedFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
-    // };
-
     const eliminarDocumento = async(index) => {
             const file = selectedFiles[index];
-            console.log(file)
     
             // Prepara los datos de MetasFuente
             const metasFuente = modalData; // Asegúrate de que modalData tenga los datos correctos
@@ -255,7 +292,7 @@ const Monitoring = () => {
                 <div className="flex-grow-1 flex jc-center ai-center">
                     <div className="Large_10">
                         <article className="PowerMas_Article_Upload center">
-                            <p style={{color: '#878280'}}>Solo se puede subir documentos en formato PDF</p>
+                            <p style={{color: '#878280'}}>Solo se puede subir documentos en formato PDF,XLS,XLSM,XLSX,PPTX,JPG,PNG,MP4</p>
                             <h3>Subir Archivo</h3>
                         </article>
                         <br />
@@ -275,7 +312,7 @@ const Monitoring = () => {
                                 onChange={handleFileChange} 
                                 accept="*/*"
                             />
-                            <FaRegFileExcel className="Large-f5 w-auto" />
+                            <FaFile className="Large-f5 w-auto" />
                             {
                                 dragging ?
                                 <p>Suelta el archivo aquí</p>
@@ -296,6 +333,7 @@ const Monitoring = () => {
                     <table className="PowerMas_Modal_Documentos Large_12">
                         <thead className="">
                             <tr style={{position: 'sticky', top: '0', backgroundColor: '#fff'}}>
+                                <th className=''></th>
                                 <th className=''>Nombre</th>
                                 <th className='center'>Tamaño</th>
                                 <th></th>
@@ -304,6 +342,16 @@ const Monitoring = () => {
                         <tbody>
                             {selectedFiles.map((file, index) => (
                                 <tr key={index}>
+                                    <td className="PowerMas_IconsTable">
+                                        <div className='flex ai-center jc-center'>
+                                            <FaDownload
+                                                style={{width: '20px'}}
+                                                data-tooltip-id="delete-tooltip" 
+                                                data-tooltip-content="Descargar"
+                                                onClick={() => downloadFile(`${file.metAno}${file.metCod}_${file.metFueVerNom}`)}
+                                            />
+                                        </div>
+                                    </td>
                                     <td className='f_75' style={{whiteSpace: 'nowrap'}}>{file.metFueVerNom}</td>
                                     <td className='f_75' style={{whiteSpace: 'nowrap'}}>{formatterBudget.format(file.metFueVerPes / 1024)} KB</td>
                                     <td className="PowerMas_IconsTable">

@@ -12,6 +12,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor();
 // Servicios para los Modulos DAO
+builder.Services.AddScoped<MonedaDAO>();
 builder.Services.AddScoped<MetaDAO>();
 builder.Services.AddScoped<LogDAO>();
 builder.Services.AddScoped<NacionalidadDAO>();

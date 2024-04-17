@@ -199,7 +199,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                             placeholder='123456' 
                             maxLength={100} 
                             name="objEspNum" 
-                            autoComplete='disabled'
+                            autoComplete='off'
                             {...register(
                                 'objEspNum', { 
                                     required: 'El campo es requerido',
@@ -229,7 +229,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                             style={{textTransform: 'capitalize'}}
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.objEspNom || isSubmitted ? (errors.objEspNom ? 'invalid' : 'valid') : ''}`} 
                             placeholder="Movilidad Humana"
-                            autoComplete="disabled"
+                            autoComplete='off'
                             maxLength={300}
                             {...register('objEspNom', { 
                                 required: 'El campo es requerido',

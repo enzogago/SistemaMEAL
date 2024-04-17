@@ -592,7 +592,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, updateData
                                 id="metBenAnoEjeTec"
                                 className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.metBenAnoEjeTec || isSubmitted ? (errors.metBenAnoEjeTec ? 'invalid' : 'valid') : ''}`} 
                                 placeholder="2024"
-                                autoComplete="disabled"
+                                autoComplete='off'
                                 maxLength={4}
                                 onKeyDown={(event) => {
                                     if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
@@ -711,7 +711,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, updateData
                             style={{textTransform: 'capitalize'}}
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benNom || isSubmitted ? (errors.benNom ? 'invalid' : 'valid') : ''}`} 
                             placeholder="Enzo Fabricio"
-                            autoComplete="disabled"
+                            autoComplete='off'
                             disabled={fieldsDisabled}
                             {...register('benNom', { 
                                 required: 'El nombre es requerido',
@@ -734,7 +734,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, updateData
                             type="text" 
                             id="benApe"
                             style={{textTransform: 'capitalize'}}
-                            autoComplete="disabled"
+                            autoComplete='off'
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benApe || isSubmitted ? (errors.benApe ? 'invalid' : 'valid') : ''}`} 
                             placeholder="Gago Aguirre"
                             disabled={fieldsDisabled}
@@ -830,7 +830,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, updateData
                             id="benFecNac"
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benFecNac || isSubmitted ? (errors.benFecNac ? 'invalid' : 'valid') : ''}`} 
                             placeholder="Ejm: 17-03-2003 (DD-MM-YYYY)"
-                            autoComplete="disabled"
+                            autoComplete='off'
                             maxLength={10}
                             disabled={fieldsDisabled}
                             onKeyDown={(event) => {
@@ -896,7 +896,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, updateData
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benCorEle || isSubmitted ? (errors.benCorEle ? 'invalid' : 'valid') : ''}`} 
                             placeholder="correo@correo.com"
                             disabled={fieldsDisabled}
-                            autoComplete="disabled"
+                            autoComplete='off'
                             {...register('benCorEle', { 
                                 pattern: {
                                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
@@ -970,7 +970,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, updateData
                             type="text" 
                             id="benDir"
                             style={{textTransform: 'capitalize'}}
-                            autoComplete="disabled"
+                            autoComplete='off'
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benDir || isSubmitted ? (errors.benDir ? 'invalid' : 'valid') : ''}`} 
                             placeholder="Dirección del beneficiario"
                             disabled={fieldsDisabled}
@@ -1003,7 +1003,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, updateData
                                     style={{textTransform: 'capitalize'}}
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benNomApo || isSubmitted ? (errors.benNomApo ? 'invalid' : 'valid') : ''}`} 
                                     placeholder="Enzo Fabricio"
-                                    autoComplete="disabled"
+                                    autoComplete='off'
                                     disabled={fieldsDisabled}
                                     {...register('benNomApo', { 
                                         required: 'El nombre del apoderado es requerido',
@@ -1028,7 +1028,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, updateData
                                     style={{textTransform: 'capitalize'}}
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benApeApo || isSubmitted ? (errors.benApeApo ? 'invalid' : 'valid') : ''}`} 
                                     placeholder="Gago Aguirre"
-                                    autoComplete="disabled"
+                                    autoComplete='off'
                                     disabled={fieldsDisabled}
                                     {...register('benApeApo', { 
                                         required: 'El nombre del apoderado es requerido',

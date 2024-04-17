@@ -70,7 +70,7 @@ const ForgotPassword = () => {
                                 id="usuCorEle" 
                                 className={`PowerMas_InputLogin PowerMas_Modal_Form_${dirtyFields.usuCorEle || isSubmitted ? (errors.usuCorEle ? 'invalid' : 'valid') : ''} Medium-f1 Small-f_75`} 
                                 placeholder="Ejm: correo@correo.es"
-                                autoComplete="disabled"
+                                autoComplete='off'
                                 maxLength={50}
                                 {...register('usuCorEle', { 
                                     required: 'El Email es requerido',

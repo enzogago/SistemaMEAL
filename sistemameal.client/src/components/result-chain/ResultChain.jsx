@@ -17,7 +17,7 @@ const ResultChain = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [subproyectos, setSubProyectos] = useState([]);
     const [indicadores, setIndicadores] = useState([]);
-    const [activeButton, setActiveButton] = useState('porAno');
+    const [activeButton, setActiveButton] = useState('todos');
     const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
 
     const [headers, setHeaders] = useState([]);
@@ -390,23 +390,35 @@ const ResultChain = () => {
         let data = indicadores.map((item, index) => {
             const rowData = {
                 '#': index+1,
-                'Proyecto': item.proNom.toLowerCase(),
-                'Código': item.indNum,
-                'Nombre': item.indNom.charAt(0).toUpperCase() + item.indNom.slice(1).toLowerCase(),
+                'SUB_PROYECTO': item.subProNom.toLowerCase(),
+                'CÓDIGO': item.indNum,
+                'NOMBRE': item.indNom.charAt(0).toUpperCase() + item.indNom.slice(1).toLowerCase(),
             };
             headers.forEach(header => {
-                const inputValue = document.querySelector(`input[name="${item.indAno}_${item.indCod}_${header.key}"]`).value;
+                let inputValue;
+                if (header.key === 'totalPorAno') {
+                    inputValue = calculateTotal(item.indAno, item.indCod, 'porAno', totalsPorAnoAll);
+                } else if (header.key === 'totalPorImplementador') {
+                    inputValue = calculateTotal(item.indAno, item.indCod, 'porImplementador', totalsPorImplementador);
+                } else if (header.key === 'totalPorUbicacion') {
+                    inputValue = calculateTotal(item.indAno, item.indCod, 'porUbicacion', totalsPorUbicacion);
+                } else {
+                    inputValue = document.querySelector(`input[name="${item.indAno}_${item.indCod}_${header.key}"]`);
+                    if (inputValue){
+                        inputValue = inputValue.value;
+                    }
+                }
                 rowData[header.name] = inputValue !== '' ? inputValue : '0';
             });
-            rowData['Total'] = calculateTotal(item.indAno, item.indCod, activeButton, totals);
             return rowData;
         });
     
         // Definir los encabezados
-        let headersExcel = ['#', 'Proyecto', 'Código', 'Nombre', ...headers.map(header => header.name), 'Total'];
+        let headersExcel = ['#', 'SUB_PROYECTO', 'CÓDIGO', 'NOMBRE', ...headers.map(header => header.name)];
     
         Export_Excel_Basic(data, headersExcel, activeButton, false);
     };
+    
     
     return (
         <div className='p1 flex flex-column flex-grow-1 overflow-auto'>
@@ -451,7 +463,7 @@ const ResultChain = () => {
                     </div>
                 </div>
             </div>
-            <div className='flex jc-space-between'>
+            {/* <div className='flex jc-space-between'>
                 <div className='flex gap_5'>
                     <button 
                         className={`PowerMas_Buttom_Tab PowerMas_Buttom_Tab_${activeButton === 'porAno' ? 'Active' : ''} flex ai-center gap-1`} 
@@ -507,17 +519,16 @@ const ResultChain = () => {
                     </button>
                 </div>
                 
-            </div>
-            <div className="PowerMas_TableContainer flex-column overflow-auto borde-ayuda">
+            </div> */}
+            <div className="PowerMas_TableContainer flex-column overflow-auto">
                 <table className="PowerMas_TableStatus ">
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Proyecto</th>
                             <th>Código</th>
                             <th>Nombre</th>
                             {/* Encabezados */}
-                            {headers.map((header, index) => <th key={index}>{header.name}</th>)}
+                            {headers.map((header, index) => <th style={{backgroundColor: `${header.key.startsWith('total')? '#919886': '#fff'}`,color: `${header.key.startsWith('total')? '#fff': '#000'}`}} key={index}>{header.name}</th>)}
                             {
                                 activeButton != 'todos' &&
                                 <th>Total</th>
@@ -530,7 +541,7 @@ const ResultChain = () => {
                             const rowKey = `${item.indAno}_${item.indCod}`;
                             const rowData = renderData[rowKey] || {};
                             const text = item.indNom.charAt(0).toUpperCase() + item.indNom.slice(1).toLowerCase();
-                            const shortText = text.length > 60 ? text.substring(0, 60) + '...' : text;
+                            const shortText = text.length > 30 ? text.substring(0, 30) + '...' : text;
 
                             const totalPorAno = calculateTotalAno(item.indAno, item.indCod, totalsPorAno);
                             const totalPorImp = calculateTotalAno(item.indAno, item.indCod, totalsPorImplementadorIni);
@@ -539,10 +550,9 @@ const ResultChain = () => {
                             return (
                                 <tr key={index}>
                                     <td>{index+1}</td>
-                                    <td style={{textTransform: 'capitalize'}}>{item.proNom.toLowerCase()}</td>
                                     <td>{item.indNum}</td>
                                     {
-                                        text.length > 60 ?
+                                        text.length > 30 ?
                                         <td 
                                             data-tooltip-id="info-tooltip" 
                                             data-tooltip-content={text} 
@@ -555,19 +565,19 @@ const ResultChain = () => {
                                        
                                         if (header.key === 'totalPorAno') {
                                             return (
-                                                <td key={i}>
+                                                <td className='center' style={{backgroundColor: '#919886',color: '#fff'}} key={i}>
                                                     {calculateTotal(item.indAno, item.indCod, 'porAno', totalsPorAnoAll)}
                                                 </td>
                                             );
                                         } else if (header.key === 'totalPorImplementador') {
                                             return (
-                                                <td key={i}>
+                                                <td className='center' style={{backgroundColor: '#919886',color: '#fff'}} key={i}>
                                                     {calculateTotal(item.indAno, item.indCod, 'porImplementador', totalsPorImplementador)}
                                                 </td>
                                             );
                                         } else if (header.key === 'totalPorUbicacion') {
                                             return (
-                                                <td key={i}>
+                                                <td className='center' style={{backgroundColor: '#919886',color: '#fff'}} key={i}>
                                                     {calculateTotal(item.indAno, item.indCod, 'porUbicacion', totalsPorUbicacion)}
                                                 </td>
                                             );

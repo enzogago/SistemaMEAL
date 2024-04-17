@@ -221,7 +221,7 @@ namespace SistemaMEAL.Modulos
             return temporal?? new List<Proyecto>();
         }
 
-        public IEnumerable<Proyecto> Listado(ClaimsIdentity? identity, string? proAno = null, string? proCod = null, string? proNom = null, string? proDes = null, string? proIde = null)
+        public IEnumerable<Proyecto> Listado(ClaimsIdentity? identity, string? proAno = null, string? proCod = null, string? proNom = null, string? proDes = null, string? proIde = null, string? proLinInt = null)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
             
@@ -238,6 +238,7 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_PRONOM", string.IsNullOrEmpty(proNom) ? (object)DBNull.Value : proNom);
                 cmd.Parameters.AddWithValue("@P_PRODES", string.IsNullOrEmpty(proDes) ? (object)DBNull.Value : proDes);
                 cmd.Parameters.AddWithValue("@P_PROIDE", string.IsNullOrEmpty(proIde) ? (object)DBNull.Value : proIde);
+                cmd.Parameters.AddWithValue("@P_PROLININT", string.IsNullOrEmpty(proLinInt) ? (object)DBNull.Value : proLinInt);
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                 cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
                 cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
@@ -297,6 +298,7 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_PRONOM", proyecto.ProNom);
                 cmd.Parameters.AddWithValue("@P_PRODES", proyecto.ProDes);
                 cmd.Parameters.AddWithValue("@P_PROIDE", proyecto.ProIde);
+                cmd.Parameters.AddWithValue("@P_PROLININT", proyecto.ProLinInt);
                 cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                 cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
@@ -358,6 +360,7 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_PRONOM", proyecto.ProNom);
                 cmd.Parameters.AddWithValue("@P_PRODES", proyecto.ProDes);
                 cmd.Parameters.AddWithValue("@P_PROIDE", proyecto.ProIde);
+                cmd.Parameters.AddWithValue("@P_PROLININT", proyecto.ProLinInt);
                 cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                 cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
@@ -475,6 +478,7 @@ namespace SistemaMEAL.Modulos
                         cmd.Parameters.AddWithValue("@P_PRONOM", proyecto.ProNom);
                         cmd.Parameters.AddWithValue("@P_PRODES", proyecto.ProDes);
                         cmd.Parameters.AddWithValue("@P_PROIDE", proyecto.ProIde);  
+                        cmd.Parameters.AddWithValue("@P_PROLININT", proyecto.ProLinInt);  
                         cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
                         cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                         cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
@@ -1003,6 +1007,7 @@ namespace SistemaMEAL.Modulos
                         cmd.Parameters.AddWithValue("@P_PROPERMESFIN", proyecto.ProPerMesFin);  
                         cmd.Parameters.AddWithValue("@P_PROINVSUBACT", proyecto.ProInvSubAct);  
                         cmd.Parameters.AddWithValue("@P_PROIDE", proyecto.ProIde);  
+                        cmd.Parameters.AddWithValue("@P_PROLININT", proyecto.ProLinInt);  
                         cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
                         cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                         cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
@@ -1049,11 +1054,11 @@ namespace SistemaMEAL.Modulos
                             cmd.Parameters.AddWithValue("@P_PROCOD", proCod);
                             cmd.Parameters.AddWithValue("@P_IMPCOD", implementador.ImpCod);
                             cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
-                            cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
-                            cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
-                            cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
-                            cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
-                            cmd.Parameters.AddWithValue("@P_USUAPE_U", "GAGO");
+                            cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                            cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                            cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                            cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                            cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
 
                             pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                             pDescripcionMensaje.Direction = ParameterDirection.Output;
@@ -1087,11 +1092,11 @@ namespace SistemaMEAL.Modulos
                             cmd.Parameters.AddWithValue("@P_UBIANO", ubicacion.UbiAno);
                             cmd.Parameters.AddWithValue("@P_UBICOD", ubicacion.UbiCod);
                             cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
-                            cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "192.168.1.1");
-                            cmd.Parameters.AddWithValue("@P_USUANO_U", "2023");
-                            cmd.Parameters.AddWithValue("@P_USUCOD_U", "000001");
-                            cmd.Parameters.AddWithValue("@P_USUNOM_U", "ENZO");
-                            cmd.Parameters.AddWithValue("@P_USUAPE_U", "GAGO");
+                            cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                            cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                            cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                            cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                            cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
 
                             pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                             pDescripcionMensaje.Direction = ParameterDirection.Output;

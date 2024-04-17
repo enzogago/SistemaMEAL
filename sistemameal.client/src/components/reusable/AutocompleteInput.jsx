@@ -61,7 +61,7 @@ const AutocompleteInput = ({ options, register, watch, dirtyFields, isSubmitted,
                 onFocus={() => setIsFocused(true)}
                 onBlur={handleBlur}
                 disabled={disabled}
-                autoComplete='disabled'
+                autoComplete='off'
                 placeholder={`Selecciona un ${titulo}`}
                 onInput={(e) => {
                     setValue(name, e.target.value);  // Actualiza el valor del campo de entrada

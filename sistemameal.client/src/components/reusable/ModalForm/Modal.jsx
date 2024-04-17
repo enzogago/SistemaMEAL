@@ -8,6 +8,7 @@ import InputColor from './Inputs/InputColor';
 import InputCodigoSap from './Inputs/InputCodigoSap';
 import InputNumero from './Inputs/InputNumero';
 import InputIdentificador from './Inputs/InputIdentificador';
+import InputSimbolo from './Inputs/InputSimbolo';
 
 const Modal = ({ estadoEditado, modalVisible, setModalVisible, closeModal, setData, fieldMapping, controller, title, controllerSelect, select, selectMapping }) => {
     //
@@ -164,6 +165,8 @@ const Modal = ({ estadoEditado, modalVisible, setModalVisible, closeModal, setDa
                                 return <InputColor key={field} register={register} errors={errors} dirtyFields={dirtyFields} isSubmitted={isSubmitted} setValue={setValue} color={color} setColor={setColor} />;
                             case 'codigoSAP':
                                 return <InputCodigoSap key={field} register={register} errors={errors} dirtyFields={dirtyFields} isSubmitted={isSubmitted} />;
+                            case 'simbolo':
+                                return <InputSimbolo key={field} register={register} errors={errors} dirtyFields={dirtyFields} isSubmitted={isSubmitted} />;
                             default:
                                 return null;
                         }

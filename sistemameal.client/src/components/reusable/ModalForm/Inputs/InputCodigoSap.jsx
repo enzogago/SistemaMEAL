@@ -19,7 +19,7 @@ const InputCodigoSap = ({register, errors, dirtyFields, isSubmitted}) => {
             placeholder='123456' 
             maxLength={100} 
             name="codigoSAP" 
-            autoComplete='disabled'
+            autoComplete='off'
             {...register(
                 'codigoSAP', { 
                     required: 'El campo es requerido',

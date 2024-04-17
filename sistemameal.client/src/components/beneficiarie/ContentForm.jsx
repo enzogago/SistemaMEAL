@@ -155,7 +155,7 @@ const ContentForm = ({register, dirtyFields, isSubmitted, errors, reset, watch, 
                             id="benNom"
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benNom || isSubmitted ? (errors.benNom ? 'invalid' : 'valid') : ''}`} 
                             placeholder="Enzo Fabricio"
-                            autoComplete="disabled"
+                            autoComplete='off'
                             maxLength={50}
                             style={{textTransform: 'capitalize'}}
                             {...register('benNom', { 
@@ -177,7 +177,7 @@ const ContentForm = ({register, dirtyFields, isSubmitted, errors, reset, watch, 
                             type="text" 
                             id="benApe"
                             style={{textTransform: 'capitalize'}}
-                            autoComplete="disabled"
+                            autoComplete='off'
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benApe || isSubmitted ? (errors.benApe ? 'invalid' : 'valid') : ''}`} 
                             placeholder="Gago Aguirre"
                             {...register('benApe', { 
@@ -262,7 +262,7 @@ const ContentForm = ({register, dirtyFields, isSubmitted, errors, reset, watch, 
                                     id="benFecNac"
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benFecNac || isSubmitted ? (errors.benFecNac ? 'invalid' : 'valid') : ''}`} 
                                     placeholder="Ejm: 17-03-2003 (DD-MM-YYYY)"
-                                    autoComplete="disabled"
+                                    autoComplete='off'
                                     maxLength={10}
                                     onKeyDown={(event) => {
                                         if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
@@ -294,7 +294,7 @@ const ContentForm = ({register, dirtyFields, isSubmitted, errors, reset, watch, 
                                     id="edad"
                                     className='block Phone_12'
                                     placeholder="Edad"
-                                    autoComplete="disabled"
+                                    autoComplete='off'
                                     disabled={true}
                                     value={edadView}
                                 />
@@ -307,7 +307,7 @@ const ContentForm = ({register, dirtyFields, isSubmitted, errors, reset, watch, 
                             type="text" 
                             id="benDir"
                             style={{textTransform: 'capitalize'}}
-                            autoComplete="disabled"
+                            autoComplete='off'
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benDir || isSubmitted ? (errors.benDir ? 'invalid' : 'valid') : ''}`} 
                             placeholder="Dirección del beneficiario"
                             {...register('benDir', { 
@@ -363,7 +363,7 @@ const ContentForm = ({register, dirtyFields, isSubmitted, errors, reset, watch, 
                         id="benCorEle"
                         className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benCorEle || isSubmitted ? (errors.benCorEle ? 'invalid' : 'valid') : ''}`} 
                         placeholder="correo@correo.com"
-                        autoComplete="disabled"
+                        autoComplete='off'
                         {...register('benCorEle', { 
                             required: 'El correo es requerida',
                             pattern: {
@@ -387,7 +387,7 @@ const ContentForm = ({register, dirtyFields, isSubmitted, errors, reset, watch, 
                         id="benTel"
                         className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benTel || isSubmitted ? (errors.benTel ? 'invalid' : 'valid') : ''}`} 
                         placeholder="907078329"
-                        autoComplete="disabled"
+                        autoComplete='off'
                         maxLength={10}
                         onKeyDown={(event) => {
                             if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
@@ -419,7 +419,7 @@ const ContentForm = ({register, dirtyFields, isSubmitted, errors, reset, watch, 
                         id="benTelCon"
                         className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benTelCon || isSubmitted ? (errors.benTelCon ? 'invalid' : 'valid') : ''}`} 
                         placeholder="907078329"
-                        autoComplete="disabled"
+                        autoComplete='off'
                         maxLength={10}
                         onKeyDown={(event) => {
                             if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
@@ -457,7 +457,7 @@ const ContentForm = ({register, dirtyFields, isSubmitted, errors, reset, watch, 
                                 type="text"
                                 className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benNomApo || isSubmitted ? (errors.benNomApo ? 'invalid' : 'valid') : ''}`} 
                                 placeholder="Enzo Fabricio"
-                                autoComplete="disabled"
+                                autoComplete='off'
                                 {...register('benNomApo', { 
                                     required: 'El nombre del apoderado es requerido',
                                     minLength: { value: 3, message: 'El nombre debe tener minimo 3 digitos' },
@@ -478,7 +478,7 @@ const ContentForm = ({register, dirtyFields, isSubmitted, errors, reset, watch, 
                                 type="text"
                                 className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benApeApo || isSubmitted ? (errors.benApeApo ? 'invalid' : 'valid') : ''}`} 
                                 placeholder="Gago Aguirre"
-                                autoComplete="disabled"
+                                autoComplete='off'
                                 {...register('benApeApo', { 
                                     required: 'El nombre del apoderado es requerido',
                                     minLength: { value: 3, message: 'El nombre debe tener minimo 3 digitos' },

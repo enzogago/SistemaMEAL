@@ -77,7 +77,7 @@ const Table = ({data, setUsersTable}) => {
                 header: "Estado",
                 accessorKey: "usuEst",
                 cell: ({row}) => {
-                    const text = row.original.usuEst === 'A' ? 'Activo' : 'Inactivo';
+                    const text = row.original.usuEst === 'A' ? 'ACTIVO' : 'INACTIVO';
                     return (
                         <div
                             className="bold"
@@ -92,7 +92,7 @@ const Table = ({data, setUsersTable}) => {
                 header: "Nombre Completo",
                 accessorKey: "usuNom",
                 cell: ({row}) => {
-                    const text = row.original.docIdeAbr + ' ' + row.original.usuNumDoc + ' - ' + row.original.usuNom.toLowerCase() + ' ' + row.original.usuApe.toLowerCase();
+                    const text = row.original.docIdeAbr + ' ' + row.original.usuNumDoc + ' - ' + row.original.usuNom + ' ' + row.original.usuApe;
                     return (
                         <div style={{textTransform: 'capitalize'}}>
                             {text}
@@ -110,7 +110,7 @@ const Table = ({data, setUsersTable}) => {
                 cell: ({row}) => {
                     return (
                         <div style={{textTransform: 'capitalize'}}>
-                            {row.original.ubiNom.toLowerCase()}
+                            {row.original.ubiNom}
                         </div>
                     )
                 }
@@ -119,7 +119,7 @@ const Table = ({data, setUsersTable}) => {
                 header: "Correo",
                 accessorKey: "usuCorEle",
                 cell: ({row}) => {
-                    const text = row.original.usuCorEle.toLowerCase();
+                    const text = row.original.usuCorEle;
                     return (
                         <div>
                             {text}
@@ -135,7 +135,7 @@ const Table = ({data, setUsersTable}) => {
                 header: "Cargo",
                 accessorKey: "carNom",
                 cell: ({row}) => {
-                    const text = row.original.carNom.charAt(0).toUpperCase() + row.original.carNom.slice(1).toLowerCase();
+                    const text = row.original.carNom.charAt(0).toUpperCase() + row.original.carNom.slice(1);
                     return (
                         <div>
                             {text}
@@ -147,7 +147,7 @@ const Table = ({data, setUsersTable}) => {
                 header: "Rol",
                 accessorKey: "rolNom",
                 cell: ({row}) => {
-                    const text = row.original.rolNom.charAt(0).toUpperCase() + row.original.rolNom.slice(1).toLowerCase();
+                    const text = row.original.rolNom.charAt(0).toUpperCase() + row.original.rolNom.slice(1);
                     return (
                         <div>
                             {text}

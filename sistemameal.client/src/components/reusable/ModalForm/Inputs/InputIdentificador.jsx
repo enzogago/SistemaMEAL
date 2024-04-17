@@ -19,7 +19,7 @@ const InputIdentificador = ({register, errors, dirtyFields, isSubmitted}) => {
             placeholder='12345' 
             maxLength={10} 
             name="codigo" 
-            autoComplete='disabled'
+            autoComplete='off'
             {...register(
                 'codigo', { 
                     required: 'El campo es requerido',
