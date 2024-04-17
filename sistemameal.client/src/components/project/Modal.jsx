@@ -43,7 +43,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
             for (let key in estadoEditado) {
                 if (typeof estadoEditado[key] === 'string') {
                     // Convierte cada cadena a minúsculas
-                    newData[key] = estadoEditado[key].trim().toLowerCase();
+                    newData[key] = estadoEditado[key].trim();
                 } else {
                     // Mantiene los valores no string tal como están
                     newData[key] = estadoEditado[key];

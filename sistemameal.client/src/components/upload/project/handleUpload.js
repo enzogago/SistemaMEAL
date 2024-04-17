@@ -12,7 +12,7 @@ export const expectedHeaders = [
     { display: 'OBJETIVO ESPECIFICO', dbKey: 'objEspNom', entity: 'ObjetivoEspecifico', validation: 'nombre' },
     { display: 'CODIGO_OB', dbKey: 'objNum', entity: 'Objetivo', validation: 'numero' },
     { display: 'OBJETIVO', dbKey: 'objNom', entity: 'Objetivo', validation: 'nombre' },
-    { display: 'CODIGO_SAP', dbKey: 'subProSap', entity: 'Subproyecto', validation: 'numero' },
+    { display: 'CODIGO_FINANCIACION', dbKey: 'subProSap', entity: 'Subproyecto', validation: 'numero' },
     { display: 'NOMBRE SUBPROYECTO', dbKey: 'subProNom', entity: 'Subproyecto', validation: 'nombre' },
     { display: 'RESPONSABLE-COORDINADOR', dbKey: 'subProRes', entity: 'Subproyecto', validation: 'nombre' },
     { display: 'MES_INICIO', dbKey: 'subProPerMesIni', entity: 'Subproyecto', validation: 'nombre' },
@@ -21,6 +21,7 @@ export const expectedHeaders = [
     { display: 'AÑO_FIN', dbKey: 'subProPerAnoFin', entity: 'Subproyecto', validation: 'año' },
     { display: 'INVOLUCRA_SUB_ACTIVIDAD', dbKey: 'subProInvSubAct', entity: 'Subproyecto', validation: 'descripcion' },
     { display: 'CODIGO PROYECTO', dbKey: 'proIde', entity: 'Proyecto', validation: 'numero' },
+    { display: 'LINEA DE INTERVENCION', dbKey: 'proLinInt', entity: 'Proyecto', validation: 'numero' },
     { display: 'NOMBRE PROYECTO', dbKey: 'proNom', entity: 'Proyecto', validation: 'nombre' },
     { display: 'DESCRIPCION PROYECTO', dbKey: 'proDes', entity: 'Proyecto', validation: 'descripcion' },
 ];
@@ -51,21 +52,21 @@ const validationRules = {
         required: false,
         maxLength: 300,
         minLength: 5,
-        pattern: /^[0-9A-Za-zñÑáéíóúÁÉÍÓÚ()%/.,;üÜ\s-_]+$/,
+        pattern: /^[0-9A-Za-zñÑáéíóúÁÉÍÓÚº()%/.,;üÜ\s-_]+$/,
         patternMessage: 'Por favor, introduce solo letras y espacios',
     },
     'nombre': {
         required: true,
         maxLength: 300,
         minLength: 2,
-        pattern: /^[0-9A-Za-zñÑáéíóúÁÉÍÓÚ():%/.,;üÜ\s-_]+$/,
+        pattern: /^[0-9A-Za-zñÑáéíóúÁÉÍÓÚº():%/.,;üÜ\s-_]+$/,
         patternMessage: 'Por favor, introduce solo letras y espacios',
     },
     'descripcion': {
         required: false,
         maxLength: 300,
         minLength: 0,
-        pattern: /^[0-9A-Za-zñÑáéíóúÁÉÍÓÚ()%/.,;üÜ\s-_]+$/,
+        pattern: /^[0-9A-Za-zñÑáéíóúÁÉÍÓÚº()%/.,;üÜ\s-_]+$/,
         patternMessage: 'Por favor, introduce solo letras y espacios',
     },
     'color': {
@@ -156,7 +157,7 @@ export const handleUpload = async (file, setTableData, setPostData, setIsValid, 
         const expectedHeaderDisplays = expectedHeaders.map(header => header.display.toUpperCase());
         console.log(expectedHeaderDisplays);
         // Verifica que los encabezados son correctos
-        const headers = worksheet.getRow(12).values.slice(3, 25); // Tomando en cuenta los encabezados estan en la fila 4 a partir de la columna 2
+        const headers = worksheet.getRow(12).values.slice(3, 26); // Tomando en cuenta los encabezados estan en la fila 4 a partir de la columna 2
         console.log(headers);
         if (!arraysEqual(headers, expectedHeaderDisplays)) {
             alert('Los encabezados no son válidos');
@@ -173,7 +174,7 @@ export const handleUpload = async (file, setTableData, setPostData, setIsValid, 
             const row = worksheet.getRow(rowNumber);
 
             // Verifica si todas las celdas en la fila están vacías
-            const isEmptyRow = row.values.slice(3, 25).every(cell => !cell || cell.trim() === '');
+            const isEmptyRow = row.values.slice(3, 26).every(cell => !cell || cell.trim() === '');
             // Si la fila está vacía, detiene la iteración
             if (isEmptyRow) {
                 break;
@@ -189,13 +190,13 @@ export const handleUpload = async (file, setTableData, setPostData, setIsValid, 
             const resultData  = {}; // Inicializa los datos del subproyecto
             const IndicatorData  = {}; // Inicializa los datos del subproyecto
 
-            for (let colNumber = 3; colNumber <= 24; colNumber++) { // Itera desde la columna B (2) hasta la F (6)
-                const cellValueForIndTipInd = row.getCell(25).text.trim();
-                const cellValueForProMesIni = row.getCell(26).text.trim();
-                const cellValueForProMesFin = row.getCell(27).text.trim();
-                const cellValueForUni = row.getCell(28).text.trim();
-                const cellValueForTipVal = row.getCell(29).text.trim();
-                const cellValueForInvSubAct = row.getCell(30).text.trim();
+            for (let colNumber = 3; colNumber <= 25; colNumber++) { // Itera desde la columna B (2) hasta la F (6)
+                const cellValueForIndTipInd = row.getCell(26).text.trim();
+                const cellValueForProMesIni = row.getCell(27).text.trim();
+                const cellValueForProMesFin = row.getCell(28).text.trim();
+                const cellValueForUni = row.getCell(29).text.trim();
+                const cellValueForTipVal = row.getCell(30).text.trim();
+                const cellValueForInvSubAct = row.getCell(31).text.trim();
 
                 const cell = row.getCell(colNumber);
                 const cellValue = cell.text.trim();

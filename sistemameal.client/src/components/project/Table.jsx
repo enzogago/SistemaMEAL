@@ -48,7 +48,7 @@ const Table = ({data = [], setData, openModal}) => {
                 accessorKey: "proNom",
                 cell: ({row}) => (
                     <div style={{textTransform: 'capitalize'}}>
-                        {row.original.proNom.toLowerCase()}
+                        {row.original.proNom}
                     </div>
                 ),
             },
@@ -57,7 +57,7 @@ const Table = ({data = [], setData, openModal}) => {
                 accessorKey: "proDes",
                 cell: ({row}) => (
                     <div style={{textTransform: 'capitalize'}}>
-                        {row.original.proDes.toLowerCase()}
+                        {row.original.proDes}
                     </div>
                 ),
             },

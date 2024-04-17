@@ -41,7 +41,7 @@ const Table = ({data = [], setData}) => {
                 accessorKey: "subProNom",
                 cell: ({row}) => (
                     <div style={{textTransform: 'capitalize'}}>
-                        {row.original.subProSap + ' - ' +row.original.subProNom.toLowerCase()}
+                        {row.original.subProSap + ' - ' +row.original.subProNom}
                     </div>
                 ),
             },
@@ -50,7 +50,7 @@ const Table = ({data = [], setData}) => {
                 accessorKey: "proNom",
                 cell: ({row}) => (
                     <div style={{textTransform: 'capitalize'}}>
-                        {row.original.proIde + ' - ' +row.original.proNom.toLowerCase()}
+                        {row.original.proIde + ' - ' +row.original.proNom}
                     </div>
                 ),
             },
@@ -59,7 +59,7 @@ const Table = ({data = [], setData}) => {
                 accessorKey: "subProRes",
                 cell: ({row}) => (
                     <div style={{textTransform: 'capitalize'}}>
-                        {row.original.subProRes.toLowerCase()}
+                        {row.original.subProRes}
                     </div>
                 ),
             },
@@ -68,7 +68,7 @@ const Table = ({data = [], setData}) => {
                 accessorKey: "subProPerAnoIni",
                 cell: ({row}) => {
                     return (
-                        <div style={{textTransform: 'capitalize'}}>{row.original.subProPerMesIniNombre + ' - ' +  row.original.subProPerAnoIni }</div>
+                        <div style={{textTransform: 'capitalize'}}>{row.original.subProPerMesIniNombre.toUpperCase() + ' - ' +  row.original.subProPerAnoIni }</div>
                     );
                 },
             },
@@ -77,7 +77,7 @@ const Table = ({data = [], setData}) => {
                 accessorKey: "subProPerAnoFin",
                 cell: ({row}) => {
                     return (
-                        <div style={{textTransform: 'capitalize'}}>{row.original.subProPerMesFinNombre + ' - ' +  row.original.subProPerAnoFin }</div>
+                        <div style={{textTransform: 'capitalize'}}>{row.original.subProPerMesFinNombre.toUpperCase() + ' - ' +  row.original.subProPerAnoFin }</div>
                     );
                 },
             },
@@ -137,7 +137,7 @@ const Table = ({data = [], setData}) => {
     data.forEach(item => {
         item.subProPerMesFinNombre = new Date(2024, item.subProPerMesFin - 1).toLocaleString('es-ES', { month: 'long' });
         item.subProPerMesIniNombre = new Date(2024, item.subProPerMesIni - 1).toLocaleString('es-ES', { month: 'long' });
-        item.subProInvSubActNombre = item.subProInvSubAct === 'S' ? 'Proyecto con Sub Actividades' : 'Proyecto sin Sub Actividades';
+        item.subProInvSubActNombre = item.subProInvSubAct === 'S' ? 'PROYECTO CON SUB ACTIVIDADES' : 'PROYECTO SIN SUB ACTIVIDADES';
     });
 
     const [sorting, setSorting] = useState([]);
