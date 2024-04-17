@@ -1689,13 +1689,20 @@ textarea {
 	border: 1px solid #F7775A;
 	background-color: #FFF5EE;
 	border-radius: 5px;
+	transition: all 0.3s ease;
+}
+.PowerMas_Add_Beneficiarie:hover{
+	background-color: #FFE8D9;
 }
 .PowerMas_Add_Execution{
 	border: 1px solid #20737B;
 	background-color: #20737b0f;
 	border-radius: 5px;
+	transition: all 0.3s ease;
 }
-
+.PowerMas_Add_Execution:hover{
+	background-color: #CCE1E4;
+}
 .progress-bar {
     width: 100%;
     border-radius: 2px;
@@ -1982,6 +1989,22 @@ textarea {
 	color: #fff;
 }
 
+.PowerMas_Buttom_All_Tab{
+	font-size: 0.75rem;
+	background-color: #FFFFFF;
+	padding: 0.25rem 0.5rem;
+	border-radius: 5px 5px 0 0;
+	border-width: 1px 1px 0px 1px;
+	border-style: solid;
+	border-color: #006776;
+	transition: all 0.1s ease-in;
+}
+
+.PowerMas_Buttom_All_Tab_Active{
+	background-color: #006776;
+	color: #fff;
+}
+
 .borde-ayuda{
 	border-width: 1px 1px 0px 1px;
 	border-style: solid;
@@ -2037,9 +2060,11 @@ textarea {
 
 
 .PowerMas_Tooltip_Active {
-	background: #fff url("../Img/PowerMas_Correcto.svg") no-repeat 98% center;
+	background: #fff url("../Img/PowerMas_InputActive.svg") no-repeat 98% center;
 	background-size: 16px 16px;
 	background-position: 96%;
+	background-color: #372E2C02;
+	border: 1px solid #FCAC79;
 }
 
 

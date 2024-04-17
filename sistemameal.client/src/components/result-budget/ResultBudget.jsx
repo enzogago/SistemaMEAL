@@ -238,7 +238,7 @@ const ResultBudget = () => {
         try {
             Notiflix.Loading.pulse();
             const token = localStorage.getItem('token');
-            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Indicador/cadena-indicador`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Indicador/cadena-indicador-presupuesto`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -422,7 +422,7 @@ const ResultBudget = () => {
                             <th>Proyecto</th>
                             <th>Código</th>
                             <th>Nombre</th>
-                            {headersNew.map((header, index) => <th key={index}>{header.name} ($)</th>)}
+                            {headersNew.map((header, index) => <th key={index}>{header.name} (€)</th>)}
                             {/* <th>Total</th> */}
                         </tr>
                     </thead>

@@ -463,9 +463,9 @@ const ExecutionBudget = () => {
                             <th style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}>Código</th>
                             <th colSpan={3}>Nombre</th>
                             {meses.map((mes, i) => (
-                                <th className='center' style={{textTransform: 'capitalize'}} key={i+1}>{mes.toLowerCase()} ($)</th>
+                                <th className='center' style={{textTransform: 'capitalize'}} key={i+1}>{mes.toLowerCase()} (€)</th>
                             ))}
-                            <th style={{position: 'sticky', right: '0', backgroundColor: '#fff'}}>Total ($)</th>
+                            <th style={{position: 'sticky', right: '0', backgroundColor: '#fff'}}>Total (€)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -504,13 +504,13 @@ const ExecutionBudget = () => {
                                         <td key={i+1} className='center'>
                                             {formatter.format(Object.entries(totals)
                                                 .filter(([key]) => key.startsWith(`${item.indAno}_${item.indCod}`) && key.endsWith(String(i+1).padStart(2, '0')))
-                                                .reduce((sum, [, value]) => sum + value, 0))} $
+                                                .reduce((sum, [, value]) => sum + value, 0))} €
                                         </td>
                                     ))}
                                     <td className='bold center' style={{position: 'sticky', right: '0', backgroundColor: '#fff'}}>
                                         {formatter.format(Object.entries(totals)
                                             .filter(([key]) => key.startsWith(`${item.indAno}_${item.indCod}`) && key.endsWith('_total'))
-                                            .reduce((sum, [, value]) => sum + value, 0))} $
+                                            .reduce((sum, [, value]) => sum + value, 0))} €
                                     </td>
                                 </tr>
                                 {additionalRows.filter(row => row.indAno === item.indAno && row.indCod === item.indCod).map((row, rowIndex) => (
@@ -591,7 +591,7 @@ const ExecutionBudget = () => {
                                             </td>
                                         )})}
                                         <td className='bold center' style={{position: 'sticky', right: '0', backgroundColor: '#fff'}}>
-                                            {formatter.format(totals[`${row.id}_total`] || 0) } $
+                                            {formatter.format(totals[`${row.id}_total`] || 0) } €
                                         </td>
                                     </tr>
                                 ))}

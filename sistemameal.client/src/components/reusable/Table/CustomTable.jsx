@@ -276,7 +276,7 @@ const CustomTable = ({
                                 <td>{((sums.metEjeTec/sums.metMetTec)*100).toFixed(2)}%</td>
                                 <td>{sums.metMetPre.toLocaleString()} $</td>
                                 <td>{sums.metEjePre.toLocaleString()} $</td>
-                                <td>{((sums.metEjePre/sums.metMetPre)*100).toFixed(2)}%</td>
+                                <td>{(sums.metMetPre !== 0 ? ((sums.metEjePre/sums.metMetPre)*100).toFixed(2) : 0)}%</td>
                                 <td colSpan={50}></td>
                             </tr>
                         }

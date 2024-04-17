@@ -14,7 +14,7 @@ namespace SistemaMEAL.Modulos
     {
         private conexionDAO cn = new conexionDAO();
 
-         public IEnumerable<Meta> BuscarMetasPorSubProyecto(ClaimsIdentity? identity, string? subProAno, string? subProCod, string? metAnoPlaTec)
+        public IEnumerable<Meta> BuscarMetasPorSubProyecto(ClaimsIdentity? identity, string? subProAno, string? subProCod, string? metAnoPlaTec)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
             
@@ -489,5 +489,190 @@ namespace SistemaMEAL.Modulos
 
             return (mensaje, tipoMensaje);
         }
+
+        public async Task<(string? message, string? messageType)> SubirArchivo(MetaFuente metaFuente, FileData fileData, string uploadsDirectory)
+        {
+            // var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
+            string? mensaje = "";
+            string? tipoMensaje = "";
+
+            try
+            {
+                cn.getcn.Open();
+
+                // Aquí tienes los datos del archivo
+                var data = fileData.Data;
+                var fileName = fileData.FileName;
+                var fileSize = fileData.FileSize;
+
+                System.IO.Directory.CreateDirectory(uploadsDirectory); // Crea el directorio si no existe
+
+                var path = Path.Combine(uploadsDirectory, fileName);
+                await System.IO.File.WriteAllBytesAsync(path, Convert.FromBase64String(data));
+
+                SqlCommand cmd = new SqlCommand("SP_INSERTAR_META_FUENTE_VERIFICACION", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@P_METANO", metaFuente.MetAno);
+                cmd.Parameters.AddWithValue("@P_METCOD", metaFuente.MetCod);
+                cmd.Parameters.AddWithValue("@P_METFUEVERNOM", fileName);
+                cmd.Parameters.AddWithValue("@P_METFUEVERPES", fileSize);
+                cmd.Parameters.AddWithValue("@P_USUING", "asd");
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "asd");
+                cmd.Parameters.AddWithValue("@P_USUANO_U", "asd");
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", "asd");
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", "asd");
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", "asd");
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+
+                cmd.ExecuteNonQuery();
+
+                mensaje = pDescripcionMensaje.Value.ToString();
+                tipoMensaje = pTipoMensaje.Value.ToString();
+            }
+            catch (SqlException ex)
+            {
+                mensaje = ex.Message;
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return (mensaje, tipoMensaje);
+        }
+
+        public async Task<(string? message, string? messageType)> EliminarArchivo(MetaFuente metaFuente, FileData fileData, string uploadsDirectory)
+        {
+            // var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
+            string? mensaje = "";
+            string? tipoMensaje = "";
+
+            try
+            {
+                cn.getcn.Open();
+
+                // Aquí tienes los datos del archivo
+                var data = fileData.Data;
+                var fileName = fileData.FileName;
+                var fileSize = fileData.FileSize;
+
+                var path = Path.Combine(uploadsDirectory, fileName);
+
+                if (System.IO.File.Exists(path))
+                {
+                    System.IO.File.Delete(path);
+                }
+                else
+                {
+                    throw new Exception("Archivo no encontrado" );
+                }
+
+                SqlCommand cmd = new SqlCommand("SP_ELIMINAR_META_FUENTE_VERIFICACION", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@P_METANO", metaFuente.MetAno);
+                cmd.Parameters.AddWithValue("@P_METCOD", metaFuente.MetCod);
+                cmd.Parameters.AddWithValue("@P_METFUEVERNOM", fileName);
+                cmd.Parameters.AddWithValue("@P_USUMOD", "asd");
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "asd");
+                cmd.Parameters.AddWithValue("@P_USUANO_U", "asd");
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", "asd");
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", "asd");
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", "asd");
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+
+                cmd.ExecuteNonQuery();
+
+                mensaje = pDescripcionMensaje.Value.ToString();
+                tipoMensaje = pTipoMensaje.Value.ToString();
+            }
+            catch (SqlException ex)
+            {
+                mensaje = ex.Message;
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return (mensaje, tipoMensaje);
+        }
+
+        public IEnumerable<MetaFuente> BuscarArchivosPorMeta(ClaimsIdentity? identity, string? metAno, string? metCod, string? metFueVerNom = null, string? metFueVerPes = null)
+        {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+            Console.WriteLine(metAno);
+            Console.WriteLine(metCod);
+            
+            List<MetaFuente>? temporal = new List<MetaFuente>();
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_META_FUENTE_VERIFICACION", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                // Aquí puedes agregar los parámetros necesarios para tu procedimiento almacenado
+                cmd.Parameters.AddWithValue("@P_METANO", metAno);
+                cmd.Parameters.AddWithValue("@P_METCOD", metCod);
+                cmd.Parameters.AddWithValue("@P_METFUEVERNOM", string.IsNullOrEmpty(metFueVerNom) ? (object)DBNull.Value : metFueVerNom);
+                cmd.Parameters.AddWithValue("@P_METFUEVERPES", string.IsNullOrEmpty(metFueVerPes) ? (object)DBNull.Value : metFueVerPes);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                if (!reader.HasRows)
+                {
+                    jsonResult.Append("[]");
+                }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                // Deserializa la cadena JSON en una lista de objetos MetaFuente
+                temporal = JsonConvert.DeserializeObject<List<MetaFuente>>(jsonResult.ToString());
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return temporal?? new List<MetaFuente>();
+        }
+
+
     }
 }

@@ -125,7 +125,7 @@ const Table = ({ data, setMonitoringData, setModalIsOpen }) => {
             metMetPre: filtered.reduce((sum, item) => sum + Number(item.metMetPre), 0),
             metEjePre: filtered.reduce((sum, item) => sum + Number(item.metEjePre), 0),
         };
-    
+        console.log(sums)
         // Guarda las sumas en el estado
         setSums(sums);
     
@@ -454,7 +454,7 @@ const Table = ({ data, setMonitoringData, setModalIsOpen }) => {
                         <div className="flex jc-center ai-center" >
                             <button  
                                 className="PowerMas_Add_Beneficiarie f_75 p_25 flex-grow-1" 
-                                onClick={() => setModalIsOpen(true)}
+                                onClick={() => setModalIsOpen(row.original)}
                             >
                                 FFVV
                             </button>

@@ -87,6 +87,8 @@ namespace SistemaMEAL.Server.Models
             var ano = identity.Claims.FirstOrDefault(x => x.Type == "USUANO")?.Value;
             var cod = identity.Claims.FirstOrDefault(x => x.Type == "USUCOD")?.Value;
 
+            Console.WriteLine("", ano, cod);
+
             // Buscar usuario
             var usuario = usuarios.BuscarUsuario(ano, cod);
             if (usuario == null)

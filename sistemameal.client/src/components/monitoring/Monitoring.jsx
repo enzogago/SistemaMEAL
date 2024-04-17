@@ -4,12 +4,13 @@ import Table from './Table';
 import Modal from 'react-modal';
 import { FaRegFileExcel, FaRegTrashAlt } from 'react-icons/fa';
 import { formatterBudget } from './goal/helper';
+import { fetchData } from '../reusable/helper';
 
 const Monitoring = () => {
     const [selectedFiles, setSelectedFiles] = useState([]);
+    const [modalData, setModalData] = useState(null);
 
-
-    const [ monitoringData, setMonitoringData] = useState([])
+    const [monitoringData, setMonitoringData] = useState([])
     const [modalIsOpen, setModalIsOpen] = useState(false)
 
     const [dragging, setDragging] = useState(false);
@@ -19,41 +20,27 @@ const Monitoring = () => {
     const fileInputRef = useRef();
 
     const closeModal = () => {
-        setModalIsOpen(false)
-    }
+        setModalIsOpen(false);
+        setModalData(null);
+        setSelectedFiles([]);
+    };
+    
+
+    const openModalWithData = (data) => {
+        setModalData(data);
+        console.log(data);
+        setModalIsOpen(true);
+
+        fetchData(`Meta/files/${data.metAno}/${data.metCod}`, (data) => {
+            console.log(data)
+            setSelectedFiles(data)
+        })
+    };
+
+    
     // EFECTO AL CARGAR COMPONENTE GET - LISTAR ESTADOS
     useEffect(() => {
-        const fetchMonitoreo = async () => {
-            try {
-                Notiflix.Loading.pulse('Cargando...');
-                const token = localStorage.getItem('token');
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/Filter`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                if (!response.ok) {
-                    if(response.status == 401 || response.status == 403){
-                        const data = await response.json();
-                        Notiflix.Notify.failure(data.message);
-                    }
-                    return;
-                }
-                const data = await response.json();
-                if (data.success == false) {
-                    Notiflix.Notify.failure(data.message);
-                    return;
-                }
-                setMonitoringData(data);
-                console.log(data)
-            } catch (error) {
-                console.error('Error:', error);
-            } finally {
-                Notiflix.Loading.remove();
-            }
-        };
-
-        fetchMonitoreo();
+        fetchData('Monitoreo/Filter', setMonitoringData)
     }, []);
 
 
@@ -66,35 +53,48 @@ const Monitoring = () => {
     
             // Extrae los datos de la URL de los datos
             const fileData = dataUrl.split(',')[1];
-            console.log(fileData)
+    
+            // Prepara los datos de MetasFuente
+            const metasFuente = modalData; // Asegúrate de que modalData tenga los datos correctos
+    
+            // Construye el objeto MetasFuenteDto
+            const metasFuenteDto = {
+                MetaFuente: metasFuente,
+                FileData: {
+                    data: fileData, 
+                    fileName: file.name,
+                    fileSize: String(file.size)
+                }
+            };
     
             // Ahora puedes guardar los datos del archivo donde quieras
             // Por ejemplo, podrías hacer una solicitud a tu servidor para guardar el archivo
-            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Meta/save-file`, {
-                method: 'POST',
-                body: JSON.stringify({ 
-                    data: fileData, 
-                    fileName: file.name // Aquí incluyes el nombre del archivo
-                }),
-                headers: { 'Content-Type': 'application/json' },
-            });
+            try {
+                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Meta/save-file`, {
+                    method: 'POST',
+                    body: JSON.stringify(metasFuenteDto),
+                    headers: { 'Content-Type': 'application/json' },
+                });
     
-            if (!response.ok) {
-                Notiflix.Notify.failure("Error al subir el archivo.");
-                return;
+                const data = await response.json();
+
+                if (!response.ok) {
+                    Notiflix.Notify.failure(data.message);
+                    return;
+                }
+
+                fetchData(`Meta/files/${modalData.metAno}/${modalData.metCod}`, setSelectedFiles);
+
+                Notiflix.Notify.success(data.message);
+            } catch (error) {
+                Notiflix.Notify.failure(error.message);
             }
-            const data = await response.json();
-    
-            Notiflix.Notify.success(data.message);
         };
     
         reader.readAsDataURL(file);
     };
+    
 
-
-    
-    
-    
     const handleDrag = (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -129,8 +129,6 @@ const Monitoring = () => {
             const fileType = file.type;
             if (['application/pdf', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel.sheet.macroEnabled.12', 'image/jpeg', 'image/png', 'image/gif', 'video/mp4', 'video/quicktime', 'video/x-msvideo'].includes(fileType)) {
                 fileInputRef.current.files = e.dataTransfer.files;
-                setSelectedFile(e.dataTransfer.files[0]); // Aquí se actualiza el estado selectedFile
-                setSelectedFiles(prevFiles => [...prevFiles, e.dataTransfer.files[0]]); // Aquí se agrega el archivo a la lista de selectedFiles
                 handleFileUpload(e.dataTransfer.files[0]); // Aquí se sube el archivo
             } else {
                 Notiflix.Notify.failure("Formato no soportado")
@@ -143,7 +141,6 @@ const Monitoring = () => {
     const handleFileChange = (event) => {
         console.log(event.target.files[0])
         if (['application/pdf', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel.sheet.macroEnabled.12', 'image/jpeg', 'image/png', 'image/gif', 'video/mp4', 'video/quicktime', 'video/x-msvideo'].includes(event.target.files[0].type)) {
-            setSelectedFiles(prevFiles => [...prevFiles, event.target.files[0]]);
             handleFileUpload(event.target.files[0]); // Aquí se sube el archivo
         } else {
             Notiflix.Notify.failure("Formato no soportado")
@@ -154,25 +151,68 @@ const Monitoring = () => {
         fileInputRef.current.click();
     };
 
-    const eliminarDocumento = async (index) => {
-        const file = selectedFiles[index];
-        const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Meta/delete-file`, {
-            method: 'DELETE',
-            body: JSON.stringify({ 
-                fileName: file.name // Aquí incluyes el nombre del archivo
-            }),
-            headers: { 'Content-Type': 'application/json' },
-        });
+    // const eliminarDocumento = async (index) => {
+    //     const file = selectedFiles[index];
+    //     const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Meta/delete-file`, {
+    //         method: 'DELETE',
+    //         body: JSON.stringify({ 
+    //             fileName: file.name // Aquí incluyes el nombre del archivo
+    //         }),
+    //         headers: { 'Content-Type': 'application/json' },
+    //     });
     
-        if (!response.ok) {
-            Notiflix.Notify.failure("Error al eliminar el archivo.");
-            return;
-        }
-        const data = await response.json();
+    //     if (!response.ok) {
+    //         Notiflix.Notify.failure("Error al eliminar el archivo.");
+    //         return;
+    //     }
+    //     const data = await response.json();
     
-        Notiflix.Notify.success(data.message);
+    //     Notiflix.Notify.success(data.message);
     
-        setSelectedFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
+    //     setSelectedFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
+    // };
+
+    const eliminarDocumento = async(index) => {
+            const file = selectedFiles[index];
+            console.log(file)
+    
+            // Prepara los datos de MetasFuente
+            const metasFuente = modalData; // Asegúrate de que modalData tenga los datos correctos
+    
+            // Construye el objeto MetasFuenteDto
+            const metasFuenteDto = {
+                MetaFuente: metasFuente,
+                FileData: {
+                    fileName: file.metFueVerNom,
+                    fileSize: String(file.metFueVerPes)
+                }
+            };
+    
+            // Ahora puedes guardar los datos del archivo donde quieras
+            try {
+                Notiflix.Loading.pulse('Cargando...');
+                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Meta/delete-file`, {
+                    method: 'POST',
+                    body: JSON.stringify(metasFuenteDto),
+                    headers: { 'Content-Type': 'application/json' },
+                });
+    
+                const data = await response.json();
+
+                if (!response.ok) {
+                    Notiflix.Notify.failure(data.message);
+                    return;
+                }
+
+                // En lugar de actualizar el estado aquí, volvemos a llamar a fetchData
+                await fetchData(`Meta/files/${modalData.metAno}/${modalData.metCod}`, setSelectedFiles);
+
+                Notiflix.Notify.success(data.message);
+            } catch (error) {
+                Notiflix.Notify.failure(error.message);
+            } finally {
+                Notiflix.Loading.remove();
+            }
     };
     
 
@@ -181,7 +221,7 @@ const Monitoring = () => {
             <Table 
                 data={monitoringData}
                 setMonitoringData={setMonitoringData}
-                setModalIsOpen={setModalIsOpen}
+                setModalIsOpen={openModalWithData}
             />
             <Modal
                 ariaHideApp={false}
@@ -264,8 +304,8 @@ const Monitoring = () => {
                         <tbody>
                             {selectedFiles.map((file, index) => (
                                 <tr key={index}>
-                                    <td className='f_75' style={{whiteSpace: 'nowrap'}}>{file.name}</td>
-                                    <td className='f_75' style={{whiteSpace: 'nowrap'}}>{formatterBudget.format(file.size / 1024)} KB</td>
+                                    <td className='f_75' style={{whiteSpace: 'nowrap'}}>{file.metFueVerNom}</td>
+                                    <td className='f_75' style={{whiteSpace: 'nowrap'}}>{formatterBudget.format(file.metFueVerPes / 1024)} KB</td>
                                     <td className="PowerMas_IconsTable">
                                         <div className='flex ai-center jc-center'>
                                             <FaRegTrashAlt
@@ -288,7 +328,7 @@ const Monitoring = () => {
                     </table>
                 </div>
                 <div className="center">
-                    <button className="PowerMas_Buttom_Primary Large_3 center p_5 m_25"  onClick={handleFileUpload}>Guardar</button>
+                    <button className="PowerMas_Buttom_Primary Large_3 center p_5 m_25" onClick={closeModal}>Cerrar</button>
                 </div>
             </Modal>
         </>
