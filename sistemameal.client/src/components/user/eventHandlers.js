@@ -57,7 +57,7 @@ export const handleSubmit = async (data, isEditing, navigate, safeCiphertext) =>
 export const handleDelete = async (ano, cod, setData) => {
     Notiflix.Confirm.show(
         'Eliminar Registro',
-        '¿Estás seguro que quieres eliminar este registro?',
+        '¿Está seguro que quieres eliminar este registro?',
         'Sí',
         'No',
         async () => {

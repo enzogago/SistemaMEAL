@@ -361,6 +361,11 @@ input::placeholder,select::placeholder{
 	padding-left: 10px;
 }
 
+.PowerMas_Active_Menu{
+	color: #FFC658!important;
+	font-weight: 600;
+}
+
 .PowerMas_Submenu {
 	max-height: 0;
 	overflow: hidden;
@@ -682,7 +687,7 @@ input::placeholder,select::placeholder{
 
 .PowerMas_TableHome td, th{
 	text-align: left;
-	padding: 0.5rem;
+	padding: 0.5rem 0.75rem;
 }
 
 .PowerMas_TableHome tr:first-child th {
@@ -1109,12 +1114,34 @@ textarea {
     background: white; 
 	transition: background-color 0.3s ease;
 }
+.PowerMas_TableStatus thead tr:first-child{
+	position: sticky;
+    top: 0;
+    background: white; 
+	transition: background-color 0.3s ease;
+}
+
+
 .PowerMas_TableStatus thead tr:first-child input{
 	border: none;
 	outline: none;
 	width: 100%;
 	border-bottom: 1px solid black;
 }
+
+.PowerMas_Borde_Total{
+	border-right: 1px solid #d3d3d3;
+}
+
+.PowerMas_Borde_Total{
+	border-right: 1px solid #d3d3d3;
+}
+
+.PowerMas_Borde_Total2{
+    border-top: 1px solid #d3d3d3;
+}
+
+
 
 .PowerMas_Input_Color {
 	height: auto;

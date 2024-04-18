@@ -786,10 +786,9 @@ const FormGoal = () => {
                                     placeholder="2023"
                                     autoComplete='off'
                                     maxLength={4}
-                                    onKeyDown={(event) => {
-                                        if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
-                                            event.preventDefault();
-                                        }
+                                    onInput={(event) => {
+                                        // Reemplaza cualquier carácter que no sea un número por una cadena vacía
+                                        event.target.value = event.target.value.replace(/[^0-9]/g, '');
                                     }}
                                     {...register('metAnoPlaTec', { 
                                         required: 'El campo es requerido',
@@ -860,10 +859,9 @@ const FormGoal = () => {
                                 placeholder="500"
                                 autoComplete='off'
                                 maxLength={10}
-                                onKeyDown={(event) => {
-                                    if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
-                                        event.preventDefault();
-                                    }
+                                onInput={(event) => {
+                                    // Reemplaza cualquier carácter que no sea un número por una cadena vacía
+                                    event.target.value = event.target.value.replace(/[^0-9]/g, '');
                                 }}
                                 {...register('metMetTec', {
                                     required: 'La meta es requerida',
@@ -899,10 +897,9 @@ const FormGoal = () => {
                                     placeholder="500"
                                     autoComplete='off'
                                     maxLength={10}
-                                    onKeyDown={(event) => {
-                                        if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
-                                            event.preventDefault();
-                                        }
+                                    onInput={(event) => {
+                                        // Reemplaza cualquier carácter que no sea un número por una cadena vacía
+                                        event.target.value = event.target.value.replace(/[^0-9]/g, '');
                                     }}
                                     {...register('metMetPre', {
                                         required: 'La meta es requerida',

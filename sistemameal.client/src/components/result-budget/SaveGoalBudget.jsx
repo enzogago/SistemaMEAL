@@ -409,6 +409,8 @@ const SaveGoalBudget = () => {
                                                     className={`PowerMas_Input_Cadena Large_12 f_75 PowerMas_Cadena_Form_${dirtyFields[`mes_${String(i+1).padStart(2, '0')}_${row.id}`] || isSubmitted ? (errors[`mes_${String(i+1).padStart(2, '0')}_${row.id}`] ? 'invalid' : 'valid') : ''}`} 
                                                     style={{margin: '0'}}
                                                     onInput={(e) => {
+                                                        e.target.value = e.target.value.replace(/[^0-9]/g, '');
+
                                                         if (row.id !== undefined) {
                                                             const key = `${row.id}_${String(i+1).padStart(2, '0')}`;
                                                             const totalKey = `${row.id}_total`;
@@ -425,11 +427,7 @@ const SaveGoalBudget = () => {
                                                             }));
                                                         }
                                                     }}
-                                                    onKeyDown={(event) => {
-                                                        if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter' && event.key !== '.') {
-                                                            event.preventDefault();
-                                                        }
-                                                    }}
+                                                    
                                                     maxLength={10}
                                                     {...register(`mes_${String(i+1).padStart(2, '0')}_${row.id}`, { 
                                                         pattern: {

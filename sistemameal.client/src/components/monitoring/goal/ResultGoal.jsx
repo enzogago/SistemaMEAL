@@ -918,6 +918,8 @@ const ResultGoal = () => {
                                                     `} 
                                                     style={{margin: '0'}}
                                                     onInput={(e) => {
+                                                        e.target.value = e.target.value.replace(/[^0-9]/g, '');
+
                                                         if (row.id !== undefined) {
                                                             const key = `${row.id}_${String(i+1).padStart(2, '0')}`;
                                                             const totalKey = `${row.id}_total`;
@@ -932,11 +934,6 @@ const ResultGoal = () => {
                                                                 ...prevValues,
                                                                 [key]: newValue
                                                             }));
-                                                        }
-                                                    }}
-                                                    onKeyDown={(event) => {
-                                                        if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
-                                                            event.preventDefault();
                                                         }
                                                     }}
                                                     maxLength={10}

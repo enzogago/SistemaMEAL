@@ -137,7 +137,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return rToken;
 
-            var (message, messageType) = _subproyectos.ModificarSubProyectoImplementadorUbicacion(identity, subProyectoImplementadorUbicacionDto.SubProyecto, subProyectoImplementadorUbicacionDto.SubProyectoImplementadores, subProyectoImplementadorUbicacionDto.SubProyectoUbicaciones);
+            var (message, messageType) = _subproyectos.ModificarSubProyectoImplementadorUbicacion(identity, subProyectoImplementadorUbicacionDto.SubProyecto, subProyectoImplementadorUbicacionDto.SubProyectoImplementadores, subProyectoImplementadorUbicacionDto.SubProyectoFinanciadores, subProyectoImplementadorUbicacionDto.SubProyectoUbicaciones);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });

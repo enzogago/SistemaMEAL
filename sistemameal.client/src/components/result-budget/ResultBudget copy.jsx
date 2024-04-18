@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { FaSortDown } from 'react-icons/fa';
 import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
-import { Export_Excel_Basic, fetchData } from '../reusable/helper';
+import { Export_Excel_Basic2, fetchData } from '../reusable/helper';
 import { useForm } from 'react-hook-form';
 import Notiflix, { Notify } from 'notiflix';
 import userIcon from '../../icons/user.svg';
@@ -10,8 +10,9 @@ import calendarIcon from '../../icons/calendar.svg';
 import calendarIconActive from '../../icons/calendar-active.svg';
 import locationIcon from '../../icons/location.svg';
 import locationIconActive from '../../icons/location-active.svg';
+import { formatterBudget } from '../monitoring/goal/helper';
 
-const ResultChain = () => {
+const ResultBudget = () => {
 
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [subproyectos, setSubProyectos] = useState([]);
@@ -23,11 +24,15 @@ const ResultChain = () => {
     const [viewTotals, setViewTotals] = useState({});
     const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
 
+
     const { 
         register, 
         watch, 
         handleSubmit, 
         formState: { errors, dirtyFields, isSubmitted }, 
+        reset, 
+        setValue, 
+        trigger 
     } = 
     useForm({ mode: "onChange"});
 
@@ -42,22 +47,23 @@ const ResultChain = () => {
         }
     }, [watch('subproyecto')])
     
+    
     useEffect(() => {
         const subproyecto = watch('subproyecto');
         if (subproyecto && subproyecto !== '0') {
             const { subProAno, subProCod } = JSON.parse(subproyecto);
-            fetchData(`Indicador/subproyecto/${subProAno}/${subProCod}`,setIndicadores)
+            fetchData(`Indicador/subproyecto-actividad/${subProAno}/${subProCod}`,setIndicadores)
             
             let endpoint;
             switch (activeButton) {
                 case 'Por Año':
-                    endpoint = `Indicador/cadena/${subProAno}/${subProCod}`;
+                    endpoint = `Indicador/cadena-actividad/${subProAno}/${subProCod}`;
                     break;
                 case 'Por Implementador':
-                    endpoint = `Indicador/implementador/${subProAno}/${subProCod}`;
+                    endpoint = `Indicador/implementador-actividad/${subProAno}/${subProCod}`;
                     break;
                 case 'Por Ubicación':
-                    endpoint = `Indicador/ubicacion/${subProAno}/${subProCod}`;
+                    endpoint = `Indicador/ubicacion-actividad/${subProAno}/${subProCod}`;
                     break;
                 default:
                     return;
@@ -79,7 +85,7 @@ const ResultChain = () => {
                         // Verificar si ya existe un valor para la clave
                         if (!newViewTotals[`${key}_${subKey}_${activeButton}`]) {
                             // Si no existe un valor, inicializar los totales de la vista con los valores iniciales
-                            newViewTotals[`${key}_${subKey}_${activeButton}`] = transformedData[key][subKey].metTec;
+                            newViewTotals[`${key}_${subKey}_${activeButton}`] = transformedData[key][subKey].metPre;
                         }
 
                     }
@@ -178,7 +184,7 @@ const ResultChain = () => {
         // Iterar sobre los datos del formulario
         for (let key in data) {
             // Obtener el valor inicial y el valor actual de la celda
-            let valorInicial = initialValues[key]?.metTec || '';
+            let valorInicial = initialValues[key]?.metPre || '';
             let valorActual = data[key];
     
             // Si el valor ha cambiado, agregar el cambio al arreglo correspondiente
@@ -195,19 +201,19 @@ const ResultChain = () => {
                 };
                 if (keyType.length === 4) {  // Si la longitud es 4, entonces es un 'ano'
                     cambio.cadResPerAno = keyType;
-                    cambio.cadResPerMetTec = valorActual;
-                    cambio.cadResPerMetPre = initialValues[key].metPre;
+                    cambio.cadResPerMetTec = initialValues[key].metPre;
+                    cambio.cadResPerMetPre = valorActual;
                     cambiosPorAno.push(cambio);
                 } else if (keyType.length === 2) {  // Si la longitud es 2, entonces es un 'implementador'
                     cambio.impCod = keyType;
-                    cambio.cadResImpMetTec = valorActual;
-                    cambio.cadResImpMetPre = initialValues[key].metPre;
+                    cambio.cadResImpMetTec = initialValues[key].metPre;
+                    cambio.cadResImpMetPre = valorActual;
                     cambiosPorImplementador.push(cambio);
                 } else if (keyType.length === 10) {  // Si la longitud es 10, entonces es una 'ubicacion'
                     cambio.ubiAno = keyType.substring(0, 4);
                     cambio.ubiCod = keyType.substring(4);
-                    cambio.cadResUbiMetTec = valorActual;
-                    cambio.cadResUbiMetPre = initialValues[key].metPre;
+                    cambio.cadResUbiMetTec = initialValues[key].metPre;
+                    cambio.cadResUbiMetPre = valorActual;
                     cambiosPorUbicacion.push(cambio);
                 }
             }
@@ -223,7 +229,7 @@ const ResultChain = () => {
             CadenaImplementadores: cambiosPorImplementador,
             CadenaUbicaciones: cambiosPorUbicacion
         }
-    
+        console.log(CadenaIndicadorDto)
         handleInsert(CadenaIndicadorDto);
     };
 
@@ -232,7 +238,7 @@ const ResultChain = () => {
         try {
             Notiflix.Loading.pulse();
             const token = localStorage.getItem('token');
-            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Indicador/cadena-indicador`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Indicador/cadena-indicador-presupuesto`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -304,23 +310,18 @@ const ResultChain = () => {
                 const inputValue = document.querySelector(`input[name="${item.indAno}_${item.indCod}_${key}"]`).value;
                 rowData[key] = inputValue !== '' ? inputValue : '0';
             });
-            rowData['Total'] = calculateTotal(item.indAno, item.indCod, activeButton, viewTotals);
             return rowData;
         });
     
         // Definir los encabezados
-        let headersExcel = ['#', 'Proyecto', 'Código', 'Nombre', ...headersNew.map(header => ({name: header.name, code: header.code})), 'Total'];
+        let headersExcel = ['#', 'Proyecto', 'Código', 'Nombre', ...headersNew.map(header => ({name: header.name, code: header.code}))];
     
-        Export_Excel_Basic(data,headersExcel, activeButton, false);
+        Export_Excel_Basic2(data,headersExcel, activeButton, true);
     };
-    
-    
-    
-    
     
     return (
         <div className='p1 flex flex-column flex-grow-1 overflow-auto'>
-            <h1 className="Large-f1_5"> Cadena de resultado | Metas técnicas programáticas </h1>
+            <h1 className="Large-f1_5"> Cadena de resultado | Metas presupuesto </h1>
             <div className='flex jc-space-between'>
                 <div className="m_25 flex-grow-1">
                     <select 
@@ -354,10 +355,18 @@ const ResultChain = () => {
                 <div className={`PowerMas_Dropdown_Export Large_3 Large-m_25 ${dropdownOpen ? 'open' : ''}`}>
                     <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>Exportar <FaSortDown className='Large_1' /></button>
                     <div className="PowerMas_Dropdown_Export_Content Phone_12">
-                        <a onClick={() => {
-                            Export_Excel();
-                            setDropdownOpen(false);
-                        }} className='flex jc-space-between p_5'>Excel <img className='Large_1' src={Excel_Icon} alt="" /> </a>
+                        {/* {true &&
+                            <a onClick={() => {
+                                Export_PDF();
+                                setDropdownOpen(false);
+                            }} className='flex jc-space-between p_5'>PDF <img className='Large_1' src={Pdf_Icon} alt="" /></a>
+                        } */}
+                        {true &&
+                            <a onClick={() => {
+                                Export_Excel();
+                                setDropdownOpen(false);
+                            }} className='flex jc-space-between p_5'>Excel <img className='Large_1' src={Excel_Icon} alt="" /> </a>
+                        }
                     </div>
                 </div>
             </div>
@@ -413,8 +422,8 @@ const ResultChain = () => {
                             <th>Proyecto</th>
                             <th>Código</th>
                             <th>Nombre</th>
-                            {headersNew.map((header, index) => <th key={index}>{header.name}</th>)}
-                            <th>Total</th>
+                            {headersNew.map((header, index) => <th key={index}>{header.name} (€)</th>)}
+                            {/* <th>Total</th> */}
                         </tr>
                     </thead>
                     <tbody>
@@ -444,15 +453,11 @@ const ResultChain = () => {
                                         return(
                                         <td key={key}>
                                             <input
-                                                onKeyDown={(event) => {
-                                                    if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
-                                                        event.preventDefault();
-                                                    }
-                                                }}
                                                 maxLength={10}
                                                 style={{margin: 0}}
                                                 className={`PowerMas_Input_Cadena Large_12 f_75 PowerMas_Cadena_Form_${dirtyFields[`${item.indAno}_${item.indCod}_${key}`] || isSubmitted ? (errors[`${item.indAno}_${item.indCod}_${key}`] ? 'invalid' : 'valid') : ''}`} 
-                                                onInput={e => {
+                                                onInput={(e) => {
+                                                    e.target.value = e.target.value.replace(/[^0-9]/g, '');
                                                     // Actualizar el valor en los totales de la vista
                                                     const newValue = e.target.value;
                                                     setViewTotals(prevTotals => {
@@ -497,7 +502,7 @@ const ResultChain = () => {
                                                 }}
                                                 {...register(`${item.indAno}_${item.indCod}_${key}`, {
                                                     pattern: {
-                                                        value: /^(?:[1-9]\d*|)$/,
+                                                        value: /^(?:[1-9]\d*(\.\d+)?|0\.\d*[1-9]\d*)$/,
                                                         message: 'Valor no válido',
                                                     },
                                                     maxLength: {
@@ -505,14 +510,13 @@ const ResultChain = () => {
                                                         message: ''
                                                     }
                                                 })}
-                                                defaultValue={indicatorData[key]?.metTec || ''}
+                                                defaultValue={indicatorData[key]?.metPre || ''}
                                             />
                                         </td>
                                     )})}
-                                    <td className={`center bold ${calculateTotal(item.indAno, item.indCod, activeButton, viewTotals) > totalPorAno ? 'invalid' : ''}`}>
-                                        {calculateTotal(item.indAno, item.indCod, activeButton, viewTotals)}
-                                    </td>
-
+                                    {/* <td className={`center bold ${calculateTotal(item.indAno, item.indCod, activeButton, viewTotals) > totalPorAno ? 'invalid' : ''}`}>
+                                        {formatterBudget.format(calculateTotal(item.indAno, item.indCod, activeButton, viewTotals))} $
+                                    </td> */}
                                 </tr>
                             )
                         })
@@ -549,4 +553,4 @@ const ResultChain = () => {
     )
 }
 
-export default ResultChain
+export default ResultBudget

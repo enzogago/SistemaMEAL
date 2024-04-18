@@ -353,6 +353,45 @@ namespace SistemaMEAL.Modulos
             }
             return temporal?? new List<CadenaIndicador>();
         }
+        public IEnumerable<CadenaIndicador> BuscarCadenaPorFinanciadorActividad(string? subProAno, string? subProCod)
+        {
+            List<CadenaIndicador>? temporal = new List<CadenaIndicador>();
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_CADENA_FINANCIADOR_ACTIVIDAD", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@P_SUBPROANO", string.IsNullOrEmpty(subProAno) ? (object)DBNull.Value : subProAno);
+                cmd.Parameters.AddWithValue("@P_SUBPROCOD", string.IsNullOrEmpty(subProCod) ? (object)DBNull.Value : subProCod);
+
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (!reader.HasRows)
+                {
+                    jsonResult.Append("[]");
+                }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                // Deserializa la cadena JSON en una lista de objetos Estado
+                temporal = JsonConvert.DeserializeObject<List<CadenaIndicador>>(jsonResult.ToString());
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return temporal?? new List<CadenaIndicador>();
+        }
         public IEnumerable<CadenaIndicador> BuscarCadenaPorUbicacionActividad(string? subProAno, string? subProCod)
         {
             List<CadenaIndicador>? temporal = new List<CadenaIndicador>();
@@ -695,6 +734,85 @@ namespace SistemaMEAL.Modulos
                             throw new Exception("Error al insertar Indicador");
                         }
 
+                        //
+                        cmd = new SqlCommand("SP_BUSCAR_SUB_PROYECTO_FINANCIADOR", cn.getcn);
+                        cmd.CommandType = CommandType.StoredProcedure;
+
+                        cmd.Parameters.AddWithValue("@P_FINCOD", (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@P_SUBPROANO", indicador.SubProAno);
+                        cmd.Parameters.AddWithValue("@P_SUBPROCOD", indicador.SubProCod);
+                        cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                        cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                        cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                        cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                        cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                        pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                        pDescripcionMensaje.Direction = ParameterDirection.Output;
+                        cmd.Parameters.Add(pDescripcionMensaje);
+
+                        pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                        pTipoMensaje.Direction = ParameterDirection.Output;
+                        cmd.Parameters.Add(pTipoMensaje);
+
+                        jsonResult = new StringBuilder();
+                        reader = cmd.ExecuteReader();
+                        if (!reader.HasRows)
+                        {
+                            jsonResult.Append("[]");
+                        }
+                        else
+                        {
+                            while (reader.Read())
+                            {
+                                jsonResult.Append(reader.GetValue(0).ToString());
+                            }
+                        }
+                        // Deserializa la cadena JSON en una lista de objetos Estado
+                        List<Financiador>? financiadores = JsonConvert.DeserializeObject<List<Financiador>>(jsonResult.ToString());
+                        if (financiadores.Count > 0)
+                        {
+                            foreach (var financiador in financiadores)
+                            {
+                                cmd = new SqlCommand("SP_INSERTAR_CADENA_RESULTADO_FINANCIADOR", cn.getcn);
+                                cmd.CommandType = CommandType.StoredProcedure;
+                                cmd.Parameters.AddWithValue("@P_INDANO", indAno);
+                                cmd.Parameters.AddWithValue("@P_INDCOD", indCod);
+                                cmd.Parameters.AddWithValue("@P_FINCOD", financiador.FinCod);
+                                cmd.Parameters.AddWithValue("@P_CADRESFINMETPRE", "");
+                                cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
+                                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                                pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                                cmd.Parameters.Add(pDescripcionMensaje);
+
+                                pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                                pTipoMensaje.Direction = ParameterDirection.Output;
+                                cmd.Parameters.Add(pTipoMensaje);
+
+                                cmd.ExecuteNonQuery();
+
+                                message = pDescripcionMensaje.Value.ToString();
+                                messageType = pTipoMensaje.Value.ToString();
+
+                                // Inserta el DocumentoBeneficiario
+                                if (messageType != "3")
+                                {
+                                    Console.WriteLine(message);
+                                    throw new Exception(message);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            throw new Exception("Error al insertar Indicador");
+                        }
+
                         cmd = new SqlCommand("SP_BUSCAR_SUB_PROYECTO_UBICACION", cn.getcn);
                         cmd.CommandType = CommandType.StoredProcedure;
 
@@ -851,45 +969,190 @@ namespace SistemaMEAL.Modulos
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 
+            string? tipoMensajeRes = "";
+            string? mensajeRes = "";
+
             string? mensaje = "";
             string? tipoMensaje = "";
-            try
+
+
+             using (TransactionScope scope = new TransactionScope())
             {
-                cn.getcn.Open();
+                using (SqlConnection connection = cn.getcn)
+                {
+                    try
+                    {
+                        SqlCommand cmd;
+                        SqlParameter pDescripcionMensaje;
+                        SqlParameter pTipoMensaje;
+                        StringBuilder jsonResult;
+                        SqlDataReader reader;
+                        List<Indicador>? indicadores = null;
 
-                SqlCommand cmd = new SqlCommand("SP_ELIMINAR_INDICADOR", cn.getcn);
-                cmd.CommandType = CommandType.StoredProcedure;
+                        if (connection.State == ConnectionState.Closed)
+                        {
+                            connection.Open();
+                        }
 
-                cmd.Parameters.AddWithValue("@P_INDANO", indicador.IndAno);
-                cmd.Parameters.AddWithValue("@P_INDCOD", indicador.IndCod);
-                cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
-                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
-                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
-                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
-                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
-                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+                        cmd = new SqlCommand("SP_ELIMINAR_INDICADOR", cn.getcn);
+                        cmd.CommandType = CommandType.StoredProcedure;
 
-                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
-                pDescripcionMensaje.Direction = ParameterDirection.Output;
-                cmd.Parameters.Add(pDescripcionMensaje);
+                        cmd.Parameters.AddWithValue("@P_INDANO", indicador.IndAno);
+                        cmd.Parameters.AddWithValue("@P_INDCOD", indicador.IndCod);
+                        cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
+                        cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                        cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                        cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                        cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                        cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
 
-                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
-                pTipoMensaje.Direction = ParameterDirection.Output;
-                cmd.Parameters.Add(pTipoMensaje);
+                        pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                        pDescripcionMensaje.Direction = ParameterDirection.Output;
+                        cmd.Parameters.Add(pDescripcionMensaje);
 
-                cmd.ExecuteNonQuery();
+                        pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                        pTipoMensaje.Direction = ParameterDirection.Output;
+                        cmd.Parameters.Add(pTipoMensaje);
 
-                mensaje = pDescripcionMensaje.Value.ToString();
-                tipoMensaje = pTipoMensaje.Value.ToString();
-            }
-            catch (SqlException ex)
-            {
-                mensaje = ex.Message;
-                tipoMensaje = "1";
-            }
-            finally
-            {
-                cn.getcn.Close();
+                        cmd.ExecuteNonQuery();
+
+                        mensaje = pDescripcionMensaje.Value.ToString();
+                        tipoMensaje = pTipoMensaje.Value.ToString();
+
+                        if (tipoMensaje != "3")
+                        {
+                            Console.WriteLine(mensaje);
+                            throw new Exception(mensaje);
+                        }
+
+                        cmd = new SqlCommand("SP_ELIMINAR_CADENA_RESULTADO_PERIODO_GENERAL", cn.getcn);
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@P_INDANO", indicador.IndAno);
+                        cmd.Parameters.AddWithValue("@P_INDCOD", indicador.IndCod);
+                        cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
+                        cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                        cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                        cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                        cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                        cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                        pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                        pDescripcionMensaje.Direction = ParameterDirection.Output;
+                        cmd.Parameters.Add(pDescripcionMensaje);
+                        pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                        pTipoMensaje.Direction = ParameterDirection.Output;
+                        cmd.Parameters.Add(pTipoMensaje);
+
+                        cmd.ExecuteNonQuery();
+
+                        mensajeRes = pDescripcionMensaje.Value.ToString();
+                        tipoMensajeRes = pTipoMensaje.Value.ToString();
+
+                        if (tipoMensajeRes != "3")
+                        {
+                            Console.WriteLine(mensajeRes);
+                            throw new Exception(mensajeRes);
+                        }
+
+                        cmd = new SqlCommand("SP_ELIMINAR_CADENA_RESULTADO_IMPLEMENTADOR_GENERAL", cn.getcn);
+
+                        cmd.CommandType = CommandType.StoredProcedure;
+
+                        cmd.Parameters.AddWithValue("@P_INDANO", indicador.IndAno);
+                        cmd.Parameters.AddWithValue("@P_INDCOD", indicador.IndCod);
+                        cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
+                        cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                        cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                        cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                        cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                        cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                        pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                        pDescripcionMensaje.Direction = ParameterDirection.Output;
+                        cmd.Parameters.Add(pDescripcionMensaje);
+                        pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                        pTipoMensaje.Direction = ParameterDirection.Output;
+                        cmd.Parameters.Add(pTipoMensaje);
+
+                        cmd.ExecuteNonQuery();
+
+                        mensajeRes = pDescripcionMensaje.Value.ToString();
+                        tipoMensajeRes = pTipoMensaje.Value.ToString();
+
+                        if (tipoMensajeRes != "3")
+                        {
+                            Console.WriteLine(mensajeRes);
+                            throw new Exception(mensajeRes);
+                        }
+
+                        cmd = new SqlCommand("SP_ELIMINAR_CADENA_RESULTADO_FINANCIADOR_GENERAL", cn.getcn);
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@P_INDANO", indicador.IndAno);
+                        cmd.Parameters.AddWithValue("@P_INDCOD", indicador.IndCod);
+                        cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
+                        cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                        cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                        cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                        cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                        cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                        pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                        pDescripcionMensaje.Direction = ParameterDirection.Output;
+                        cmd.Parameters.Add(pDescripcionMensaje);
+                        pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                        pTipoMensaje.Direction = ParameterDirection.Output;
+                        cmd.Parameters.Add(pTipoMensaje);
+                        cmd.ExecuteNonQuery();
+                        mensajeRes = pDescripcionMensaje.Value.ToString();
+                        tipoMensajeRes = pTipoMensaje.Value.ToString();
+
+                        if (tipoMensajeRes != "3")
+                        {
+                            Console.WriteLine(mensajeRes);
+                            throw new Exception(tipoMensajeRes);
+                        }
+
+                        cmd = new SqlCommand("SP_ELIMINAR_CADENA_RESULTADO_UBICACION_GENERAL", cn.getcn);
+                        cmd.CommandType = CommandType.StoredProcedure;
+
+                        cmd.Parameters.AddWithValue("@P_INDANO", indicador.IndAno);
+                        cmd.Parameters.AddWithValue("@P_INDCOD", indicador.IndCod);
+                        cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
+                        cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                        cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                        cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                        cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                        cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+                        pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                        pDescripcionMensaje.Direction = ParameterDirection.Output;
+                        cmd.Parameters.Add(pDescripcionMensaje);
+                        pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                        pTipoMensaje.Direction = ParameterDirection.Output;
+                        cmd.Parameters.Add(pTipoMensaje);
+
+                        cmd.ExecuteNonQuery();
+
+                        mensajeRes = pDescripcionMensaje.Value.ToString();
+                        tipoMensajeRes = pTipoMensaje.Value.ToString();
+
+                        if (tipoMensajeRes != "3")
+                        {
+                            Console.WriteLine(mensajeRes);
+                            throw new Exception(mensajeRes);
+                        }
+
+                        // Si todas las operaciones fueron exitosas, confirma la transacción
+                        scope.Complete();
+                        tipoMensaje = "3";
+                    }
+                    catch (Exception ex)
+                    {
+                        // Si alguna operación falló, la transacción se revierte.
+                        mensaje = ex.Message;
+                        tipoMensaje = "1";
+                        Console.WriteLine(ex);
+                    }
+                }
             }
             return (mensaje, tipoMensaje);
         }

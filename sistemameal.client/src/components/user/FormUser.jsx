@@ -274,10 +274,9 @@ const FormUser = () => {
                                 placeholder="Ejm: 74301932"
                                 maxLength={10}
                                 autoComplete='off'
-                                onKeyDown={(event) => {
-                                    if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
-                                        event.preventDefault();
-                                    }
+                                onInput={(event) => {
+                                    // Reemplaza cualquier carácter que no sea un número por una cadena vacía
+                                    event.target.value = event.target.value.replace(/[^0-9]/g, '');
                                 }}
                                 {...register('usuNumDoc', { 
                                     required: 'El número de documento es requerido',
@@ -399,10 +398,9 @@ const FormUser = () => {
                                     placeholder="Ejm: 17-03-2003 (DD-MM-YYYY)"
                                     maxLength={10}
                                     autoComplete='off'
-                                    onKeyDown={(event) => {
-                                        if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
-                                            event.preventDefault();
-                                        }
+                                    onInput={(event) => {
+                                        // Reemplaza cualquier carácter que no sea un número por una cadena vacía
+                                        event.target.value = event.target.value.replace(/[^0-9]/g, '');
                                     }}
                                     {...register('usuFecNac', { 
                                         required: 'La Fecha de nacimiento es requerido',
@@ -508,45 +506,7 @@ const FormUser = () => {
                                 </p>
                             )}
                         </div>
-                        {/* <div className="Large_12 flex flex-column">
-                            <label htmlFor="usuTel">Teléfono</label>
-                            <input 
-                                type="text" 
-                                id="usuTel" 
-                                className={`p1 PowerMas_Modal_Form_${dirtyFields.usuTel || isSubmitted ? (errors.usuTel ? 'invalid' : 'valid') : ''}`} 
-                                placeholder="Ejm: 922917351"
-                                autoComplete='off'
-                                onKeyDown={(event) => {
-                                    console.log(event.target.value)
-                                    console.log(phoneCodeInput)
-                                    if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
-                                        event.preventDefault();
-                                    }
-                                    if (event.key === 'Backspace' && event.target.value === phoneCodeInput) {
-                                        event.preventDefault();
-                                    }
-                                    // Evita que el usuario ingrese más dígitos de los permitidos
-                                    if (!['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter'].includes(event.key) && event.target.value.length >= phoneLength + phoneCodeInput.length) {
-                                        event.preventDefault();
-                                    }
-                                }}
-                                {...register('usuTel', { 
-                                    required: 'El número de telefono es requerido',
-                                    minLength: { value: phoneLength + phoneCodeInput.length, message: `El número de telefono debe tener minimo ${phoneLength} digitos` },
-                                    pattern: {
-                                        value: /^\+\d*$/,
-                                        message: 'El número de teléfono debe comenzar con "+" y contener solo números',
-                                    },
-                                })} 
-                            />
-                            {errors.usuTel ? (
-                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.usuTel.message}</p>
-                            ) : (
-                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                Espacio reservado para el mensaje de error
-                                </p>
-                            )}
-                        </div> */}
+                        
                         <div className="Large_12 flex flex-column">
                             <label htmlFor="rolCod">Rol</label>
                             <select 

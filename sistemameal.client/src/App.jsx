@@ -217,7 +217,7 @@ const App = () => {
                                                     </>
                                                 )}
                                                 <Route path="tutorial" element={<Tutorial />} />
-                                                <Route path="form-profile/:id" element={<FormProfile />} />
+                                                <Route path="profile/:id" element={<FormProfile />} />
                                                 <Route path="*" element={<NotFound />} />
                                             </Routes>
                                     </Layout>

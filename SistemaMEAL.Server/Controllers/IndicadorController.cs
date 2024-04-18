@@ -127,6 +127,17 @@ namespace SistemaMEAL.Server.Controllers
             var data = _indicadores.BuscarCadenaPorImplementadorActividad(subProAno,subProCod);
             return Ok(data);
         }
+        [HttpGet("financiador-actividad/{subProAno}/{subProCod}")]
+        public dynamic BuscarCadenaPorFinanciadorActividad(string subProAno, string subProCod)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var data = _indicadores.BuscarCadenaPorFinanciadorActividad(subProAno,subProCod);
+            return Ok(data);
+        }
         [HttpGet("ubicacion-actividad/{subProAno}/{subProCod}")]
         public dynamic BuscarCadenaPorUbicacionActividad(string subProAno, string subProCod)
         {

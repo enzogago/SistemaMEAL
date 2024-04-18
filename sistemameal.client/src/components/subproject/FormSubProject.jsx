@@ -27,7 +27,7 @@ const FormSubProject = () => {
     const [ implementadores, setImplementadores ] = useState([])
     const [ financiadores, setFinanciadores ] = useState([])
     const [ selectCount, setSelectCount ] = useState(1);
-    const [ selectCountFin, setSelectCountFin ] = useState(1);
+    const [ selectCountFin, setSelectCountFin ] = useState(0);
     const [ locationSelects, setLocationSelects ] = useState([{ count: 1, selects: [] }]);
     const [ paises, setPaises ] = useState([]);
     const [ proyectos, setProyectos ] = useState([]);
@@ -458,6 +458,9 @@ const FormSubProject = () => {
 
             // Elimina las propiedades de los implementadores
             for (let key in subProjectData) {
+                if (key.startsWith('finCod')) {
+                    delete subProjectData[key];
+                }
                 if (key.startsWith('impCod')) {
                     delete subProjectData[key];
                 }
@@ -530,18 +533,16 @@ const FormSubProject = () => {
 
 
     const handleRemoveFinanciador = (index) => {
-        if (selectCountFin > 1) {
-            // Recorre todos los selectores que vienen después del que estás eliminando
-            for (let i = index + 1; i < selectCountFin; i++) {
-                // Obtiene el valor del selector actual
-                const value = watch(`finCod${i}`);
-                // Asigna el valor al selector anterior
-                setValue(`finCod${i - 1}`, value);
-            }
-            // Elimina el último selector
-            setValue(`finCod${selectCountFin - 1}`, '0');
-            setSelectCountFin(prevCount => prevCount - 1);
+        // Recorre todos los selectores que vienen después del que estás eliminando
+        for (let i = index + 1; i < selectCountFin; i++) {
+            // Obtiene el valor del selector actual
+            const value = watch(`finCod${i}`);
+            // Asigna el valor al selector anterior
+            setValue(`finCod${i - 1}`, value);
         }
+        // Elimina el último selector
+        setValue(`finCod${selectCountFin - 1}`, '0');
+        setSelectCountFin(prevCount => prevCount - 1);
     };
     const handleRemoveImplementador = (index) => {
         if (selectCount > 1) {
@@ -623,12 +624,12 @@ const FormSubProject = () => {
                             maxLength={10} 
                             name="subProSap" 
                             autoComplete='off'
-                            onKeyDown={(event) => {
-                                if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
-                                    event.preventDefault();
-                                }
+                            onInput={(event) => {
+                                // Reemplaza cualquier carácter que no sea un número por una cadena vacía
+                                event.target.value = event.target.value.replace(/[^0-9]/g, '');
                             }}
-                            {...register('subProSap', { 
+                            {...register('subProSap', {
+                                required: 'El campo es requerido',
                                 minLength: {
                                     value: 6,
                                     message: 'El campo debe tener al menos 6 dígitos'
@@ -780,10 +781,9 @@ const FormSubProject = () => {
                                 placeholder="2023"
                                 autoComplete='off'
                                 maxLength={4}
-                                onKeyDown={(event) => {
-                                    if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
-                                        event.preventDefault();
-                                    }
+                                onInput={(event) => {
+                                    // Reemplaza cualquier carácter que no sea un número por una cadena vacía
+                                    event.target.value = event.target.value.replace(/[^0-9]/g, '');
                                 }}
                                 {...register('subProPerAnoIni', { 
                                     required: 'El campo es requerido',
@@ -860,10 +860,9 @@ const FormSubProject = () => {
                                 placeholder="2023"
                                 autoComplete='off'
                                 maxLength={4}
-                                onKeyDown={(event) => {
-                                    if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
-                                        event.preventDefault();
-                                    }
+                                onInput={(event) => {
+                                    // Reemplaza cualquier carácter que no sea un número por una cadena vacía
+                                    event.target.value = event.target.value.replace(/[^0-9]/g, '');
                                 }}
                                 {...register('subProPerAnoFin', { 
                                     required: 'El campo es requerido',

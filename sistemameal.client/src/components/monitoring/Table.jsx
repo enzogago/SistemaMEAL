@@ -151,7 +151,7 @@ const Table = ({ data, setMonitoringData, setModalIsOpen }) => {
 
         Notiflix.Confirm.show(
             'Eliminar Registro',
-            '¿Estás seguro que quieres eliminar este registro?',
+            '¿Está seguro que quieres eliminar este registro?',
             'Sí',
             'No',
             async () => {

@@ -10,7 +10,7 @@ import 'jspdf-autotable';
 export const handleDeleteMant = async (controller, obj, setRegistros) => {
     Notiflix.Confirm.show(
         'Eliminar Registro',
-        '¿Estás seguro que quieres eliminar este registro?',
+        '¿Está seguro que quieres eliminar este registro?',
         'Sí',
         'No',
         async () => {
@@ -57,7 +57,7 @@ export const handleDeleteMant = async (controller, obj, setRegistros) => {
 export const handleDelete = async (controller, codigo, setRegistros) => {
     Notiflix.Confirm.show(
         'Eliminar Registro',
-        '¿Estás seguro que quieres eliminar este registro?',
+        '¿Está seguro que quieres eliminar este registro?',
         'Sí',
         'No',
         async () => {
@@ -424,7 +424,7 @@ export const Export_Excel_Helper = async (data, headers, title, properties) => {
 
     // Añadir los datos
     data.forEach(item => {
-        let fecha = new Date(item.fecMod);
+        let fecha = new Date(item.fecMod + 'Z');
         const rowData = properties.map(prop => {
             if (prop === 'fecMod') {
                 return fecha;
@@ -507,7 +507,7 @@ export const Export_PDF_Helper = async (data, headers, title, properties, format
         });
         // Definir los datos de la tabla
         const tableData = data.map(item => {
-            let fecha = new Date(item.fecMod).toISOString();
+            let fecha = new Date(item.fecMod + 'Z').toISOString();
 
             // Formatear la fecha y hora
             let fechaFormateada = fecha.substring(0, 16).replace('T', ' ');

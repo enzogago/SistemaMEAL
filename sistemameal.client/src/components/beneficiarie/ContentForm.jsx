@@ -264,10 +264,9 @@ const ContentForm = ({register, dirtyFields, isSubmitted, errors, reset, watch, 
                                     placeholder="Ejm: 17-03-2003 (DD-MM-YYYY)"
                                     autoComplete='off'
                                     maxLength={10}
-                                    onKeyDown={(event) => {
-                                        if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
-                                            event.preventDefault();
-                                        }
+                                    onInput={(event) => {
+                                        // Reemplaza cualquier carácter que no sea un número por una cadena vacía
+                                        event.target.value = event.target.value.replace(/[^0-9]/g, '');
                                     }}
                                     {...register('benFecNac', { 
                                         required: 'La Fecha de nacimiento es requerido',
@@ -389,10 +388,9 @@ const ContentForm = ({register, dirtyFields, isSubmitted, errors, reset, watch, 
                         placeholder="907078329"
                         autoComplete='off'
                         maxLength={10}
-                        onKeyDown={(event) => {
-                            if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
-                                event.preventDefault();
-                            }
+                        onInput={(event) => {
+                            // Reemplaza cualquier carácter que no sea un número por una cadena vacía
+                            event.target.value = event.target.value.replace(/[^0-9]/g, '');
                         }}
                         {...register('benTel', { 
                             required: 'El número de telefono es requerido',
@@ -421,10 +419,9 @@ const ContentForm = ({register, dirtyFields, isSubmitted, errors, reset, watch, 
                         placeholder="907078329"
                         autoComplete='off'
                         maxLength={10}
-                        onKeyDown={(event) => {
-                            if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
-                                event.preventDefault();
-                            }
+                        onInput={(event) => {
+                            // Reemplaza cualquier carácter que no sea un número por una cadena vacía
+                            event.target.value = event.target.value.replace(/[^0-9]/g, '');
                         }}
                         {...register('benTelCon', { 
                             required: 'El número de telefono es requerido',

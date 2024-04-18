@@ -168,10 +168,10 @@ const CustomTable = ({
                     {
                         table.getRowModel().rows.length > 0 &&
 
-                        <thead>
+                        <thead className=''>
                             {
                                 table.getHeaderGroups().map(headerGroup => (
-                                    <tr key={headerGroup.id} style={{zIndex: 10}}>
+                                    <tr key={headerGroup.id} style={{zIndex: 10}} className=''>
                                         {
                                             headerGroup.headers.map((header, index, array) => (
                                                 <th 

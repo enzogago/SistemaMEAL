@@ -156,7 +156,6 @@ const FormProfile = () => {
     return (
         <div className="bg-white h-100 flex flex-column">
             <div className="PowerMas_Header_Form_Beneficiarie flex ai-center p2">
-                {/* <GrFormPreviousLink className="m1 w-auto Large-f2_5 pointer" onClick={() => navigate('/user')} /> */}
                 <h1 className="flex-grow-1">Perfil</h1>
             </div>
             <div className="flex flex-grow-1 overflow-auto p1_25 gap-1">
@@ -393,10 +392,10 @@ const FormProfile = () => {
                     </div>
                 </div>
             </div>
-            <div className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
-                <button onClick={() => navigate('/user')} className="Large_5 m2">Atras</button>
-                <button onClick={handleNext} className="Large_5 m2">Siguiente</button>
-            </div>
+            <footer className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
+                <button onClick={() => navigate('/user')} className="Large_3 m_75 PowerMas_Buttom_Secondary">Atras</button>
+                <button onClick={handleNext} className="Large_3 m_75 PowerMas_Buttom_Primary">Grabar y Siguiente</button>
+            </footer>
         </div>
   )
 }

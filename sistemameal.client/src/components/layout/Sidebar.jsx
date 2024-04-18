@@ -126,7 +126,7 @@ const Sidebar = () => {
                 <div className="PowerMas_MenuContainer Large-f1 flex-grow-1 overflow-auto">
                     <div className="PowerMas_MenuOptions overflow-auto">
                         <div className='PowerMas_MainSingleLink'>
-                            <Link to='/'>
+                            <Link activec to='/'>
                                 <div className="PowerMas_SingleLink Large-f1">
                                     <FaHome />
                                     <span > Home </span>

@@ -26,6 +26,12 @@ namespace SistemaMEAL.Server.Models
         public String? ImpNom { get; set; }
         public String? CadResImpMetTec { get; set; }
         public String? CadResImpMetPre { get; set; }
+        public String? FinCod { get; set; }
+        public String? FinNom { get; set; }
+        public String? FinSap { get; set; }
+        public String? FinIde { get; set; }
+        public String? CadResFinMetTec { get; set; }
+        public String? CadResFinMetPre { get; set; }
         public String? UsuIng { get; set; }
         public DateTime? FecIng { get; set; }
         public String? UsuMod { get; set; }

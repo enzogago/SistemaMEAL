@@ -107,7 +107,7 @@ const Bar = ({showSidebarAndBar}) => {
                         showSidebarAndBar &&
                         <div className="PowerMas_ProfileInfo flex-column m_5">
                             <span style={{textTransform: 'capitalize', borderBottom: '1px solid #000', marginBottom: '0.25rem', paddingBottom: '0.25rem'}} className="PowerMas_Username Large-f1 Medium-f1 Small-f_75">{userLogged  ? `${userLogged.usuNom.toLowerCase()} ${userLogged.usuApe.toLowerCase()}` : ''}</span>
-                            <span style={{textTransform: 'capitalize'}}  className="PowerMas_UserRole Large-f_75 Medium-f_75 Small-f_5">{userLogged  ? userLogged.carNom.toLowerCase() : ''}</span>
+                            <span style={{textTransform: 'capitalize'}}  className="PowerMas_UserRole Large-f_75 Medium-f_75 Small-f_5">{userLogged  ? userLogged.rolNom.toLowerCase() : ''}</span>
                         </div>
                     }
                     <div 
@@ -128,7 +128,7 @@ const Bar = ({showSidebarAndBar}) => {
                             {
                                 showSidebarAndBar &&
                                 <>
-                                    <Link className='flex ai-center p_25' onClick={() => setIsOpen(false)}>
+                                    <Link className='flex ai-center p_25' onClick={() => setIsOpen(false)} to={`/profile/${encryptId(`${userLogged.usuAno}${userLogged.usuCod}`)}`}>
                                         <FaUserAlt className='w-auto m_5' />
                                         <span className='flex'>Perfil</span>
                                     </Link>

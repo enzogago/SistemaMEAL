@@ -114,7 +114,7 @@ export const fetchBeneficiariosMeta = async (metAno, metCod, setBeneficiariosMet
 export const handleDeleteBeneficiarioMeta = async (controller,metAno,metCod,benAno,benCod,ubiAno,ubiCod,metBenAnoEjeTec, metBenMesEjeTec, updateData, setUpdateData, fetchBeneficiarie) => {
     Notiflix.Confirm.show(
         'Eliminar Registro',
-        '¿Estás seguro que quieres eliminar este registro?',
+        '¿Está seguro que quieres eliminar este registro?',
         'Sí',
         'No',
         async () => {

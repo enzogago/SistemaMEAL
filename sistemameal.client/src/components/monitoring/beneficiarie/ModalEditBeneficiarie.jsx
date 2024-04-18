@@ -594,10 +594,9 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, updateData
                                 placeholder="2024"
                                 autoComplete='off'
                                 maxLength={4}
-                                onKeyDown={(event) => {
-                                    if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
-                                        event.preventDefault();
-                                    }
+                                onInput={(event) => {
+                                    // Reemplaza cualquier carácter que no sea un número por una cadena vacía
+                                    event.target.value = event.target.value.replace(/[^0-9]/g, '');
                                 }}
                                 {...register('metBenAnoEjeTec', { 
                                     required: 'El campo es requerido',
@@ -833,10 +832,9 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, updateData
                             autoComplete='off'
                             maxLength={10}
                             disabled={fieldsDisabled}
-                            onKeyDown={(event) => {
-                                if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab' && event.key !== 'Enter') {
-                                    event.preventDefault();
-                                }
+                            onInput={(event) => {
+                                // Reemplaza cualquier carácter que no sea un número por una cadena vacía
+                                event.target.value = event.target.value.replace(/[^0-9]/g, '');
                             }}
                             {...register('benFecNac', { 
                                 required: 'La Fecha de nacimiento es requerido',
