@@ -227,7 +227,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return rToken;
 
-            var (message, messageType) = _indicadores.ModificarCadenaIndicadorPresupuesto(identity, cadenaIndicadorDto.CadenaPeriodos, cadenaIndicadorDto.CadenaImplementadores, cadenaIndicadorDto.CadenaUbicaciones);
+            var (message, messageType) = _indicadores.ModificarCadenaIndicadorPresupuesto(identity, cadenaIndicadorDto.CadenaPeriodos, cadenaIndicadorDto.CadenaImplementadores, cadenaIndicadorDto.CadenaFinanciadores, cadenaIndicadorDto.CadenaUbicaciones);
             if (messageType == "1") // Error
             {
                 return new BadRequestObjectResult(new { success = false, message });

@@ -2,6 +2,7 @@ import { Suspense, lazy, useContext, useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 // Notiflix Configuracion estilos
 import './js/notiflixConfig';
+import 'react-tippy/dist/tippy.css';
 // Context
 import { AuthContext } from './context/AuthContext';
 import LoadingComponent from './components/LoadingComponent';

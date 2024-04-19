@@ -15,11 +15,11 @@ const SaveGoalBudget = () => {
     const navigate = useNavigate();
     // Variables State AuthContext 
     const { statusInfo } = useContext(StatusContext);
-    const { tableData } = statusInfo;
+    const { tableData, subProjectUpload, anoUpload } = statusInfo;
 
     useEffect(() => {
         // Si tableData está vacío, navega a otra ruta
-        if (tableData.length === 0) {
+        if (tableData.length === 0 ) {
             navigate('/upload-goal-budget');
         }
     }, [tableData, navigate]);
@@ -50,8 +50,13 @@ const SaveGoalBudget = () => {
     useForm({ mode: "onChange"});
     
     useEffect(() => {
-            fetchData(`Indicador/subproyecto-actividad/${'2024'}/${'000001'}`,setIndicadores)
-            fetchData(`Meta/${'2024'}/${'000001'}/${'2024'}`, (data) => {
+        const subProAno = subProjectUpload ? subProjectUpload.slice(0,4) : null; 
+        const subProCod = subProjectUpload ? subProjectUpload.slice(4) : null; 
+        
+        if (subProAno && subProCod) {
+            console.log("hola")
+            fetchData(`Indicador/subproyecto-actividad/${subProAno}/${subProCod}`,setIndicadores)
+            fetchData(`Meta/${subProAno}/${subProCod}/${anoUpload}`, (data) => {
                 setInitialMetas(tableData); //
                 setTotals({});
                 const rows = {};
@@ -70,7 +75,6 @@ const SaveGoalBudget = () => {
                         obj.metCod === meta.metCod
                     );
                     const valueToSet = tableDataObject ? tableDataObject.metEjePre : '';
-
                     // Crea un objeto con los valores que necesitas para tus inputs
                     const inputValues = {
                         mes: valueToSet,
@@ -79,7 +83,7 @@ const SaveGoalBudget = () => {
                         ubicacion: JSON.stringify({ ubiAno: meta.ubiAno, ubiCod: meta.ubiCod }),
                         meta: JSON.stringify({ metAno: meta.metAno, metCod: meta.metCod }),
                     };
-                        
+                            
                     setValue(`financiador_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.financiador);
                     setValue(`implementador_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.implementador);
                     setValue(`ubicacion_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.ubicacion);
@@ -119,7 +123,7 @@ const SaveGoalBudget = () => {
                 setAdditionalRows(filas);
                 setRowIdCounter(counter+1);
             });
-
+        }
     }, []);
     
     

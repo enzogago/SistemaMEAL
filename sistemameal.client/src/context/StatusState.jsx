@@ -14,6 +14,8 @@ const StatusState = ({ children }) => {
     const [postData, setPostData] = useState([]);
     const [isValid, setIsValid] = useState(true);
     const [errorCells, setErrorCells] = useState([]);
+    const [subProjectUpload, setSubprojectUpload] = useState('');
+    const [anoUpload, setAnoUpload] = useState('');
 
     const [state, dispatch] = useReducer(statusReducer, initialState);
 
@@ -44,6 +46,8 @@ const StatusState = ({ children }) => {
         postData,
         isValid,
         errorCells,
+        subProjectUpload,
+        anoUpload
     };
 
     const statusActions = {
@@ -55,6 +59,8 @@ const StatusState = ({ children }) => {
         setPostData,
         setIsValid,
         setErrorCells,
+        setSubprojectUpload,
+        setAnoUpload
     };
 
     return (

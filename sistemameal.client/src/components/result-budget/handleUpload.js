@@ -112,7 +112,7 @@ function arraysEqual(a, b) {
     return a.length === b.length && a.every((val, index) => val === b[index]);
 }
 
-export const handleUpload = async (file, setTableData, navigate)=> {
+export const handleUpload = async (file, setTableData, setSubprojectUpload, setAnoUpload, navigate)=> {
     // Reinicia los estados cada vez que se carga un archivo
     setTableData([]);
 
@@ -154,7 +154,7 @@ export const handleUpload = async (file, setTableData, navigate)=> {
             const row = worksheet.getRow(rowNumber);
 
             // Verifica si todas las celdas en la fila están vacías
-            const isEmptyRow = row.values.slice(3, 24).every(cell => {
+            const isEmptyRow = row.values.slice(3, 19).every(cell => {
                 // Si la celda es un objeto, verifica la propiedad 'result'
                 if (typeof cell === 'object' && cell !== null) {
                     return !cell.result || cell.result.trim() === '';
@@ -168,9 +168,8 @@ export const handleUpload = async (file, setTableData, navigate)=> {
             }
 
             // Recorremos cada celda de la fila actual
-            for (let colNumber = 12; colNumber <= 23; colNumber++) {
-                // Obtenemos el valor de la celda correspondiente en el rango 23 a 34
-                const correspondingCellValue = row.getCell(colNumber + 13).text;
+            for (let colNumber = 8; colNumber <= 19; colNumber++) {
+                const correspondingCellValue = row.getCell(colNumber + 17).text;
                 // Solo añadimos el objeto a tableData si correspondingCellValue no está vacío
                 if (correspondingCellValue && correspondingCellValue.trim() !== '') {
                     let rowData = {};
@@ -184,8 +183,18 @@ export const handleUpload = async (file, setTableData, navigate)=> {
 
             rowNumber++;
         }
+
+        // Obtén los valores de las celdas U12 y V12
+        const subprojectUpload = worksheet.getCell('U12').text;
+        const anoUpload = worksheet.getCell('V12').text;
+
+        // Actualiza los estados con los valores obtenidos
+        setSubprojectUpload(subprojectUpload);
+        setAnoUpload(anoUpload);
         
         console.log(tableData);
+        console.log(subprojectUpload);
+        console.log(anoUpload);
         setTableData(tableData);
         navigate('/save-goal-budget');
     };

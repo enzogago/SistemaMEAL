@@ -1141,7 +1141,14 @@ textarea {
     border-top: 1px solid #d3d3d3;
 }
 
-
+.PowerMas_Combine_Header{
+	background-color: #372E2C20;
+	color: #372e2ca0!important;
+}
+.unmatched{
+	color: red!important;
+	font-weight: bold;
+}
 
 .PowerMas_Input_Color {
 	height: auto;
@@ -2108,4 +2115,14 @@ textarea {
 .PowerMas_SidebarResponsive.open {
     transform: translateY(0);
     height: auto;
+}
+
+
+
+.tippy-tooltip{
+	font-size: 0.75rem!important;
+	background-color: red!important;
+}
+.arrow-regular{
+	border-bottom: 7px solid red!important;
 }

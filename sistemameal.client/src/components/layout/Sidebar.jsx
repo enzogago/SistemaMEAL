@@ -1,5 +1,5 @@
 // React
-import { Link } from 'react-router-dom';
+import { Link, NavLink, useMatch } from 'react-router-dom';
 import {  useContext, useEffect, useState } from 'react';
 // sources
 import logo from '../../img/Logo_Blanco.webp';
@@ -115,6 +115,9 @@ const Sidebar = () => {
     const closeSidebar = () => {
         setIsOpen(false);
     };
+
+    const match = useMatch('/'); // Comprueba si la ruta actual es la página de inicio
+    const isHome = match ? 'PowerMas_Active_Menu' : '';
     
     return (
         <div className={`PowerMas_Menu Large_2 Medium_3 flex flex-column`}>
@@ -126,12 +129,12 @@ const Sidebar = () => {
                 <div className="PowerMas_MenuContainer Large-f1 flex-grow-1 overflow-auto">
                     <div className="PowerMas_MenuOptions overflow-auto">
                         <div className='PowerMas_MainSingleLink'>
-                            <Link activec to='/'>
+                            <NavLink className={`${isHome}`} to='/'>
                                 <div className="PowerMas_SingleLink Large-f1">
                                     <FaHome />
                                     <span > Home </span>
                                 </div>
-                            </Link>
+                            </NavLink>
                         </div>
                         {menuGroup.map((menuItem, index) => (
                             <MenuItem key={index} menu={menuItem} level={1} closeSidebar={closeSidebar} />

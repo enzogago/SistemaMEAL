@@ -10,12 +10,12 @@ import template from '../../templates/GASTO_MENSUAL.xlsm';
 const UploadGoalBudget = () => {
     // Variables State AuthContext 
     const { statusActions } = useContext(StatusContext);
-    const { setTableData } = statusActions;
+    const { setTableData, setSubprojectUpload, setAnoUpload } = statusActions;
 
     const navigate = useNavigate();
 
     const handleFileUpload = () => {
-        handleUpload(selectedFile, setTableData, navigate);
+        handleUpload(selectedFile, setTableData, setSubprojectUpload, setAnoUpload, navigate);
     };
 
     const [dragging, setDragging] = useState(false);

@@ -547,7 +547,7 @@ const ExecutionBudget = () => {
                                             <td key={i+1}>
                                                 <input
                                                     data-tooltip-id="info-tooltip" 
-                                                    data-tooltip-content={getValues(`meta_${String(i+1).padStart(2, '0')}_${row.id}`) && `Meta técnica: ${getValues(`metMetTec_${String(i+1).padStart(2, '0')}_${row.id}`)}`} 
+                                                    data-tooltip-content={getValues(`meta_${String(i+1).padStart(2, '0')}_${row.id}`) && `Meta técnica: ${getValues(`metMetTec_${String(i+1).padStart(2, '0')}_${row.id}`) || 0 }`} 
                                                     className={`
                                                         PowerMas_Input_Cadena Large_12 f_75 
                                                         PowerMas_Cadena_Form_${dirtyFields[`mes_${String(i+1).padStart(2, '0')}_${row.id}`] || isSubmitted ? (errors[`mes_${String(i+1).padStart(2, '0')}_${row.id}`] ? 'invalid' : 'valid') : ''}

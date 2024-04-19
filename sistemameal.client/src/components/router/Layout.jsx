@@ -101,6 +101,13 @@ const Layout = ({ children }) => {
                 place='top-start'
                 className="PowerMas_Tooltip_Info"
             />
+            <Tooltip 
+                id="error-total" 
+                effect="solid"
+                place='top-start'
+                className="PowerMas_Tooltip_Error"
+            />
+
         </div>)
 };
 export default Layout;
