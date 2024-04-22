@@ -11,13 +11,15 @@ import {
 } from '@tanstack/react-table';
 import { expectedHeaders } from "./handleUpload";
 import Notiflix from "notiflix";
+import CryptoJS from 'crypto-js';
 
 const UploadValidate = () => {
     const navigate = useNavigate();
     // Variables State AuthContext 
-    const { statusInfo } = useContext(StatusContext);
+    const { statusInfo, statusActions } = useContext(StatusContext);
     const { tableData, isValid, errorCells, metaBeneficiario } = statusInfo;
-
+    const { setTableData } = statusActions;
+    console.log(metaBeneficiario)
     useEffect(() => {
         if (tableData.length == 0) {
             navigate('/monitoring');
@@ -92,11 +94,22 @@ const UploadValidate = () => {
             }
             console.log(data)
             Notiflix.Notify.success(data.message)
+            setTableData([]);
+            navigate('/monitoring')
         } catch (error) {
             console.error('Error:', error);
         } finally {
             Notiflix.Loading.remove();
         }
+    }
+
+    const  returnUpload = () => {
+        const id = `${metaBeneficiario.metAno}${metaBeneficiario.metCod}`;
+        // Encripta el ID
+        const ciphertext = CryptoJS.AES.encrypt(id, 'secret key 123').toString();
+        // Codifica la cadena cifrada para que pueda ser incluida de manera segura en una URL
+        const safeCiphertext = btoa(ciphertext).replace('+', '-').replace('/', '_').replace(/=+$/, '');
+        navigate(`/upload-beneficiarie/${safeCiphertext}`);
     }
 
     return (
@@ -108,7 +121,7 @@ const UploadValidate = () => {
                 isLargePagination={true}
             />
             <footer className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
-                <button onClick={() => navigate('/upload-beneficiarie')} className="Large_3 m_75 PowerMas_Buttom_Secondary">Atras</button>
+                <button onClick={returnUpload} className="Large_3 m_75 PowerMas_Buttom_Secondary">Atras</button>
                 <button 
                     className="Large_3 m_75 PowerMas_Buttom_Primary"
                     onClick={processValidData} 

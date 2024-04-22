@@ -7,16 +7,15 @@ import { useForm } from 'react-hook-form';
 import { fetchData } from "../../reusable/helper";
 import { handleSubmitMetaEjecucion } from "./eventHandlers";
 import InfoGoal from "./InfoGoal";
-import 'intl-tel-input/build/css/intlTelInput.css';
-import 'intl-tel-input/build/js/utils.js';
 import ModalGoalExecuting from "./ModalGoalExecuting";
 
 const FormGoalExecution = () => {
+    // Navegación y parámetros de la ruta
     const navigate = useNavigate();
     const { id: safeCiphertext } = useParams();
-    // Reemplaza los caracteres a su representación original en base64 y decodifica la cadena
+
+    // Desencriptación del ID
     const ciphertext = atob(safeCiphertext);
-    // Desencripta el ID
     const bytes  = CryptoJS.AES.decrypt(ciphertext, 'secret key 123');
     const id = bytes.toString(CryptoJS.enc.Utf8);
     const metAno = id.slice(0, 4);
@@ -27,18 +26,15 @@ const FormGoalExecution = () => {
     const [ metaData, setMetaData] = useState(null);
     const [ selects, setSelects ] = useState([]);
     const [ cargando, setCargando ] = useState(false)
-    
     const [ verificarPais, setVerificarPais ] = useState(null);
-    
-    const [isDataLoaded, setIsDataLoaded] = useState(false);
+    const [ isDataLoaded, setIsDataLoaded ] = useState(false);
+    const [ selectedValues, setSelectedValues ] = useState([]);
+    const [ openModalGoalExecuting, setOpenModalGoalExecuting ] = useState(false);
+    const [ firstEdit, setFirstEdit ] = useState(false);
+    const [ initialSelectCount, setInitialSelectCount ] = useState(0);
 
-    const [selectedValues, setSelectedValues] = useState([]);
-    const [firstEdit, setFirstEdit] = useState(false);
-    
-    const [ openModalGoalExecuting, setOpenModalGoalExecuting] = useState(false);
-
-    // Cargamos la Informacion a tratar en este Formulario
-    const fetchBeneficiarie = async () => {
+    // Carga de datos de la meta
+    const fetchMetaDetails = async () => {
         try {
             const token = localStorage.getItem('token');
             Notiflix.Loading.pulse('Cargando...');
@@ -65,33 +61,37 @@ const FormGoalExecution = () => {
             Notiflix.Loading.remove();
         }
     }
-    
+
+    // Efecto para cargar los datos de la meta
     useEffect(() => {
         if (id.length === 10 && isDataLoaded) {
-            fetchBeneficiarie();
+            fetchMetaDetails();
         }
     }, [id, isDataLoaded]);
+
+    // Efecto para cargar los datos de ubicación
     useEffect(() => {
         Promise.all([
             fetchData('Ubicacion', setPaises),
+            setFirstEdit(false),
+            setInitialSelectCount(0)
         ]).then(() => setIsDataLoaded(true));
     }, []);
 
-    // Propiedades Form Principal
+    // Propiedades del formulario principal
     const { 
         register, 
         watch, 
         handleSubmit: validateForm, 
         formState: { errors, dirtyFields, isSubmitted }, 
-        reset, 
-        setValue, 
-        trigger,
-        setFocus
+        setValue,
+        reset,
     } = useForm({ mode: "onChange"});
 
+    // Efecto para manejar los cambios en el selector de país
     const pais = watch('pais');
     useEffect(() => {
-        if (pais) {
+        if (pais && firstEdit) {
             if (pais == '0') {
                 setSelects([]);
                 return;
@@ -100,7 +100,7 @@ const FormGoalExecution = () => {
         }
     }, [pais]);
     
-    
+    // Manejo de cambios en el selector de país
     const handleCountryChange = async (ubicacion, index) => {
         const selectedCountry = JSON.parse(ubicacion);
         if (ubicacion == '0') {
@@ -149,7 +149,8 @@ const FormGoalExecution = () => {
         }
     };
 
-    const fetchSelects = async (ubiAno,ubiCod) => {
+    // Carga de los selectores
+    const fetchSelects = async (ubiAno, ubiCod) => {
         try {
             const token = localStorage.getItem('token');
             Notiflix.Loading.pulse('Cargando...');
@@ -167,16 +168,19 @@ const FormGoalExecution = () => {
             console.log(data)
             if (data.length > 1) {
                 setValue('pais', JSON.stringify({ ubiCod: data[0].ubiCod, ubiAno: data[0].ubiAno }));
+                await handleCountryChange(JSON.stringify({ ubiCod: data[0].ubiCod, ubiAno: data[0].ubiAno }));
                 const newSelectedValues = data.slice(1).map(location => JSON.stringify({ubiCod:location.ubiCod,ubiAno:location.ubiAno}));
-                setSelectedValues(newSelectedValues);
+                setSelectedValues(newSelectedValues);   
+                setInitialSelectCount(data.length);
                 console.log(newSelectedValues)
                 for (const [index, location] of data.slice(1).entries()) {
+                    // Espera a que handleCountryChange termine antes de continuar con la siguiente iteración
                     await handleCountryChange(JSON.stringify({ubiCod: location.ubiCod,ubiAno: location.ubiAno}), index);
-                    setFirstEdit(true);  // Indica que estás estableciendo el valor del select de país
                 }
+                setFirstEdit(true)
             } else {
-                setFirstEdit(true);
                 setValue('pais', JSON.stringify({ ubiCod: data[0].ubiCod, ubiAno: data[0].ubiAno }));
+                setFirstEdit(true)
             }
             setVerificarPais({ ubiCod: data[0].ubiCod, ubiAno: data[0].ubiAno });
         } catch (error) {
@@ -186,27 +190,46 @@ const FormGoalExecution = () => {
         }
     }
 
-    const Registrar_Beneficiario =  () => {
+    // Registro de la ejecución
+    const submitExecutionData =  () => {
         validateForm( (data) => {
-            // Obtiene el ubiAno y ubiCod del último select
-            const lastSelectElement = document.querySelector(`select[name=select${selects.length - 1}]`);
-            const lastSelect = JSON.parse(lastSelectElement.value);
-            const ubiAno = lastSelect.ubiAno;
-            const ubiCod = lastSelect.ubiCod;
-            // Verifica que todos los selects tengan una opción válida seleccionada
-            for (let i = 0; i < selects.length; i++) {
-                const selectElement = document.querySelector(`select[name=select${i}]`);
-                if (selectElement && selectElement.value === '0') {
-                    console.error(`El select ${i} no tiene una opción válida seleccionada.`);
-                    selectElement.classList.remove('PowerMas_Modal_Form_valid');
-                    selectElement.classList.add('PowerMas_Modal_Form_invalid');
-                    selectElement.focus();
-                    return;
+            // Definimos variables de ubicacion
+            let ubiAno, ubiCod;
+            // Si los selects dinamicos son mayor a 1
+            if (selects.length > 1) {
+                // Obtiene el ubiAno y ubiCod del último select
+                const lastSelectElement = document.querySelector(`select[name=select${selects.length - 1}]`);
+                const lastSelect = lastSelectElement.value;
+                if (lastSelect === '0') {
+                    // Si el último select tiene un valor de '0', obtén el ubiAno y ubiCod del penúltimo select
+                    const penultimateSelectElement = document.querySelector(`select[name=select${selects.length - 2}]`);
+                    const penultimateSelect = JSON.parse(penultimateSelectElement.value);
+                    ubiAno = penultimateSelect.ubiAno;
+                    ubiCod = penultimateSelect.ubiCod;
                 } else {
-                    selectElement.classList.remove('PowerMas_Modal_Form_invalid');
-                    selectElement.classList.add('PowerMas_Modal_Form_valid');
+                    // Si el último select tiene un valor distinto de '0', usa ese
+                    const ultimo = JSON.parse(lastSelect);
+                    ubiAno = ultimo.ubiAno;
+                    ubiCod = ultimo.ubiCod;
+                }
+            } else {
+                const lastSelectElement = document.querySelector(`select[name=select${selects.length - 1}]`);
+                const lastSelect = lastSelectElement.value;
+
+                // Si luego del siguiente nivel de Pais no se selecciona nada
+                if(lastSelect === '0'){
+                    // Se toman los valores pasados del select pais
+                    const { ubiAno: paisUbiAno, ubiCod: paisUbiCod } = JSON.parse(data.pais);
+                    ubiAno = paisUbiAno;
+                    ubiCod = paisUbiCod;
+                } else{
+                    // Caso contrario se toma el unico valor que tiene ese select ya que no tiene más niveles por debajo
+                    const ultimo = JSON.parse(lastSelect);
+                    ubiAno = ultimo.ubiAno;
+                    ubiCod = ultimo.ubiCod;
                 }
             }
+
             const { metEjeVal, metEjeMesEjeTec, metEjeAnoEjeTec } = data;
 
             const MetaEjecucion = {
@@ -220,47 +243,21 @@ const FormGoalExecution = () => {
             }
 
             console.log(MetaEjecucion);
-            handleSubmitMetaEjecucion(MetaEjecucion, handleReset, fetchBeneficiarie);
+            handleSubmitMetaEjecucion(MetaEjecucion, handleReset, fetchMetaDetails);
         })();
     };
 
+    // Reseteo del formulario
     const handleReset = () => {
-        // reset({
-        //     benApe: '',
-        //     benApeApo: '',
-        //     benCorEle: '',
-        //     benFecNac: '',
-        //     benNom: '',
-        //     benNomApo: '',
-        //     benSex: '',
-        //     benAut: '',
-        //     benDir: '',
-        //     genCod: '0',
-        //     nacCod: '0',
-        //     benTel: '0',
-        //     pais: '0',
-        //     benTelCon: '0',
-        // });
-        // setDocumentosAgregados([]);
-        // setFieldsDisabled(true);
-        // setMostrarAgregarDocumento(false);
-        // setAccionActual('buscar');
-        // setValue('metEjeMesEjeTec', metaData.metMesPlaTec)
-        // setValue('metEjeAnoEjeTec', metaData.metAnoPlaTec)
-        // setValue('pais', JSON.stringify(verificarPais));
-
-        // // Resetear campos del telefono
-        // setPhoneNumber('');
-        // phoneInputRef.current.value = '';
-        // setIsTouched(false);
-        // setPhoneContactNumber('');
-        // phoneContactInputRef.current.value = '';
-        // setContactIsTouched(false);
+        reset({
+            metEjeVal: ''
+        })
     };
 
-    // Observar Cambios de campos registrados
+    // Observación de cambios en los campos registrados
     const metEjeAnoEjeTec = watch('metEjeAnoEjeTec');
 
+    // Manejo de apertura y cierre de modal
     const openModalExecuting = () => {
         setOpenModalGoalExecuting(true);
     };
@@ -325,6 +322,11 @@ const FormGoalExecution = () => {
                                         value={selectedValues[index]}
                                         name={`select${index}`} 
                                         onChange={(event) => {
+                                            // Si el selector está deshabilitado, no hagas nada
+                                            if (index+1 < initialSelectCount) {
+                                                return;
+                                            }
+
                                             handleCountryChange(event.target.value, index);
                                             // Aquí actualizamos el valor seleccionado en el estado
                                             setSelectedValues(prevSelectedValues => {
@@ -335,6 +337,7 @@ const FormGoalExecution = () => {
                                         }} 
                                         style={{textTransform: 'capitalize'}}
                                         className="block Phone_12"
+                                        disabled={index+1 < initialSelectCount}
                                     >
                                         <option style={{textTransform: 'capitalize'}} value="0">--Seleccione {options[0].ubiTip.toLowerCase()}--</option>
                                         {options.map(option => (
@@ -471,7 +474,7 @@ const FormGoalExecution = () => {
                     />
             </div>
             <div className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
-                <button className="PowerMas_Buttom_Primary Large_3 m_75" onClick={Registrar_Beneficiario} >Guardar</button>
+                <button className="PowerMas_Buttom_Primary Large_3 m_75" onClick={submitExecutionData} >Guardar</button>
                 <button className="PowerMas_Buttom_Secondary Large_3 m_75" onClick={handleReset}>Limpiar</button>
             </div>
 

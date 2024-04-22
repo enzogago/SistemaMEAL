@@ -17,6 +17,7 @@ import ModalBeneficiariesName from "./ModalBeneficiariesName";
 import 'intl-tel-input/build/css/intlTelInput.css';
 import 'intl-tel-input/build/js/utils.js';
 import { useRef } from "react";
+import ModalBeneficiariesAssociated from "./ModalBeneficiariesAssociated";
 
 const FormGoalBeneficiarie = () => {
     const navigate = useNavigate();
@@ -78,9 +79,11 @@ const FormGoalBeneficiarie = () => {
     const [errorContactMessage, setErrorContactMessage] = useState('');
     const [contactIsTouched, setContactIsTouched] = useState(false);
 
+    const [ initialSelectCount, setInitialSelectCount ] = useState(0);
+
 
     // Cargamos la Informacion a tratar en este Formulario
-    const fetchBeneficiarie = async () => {
+    const fetchMetaDetails = async () => {
         try {
             const token = localStorage.getItem('token');
             Notiflix.Loading.pulse('Cargando...');
@@ -110,7 +113,7 @@ const FormGoalBeneficiarie = () => {
     }
     useEffect(() => {
         if (id.length === 10 && isDataLoaded) {
-            fetchBeneficiarie();
+            fetchMetaDetails();
         }
     }, [id, isDataLoaded]);
     useEffect(() => {
@@ -118,7 +121,9 @@ const FormGoalBeneficiarie = () => {
             fetchData('Genero', setGeneros),
             fetchData('Nacionalidad', setNacionalidades),
             fetchData('Ubicacion', setPaises),
-            fetchData('DocumentoIdentidad', setDocumentos)
+            fetchData('DocumentoIdentidad', setDocumentos),
+            setFirstEdit(false),
+            setInitialSelectCount(0)
         ]).then(() => setIsDataLoaded(true));
     }, []);
 
@@ -137,15 +142,12 @@ const FormGoalBeneficiarie = () => {
 
     const pais = watch('pais');
     useEffect(() => {
-        if (pais) {
+        if (pais && firstEdit) {
             if (pais == '0') {
-                console.log("te reinicio pq puedo")
                 setSelects([]);
                 return;
             } 
-            console.log(pais)
             handleCountryChange(pais);
-            console.log("ok bravo")
         }
     }, [pais]);
 
@@ -514,17 +516,19 @@ const FormGoalBeneficiarie = () => {
             console.log(data)
             if (data.length > 1) {
                 setValue('pais', JSON.stringify({ ubiCod: data[0].ubiCod, ubiAno: data[0].ubiAno }));
+                await handleCountryChange(JSON.stringify({ ubiCod: data[0].ubiCod, ubiAno: data[0].ubiAno }));
                 const newSelectedValues = data.slice(1).map(location => JSON.stringify({ubiCod:location.ubiCod,ubiAno:location.ubiAno}));
                 setSelectedValues(newSelectedValues);
+                setInitialSelectCount(data.length);
                 console.log(newSelectedValues)
                 for (const [index, location] of data.slice(1).entries()) {
-                    console.log("cuantas")
+                    // Espera a que handleCountryChange termine antes de continuar con la siguiente iteración
                     await handleCountryChange(JSON.stringify({ubiCod: location.ubiCod,ubiAno: location.ubiAno}), index);
-                    setFirstEdit(true);  // Indica que estás estableciendo el valor del select de país
                 }
+                setFirstEdit(true)
             } else {
-                setFirstEdit(true);
                 setValue('pais', JSON.stringify({ ubiCod: data[0].ubiCod, ubiAno: data[0].ubiAno }));
+                setFirstEdit(true);
             }
             setVerificarPais({ ubiCod: data[0].ubiCod, ubiAno: data[0].ubiAno });
             initPhoneInput(phoneInputRef, setIsValid, setPhoneNumber, setErrorMessage,'',data[0].ubiNom, setIsTouched);
@@ -541,22 +545,40 @@ const FormGoalBeneficiarie = () => {
             console.log(data)
             const {metBenAnoEjeTec,metBenMesEjeTec} = data;
             // Obtiene el ubiAno y ubiCod del último select
-            const lastSelectElement = document.querySelector(`select[name=select${selects.length - 1}]`);
-            const lastSelect = JSON.parse(lastSelectElement.value);
-            const ubiAno = lastSelect.ubiAno;
-            const ubiCod = lastSelect.ubiCod;
-            // Verifica que todos los selects tengan una opción válida seleccionada
-            for (let i = 0; i < selects.length; i++) {
-                const selectElement = document.querySelector(`select[name=select${i}]`);
-                if (selectElement && selectElement.value === '0') {
-                    console.error(`El select ${i} no tiene una opción válida seleccionada.`);
-                    selectElement.classList.remove('PowerMas_Modal_Form_valid');
-                    selectElement.classList.add('PowerMas_Modal_Form_invalid');
-                    selectElement.focus();
-                    return;
+            // Definimos variables de ubicacion
+            let ubiAno, ubiCod;
+            // Si los selects dinamicos son mayor a 1
+            if (selects.length > 1) {
+                // Obtiene el ubiAno y ubiCod del último select
+                const lastSelectElement = document.querySelector(`select[name=select${selects.length - 1}]`);
+                const lastSelect = lastSelectElement.value;
+                if (lastSelect === '0') {
+                    // Si el último select tiene un valor de '0', obtén el ubiAno y ubiCod del penúltimo select
+                    const penultimateSelectElement = document.querySelector(`select[name=select${selects.length - 2}]`);
+                    const penultimateSelect = JSON.parse(penultimateSelectElement.value);
+                    ubiAno = penultimateSelect.ubiAno;
+                    ubiCod = penultimateSelect.ubiCod;
                 } else {
-                    selectElement.classList.remove('PowerMas_Modal_Form_invalid');
-                    selectElement.classList.add('PowerMas_Modal_Form_valid');
+                    // Si el último select tiene un valor distinto de '0', usa ese
+                    const ultimo = JSON.parse(lastSelect);
+                    ubiAno = ultimo.ubiAno;
+                    ubiCod = ultimo.ubiCod;
+                }
+            } else {
+                const lastSelectElement = document.querySelector(`select[name=select${selects.length - 1}]`);
+                const lastSelect = lastSelectElement.value;
+
+                // Si luego del siguiente nivel de Pais no se selecciona nada
+                if(lastSelect === '0'){
+                    // Se toman los valores pasados del select pais
+                    const { ubiAno: paisUbiAno, ubiCod: paisUbiCod } = JSON.parse(data.pais);
+                    ubiAno = paisUbiAno;
+                    ubiCod = paisUbiCod;
+                } else{
+                    // Caso contrario se toma el unico valor que tiene ese select ya que no tiene más niveles por debajo
+                    const ultimo = JSON.parse(lastSelect);
+                    ubiAno = ultimo.ubiAno;
+                    ubiCod = ultimo.ubiCod;
                 }
             }
 
@@ -602,7 +624,7 @@ const FormGoalBeneficiarie = () => {
                 beneficiarioMonitoreo.Beneficiario.benTelCon=phoneContactNumber;
 
                 console.log(beneficiarioMonitoreo)
-                handleSubmitMetaBeneficiario(beneficiarioMonitoreo, handleReset, updateData, setUpdateData, fetchBeneficiarie);
+                handleSubmitMetaBeneficiario(beneficiarioMonitoreo, handleReset, updateData, setUpdateData, fetchMetaDetails);
             } else { // Si existe el beneficairio solo insertar MetaBeneficiario
                 const { benAno, benCod } = data;
                 const MetaBeneficiario = {
@@ -616,7 +638,7 @@ const FormGoalBeneficiarie = () => {
                     metBenAnoEjeTec
                 }
                 console.log(MetaBeneficiario)
-                handleSubmitMetaBeneficiarioExiste(MetaBeneficiario, handleReset, updateData, setUpdateData, fetchBeneficiarie);
+                handleSubmitMetaBeneficiarioExiste(MetaBeneficiario, handleReset, updateData, setUpdateData, fetchMetaDetails);
             }
         })();
     };
@@ -672,8 +694,6 @@ const FormGoalBeneficiarie = () => {
         nuevosDocumentos.splice(index, 1);
         setDocumentosAgregados(nuevosDocumentos);
     }
-
-    
 
     return (
         <>
@@ -732,6 +752,11 @@ const FormGoalBeneficiarie = () => {
                                         value={selectedValues[index]}
                                         name={`select${index}`} 
                                         onChange={(event) => {
+                                            // Si el selector está deshabilitado, no hagas nada
+                                            if (index+1 < initialSelectCount) {
+                                                return;
+                                            }
+
                                             handleCountryChange(event.target.value, index);
                                             // Aquí actualizamos el valor seleccionado en el estado
                                             setSelectedValues(prevSelectedValues => {
@@ -742,6 +767,7 @@ const FormGoalBeneficiarie = () => {
                                         }} 
                                         style={{textTransform: 'capitalize'}}
                                         className="block Phone_12"
+                                        disabled={index+1 < initialSelectCount}
                                     >
                                         <option style={{textTransform: 'capitalize'}} value="0">--Seleccione {options[0].ubiTip.toLowerCase()}--</option>
                                         {options.map(option => (
@@ -1363,6 +1389,7 @@ const FormGoalBeneficiarie = () => {
                     <InfoGoal 
                         metaData={metaData} 
                         openModal={openModal} 
+                        is={false}
                     />
             </div>
             <div className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
@@ -1434,43 +1461,11 @@ const FormGoalBeneficiarie = () => {
             </Modal>
 
             {/* Modal Beneficarios asociados a la meta */}
-            <Modal
-                ariaHideApp={false}
-                isOpen={modalFormIsOpen}
-                onRequestClose={closeModal}
-                closeTimeoutMS={200}
-                style={{
-                    content: {
-                        top: '50%',
-                        left: '50%',
-                        right: 'auto',
-                        bottom: 'auto',
-                        width: '90%',
-                        height: '90%',
-                        marginRight: '-50%',
-                        transform: 'translate(-50%, -50%)',
-                        backgroundColor: '#fff',
-                        border: '1px solid #ccc',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        
-                    },
-                    overlay: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                        zIndex: 30
-                    }
-                }}
-            >   
-                <span className="PowerMas_CloseModal" style={{position: 'absolute',right: 20, top: 10}} onClick={closeModal}>×</span>
-                <h2 className='PowerMas_Title_Modal f1_5 center'>Beneficiarios asociados a la meta</h2>
-                <TableForm
-                    modalFormIsOpen={modalFormIsOpen}
-                    metaData={metaData}
-                    updateData={updateData}
-                    setUpdateData={setUpdateData}
-                    fetchBeneficiarie={fetchBeneficiarie}
-                />
-            </Modal>
+            <ModalBeneficiariesAssociated
+                openModal={modalFormIsOpen}
+                closeModal={closeModal}
+                metaData={metaData}
+            />
 
             {/* Intervenciones del beneficiario */}
             <ModalGoalBeneficiarie 

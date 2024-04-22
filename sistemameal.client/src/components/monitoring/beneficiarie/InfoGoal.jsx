@@ -1,7 +1,7 @@
 import React from 'react'
 import DonutChart from '../../reusable/DonutChart'
 
-const InfoGoal = ({metaData, openModal}) => {
+const InfoGoal = ({metaData, openModal, is = true}) => {
     
     const indTipIndMap = {
         'IAC': 'Indicador Actividad',
@@ -72,7 +72,7 @@ const InfoGoal = ({metaData, openModal}) => {
             </div>
             <div className="PowerMas_Bubble flex flex-column ai-center jc-center" onClick={openModal}>
                 <p className="f1_5">{metaData && Number(metaData.metEjeTec).toLocaleString()}</p>
-                <p className="f_75" style={{lineHeight: '1'}}>Ver<br/>Ejecuciones</p>
+                <p className="f_75" style={{lineHeight: '1'}}>Ver<br/>{is ? 'Ejecuciones' : 'Beneficiarios'}</p>
             </div>
         </>
     )

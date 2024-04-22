@@ -2,7 +2,7 @@ import Notiflix from 'notiflix';
 import React, { useEffect, useRef, useState } from 'react'
 import Table from './Table';
 import Modal from 'react-modal';
-import { FaRegFileExcel, FaRegTrashAlt, FaDownload, FaFile  } from 'react-icons/fa';
+import { FaRegTrashAlt, FaDownload, FaFile  } from 'react-icons/fa';
 import { formatterBudget } from './goal/helper';
 import { fetchData } from '../reusable/helper';
 

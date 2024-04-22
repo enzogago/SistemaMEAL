@@ -9,7 +9,6 @@ import IconUser from '../../icons/IconUser';
 import IconLocation from '../../icons/IconLocation';
 import { Tooltip } from 'react-tippy';
 
-
 const ResultChain = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [subproyectos, setSubProyectos] = useState([]);
@@ -37,7 +36,7 @@ const ResultChain = () => {
             const currentIndex = inputs.indexOf(target);
     
             // Calcula el número de columnas en la tabla
-            const numColumns = headers.length - 4; // Añade 4 por las columnas de totales
+            const numColumns = headers.length - 3; // Añade 4 por las columnas de totales
     
             // Calcula el índice de la fila y de la columna del input actual
             const currentRow = Math.floor(currentIndex / numColumns);

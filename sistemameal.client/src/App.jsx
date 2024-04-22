@@ -19,6 +19,7 @@ import UploadGoalBudget from './components/result-budget/UploadGoalBudget';
 import SaveGoalBudget from './components/result-budget/SaveGoalBudget';
 import ViewExecution from './components/result-budget/ViewExecution';
 import FormGoalExecution from './components/monitoring/beneficiarie/FormGoalExecution';
+import Prueba from './Prueba';
 // import Login from './components/auth/Login';
 // import Layout from './components/router/Layout';
 // Componentes
@@ -220,6 +221,7 @@ const App = () => {
                                                     </>
                                                 )}
                                                 <Route path="tutorial" element={<Tutorial />} />
+                                                <Route path="prueba" element={<Prueba />} />
                                                 <Route path="profile/:id" element={<FormProfile />} />
                                                 <Route path="*" element={<NotFound />} />
                                             </Routes>

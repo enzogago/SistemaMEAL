@@ -19,18 +19,9 @@ import femenino from '../../../img/PowerMas_Avatar_Femenino.svg';
 
 import ModalEditBeneficiarie from "./ModalEditBeneficiarie";
 
-const TableForm = ({modalFormIsOpen, metaData, updateData, setUpdateData, fetchBeneficiarie }) => {
+const TableForm = ({data, openModal, metaData }) => {
+    if(!openModal) return;
 
-    if(!modalFormIsOpen) return;
-
-    const [ data, setData] = useState([])
-    
-    useEffect(() => {
-        fetchBeneficiariosMeta(metaData.metAno,metaData.metCod,setData);
-    }, [updateData])
-
-    console.log(data)
-    const navigate = useNavigate();
     // Variables State AuthContext 
     const { authInfo } = useContext(AuthContext);
     const { userPermissions } = authInfo;
