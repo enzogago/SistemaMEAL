@@ -26,6 +26,19 @@ namespace SistemaMEAL.Server.Controllers
 
 
         [HttpGet]
+        [Route("{metAno}/{metCod}")]
+        public dynamic BuscarMeta(string metAno, string metCod)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var result = _metas.BuscarMeta(identity, metAno: metAno, metCod: metCod);
+            return Ok(result.FirstOrDefault());
+        }
+
+        [HttpGet]
         [Route("{subProAno}/{subProCod}/{metAnoPlaTec}")]
         public dynamic BuscarMonitoreoForm(string subProAno, string subProCod, string metAnoPlaTec)
         {
@@ -35,6 +48,19 @@ namespace SistemaMEAL.Server.Controllers
             if (!rToken.success) return Unauthorized(rToken);
 
             var result = _metas.BuscarMetasPorSubProyecto(identity, subProAno, subProCod, metAnoPlaTec);
+            return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("executing/{metAno}/{metCod}")]
+        public dynamic BuscarMetaEjecucion(string metAno, string metCod)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var result = _metas.BuscarMetaEjecucion(identity, metAno: metAno, metCod: metCod);
             return Ok(result);
         }
 

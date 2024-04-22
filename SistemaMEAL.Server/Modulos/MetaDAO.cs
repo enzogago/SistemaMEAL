@@ -673,6 +673,143 @@ namespace SistemaMEAL.Modulos
             return temporal?? new List<MetaFuente>();
         }
 
+        public IEnumerable<Meta> BuscarMeta(ClaimsIdentity? identity, string? metAno = null, string? metCod = null, string? estCod = null, string? metMetTec = null, string? metEjeTec = null, string? metPorAvaTec = null, string? metMetPre = null, string? metEjePre = null, string? metPorAvaPre = null, string? metMesPlaTec = null, string? metAnoPlaTec = null, string? metMesPlaPre = null, string? metAnoPlaPre = null, string? metEstPre = null, string? impCod = null, string? ubiAno = null, string? ubiCod = null, string? indAno = null, string? indCod = null, string? usuAno = null, string? usuCod = null, string? finCod = null)
+        {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
+            List<Meta>? temporal = new List<Meta>();
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_META", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                // Aquí puedes agregar los parámetros necesarios para tu procedimiento almacenado
+                cmd.Parameters.AddWithValue("@P_METANO", string.IsNullOrEmpty(metAno) ? (object)DBNull.Value : metAno);
+                cmd.Parameters.AddWithValue("@P_METCOD", string.IsNullOrEmpty(metCod) ? (object)DBNull.Value : metCod);
+                cmd.Parameters.AddWithValue("@P_ESTCOD", string.IsNullOrEmpty(estCod) ? (object)DBNull.Value : estCod);
+                cmd.Parameters.AddWithValue("@P_METMETTEC", string.IsNullOrEmpty(metMetTec) ? (object)DBNull.Value : metMetTec);
+                cmd.Parameters.AddWithValue("@P_METEJETEC", string.IsNullOrEmpty(metEjeTec) ? (object)DBNull.Value : metEjeTec);
+                cmd.Parameters.AddWithValue("@P_METPORAVATEC", string.IsNullOrEmpty(metPorAvaTec) ? (object)DBNull.Value : metPorAvaTec);
+                cmd.Parameters.AddWithValue("@P_METMETPRE", string.IsNullOrEmpty(metMetPre) ? (object)DBNull.Value : metMetPre);
+                cmd.Parameters.AddWithValue("@P_METEJEPRE", string.IsNullOrEmpty(metEjePre) ? (object)DBNull.Value : metEjePre);
+                cmd.Parameters.AddWithValue("@P_METPORAVAPRE", string.IsNullOrEmpty(metPorAvaPre) ? (object)DBNull.Value : metPorAvaPre);
+                cmd.Parameters.AddWithValue("@P_METMESPLATEC", string.IsNullOrEmpty(metMesPlaTec) ? (object)DBNull.Value : metMesPlaTec);
+                cmd.Parameters.AddWithValue("@P_METANOPLATEC", string.IsNullOrEmpty(metAnoPlaTec) ? (object)DBNull.Value : metAnoPlaTec);
+                cmd.Parameters.AddWithValue("@P_METMESPLAPRE", string.IsNullOrEmpty(metMesPlaPre) ? (object)DBNull.Value : metMesPlaPre);
+                cmd.Parameters.AddWithValue("@P_METANOPLAPRE", string.IsNullOrEmpty(metAnoPlaPre) ? (object)DBNull.Value : metAnoPlaPre);
+                cmd.Parameters.AddWithValue("@P_METESTPRE", string.IsNullOrEmpty(metEstPre) ? (object)DBNull.Value : metEstPre);
+                cmd.Parameters.AddWithValue("@P_IMPCOD", string.IsNullOrEmpty(impCod) ? (object)DBNull.Value : impCod);
+                cmd.Parameters.AddWithValue("@P_UBIANO", string.IsNullOrEmpty(ubiAno) ? (object)DBNull.Value : ubiAno);
+                cmd.Parameters.AddWithValue("@P_UBICOD", string.IsNullOrEmpty(ubiCod) ? (object)DBNull.Value : ubiCod);
+                cmd.Parameters.AddWithValue("@P_INDANO", string.IsNullOrEmpty(indAno) ? (object)DBNull.Value : indAno);
+                cmd.Parameters.AddWithValue("@P_INDCOD", string.IsNullOrEmpty(indCod) ? (object)DBNull.Value : indCod);
+                cmd.Parameters.AddWithValue("@P_USUANO", string.IsNullOrEmpty(usuAno) ? (object)DBNull.Value : usuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD", string.IsNullOrEmpty(usuCod) ? (object)DBNull.Value : usuCod);
+                cmd.Parameters.AddWithValue("@P_FINCOD", string.IsNullOrEmpty(finCod) ? (object)DBNull.Value : finCod);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                if (!reader.HasRows)
+                {
+                    jsonResult.Append("[]");
+                }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                // Deserializa la cadena JSON en una lista de objetos Usuario
+                temporal = JsonConvert.DeserializeObject<List<Meta>>(jsonResult.ToString());
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return temporal?? new List<Meta>();
+        }
+
+
+        public IEnumerable<MetaEjecucion> BuscarMetaEjecucion(ClaimsIdentity? identity, string? metAno = null, string? metCod = null, string? metEjeVal = null, string? ubiAno = null, string? ubiCod = null, string? metEjeAnoEjeTec = null, string? metEjeMesEjeTec = null)
+        {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
+            List<MetaEjecucion>? temporal = new List<MetaEjecucion>();
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_META_EJECUCION", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                // Aquí puedes agregar los parámetros necesarios para tu procedimiento almacenado
+                cmd.Parameters.AddWithValue("@P_METANO", string.IsNullOrEmpty(metAno) ? (object)DBNull.Value : metAno);
+                cmd.Parameters.AddWithValue("@P_METCOD", string.IsNullOrEmpty(metCod) ? (object)DBNull.Value : metCod);
+                cmd.Parameters.AddWithValue("@P_UBIANO", string.IsNullOrEmpty(ubiAno) ? (object)DBNull.Value : ubiAno);
+                cmd.Parameters.AddWithValue("@P_UBICOD", string.IsNullOrEmpty(ubiCod) ? (object)DBNull.Value : ubiCod);
+                cmd.Parameters.AddWithValue("@P_METEJEVAL", string.IsNullOrEmpty(metEjeVal) ? (object)DBNull.Value : metEjeVal);
+                cmd.Parameters.AddWithValue("@P_METEJEMESEJETEC", string.IsNullOrEmpty(metEjeAnoEjeTec) ? (object)DBNull.Value : metEjeAnoEjeTec);
+                cmd.Parameters.AddWithValue("@P_METEJEANOEJETEC", string.IsNullOrEmpty(metEjeMesEjeTec) ? (object)DBNull.Value : metEjeMesEjeTec);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (!reader.HasRows)
+                {
+                    jsonResult.Append("[]");
+                }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                // Deserializa la cadena JSON en una lista de objetos Usuario
+                temporal = JsonConvert.DeserializeObject<List<MetaEjecucion>>(jsonResult.ToString());
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return temporal?? new List<MetaEjecucion>();
+        }
+
 
     }
 }

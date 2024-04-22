@@ -36,7 +36,9 @@ namespace SistemaMEAL.Server.Models
         public String? Cantidad { get; set; }
 
         // Ayuda Meta Beneficiario Modal
+        public String? DocIdeCod { get; set; }
         public String? DocIdeNom { get; set; }
+        public String? DocIdeNum { get; set; }
         public String? DocIdeAbr { get; set; }
         public String? DocIdeBenNum { get; set; }
 

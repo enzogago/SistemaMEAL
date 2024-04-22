@@ -85,7 +85,7 @@ const FormGoalBeneficiarie = () => {
             const token = localStorage.getItem('token');
             Notiflix.Loading.pulse('Cargando...');
             
-            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/${metAno}/${metCod}`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Meta/${metAno}/${metCod}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }

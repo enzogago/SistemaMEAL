@@ -80,6 +80,44 @@ export const handleSubmitMetaBeneficiarioExiste = async (data, handleReset, upda
     }
 };
 
+export const handleSubmitMetaEjecucion = async (data, handleReset, fetchBeneficiarie)=> {
+    try {
+        Notiflix.Loading.pulse('Cargando...');
+        const token = localStorage.getItem('token');
+        
+        const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/execution`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            if(response.status === 409){
+                Notiflix.Notify.warning(`${errorData.message}`);
+                console.log(errorData)
+                return;
+            } else {
+                Notiflix.Notify.failure(errorData.message);
+                console.log(errorData)
+                return;
+            }
+        }
+
+        const successData = await response.json();
+        Notiflix.Notify.success(successData.message);
+        fetchBeneficiarie();
+        handleReset();
+    } catch (error) {
+        console.error('Error:', error);
+    } finally {
+        Notiflix.Loading.remove();
+    }
+};
+
 export const fetchBeneficiariosMeta = async (metAno, metCod, setBeneficiariosMeta) => {
     try {
         Notiflix.Loading.pulse('Cargando...');

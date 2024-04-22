@@ -146,6 +146,30 @@ namespace SistemaMEAL.Server.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("execution")]
+        public dynamic InsertarMetaEjecucion(MetaEjecucion metaEjecucion)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var (message, messageType) = _monitoreos.InsertarMetaEjecucion(identity, metaEjecucion);
+            if (messageType == "1")
+            {
+                return new BadRequestObjectResult(new { success = false, message });
+            }
+            else if (messageType == "2")
+            {
+                return new ConflictObjectResult(new { success = false, message });
+            }
+            else
+            {
+                return new OkObjectResult(new { success = true, message });
+            }
+        }
+
         [HttpDelete]
         [Route("eliminar-beneficiario/{metAno}/{metCod}/{benAno}/{benCod}/{ubiAno}/{ubiCod}/{metBenAnoEjeTec}/{metBenMesEjeTec}")]
         public dynamic EliminarBeneficiarioMonitoreo(string metAno, string metCod, string benAno, string benCod, string ubiAno, string ubiCod, string metBenAnoEjeTec, string metBenMesEjeTec)

@@ -16,6 +16,7 @@ const StatusState = ({ children }) => {
     const [errorCells, setErrorCells] = useState([]);
     const [subProjectUpload, setSubprojectUpload] = useState('');
     const [anoUpload, setAnoUpload] = useState('');
+    const [metaBeneficiario, setMetaBeneficiario] = useState(null);
 
     const [state, dispatch] = useReducer(statusReducer, initialState);
 
@@ -47,7 +48,8 @@ const StatusState = ({ children }) => {
         isValid,
         errorCells,
         subProjectUpload,
-        anoUpload
+        anoUpload,
+        metaBeneficiario
     };
 
     const statusActions = {
@@ -60,7 +62,8 @@ const StatusState = ({ children }) => {
         setIsValid,
         setErrorCells,
         setSubprojectUpload,
-        setAnoUpload
+        setAnoUpload,
+        setMetaBeneficiario
     };
 
     return (

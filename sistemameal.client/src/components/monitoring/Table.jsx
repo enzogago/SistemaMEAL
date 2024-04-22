@@ -60,6 +60,11 @@ const Table = ({ data, setMonitoringData, setModalIsOpen }) => {
     }
 
     const Register_Beneficiarie = (row) => {
+        const id = `${row.original.metAno}${row.original.metCod}`;
+        // Encripta el ID
+        const ciphertext = CryptoJS.AES.encrypt(id, 'secret key 123').toString();
+        // Codifica la cadena cifrada para que pueda ser incluida de manera segura en una URL
+        const safeCiphertext = btoa(ciphertext).replace('+', '-').replace('/', '_').replace(/=+$/, '');
 
         Notiflix.Confirm.show(
             'Registrar Beneficiario',
@@ -67,17 +72,21 @@ const Table = ({ data, setMonitoringData, setModalIsOpen }) => {
             'Masivo',
             'Individual',
             () => {
-                navigate(`/upload-beneficiarie`);
+                navigate(`/upload-beneficiarie/${safeCiphertext}`);
             },
             () => {
-                const id = `${row.original.metAno}${row.original.metCod}`;
-                // Encripta el ID
-                const ciphertext = CryptoJS.AES.encrypt(id, 'secret key 123').toString();
-                // Codifica la cadena cifrada para que pueda ser incluida de manera segura en una URL
-                const safeCiphertext = btoa(ciphertext).replace('+', '-').replace('/', '_').replace(/=+$/, '');
                 navigate(`/form-goal-beneficiarie/${safeCiphertext}`);
             }
         )
+    }
+
+    const Register_Execution = (row) => {
+        const id = `${row.original.metAno}${row.original.metCod}`;
+        // Encripta el ID
+        const ciphertext = CryptoJS.AES.encrypt(id, 'secret key 123').toString();
+        // Codifica la cadena cifrada para que pueda ser incluida de manera segura en una URL
+        const safeCiphertext = btoa(ciphertext).replace('+', '-').replace('/', '_').replace(/=+$/, '');
+        navigate(`/form-goal-execution/${safeCiphertext}`);
     }
     
     const actions = {
@@ -483,6 +492,7 @@ const Table = ({ data, setMonitoringData, setModalIsOpen }) => {
                         <div className="flex jc-center ai-center">
                             <button  
                                 className="PowerMas_Add_Execution f_75 p_25 flex-grow-1" 
+                                onClick={() => Register_Execution(row)}
                             >
                                 Ejecución
                             </button>

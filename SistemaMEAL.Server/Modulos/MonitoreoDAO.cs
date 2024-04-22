@@ -759,6 +759,56 @@ namespace SistemaMEAL.Modulos
             }
             return (mensaje, tipoMensaje);
         }
+        public (string? message, string? messageType) InsertarMetaEjecucion(ClaimsIdentity? identity, MetaEjecucion metaEjecucion)
+        {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
+            string? mensaje = "";
+            string? tipoMensaje = "";
+            try
+            {
+                cn.getcn.Open();
+                SqlCommand cmd = new SqlCommand("SP_INSERTAR_META_EJECUCION", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@P_METANO", metaEjecucion.MetAno);
+                cmd.Parameters.AddWithValue("@P_METCOD", metaEjecucion.MetCod);
+                cmd.Parameters.AddWithValue("@P_UBIANO", metaEjecucion.UbiAno);
+                cmd.Parameters.AddWithValue("@P_UBICOD", metaEjecucion.UbiCod);
+                cmd.Parameters.AddWithValue("@P_METEJEVAL", metaEjecucion.MetEjeVal);
+                cmd.Parameters.AddWithValue("@P_METEJEMESEJETEC", metaEjecucion.MetEjeMesEjeTec);
+                cmd.Parameters.AddWithValue("@P_METEJEANOEJETEC", metaEjecucion.MetEjeAnoEjeTec);
+                cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+
+                cmd.ExecuteNonQuery();
+
+                mensaje = pDescripcionMensaje.Value.ToString();
+                tipoMensaje = pTipoMensaje.Value.ToString();
+            }
+            catch (SqlException ex)
+            {
+                mensaje = ex.Message;
+                tipoMensaje = "1";
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return (mensaje, tipoMensaje);
+        }
 
         public (string? message, string? messageType) EliminarBeneficiarioMonitoreo(ClaimsIdentity? identity, string metAno, string metCod, string benAno, string benCod, string ubiAno, string ubiCod, string metBenAnoEjeTec, string metBenMesEjeTec)
         {

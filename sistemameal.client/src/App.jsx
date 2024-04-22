@@ -18,6 +18,7 @@ import ForgotPassword from './components/auth/ForgotPassword';
 import UploadGoalBudget from './components/result-budget/UploadGoalBudget';
 import SaveGoalBudget from './components/result-budget/SaveGoalBudget';
 import ViewExecution from './components/result-budget/ViewExecution';
+import FormGoalExecution from './components/monitoring/beneficiarie/FormGoalExecution';
 // import Login from './components/auth/Login';
 // import Layout from './components/router/Layout';
 // Componentes
@@ -211,9 +212,10 @@ const App = () => {
                                                 )}
                                                 {menuData.some(menu => menu.menRef === 'monitoring') && (
                                                     <>
+                                                        <Route path="form-goal-execution/:id" element={<FormGoalExecution />} />
                                                         <Route path="form-goal-beneficiarie/:id" element={<FormGoalBeneficiarie />} />
                                                         <Route path="form-goal/:id?" element={<FormGoal />} />
-                                                        <Route path="upload-beneficiarie" element={<UploadBeneficiarie />} />
+                                                        <Route path="upload-beneficiarie/:id" element={<UploadBeneficiarie />} />
                                                         <Route path="validate-beneficiarie" element={<UploadValidate />} />
                                                     </>
                                                 )}

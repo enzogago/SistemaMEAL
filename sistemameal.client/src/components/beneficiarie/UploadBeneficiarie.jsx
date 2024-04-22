@@ -1,14 +1,47 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Bar from "../user/Bar";
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { FaDownload, FaRegFileExcel } from "react-icons/fa";
 import Notiflix from "notiflix";
+import CryptoJS from 'crypto-js';
+import template from '../../templates/MARCO_LOGICO.xlsm';
+import { handleUpload } from "./handleUpload";
+import { StatusContext } from "../../context/StatusContext";
 
 const UploadBeneficiarie = () => {
+    const { id: safeCiphertext } = useParams();
+    // Reemplaza los caracteres a su representación original en base64 y decodifica la cadena
+    const ciphertext = atob(safeCiphertext);
+    // Desencripta el ID
+    const bytes  = CryptoJS.AES.decrypt(ciphertext, 'secret key 123');
+    const id = bytes.toString(CryptoJS.enc.Utf8);
+    const metAno = id.slice(0, 4);
+    const metCod = id.slice(4);
+
+    //
     const navigate = useNavigate();
 
+     // Variables State AuthContext 
+     const { statusActions } = useContext(StatusContext);
+     const { setTableData, setIsValid, setErrorCells, setMetaBeneficiario } = statusActions;
+
+    useEffect(() => {
+        if (id.length !== 10) {
+            navigate('/monitoring');
+        }
+    }, [id]);
+    
+
     const handleFileUpload = () => {
-        navigate('/validate-beneficiarie');
+        setMetaBeneficiario({
+            metAno,
+            metCod,
+            ubiAno: '2024',
+            ubiCod: '000001',
+            metBenMesEjeTec: '01',
+            metBenAnoEjeTec: '2025',
+        })
+        handleUpload(selectedFile, setTableData, setIsValid, setErrorCells, navigate);
     };
 
     const [dragging, setDragging] = useState(false);
@@ -49,7 +82,7 @@ const UploadBeneficiarie = () => {
             // Verificar si el archivo es un Excel
             const file = e.dataTransfer.files[0];
             const fileType = file.name.split('.').pop();
-            if (fileType === 'xls' || fileType === 'xlsx') {
+            if (fileType === 'xlsm') {
                 fileInputRef.current.files = e.dataTransfer.files;
                 setSelectedFile(e.dataTransfer.files[0]); // Aquí se actualiza el estado selectedFile
             } else {
@@ -65,8 +98,21 @@ const UploadBeneficiarie = () => {
     };
 
     const handleFileChange = (event) => {
-        setSelectedFile(event.target.files[0]);
+        console.log(event.target.files[0])
+        if (event.target.files[0].type === 'application/vnd.ms-excel.sheet.macroEnabled.12') {
+            setSelectedFile(event.target.files[0]);
+        } else {
+            Notiflix.Notify.failure("Formato no soportado")
+        }
     };
+
+    const handleDownload = () => {
+        fetch(template)
+            .then(response => response.blob())
+            .then(blob => {
+                saveAs(blob, 'MARCO_LOGICO.xlsm');
+            });
+    }
 
     
     return (
@@ -76,7 +122,7 @@ const UploadBeneficiarie = () => {
                 
                 <div className="Large_8">
                 <div className="flex jc-center p_5">
-                <button className="PowerMas_Buttom_Secondary flex ai-center jc-space-between p_5 Phone_3"> 
+                <button className="PowerMas_Buttom_Secondary flex ai-center jc-space-between p_5 Phone_3" onClick={handleDownload}> 
                     Descargar formato 
                     <FaDownload className="w-auto" /> 
                 </button>
@@ -100,7 +146,7 @@ const UploadBeneficiarie = () => {
                             ref={fileInputRef} 
                             style={{display: 'none'}} 
                             onChange={handleFileChange} 
-                            accept=".xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                            accept=".xlsm,application/vnd.ms-excel.sheet.macroEnabled.12"
                         />
                         <FaRegFileExcel className="Large-f5 w-auto" />
                         {
@@ -124,7 +170,7 @@ const UploadBeneficiarie = () => {
                 <button 
                 onClick={handleFileUpload} 
                 className="Large_3 m_75 PowerMas_Buttom_Primary"
-                // disabled={!selectedFile}
+                disabled={!selectedFile}
                 >
                     Siguiente
                 </button>

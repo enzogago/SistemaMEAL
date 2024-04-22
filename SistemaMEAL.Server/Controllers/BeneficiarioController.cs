@@ -136,6 +136,32 @@ namespace SistemaMEAL.Server.Controllers
                 return new OkObjectResult(new { success = true, message });
             }
         }
+
+        [HttpPost]
+        [Route("masivo")]
+        public dynamic InsertarMasivo(MetaBeneficiarioDto metaBeneficiarioDto)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return rToken;
+
+
+            var (message, messageType) = _beneficiarios.InsertarBeneficiarioMasivo(identity, metaBeneficiarioDto.Beneficiarios, metaBeneficiarioDto.MetaBeneficiario);
+            if (messageType == "1") // Error
+            {
+                return new BadRequestObjectResult(new { success = false, message });
+            }
+            else if (messageType == "2") // Registro ya existe
+            {
+                return new ConflictObjectResult(new { success = false, message });
+            }
+            else // Registro modificado correctamente
+            {
+                return new OkObjectResult(new { success = true, message });
+            }
+        }
+
         [HttpPut]
         public dynamic Modificar(Beneficiario? beneficiario)
         {

@@ -250,6 +250,173 @@ namespace SistemaMEAL.Server.Modulos
             return (mensaje, tipoMensaje);
         }
 
+        public (string? message, string? messageType) InsertarBeneficiarioMasivo(ClaimsIdentity? identity, List<Beneficiario> beneficiarios, MetaBeneficiario metaBeneficiario)
+        {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
+            string? mensaje = "";
+            string? tipoMensaje = "";
+
+            using (TransactionScope scope = new TransactionScope())
+            {
+                using (SqlConnection connection = cn.getcn)
+                {
+                    try
+                    {
+
+                        SqlCommand cmd;
+                        SqlParameter pDescripcionMensaje;
+                        SqlParameter pTipoMensaje;
+                        SqlParameter pAno;
+                        SqlParameter pCod;
+
+                         if (connection.State == ConnectionState.Closed)
+                        {
+                            connection.Open();
+                        }
+                        
+                        if (beneficiarios.Count > 0)
+                        {
+                            foreach (var beneficiario in beneficiarios)
+                            {
+                                // Inserta el beneficiario
+                                cmd = new SqlCommand("SP_INSERTAR_BENEFICIARIO", cn.getcn);
+                                cmd.CommandType = CommandType.StoredProcedure;
+                                cmd.Parameters.AddWithValue("@P_BENNOM", beneficiario.BenNom);
+                                cmd.Parameters.AddWithValue("@P_BENAPE", beneficiario.BenApe);
+                                cmd.Parameters.AddWithValue("@P_BENNOMAPO", beneficiario.BenNomApo);
+                                cmd.Parameters.AddWithValue("@P_BENAPEAPO", beneficiario.BenApeApo);
+                                cmd.Parameters.AddWithValue("@P_BENFECNAC", beneficiario.BenFecNac);
+                                cmd.Parameters.AddWithValue("@P_BENSEX", beneficiario.BenSex);
+                                cmd.Parameters.AddWithValue("@P_GENCOD", beneficiario.GenCod);
+                                cmd.Parameters.AddWithValue("@P_NACCOD", beneficiario.NacCod);
+                                cmd.Parameters.AddWithValue("@P_BENCORELE", beneficiario.BenCorEle);
+                                cmd.Parameters.AddWithValue("@P_BENTEL", beneficiario.BenTel);
+                                cmd.Parameters.AddWithValue("@P_BENTELCON", beneficiario.BenTelCon);
+                                cmd.Parameters.AddWithValue("@P_BENCODUNI", beneficiario.BenCodUni);
+                                cmd.Parameters.AddWithValue("@P_BENDIR", beneficiario.BenDir);
+                                cmd.Parameters.AddWithValue("@P_BENAUT", beneficiario.BenAut);
+                                cmd.Parameters.AddWithValue("@P_BENFECREG", "10-02-2024");
+                                cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
+                                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                                pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                                cmd.Parameters.Add(pDescripcionMensaje);
+
+                                pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                                pTipoMensaje.Direction = ParameterDirection.Output;
+                                cmd.Parameters.Add(pTipoMensaje);
+
+                                pAno = new SqlParameter("@P_BENANO_OUT", SqlDbType.NVarChar, 4);
+                                pAno.Direction = ParameterDirection.Output;
+                                cmd.Parameters.Add(pAno);
+
+                                pCod = new SqlParameter("@P_BENCOD_OUT", SqlDbType.Char, 6);
+                                pCod.Direction = ParameterDirection.Output;
+                                cmd.Parameters.Add(pCod);
+
+                                cmd.ExecuteNonQuery();
+
+                                mensaje = pDescripcionMensaje.Value.ToString();
+                                tipoMensaje = pTipoMensaje.Value.ToString();
+
+                                if (tipoMensaje != "3")
+                                {
+                                    Console.WriteLine(mensaje);
+                                    throw new Exception(mensaje);
+                                }
+
+                                var benAnoOut = pAno.Value.ToString();
+                                var benCodOut = pCod.Value.ToString();
+
+                                // Inserta el DocumentoBeneficiario
+                                cmd = new SqlCommand("SP_INSERTAR_DOCUMENTO_IDENTIDAD_BENEFICIARIO", cn.getcn);
+                                cmd.CommandType = CommandType.StoredProcedure;
+                                cmd.Parameters.AddWithValue("@P_DOCIDECOD", beneficiario.DocIdeCod);
+                                cmd.Parameters.AddWithValue("@P_BENANO", benAnoOut);
+                                cmd.Parameters.AddWithValue("@P_BENCOD", benCodOut);
+                                cmd.Parameters.AddWithValue("@P_DOCIDEBENNUM", beneficiario.BenCodUni);
+                                cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
+                                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                                pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                                cmd.Parameters.Add(pDescripcionMensaje);
+
+                                pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                                pTipoMensaje.Direction = ParameterDirection.Output;
+                                cmd.Parameters.Add(pTipoMensaje);
+
+                                cmd.ExecuteNonQuery();
+
+                                mensaje = pDescripcionMensaje.Value.ToString();
+                                tipoMensaje = pTipoMensaje.Value.ToString();
+
+                                if (tipoMensaje != "3")
+                                {
+                                    Console.WriteLine(mensaje);
+                                    throw new Exception(mensaje);
+                                }
+
+                                cmd = new SqlCommand("SP_INSERTAR_META_BENEFICIARIO", cn.getcn);
+                                cmd.CommandType = CommandType.StoredProcedure;
+
+                                cmd.Parameters.AddWithValue("@P_METANO", metaBeneficiario.MetAno);
+                                cmd.Parameters.AddWithValue("@P_METCOD", metaBeneficiario.MetCod);
+                                cmd.Parameters.AddWithValue("@P_BENANO", benAnoOut);
+                                cmd.Parameters.AddWithValue("@P_BENCOD", benCodOut);
+                                cmd.Parameters.AddWithValue("@P_UBIANO", metaBeneficiario.UbiAno);
+                                cmd.Parameters.AddWithValue("@P_UBICOD", metaBeneficiario.UbiCod);
+                                cmd.Parameters.AddWithValue("@P_METBENMESEJETEC", metaBeneficiario.MetBenMesEjeTec);
+                                cmd.Parameters.AddWithValue("@P_METBENANOEJETEC", metaBeneficiario.MetBenAnoEjeTec);
+                                cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
+                                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                                pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                                cmd.Parameters.Add(pDescripcionMensaje);
+
+                                pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                                pTipoMensaje.Direction = ParameterDirection.Output;
+                                cmd.Parameters.Add(pTipoMensaje);
+
+                                cmd.ExecuteNonQuery();
+
+                                mensaje = pDescripcionMensaje.Value.ToString();
+                                tipoMensaje = pTipoMensaje.Value.ToString();
+                            }
+                        }
+
+                        // Si todas las operaciones fueron exitosas, confirma la transacción
+                        scope.Complete();
+                        mensaje = "Registros insertados exitosamente.";
+                        tipoMensaje = "3";
+                    }
+                    catch (SqlException ex)
+                    {
+                        // Si alguna operación falló, la transacción se revierte.
+                        mensaje = ex.Message;
+                        tipoMensaje = "1";
+                    }
+                }
+
+                return (mensaje, tipoMensaje);
+            }
+        }
+
 
         public IEnumerable<Beneficiario> Listado(ClaimsIdentity? identity, string? benAno = null, string? benCod = null, string? benNom = null, string? benApe = null, string? benFecNac = null, string? benTel = null, string? benCorEle = null, string? benSex = null, string? genCod = null, string? benFecReg = null, string? benCodUni = null, string? benTelCon = null, string? benNomApo = null, string? benApeApo = null, string? nacCod = null, string? benDir = null, string? benAut = null)
         {
