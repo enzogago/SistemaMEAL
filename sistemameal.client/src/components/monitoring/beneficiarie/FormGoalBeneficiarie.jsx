@@ -80,6 +80,36 @@ const FormGoalBeneficiarie = () => {
     const [contactIsTouched, setContactIsTouched] = useState(false);
 
     const [ initialSelectCount, setInitialSelectCount ] = useState(0);
+    const [update, setUpdate] = useState(false)
+
+
+    useEffect(() => {
+        // Cargamos la Informacion a tratar en este Formulario
+        const refreshhMetaDetails = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                Notiflix.Loading.pulse('Cargando...');
+                
+                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Meta/${metAno}/${metCod}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = await response.json();
+                if (!response.ok) {
+                    Notiflix.Notify.failure(data.message);
+                    return;
+                }
+                setMetaData(data);
+            } catch (error) {
+                console.error('Error:', error);
+            } finally {
+                Notiflix.Loading.remove();
+            }
+        }
+        refreshhMetaDetails();
+    }, [update])
+    
 
 
     // Cargamos la Informacion a tratar en este Formulario
@@ -1465,6 +1495,8 @@ const FormGoalBeneficiarie = () => {
                 openModal={modalFormIsOpen}
                 closeModal={closeModal}
                 metaData={metaData}
+                update={update}
+                setUpdate ={setUpdate}
             />
 
             {/* Intervenciones del beneficiario */}

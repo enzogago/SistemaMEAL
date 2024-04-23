@@ -23,7 +23,6 @@ input[type=text],input[type=search], select{
 }
 .PowerMas_MainHome input,.PowerMas_MainHome select{
 	border-radius: 5px;
-	margin-top: 5px;
 	transition: border 0.2s;
 }
 select option {
@@ -1059,7 +1058,7 @@ textarea {
 }
 
 .TableMainContainer{
-	flex-grow: 1;
+	height: 100%;
 	display: flex;
 	flex-direction: column;
 	overflow: auto;
@@ -1070,7 +1069,6 @@ textarea {
 .PowerMas_TableContainer {
 	flex-grow: 1;
     overflow: auto;
-	display: flex;
 }
 .PowerMas_TableContainerHome{
 	flex-grow: 1;
@@ -1177,6 +1175,25 @@ textarea {
 	cursor: col-resize;
 }
 
+.PowerMas_Table_Monitoring{
+	font-size: 0.75rem;
+}
+.PowerMas_Table_Monitoring td {
+	width: auto;
+	border-bottom: 1px solid #d3d3d3;
+	white-space: nowrap;
+	padding: 0 0.5rem;
+}
+
+.PowerMas_Table_Monitoring tbody tr{
+	background-color: white;
+	transition: background-color 0.1s ease;
+	height: 1.75rem;
+}
+
+.PowerMas_Table_Monitoring tbody tr:hover{
+	background-color: #ffc65833; 
+}
 
 
 .PowerMas_TableStatus{

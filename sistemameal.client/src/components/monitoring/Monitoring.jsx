@@ -10,7 +10,6 @@ const Monitoring = () => {
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [modalData, setModalData] = useState(null);
 
-    const [monitoringData, setMonitoringData] = useState([])
     const [modalIsOpen, setModalIsOpen] = useState(false)
 
     const [dragging, setDragging] = useState(false);
@@ -37,11 +36,6 @@ const Monitoring = () => {
         })
     };
 
-    
-    // EFECTO AL CARGAR COMPONENTE GET - LISTAR ESTADOS
-    useEffect(() => {
-        fetchData('Monitoreo/Filter', setMonitoringData)
-    }, []);
 
     const handleFileUpload = (file) => {
         Notiflix.Loading.pulse();
@@ -56,7 +50,6 @@ const Monitoring = () => {
     
             // Prepara los datos de MetasFuente
             const metasFuente = modalData; // Asegúrate de que modalData tenga los datos correctos
-    
             // Construye el objeto MetasFuenteDto
             const metasFuenteDto = {
                 MetaFuente: metasFuente,
@@ -196,7 +189,7 @@ const Monitoring = () => {
                 const splitFileName = fileName.split("_");
                 // Toma la parte del nombre del archivo después del primer "_"
                 const newFileName = splitFileName.length > 1 ? splitFileName.slice(1).join('_') : fileName;
-                link.setAttribute('download', newFileName);
+                link.setAttribute('download', fileName);
                 document.body.appendChild(link);
                 link.click();
                 link.parentNode.removeChild(link);
@@ -215,7 +208,7 @@ const Monitoring = () => {
     
             // Prepara los datos de MetasFuente
             const metasFuente = modalData; // Asegúrate de que modalData tenga los datos correctos
-    
+            console.log(file)
             // Construye el objeto MetasFuenteDto
             const metasFuenteDto = {
                 MetaFuente: metasFuente,
@@ -256,8 +249,6 @@ const Monitoring = () => {
     return (
         <>
             <Table 
-                data={monitoringData}
-                setMonitoringData={setMonitoringData}
                 setModalIsOpen={openModalWithData}
             />
             <Modal
@@ -348,7 +339,7 @@ const Monitoring = () => {
                                                 style={{width: '20px'}}
                                                 data-tooltip-id="delete-tooltip" 
                                                 data-tooltip-content="Descargar"
-                                                onClick={() => downloadFile(`${file.metAno}${file.metCod}_${file.metFueVerNom}`)}
+                                                onClick={() => downloadFile(`${file.metFueVerNom}`)}
                                             />
                                         </div>
                                     </td>
@@ -369,7 +360,7 @@ const Monitoring = () => {
                             {
                                 selectedFiles.length == 0 &&
                                 <tr className="center">
-                                    <td colSpan={3} className="p1 f_75"> No se registraron documentos</td>
+                                    <td colSpan={4} className="p1 f_75"> No se registraron documentos</td>
                                 </tr>
                             }
                         </tbody>

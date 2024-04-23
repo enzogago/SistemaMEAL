@@ -7,7 +7,7 @@ import 'intl-tel-input/build/css/intlTelInput.css';
 import 'intl-tel-input/build/js/utils.js';
 import { initPhoneInput } from './eventHandlers';
 
-const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, updateData, setUpdateData, metaData}) => {
+const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate, metaData}) => {
 
     if (!modalVisible) return; 
     const [ paises, setPaises ] = useState([]);
@@ -182,10 +182,10 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, updateData
 
             if (!hasChanged && !fieldsDisabled) { // No cambió y los campos habilitados
                 // UPDATE BENEFICIARIO
-                handleSubmitBeneficiarie(data, closeModalEdit, updateData, setUpdateData);
+                handleSubmitBeneficiarie(data, closeModalEdit, setUpdate);
             } else if(fieldsDisabled){ // Cambió y los campos deshabilitados
                 // Update META_BENEFICIARIO
-                handleSubmiMetaBeneficiario(dataMetaBeneficiario, closeModalEdit, updateData, setUpdateData);
+                handleSubmiMetaBeneficiario(dataMetaBeneficiario, closeModalEdit, setUpdate);
             } else if(!fieldsDisabled){
                 if(hasChanged && hasChangedBeneficiarie){ // Si cambian los datos de Meta_Beneficiario y Beneficiario
                     // UPDATE META_BENEFICAIRIO y BENEFICIARIO
@@ -193,16 +193,16 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, updateData
                         Beneficiario: { ...data },
                         MetaBeneficiario: { ...dataMetaBeneficiario},
                     }
-                    handleSubmiBeneficiarioMetaBeneficiario(dataBeneficiarioMetaBeneficiario, closeModalEdit, updateData, setUpdateData);
+                    handleSubmiBeneficiarioMetaBeneficiario(dataBeneficiarioMetaBeneficiario, closeModalEdit, setUpdate);
                 } else { // Solo cambia los datos de Meta_Beneficiario
                     // Update META_BENEFICIARIO
-                    handleSubmiMetaBeneficiario(dataMetaBeneficiario, closeModalEdit, updateData, setUpdateData);
+                    handleSubmiMetaBeneficiario(dataMetaBeneficiario, closeModalEdit, setUpdate);
                 }
             }
         })();
     }
 
-    const handleSubmitBeneficiarie = async (data, closeModalEdit, updateData, setUpdateData) => {
+    const handleSubmitBeneficiarie = async (data, closeModalEdit, setUpdate) => {
         let newData = {};
                 
         for (let key in data) {
@@ -235,7 +235,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, updateData
     
             Notiflix.Notify.success(data.message);
             closeModalEdit();
-            setUpdateData(!updateData);
+            setUpdate(prevUpdate => !prevUpdate);
         } catch (error) {
             console.error('Error:', error);
         } finally {
@@ -279,7 +279,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, updateData
 
             Notiflix.Notify.success(data.message);
             closeModalEdit();
-            setUpdateData(!updateData);
+            setUpdate(prevUpdate => !prevUpdate);
         } catch (error) {
             console.error('Error:', error);
         } finally {
@@ -307,7 +307,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, updateData
 
             Notiflix.Notify.success(data.message);
             closeModalEdit();
-            setUpdateData(!updateData);
+            setUpdate(prevUpdate => !prevUpdate);
         } catch (error) {
             console.error('Error:', error);
         } finally {

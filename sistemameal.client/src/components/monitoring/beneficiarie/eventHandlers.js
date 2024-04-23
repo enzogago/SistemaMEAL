@@ -149,7 +149,7 @@ export const fetchBeneficiariosMeta = async (metAno, metCod, setBeneficiariosMet
     }
 };
 
-export const handleDeleteBeneficiarioMeta = async (controller,metAno,metCod,benAno,benCod,ubiAno,ubiCod,metBenAnoEjeTec, metBenMesEjeTec, updateData, setUpdateData, fetchBeneficiarie) => {
+export const handleDeleteBeneficiarioMeta = async (controller,metAno,metCod,benAno,benCod,ubiAno,ubiCod,metBenAnoEjeTec, metBenMesEjeTec, setUpdate) => {
     Notiflix.Confirm.show(
         'Eliminar Registro',
         '¿Está seguro que quieres eliminar este registro?',
@@ -175,9 +175,8 @@ export const handleDeleteBeneficiarioMeta = async (controller,metAno,metCod,benA
                 }
 
                 Notiflix.Notify.success(data.message);
-                
-                setUpdateData(!updateData);
-                fetchBeneficiarie();
+                console.log(setUpdate)
+                setUpdate(prevUpdate => !prevUpdate);
             } catch (error) {
                 console.error('Error:', error);
             }

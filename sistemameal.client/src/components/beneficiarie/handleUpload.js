@@ -1,4 +1,5 @@
 import ExcelJS from 'exceljs';
+import Notiflix from 'notiflix';
 
 export const expectedHeaders = [
     { display: 'AUTORIZACION_DATOS', dbKey: 'benAutNom', validation: 'descripcion' },
@@ -116,17 +117,17 @@ export const handleUpload = async (file, setTableData, setIsValid, setErrorCells
     // const file = fileInput.current.files[0];
     // Comprueba si el archivo es un Excel
     if (!['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'application/vnd.ms-excel.sheet.macroEnabled.12'].includes(file.type)) {
-        alert('Por favor, sube un archivo Excel habilitado para macros');
+        Notiflix.Notify.failure('Por favor, sube un archivo Excel habilitado para macros');
         return;
     }
     
     // Comprueba el nombre del archivo
     const fileName = file.name;
-    // const expectedFileName = 'GASTO_MENSUAL.xlsm'; // Reemplaza esto con el nombre de archivo esperado
-    // if (fileName !== expectedFileName) {
-    //     alert(`El nombre del archivo debe ser "${expectedFileName}"`);
-    //     return;
-    // }
+    const expectedFileName = 'Plantilla_Registro_Beneficiarios_Masivo.xlsx'; // Reemplaza esto con el nombre de archivo esperado
+    if (fileName.toUpperCase() !== expectedFileName.toUpperCase()) {
+        Notiflix.Notify.failure(`El nombre del archivo debe ser "${expectedFileName}"`);
+        return;
+    }
 
     const reader = new FileReader();
     reader.onload = async function(e) {
@@ -135,10 +136,10 @@ export const handleUpload = async (file, setTableData, setIsValid, setErrorCells
         await workbook.xlsx.load(data);
 
         // Verifica el nombre de la hoja
-        const worksheetName = 'BENEFICIARIO'; // Reemplaza esto con el nombre de tu hoja
+        const worksheetName = 'BENEFICIARIOS'; // Reemplaza esto con el nombre de tu hoja
         const worksheet = workbook.getWorksheet(worksheetName);
         if (!worksheet) {
-            alert(`No se encontró la hoja "${worksheetName}"`);
+            Notiflix.Notify.failure(`No se encontró la hoja "${worksheetName}"`);
             return;
         }
 
@@ -146,7 +147,7 @@ export const handleUpload = async (file, setTableData, setIsValid, setErrorCells
         const newErrorCells = [];
 
         // Fila inicial para empezar a leer
-        let rowNumber = 13;
+        let rowNumber = 10;
         while (rowNumber <= worksheet.rowCount) { // Itera sobre todas las filas
             const row = worksheet.getRow(rowNumber);
 
@@ -182,7 +183,7 @@ export const handleUpload = async (file, setTableData, setIsValid, setErrorCells
                 const validationMessage = validateCell(cellValue, fieldValidationRules);
                 console.log(validationMessage)
                 if (validationMessage !== true) {
-                    newErrorCells.push({ row: rowNumber - 13, column: colNumber - 3,  message: validationMessage});
+                    newErrorCells.push({ row: rowNumber - 10, column: colNumber - 3,  message: validationMessage});
                     setIsValid(false);
                 }
 

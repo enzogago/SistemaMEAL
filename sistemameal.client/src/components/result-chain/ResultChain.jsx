@@ -275,10 +275,12 @@ const ResultChain = () => {
         let cambiosPorImplementador = [];
         let cambiosPorUbicacion = [];
         
+        console.log(renderData)
+        console.log(data)
         // Iterar sobre los datos del formulario
         for (let key in data) {
             // Obtener el valor inicial y el valor actual de la celda
-            let valorInicial = renderData[key] || '';
+            let valorInicial = renderData[key].value || '';
             let valorActual = data[key];
 
             // Si el valor ha cambiado, agregar el cambio al arreglo correspondiente

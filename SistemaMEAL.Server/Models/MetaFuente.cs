@@ -13,6 +13,11 @@ namespace SistemaMEAL.Server.Models
         [Key, Column(Order = 2)]
         public String? MetFueVerNom { get; set; }
         public String? MetFueVerPes { get; set; }
+        public String? ProIde { get; set; }
+        public String? SubProSap { get; set; }
+        public String? ResNum { get; set; }
+        public String? IndActResNum { get; set; }
+
         public String? UsuIng { get; set; }
         public DateTime? FecIng { get; set; }
         public String? UsuMod { get; set; }

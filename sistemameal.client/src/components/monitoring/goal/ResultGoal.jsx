@@ -937,6 +937,7 @@ const ResultGoal = () => {
                                                         }
                                                     }}
                                                     maxLength={10}
+                                                    autoComplete='off'
                                                     {...register(`mes_${String(i+1).padStart(2, '0')}_${row.id}`, { 
                                                         pattern: {
                                                             value: /^(?:[1-9]\d*|)$/,

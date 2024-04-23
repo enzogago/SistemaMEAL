@@ -4,7 +4,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { FaDownload, FaRegFileExcel } from "react-icons/fa";
 import Notiflix from "notiflix";
 import CryptoJS from 'crypto-js';
-import template from '../../templates/MARCO_LOGICO.xlsm';
+import template from '../../templates/PLANTILLA_REGISTRO_BENEFICIARIOS_MASIVO.xlsx';
 import { handleUpload } from "./handleUpload";
 import { StatusContext } from "../../context/StatusContext";
 import InfoGoal from "../monitoring/beneficiarie/InfoGoal";
@@ -36,6 +36,7 @@ const UploadBeneficiarie = () => {
     const [ selectedValues, setSelectedValues ] = useState([]);
     const [ firstEdit, setFirstEdit ] = useState(false);
     const [ openModalGoalExecuting, setOpenModalGoalExecuting] = useState(false);
+    const [update, setUpdate] = useState(false)
 
     // Definición de referencias
     const dragCounter = useRef(0);
@@ -77,7 +78,7 @@ const UploadBeneficiarie = () => {
             // Verificar si el archivo es un Excel
             const file = e.dataTransfer.files[0];
             const fileType = file.name.split('.').pop();
-            if (fileType === 'xlsm') {
+            if (fileType === 'xlsx') {
                 fileInputRef.current.files = e.dataTransfer.files;
                 setSelectedFile(e.dataTransfer.files[0]); // Aquí se actualiza el estado selectedFile
             } else {
@@ -92,7 +93,7 @@ const UploadBeneficiarie = () => {
     };
     const handleFileChange = (event) => {
         console.log(event.target.files[0])
-        if (event.target.files[0].type === 'application/vnd.ms-excel.sheet.macroEnabled.12') {
+        if (event.target.files[0].type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"){
             setSelectedFile(event.target.files[0]);
         } else {
             Notiflix.Notify.failure("Formato no soportado")
@@ -102,7 +103,7 @@ const UploadBeneficiarie = () => {
         fetch(template)
             .then(response => response.blob())
             .then(blob => {
-                saveAs(blob, 'MARCO_LOGICO.xlsm');
+                saveAs(blob, 'PLANTILLA_REGISTRO_BENEFICIARIOS_MASIVO.xlsx');
             });
     }
 
@@ -512,7 +513,7 @@ const UploadBeneficiarie = () => {
                                         ref={fileInputRef} 
                                         style={{display: 'none'}} 
                                         onChange={handleFileChange} 
-                                        accept=".xlsm,application/vnd.ms-excel.sheet.macroEnabled.12"
+                                        accept=".xlsx"
                                     />
                                     <FaRegFileExcel className="Large-f5 w-auto" />
                                     {
@@ -554,6 +555,8 @@ const UploadBeneficiarie = () => {
                 openModal={openModalGoalExecuting}
                 closeModal={closeModalExecuting}
                 metaData={metaData}
+                update={update}
+                setUpdate={setUpdate}
             />
         </>
     )

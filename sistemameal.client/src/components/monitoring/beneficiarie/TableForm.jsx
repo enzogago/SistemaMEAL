@@ -19,7 +19,7 @@ import femenino from '../../../img/PowerMas_Avatar_Femenino.svg';
 
 import ModalEditBeneficiarie from "./ModalEditBeneficiarie";
 
-const TableForm = ({data, openModal, metaData }) => {
+const TableForm = ({data, openModal, metaData, setUpdate }) => {
     if(!openModal) return;
 
     // Variables State AuthContext 
@@ -240,7 +240,7 @@ const TableForm = ({data, openModal, metaData }) => {
                                 data-tooltip-id="delete-tooltip" 
                                 data-tooltip-content="Eliminar" 
                                 className='Large-p_25' 
-                                onClick={() => handleDeleteBeneficiarioMeta('Monitoreo',metaData.metAno,metaData.metCod,benAno,benCod,ubiAno,ubiCod,metBenAnoEjeTec,metBenMesEjeTec, updateData, setUpdateData, fetchBeneficiarie)} 
+                                onClick={() => handleDeleteBeneficiarioMeta('Monitoreo',metaData.metAno,metaData.metCod,benAno,benCod,ubiAno,ubiCod,metBenAnoEjeTec,metBenMesEjeTec, setUpdate)} 
                             />
                         }
                         
@@ -318,8 +318,7 @@ const TableForm = ({data, openModal, metaData }) => {
                     closeModalEdit={closeModalEdit}
                     metaData={metaData}
                     record={currentRecord}
-                    updateData={updateData}
-                    setUpdateData={setUpdateData}
+                    setUpdate={setUpdate}
                 />
             }
         </>
