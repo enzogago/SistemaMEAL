@@ -275,6 +275,7 @@ const ModalProfile = ({openModal, closeModal}) => {
                     }
     
                     Notiflix.Notify.success(data.message);
+                    setUserLogged(dataResult.user);
                 } catch (error) {
                     console.error(error.message);
                 } finally {
@@ -385,7 +386,7 @@ const ModalProfile = ({openModal, closeModal}) => {
                                 onMouseEnter={() => setIsIconVisible(true)} 
                                 onMouseLeave={() => setIsIconVisible(false)}
                             >
-                                <img src={avatar} alt="Descripción de la imagen" />
+                                <img src={Object.keys(userLogged).length && `data:image/jpeg;base64,${userLogged.usuAva}`} alt="Descripción de la imagen" />
                                 {isIconVisible && (
                                     <div className="overlay" onClick={() => setIsUpload(true)}>
                                         <FaEdit />
