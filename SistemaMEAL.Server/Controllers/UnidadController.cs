@@ -28,7 +28,6 @@ namespace SistemaMEAL.Server.Controllers
             if (!rToken.success) return Unauthorized(rToken);
 
             var unidades = _unidades.Listado(identity);
-            Console.WriteLine(unidades);
             return Ok(unidades);
         }
 

@@ -28,7 +28,6 @@ namespace SistemaMEAL.Server.Controllers
             if (!rToken.success) return Unauthorized(rToken);
 
             var cargos = _cargos.Listado(identity);
-            Console.WriteLine(cargos);
             return Ok(cargos);
         }
 

@@ -50,7 +50,7 @@ const Login = () => {
             const clientIp = ipData.ip;
 
 
-            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/usuario/login`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Usuario/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

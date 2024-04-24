@@ -48,7 +48,7 @@ const PermissionUser = () => {
             try {
                 startRequest();
                 const token = localStorage.getItem('token');
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/usuario/${usuAno}/${usuCod}`, {
+                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Usuario/${usuAno}/${usuCod}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

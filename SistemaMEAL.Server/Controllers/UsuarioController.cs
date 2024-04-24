@@ -11,7 +11,7 @@ using SistemaMEAL.Server.Modulos;
 namespace SistemaMEAL.Server.Controllers
 {
     [ApiController]
-    [Route("usuario")]
+    [Route("api/[controller]")]
     public class UsuarioController : ControllerBase
     {
         private readonly UsuarioDAO _usuarios;
@@ -113,6 +113,49 @@ namespace SistemaMEAL.Server.Controllers
             else // Registro modificado correctamente
             {
                 return new OkObjectResult(new { success = true, message });
+            }
+        }
+
+        [HttpPut("profile")]
+        public dynamic ModificarPerfilUsuario(Usuario usuario)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return rToken;
+
+            var (message, messageType, user) = _usuarios.ModificarPerfilUsuario(identity, usuario);
+            if (messageType == "1") // Error
+            {
+                return new BadRequestObjectResult(new { success = false, message });
+            }
+            else if (messageType == "2") // Registro ya existe
+            {
+                return new ConflictObjectResult(new { success = false, message });
+            }
+            else // Registro modificado correctamente
+            {
+                return new OkObjectResult(new { success = true, message, user });
+            }
+        }
+
+        [HttpPost("update-avatar")]
+        public dynamic ModificarAvatarUsuario(Usuario usuario)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+
+            var (message, messageType, user) = _usuarios.ModificarAvatarUsuario(identity, usuario);
+            if (messageType == "1") // Error
+            {
+                return new BadRequestObjectResult(new { success = false, message });
+            }
+            else if (messageType == "2") // Registro ya existe
+            {
+                return new ConflictObjectResult(new { success = false, message });
+            }
+            else // Registro modificado correctamente
+            {
+                return new OkObjectResult(new { success = true, message, user });
             }
         }
 

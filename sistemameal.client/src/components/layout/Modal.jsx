@@ -18,7 +18,7 @@ const Modal = ({ isOpen, closeModal, user }) => {
         try {
             Notiflix.Loading.pulse();
             const token = localStorage.getItem('token');
-            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/usuario/restablecerPassword`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Usuario/restablecerPassword`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

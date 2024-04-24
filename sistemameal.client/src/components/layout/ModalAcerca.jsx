@@ -4,7 +4,7 @@ import { StatusContext } from '../../context/StatusContext';
 // sources
 import logo from '../../img/PowerMas_LogoAyudaEnAccion.svg';
 
-const ModalAcerca = ({ isOpen, closeModal }) => {
+const   ModalAcerca = ({ isOpen, closeModal }) => {
     // variables state de AuthContext
     const { authActions } = useContext(AuthContext);
     const { setIsLoggedIn } = authActions;

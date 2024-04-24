@@ -4,6 +4,7 @@ using SistemaMEAL.Server.Models;
 using System.Data;
 using System.Text;
 using System.Security.Claims;
+using Microsoft.SharePoint.Client;
 
 namespace SistemaMEAL.Server.Modulos
 {
@@ -81,6 +82,178 @@ namespace SistemaMEAL.Server.Modulos
                 cn.getcn.Close();
             }
             return (mensaje, tipoMensaje);
+        }
+
+        public (string? message, string? messageType, Usuario? user) ModificarPerfilUsuario(ClaimsIdentity? identity, Usuario usuario)
+        {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
+            string? mensaje = "";
+            string? tipoMensaje = "";
+            Usuario? user = new Usuario();
+            try
+            {
+                SqlCommand cmd;
+                SqlParameter pDescripcionMensaje;
+                SqlParameter pTipoMensaje;
+
+                cn.getcn.Open();
+
+                // Obtén el primer carácter de usuario.usuNom
+                string? primerCaracterUsuNom = usuario.UsuNom?.Substring(0, 1);
+
+                // Obtén la primera palabra de usuario.usuApe
+                string? primeraPalabraUsuApe = usuario.UsuApe?.Split(' ')[0];
+
+                // Concatena el primer carácter de usuario.usuNom y la primera palabra de usuario.usuApe
+                string usuNomUsu = primerCaracterUsuNom + primeraPalabraUsuApe;
+
+                cmd = new SqlCommand("SP_MODIFICAR_PERFIL_USUARIO", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                // Aquí debes agregar todos los parámetros que necesita tu procedimiento almacenado
+                cmd.Parameters.AddWithValue("@P_USUANO", usuario.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD", usuario.UsuCod);
+                cmd.Parameters.AddWithValue("@P_DOCIDECOD", usuario.DocIdeCod);
+                cmd.Parameters.AddWithValue("@P_USUNUMDOC", usuario.UsuNumDoc);
+                cmd.Parameters.AddWithValue("@P_USUNOM", usuario.UsuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE", usuario.UsuApe);
+                cmd.Parameters.AddWithValue("@P_USUFECNAC", usuario.UsuFecNac);
+                cmd.Parameters.AddWithValue("@P_USUTEL", usuario.UsuTel);
+                cmd.Parameters.AddWithValue("@P_USUNOMUSU", usuNomUsu);
+                cmd.Parameters.AddWithValue("@P_CARCOD", usuario.CarCod);
+                cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+
+                cmd.ExecuteNonQuery();
+
+                mensaje = pDescripcionMensaje.Value.ToString();
+                tipoMensaje = pTipoMensaje.Value.ToString();
+
+                cmd = new SqlCommand("SP_BUSCAR_USUARIO_AUTH", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@Ano", usuario.UsuAno);
+                cmd.Parameters.AddWithValue("@Cod", usuario.UsuCod);
+
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (!reader.HasRows)
+                {
+                    jsonResult.Append("[]");
+                }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                // Deserializa la cadena JSON en una lista de objetos Usuario
+                List<Usuario>? usuarios = JsonConvert.DeserializeObject<List<Usuario>>(jsonResult.ToString());
+                if (usuarios?.Count > 0)
+                {
+                    user = usuarios[0];
+                }
+            }
+            catch (SqlException ex)
+            {
+                tipoMensaje = "1";
+                mensaje = ex.Message;
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return (mensaje, tipoMensaje, user);
+        }
+
+        public (string? message, string? messageType, Usuario? user) ModificarAvatarUsuario(ClaimsIdentity? identity, Usuario usuario)
+        {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
+            string? mensaje = "";
+            string? tipoMensaje = "";
+            Usuario? user = new Usuario();
+            try
+            {
+                SqlCommand cmd;
+                SqlParameter pDescripcionMensaje;
+                SqlParameter pTipoMensaje;
+
+                cn.getcn.Open();
+
+                cmd = new SqlCommand("SP_MODIFICAR_AVATAR_USUARIO", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                // Aquí debes agregar todos los parámetros que necesita tu procedimiento almacenado
+                cmd.Parameters.AddWithValue("@P_USUANO", usuario.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD", usuario.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUAVA", usuario.UsuAva);
+                cmd.Parameters.AddWithValue("@P_USUMOD", "");
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "");
+                cmd.Parameters.AddWithValue("@P_USUANO_U", "");
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", "");
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", "");
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", "");
+
+                pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+
+                cmd.ExecuteNonQuery();
+
+                mensaje = pDescripcionMensaje.Value.ToString();
+                tipoMensaje = pTipoMensaje.Value.ToString();
+
+                cmd = new SqlCommand("SP_BUSCAR_USUARIO_AUTH", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@Ano", usuario.UsuAno);
+                cmd.Parameters.AddWithValue("@Cod", usuario.UsuCod);
+
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (!reader.HasRows)
+                {
+                    jsonResult.Append("[]");
+                }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                // Deserializa la cadena JSON en una lista de objetos Usuario
+                List<Usuario>? usuarios = JsonConvert.DeserializeObject<List<Usuario>>(jsonResult.ToString());
+                if (usuarios?.Count > 0)
+                {
+                    user = usuarios[0];
+                }
+            }
+            catch (SqlException ex)
+            {
+                tipoMensaje = "1";
+                mensaje = ex.Message;
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return (mensaje, tipoMensaje, user);
         }
 
         public (string? message, string? messageType, string? usuAnoOut, string? usuCodOut) Insertar(ClaimsIdentity? identity, Usuario usuario)

@@ -3,7 +3,7 @@ import CryptoJS from 'crypto-js';
 import { Send_Email_New_User } from "../auth/PowerMas_EmailJs";
 
 export const handleSubmit = async (data, isEditing, navigate, safeCiphertext) => {
-    const url = isEditing ? `${import.meta.env.VITE_APP_API_URL}/usuario/${data.usuAno}/${data.usuCod}` : `${import.meta.env.VITE_APP_API_URL}/usuario`;
+    const url = isEditing ? `${import.meta.env.VITE_APP_API_URL}/api/Usuario/${data.usuAno}/${data.usuCod}` : `${import.meta.env.VITE_APP_API_URL}/api/Usuario`;
     const method = isEditing ? 'PUT' : 'POST';
 
     try {
@@ -61,7 +61,7 @@ export const handleDelete = async (ano, cod, setData) => {
         'Sí',
         'No',
         async () => {
-            const url = `${import.meta.env.VITE_APP_API_URL}/usuario/${ano}/${cod}`;
+            const url = `${import.meta.env.VITE_APP_API_URL}/api/Usuario/${ano}/${cod}`;
 
             const token = localStorage.getItem('token');
 
@@ -81,7 +81,7 @@ export const handleDelete = async (ano, cod, setData) => {
                 Notiflix.Notify.success(data.message);
                 
                 // Actualiza los datos después de eliminar un registro
-                const updateResponse = await fetch(`${import.meta.env.VITE_APP_API_URL}/usuario`, {
+                const updateResponse = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Usuario`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

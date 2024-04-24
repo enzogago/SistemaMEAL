@@ -221,21 +221,7 @@ export const initPhoneInput = (inputRef, setIsValid, setTelefono, setErrorMessag
     inputRef.current.addEventListener('countrychange', function() {
         setIsValid(false)
         const countryData = phoneInput.getSelectedCountryData();
-        let maxLength;
-        switch (countryData.iso2) {
-            case 'pe':  // Perú
-                maxLength = 11;  
-                break;
-            case 'ec':  // Ecuador
-                maxLength = 12;  
-                break;
-            case 'co':  // Colombia
-                maxLength = 11;
-                break;
-            default:
-                maxLength = 15;  // Valor por defecto
-        }
-        inputRef.current.setAttribute('maxLength', maxLength);
+        console.log(countryData)
     });
 
     inputRef.current.addEventListener('input', function() {

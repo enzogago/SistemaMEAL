@@ -14,13 +14,13 @@ const ForgotPassword = () => {
         try {
             Notiflix.Loading.pulse('Cargando...');
             // Obtenemos los datos
-            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/usuario/forgot-password/${dataForm.usuCorEle}`);
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Usuario/forgot-password/${dataForm.usuCorEle}`);
             const data = await response.json();
             if (data.length > 0) {
                 const { usuAno, usuCod, usuNom, usuApe, usuFecNac, usuCorEle } = data[0];
                 const password = (usuNom.charAt(0) + usuApe.split(' ')[0] + usuFecNac.slice(-4)).toLowerCase();
                 console.log(password)
-                const response2 = await fetch(`${import.meta.env.VITE_APP_API_URL}/usuario/forgot-restablecer`, {
+                const response2 = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Usuario/forgot-restablecer`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'

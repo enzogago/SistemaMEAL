@@ -59,7 +59,7 @@ const FormGoal = () => {
             const token = localStorage.getItem('token');
             
             // Obtenemos los datos
-            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/usuario/tecnico`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Usuario/tecnico`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }

@@ -53,6 +53,7 @@ namespace SistemaMEAL.Server.Models
         public String? UbiCod { get; set; }
         public String? UbiNom { get; set; }
 
+        public byte[]? UsuAva { get; set; }
         public String? Ip { get; set; }
         public String? UsuIng { get; set; }
 

@@ -12,7 +12,7 @@ const User = () => {
             try {
                 Notiflix.Loading.pulse('Cargando...');
                 const token = localStorage.getItem('token');
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/usuario`, {
+                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Usuario`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

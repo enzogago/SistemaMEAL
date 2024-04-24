@@ -14,13 +14,14 @@ import CryptoJS from 'crypto-js';
 import masculino from '../../img/PowerMas_Avatar_Masculino.svg';
 import femenino from '../../img/PowerMas_Avatar_Femenino.svg';
 import Logo from '../../img/PowerMas_LogoAyudaEnAccion.png';
+import ModalProfile from './ModalProfile';
 
 const Bar = ({showSidebarAndBar}) => {
     const navigate = useNavigate();
     // Variables state AuthContext
     const { authInfo, authActions } = useContext(AuthContext);
     const { userLogged } = authInfo;
-
+    console.log(userLogged)
     const { setUserLogged } = authActions;
     // Variables State statusContext
     const { statusActions } = useContext(StatusContext);
@@ -28,6 +29,7 @@ const Bar = ({showSidebarAndBar}) => {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isModalAcercaOpen, setIsModalAcercaOpen] = useState(false);
+    const [isOpenModalProfile, setIsOpenModalProfile] = useState(false);
     
     // Funciones para abrir y cerrar los modales
     const openModal = (estado = null) => {
@@ -48,6 +50,10 @@ const Bar = ({showSidebarAndBar}) => {
         setIsModalAcercaOpen(false);
     };
 
+    const closeModalProfile = () => {
+        setIsOpenModalProfile(false);
+    };
+
     // Estado para rastrear si el menú está abierto
     const [isOpen, setIsOpen] = useState(false);
 
@@ -65,6 +71,10 @@ const Bar = ({showSidebarAndBar}) => {
 
     const CambiarContraseña = () => {
         openModal();
+        setIsOpen(false);
+    }
+    const editarPerfil = () => {
+        setIsOpenModalProfile(true);
         setIsOpen(false);
     }
     const AcercDe = () => {
@@ -101,7 +111,7 @@ const Bar = ({showSidebarAndBar}) => {
                 }
                 <div className="PowerMas_ProfileContainer">
                     <div className="PowerMas_ProfilePicture">
-                        <img src={Object.keys(userLogged).length && (userLogged.usuSex === 'M' ? masculino : femenino)} alt="Descripción de la imagen" />
+                        <img src={Object.keys(userLogged).length && `data:image/jpeg;base64,${userLogged.usuAva}`} alt="Descripción de la imagen" />
                     </div>
                     {
                         showSidebarAndBar &&
@@ -119,7 +129,7 @@ const Bar = ({showSidebarAndBar}) => {
                     {isOpen && (
                         <div className={`Medium_2 Phone_6 PowerMas_DropdownMenu ${isOpen ? 'PowerMas_DropdownMenu--open' : ''}`}>
                             <div className='PowerMas_Profile_Name p_75 flex flex-column jc-center ai-center gap_5'> 
-                                <div className="PowerMas_ProfilePicture2">
+                                <div className="PowerMas_ProfilePicture2" style={{width: '75px'}}>
                                     <img src={userLogged && (userLogged.usuSex === 'M' ? masculino : femenino)} alt="Descripción de la imagen" />
                                 </div>
                                 <p style={{textTransform: 'capitalize'}} className='color-black'>Hola, {userLogged ? `${userLogged.usuNom.toLowerCase()}` : ''}</p>
@@ -128,7 +138,7 @@ const Bar = ({showSidebarAndBar}) => {
                             {
                                 showSidebarAndBar &&
                                 <>
-                                    <Link className='flex ai-center p_25' onClick={() => setIsOpen(false)} to={`/profile/${encryptId(`${userLogged.usuAno}${userLogged.usuCod}`)}`}>
+                                    <Link className='flex ai-center p_25' onClick={editarPerfil}>
                                         <FaUserAlt className='w-auto m_5' />
                                         <span className='flex'>Perfil</span>
                                     </Link>
@@ -163,6 +173,10 @@ const Bar = ({showSidebarAndBar}) => {
                 <ModalAcerca 
                     isOpen={isModalAcercaOpen}
                     closeModal={closeModalAcerca}
+                />
+                <ModalProfile 
+                    openModal={isOpenModalProfile}
+                    closeModal={closeModalProfile}
                 />
             </div>
         </div>

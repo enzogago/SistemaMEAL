@@ -19,7 +19,7 @@ const AuthState = ({ children }) => {
         try {
             const token = localStorage.getItem('token');
             if(!token) return;
-            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/usuario/perfil`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Usuario/perfil`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
