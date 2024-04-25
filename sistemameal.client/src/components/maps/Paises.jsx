@@ -73,18 +73,18 @@ const Paises = ({mapData, beneficiariosData}) => {
                 return `
                 <div style="z-index: 100;">
                     <p class="center Large-f1_25 bold">${d.name}</p>
-                    <p>Beneficiarios: ${formatter.format(Number(cantidad))} </p>
+                    <p>Beneficiarios: ${formatter.format(Number(25013))} </p>
                     <p>Atenciones: ${formatter.format(metEjeTec)}</p>
                     <hr style="border:1px solid #fff;margin: 0.5rem 0" />
                     <p class="" style="text-decoration: underline;">Técnico</p>
                     <p>Meta: ${formatter.format(metMetTec)} </p>
                     <p>Ejecución: ${formatter.format(metEjeTec)} </p>
-                    <p>Avance: ${formatNumber(metPorAvaTec)}% </p>
+                    <p>Avance: ${formatNumber(metEjeTec/metMetTec*100)}% </p>
                     <hr style="border:1px solid #fff;margin: 0.5rem 0" />
                     <p style="text-decoration: underline;">Presupuesto</p>
-                    <p>Meta: $${formatter.format(metMetPre)} </p>
-                    <p>Ejecución: $${formatter.format(metEjePre)} </p>
-                    <p>Avance: ${formatNumber(metPorAvaPre)}% </p>
+                    <p>Meta: $${formatter.format(4500)} </p>
+                    <p>Ejecución: $${formatter.format(2800)} </p>
+                    <p>Avance: ${formatNumber(2800/4500*100)}% </p>
                 </div>
                 `;
             });

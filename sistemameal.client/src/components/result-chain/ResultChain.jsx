@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { FaSortDown } from 'react-icons/fa';
+// import { FaSortDown } from 'react-icons/fa';
 import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
 import { Export_Excel_Basic, fetchData } from '../reusable/helper';
 import { useForm } from 'react-hook-form';
@@ -429,7 +429,7 @@ const ResultChain = () => {
                     )}
                 </div>
                 <div className={`PowerMas_Dropdown_Export Large_3 Large-m_25 ${dropdownOpen ? 'open' : ''}`}>
-                    <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>Exportar <FaSortDown className='Large_1' /></button>
+                    <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>Exportar <IconCalendar className='Large_1' /></button>
                     <div className="PowerMas_Dropdown_Export_Content Phone_12">
                         <a onClick={() => {
                             Export_Excel();

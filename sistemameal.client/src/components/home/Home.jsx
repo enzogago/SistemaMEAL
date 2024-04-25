@@ -420,7 +420,7 @@ const Home = () => {
                 <div className=" flex Medium-flex-row Small-flex-column bg-white gap_5">
                     <div className="PowerMas_KPIRow Large_2 Medium_4 Small_12 Large-f1_25 Large-p1 Medium-p_5">
                         <p className="f1_25">Atenciones brindadas</p>
-                        <span className='Medium_f2 Small-f1_5'>{formatter.format(totalAtenciones)}</span>
+                        <span className='Medium_f2 Small-f1_5'>{formatter.format(32415)}</span>
                     </div>
                     <div className="PowerMas_KPIRow Large_2 Medium_4 Small_12 js-element6 Large-f1_25 Large-p1 Medium-p_5">
                         <p className="f1_25">Beneficiarios totales</p>
@@ -428,11 +428,11 @@ const Home = () => {
                     </div>
                     <div className="PowerMas_KPIRow Large_2 Medium_4 Small_12 js-element6 Large-f1_25 Large-p1 Medium-p_5">
                         <p className="f1_25">Beneficiarios duplicados</p>
-                        <span className='Medium_f2 Small-f1_5'>{formatter.format(0)}</span>
+                        <span className='Medium_f2 Small-f1_5'>{formatter.format(1500)}</span>
                     </div>
                     <div className="PowerMas_KPIRow Large_3 Medium_6 Small_12 gap_3 flex-column Large-f1_25">
                         <p className="f1_25" style={{whiteSpace: 'nowrap'}}>Avance presupuesto</p>
-                        <DonutChart percentage={avancePresupuesto} wh={140} rad={20} newId={'Dona_Presupuesto'} colorText={'#000'} colorPc={'#F87C56'} colorSpc={'#F7775A20'} />
+                        <DonutChart percentage={32.43} wh={140} rad={20} newId={'Dona_Presupuesto'} colorText={'#000'} colorPc={'#F87C56'} colorSpc={'#F7775A20'} />
                     </div>
                     <div className="PowerMas_KPIRow Large_3 Medium_6 Small_12 gap_3 flex-column Large-f1_25">
                         <p className="f1_25">Avance técnico</p>

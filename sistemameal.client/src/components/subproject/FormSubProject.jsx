@@ -614,7 +614,7 @@ const FormSubProject = () => {
                     </div>
                     <div className="m_75">
                         <label className="">
-                            Codigo de financiación
+                            Financiador principal
                         </label>
                         <input 
                             id="subProSap"
@@ -624,24 +624,24 @@ const FormSubProject = () => {
                             maxLength={10} 
                             name="subProSap" 
                             autoComplete='off'
-                            onInput={(event) => {
-                                // Reemplaza cualquier carácter que no sea un número por una cadena vacía
-                                event.target.value = event.target.value.replace(/[^0-9]/g, '');
-                            }}
+                            // onInput={(event) => {
+                            //     // Reemplaza cualquier carácter que no sea un número por una cadena vacía
+                            //     event.target.value = event.target.value.replace(/[^0-9]/g, '');
+                            // }}
                             {...register('subProSap', {
                                 required: 'El campo es requerido',
                                 minLength: {
-                                    value: 6,
-                                    message: 'El campo debe tener al menos 6 dígitos'
+                                    value: 3,
+                                    message: 'El campo debe tener al menos 3 dígitos'
                                 },
                                 maxLength: {
-                                    value: 10,
-                                    message: 'El campo no debe tener más de 10 dígitos'
+                                    value: 30,
+                                    message: 'El campo no debe tener más de 30 dígitos'
                                 },
                                 pattern: {
-                                    value: /^[0-9]*$/,
-                                    message: 'El campo solo debe contener números'
-                                }
+                                    value: /^[A-Za-zñÑáéíóúÁÉÍÓÚüÜ/\s-_]+$/,
+                                    message: 'Por favor, introduce solo letras y espacios',
+                                },
                             })}
                         />
                         {errors.subProSap ? (

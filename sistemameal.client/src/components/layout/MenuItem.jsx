@@ -1,8 +1,29 @@
-import * as Icons from "react-icons/fa";
-import { Link, NavLink, useMatch } from "react-router-dom";
+import { NavLink, useMatch } from "react-router-dom";
+import FaProjectDiagram from "../../icons/FaProjectDiagram";
+import FaMaitenance from "../../icons/FaMaitenance";
+import FaWatchmanMonitoring from "../../icons/FaWatchmanMonitoring";
+import FaMoneyCheckAlt from "../../icons/FaMoneyCheckAlt";
+import FaShieldAlt from "../../icons/FaShieldAlt";
+import FaRegObjectGroup from "../../icons/FaRegObjectGroup";
+import FaFlag from "../../icons/FaFlag";
+import FaMosque from "../../icons/FaMosque";
+import FaSquare from "../../icons/FaSquare";
 
-const MenuItem = ({ menu, level, closeSidebar }) => {
-    const IconName = Icons[menu.menIco.trim()];
+const componentMap = {
+    'FaProjectDiagram': FaProjectDiagram,
+    'FaMaitenance': FaMaitenance,
+    'FaWatchmanMonitoring': FaWatchmanMonitoring,
+    'FaMoneyCheckAlt': FaMoneyCheckAlt,
+    'FaShieldAlt': FaShieldAlt,
+    'FaRegObjectGroup': FaRegObjectGroup,
+    'FaFlag': FaFlag,
+    'FaMosque': FaMosque,
+    'FaSquare': FaSquare
+};
+
+
+const MenuItem = ({ menu, level }) => {
+    const Icono  = componentMap[menu.menIco.trim()];
 
     const match = useMatch(menu.menRef === '#' || menu.menRef === '' ? '#' : `/${menu.menRef}`);
     const isActive = match ? 'PowerMas_Active_Menu' : '';
@@ -23,7 +44,9 @@ const MenuItem = ({ menu, level, closeSidebar }) => {
                     to={menu.menRef === '#' || menu.menRef === '' ? '#' : `${menu.menRef}`}
                     target={isDashboard ? '_blank' : '_self'}
                 >
-                    {IconName && <IconName style={{marginLeft: '1rem'}} />}
+                    <span style={{marginLeft: '1rem'}} >
+                    {Icono && <Icono />}
+                    </span>
                     <span className={`  Medium-f_75 Small-f_75`} style={{fontSize: `${level == 1 ? '16px': '14px'}`}}> {menu.menNom} </span>
                 </NavLink>
                 {menu.subMenus.length > 0 && <span className="arrow Large_1 flex ai-center jc-center" style={{padding: '0 10px'}}> &gt; </span>}

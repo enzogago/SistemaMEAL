@@ -135,7 +135,7 @@ const Bar = ({showSidebarAndBar, isOpen, setIsOpen}) => {
                         <div className={`Medium_2 Phone_6 PowerMas_DropdownMenu ${isOpen ? 'PowerMas_DropdownMenu--open' : ''}`}>
                             <div className='PowerMas_Profile_Name p_75 flex flex-column jc-center ai-center gap_5'> 
                                 <div className="PowerMas_ProfilePicture2" style={{width: '75px'}}>
-                                    <img src={userLogged && (userLogged.usuSex === 'M' ? masculino : femenino)} alt="Descripción de la imagen" />
+                                    <img src={userLogged && `data:image/jpeg;base64,${userLogged.usuAva}`} alt="Descripción de la imagen" />
                                 </div>
                                 <p style={{textTransform: 'capitalize'}} className='color-black'>Hola, {userLogged ? `${userLogged.usuNom.toLowerCase()}` : ''}</p>
                             </div>

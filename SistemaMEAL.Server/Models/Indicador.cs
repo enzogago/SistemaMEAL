@@ -16,6 +16,7 @@ namespace SistemaMEAL.Server.Models
         public String? TipValCod { get; set; }
         public String? TipValNom { get; set; }
         public String? IndTipInd { get; set; }
+        public String? IndTotPre { get; set; }
         public String? UsuIng { get; set; }
         public DateTime? FecIng { get; set; }
         public String? UsuMod { get; set; }

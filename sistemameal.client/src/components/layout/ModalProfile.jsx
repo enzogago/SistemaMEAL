@@ -8,6 +8,8 @@ import Notiflix from 'notiflix';
 import { FaEdit, FaRegFileExcel } from 'react-icons/fa';
 import ImageCropper from './ImageCropper';
 import imageCompression from 'browser-image-compression';
+import masculino from '../../img/PowerMas_Avatar_Masculino.svg';
+
 
 const ModalProfile = ({openModal, closeModal}) => {
     const { authInfo, authActions } = useContext(AuthContext);
@@ -240,7 +242,7 @@ const ModalProfile = ({openModal, closeModal}) => {
                 // Opciones de compresión
                 const options = {
                     maxSizeMB: 0.1, // (max file size in MB)
-                    maxWidthOrHeight: 125, // compressed file has width or height maximum 1920px
+                    maxWidthOrHeight: 200, // compressed file has width or height maximum 1920px
                     useWebWorker: true,
                 };
     
@@ -309,28 +311,28 @@ const ModalProfile = ({openModal, closeModal}) => {
                         ×
                     </span>
                 </header>
-                <section className='flex ai-center jc-center flex-column flex-grow-1 Large-p1_5 Large-gap-1 overflow-auto'>
-                    <div className='relative'>
+                <section className='Large_12 flex ai-center jc-center flex-column flex-grow-1 Large-p1_5 Large-gap-1 overflow-auto'>
+                    <div className='relative flex ai-center jc-center Large_12'>
                         {
                             isUpload ?
                             <>
                                 {
                                     selectedFile ?
-                                        <>
+                                        <div className='Large_12'>
                                         
                                         <ImageCropper 
                                             imageSrc={URL.createObjectURL(selectedFile)} 
                                             setCropper={setCropper}
                                         />
-                                        <div className='Phone_12 flex ai-center jc-space-between p_25'>
-                                            <button className='PowerMas_Buttom_Secondary p_25' onClick={() => setSelectedFile(null)}>
+                                        <div className='Phone_12 flex ai-center jc-center gap_5 p_25'>
+                                            <button className='PowerMas_Buttom_Secondary Large_3 p_25' onClick={() => setSelectedFile(null)}>
                                                 Cancelar
                                             </button>
-                                            <button className='PowerMas_Buttom_Primary p_25' onClick={handleSubmitImage}>
+                                            <button className='PowerMas_Buttom_Primary Large_3 p_25' onClick={handleSubmitImage}>
                                                 Guardar
                                             </button>
                                         </div>
-                                        </>
+                                        </div>
                                     :
                                     <>
                                         <div
@@ -349,7 +351,7 @@ const ModalProfile = ({openModal, closeModal}) => {
                                                 onChange={handleFileChange} 
                                                 accept=".jpg,.jpeg"
                                             />
-                                            <FaRegFileExcel className="Large-f5 w-auto" />
+                                            <img src={masculino}  className="Large_4" />
                                             {
                                                 dragging ?
                                                 <p className='f_75'>Suelta el archivo aquí</p>
