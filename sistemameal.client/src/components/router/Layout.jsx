@@ -2,6 +2,7 @@ import { useLocation } from 'react-router-dom';
 import Bar from "../layout/Bar";
 import Sidebar from "../layout/Sidebar";
 import { Tooltip } from 'react-tooltip';
+import { useEffect, useState } from 'react';
 
 const Layout = ({ children }) => {
     const location = useLocation();
@@ -50,6 +51,22 @@ const Layout = ({ children }) => {
             //     );
         }
     };
+
+    const [isOpen, setIsOpen] = useState(false);
+    useEffect(() => {
+        // Función para manejar el clic en el documento
+        const handleDocumentClick = () => {
+            setIsOpen(false); // Cierra el menú cuando se hace clic fuera de él
+        };
+
+        // Agrega el event listener cuando el componente se monta
+        document.addEventListener('click', handleDocumentClick);
+
+        // Limpia el event listener cuando el componente se desmonta
+        return () => {
+            document.removeEventListener('click', handleDocumentClick);
+        };
+    }, []); 
     
 
     return(
@@ -59,7 +76,7 @@ const Layout = ({ children }) => {
                 <>
                     <Sidebar />
                     <div className="PowerMas_MainRender Large_10 Medium_9 Small_12">
-                        <Bar showSidebarAndBar={true} />
+                        <Bar showSidebarAndBar={true} isOpen={isOpen} setIsOpen={setIsOpen} />
                         <section className="PowerMas_Content Large-m1">
                             {children}
                         </section>
@@ -67,7 +84,7 @@ const Layout = ({ children }) => {
                 </>
                 :
                 <div className='flex flex-column Large_12'>
-                    <Bar showSidebarAndBar={showSidebarAndBar} />
+                    <Bar showSidebarAndBar={showSidebarAndBar} isOpen={isOpen} setIsOpen={setIsOpen} />
                     {children}
                 </div>
             }

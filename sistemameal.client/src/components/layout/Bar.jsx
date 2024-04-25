@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import avatar from '../../img/avatar.jpeg';
 import { AuthContext } from '../../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
@@ -16,7 +16,7 @@ import femenino from '../../img/PowerMas_Avatar_Femenino.svg';
 import Logo from '../../img/PowerMas_LogoAyudaEnAccion.png';
 import ModalProfile from './ModalProfile';
 
-const Bar = ({showSidebarAndBar}) => {
+const Bar = ({showSidebarAndBar, isOpen, setIsOpen}) => {
     const navigate = useNavigate();
     // Variables state AuthContext
     const { authInfo, authActions } = useContext(AuthContext);
@@ -54,11 +54,9 @@ const Bar = ({showSidebarAndBar}) => {
         setIsOpenModalProfile(false);
     };
 
-    // Estado para rastrear si el menú está abierto
-    const [isOpen, setIsOpen] = useState(false);
-
     // Función para manejar el clic en el icono
-    const handleIconClick = () => {
+    const handleIconClick = (e) => {
+        e.stopPropagation(); // Previene que el evento de click se propague al documento
         setIsOpen(!isOpen);
     };
 
@@ -82,14 +80,21 @@ const Bar = ({showSidebarAndBar}) => {
         setIsOpen(false);
     }
 
-    // Función para encriptar el ID del usuario
-    const encryptId = (id) => {
-        // Encripta el ID
-        const ciphertext = CryptoJS.AES.encrypt(id, 'secret key 123').toString();
-        // Codifica la cadena cifrada para que pueda ser incluida de manera segura en una URL
-        const safeCiphertext = btoa(ciphertext).replace('+', '-').replace('/', '_').replace(/=+$/, '');
-        return safeCiphertext;
-    }
+
+    useEffect(() => {
+        // Función para manejar el clic en el documento
+        const handleDocumentClick = () => {
+            setIsOpen(false); // Cierra el menú cuando se hace clic fuera de él
+        };
+
+        // Agrega el event listener cuando el componente se monta
+        document.addEventListener('click', handleDocumentClick);
+
+        // Limpia el event listener cuando el componente se desmonta
+        return () => {
+            document.removeEventListener('click', handleDocumentClick);
+        };
+    }, []); // Dependencias vacías para que se ejecute solo al montar y desmontar
 
     return (
         <div style={{backgroundColor: '#fff', boxShadow: 'inset 10px 0px 10px rgba(0, 0, 0, 0.2)'}}>

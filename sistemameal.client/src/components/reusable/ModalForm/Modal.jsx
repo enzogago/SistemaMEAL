@@ -90,7 +90,7 @@ const Modal = ({ estadoEditado, modalVisible, setModalVisible, closeModal, setDa
                     if (formField === 'color') {
                         setColor(value);
                     } else {
-                        value = value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+                        value = value.charAt(0).toUpperCase() + value.slice(1);
                     }
                     setValue(formField, value);
                 }

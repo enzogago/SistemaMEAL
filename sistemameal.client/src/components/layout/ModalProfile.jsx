@@ -27,6 +27,9 @@ const ModalProfile = ({openModal, closeModal}) => {
     const [errorMessage, setErrorMessage] = useState('');
     const [isTouched, setIsTouched] = useState(false);
 
+     // Estado para almacenar la referencia a Cropper
+  const [cropper, setCropper] = useState(null);
+
     const fetchDataReturn = async (controller) => {
         try {
             Notiflix.Loading.pulse('Cargando...');
@@ -158,10 +161,8 @@ const ModalProfile = ({openModal, closeModal}) => {
     };
 
     // Definición de funciones de manejo de archivos
-
     const [ dragging, setDragging ] = useState(false);
     const [ selectedFile, setSelectedFile ] = useState(null);
-    const [ croppedImage, setCroppedImage ] = useState(null);
 
     // Definición de referencias
     const dragCounter = useRef(0);
@@ -222,50 +223,50 @@ const ModalProfile = ({openModal, closeModal}) => {
         fileInputRef.current.click();
     };
 
-
-    const updateImage = async () => {
+    const handleSubmitImage = async () => {
         try {
-            // Aquí tienes los datos del archivo
-            const dataUrl = croppedImage;
+            Notiflix.Loading.pulse();
     
-            // Convierte dataUrl a File
-            const response = await fetch(dataUrl);
-            let file = await response.blob();
-            file = new File([file], "FileName.jpg", { type: "image/jpeg" });
+            // Si hay una imagen seleccionada para recortar
+            if (selectedFile && cropper) {
+                // Recorta la imagen
+                const croppedImageDataURL = cropper.getCroppedCanvas().toDataURL();
     
-            // Opciones de compresión
-            const options = {
-                maxSizeMB: 0.1, // (max file size in MB)
-                maxWidthOrHeight: 125, // compressed file has width or height maximum 1920px
-                useWebWorker: true,
-            };
+                // Convierte dataUrl a File
+                const response = await fetch(croppedImageDataURL);
+                let file = await response.blob();
+                file = new File([file], "FileName.jpg", { type: "image/jpeg" });
     
-            // Comprime la imagen
-            const compressedFile = await imageCompression(file, options);
-    
-            // Lee el archivo comprimido
-            const reader = new FileReader();
-            reader.onloadend = async () => {
-                // Extrae los datos de la URL de los datos
-                const fileData = reader.result.split(',')[1];
-    
-                const dataAvatar = {
-                    usuAno,
-                    usuCod,
-                    usuAva: fileData,
+                // Opciones de compresión
+                const options = {
+                    maxSizeMB: 0.1, // (max file size in MB)
+                    maxWidthOrHeight: 125, // compressed file has width or height maximum 1920px
+                    useWebWorker: true,
                 };
     
-                console.log(dataAvatar);
+                // Comprime la imagen
+                const compressedFile = await imageCompression(file, options);
     
-                try {
-                    Notiflix.Loading.pulse();
+                // Lee el archivo comprimido
+                const reader = new FileReader();
+                reader.onloadend = async () => {
+                    // Extrae los datos de la URL de los datos
+                    const fileData = reader.result.split(',')[1];
+    
+                    const dataAvatar = {
+                        usuAno,
+                        usuCod,
+                        usuAva: fileData,
+                    };
+    
+                    console.log(dataAvatar);
     
                     const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Usuario/update-avatar`, {
                         method: 'POST',
                         body: JSON.stringify(dataAvatar),
                         headers: { 'Content-Type': 'application/json' },
                     });
-        
+    
                     const data = await response.json();
     
                     if (!response.ok) {
@@ -275,18 +276,20 @@ const ModalProfile = ({openModal, closeModal}) => {
                     }
     
                     Notiflix.Notify.success(data.message);
-                    setUserLogged(dataResult.user);
-                } catch (error) {
-                    console.error(error.message);
-                } finally {
-                    Notiflix.Loading.remove();
-                }
-            };
-            reader.readAsDataURL(compressedFile);
+                    setUserLogged(data.user);
+                    setSelectedFile(null);
+                    setIsUpload(false);
+                };
+                reader.readAsDataURL(compressedFile);
+            }
+    
         } catch (error) {
-            console.error(error);
+            console.error('Error:', error);
+        } finally {
+            Notiflix.Loading.remove();
         }
     };
+    
     
 
     return (
@@ -317,11 +320,13 @@ const ModalProfile = ({openModal, closeModal}) => {
                                         
                                         <ImageCropper 
                                             imageSrc={URL.createObjectURL(selectedFile)} 
-                                            onCrop={setCroppedImage}
-                                            setSelectedFile={setSelectedFile}
+                                            setCropper={setCropper}
                                         />
-                                        <div className='Phone_12 flex ai-center jc-center'>
-                                            <button className='PowerMas_Buttom_Primary p_5' onClick={updateImage}>
+                                        <div className='Phone_12 flex ai-center jc-space-between p_25'>
+                                            <button className='PowerMas_Buttom_Secondary p_25' onClick={() => setSelectedFile(null)}>
+                                                Cancelar
+                                            </button>
+                                            <button className='PowerMas_Buttom_Primary p_25' onClick={handleSubmitImage}>
                                                 Guardar
                                             </button>
                                         </div>
@@ -367,12 +372,6 @@ const ModalProfile = ({openModal, closeModal}) => {
                                         >
                                             x
                                         </span>
-                                        <br />
-                                        <div className='Phone_12 flex ai-center jc-center'>
-                                            <button className='PowerMas_Buttom_Primary p_5' onClick={updateImage}>
-                                                Guardar
-                                            </button>
-                                        </div>
                                     </>
                                 }
                             </>

@@ -55,17 +55,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
     // Efecto al editar estado
     useEffect(() => {
         if (estadoEditado) {
-            let newData = {};
-            for (let key in estadoEditado) {
-                if (typeof estadoEditado[key] === 'string') {
-                    // Convierte cada cadena a minúsculas
-                    newData[key] = estadoEditado[key].trim().toLowerCase();
-                } else {
-                    // Mantiene los valores no string tal como están
-                    newData[key] = estadoEditado[key];
-                }
-            }
-            reset(newData);
+            reset(estadoEditado);
         }
     }, [estadoEditado, reset, setValue]);
 
@@ -93,7 +83,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                                 'finIde', { 
                                     required: 'el campo es requerido',
                                     maxLength: { value: 7, message: 'El campo no puede tener más de 7 caracteres' },
-                                    minLength:  { value: 6, message: 'El campo no puede tener menos de 6 caracteres' },
+                                    minLength:  { value: 4, message: 'El campo no puede tener menos de 4 caracteres' },
                                     pattern: {
                                         value: /^[A-Za-z0-9/\s-_]+$/,
                                         message: 'Por favor, introduce solo letras y espacios',
