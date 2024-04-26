@@ -7,8 +7,6 @@ import {
     getPaginationRowModel,
     getSortedRowModel, 
 } from '@tanstack/react-table';
-// Iconos package
-import { FaEdit, FaRegTrashAlt } from 'react-icons/fa';
 // Context
 import { AuthContext } from '../../context/AuthContext';
 // Funciones reusables
@@ -19,6 +17,8 @@ import masculino from '../../img/PowerMas_Avatar_Masculino.svg';
 import femenino from '../../img/PowerMas_Avatar_Femenino.svg';
 import CustomTable from "../reusable/Table/CustomTable";
 import { handleDelete } from "./eventHandlers";
+import Edit from "../../icons/Edit";
+import Delete from "../../icons/Delete";
 
 const Table = ({data, setUsersTable}) => {
     const navigate = useNavigate();
@@ -184,21 +184,25 @@ const Table = ({data, setUsersTable}) => {
                 stickyRight: 0,
                 cell: ({row}) => (
                     <div className='PowerMas_IconsTable flex jc-center ai-center'>
-                        {actions.edit && 
-                            <FaEdit 
+                        {actions.edit &&
+                            <span
                                 data-tooltip-id="edit-tooltip" 
                                 data-tooltip-content="Editar" 
-                                className='Large-p_25' 
+                                className='flex f1_5 p_25' 
                                 onClick={() => Editar_Usuario(row)} 
-                            />
+                            >
+                                <Edit />
+                            </span>
                         }
-                        {actions.delete && 
-                            <FaRegTrashAlt 
+                        {actions.delete &&
+                            <span
                                 data-tooltip-id="delete-tooltip" 
                                 data-tooltip-content="Eliminar" 
-                                className='Large-p_25' 
+                                className='flex f1_5 p_25'
                                 onClick={() => handleDelete(row.original.usuAno, row.original.usuCod, setUsersTable)} 
-                            />
+                            >
+                                <Delete />
+                            </span>
                         }
                     </div>
                 ),

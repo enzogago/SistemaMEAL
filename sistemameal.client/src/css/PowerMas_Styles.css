@@ -978,7 +978,9 @@ textarea {
     left: 0;
     top: 50%;
     transform: translateY(-50%);
+	margin-left: 15px;
 }
+
 .PowerMas_Input_Filter_Container{
 	border-radius: 5px;
 	flex-wrap: nowrap;
@@ -1199,6 +1201,21 @@ textarea {
 	background-color: #ffc65833; 
 }
 
+.PowerMas_Table_Monitoring thead tr:first-child{
+	background-color: #FFFFFF;
+	position: sticky;
+	top: 0;
+	z-index: 1;
+}
+
+.PowerMas_Table_Monitoring thead tr:first-child::before{
+	content: '';
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	border-bottom: 1px solid red;
+}
+
 
 .PowerMas_TableStatus{
 	font-size: 0.75rem;
@@ -1400,8 +1417,6 @@ textarea {
 	width: auto;
 }
 .PowerMas_IconsTable svg{
-	width: 29px;
-	height: 29px;
 	color: var(--naranja-ayuda);
 	transition: color 0.2s ease;
 }

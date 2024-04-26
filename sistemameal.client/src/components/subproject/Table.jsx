@@ -7,13 +7,13 @@ import {
     getPaginationRowModel,
     getSortedRowModel, 
 } from '@tanstack/react-table';
-// Iconos package
-import { FaEdit, FaRegTrashAlt } from 'react-icons/fa';
 // Funciones reusables
 import { Export_Excel_Helper, Export_PDF_Helper, handleDeleteMant } from '../reusable/helper';
 // Componentes
 import { AuthContext } from "../../context/AuthContext";
 import CustomTable from "../reusable/Table/CustomTable";
+import Edit from "../../icons/Edit";
+import Delete from "../../icons/Delete";
 
 
 const Table = ({data = [], setData}) => {
@@ -100,21 +100,25 @@ const Table = ({data = [], setData}) => {
                 stickyRight: 0,
                 cell: ({row}) => (
                     <div className='PowerMas_IconsTable flex jc-center ai-center'>
-                        {actions.edit && 
-                            <FaEdit 
+                        {actions.edit &&
+                            <span
                                 data-tooltip-id="edit-tooltip" 
                                 data-tooltip-content="Editar" 
-                                className='Large-p_25' 
+                                className='flex f1_5 p_25' 
                                 onClick={() => Editar_Sub_Proyecto(row)} 
-                            />
+                            >
+                                <Edit />
+                            </span>
                         }
-                        {actions.delete && 
-                            <FaRegTrashAlt 
+                        {actions.delete &&
+                            <span
                                 data-tooltip-id="delete-tooltip" 
                                 data-tooltip-content="Eliminar" 
-                                className='Large-p_25' 
-                                onClick={() => handleDeleteMant('SubProyecto',row.original, setData)} 
-                            />
+                                className='flex f1_5 p_25'
+                                onClick={() => handleDeleteMant(row.original, row.original, setData)} 
+                            >
+                                <Delete />
+                            </span>
                         }
                     </div>
                 ),

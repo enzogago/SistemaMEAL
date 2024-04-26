@@ -1,5 +1,4 @@
 import { useContext, useEffect, useState } from 'react';
-import avatar from '../../img/avatar.jpeg';
 import { AuthContext } from '../../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaUnlockKeyhole } from "react-icons/fa6";
@@ -10,7 +9,6 @@ import { FaPowerOff } from "react-icons/fa";
 import { StatusContext } from '../../context/StatusContext';
 import Modal from './Modal';
 import ModalAcerca from './ModalAcerca';
-import CryptoJS from 'crypto-js';
 import masculino from '../../img/PowerMas_Avatar_Masculino.svg';
 import femenino from '../../img/PowerMas_Avatar_Femenino.svg';
 import Logo from '../../img/PowerMas_LogoAyudaEnAccion.png';

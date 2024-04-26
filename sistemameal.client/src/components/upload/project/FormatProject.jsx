@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import Bar from "../../user/Bar"
-import { FaDownload } from "react-icons/fa6";
+import Download from "../../../icons/Download";
 
 
 const FormatProject = () => {
@@ -67,7 +67,9 @@ const FormatProject = () => {
                 <div className="flex jc-center p_5">
                     <button className="PowerMas_Buttom_Secondary flex ai-center jc-space-between p_5 Phone_3"> 
                         Descargar formato 
-                        <FaDownload className="w-auto" /> 
+                        <span className="flex Large-f1_5">
+                            <Download /> 
+                        </span> 
                     </button>
                 </div>
             </div>

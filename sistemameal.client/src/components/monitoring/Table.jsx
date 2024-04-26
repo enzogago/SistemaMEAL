@@ -228,7 +228,6 @@ const Table = ({setModalIsOpen}) => {
                         <thead>
                             <tr>
                                 <th></th>
-                                <th></th>
                                 <th>FFVV</th>
                                 <th>Añadir</th>
                                 <th>Estado</th>

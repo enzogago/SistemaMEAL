@@ -1,4 +1,3 @@
-import { FaPlus, FaSearch, FaSortDown } from 'react-icons/fa';
 import { TiArrowSortedUp ,TiArrowSortedDown } from "react-icons/ti";
 import Excel_Icon from '../../../img/PowerMas_Excel_Icon.svg';
 import Pdf_Icon from '../../../img/PowerMas_Pdf_Icon.svg';
@@ -10,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { GrNext, GrPrevious } from 'react-icons/gr';
 import { useRef } from 'react';
 import { Tooltip } from 'react-tooltip';
+import Search from '../../../icons/Search';
 
 const CustomTableUpload = ({ 
     title, 
@@ -76,13 +76,13 @@ const CustomTableUpload = ({
     }
 
     return (
-        <div className='TableMainContainer Large-p1 Medium-p1 Small-p_5'>
+        <div className='TableMainContainer Large-p1 Medium-p1 Small-p_5 todos'>
             <div className="">
                 <h1 className="Large-f1_5"> { title && `Listado de ${title}`}</h1>
                 <div className="flex">
                     {setSearchFilter && 
                         <div className="PowerMas_Search_Container Large_6 Large-m_5">
-                            <FaSearch className="Large_1 search-icon" />
+                            <Search />
                             <input 
                                 className='PowerMas_Input_Filter Large_12 p_5'
                                 type="search"
@@ -105,7 +105,7 @@ const CustomTableUpload = ({
                                     ))}
                                 </div>
                                 <div className="Phone_12 relative">
-                                    <FaSearch className="search-icon" />
+                                    <Search />
                                     <input 
                                         className='PowerMas_Input_Filter Large_12 Large-p_5'
                                         type="search"
@@ -121,7 +121,7 @@ const CustomTableUpload = ({
                     {
                         ((actions && actions.pdf) || (actions && actions.excel)) &&
                         <div className={`PowerMas_Dropdown_Export Large_3 Large-m_5 ${dropdownOpen ? 'open' : ''}`}>
-                            <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>Exportar <FaSortDown className='Large_1' /></button>
+                            <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>Exportar <Search /></button>
                             <div className="PowerMas_Dropdown_Export_Content Phone_12">
                                 {actions.pdf &&
                                     <a onClick={Export_PDF} className='flex jc-space-between p_5'>PDF <img className='Large_1' src={Pdf_Icon} alt="" /></a>

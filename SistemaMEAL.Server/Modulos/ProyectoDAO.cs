@@ -855,6 +855,8 @@ namespace SistemaMEAL.Modulos
                                                 cmd.Parameters.AddWithValue("@P_INDTIPIND", indicador.IndTipInd);
                                                 cmd.Parameters.AddWithValue("@P_UNICOD", indicador.UniCod);
                                                 cmd.Parameters.AddWithValue("@P_TIPVALCOD", indicador.TipValCod);
+                                                cmd.Parameters.AddWithValue("@P_INDTOTPRE", "");
+                                                cmd.Parameters.AddWithValue("@P_MONCOD", "00");
                                                 cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
                                                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                                                 cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);

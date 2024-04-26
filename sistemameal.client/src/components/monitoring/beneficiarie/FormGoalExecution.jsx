@@ -1,6 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
 import CryptoJS from 'crypto-js';
-import { GrFormPreviousLink } from "react-icons/gr";
 import { useEffect, useState } from "react";
 import Notiflix from "notiflix";
 import { useForm } from 'react-hook-form';
@@ -8,6 +7,7 @@ import { fetchData } from "../../reusable/helper";
 import { handleSubmitMetaEjecucion } from "./eventHandlers";
 import InfoGoal from "./InfoGoal";
 import ModalGoalExecuting from "./ModalGoalExecuting";
+import Return from "../../../icons/Return";
 
 const FormGoalExecution = () => {
     // Navegación y parámetros de la ruta
@@ -268,7 +268,9 @@ const FormGoalExecution = () => {
     return (
         <>
             <div className="PowerMas_Header_Form_Beneficiarie flex ai-center p_5 gap-1">
-                <GrFormPreviousLink className="w-auto Large-f2_5 pointer" onClick={() => navigate('/monitoring')} />
+                <span className='flex f1_25 pointer' onClick={() => navigate('/monitoring')}>
+                    <Return />
+                </span>
                 <h1 className="f1_75">Nuevo Ejecucion</h1>
             </div>
             

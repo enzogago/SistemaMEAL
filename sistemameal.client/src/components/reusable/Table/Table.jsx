@@ -6,14 +6,12 @@ import {
     getPaginationRowModel,
     getSortedRowModel, 
 } from '@tanstack/react-table';
-// Iconos package
-import { FaEdit , FaRegTrashAlt } from 'react-icons/fa';
-// Context
-// Funciones reusables
 // Componentes
 import { AuthContext } from '../../../context/AuthContext';
 import { Export_Excel_Helper, Export_PDF_Helper, handleDeleteMant, orthographicCorrections } from '../helper';
 import CustomTable from './CustomTable';
+import Edit from '../../../icons/Edit';
+import Delete from '../../../icons/Delete';
 
 const Table = ({ data, openModal, setData, controller, fieldMapping, title, resize, isLargePagination=false,format='A4',filterProperties }) => {
     console.log(data)
@@ -158,21 +156,25 @@ const Table = ({ data, openModal, setData, controller, fieldMapping, title, resi
                 stickyRight: 0,
                 cell: ({row}) => (
                     <div className='PowerMas_IconsTable flex jc-center ai-center'>
-                        {actions.edit && 
-                            <FaEdit 
+                        {actions.edit &&
+                            <span
                                 data-tooltip-id="edit-tooltip" 
                                 data-tooltip-content="Editar" 
-                                className='Large-p_25' 
-                                onClick={() => openModal(row.original)} 
-                            />
+                                className='flex f1_5 p_25' 
+                                onClick={() => openModal(row)} 
+                            >
+                                <Edit />
+                            </span>
                         }
-                        {actions.delete && 
-                            <FaRegTrashAlt 
+                        {actions.delete &&
+                            <span
                                 data-tooltip-id="delete-tooltip" 
                                 data-tooltip-content="Eliminar" 
-                                className='Large-p_25' 
-                                onClick={() => handleDeleteMant(controller, row.original, setData)} 
-                            />
+                                className='flex f1_5 p_25'
+                                onClick={() => handleDeleteMant(row.original, row.original, setData)} 
+                            >
+                                <Delete />
+                            </span>
                         }
                     </div>
                 ),

@@ -1,7 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import Bar from "../user/Bar";
 import { useContext, useEffect, useRef, useState } from "react";
-import { FaDownload, FaRegFileExcel } from "react-icons/fa";
 import Notiflix from "notiflix";
 import CryptoJS from 'crypto-js';
 import template from '../../templates/PLANTILLA_REGISTRO_BENEFICIARIOS_MASIVO.xlsx';
@@ -11,6 +10,8 @@ import InfoGoal from "../monitoring/beneficiarie/InfoGoal";
 import { useForm } from "react-hook-form";
 import { fetchData } from "../reusable/helper";
 import ModalBeneficiariesAssociated from "../monitoring/beneficiarie/ModalBeneficiariesAssociated";
+import Download from "../../icons/Download";
+import FileExcel from "../../icons/FileExcel";
 
 const UploadBeneficiarie = () => {
     // Obtención de parámetros de la URL
@@ -490,8 +491,10 @@ const UploadBeneficiarie = () => {
                             <div className="Large_8">
                                 <div className="flex jc-center p_5">
                                     <button className="PowerMas_Buttom_Secondary flex ai-center jc-space-between p_5 gap-1" onClick={handleDownload}> 
-                                        Descargar formato 
-                                        <FaDownload className="w-auto" /> 
+                                        Descargar formato
+                                        <span className="flex Large-f1_5">
+                                            <Download /> 
+                                        </span>
                                     </button>
                                 </div>
                                 <article className="PowerMas_Article_Upload center">
@@ -500,7 +503,7 @@ const UploadBeneficiarie = () => {
                                 </article>
                                 <br />
                                 <div
-                                    className="PowerMas_Input_Upload center p2 pointer"
+                                    className="PowerMas_Input_Upload center p2 pointer todos"
                                     ref={dropRef}
                                     onClick={handleDivClick}
                                     onDragEnter={handleDragIn}
@@ -515,7 +518,9 @@ const UploadBeneficiarie = () => {
                                         onChange={handleFileChange} 
                                         accept=".xlsx"
                                     />
-                                    <FaRegFileExcel className="Large-f5 w-auto" />
+                                    <span className="Large-f5 flex ai-center jc-center" >
+                                        <FileExcel />
+                                    </span>
                                     {
                                         dragging ?
                                         <p>Suelta el archivo aquí</p>

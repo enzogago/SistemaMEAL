@@ -1,14 +1,12 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
-import avatar from '../../img/avatar.jpeg';
 import { useForm } from 'react-hook-form';
-import { fetchData } from '../reusable/helper';
 import { AuthContext } from '../../context/AuthContext';
 import { initPhoneInput } from '../monitoring/beneficiarie/eventHandlers';
 import Notiflix from 'notiflix';
-import { FaEdit, FaRegFileExcel } from 'react-icons/fa';
 import ImageCropper from './ImageCropper';
 import imageCompression from 'browser-image-compression';
 import masculino from '../../img/PowerMas_Avatar_Masculino.svg';
+import Edit from '../../icons/Edit';
 
 
 const ModalProfile = ({openModal, closeModal}) => {
@@ -389,9 +387,9 @@ const ModalProfile = ({openModal, closeModal}) => {
                             >
                                 <img src={Object.keys(userLogged).length && `data:image/jpeg;base64,${userLogged.usuAva}`} alt="Descripción de la imagen" />
                                 {isIconVisible && (
-                                    <div className="overlay" onClick={() => setIsUpload(true)}>
-                                        <FaEdit />
-                                    </div>
+                                    <span className="overlay" onClick={() => setIsUpload(true)}>
+                                        <Edit />
+                                    </span>
                                 )}
                             </div>
                         }

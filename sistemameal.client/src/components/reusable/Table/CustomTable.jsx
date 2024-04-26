@@ -1,4 +1,4 @@
-import { FaPlus, FaSearch, FaSortDown } from 'react-icons/fa';
+import { FaPlus } from 'react-icons/fa';
 import { TiArrowSortedUp ,TiArrowSortedDown } from "react-icons/ti";
 import Excel_Icon from '../../../img/PowerMas_Excel_Icon.svg';
 import Pdf_Icon from '../../../img/PowerMas_Pdf_Icon.svg';
@@ -10,6 +10,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { GrNext, GrPrevious } from 'react-icons/gr';
 import { useEffect, useRef } from 'react';
+import Search from '../../../icons/Search';
 
 const CustomTable = ({ 
     title, 
@@ -89,13 +90,14 @@ const CustomTable = ({
         <div className='TableMainContainer Large-p1 Medium-p1 Small-p_5'>
             <div className="">
                 <h1 className="Medium-f1_5 Small-f1_25"> { title && `Listado de ${title}`}</h1>
-
-                <div className="flex">
+                <div className="flex gap-1 p_25">
                     {setSearchFilter && 
-                        <div className="PowerMas_Search_Container Large_6 Large-m_5 flex-grow-1">
-                            <FaSearch className="Large_1 search-icon" />
+                        <div className="PowerMas_Search_Container Large_6 flex-grow-1">
+                            <span className='flex f1_25'>
+                                <Search />
+                            </span>
                             <input 
-                                className='PowerMas_Input_Filter Large_12 p_25'
+                                className='PowerMas_Input_Filter Large_12 p_5'
                                 type="search"
                                 placeholder='Buscar'
                                 value={searchFilter}
@@ -105,7 +107,7 @@ const CustomTable = ({
                     }
                     {
                         setSearchTags && removeTag &&
-                        <div className="PowerMas_Search_Container Large_6 Large-m_5 flex-grow-1">
+                        <div className="PowerMas_Search_Container Large_6 flex-grow-1">
                             <div className="PowerMas_Input_Filter_Container flex">
                                 <div className="flex ai-center">
                                     {searchTags && searchTags.map(tag => (
@@ -116,9 +118,11 @@ const CustomTable = ({
                                     ))}
                                 </div>
                                 <div className="Phone_12 relative">
-                                    <FaSearch className="search-icon" />
+                                    <span className='flex f1_25'>
+                                        <Search />
+                                    </span>
                                     <input 
-                                        className='PowerMas_Input_Filter Large_12 Large-p_25'
+                                        className='PowerMas_Input_Filter Large_12 Large-p_5'
                                         type="search"
                                         placeholder='Buscar'
                                         onChange={handleInputChange}
@@ -133,7 +137,7 @@ const CustomTable = ({
                         actions && actions.add && 
                         <>
                             <button 
-                                className='flex jc-space-between ai-center Large_3 Large-m_5 Large-p_5 PowerMas_Buttom_Primary'
+                                className='flex jc-space-between ai-center Large_3 Large-p_5 PowerMas_Buttom_Primary'
                                 onClick={() => {openModal ? openModal() : navigate(`/${navigatePath}`)}} 
                                 disabled={!actions.add}
                             >
@@ -143,8 +147,8 @@ const CustomTable = ({
                     }
                     {
                         ((actions && actions.pdf) || (actions && actions.excel)) &&
-                        <div className={`PowerMas_Dropdown_Export Large_3 Large-m_5 ${dropdownOpen ? 'open' : ''}`}>
-                            <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>Exportar <FaSortDown className='Large_1' /></button>
+                        <div className={`PowerMas_Dropdown_Export Large_3 ${dropdownOpen ? 'open' : ''}`}>
+                            <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>Exportar <Search /></button>
                             <div className="PowerMas_Dropdown_Export_Content Phone_12">
                                 {actions.pdf &&
                                     <a onClick={() => {

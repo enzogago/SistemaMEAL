@@ -1,7 +1,5 @@
-import { useContext } from 'react'
-import { StatusContext } from '../../../context/StatusContext';
 import Bar from '../../user/Bar';
-import { FaEdit, FaPlus, FaRegTrashAlt, FaTrash } from "react-icons/fa";
+import { FaPlus, FaRegTrashAlt } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import CryptoJS from 'crypto-js';
 import { useEffect, useState } from "react";

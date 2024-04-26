@@ -1,4 +1,4 @@
-import { FaPlus, FaRegTrashAlt } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import CryptoJS from 'crypto-js';
 import { useEffect, useState } from "react";
@@ -6,6 +6,7 @@ import Notiflix from "notiflix";
 import { useForm } from 'react-hook-form';
 import { GrFormPreviousLink } from "react-icons/gr";
 import { fetchData } from "../reusable/helper";
+import Delete from "../../icons/Delete";
 
 const FormSubProject = () => {
     const navigate = useNavigate();
@@ -923,12 +924,14 @@ const FormSubProject = () => {
                                     ))}
                                 </select>
                                 <div className='PowerMas_IconsTable flex jc-center ai-center'>
-                                    <FaRegTrashAlt 
+                                    <span
                                         data-tooltip-id="delete-tooltip" 
                                         data-tooltip-content="Eliminar" 
-                                        className='Large-p_25' 
+                                        className='flex f1_5' 
                                         onClick={() => handleRemoveImplementador(index)} 
-                                    />
+                                    >
+                                        <Delete />
+                                    </span>
                                 </div>
                             </div>
                         ))}
@@ -960,12 +963,14 @@ const FormSubProject = () => {
                                     ))}
                                 </select>
                                 <div className='PowerMas_IconsTable flex jc-center ai-center'>
-                                    <FaRegTrashAlt 
+                                    <span
                                         data-tooltip-id="delete-tooltip" 
                                         data-tooltip-content="Eliminar" 
-                                        className='Large-p_25' 
+                                        className='flex f1_5' 
                                         onClick={() => handleRemoveFinanciador(index)} 
-                                    />
+                                    >
+                                        <Delete />
+                                    </span>
                                 </div>
                             </div>
                         ))}
@@ -986,12 +991,14 @@ const FormSubProject = () => {
                                         Pais:
                                     </label>
                                     <div className='PowerMas_IconsTable flex jc-center ai-center'>
-                                        <FaRegTrashAlt 
+                                        <span
                                             data-tooltip-id="delete-tooltip" 
                                             data-tooltip-content="Eliminar" 
-                                            className='Large-p_25' 
+                                            className='flex f1_5' 
                                             onClick={() => handleRemoveUbicacion(countryIndex)} 
-                                        />
+                                        >
+                                            <Delete />
+                                        </span>
                                     </div>
                                 </div>
                                 <select 

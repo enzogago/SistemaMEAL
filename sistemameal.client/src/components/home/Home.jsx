@@ -1,5 +1,4 @@
 import { Fragment, Suspense, lazy, useEffect, useState } from 'react';
-import { FaSearch } from 'react-icons/fa';
 import Notiflix from 'notiflix';
 import Table from './Table';
 const DonutChart = lazy(() => import('../reusable/DonutChart'));
@@ -18,6 +17,7 @@ import { formatter } from '../monitoring/goal/helper';
 import DivergingEmpty from '../../img/PowerMas_DivergingEmpty.svg';
 import PieEmpty from '../../img/PowerMas_PieEmpty.svg';
 import BarEmpty from '../../img/PowerMas_BarEmpty.svg';
+import Search from '../../icons/Search';
 
 const Home = () => {
     const [ monitoringData, setMonitoringData] = useState([])
@@ -401,7 +401,7 @@ const Home = () => {
                     ))}
                 </div>
                 <div className="Phone_12 relative">
-                    <FaSearch className="search-icon" />
+                    <Search />
                     <input 
                         className='PowerMas_Input_Filter Phone_12 Large-p_5'
                         style={{cursor: `${disabledFilter ? 'progress' : ''}`}}

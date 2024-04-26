@@ -1,15 +1,12 @@
 import { useNavigate, useParams } from "react-router-dom";
 import Modal from 'react-modal';
 import CryptoJS from 'crypto-js';
-import { GrFormPreviousLink } from "react-icons/gr";
 import { useEffect, useState } from "react";
 import Notiflix from "notiflix";
 import { useForm } from 'react-hook-form';
-import TableForm from "./TableForm";
 import { fetchData } from "../../reusable/helper";
 import { handleSubmitMetaBeneficiario, handleSubmitMetaBeneficiarioExiste, initPhoneInput } from "./eventHandlers";
 import ModalGoalBeneficiarie from "./ModalGoalBeneficiarie";
-import { FaRegTrashAlt } from "react-icons/fa";
 import { IoIosInformationCircleOutline } from "react-icons/io";
 import logo from '../../../img/PowerMas_LogoAyudaEnAccion.svg';
 import InfoGoal from "./InfoGoal";
@@ -18,6 +15,8 @@ import 'intl-tel-input/build/css/intlTelInput.css';
 import 'intl-tel-input/build/js/utils.js';
 import { useRef } from "react";
 import ModalBeneficiariesAssociated from "./ModalBeneficiariesAssociated";
+import Return from "../../../icons/Return";
+import Delete from "../../../icons/Delete";
 
 const FormGoalBeneficiarie = () => {
     const navigate = useNavigate();
@@ -728,7 +727,9 @@ const FormGoalBeneficiarie = () => {
     return (
         <>
             <div className="PowerMas_Header_Form_Beneficiarie flex ai-center p_5 gap-1">
-                <GrFormPreviousLink className="w-auto Large-f2_5 pointer" onClick={() => navigate('/monitoring')} />
+                <span className='flex f1_25 pointer' onClick={() => navigate('/monitoring')}>
+                    <Return />
+                </span>
                 <h1 className="f1_75">Nuevo Beneficiario</h1>
             </div>
             
@@ -1455,7 +1456,7 @@ const FormGoalBeneficiarie = () => {
             >
                 <span className="PowerMas_CloseModal" style={{position: 'absolute',right: 20, top: 10}} onClick={cerrarModal}>×</span>
                 <h2 className='PowerMas_Title_Modal f1_5 center'>Documentos Agregados</h2>
-                <table className="PowerMas_Modal_Documentos">
+                <table className="PowerMas_Modal_Documentos Large_12">
                     <thead className="">
                         <tr>
                             <th>Tipo de documento</th>
@@ -1469,11 +1470,15 @@ const FormGoalBeneficiarie = () => {
                                 <td style={{textTransform: 'capitalize', textWrap: 'nowrap'}}>{documento.docIdeAbr} - {documento.docIdeNom.toLowerCase()}</td>
                                 <td className="center">{documento.docIdeBenNum}</td>
                                 <td className="PowerMas_IconsTable"> 
-                                    <FaRegTrashAlt 
+                                    <span
                                         data-tooltip-id="delete-tooltip" 
-                                        data-tooltip-content="Eliminar"
+                                        data-tooltip-content="Eliminar" 
+                                        className='flex f1_5 p_25'
                                         onClick={() => eliminarDocumento(index)}
-                                    />
+                                    >
+                                        <Delete />
+                                    </span>
+
                                 </td>
                             </tr>
                         ))}

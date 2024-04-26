@@ -9,7 +9,6 @@ import {
     getSortedRowModel, 
 } from '@tanstack/react-table';
 // Iconos package
-import { FaEdit, FaPlus, FaRegTrashAlt, FaSearch, FaSortDown } from 'react-icons/fa';
 // 
 import CryptoJS from 'crypto-js';
 // Context
@@ -125,7 +124,7 @@ const Table = ({ data }) => {
                 disableSorting: true,
                 cell: ({row}) => (
                     <div className='PowerMas_IconsTable flex jc-center ai-center'>
-                        {actions.edit && 
+                        {/* {actions.edit && 
                             <FaEdit 
                                 data-tooltip-id="edit-tooltip" 
                                 data-tooltip-content="Editar" 
@@ -140,7 +139,7 @@ const Table = ({ data }) => {
                                 className='Large-p_25' 
                                 // onClick={() => handleDelete('Beneficiario', row.original.uniCod, setData, setIsLoggedIn)} 
                             />
-                        }
+                        } */}
                     </div>
                 ),
             });

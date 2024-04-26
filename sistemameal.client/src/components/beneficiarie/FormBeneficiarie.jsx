@@ -1,10 +1,9 @@
-import Notiflix from "notiflix";
 import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from "react-router-dom";
 import CryptoJS from 'crypto-js';
-import { GrFormPreviousLink } from "react-icons/gr";
 import ContentForm from "./ContentForm";
 import { handleSubmit } from "./eventHandlers";
+import Return from "../../icons/Return";
 
 const FormBeneficiarie = () => {
     const navigate = useNavigate();
@@ -59,7 +58,11 @@ const FormBeneficiarie = () => {
     return (
         <>
             <div className="PowerMas_Header_Form_Beneficiarie flex ai-center p_5 gap-1">
-                <GrFormPreviousLink className="w-auto Large-f2_5 pointer" onClick={() => navigate('/beneficiarie')} />
+                <span className="flex pointer   " onClick={() => navigate('/beneficiarie')} >
+                    <span className='flex f1_25'>
+                        <Return />
+                    </span>
+                </span>
                 <h1 className="flex-grow-1 f1_75">{isEditing ? 'Editar' : 'Nuevo'} Beneficiario</h1>
             </div>
             <ContentForm
