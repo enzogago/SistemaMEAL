@@ -6,7 +6,6 @@ import Modal from './Modal';
 import ModalAcerca from './ModalAcerca';
 import masculino from '../../img/PowerMas_Avatar_Masculino.svg';
 import femenino from '../../img/PowerMas_Avatar_Femenino.svg';
-import Logo from '../../img/PowerMas_LogoAyudaEnAccion.png';
 import ModalProfile from './ModalProfile';
 import Logout from '../../icons/Logout';
 import About from '../../icons/About';
@@ -114,7 +113,7 @@ const Bar = ({showSidebarAndBar, isOpen, setIsOpen}) => {
                 }
                 <div className="PowerMas_ProfileContainer">
                     <div className="PowerMas_ProfilePicture">
-                        <img src={Object.keys(userLogged).length && `data:image/jpeg;base64,${userLogged.usuAva}`} alt="Descripción de la imagen" />
+                        <img src={userLogged && (userLogged.usuAva ? `data:image/jpeg;base64,${userLogged.usuAva}` : (userLogged.usuSex == 'M' ? masculino : femenino ))} alt="Descripción de la imagen" />
                     </div>
                     {
                         showSidebarAndBar &&
@@ -133,34 +132,34 @@ const Bar = ({showSidebarAndBar, isOpen, setIsOpen}) => {
                         <div className={`Medium_2 Phone_6  PowerMas_DropdownMenu ${isOpen ? 'PowerMas_DropdownMenu--open' : ''}`}>
                             <div className='PowerMas_Profile_Name p_75 flex flex-column jc-center ai-center gap_5'> 
                                 <div className="PowerMas_ProfilePicture2" style={{width: '75px'}}>
-                                    <img src={userLogged && `data:image/jpeg;base64,${userLogged.usuAva}`} alt="Descripción de la imagen" />
+                                    <img src={userLogged && (userLogged.usuAva ? `data:image/jpeg;base64,${userLogged.usuAva}` : (userLogged.usuSex == 'M' ? masculino : femenino ))} alt="Descripción de la imagen" />
                                 </div>
-                                <p style={{textTransform: 'capitalize'}} className='color-black'>Hola, {userLogged ? `${userLogged.usuNom.toLowerCase()}` : ''}</p>
+                                <p style={{textTransform: 'capitalize'}} className='color-black center'>Hola, {userLogged ? `${userLogged.usuNom.toLowerCase()}` : ''}</p>
                             </div>
                             <hr className='PowerMas_Hr m0' />
                             {
                                 showSidebarAndBar &&
                                 <>
-                                    <Link className='flex ai-center gap_5 p_5' onClick={editarPerfil}>
-                                        <span className='flex f1_25'>
+                                    <Link className='flex ai-center gap_75 p_5' onClick={editarPerfil}>
+                                        <span className='flex f1'>
                                             <User />
                                         </span>
                                         <span className='flex'>Perfil</span>
                                     </Link>
-                                    <Link className='flex ai-center gap_5 p_5 grey-hover' onClick={CambiarContraseña}>
-                                        <span className='flex f1_25'>
+                                    <Link className='flex ai-center gap_75 p_5 grey-hover' onClick={CambiarContraseña}>
+                                        <span className='flex f'>
                                             <Chain />
                                         </span>
                                         <span className='flex'>Contraseña</span>
                                     </Link>
-                                    <Link className='flex ai-center p_5 gap_5' onClick={() => setIsOpen(false)}  to="/tutorial">
-                                        <span className='flex f1_25'>
+                                    <Link className='flex ai-center p_5 gap_75' onClick={() => setIsOpen(false)}  to="/tutorial">
+                                        <span className='flex f1'>
                                             <Play />
                                         </span>
                                         <span className='flex'>Tutoriales</span>
                                     </Link>
-                                    <Link className='flex gap_5 ai-center p_5' onClick={AcercDe}>
-                                        <span className='flex f1_25'>
+                                    <Link className='flex gap_75 ai-center p_5' onClick={AcercDe}>
+                                        <span className='flex f1'>
                                             <About />
                                         </span>
                                         <span className='flex'>Acerca De</span>
@@ -168,8 +167,8 @@ const Bar = ({showSidebarAndBar, isOpen, setIsOpen}) => {
                                     <hr className='PowerMas_Hr m0' />
                                 </>
                             }
-                            <Link className='flex gap_5 ai-center p_5' onClick={CerrarSesion}>
-                                <span className='flex f1_25'>
+                            <Link className='flex gap_75 ai-center p_5' onClick={CerrarSesion}>
+                                <span className='flex f1'>
                                     <Logout />
                                 </span>
                                 <span className='flex flex-grow-1'>Cerrar Sesión</span>

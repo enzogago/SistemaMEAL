@@ -16,6 +16,9 @@ namespace SistemaMEAL.Modulos
         public IEnumerable<Monitoreo> Listado(ClaimsIdentity? identity, string? tags)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
+            Console.WriteLine(userClaims.UsuAno);
+            Console.WriteLine(userClaims.UsuCod);
             List<Monitoreo>? temporal = new List<Monitoreo>();
             try
             {

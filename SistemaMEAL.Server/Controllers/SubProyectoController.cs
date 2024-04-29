@@ -13,11 +13,13 @@ namespace SistemaMEAL.Server.Controllers
     {
         private readonly SubProyectoDAO _subproyectos;
         private readonly UsuarioDAO _usuarios;
+        private readonly IWebHostEnvironment _hostingEnvironment;
 
-        public SubProyectoController(SubProyectoDAO subproyectos, UsuarioDAO usuarios)
+        public SubProyectoController(SubProyectoDAO subproyectos, UsuarioDAO usuarios, IWebHostEnvironment hostingEnvironment)
         {
             _subproyectos = subproyectos;
             _usuarios = usuarios;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         [HttpGet]
@@ -151,5 +153,94 @@ namespace SistemaMEAL.Server.Controllers
                 return new OkObjectResult(new { success = true, message });
             }
         }
+
+        [HttpPost]
+        [Route("save-file")]
+        public async Task<IActionResult> SubirArchivo(SubProyectoFuenteDto subProyectoFuenteDto)
+        {
+            // var identity = HttpContext.User.Identity as ClaimsIdentity;
+            // var rToken = Jwt.validarToken(identity, _usuarios);
+            // if (!rToken.success) 
+            // {
+            //     return Unauthorized(new { success = false, message = rToken.message });
+            // }
+
+            string uploadsDirectory;
+
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+            {
+                uploadsDirectory = Path.Combine(_hostingEnvironment.ContentRootPath, "fuentes", "sub-proyecto");
+            }
+            else
+            {
+                uploadsDirectory = Path.Combine(_hostingEnvironment.WebRootPath, "fuentes", "sub-proyecto");
+            }
+
+            var (message, messageType) = await _subproyectos.SubirArchivo(subProyectoFuenteDto.SubProyectoFuente, subProyectoFuenteDto.FileData, uploadsDirectory);
+            if (messageType == "1")
+            {
+                return new BadRequestObjectResult(new { success = false, message });
+            }
+            else if (messageType == "2")
+            {
+                return new ConflictObjectResult(new { success = false, message });
+            }
+            else
+            {
+                return new OkObjectResult(new { success = true, message });
+            }
+        }
+
+        [HttpPost]
+        [Route("delete-file")]
+        public async Task<IActionResult> EliminarArchivo(SubProyectoFuenteDto subProyectoFuenteDto)
+        {
+            // var identity = HttpContext.User.Identity as ClaimsIdentity;
+            // var rToken = Jwt.validarToken(identity, _usuarios);
+            // if (!rToken.success) 
+            // {
+            //     return Unauthorized(new { success = false, message = rToken.message });
+            // }
+
+            string uploadsDirectory;
+
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+            {
+                uploadsDirectory = Path.Combine(_hostingEnvironment.ContentRootPath, "fuentes", "sub-proyecto");
+            }
+            else
+            {
+                uploadsDirectory = Path.Combine(_hostingEnvironment.WebRootPath, "fuentes", "sub-proyecto");
+            }
+
+            var (message, messageType) = await _subproyectos.EliminarArchivo(subProyectoFuenteDto.SubProyectoFuente, subProyectoFuenteDto.FileData, uploadsDirectory);
+            if (messageType == "1")
+            {
+                return new BadRequestObjectResult(new { success = false, message });
+            }
+            else if (messageType == "2")
+            {
+                return new ConflictObjectResult(new { success = false, message });
+            }
+            else
+            {
+                return new OkObjectResult(new { success = true, message });
+            }
+        }
+
+        [HttpGet]
+        [Route("files/{subProAno}/{subProCod}")]
+        public dynamic BuscarArchivos(string subProAno, string subProCod)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var result = _subproyectos.BuscarArchivos(identity, subProAno, subProCod);
+            return Ok(result);
+        }
+
+        
     }
 }

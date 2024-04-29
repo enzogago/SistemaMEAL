@@ -195,7 +195,8 @@ const FormSubProject = () => {
         handleSubmit: validateForm, 
         formState: { errors, dirtyFields, isSubmitted }, 
         reset, 
-        setValue 
+        setValue,
+        trigger
     } = useForm({ mode: "onChange"});
     
     useEffect(() => {
@@ -568,6 +569,10 @@ const FormSubProject = () => {
     }
 
     const currentYear = new Date().getFullYear();
+
+
+    const watchInicio = watch(['subProPerAnoIni', 'subProPerMesIni']);
+    const watchFin = watch(['subProPerAnoFin', 'subProPerMesFin']);
     
     
     return (
@@ -745,10 +750,26 @@ const FormSubProject = () => {
                             <label htmlFor="subProPerMesIni" className="">
                                 Mes Inicio:
                             </label>
-                            <select 
+                            <select
+                                onInput={() => {
+                                    setTimeout(() => {
+                                        trigger('subProPerMesFin');
+                                        trigger('subProPerAnoIni');
+                                        trigger('subProPerAnoFin');
+                                    }, 0);
+                                }}
                                 className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.subProPerMesIni || isSubmitted ? (errors.subProPerMesIni ? 'invalid' : 'valid') : ''}`} 
                                 {...register('subProPerMesIni', { 
-                                    validate: value => value !== '0' || 'El mes es requerido' 
+                                    validate: {
+                                        required: value => value !== '0' || 'El mes es requerido',
+                                        greaterOrEqual: value => {
+                                            const mesInicio = value;
+                                            const mesFin = watchInicio[1];
+                                            const añoInicio = watchInicio[0];
+                                            const añoFin = watchFin[0];
+                                            return (añoInicio < añoFin) || (añoInicio === añoFin && mesInicio <= mesFin) || 'El mes y el año de Inicio no pueden ser mayores al de Fin';
+                                        }
+                                    }
                                 })}
                                 id="subProPerMesIni" 
                             >
@@ -788,12 +809,22 @@ const FormSubProject = () => {
                                 onInput={(event) => {
                                     // Reemplaza cualquier carácter que no sea un número por una cadena vacía
                                     event.target.value = event.target.value.replace(/[^0-9]/g, '');
+
+                                    setTimeout(() => {
+                                        trigger('subProPerMesIni');
+                                        trigger('subProPerMesFin');
+                                        trigger('subProPerAnoFin');
+                                    }, 0);
                                 }}
                                 {...register('subProPerAnoIni', { 
                                     required: 'El campo es requerido',
                                     validate: value => {
                                         if (value < currentYear - 1 || value > currentYear + 10) {
                                             return 'El año debe estar entre ' + (currentYear - 1) + ' y ' + (currentYear + 10);
+                                        }
+
+                                        if (parseInt(value) > parseInt(watchFin[0])) {
+                                            return 'El año de Inicio debe ser menor o igual al año de Fin.';
                                         }
                                     },
                                     minLength: {
@@ -824,10 +855,26 @@ const FormSubProject = () => {
                             <label htmlFor="subProPerMesFin" className="">
                                 Mes Fin:
                             </label>
-                            <select 
+                            <select
+                                onInput={() => {
+                                    setTimeout(() => {
+                                        trigger('subProPerMesIni');
+                                        trigger('subProPerAnoIni');
+                                        trigger('subProPerAnoFin');
+                                    }, 0);
+                                }}
                                 className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.subProPerMesFin || isSubmitted ? (errors.subProPerMesFin ? 'invalid' : 'valid') : ''}`} 
                                 {...register('subProPerMesFin', { 
-                                    validate: value => value !== '0' || 'El mes es requerido' 
+                                    validate: {
+                                        required: value => value !== '0' || 'El campo es requerido',
+                                        greaterOrEqual: value => {
+                                            const mesFin = value;
+                                            const mesInicio = watchInicio[1];
+                                            const añoInicio = parseInt(watchInicio[0]);
+                                            const añoFin = parseInt(watchFin[0]);
+                                            return (añoInicio < añoFin) || (añoInicio === añoFin && mesInicio <= mesFin) || 'El mes y el año de Fin no pueden ser menores al de Inicio';
+                                        }
+                                    }
                                 })}
                                 id="subProPerMesFin" 
                             >
@@ -867,12 +914,22 @@ const FormSubProject = () => {
                                 onInput={(event) => {
                                     // Reemplaza cualquier carácter que no sea un número por una cadena vacía
                                     event.target.value = event.target.value.replace(/[^0-9]/g, '');
+
+                                    setTimeout(() => {
+                                        trigger('subProPerMesIni');
+                                        trigger('subProPerMesFin');
+                                        trigger('subProPerAnoIni');
+                                    }, 0);
                                 }}
                                 {...register('subProPerAnoFin', { 
                                     required: 'El campo es requerido',
                                     validate: value => {
                                         if (value < currentYear - 1 || value > currentYear + 10) {
                                             return 'El año debe estar entre ' + (currentYear - 1) + ' y ' + (currentYear + 10);
+                                        }
+
+                                        if (parseInt(value) < parseInt(watchInicio[0])) {
+                                            return 'El año de Fin debe ser mayor o igual al año de Inicio.';
                                         }
                                     },
                                     minLength: {

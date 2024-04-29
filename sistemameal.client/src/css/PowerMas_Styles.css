@@ -11,8 +11,6 @@
 	--turquesa: #006776;
 }
   
-
-
 body {
 	font-family: DMMono;
 }
@@ -1213,7 +1211,7 @@ textarea {
 	position: absolute;
 	bottom: 0;
 	width: 100%;
-	border-bottom: 1px solid red;
+	border-bottom: 1px solid #d3d3d3;
 }
 
 

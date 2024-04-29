@@ -41,5 +41,6 @@ namespace SistemaMEAL.Server.Models
         public String? SubProPerAnoFin { get; set; }
         public String? SubProPerMesFin { get; set; }
         public List<Indicador>? Indicadores { get; set; }
+         public List<Actividad>? Actividades { get; set; }
     }
 }

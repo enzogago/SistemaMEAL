@@ -176,7 +176,8 @@ const Table = ({data, setUsersTable}) => {
             
         ]
 
-        if (actions.delete || actions.edit) {
+        // if (actions.delete || actions.edit) {
+        if (true) {
             baseColumns.push({
                 header: () => <div style={{textAlign: 'center', flexGrow: '1'}}>Acciones</div>,
                 accessorKey: "acciones",
@@ -184,7 +185,8 @@ const Table = ({data, setUsersTable}) => {
                 stickyRight: 0,
                 cell: ({row}) => (
                     <div className='PowerMas_IconsTable flex jc-center ai-center'>
-                        {actions.edit &&
+                        {/* {actions.edit && */}
+                        {true &&
                             <span
                                 data-tooltip-id="edit-tooltip" 
                                 data-tooltip-content="Editar" 

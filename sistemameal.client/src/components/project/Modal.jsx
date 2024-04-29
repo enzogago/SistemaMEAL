@@ -31,7 +31,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
     // Activar focus en input
     useEffect(() => {
         if (modalVisible) {
-            document.getElementById('proLinInt').focus();
+            document.getElementById('proIde').focus();
         }
     }, [modalVisible]);
 
@@ -61,38 +61,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                 <span className="PowerMas_CloseModal" onClick={closeModalAndReset}>×</span>
                 <h2 className="PowerMas_Title_Modal center f1_5">{estadoEditado ? 'Editar' : 'Nuevo'} {title}</h2>
                 <form className='Large-f1 PowerMas_FormStatus flex flex-column gap_3' onSubmit={validateForm(onSubmit)}>
-                    <div className="">
-                        <label className="block">
-                            Linea de Intervención:
-                        </label>
-                        <input 
-                            id="proLinInt"
-                            className={`PowerMas_Modal_Form_${dirtyFields['proLinInt'] || isSubmitted ? (errors['proLinInt'] ? 'invalid' : 'valid') : ''}`}  
-                            type="text" 
-                            placeholder='PRO.1.0' 
-                            maxLength={10} 
-                            name="proLinInt" 
-                            autoComplete='off'
-                            {...register(
-                                'proLinInt', { 
-                                    required: 'El campo es requerido',
-                                    minLength: { value: 6, message: 'El campo no puede tener menos de 6 caracteres' },
-                                    maxLength: { value: 10, message: 'El campo no puede tener más de 10 caracteres' },
-                                    pattern: {
-                                        value: /^[A-Za-z0-9.]+$/,
-                                        message: 'Por favor, introduce solo letras y espacios',
-                                    },
-                                }
-                            )}
-                        />
-                        {errors['proLinInt'] ? (
-                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors['proLinInt'].message}</p>
-                        ) : (
-                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                Espacio reservado para el mensaje de error
-                            </p>
-                        )}
-                    </div>
+                    
                     <div className="">
                         <label className="block">
                             Código Proyecto:
@@ -119,6 +88,38 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                         />
                         {errors['proIde'] ? (
                             <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors['proIde'].message}</p>
+                        ) : (
+                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                Espacio reservado para el mensaje de error
+                            </p>
+                        )}
+                    </div>
+                    <div className="">
+                        <label className="block">
+                            Linea de Intervención:
+                        </label>
+                        <input 
+                            id="proLinInt"
+                            className={`PowerMas_Modal_Form_${dirtyFields['proLinInt'] || isSubmitted ? (errors['proLinInt'] ? 'invalid' : 'valid') : ''}`}  
+                            type="text" 
+                            placeholder='PRO.1.0' 
+                            maxLength={10} 
+                            name="proLinInt" 
+                            autoComplete='off'
+                            {...register(
+                                'proLinInt', { 
+                                    required: 'El campo es requerido',
+                                    minLength: { value: 6, message: 'El campo no puede tener menos de 6 caracteres' },
+                                    maxLength: { value: 10, message: 'El campo no puede tener más de 10 caracteres' },
+                                    pattern: {
+                                        value: /^[A-Za-z0-9.]+$/,
+                                        message: 'Por favor, introduce solo letras y espacios',
+                                    },
+                                }
+                            )}
+                        />
+                        {errors['proLinInt'] ? (
+                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors['proLinInt'].message}</p>
                         ) : (
                             <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
                                 Espacio reservado para el mensaje de error

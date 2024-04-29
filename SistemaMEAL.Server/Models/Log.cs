@@ -24,5 +24,6 @@ namespace SistemaMEAL.Server.Models
         public String? UsuCod { get; set; }
         public String? UsuNom { get; set; }
         public String? UsuApe { get; set; }
+        public String? UsuAva { get; set; }
     }
 }

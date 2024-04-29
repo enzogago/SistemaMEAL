@@ -5,9 +5,9 @@ import { initPhoneInput } from '../monitoring/beneficiarie/eventHandlers';
 import Notiflix from 'notiflix';
 import ImageCropper from './ImageCropper';
 import imageCompression from 'browser-image-compression';
-import masculino from '../../img/PowerMas_Avatar_Masculino.svg';
 import Edit from '../../icons/Edit';
-
+import masculino from '../../img/PowerMas_Avatar_Masculino.svg';
+import femenino from '../../img/PowerMas_Avatar_Femenino.svg';
 
 const ModalProfile = ({openModal, closeModal}) => {
     const { authInfo, authActions } = useContext(AuthContext);
@@ -385,7 +385,7 @@ const ModalProfile = ({openModal, closeModal}) => {
                                 onMouseEnter={() => setIsIconVisible(true)} 
                                 onMouseLeave={() => setIsIconVisible(false)}
                             >
-                                <img src={Object.keys(userLogged).length && `data:image/jpeg;base64,${userLogged.usuAva}`} alt="Descripción de la imagen" />
+                                <img src={userLogged && (userLogged.usuAva ? `data:image/jpeg;base64,${userLogged.usuAva}` : (userLogged.usuSex == 'M' ? masculino : femenino ))} alt="Descripción de la imagen" />
                                 {isIconVisible && (
                                     <span className="overlay" onClick={() => setIsUpload(true)}>
                                         <Edit />

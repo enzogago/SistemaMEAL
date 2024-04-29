@@ -39,23 +39,6 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return rToken;
 
-            dynamic data = rToken.result;
-            Usuario usuario = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "CREAR DOCUMENTO_IDENTIDAD") && usuario.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para insertar documentos de identidad",
-                    result = ""
-                };
-            }
-
             var (message, messageType) = _documentos.Insertar(identity, documento);
             if (messageType == "1") // Error
             {
@@ -79,23 +62,6 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return rToken;
 
-            dynamic data = rToken.result;
-            Usuario usuario = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "MODIFICAR DOCUMENTO_IDENTIDAD") && usuario.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para modificar documentos de identidad",
-                    result = ""
-                };
-            }
-
             var (message, messageType) = _documentos.Modificar(identity, documento);
             if (messageType == "1") // Error
             {
@@ -118,24 +84,7 @@ namespace SistemaMEAL.Server.Controllers
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return rToken;
-
-            dynamic data = rToken.result;
-            Usuario usuario = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "ELIMINAR DOCUMENTO_IDENTIDAD") && usuario.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para eliminar documentos de identidad",
-                    result = ""
-                };
-            }
-
+            
             var (message, messageType) = _documentos.Eliminar(identity, documentoIdentidad);
             if (messageType == "1") // Error
             {

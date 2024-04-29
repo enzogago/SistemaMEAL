@@ -8,7 +8,6 @@ const Ecuador = lazy(() => import('../maps/Ecuador'));
 const Colombia = lazy(() => import('../maps/Colombia'));
 const PieChart = lazy(() => import('../reusable/graphics/PieChart'));
 const DivergingBarChart = lazy(() => import('../reusable/graphics/DivergingBarChart'));
-// const HorizontalBarChart = lazy(() => import('../reusable/graphics/HorizontalBarChart'));
 import HorizontalBarChart from '../reusable/graphics/HorizontalBarChart';
 import masculino from '../../img/PowerMas_Avatar_Masculino.svg';
 import femenino from '../../img/PowerMas_Avatar_Femenino.svg';
@@ -551,7 +550,7 @@ const Home = () => {
             </div>
             
             <div className="PowerMas_RecentsSection flex Large-flex-row Medium-flex-row Small-flex-column m1 gap-1">
-                <div className="PowerMas_Home_Card flex flex-column  Large_6 Medium_6 Phone_12 Large_p0" style={{maxHeight: '30rem'}}>
+                <div className="PowerMas_Home_Card flex flex-column  Large_6 Medium_6 Phone_12 Large_p0" style={{maxHeight: '24rem'}}>
                     <div className='Large_12 p_5 PowerMas_Tittle_Map center'>
                         <h4>Actividades recientes</h4>
                     </div>
@@ -573,11 +572,11 @@ const Home = () => {
                             let shortText = text.length > 50? text.substring(0, 50) + '...' : text;
 
                             return (
-                                <Fragment  key={index}>
+                                <Fragment key={index}>
                                     <div className="flex ai-center gap-1">
                                         <div>
                                             <div className="PowerMas_ProfilePicture2 m_25" style={{width: '40px', height: '40px', border: '1px solid #000000'}}>
-                                                <img src={masculino} alt="Descripción de la imagen" />
+                                                <img src={item && (item.usuAva ? `data:image/jpeg;base64,${item.usuAva}` : (item.usuSex == 'M' ? masculino : femenino ))} alt="Descripción de la imagen" />
                                             </div>
                                         </div>
                                         <div className="flex flex-column flex-grow-1">

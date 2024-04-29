@@ -261,6 +261,144 @@ namespace SistemaMEAL.Modulos
 
             return (mensaje, tipoMensaje);
         }
+        public (string? message, string? messageType) InsertarMetaUsuario(ClaimsIdentity? identity, List<MetaUsuario> metasInsertar,List<MetaUsuario> metasEliminar)
+        {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
+            string? mensaje = "";
+            string? tipoMensaje = "";
+
+            using (TransactionScope scope = new TransactionScope())
+            {
+                using (SqlConnection connection = cn.getcn)
+                {
+                    try
+                    {
+                        if (connection.State == ConnectionState.Closed)
+                        {
+                            connection.Open();
+                        }
+
+                        SqlCommand cmd;
+                        SqlParameter pDescripcionMensaje;
+                        SqlParameter pTipoMensaje;
+
+                        DataTable dtMetaUsuariosInsertar = new DataTable();
+                        dtMetaUsuariosInsertar.Columns.Add("METANO", typeof(string));
+                        dtMetaUsuariosInsertar.Columns.Add("METCOD", typeof(string));
+
+                        if (metasInsertar.Count > 0)
+                        {
+                            foreach (var meta in metasInsertar)
+                            {
+                                dtMetaUsuariosInsertar.Rows.Add(meta.MetAno,meta.MetCod);
+                            }
+
+                            cmd = new SqlCommand("SP_INSERTAR_META_USUARIO_MASIVO", cn.getcn);
+                            cmd.CommandType = CommandType.StoredProcedure;
+
+                            SqlParameter param = new SqlParameter();
+                            param.ParameterName = "@MetaUsuario";
+                            param.SqlDbType = SqlDbType.Structured;
+                            param.Value = dtMetaUsuariosInsertar;
+                            param.TypeName = "MetaUsuarioType";
+
+                            cmd.Parameters.Add(param);
+                            cmd.Parameters.AddWithValue("@P_USUANO", metasInsertar[0].UsuAno);
+                            cmd.Parameters.AddWithValue("@P_USUCOD", metasInsertar[0].UsuCod);
+                            cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
+                            cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                            cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                            cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                            cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                            cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                            pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                            pDescripcionMensaje.Direction = ParameterDirection.Output;
+                            cmd.Parameters.Add(pDescripcionMensaje);
+                            pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                            pTipoMensaje.Direction = ParameterDirection.Output;
+                            cmd.Parameters.Add(pTipoMensaje);
+
+                            cmd.ExecuteNonQuery();
+                                
+                            mensaje = pDescripcionMensaje.Value.ToString();
+                            tipoMensaje = pTipoMensaje.Value.ToString();
+
+                            if (tipoMensaje != "3")
+                            {
+                                Console.WriteLine(mensaje);
+                                throw new Exception(mensaje);
+                            }
+                        }
+
+                        DataTable dtMetaUsuariosEliminar = new DataTable();
+                        dtMetaUsuariosEliminar.Columns.Add("METANO", typeof(string));
+                        dtMetaUsuariosEliminar.Columns.Add("METCOD", typeof(string));
+                        
+                        if (metasEliminar.Count > 0)
+                        {
+                            foreach (var meta in metasEliminar)
+                            {
+                                dtMetaUsuariosEliminar.Rows.Add(meta.MetAno,meta.MetCod);
+                            }
+
+                            cmd = new SqlCommand("SP_ELIMINAR_META_USUARIO_MASIVO", cn.getcn);
+                            cmd.CommandType = CommandType.StoredProcedure;
+
+                            SqlParameter param = new SqlParameter();
+                            param.ParameterName = "@MetaUsuario";
+                            param.SqlDbType = SqlDbType.Structured;
+                            param.Value = dtMetaUsuariosEliminar;
+                            param.TypeName = "MetaUsuarioType";
+
+                            cmd.Parameters.Add(param);
+                            cmd.Parameters.AddWithValue("@P_USUANO", metasEliminar[0].UsuAno);
+                            cmd.Parameters.AddWithValue("@P_USUCOD", metasEliminar[0].UsuCod);
+                            cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
+                            cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                            cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                            cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                            cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                            cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                            pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                            pDescripcionMensaje.Direction = ParameterDirection.Output;
+                            cmd.Parameters.Add(pDescripcionMensaje);
+                            pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                            pTipoMensaje.Direction = ParameterDirection.Output;
+                            cmd.Parameters.Add(pTipoMensaje);
+
+                            cmd.ExecuteNonQuery();
+                                
+                            mensaje = pDescripcionMensaje.Value.ToString();
+                            tipoMensaje = pTipoMensaje.Value.ToString();
+
+                            if (tipoMensaje != "3")
+                            {
+                                Console.WriteLine(mensaje);
+                                throw new Exception(mensaje);
+                            }
+                        }
+                        
+
+                        mensaje = "Accesos actualizados correctamente.";
+                        tipoMensaje = "3";
+                        scope.Complete();
+                    }
+                    catch (Exception ex)
+                    {
+                        // Si alguna operación falló, la transacción se revierte.
+                        mensaje = ex.Message;
+                        tipoMensaje = "1";
+                        Console.WriteLine(ex);
+                    }
+                }
+            }
+
+            return (mensaje, tipoMensaje);
+        }
+
         public (string? message, string? messageType) ActualizarMetasPresupuesto(ClaimsIdentity? identity, List<Meta> metas)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
@@ -671,6 +809,64 @@ namespace SistemaMEAL.Modulos
                 cn.getcn.Close();
             }
             return temporal?? new List<MetaFuente>();
+        }
+
+        public IEnumerable<MetaUsuario> BuscarMetasUsuario(ClaimsIdentity? identity, string? usuAno, string? usuCod, string? metAno = null, string? metCod = null)
+        {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+            
+            List<MetaUsuario>? temporal = new List<MetaUsuario>();
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_META_USUARIO", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                // Aquí puedes agregar los parámetros necesarios para tu procedimiento almacenado
+                cmd.Parameters.AddWithValue("@P_USUANO", usuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD", usuCod);
+                cmd.Parameters.AddWithValue("@P_METANO", string.IsNullOrEmpty(metAno) ? (object)DBNull.Value : metAno);
+                cmd.Parameters.AddWithValue("@P_METCOD", string.IsNullOrEmpty(metCod) ? (object)DBNull.Value : metCod);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                if (!reader.HasRows)
+                {
+                    jsonResult.Append("[]");
+                }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                // Deserializa la cadena JSON en una lista de objetos MetaUsuario
+                temporal = JsonConvert.DeserializeObject<List<MetaUsuario>>(jsonResult.ToString());
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return temporal?? new List<MetaUsuario>();
         }
 
         public IEnumerable<Meta> BuscarMeta(ClaimsIdentity? identity, string? metAno = null, string? metCod = null, string? estCod = null, string? metMetTec = null, string? metEjeTec = null, string? metPorAvaTec = null, string? metMetPre = null, string? metEjePre = null, string? metPorAvaPre = null, string? metMesPlaTec = null, string? metAnoPlaTec = null, string? metMesPlaPre = null, string? metAnoPlaPre = null, string? metEstPre = null, string? impCod = null, string? ubiAno = null, string? ubiCod = null, string? indAno = null, string? indCod = null, string? usuAno = null, string? usuCod = null, string? finCod = null)

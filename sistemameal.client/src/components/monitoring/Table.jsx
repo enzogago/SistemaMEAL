@@ -8,6 +8,7 @@ import TableEmpty from '../../img/PowerMas_TableEmpty.svg';
 import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
 import Pdf_Icon from '../../img/PowerMas_Pdf_Icon.svg';
 import Search from '../../icons/Search';
+import Expand from '../../icons/Expand';
 
 const smallPageSizes = [10, 20, 30, 50];
 const largePageSizes = [100, 200, 300, 500];
@@ -207,7 +208,7 @@ const Table = ({setModalIsOpen}) => {
                     <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>
                         Exportar
                         <span className='flex'>
-                            <Search />
+                            <Expand />
                         </span>
                     </button>
                     <div className="PowerMas_Dropdown_Export_Content Phone_12">

@@ -156,7 +156,7 @@ const FormUser = () => {
                 for (let key in data) {
                     if (typeof data[key] === 'string') {
                         // Convierte cada cadena a minúsculas
-                        newData[key] = data[key].toLowerCase();
+                        newData[key] = data[key];
                     } else {
                         // Mantiene los valores no string tal como están
                         newData[key] = data[key];
@@ -241,16 +241,16 @@ const FormUser = () => {
                             <label htmlFor="docIdeCod">Documento Identidad</label>
                             <select 
                                 id="docIdeCod" 
-                                className={`f_75 p1 PowerMas_Modal_Form_${dirtyFields.docIdeCod || isSubmitted ? (errors.docIdeCod ? 'invalid' : 'valid') : ''}`} 
+                                className={`p1 PowerMas_Modal_Form_${dirtyFields.docIdeCod || isSubmitted ? (errors.docIdeCod ? 'invalid' : 'valid') : ''}`} 
                                 {...register('docIdeCod', { 
                                     validate: value => value !== '0' || 'El documento de identidad es requerido' 
                                 })}
                                 style={{ textTransform: 'capitalize'}}
                             >
-                                <option className="f_75" value="0">--Seleccione Documento Identidad--</option>
+                                <option className="" value="0">--Seleccione Documento Identidad--</option>
                                 {documentos.map(documento => (
                                     <option
-                                        className="f_75"
+                                        className=""
                                         key={documento.docIdeCod}
                                         style={{textTransform: 'capitalize'}}
                                         value={documento.docIdeCod}> ({documento.docIdeAbr}) {documento.docIdeNom}
@@ -365,20 +365,20 @@ const FormUser = () => {
                                         type="radio" 
                                         id="masculino" 
                                         name="usuSex" 
-                                        value="m" 
+                                        value="M" 
                                         {...register('usuSex', { required: 'Por favor, selecciona una opción' })}
                                     />
-                                    <label htmlFor="masculino">Masculino</label>
+                                    <label htmlFor="masculino">MASCULINO</label>
                                 </div>
                                 <div className="flex gap_5">
                                     <input 
                                         type="radio" 
                                         id="femenino" 
                                         name="usuSex" 
-                                        value="f" 
+                                        value="F" 
                                         {...register('usuSex', { required: 'Por favor, selecciona una opción' })}
                                     />
-                                    <label htmlFor="femenino">Femenino</label>
+                                    <label htmlFor="femenino">FEMENINO</label>
                                 </div>
                             </div>
                             {errors.usuSex ? (
@@ -458,15 +458,15 @@ const FormUser = () => {
                             <select 
                                 id="pais"
                                 style={{textTransform: 'capitalize'}}
-                                className={`f_75 block Phone_12 PowerMas_Modal_Form_${dirtyFields.pais || isSubmitted ? (errors.pais ? 'invalid' : 'valid') : ''}`} 
+                                className={` block Phone_12 PowerMas_Modal_Form_${dirtyFields.pais || isSubmitted ? (errors.pais ? 'invalid' : 'valid') : ''}`} 
                                 {...register('pais', { 
                                     validate: value => value !== '0' || 'El País es requerido' 
                                 })}
                             >
-                                <option className="f_75" value="0">--Seleccione País--</option>
+                                <option className="" value="0">--Seleccione País--</option>
                                 {paises.map(pais => (
                                     <option
-                                        className="f_75"
+                                        className=""
                                         key={pais.ubiCod} 
                                         value={JSON.stringify({ ubiCod: pais.ubiCod, ubiAno: pais.ubiAno })}
                                     > 
@@ -511,7 +511,7 @@ const FormUser = () => {
                             <label htmlFor="rolCod">Rol</label>
                             <select 
                                 id="rolCod"
-                                className={`f_75 p1 PowerMas_Modal_Form_${dirtyFields.rolCod || isSubmitted ? (errors.rolCod ? 'invalid' : 'valid') : ''}`}
+                                className={`p1 PowerMas_Modal_Form_${dirtyFields.rolCod || isSubmitted ? (errors.rolCod ? 'invalid' : 'valid') : ''}`}
                                 {...register('rolCod', { 
                                     validate: value => value !== '0' || 'El rol es requerido' 
                                 })}
@@ -524,7 +524,7 @@ const FormUser = () => {
                                         value={rol.rolCod}
                                         style={{textTransform: 'capitalize'}}
                                     >
-                                        {rol.rolNom.toLowerCase()}
+                                        {rol.rolNom}
                                     </option>
                                 ))}
                             </select>
@@ -553,7 +553,7 @@ const FormUser = () => {
                                         value={cargo.carCod}
                                         style={{textTransform: 'capitalize'}}
                                     >
-                                        {cargo.carNom.toLowerCase()}
+                                        {cargo.carNom}
                                     </option>
                                 ))}
                             </select>
@@ -614,20 +614,20 @@ const FormUser = () => {
                                         type="radio" 
                                         id="activo" 
                                         name="usuEst" 
-                                        value="a"
+                                        value="A"
                                         {...register('usuEst', { required: 'Por favor, selecciona una opción' })}
                                     />
-                                    <label htmlFor="activo">Activo</label>
+                                    <label htmlFor="activo">ACTIVO</label>
                                 </div>
                                 <div className="flex gap_5">
                                     <input 
                                         type="radio" 
                                         id="inactivo" 
                                         name="usuEst" 
-                                        value="i"
+                                        value="I"
                                         {...register('usuEst', { required: 'Por favor, selecciona una opción' })}
                                     />
-                                    <label htmlFor="inactivo">Inactivo</label>
+                                    <label htmlFor="inactivo">INACTIVO</label>
                                 </div>
                             </div>
                             {errors.usuEst ? (

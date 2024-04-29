@@ -1,13 +1,11 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { AuthContext } from "../../context/AuthContext";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Notiflix from "notiflix";
-import ProjectItem from "./ProjectItem";
 import Bar from "./Bar";
 import CryptoJS from 'crypto-js';
-import masculino from '../../img/PowerMas_Avatar_Masculino.svg';
-import femenino from '../../img/PowerMas_Avatar_Femenino.svg';
 import { Tree } from 'antd';
+import UserInfo from "./UserInfo";
+import { fetchData } from "../reusable/helper";
 
 
 const PermissionUser = () => {
@@ -26,90 +24,110 @@ const PermissionUser = () => {
 
     const [ user, setUser ] = useState(null);
 
-    // EFECTO AL CARGAR COMPONENTE GET - LISTAR PROYECTOS
+    const [initialCheckedKeys, setInitialCheckedKeys] = useState([]);
+
+
+    // EFECTO AL CARGAR COMPONENTE GET - LISTAR METAS
     useEffect(() => {
-        let activeRequests = 0;
-
-        const startRequest = () => {
-            if (activeRequests === 0) {
-                Notiflix.Loading.pulse('Cargando...');
-            }
-            activeRequests++;
-        };
-
-        const endRequest = () => {
-            activeRequests--;
-            if (activeRequests === 0) {
-                Notiflix.Loading.remove();
-            }
-        };
-
-        const fetchUsuario = async () => {
-            try {
-                startRequest();
-                const token = localStorage.getItem('token');
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Usuario/${usuAno}/${usuCod}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                const data = await response.json();
-    
-                if (!response.ok) {
-                Notiflix.Notify.failure(data.message);
-                return;
-                }
-    
-                setUser(data)
-            } catch (error) {
-                console.error('Error:', error);
-            } finally {
-                endRequest();
-            }
-        };
-
-        let isCancelled = false;
-
-        const fetchProyectos = async () => {
-            try {
-                startRequest();
-                const token = localStorage.getItem('token');
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Proyecto/proyectos-subproyectos`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                if (!response.ok) {
-                    const data = await response.json();
-                    Notiflix.Notify.failure(data.message);
-                    return;
-                }
-                const data = await response.json();
+        const fetchDataAsync = async () => {
+            console.log(usuAno,usuCod)
+            await fetchData(`Usuario/${usuAno}/${usuCod}`, setUser);
+            await fetchData(`Proyecto/proyectos-subproyectos`, (data) => {
+                const transformedData = transformData(data);
+                setProyectos(transformedData);
+            });
+            await fetchData(`Meta/access/${usuAno}/${usuCod}`, (data) => {
                 console.log(data)
-                if (!isCancelled) {
-                    const transformedData = transformData(data);
-                    setProyectos(transformedData);
-                    console.log(transformedData)
-                }
-            } catch (error) {
-                Notiflix.Notify.failure('Ha ocurrido un error al cargar los proyectos.');
-            } finally {
-                endRequest();
-            }
+                const metasKeys = data.map(meta => {
+                    return `${meta.proAno}-${meta.proCod}-${meta.subProAno}-${meta.subProCod}-${meta.objAno}-${meta.objCod}-${meta.objEspAno}-${meta.objEspCod}-${meta.resAno}-${meta.resCod}-${meta.actAno}-${meta.actCod}-${meta.indAno}-${meta.indCod}-meta-${meta.metAno}-${meta.metCod}`;
+                });
+                console.log(metasKeys)
+                setCheckedKeys(metasKeys);
+                setInitialCheckedKeys(metasKeys);
+            });
         };
-
-        fetchUsuario();
-        fetchProyectos();
-
-        return () => {
-            isCancelled = true;
-        };
+    
+        fetchDataAsync();
     }, []);
-
+    
+    
 
     const handleSubmit = async () => {
-        navigate('/user')
+        // Filtra las claves marcadas para obtener solo las de las metas
+        const metaKeys = checkedKeys.filter(key => key.includes('meta'));
+        
+        // Extrae metAno y metCod de las claves de las metas
+        const metas = metaKeys.map(key => {
+            const parts = key.split('-');
+            return {
+                usuAno,
+                usuCod,
+                metAno: parts[parts.length - 2],
+                metCod: parts[parts.length - 1]
+            };
+        });
+        
+        console.log(metas);
+    
+        // Calcula los accesos a insertar y eliminar
+        const metasToInsert = metaKeys.filter(key => !initialCheckedKeys.includes(key)).map(key => {
+            const parts = key.split('-');
+            return {
+                usuAno,
+                usuCod,
+                metAno: parts[parts.length - 2],
+                metCod: parts[parts.length - 1]
+            };
+        });
+
+        const metasToDelete = initialCheckedKeys.filter(key => !checkedKeys.includes(key)).map(key => {
+            const parts = key.split('-');
+            return {
+                usuAno,
+                usuCod,
+                metAno: parts[parts.length - 2],
+                metCod: parts[parts.length - 1]
+            };
+        });
+
+        
+        const MetasDto = {
+            MetasInsertar: metasToInsert,
+            MetasEliminar: metasToDelete,
+        }
+        
+        handleSubmit2(MetasDto);
     }
+    
+
+    const handleSubmit2 = async (env) => {
+        try {
+            Notiflix.Loading.pulse();
+
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Meta/access`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(env),
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                Notiflix.Notify.failure(data.message);
+                return;
+            }
+            
+            Notiflix.Notify.success(data.message);
+            navigate('/user')
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            Notiflix.Loading.remove();
+        }
+    };
+    
 
     const transformData = (data) => {
         return data.map(item => {
@@ -125,18 +143,57 @@ const PermissionUser = () => {
                                     let resChildren = [];
                                     if (objEspItem.resultados) {
                                         resChildren = objEspItem.resultados.map(resItem => {
-                                            let indChildren = [];
-                                            if (resItem.indicadoresActividades) {
-                                                indChildren = resItem.indicadoresActividades.map((indItem,index) => {
+                                            let actChildren = [];
+                                            if (resItem.actividades) {
+                                                actChildren = resItem.actividades.map(actItem => {
+                                                    let indChildren = [];
+                                                    if (actItem.indicadores) {
+                                                        indChildren = actItem.indicadores.map((indItem) => {
+                                                            let metChildren = [];
+                                                            if (indItem.metas) {
+                                                                metChildren = indItem.metas.map((metItem) => {
+                                                                    const tecnico = metItem.usuNom.charAt(0).toUpperCase() + metItem.usuNom.slice(1).toLowerCase()
+                                                                    const implementador = metItem.impNom.charAt(0).toUpperCase() + metItem.impNom.slice(1).toLowerCase()
+                                                                    const ubicacion = metItem.ubiNom.charAt(0).toUpperCase() + metItem.ubiNom.slice(1).toLowerCase()
+                                                                    
+                                                                    const nombreMesPeriodo = metItem.metMesPlaTec ? (new Date(2024, metItem.metMesPlaTec - 1).toLocaleString('es-ES', { month: 'short' })) : '';
+                                                                    const mesPeriodo = nombreMesPeriodo.charAt(0).toUpperCase() + nombreMesPeriodo.slice(1).toLowerCase()
+                                                                    const periodo = `${mesPeriodo} - ${metItem.metAnoPlaTec}`
+
+                                                                    return {
+                                                                        title: 
+                                                                        <div>
+                                                                            <span className="bold">
+                                                                                Meta:{' '}
+                                                                            </span>
+                                                                            {`Técnico: ${tecnico} | Implementador: ${implementador} | Ubicación: ${ubicacion} | Periodo: ${periodo} | Meta: ${metItem.metMetTec}`}
+                                                                        </div>,
+                                                                        key: `${item.proAno}-${item.proCod}-${subItem.subProAno}-${subItem.subProCod}-${objItem.objAno}-${objItem.objCod}-${objEspItem.objEspAno}-${objEspItem.objEspCod}-${resItem.resAno}-${resItem.resCod}-${actItem.actAno}-${actItem.actCod}-${indItem.indAno}-${indItem.indCod}-meta-${metItem.metAno}-${metItem.metCod}`
+                                                                    };
+                                                                });
+                                                            }
+                                                            return {
+                                                                title: 
+                                                                <div>
+                                                                    <span className="bold">
+                                                                        Indicador:{' '}
+                                                                    </span>
+                                                                    {indItem.indNom.charAt(0).toUpperCase() + indItem.indNom.slice(1).toLowerCase()}
+                                                                </div>,
+                                                                key: `${item.proAno}-${item.proCod}-${subItem.subProAno}-${subItem.subProCod}-${objItem.objAno}-${objItem.objCod}-${objEspItem.objEspAno}-${objEspItem.objEspCod}-${resItem.resAno}-${resItem.resCod}-${actItem.actAno}-${actItem.actCod}-${indItem.indAno}-${indItem.indCod}`,
+                                                                children: metChildren
+                                                            };
+                                                        });
+                                                    }
                                                     return {
-                                                        title: 
-                                                        <div>
-                                                            <span className="bold">
-                                                                Indicador:{' '}
-                                                            </span>
-                                                            {indItem.indActResNom.charAt(0).toUpperCase() + indItem.indActResNom.slice(1).toLowerCase()}
-                                                        </div>,
-                                                        key: `${item.proAno}-${item.proCod}-${subItem.subProAno}-${subItem.subProCod}-${objItem.objAno}-${objItem.objCod}-${objEspItem.objEspAno}-${objEspItem.objEspCod}-${resItem.resAno}-${resItem.resCod}-${indItem.indActResAno}-${indItem.indActResCod}-${indItem.indActResTip}${index}`
+                                                        title:
+                                                            <div>
+                                                                <span className="bold">
+                                                                    Grupo sin sub-actividades{' '}
+                                                                </span>
+                                                            </div>,
+                                                        key: `${item.proAno}-${item.proCod}-${subItem.subProAno}-${subItem.subProCod}-${objItem.objAno}-${objItem.objCod}-${objEspItem.objEspAno}-${objEspItem.objEspCod}-${resItem.resAno}-${resItem.resCod}-${actItem.actAno}-${actItem.actCod}`,
+                                                        children: indChildren
                                                     };
                                                 });
                                             }
@@ -149,7 +206,7 @@ const PermissionUser = () => {
                                                         {resItem.resNom.charAt(0).toUpperCase() + resItem.resNom.slice(1).toLowerCase()}
                                                     </div>,
                                                 key: `${item.proAno}-${item.proCod}-${subItem.subProAno}-${subItem.subProCod}-${objItem.objAno}-${objItem.objCod}-${objEspItem.objEspAno}-${objEspItem.objEspCod}-${resItem.resAno}-${resItem.resCod}`,
-                                                children: indChildren
+                                                children: actChildren
                                             };
                                         });
                                     }
@@ -211,88 +268,33 @@ const PermissionUser = () => {
     const [selectedKeys, setSelectedKeys] = useState([]);
     const [autoExpandParent, setAutoExpandParent] = useState(true);
     const onExpand = (expandedKeysValue) => {
-        console.log('onExpand', expandedKeysValue);
-        // if not set autoExpandParent to false, if children expanded, parent can not collapse.
-        // or, you can remove all expanded children keys.
         setExpandedKeys(expandedKeysValue);
         setAutoExpandParent(false);
     };
     const onCheck = (checkedKeysValue) => {
-        console.log('onCheck', checkedKeysValue);
         setCheckedKeys(checkedKeysValue);
     };
 
     return (
-        <div className="bg-white h-100 flex flex-column">
+        <div className="bg-white h-100 flex flex-column over">
             <div className="PowerMas_Header_Form_Beneficiarie flex ai-center">
-                {/* <GrFormPreviousLink className="m1 w-auto Large-f2_5 pointer" onClick={() => navigate('/user')} /> */}
                 <Bar currentStep={3} type='user' />
             </div>
             <div className="flex flex-grow-1 overflow-auto p1_25">
                 <div className="flex flex-grow-1  gap-1">
                     <div className="PowerMas_ListPermission PowerMas_Form_Card p1 Large_6 overflow-auto">
-                        {/* <ul>
-                            {proyectos.map(proyecto => (
-                                <ProjectItem 
-                                    key={proyecto.proCod} 
-                                    proyecto={proyecto} 
-                                    handleCheck={handleCheck} 
-                                    checkedProyectos={checkedProyectos} 
-                                    checkedSubProyectos={checkedSubProyectos} 
-                                />
-                            ))}
-                        </ul> */}
                         <Tree
-                          checkable
-                          onExpand={onExpand}
-                          expandedKeys={expandedKeys}
-                          autoExpandParent={autoExpandParent}
-                          onCheck={onCheck}
-                          checkedKeys={checkedKeys}
-                          selectedKeys={selectedKeys}
-                          treeData={proyectos}
+                            checkable
+                            onExpand={onExpand}
+                            expandedKeys={expandedKeys}
+                            autoExpandParent={autoExpandParent}
+                            onCheck={onCheck}
+                            checkedKeys={checkedKeys}
+                            selectedKeys={selectedKeys}
+                            treeData={proyectos}
                         />
                     </div>
-                    <div className="PowerMas_Info_User Large_6 PowerMas_Form_Card p1" style={{backgroundColor: '#f7f7f7'}}>
-                        <div className="flex flex-column jc-center ai-center gap_5">
-                        <div className="PowerMas_ProfilePicture2" style={{width: 125, height: 125}}>
-                            <img src={user && user.usuSex === 'M' ? masculino : femenino} alt="Descripción de la imagen" />
-                        </div>
-                        <div className="center">
-                            <p className="f1_25 bold" style={{textTransform: 'capitalize'}}>{user && user.usuNom.toLowerCase() + ' ' + user.usuApe.toLowerCase() }</p>
-                            <p className="color-gray" style={{textTransform: 'capitalize'}}>{user && user.carNom.toLowerCase() }</p>
-                        </div>
-                        </div>
-                        <br />
-                        <article className="p_25">
-                        <p className="bold">Tipo Documento:</p>
-                        <p className="color-gray" style={{textTransform: 'capitalize'}}>{user && user.docIdeNom.toLowerCase() }</p>
-                        </article>
-                        <article className="p_25">
-                        <p className="bold">Documento:</p>
-                        <p className="color-gray">{user && user.usuNumDoc}</p>
-                        </article>
-                        <article className="p_25">
-                        <p className="bold">Correo:</p>
-                        <p className="color-gray">{user && user.usuCorEle.toLowerCase() }</p>
-                        </article>
-                        <article className="p_25">
-                        <p className="bold">Nacimiento:</p>
-                        <p className="color-gray">{user && user.usuFecNac }</p>
-                        </article>
-                        <article className="p_25">
-                        <p className="bold">Teléfono:</p>
-                        <p className="color-gray">{user && user.usuTel }</p>
-                        </article>
-                        <article className="p_25">
-                        <p className="bold">Rol:</p>
-                        <p className="color-gray" style={{textTransform: 'capitalize'}}>{user && user.rolNom.toLowerCase() }</p>
-                        </article>
-                        <article className="p_25">
-                        <p className="bold">Estado:</p>
-                        <p className="color-gray bold" style={{color: `${user && (user.usuEst === 'A' ? '#20737b' : '#E5554F')}`}}>{user && (user.usuEst === 'A' ? 'Activo' : 'Inactivo')}</p>
-                        </article>
-                    </div>
+                    <UserInfo user={user} />
                 </div>
             </div>
             <footer className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">

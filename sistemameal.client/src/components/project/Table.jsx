@@ -38,28 +38,62 @@ const Table = ({data = [], setData, openModal}) => {
             {
                 header: "Código",
                 accessorKey: "proIde",
+                cell: ({row}) => (
+                    <span className="flex ai-center jc-center">
+                        {row.original.proIde}
+                    </span>
+                ),
             },
             {
                 header: "Linea de Intervención",
                 accessorKey: "proLinInt",
+                cell: ({row}) => (
+                    <span className="flex ai-center jc-center">
+                        {row.original.proLinInt}
+                    </span>
+                ),
             },
             {
                 header: "Nombre",
                 accessorKey: "proNom",
-                cell: ({row}) => (
-                    <div style={{textTransform: 'capitalize'}}>
-                        {row.original.proNom}
-                    </div>
-                ),
+                cell: ({row}) => {
+                    const text = row.original.proNom;
+                    const shortText = text.length > 70 ? text.substring(0, 70) + '...' : text;
+
+                    if (text.length > 70) {
+                        return (
+                            <span 
+                                data-tooltip-id="info-tooltip" 
+                                data-tooltip-content={text} 
+                            >
+                                {shortText}
+                            </span>
+                        )
+                    } else {
+                        return text;
+                    }
+                },
             },
             {
                 header: "Descripción",
                 accessorKey: "proDes",
-                cell: ({row}) => (
-                    <div style={{textTransform: 'capitalize'}}>
-                        {row.original.proDes}
-                    </div>
-                ),
+                cell: ({row}) => {
+                    const text = row.original.proDes;
+                    const shortText = text.length > 70 ? text.substring(0, 70) + '...' : text;
+
+                    if (text.length > 70) {
+                        return (
+                            <span 
+                                data-tooltip-id="info-tooltip" 
+                                data-tooltip-content={text} 
+                            >
+                                {shortText}
+                            </span>
+                        )
+                    } else {
+                        return text;
+                    }
+                },
             },
         ];
 
@@ -75,7 +109,7 @@ const Table = ({data = [], setData, openModal}) => {
                             <span
                                 data-tooltip-id="edit-tooltip" 
                                 data-tooltip-content="Editar" 
-                                className='flex f1_5 p_25' 
+                                className='flex f1_25 p_25' 
                                 onClick={() => openModal(row.original)} 
                             >
                                 <Edit />
@@ -85,7 +119,7 @@ const Table = ({data = [], setData, openModal}) => {
                             <span
                                 data-tooltip-id="delete-tooltip" 
                                 data-tooltip-content="Eliminar" 
-                                className='flex f1_5 p_25'
+                                className='flex f1_25 p_25'
                                 onClick={() => handleDelete('Proyecto',row.original, setData)} 
                             >
                                 <Delete />
@@ -104,8 +138,9 @@ const Table = ({data = [], setData, openModal}) => {
     const [sorting, setSorting] = useState([]);
     const filteredData = useMemo(() => 
         data.filter(item => 
+            (item.proLinInt ? item.proLinInt.includes(searchFilter.toUpperCase()) : false) ||
             (item.proNom ? item.proNom.includes(searchFilter.toUpperCase()) : false) ||
-            (item.proDes ? item.proRes.includes(searchFilter.toUpperCase()) : false) ||
+            (item.proDes ? item.proDes.includes(searchFilter.toUpperCase()) : false) ||
             (item.proIde ? item.proIde.includes(searchFilter.toUpperCase()) : false)
         ), [data, searchFilter]
     );
@@ -133,9 +168,9 @@ const Table = ({data = [], setData, openModal}) => {
         proInvSubAct: item.proInvSubAct === 'S' ? 'SI' : 'NO',
 
     }));
-    const headers = ['CODIGO', 'NOMBRE', 'DESCRIPCION', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
+    const headers = ['CODIGO', 'LINEA_INTERVENCION', 'NOMBRE', 'DESCRIPCION', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
     const title = 'PROYECTOS';  // El título de tu archivo
-    const properties = ['proIde', 'proNom', 'proDes', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
+    const properties = ['proIde', 'proLinInt', 'proNom', 'proDes', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
     const format = 'a3';  // El tamaño del formato que quieres establecer para el PDF
 
     const Export_Excel = () => {

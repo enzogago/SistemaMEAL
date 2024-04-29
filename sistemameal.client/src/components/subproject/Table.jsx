@@ -16,7 +16,7 @@ import Edit from "../../icons/Edit";
 import Delete from "../../icons/Delete";
 
 
-const Table = ({data = [], setData}) => {
+const Table = ({data = [], setData, setModalIsOpen}) => {
     const navigate = useNavigate();
     // Variables State AuthContext 
     const { authInfo } = useContext(AuthContext);
@@ -90,6 +90,25 @@ const Table = ({data = [], setData}) => {
                     );
                 },
             },
+            {
+                header: "FFVV",
+                accessorKey: "subProFueVer",
+                disableSorting: true,
+                stickyRight: 100,
+                cell: ({row}) => {
+                    return (
+                        <div className="flex jc-center ai-center" >
+                            <button  
+                                className="PowerMas_Add_Beneficiarie f_75 flex-grow-1" 
+                                style={{padding: '0.25rem 0.75rem'}}
+                                onClick={() => setModalIsOpen(row.original)}
+                            >
+                                Documento Formulacion
+                            </button>
+                        </div>
+                    );
+                },
+            },
         ];
 
         if (actions.edit || actions.delete) {
@@ -104,7 +123,7 @@ const Table = ({data = [], setData}) => {
                             <span
                                 data-tooltip-id="edit-tooltip" 
                                 data-tooltip-content="Editar" 
-                                className='flex f1_5 p_25' 
+                                className='flex f1_25 p_25' 
                                 onClick={() => Editar_Sub_Proyecto(row)} 
                             >
                                 <Edit />
@@ -114,7 +133,7 @@ const Table = ({data = [], setData}) => {
                             <span
                                 data-tooltip-id="delete-tooltip" 
                                 data-tooltip-content="Eliminar" 
-                                className='flex f1_5 p_25'
+                                className='flex f1_25 p_25'
                                 onClick={() => handleDeleteMant(row.original, row.original, setData)} 
                             >
                                 <Delete />
