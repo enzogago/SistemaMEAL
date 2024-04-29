@@ -1,11 +1,12 @@
 import Bar from '../../user/Bar';
-import { FaPlus, FaRegTrashAlt } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import CryptoJS from 'crypto-js';
 import { useEffect, useState } from "react";
 import Notiflix from "notiflix";
 import { useForm } from 'react-hook-form';
 import { fetchData } from '../../reusable/helper';
+import Plus from '../../../icons/Plus';
+import Delete from '../../../icons/Delete';
 
 const RegisterProject = () => {
     const navigate = useNavigate();
@@ -450,7 +451,14 @@ const RegisterProject = () => {
                     <div className="flex flex-column gap_5 p1_75" style={{backgroundColor: '#fff', border: '1px solid #372e2c3d'}}>
                         <div className="flex ai-center jc-space-between">
                             <h3 className="f1_25">Implementadores</h3>
-                            <FaPlus className='w-auto f1 pointer' onClick={() => setSelectCount(count => count + 1)} /> 
+                            <span 
+                                className='pointer flex f1_5 PowerMas_IconsTable'
+                                data-tooltip-id="delete-tooltip" 
+                                data-tooltip-content="Agregar" 
+                                onClick={() => setSelectCount(count => count + 1)}
+                            >
+                                <Plus />
+                            </span>
                         </div>
                         {Array.from({ length: selectCount }, (_, index) => (
                             <div key={index} className="flex gap_5">
@@ -473,14 +481,14 @@ const RegisterProject = () => {
                                         </option>
                                     ))}
                                 </select>
-                                <div className='PowerMas_IconsTable flex jc-center ai-center'>
-                                    <FaRegTrashAlt 
-                                        data-tooltip-id="delete-tooltip" 
-                                        data-tooltip-content="Eliminar" 
-                                        className='Large-p_25' 
-                                        onClick={() => handleRemoveImplementador(index)} 
-                                    />
-                                </div>
+                                <span 
+                                    className='flex jc-center ai-center pointer f1_5 PowerMas_IconsTable'
+                                    data-tooltip-id="delete-tooltip" 
+                                    data-tooltip-content="Eliminar" 
+                                    onClick={() => handleRemoveImplementador(index)} 
+                                >
+                                    <Delete />
+                                </span>
                             </div>
                         ))}
                     </div>
@@ -489,10 +497,14 @@ const RegisterProject = () => {
                 <div className="p1" style={{backgroundColor: '#fff', border: '1px solid #372e2c3d'}}>
                         <div className="flex ai-center jc-space-between">
                             <h3 className="f1_25 m1">Datos de Ubicación</h3>
-                            <FaPlus 
-                                className='w-auto f1 pointer' 
+                            <span 
+                                className='pointer flex f1_5 PowerMas_IconsTable'
+                                data-tooltip-id="delete-tooltip" 
+                                data-tooltip-content="Agregar" 
                                 onClick={() => setLocationSelects(prevSelects => [...prevSelects, { count: 1, selects: [] }])} 
-                            />
+                            >
+                                <Plus />
+                            </span>
                         </div>
                         {locationSelects.map((country, countryIndex) => {
                             return(
@@ -501,14 +513,14 @@ const RegisterProject = () => {
                                     <label htmlFor="pais" className="">
                                         Pais:
                                     </label>
-                                    <div className='PowerMas_IconsTable flex jc-center ai-center'>
-                                        <FaRegTrashAlt 
-                                            data-tooltip-id="delete-tooltip" 
-                                            data-tooltip-content="Eliminar" 
-                                            className='Large-p_25' 
-                                            onClick={() => handleRemoveUbicacion(countryIndex)} 
-                                        />
-                                    </div>
+                                    <span 
+                                        className='flex jc-center ai-center pointer f1_5 PowerMas_IconsTable'
+                                        data-tooltip-id="delete-tooltip" 
+                                        data-tooltip-content="Eliminar" 
+                                        onClick={() => handleRemoveUbicacion(countryIndex)} 
+                                    >
+                                        <Delete />
+                                    </span>
                                 </div>
                                 <select 
                                     id={`pais${countryIndex}`}

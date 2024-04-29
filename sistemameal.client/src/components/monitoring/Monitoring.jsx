@@ -2,9 +2,11 @@ import Notiflix from 'notiflix';
 import React, { useEffect, useRef, useState } from 'react'
 import Table from './Table';
 import Modal from 'react-modal';
-import { FaRegTrashAlt, FaDownload, FaFile  } from 'react-icons/fa';
 import { formatterBudget } from './goal/helper';
 import { fetchData } from '../reusable/helper';
+import Download from '../../icons/Download';
+import FileExcel from '../../icons/FileExcel';
+import Delete from '../../icons/Delete';
 
 const Monitoring = () => {
     const [selectedFiles, setSelectedFiles] = useState([]);
@@ -303,7 +305,9 @@ const Monitoring = () => {
                                 onChange={handleFileChange} 
                                 accept="*/*"
                             />
-                            <FaFile className="Large-f5 w-auto" />
+                            <span className="Large-f5 flex ai-center jc-center" >
+                                <FileExcel />
+                            </span>
                             {
                                 dragging ?
                                 <p>Suelta el archivo aquí</p>
@@ -335,25 +339,27 @@ const Monitoring = () => {
                                 <tr key={index}>
                                     <td className="PowerMas_IconsTable">
                                         <div className='flex ai-center jc-center'>
-                                            <FaDownload
-                                                style={{width: '20px'}}
+                                            <span 
+                                                className="flex Large-f1_25"
                                                 data-tooltip-id="delete-tooltip" 
                                                 data-tooltip-content="Descargar"
                                                 onClick={() => downloadFile(`${file.metFueVerNom}`)}
-                                            />
+                                            >
+                                                <Download /> 
+                                            </span>
                                         </div>
                                     </td>
-                                    <td className='f_75' style={{whiteSpace: 'nowrap'}}>{file.metFueVerNom}</td>
+                                    <td className='f_75 p_25' style={{whiteSpace: 'nowrap'}}>{file.metFueVerNom}</td>
                                     <td className='f_75' style={{whiteSpace: 'nowrap'}}>{formatterBudget.format(file.metFueVerPes / 1024)} KB</td>
                                     <td className="PowerMas_IconsTable">
-                                        <div className='flex ai-center jc-center'>
-                                            <FaRegTrashAlt
-                                                style={{width: '20px'}}
-                                                data-tooltip-id="delete-tooltip" 
-                                                data-tooltip-content="Eliminar"
-                                                onClick={() => eliminarDocumento(index)}
-                                            />
-                                        </div>
+                                        <span 
+                                            className='flex ai-center jc-center f1_25'
+                                            data-tooltip-id="delete-tooltip" 
+                                            data-tooltip-content="Eliminar"
+                                            onClick={() => eliminarDocumento(index)}
+                                        >
+                                            <Delete />
+                                        </span>
                                     </td>
                                 </tr>
                             ))}

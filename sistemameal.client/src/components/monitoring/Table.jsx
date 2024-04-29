@@ -4,10 +4,10 @@ import { formatter, formatterBudget } from '../../components/monitoring/goal/hel
 import CryptoJS from 'crypto-js';
 import { useNavigate } from 'react-router-dom';
 import Notiflix from 'notiflix';
-import { FaSearch, FaSortDown } from 'react-icons/fa';
 import TableEmpty from '../../img/PowerMas_TableEmpty.svg';
 import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
 import Pdf_Icon from '../../img/PowerMas_Pdf_Icon.svg';
+import Search from '../../icons/Search';
 
 const smallPageSizes = [10, 20, 30, 50];
 const largePageSizes = [100, 200, 300, 500];
@@ -191,7 +191,7 @@ const Table = ({setModalIsOpen}) => {
                             ))}
                         </div>
                         <div className="Phone_12 relative">
-                            <FaSearch className="search-icon" />
+                            <Search />
                             <input 
                                 className='PowerMas_Input_Filter Large_12 Large-p_5 m0'
                                 type="search"
@@ -204,7 +204,12 @@ const Table = ({setModalIsOpen}) => {
                     </div>
                 </div>
                 <div className={`PowerMas_Dropdown_Export Large_3 ${dropdownOpen ? 'open' : ''}`}>
-                    <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>Exportar <FaSortDown className='Large_1' /></button>
+                    <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>
+                        Exportar
+                        <span className='flex'>
+                            <Search />
+                        </span>
+                    </button>
                     <div className="PowerMas_Dropdown_Export_Content Phone_12">
                         <a 
                             onClick={() => {

@@ -1,14 +1,10 @@
-import { TiArrowSortedUp ,TiArrowSortedDown } from "react-icons/ti";
 import Excel_Icon from '../../../img/PowerMas_Excel_Icon.svg';
 import Pdf_Icon from '../../../img/PowerMas_Pdf_Icon.svg';
 import Pagination from './Pagination';
 import {
     flexRender, 
 } from '@tanstack/react-table';
-import { useNavigate } from 'react-router-dom';
-import { GrNext, GrPrevious } from 'react-icons/gr';
 import { useRef } from 'react';
-import { Tooltip } from 'react-tooltip';
 import Search from '../../../icons/Search';
 
 const CustomTableUpload = ({ 
@@ -35,8 +31,6 @@ const CustomTableUpload = ({
     errorCells,
     isLargePagination
 }) => {
-    const navigate = useNavigate();
-    
     const toggleDropdown = () => {
         setDropdownOpen(!dropdownOpen);
     }
@@ -158,7 +152,7 @@ const CustomTableUpload = ({
                                                     {
                                                         flexRender(header.column.columnDef.header, header.getContext())
                                                     }
-                                                   <div className='flex flex-column ai-center jc-center PowerMas_Icons_Sorter'>
+                                                   {/* <div className='flex flex-column ai-center jc-center PowerMas_Icons_Sorter'>
                                                         {header.column.getIsSorted() === 'asc' && !header.column.columnDef.disableSorting ? 
                                                             <TiArrowSortedUp className={`sort-icon active`} /> :
                                                             header.column.getIsSorted() === 'desc' && !header.column.columnDef.disableSorting ? 
@@ -169,7 +163,7 @@ const CustomTableUpload = ({
                                                                 <TiArrowSortedDown className={`sort-icon`} />
                                                             </>
                                                         }
-                                                    </div>
+                                                    </div> */}
                                                 </div>
 
                                                 {header.column.columnDef.stickyRight === undefined && resize &&  // Muestra el elemento <span> solo si la columna no es "sticky"
@@ -253,13 +247,6 @@ const CustomTableUpload = ({
                         }
                     </tbody>
                 </table>
-                {
-                    scrolled &&
-                    <>
-                        <GrPrevious className="slider" style={{left: '0'}} onClick={() => scrollTable(-1)} />
-                        <GrNext className="slider" style={{right: '0'}} onClick={() => scrollTable(1)} />
-                    </>
-                }
             </div>
             { showPagination && <Pagination table={table} isLargePagination={isLargePagination} />}
         </div>

@@ -7,7 +7,7 @@ import { Tooltip } from 'react-tippy';
 
 import IconCalendar from '../../icons/IconCalendar';
 import IconLocation from '../../icons/IconLocation';
-import IconUser from '../../icons/IconUser';
+import User from '../../icons/User';
 
 const ResultChain = () => {
     const [currency, setCurrency] = useState('');
@@ -502,7 +502,7 @@ const ResultChain = () => {
                             <th className='center PowerMas_Borde_Total PowerMas_Borde_Total2 PowerMas_Combine_Header' colSpan={numeroColumnasImplementador}>
                                 <span className='flex ai-center jc-center gap-1'>
                                     Por Implementador
-                                    <IconUser />
+                                    <User />
                                 </span>
                             </th>
                             <th className='center PowerMas_Borde_Total PowerMas_Borde_Total2 PowerMas_Combine_Header' colSpan={numeroColumnasUbicacion}>
@@ -514,7 +514,7 @@ const ResultChain = () => {
                             <th className='center PowerMas_Borde_Total PowerMas_Borde_Total2 PowerMas_Combine_Header' colSpan={numeroColumnasFinanciador}>
                                 <span className='flex ai-center jc-center gap-1'>
                                     Por Financiador
-                                    <IconUser />
+                                    <User />
                                 </span>
                             </th>
                         </tr>

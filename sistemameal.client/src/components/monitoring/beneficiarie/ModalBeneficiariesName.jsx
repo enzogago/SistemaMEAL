@@ -13,7 +13,7 @@ import CustomTable from "../../reusable/Table/CustomTable";
 import { Export_Excel_Helper, Export_PDF_Helper } from "../../reusable/helper";
 import masculino from '../../../img/PowerMas_Avatar_Masculino.svg';
 import femenino from '../../../img/PowerMas_Avatar_Femenino.svg';
-import { PiArrowFatUpFill } from "react-icons/pi";
+import Select from "../../../icons/Select";
 
 const ModalBeneficiariesName = ({data, modalBeneficiariesName, closeBeneficiariesName,buscarDataMetas }) => {
 
@@ -211,14 +211,16 @@ const ModalBeneficiariesName = ({data, modalBeneficiariesName, closeBeneficiarie
                 // const {benAno, benCod, ubiAno, ubiCod, metBenAnoEjeTec, metBenMesEjeTec } = row.original;
                 return(
                 <div className='PowerMas_IconsTable flex jc-center ai-center'>
-                    <PiArrowFatUpFill 
+                    <span
                         data-tooltip-id="select-tooltip" 
                         data-tooltip-content="Seleccionar" 
-                        className='Large-p_25' 
+                        className='flex f1_5' 
                         onClick={() => {
                             buscarDataMetas(row.original);
                         }} 
-                    />
+                    >
+                        <Select />
+                    </span>
                 </div>
             )},
         });

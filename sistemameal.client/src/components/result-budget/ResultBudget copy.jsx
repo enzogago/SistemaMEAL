@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { FaSortDown } from 'react-icons/fa';
 import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
 import { Export_Excel_Basic2, fetchData } from '../reusable/helper';
 import { useForm } from 'react-hook-form';
@@ -11,6 +10,7 @@ import calendarIconActive from '../../icons/calendar-active.svg';
 import locationIcon from '../../icons/location.svg';
 import locationIconActive from '../../icons/location-active.svg';
 import { formatterBudget } from '../monitoring/goal/helper';
+import Expand from '../../icons/Expand';
 
 const ResultBudget = () => {
 
@@ -353,7 +353,12 @@ const ResultBudget = () => {
                     )}
                 </div>
                 <div className={`PowerMas_Dropdown_Export Large_3 Large-m_25 ${dropdownOpen ? 'open' : ''}`}>
-                    <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>Exportar <FaSortDown className='Large_1' /></button>
+                    <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>
+                        Exportar
+                        <span className="flex">
+                            <Expand />
+                        </span>
+                        </button>
                     <div className="PowerMas_Dropdown_Export_Content Phone_12">
                         {/* {true &&
                             <a onClick={() => {

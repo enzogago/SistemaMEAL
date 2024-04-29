@@ -1413,9 +1413,6 @@ textarea {
 	color: #20737B;
 }
 
-.PowerMas_IconsTable{
-	width: auto;
-}
 .PowerMas_IconsTable svg{
 	color: var(--naranja-ayuda);
 	transition: color 0.2s ease;
@@ -1564,6 +1561,7 @@ textarea {
 }
 
 /*---------------*/
+
 .PowerMas_Buttom_Map{
 	width: 100%;
 	border: 1px solid #372E2C;

@@ -1,12 +1,12 @@
-import { FaPlus } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import CryptoJS from 'crypto-js';
 import { useEffect, useState } from "react";
 import Notiflix from "notiflix";
 import { useForm } from 'react-hook-form';
-import { GrFormPreviousLink } from "react-icons/gr";
 import { fetchData } from "../reusable/helper";
 import Delete from "../../icons/Delete";
+import Plus from "../../icons/Plus";
+import Return from "../../icons/Return";
 
 const FormSubProject = () => {
     const navigate = useNavigate();
@@ -251,11 +251,9 @@ const FormSubProject = () => {
                 }
                 fetchEdit();
                 fetchData(`Implementador/subproyecto/${ano}/${cod}`,(data) => {
-                    console.log(data)
                     setImplementadoresEdit(data);
                 });
                 fetchData(`Financiador/subproyecto/${ano}/${cod}`,(data) => {
-                    console.log(data)
                     setFinanciadoresEdit(data);
                 });
                 fetchData(`Ubicacion/subproyecto/${ano}/${cod}`,setUbicacionesEdit);
@@ -575,7 +573,12 @@ const FormSubProject = () => {
     return (
         <>
             <div className="PowerMas_Header_Form_Beneficiarie flex ai-center p_5 gap-1">
-                <GrFormPreviousLink className="w-auto Large-f2_5 pointer" onClick={() => navigate('/subproject')} />
+                <span 
+                    className='flex f1_25'
+                    onClick={() => navigate('/subproject')} 
+                >
+                    <Return />
+                </span>
                 <h1 className="f1_75"> {isEditing ? 'Editar' : 'Nuevo'} Sub Proyecto</h1>
             </div>
 
@@ -900,7 +903,12 @@ const FormSubProject = () => {
                     <div className="flex flex-column gap_5 p1_75" style={{backgroundColor: '#fff', border: '1px solid #372e2c3d'}}>
                         <div className="flex ai-center jc-space-between">
                             <h3 className="f1_25">Implementadores</h3>
-                            <FaPlus className='w-auto f1 pointer' onClick={() => setSelectCount(count => count + 1)} /> 
+                            <span
+                                className='flex pointer' 
+                                onClick={() => setSelectCount(count => count + 1)}
+                            >
+                                <Plus />
+                            </span>
                         </div>
                         {Array.from({ length: selectCount }, (_, index) => (
                             <div key={index} className="flex gap_5">
@@ -939,7 +947,12 @@ const FormSubProject = () => {
                     <div className="flex flex-column gap_5 p1_75" style={{backgroundColor: '#fff', border: '1px solid #372e2c3d'}}>
                         <div className="flex ai-center jc-space-between">
                             <h3 className="f1_25">Financiadores</h3>
-                            <FaPlus className='w-auto f1 pointer' onClick={() => setSelectCountFin(count => count + 1)} /> 
+                            <span
+                                className='flex pointer' 
+                                onClick={() => setSelectCountFin(count => count + 1)}
+                            >
+                                <Plus />
+                            </span>
                         </div>
                         {Array.from({ length: selectCountFin }, (_, index) => (
                             <div key={index} className="flex gap_5">
@@ -978,10 +991,12 @@ const FormSubProject = () => {
                     <div className="p1" style={{backgroundColor: '#fff', border: '1px solid #372e2c3d'}}>
                         <div className="flex ai-center jc-space-between">
                             <h3 className="f1_25 m1">Datos de Ubicación</h3>
-                            <FaPlus 
-                                className='w-auto f1 pointer' 
+                            <span
+                                className='flex pointer' 
                                 onClick={() => setLocationSelects(prevSelects => [...prevSelects, { count: 1, selects: [] }])} 
-                            />
+                            >
+                                <Plus />
+                            </span>
                         </div>
                         {locationSelects.map((country, countryIndex) => {
                             return(

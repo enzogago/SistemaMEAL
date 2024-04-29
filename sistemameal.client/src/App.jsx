@@ -20,11 +20,10 @@ import SaveGoalBudget from './components/result-budget/SaveGoalBudget';
 import ViewExecution from './components/result-budget/ViewExecution';
 import FormGoalExecution from './components/monitoring/beneficiarie/FormGoalExecution';
 import Prueba from './Prueba';
-// import Login from './components/auth/Login';
+import Login from './components/auth/Login';
 // import Layout from './components/router/Layout';
 // Componentes
 const Home = lazy(() => import('./components/home/Home'));
-const Login = lazy(() => import('./components/auth/Login'));
 const PrivateRoute = lazy(() => import('./components/router/PrivateRoute'));
 const PublicRoute = lazy(() => import('./components/router/PublicRoute'));
 const Layout = lazy(() => import('./components/router/Layout'));
@@ -52,7 +51,6 @@ const NotFound = lazy(() => import('./components/NotFound'));
 const Beneficiarie = lazy(() => import('./components/beneficiarie/Beneficiarie'));
 const FormGoalBeneficiarie = lazy(() => import('./components/monitoring/beneficiarie/FormGoalBeneficiarie'));
 const FormBeneficiarie = lazy(() => import('./components/beneficiarie/FormBeneficiarie'));
-const FormProfile = lazy(() => import('./components/profile/FormProfile'));
 const FormatProject = lazy(() => import('./components/upload/project/FormatProject'));
 const Notiflix = lazy(() => import('notiflix'));
 const SaveProject = lazy(() => import('./components/upload/project/SaveProject'));
@@ -222,7 +220,6 @@ const App = () => {
                                                 )}
                                                 <Route path="tutorial" element={<Tutorial />} />
                                                 <Route path="prueba" element={<Prueba />} />
-                                                <Route path="profile/:id" element={<FormProfile />} />
                                                 <Route path="*" element={<NotFound />} />
                                             </Routes>
                                     </Layout>

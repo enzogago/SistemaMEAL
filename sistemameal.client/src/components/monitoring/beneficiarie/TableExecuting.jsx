@@ -1,5 +1,4 @@
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 import {
     useReactTable, 
@@ -7,13 +6,13 @@ import {
     getPaginationRowModel,
     getSortedRowModel, 
 } from '@tanstack/react-table';
-// Iconos package
-import { FaEdit, FaPlus, FaRegTrashAlt, FaSearch, FaSortDown } from 'react-icons/fa';
 // Context
 import { AuthContext } from "../../../context/AuthContext";
 import CustomTable from "../../reusable/Table/CustomTable";
 import { Export_Excel_Helper, Export_PDF_Helper } from "../../reusable/helper";
-import { fetchBeneficiariosMeta, handleDeleteBeneficiarioMeta } from "./eventHandlers";
+import { handleDeleteBeneficiarioMeta } from "./eventHandlers";
+import Delete from "../../../icons/Delete";
+import Edit from "../../../icons/Edit";
 
 const TableExecuting = ({data, openModalGoalExecuting, metaData }) => {
     if(!openModalGoalExecuting) return;
@@ -122,24 +121,28 @@ const TableExecuting = ({data, openModalGoalExecuting, metaData }) => {
                     const {benAno, benCod, ubiAno, ubiCod, metBenAnoEjeTec, metBenMesEjeTec } = row.original;
                     return(
                     <div className='PowerMas_IconsTable flex jc-center ai-center'>
-                        {actions.edit && 
-                            <FaEdit 
+                        {actions.edit &&
+                            <span
                                 data-tooltip-id="edit-tooltip" 
                                 data-tooltip-content="Editar" 
-                                className='Large-p_25' 
+                                className='flex f1_5 p_25' 
                                 onClick={() => {
                                     setCurrentRecord(row.original);
                                     setModalVisible(true);
                                 }} 
-                            />
+                            >
+                                <Edit />
+                            </span>
                         }
-                        {actions.delete && 
-                            <FaRegTrashAlt 
+                        {actions.delete &&
+                            <span
                                 data-tooltip-id="delete-tooltip" 
                                 data-tooltip-content="Eliminar" 
-                                className='Large-p_25' 
-                                onClick={() => handleDeleteBeneficiarioMeta('Monitoreo',metaData.metAno,metaData.metCod,benAno,benCod,ubiAno,ubiCod,metBenAnoEjeTec,metBenMesEjeTec, updateData, setUpdateData, fetchBeneficiarie)} 
-                            />
+                                className='flex f1_5 p_25'
+                                onClick={() => handleDeleteBeneficiarioMeta('Monitoreo',metaData.metAno,metaData.metCod,benAno,benCod,ubiAno,ubiCod,metBenAnoEjeTec,metBenMesEjeTec, updateData, setUpdateData)} 
+                            >
+                                <Delete />
+                            </span>
                         }
                         
                     </div>

@@ -503,7 +503,7 @@ const UploadBeneficiarie = () => {
                                 </article>
                                 <br />
                                 <div
-                                    className="PowerMas_Input_Upload center p2 pointer todos"
+                                    className="PowerMas_Input_Upload center p2 pointer"
                                     ref={dropRef}
                                     onClick={handleDivClick}
                                     onDragEnter={handleDragIn}

@@ -1,5 +1,4 @@
 import React, { Fragment, useCallback, useEffect, useState } from 'react'
-import { FaSortDown } from 'react-icons/fa';
 import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
 import { fetchData } from '../reusable/helper';
 import { useForm } from 'react-hook-form';
@@ -8,6 +7,7 @@ import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { logoBase64 } from "../../img/Powermas_Logo_Ayuda_En_Accion";
 import { formatter } from '../monitoring/goal/helper';
+import Expand from '../../icons/Expand';
 
 const ViewExecution = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -402,7 +402,12 @@ const ViewExecution = () => {
                     </select>
                 </div>
                 <div className={`PowerMas_Dropdown_Export Large_3 ${dropdownOpen ? 'open' : ''}`}>
-                    <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={handleToggleDropdown}>Exportar <FaSortDown className='Large_1' /></button>
+                    <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={handleToggleDropdown}>
+                        Exportar
+                        <span className='flex'>
+                            <Expand />
+                        </span>
+                    </button>
                     <div className="PowerMas_Dropdown_Export_Content Phone_12">
                         <a onClick={() => {
                             exportToExcel(indicadores, totals, additionalRows);

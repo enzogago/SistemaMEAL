@@ -1,11 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaUnlockKeyhole } from "react-icons/fa6";
-import { FaUserAlt } from "react-icons/fa";
-import { IoPlayCircleSharp } from "react-icons/io5";
-import { AiFillTool } from "react-icons/ai";
-import { FaPowerOff } from "react-icons/fa";
 import { StatusContext } from '../../context/StatusContext';
 import Modal from './Modal';
 import ModalAcerca from './ModalAcerca';
@@ -13,6 +8,11 @@ import masculino from '../../img/PowerMas_Avatar_Masculino.svg';
 import femenino from '../../img/PowerMas_Avatar_Femenino.svg';
 import Logo from '../../img/PowerMas_LogoAyudaEnAccion.png';
 import ModalProfile from './ModalProfile';
+import Logout from '../../icons/Logout';
+import About from '../../icons/About';
+import User from '../../icons/User';
+import Chain from '../../icons/Chain';
+import Play from '../../icons/Play';
 
 const Bar = ({showSidebarAndBar, isOpen, setIsOpen}) => {
     const navigate = useNavigate();
@@ -130,7 +130,7 @@ const Bar = ({showSidebarAndBar, isOpen, setIsOpen}) => {
                         &gt;
                     </div>
                     {isOpen && (
-                        <div className={`Medium_2 Phone_6 PowerMas_DropdownMenu ${isOpen ? 'PowerMas_DropdownMenu--open' : ''}`}>
+                        <div className={`Medium_2 Phone_6  PowerMas_DropdownMenu ${isOpen ? 'PowerMas_DropdownMenu--open' : ''}`}>
                             <div className='PowerMas_Profile_Name p_75 flex flex-column jc-center ai-center gap_5'> 
                                 <div className="PowerMas_ProfilePicture2" style={{width: '75px'}}>
                                     <img src={userLogged && `data:image/jpeg;base64,${userLogged.usuAva}`} alt="Descripción de la imagen" />
@@ -141,28 +141,38 @@ const Bar = ({showSidebarAndBar, isOpen, setIsOpen}) => {
                             {
                                 showSidebarAndBar &&
                                 <>
-                                    <Link className='flex ai-center p_25' onClick={editarPerfil}>
-                                        <FaUserAlt className='w-auto m_5' />
+                                    <Link className='flex ai-center gap_5 p_5' onClick={editarPerfil}>
+                                        <span className='flex f1_25'>
+                                            <User />
+                                        </span>
                                         <span className='flex'>Perfil</span>
                                     </Link>
-                                    <Link className='flex ai-center p_25 grey-hover' onClick={CambiarContraseña}>
-                                        <FaUnlockKeyhole className='w-auto m_5' />
+                                    <Link className='flex ai-center gap_5 p_5 grey-hover' onClick={CambiarContraseña}>
+                                        <span className='flex f1_25'>
+                                            <Chain />
+                                        </span>
                                         <span className='flex'>Contraseña</span>
                                     </Link>
-                                    <Link className='flex ai-center p_25' onClick={() => setIsOpen(false)}  to="/tutorial">
-                                        <IoPlayCircleSharp className='w-auto m_5' />
+                                    <Link className='flex ai-center p_5 gap_5' onClick={() => setIsOpen(false)}  to="/tutorial">
+                                        <span className='flex f1_25'>
+                                            <Play />
+                                        </span>
                                         <span className='flex'>Tutoriales</span>
                                     </Link>
-                                    <Link className='flex ai-center p_25' onClick={AcercDe}>
-                                        <AiFillTool className='w-auto m_5' />
+                                    <Link className='flex gap_5 ai-center p_5' onClick={AcercDe}>
+                                        <span className='flex f1_25'>
+                                            <About />
+                                        </span>
                                         <span className='flex'>Acerca De</span>
                                     </Link>
                                     <hr className='PowerMas_Hr m0' />
                                 </>
                             }
-                            <Link className='flex ai-center p_25' onClick={CerrarSesion}>
-                                <FaPowerOff className='w-auto m_5' />
-                                <span className='flex'>Cerrar Sesión</span>
+                            <Link className='flex gap_5 ai-center p_5' onClick={CerrarSesion}>
+                                <span className='flex f1_25'>
+                                    <Logout />
+                                </span>
+                                <span className='flex flex-grow-1'>Cerrar Sesión</span>
                             </Link>
                         </div>
                     )}

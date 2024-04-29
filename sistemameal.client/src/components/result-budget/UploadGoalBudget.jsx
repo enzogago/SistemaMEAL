@@ -1,11 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import Bar from "../user/Bar";
 import { useContext, useRef, useState } from "react";
-import { FaDownload, FaRegFileExcel } from "react-icons/fa";
 import Notiflix from "notiflix";
 import { StatusContext } from "../../context/StatusContext";
 import { handleUpload } from "./handleUpload";
 import template from '../../templates/GASTO_MENSUAL.xlsm';
+import Download from "../../icons/Download";
+import FileExcel from "../../icons/FileExcel";
 
 const UploadGoalBudget = () => {
     // Variables State AuthContext 
@@ -99,7 +100,9 @@ const UploadGoalBudget = () => {
                 <div className="flex jc-center p_5">
                 <button className="PowerMas_Buttom_Secondary flex ai-center jc-space-between p_5 Phone_3" onClick={handleDownload}> 
                     Descargar formato 
-                    <FaDownload className="w-auto" /> 
+                    <span className="flex Large-f1_5">
+                        <Download /> 
+                    </span> 
                 </button>
                 </div>
                     <article className="PowerMas_Article_Upload center">
@@ -123,7 +126,9 @@ const UploadGoalBudget = () => {
                             onChange={handleFileChange} 
                             accept=".xlsm,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                         />
-                        <FaRegFileExcel className="Large-f5 w-auto" />
+                        <span className="Large-f5 flex ai-center jc-center" >
+                            <FileExcel />
+                        </span>
                         {
                             dragging ?
                             <p>Suelta el archivo aquí</p>

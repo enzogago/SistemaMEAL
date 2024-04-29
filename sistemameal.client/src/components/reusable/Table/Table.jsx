@@ -161,7 +161,7 @@ const Table = ({ data, openModal, setData, controller, fieldMapping, title, resi
                                 data-tooltip-id="edit-tooltip" 
                                 data-tooltip-content="Editar" 
                                 className='flex f1_5 p_25' 
-                                onClick={() => openModal(row)} 
+                                onClick={() => openModal(row.original)} 
                             >
                                 <Edit />
                             </span>
@@ -171,7 +171,7 @@ const Table = ({ data, openModal, setData, controller, fieldMapping, title, resi
                                 data-tooltip-id="delete-tooltip" 
                                 data-tooltip-content="Eliminar" 
                                 className='flex f1_5 p_25'
-                                onClick={() => handleDeleteMant(row.original, row.original, setData)} 
+                                onClick={() => handleDeleteMant(controller, row.original, setData)} 
                             >
                                 <Delete />
                             </span>

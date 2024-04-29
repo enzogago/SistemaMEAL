@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react'
-// import { FaSortDown } from 'react-icons/fa';
 import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
 import { Export_Excel_Basic, fetchData } from '../reusable/helper';
 import { useForm } from 'react-hook-form';
 import Notiflix from 'notiflix';
 import IconCalendar from '../../icons/IconCalendar';
-import IconUser from '../../icons/IconUser';
+import User from '../../icons/User';
 import IconLocation from '../../icons/IconLocation';
 import { Tooltip } from 'react-tippy';
+import Expand from '../../icons/Expand';
 
 const ResultChain = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -398,12 +398,12 @@ const ResultChain = () => {
     return (
         <div className='p1 flex flex-column flex-grow-1 overflow-auto'>
             <h1 className="Large-f1_5"> Cadena de resultado | Metas técnicas programáticas </h1>
-            <div className='flex jc-space-between'>
-                <div className="m_25 flex-grow-1">
+            <div className='flex ai-center jc-space-between p_25 gap-1'>
+                <div className="flex-grow-1">
                     <select 
                         id='subproyecto'
                         style={{textTransform: 'capitalize'}}
-                        className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.subproyecto || isSubmitted ? (errors.subproyecto ? 'invalid' : 'valid') : ''}`} 
+                        className={`p_5 block Phone_12 PowerMas_Modal_Form_${dirtyFields.subproyecto || isSubmitted ? (errors.subproyecto ? 'invalid' : 'valid') : ''}`} 
                         {...register('subproyecto', { 
                             validate: {
                                 required: value => value !== '0' || 'El campo es requerido',
@@ -420,16 +420,9 @@ const ResultChain = () => {
                             </option>
                         ))}
                     </select>
-                    {errors.subproyecto ? (
-                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.subproyecto.message}</p>
-                    ) : (
-                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                            Espacio reservado para el mensaje de error
-                        </p>
-                    )}
                 </div>
-                <div className={`PowerMas_Dropdown_Export Large_3 Large-m_25 ${dropdownOpen ? 'open' : ''}`}>
-                    <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>Exportar <IconCalendar className='Large_1' /></button>
+                <div className={`PowerMas_Dropdown_Export Large_3 ${dropdownOpen ? 'open' : ''}`}>
+                    <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>Exportar <Expand /></button>
                     <div className="PowerMas_Dropdown_Export_Content Phone_12">
                         <a onClick={() => {
                             Export_Excel();
@@ -454,7 +447,7 @@ const ResultChain = () => {
                             <th className='center PowerMas_Borde_Total PowerMas_Borde_Total2 PowerMas_Combine_Header' colSpan={numeroColumnasImplementador}>
                                 <span className='flex ai-center jc-center gap-1'>
                                     Por Implementador
-                                    <IconUser />
+                                    <User />
                                 </span>
                             </th>
                             <th className='center PowerMas_Borde_Total PowerMas_Borde_Total2 PowerMas_Combine_Header' colSpan={numeroColumnasUbicacion}>

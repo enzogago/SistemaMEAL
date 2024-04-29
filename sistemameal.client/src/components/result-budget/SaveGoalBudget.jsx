@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom'
 import React, { Fragment, useContext, useEffect, useState } from 'react'
-import { FaSortDown } from 'react-icons/fa';
 import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
 import { fetchData } from '../reusable/helper';
 import { useForm } from 'react-hook-form';
@@ -10,6 +9,7 @@ import { saveAs } from 'file-saver';
 import { logoBase64 } from "../../img/Powermas_Logo_Ayuda_En_Accion";
 import { formatter } from '../monitoring/goal/helper';
 import { StatusContext } from '../../context/StatusContext';
+import Expand from '../../icons/Expand';
 
 const SaveGoalBudget = () => {
     const navigate = useNavigate();
@@ -323,7 +323,12 @@ const SaveGoalBudget = () => {
             <h1 className="Large-f1_5"> Ejecución Presupuestal </h1>
             <div className='flex jc-space-between gap-1 p_5'>
                 <div className={`PowerMas_Dropdown_Export Large_3 ${dropdownOpen ? 'open' : ''}`}>
-                    <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>Exportar <FaSortDown className='Large_1' /></button>
+                    <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>
+                        Exportar 
+                        <span className='flex'>
+                            <Expand />
+                        </span>
+                    </button>
                     <div className="PowerMas_Dropdown_Export_Content Phone_12">
                         <a onClick={() => {
                             exportToExcel(indicadores, totals, additionalRows);

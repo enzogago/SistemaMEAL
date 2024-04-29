@@ -7,7 +7,6 @@ import { useForm } from 'react-hook-form';
 import { fetchData } from "../../reusable/helper";
 import { handleSubmitMetaBeneficiario, handleSubmitMetaBeneficiarioExiste, initPhoneInput } from "./eventHandlers";
 import ModalGoalBeneficiarie from "./ModalGoalBeneficiarie";
-import { IoIosInformationCircleOutline } from "react-icons/io";
 import logo from '../../../img/PowerMas_LogoAyudaEnAccion.svg';
 import InfoGoal from "./InfoGoal";
 import ModalBeneficiariesName from "./ModalBeneficiariesName";
@@ -17,6 +16,7 @@ import { useRef } from "react";
 import ModalBeneficiariesAssociated from "./ModalBeneficiariesAssociated";
 import Return from "../../../icons/Return";
 import Delete from "../../../icons/Delete";
+import Info from "../../../icons/Info";
 
 const FormGoalBeneficiarie = () => {
     const navigate = useNavigate();
@@ -1061,7 +1061,9 @@ const FormGoalBeneficiarie = () => {
                                         <span className="f_75 pointer">
                                             Ver Autorización
                                         </span>
-                                        <IoIosInformationCircleOutline  className="Large-f1_25 bold pointer w-auto" />
+                                        <span className="flex f1_25 pointer">
+                                            <Info />
+                                        </span>
                                     </div>
                                     
                                 </div>

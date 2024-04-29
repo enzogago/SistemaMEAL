@@ -2,11 +2,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import CryptoJS from 'crypto-js';
 import { useEffect, useRef, useState } from "react";
 import Notiflix from "notiflix";
-import { GrFormPreviousLink } from "react-icons/gr";
 import { useForm } from 'react-hook-form';
 import AutocompleteInput from "../../reusable/AutoCompleteInput";
 import { fetchRegistroAModificar } from "./helper";
 import { fetchData } from "../../reusable/helper";
+import Return from "../../../icons/Return";
 
 const FormGoal = () => {
     const navigate = useNavigate();
@@ -537,7 +537,9 @@ const FormGoal = () => {
     return (
         <>
             <div className="PowerMas_Header_Form_Beneficiarie flex ai-center p_5 gap-1">
-                <GrFormPreviousLink className="w-auto Large-f2_5 pointer" onClick={() => navigate('/monitoring')} />
+                <span className='flex f1_25 pointer'>
+                        <Return />
+                    </span>
                 <h1 className="f1_75"> {isEditing ? 'Editar' : 'Nueva'} Meta</h1>
             </div>
             <div className="overflow-auto flex-grow-1 flex">

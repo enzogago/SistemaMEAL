@@ -1,5 +1,3 @@
-import { FaPlus } from 'react-icons/fa';
-import { TiArrowSortedUp ,TiArrowSortedDown } from "react-icons/ti";
 import Excel_Icon from '../../../img/PowerMas_Excel_Icon.svg';
 import Pdf_Icon from '../../../img/PowerMas_Pdf_Icon.svg';
 import TableEmpty from '../../../img/PowerMas_TableEmpty.svg';
@@ -8,9 +6,11 @@ import {
     flexRender, 
 } from '@tanstack/react-table';
 import { useNavigate } from 'react-router-dom';
-import { GrNext, GrPrevious } from 'react-icons/gr';
 import { useEffect, useRef } from 'react';
 import Search from '../../../icons/Search';
+import Plus from '../../../icons/Plus';
+import Sort from "../../../icons/Sort";
+import Expand from '../../../icons/Expand';
 
 const CustomTable = ({ 
     title, 
@@ -141,14 +141,17 @@ const CustomTable = ({
                                 onClick={() => {openModal ? openModal() : navigate(`/${navigatePath}`)}} 
                                 disabled={!actions.add}
                             >
-                                Nuevo <FaPlus className='Large_1' /> 
+                                Nuevo 
+                                <span className='flex f1_25'>
+                                    <Plus />
+                                </span>
                             </button>
                         </>
                     }
                     {
                         ((actions && actions.pdf) || (actions && actions.excel)) &&
                         <div className={`PowerMas_Dropdown_Export Large_3 ${dropdownOpen ? 'open' : ''}`}>
-                            <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>Exportar <Search /></button>
+                            <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>Exportar <Expand /></button>
                             <div className="PowerMas_Dropdown_Export_Content Phone_12">
                                 {actions.pdf &&
                                     <a onClick={() => {
@@ -199,13 +202,18 @@ const CustomTable = ({
                                                         }
                                                         <div className='flex flex-column ai-center jc-center PowerMas_Icons_Sorter'>
                                                             {header.column.getIsSorted() === 'asc' && !header.column.columnDef.disableSorting ? 
-                                                                <TiArrowSortedUp className={`sort-icon active`} /> :
+                                                                <span className="sort-icon active">
+                                                                    <Sort />
+                                                                </span> :
                                                                 header.column.getIsSorted() === 'desc' && !header.column.columnDef.disableSorting ? 
-                                                                <TiArrowSortedDown className={`sort-icon active`} /> :
+                                                                <span className="sort-icon active">
+                                                                    <Sort />
+                                                                </span> :
                                                                 !header.column.columnDef.disableSorting &&
                                                                 <>
-                                                                    <TiArrowSortedUp className={`sort-icon`} />
-                                                                    <TiArrowSortedDown className={`sort-icon`} />
+                                                                    <span className="sort-icon active">
+                                                                        <Sort />
+                                                                    </span>
                                                                 </>
                                                             }
                                                         </div>
@@ -290,13 +298,13 @@ const CustomTable = ({
                         }
                     </tfoot>
                 </table>
-                {
+                {/* {
                     table.getRowModel().rows.length > 0 && scrolled &&
                     <>
                         <GrPrevious className="slider" style={{left: '0'}} onClick={() => scrollTable(-1)} />
                         <GrNext className="slider" style={{right: '0'}} onClick={() => scrollTable(1)} />
                     </>
-                }
+                } */}
             </div>
             { showPagination && <Pagination table={table} isLargePagination={isLargePagination} />}
         </div>
