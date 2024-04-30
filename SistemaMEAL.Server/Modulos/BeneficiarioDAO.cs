@@ -603,6 +603,7 @@ namespace SistemaMEAL.Server.Modulos
 
                 SqlCommand cmd = new SqlCommand("SP_BUSCAR_META_BENEFICIARIO", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
+                
                 // Aquí puedes agregar los parámetros necesarios para tu procedimiento almacenado
                 cmd.Parameters.AddWithValue("@P_METANO", string.IsNullOrEmpty(metAno) ? (object)DBNull.Value : metAno);
                 cmd.Parameters.AddWithValue("@P_METCOD", string.IsNullOrEmpty(metCod) ? (object)DBNull.Value : metCod);
@@ -627,21 +628,33 @@ namespace SistemaMEAL.Server.Modulos
                 pTipoMensaje.Direction = ParameterDirection.Output;
                 cmd.Parameters.Add(pTipoMensaje);
 
-                StringBuilder jsonResult = new StringBuilder();
-                SqlDataReader reader = cmd.ExecuteReader();
-                if (!reader.HasRows)
+                SqlDataReader rd = cmd.ExecuteReader();
+                while (rd.Read())
                 {
-                    jsonResult.Append("[]");
-                }
-                else
-                {
-                    while (reader.Read())
+                    Beneficiario beneficiario = new Beneficiario
                     {
-                        jsonResult.Append(reader.GetValue(0).ToString());
-                    }
+                        BenAno = rd["BENANO"].ToString(),
+                        BenCod = rd["BENCOD"].ToString(),
+                        BenNom = rd["BENNOM"].ToString(),
+                        BenApe = rd["BENAPE"].ToString(),
+                        BenFecNac = rd["BENFECNAC"].ToString(),
+                        BenTel = rd["BENTEL"].ToString(),
+                        BenCorEle = rd["BENCORELE"].ToString(),
+                        BenSex = rd["BENSEX"].ToString(),
+                        GenCod = rd["GENCOD"].ToString(),
+                        GenNom = rd["GENNOM"].ToString(),
+                        BenCodUni = rd["BENCODUNI"].ToString(),
+                        BenTelCon = rd["BENTELCON"].ToString(),
+                        BenNomApo = rd["BENNOMAPO"].ToString(),
+                        BenApeApo = rd["BENAPEAPO"].ToString(),
+                        NacCod = rd["NACCOD"].ToString(),
+                        NacNom = rd["NACNOM"].ToString(),
+                        BenDir = rd["BENDIR"].ToString(),
+                        BenAut = rd["BENAUT"].ToString(),
+                        MetBenMesEjeTec = rd["METBENMESEJETEC"].ToString(),
+                    };
+                    temporal.Add(beneficiario);
                 }
-                // Deserializa la cadena JSON en una lista de objetos Usuario
-                temporal = JsonConvert.DeserializeObject<List<Beneficiario>>(jsonResult.ToString());
             }
             catch (SqlException ex)
             {

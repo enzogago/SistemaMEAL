@@ -314,7 +314,7 @@ const TableForm = ({data, openModal, metaData, setUpdate }) => {
                 searchTags={searchTags}
                 setSearchTags={setSearchTags}
             />
-            {
+            {/* {
                 currentRecord &&
                 <ModalEditBeneficiarie 
                     modalVisible={modalVisible}
@@ -323,7 +323,7 @@ const TableForm = ({data, openModal, metaData, setUpdate }) => {
                     record={currentRecord}
                     setUpdate={setUpdate}
                 />
-            }
+            } */}
         </>
     )
 }

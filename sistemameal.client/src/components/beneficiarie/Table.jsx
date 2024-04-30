@@ -16,6 +16,8 @@ import { AuthContext } from '../../context/AuthContext';
 // Funciones reusables
 import { Export_Excel_Helper, Export_PDF_Helper, handleDelete } from '../reusable/helper';
 import CustomTable from '../reusable/Table/CustomTable';
+import masculino from '../../img/PowerMas_Avatar_Masculino.svg';
+import femenino from '../../img/PowerMas_Avatar_Femenino.svg';
 
 const Table = ({ data }) => {
     const navigate = useNavigate();
@@ -50,6 +52,19 @@ const Table = ({ data }) => {
 
     const columns = useMemo(() => {
         let baseColumns = [
+            {
+                header: "",
+                accessorKey: "avatar",
+                disableSorting: true,
+                cell: ({row}) => {
+                    const ben = row.original;
+                    return (
+                        <div className="PowerMas_ProfilePicture2 m_25" style={{width: '35px', height: '35px', border: `2px solid ${ben && (ben.benSex === 'M' ? '#20737b' : '#E5554F')}`}}>
+                            <img src={ben && (ben.benSex === 'M' ? masculino : femenino)} alt="Avatar" />
+                        </div>
+                    )
+                }
+            },
             {
                 header: "Código Único",
                 accessorKey: "benCodUni",
