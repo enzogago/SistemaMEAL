@@ -428,5 +428,41 @@ namespace SistemaMEAL.Server.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("access/{usuAno}/{usuCod}")]
+        public dynamic BuscarMetasUsuario(string usuAno, string usuCod)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var result = _usuarios.BuscarUsuarioAcceso(identity, usuAno:usuAno, usuCod:usuCod);
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("access")]
+        public dynamic InsertarMetaUsuario(UsuarioAccesoDto usuarioAccesoDto)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            var (message, messageType) = _usuarios.InsertarUsuarioAcceso(identity, usuarioAccesoDto.AccesosInsertar, usuarioAccesoDto.AccesosEliminar);
+            if (messageType == "1")
+            {
+                return new BadRequestObjectResult(new { success = false, message });
+            }
+            else if (messageType == "2")
+            {
+                return new ConflictObjectResult(new { success = false, message });
+            }
+            else
+            {
+                return new OkObjectResult(new { success = true, message });
+            }
+        }
+
+
     }
 }

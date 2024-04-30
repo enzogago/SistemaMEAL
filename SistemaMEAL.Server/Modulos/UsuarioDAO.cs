@@ -5,6 +5,7 @@ using System.Data;
 using System.Text;
 using System.Security.Claims;
 using Microsoft.SharePoint.Client;
+using System.Transactions;
 
 namespace SistemaMEAL.Server.Modulos
 {
@@ -727,6 +728,272 @@ namespace SistemaMEAL.Server.Modulos
             {
                 cn.getcn.Close();
             }
+            return (mensaje, tipoMensaje);
+        }
+
+
+        // public IEnumerable<UsuarioAcceso> BuscarUsuarioAcceso(ClaimsIdentity? identity, string? usuAno, string? usuCod, string? usuAccTip = null, string? usuAccAno = null, string? usuAccCod = null, string? usuAccPad = null)
+        // {
+        //     var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+            
+        //     List<UsuarioAcceso>? temporal = new List<UsuarioAcceso>();
+        //     try
+        //     {
+        //         cn.getcn.Open();
+
+        //         SqlCommand cmd = new SqlCommand("SP_BUSCAR_USUARIO_ACCESO", cn.getcn);
+        //         cmd.CommandType = CommandType.StoredProcedure;
+        //         // Aquí puedes agregar los parámetros necesarios para tu procedimiento almacenado
+        //         cmd.Parameters.AddWithValue("@P_USUANO", usuAno);
+        //         cmd.Parameters.AddWithValue("@P_USUCOD", usuCod);
+        //         cmd.Parameters.AddWithValue("@P_USUACCTIP", string.IsNullOrEmpty(usuAccTip) ? (object)DBNull.Value : usuAccTip);
+        //         cmd.Parameters.AddWithValue("@P_USUACCANO", string.IsNullOrEmpty(usuAccAno) ? (object)DBNull.Value : usuAccAno);
+        //         cmd.Parameters.AddWithValue("@P_USUACCCOD", string.IsNullOrEmpty(usuAccCod) ? (object)DBNull.Value : usuAccCod);
+        //         cmd.Parameters.AddWithValue("@P_USUACCPAD", string.IsNullOrEmpty(usuAccPad) ? (object)DBNull.Value : usuAccPad);
+        //         cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+        //         cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+        //         cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+        //         cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+        //         cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+        //         SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+        //         pDescripcionMensaje.Direction = ParameterDirection.Output;
+        //         cmd.Parameters.Add(pDescripcionMensaje);
+
+        //         SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+        //         pTipoMensaje.Direction = ParameterDirection.Output;
+        //         cmd.Parameters.Add(pTipoMensaje);
+
+        //         StringBuilder jsonResult = new StringBuilder();
+        //         SqlDataReader reader = cmd.ExecuteReader();
+
+        //         if (!reader.HasRows)
+        //         {
+        //             jsonResult.Append("[]");
+        //         }
+        //         else
+        //         {
+        //             while (reader.Read())
+        //             {
+        //                 jsonResult.Append(reader.GetValue(0).ToString());
+        //             }
+        //         }
+        //         // Deserializa la cadena JSON en una lista de objetos UsuarioAcceso
+        //         temporal = JsonConvert.DeserializeObject<List<UsuarioAcceso>>(jsonResult.ToString());
+        //     }
+        //     catch (SqlException ex)
+        //     {
+        //         Console.WriteLine(ex.Message);
+        //     }
+        //     finally
+        //     {
+        //         cn.getcn.Close();
+        //     }
+        //     return temporal?? new List<UsuarioAcceso>();
+        // }
+
+        public IEnumerable<UsuarioAcceso> BuscarUsuarioAcceso(ClaimsIdentity? identity, string? usuAno, string? usuCod, string? usuAccTip = null, string? usuAccAno = null, string? usuAccCod = null, string? usuAccPad = null)
+        {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+            
+            List<UsuarioAcceso>? temporal = new List<UsuarioAcceso>();
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_USUARIO_ACCESO", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                // Aquí puedes agregar los parámetros necesarios para tu procedimiento almacenado
+                cmd.Parameters.AddWithValue("@P_USUANO", usuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD", usuCod);
+                cmd.Parameters.AddWithValue("@P_USUACCTIP", string.IsNullOrEmpty(usuAccTip) ? (object)DBNull.Value : usuAccTip);
+                cmd.Parameters.AddWithValue("@P_USUACCANO", string.IsNullOrEmpty(usuAccAno) ? (object)DBNull.Value : usuAccAno);
+                cmd.Parameters.AddWithValue("@P_USUACCCOD", string.IsNullOrEmpty(usuAccCod) ? (object)DBNull.Value : usuAccCod);
+                cmd.Parameters.AddWithValue("@P_USUACCPAD", string.IsNullOrEmpty(usuAccPad) ? (object)DBNull.Value : usuAccPad);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+
+                SqlDataReader reader = cmd.ExecuteReader();
+                object[] values = new object[reader.FieldCount];
+                while (reader.Read())
+                {
+                    Console.WriteLine("ok");
+                    reader.GetValues(values);
+                    UsuarioAcceso usuarioAcceso = new UsuarioAcceso
+                    {
+                        UsuAno = values[0].ToString(),
+                        UsuCod = values[1].ToString(),
+                        UsuAccTip = values[2].ToString(),
+                        UsuAccAno = values[3].ToString(),
+                        UsuAccCod = values[4].ToString(),
+                        UsuAccPad = values[5].ToString()
+                    };
+                    temporal.Add(usuarioAcceso);
+                }
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return temporal?? new List<UsuarioAcceso>();
+        }
+
+
+
+        public (string? message, string? messageType) InsertarUsuarioAcceso(ClaimsIdentity? identity, List<UsuarioAcceso> accesosInsertar,List<UsuarioAcceso> accesosEliminar)
+        {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
+            string? mensaje = "";
+            string? tipoMensaje = "";
+
+            using (TransactionScope scope = new TransactionScope())
+            {
+                using (SqlConnection connection = cn.getcn)
+                {
+                    try
+                    {
+                        if (connection.State == ConnectionState.Closed)
+                        {
+                            connection.Open();
+                        }
+
+                        SqlCommand cmd;
+                        SqlParameter pDescripcionMensaje;
+                        SqlParameter pTipoMensaje;
+
+                        DataTable dtAccesosUsuarioInsertar = new DataTable();
+                        dtAccesosUsuarioInsertar.Columns.Add("USUACCTIP", typeof(string));
+                        dtAccesosUsuarioInsertar.Columns.Add("USUACCANO", typeof(string));
+                        dtAccesosUsuarioInsertar.Columns.Add("USUACCCOD", typeof(string));
+                        dtAccesosUsuarioInsertar.Columns.Add("USUACCPAD", typeof(string));
+
+                        if (accesosInsertar.Count > 0)
+                        {
+                            foreach (var acceso in accesosInsertar)
+                            {
+                                dtAccesosUsuarioInsertar.Rows.Add(acceso.UsuAccTip,acceso.UsuAccAno,acceso.UsuAccCod,acceso.UsuAccPad);
+                            }
+
+                            cmd = new SqlCommand("SP_INSERTAR_USUARIO_ACCESO_MASIVO", cn.getcn);
+                            cmd.CommandType = CommandType.StoredProcedure;
+
+                            SqlParameter param = new SqlParameter();
+                            param.ParameterName = "@UsuarioAcceso";
+                            param.SqlDbType = SqlDbType.Structured;
+                            param.Value = dtAccesosUsuarioInsertar;
+                            param.TypeName = "UsuarioAccesoType";
+
+                            cmd.Parameters.Add(param);
+                            cmd.Parameters.AddWithValue("@P_USUANO", accesosInsertar[0].UsuAno);
+                            cmd.Parameters.AddWithValue("@P_USUCOD", accesosInsertar[0].UsuCod);
+                            cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
+                            cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                            cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                            cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                            cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                            cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                            pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                            pDescripcionMensaje.Direction = ParameterDirection.Output;
+                            cmd.Parameters.Add(pDescripcionMensaje);
+                            pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                            pTipoMensaje.Direction = ParameterDirection.Output;
+                            cmd.Parameters.Add(pTipoMensaje);
+
+                            cmd.ExecuteNonQuery();
+                                
+                            mensaje = pDescripcionMensaje.Value.ToString();
+                            tipoMensaje = pTipoMensaje.Value.ToString();
+
+                            if (tipoMensaje != "3")
+                            {
+                                Console.WriteLine(mensaje);
+                                throw new Exception(mensaje);
+                            }
+                        }
+
+                        DataTable dtAccesosUsuarioEliminar = new DataTable();
+                        dtAccesosUsuarioEliminar.Columns.Add("USUACCTIP", typeof(string));
+                        dtAccesosUsuarioEliminar.Columns.Add("USUACCANO", typeof(string));
+                        dtAccesosUsuarioEliminar.Columns.Add("USUACCCOD", typeof(string));
+                        dtAccesosUsuarioEliminar.Columns.Add("USUACCPAD", typeof(string));
+
+                        if (accesosEliminar.Count > 0)
+                        {
+                            foreach (var acceso in accesosEliminar)
+                            {
+                                dtAccesosUsuarioEliminar.Rows.Add(acceso.UsuAccTip,acceso.UsuAccAno,acceso.UsuAccCod);
+                            }
+
+                            cmd = new SqlCommand("SP_ELIMINAR_USUARIO_ACCESO_MASIVO", cn.getcn);
+                            cmd.CommandType = CommandType.StoredProcedure;
+
+                            SqlParameter param = new SqlParameter();
+                            param.ParameterName = "@UsuarioAcceso";
+                            param.SqlDbType = SqlDbType.Structured;
+                            param.Value = dtAccesosUsuarioEliminar;
+                            param.TypeName = "UsuarioAccesoType";
+
+                            cmd.Parameters.Add(param);
+                            cmd.Parameters.AddWithValue("@P_USUANO", accesosEliminar[0].UsuAno);
+                            cmd.Parameters.AddWithValue("@P_USUCOD", accesosEliminar[0].UsuCod);
+                            cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
+                            cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                            cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                            cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                            cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                            cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                            pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                            pDescripcionMensaje.Direction = ParameterDirection.Output;
+                            cmd.Parameters.Add(pDescripcionMensaje);
+                            pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                            pTipoMensaje.Direction = ParameterDirection.Output;
+                            cmd.Parameters.Add(pTipoMensaje);
+
+                            cmd.ExecuteNonQuery();
+                                
+                            mensaje = pDescripcionMensaje.Value.ToString();
+                            tipoMensaje = pTipoMensaje.Value.ToString();
+
+                            if (tipoMensaje != "3")
+                            {
+                                Console.WriteLine(mensaje);
+                                throw new Exception(mensaje);
+                            }
+                        }
+                        
+
+                        mensaje = "Accesos actualizados correctamente.";
+                        tipoMensaje = "3";
+                        scope.Complete();
+                    }
+                    catch (Exception ex)
+                    {
+                        // Si alguna operación falló, la transacción se revierte.
+                        mensaje = ex.Message;
+                        tipoMensaje = "1";
+                        Console.WriteLine(ex);
+                    }
+                }
+            }
+
             return (mensaje, tipoMensaje);
         }
 

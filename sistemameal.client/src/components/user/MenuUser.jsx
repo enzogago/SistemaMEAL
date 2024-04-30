@@ -359,17 +359,17 @@ const MenuUser = () => {
         <div className="PowerMas_Header_Form_Beneficiarie flex ai-center">
           <Bar currentStep={2} type='user' />
         </div>
-        <div className="flex-grow-1 p1_25 overflow-auto">
-            <div className="flex gap-1">
-              <div className="PowerMas_ListMenus PowerMas_Form_Card Large_6 p1">
+        <div className="flex-grow-1 p1_25 overflow-auto flex gap-1">
+              <div className="PowerMas_ListMenus PowerMas_Form_Card Large_6 p1 overflow-auto">
                 <h3 className="f1_25">Listado de Menus:</h3>
                 <br />
-                <ul className="overflow-auto">
+                <ul className="">
                   {menus.map(menu => renderMenu(menu, 1))}
                 </ul>
               </div>
-              <UserInfo user={user} />
-            </div>
+              <div className="Large_6 overflow-auto">
+                <UserInfo user={user} />
+              </div>
         </div>
         <footer className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
             <button onClick={() => navigate(`/form-user/${safeCiphertext}`)} className="Large_3 m_75 PowerMas_Buttom_Secondary">Atras</button>

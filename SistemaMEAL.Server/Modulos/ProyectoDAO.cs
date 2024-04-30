@@ -233,6 +233,8 @@ namespace SistemaMEAL.Modulos
                 SqlCommand cmd = new SqlCommand("SP_BUSCAR_PROYECTO", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
 
+                cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
                 cmd.Parameters.AddWithValue("@P_PROANO", string.IsNullOrEmpty(proAno) ? (object)DBNull.Value : proAno);
                 cmd.Parameters.AddWithValue("@P_PROCOD", string.IsNullOrEmpty(proCod) ? (object)DBNull.Value : proCod);
                 cmd.Parameters.AddWithValue("@P_PRONOM", string.IsNullOrEmpty(proNom) ? (object)DBNull.Value : proNom);
@@ -255,6 +257,7 @@ namespace SistemaMEAL.Modulos
 
                 StringBuilder jsonResult = new StringBuilder();
                 SqlDataReader reader = cmd.ExecuteReader();
+
                 if (!reader.HasRows)
                 {
                     jsonResult.Append("[]");

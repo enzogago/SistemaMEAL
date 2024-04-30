@@ -205,7 +205,7 @@ const Table = ({data = [], setData, setModalIsOpen}) => {
     const headers = ['CODIGO_FINANCIACION', 'NOMBRE', 'RESPONSABLE','AÑO_INICIO','MES_INICIO','AÑO_FIN','MES_FIN','INVOLUCRA_SUB_ACTIVIDAD', 'PROYECTO', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
     const title = 'SUB PROYECTOS';  // El título de tu archivo
     const properties = ['subProSap', 'subProNom', 'subProRes', 'subProPerAnoIni', 'subProPerMesIni', 'subProPerAnoFin', 'subProPerMesFin', 'subProInvSubAct', 'proNom', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir
-    const format = 'a3';  // El tamaño del formato que quieres establecer para el PDF
+    const format = [500, 250];
 
     const Export_Excel = () => {
         // Luego puedes llamar a la función Export_Excel_Helper de esta manera:

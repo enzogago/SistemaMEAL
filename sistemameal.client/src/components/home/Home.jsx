@@ -435,12 +435,10 @@ const Home = () => {
                     </div>
                     <div className="PowerMas_KPIRow Large_3 Medium_6 Small_12 gap_3 flex-column Large-f1_25">
                         <p className="f1_25">Avance técnico</p>
-                        <Suspense fallback={<div>Cargando...</div>}>
-                            <DonutChart percentage={avanceTecnico} wh={140} rad={20} newId={'Dona_Tecnico'} colorText={'#000'} colorPc={'#F87C56'} colorSpc={'#F7775A20'} />
-                        </Suspense>
+                        <DonutChart percentage={avanceTecnico} wh={140} rad={20} newId={'Dona_Tecnico'} colorText={'#000'} colorPc={'#F87C56'} colorSpc={'#F7775A20'} />
                     </div>
                 </div>
-                <div className="PowerMas_Home_Card PowerMas_LeftSection flex Large_12 Medium_12 Phone_12 flex flex-column bg-white js-element5">
+                <div className="PowerMas_Home_Card PowerMas_LeftSection flex Large_12 Medium_12 Phone_12 flex flex-column bg-white js-element5" style={{minHeight: '26rem'}}>
                     <div className='Large_12 Phone_12 p_5 PowerMas_Tittle_Map'>
                         <h4>Listado de Metas</h4>
                     </div>

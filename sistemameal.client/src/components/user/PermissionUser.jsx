@@ -28,7 +28,7 @@ const PermissionUser = () => {
 
 
     // EFECTO AL CARGAR COMPONENTE GET - LISTAR METAS
-    useEffect(() => {
+        useEffect(() => {
         const fetchDataAsync = async () => {
             console.log(usuAno,usuCod)
             await fetchData(`Usuario/${usuAno}/${usuCod}`, setUser);
@@ -36,76 +36,55 @@ const PermissionUser = () => {
                 const transformedData = transformData(data);
                 setProyectos(transformedData);
             });
-            await fetchData(`Meta/access/${usuAno}/${usuCod}`, (data) => {
+            await fetchData(`Usuario/access/${usuAno}/${usuCod}`, (data) => {
                 console.log(data)
-                const metasKeys = data.map(meta => {
-                    return `${meta.proAno}-${meta.proCod}-${meta.subProAno}-${meta.subProCod}-${meta.objAno}-${meta.objCod}-${meta.objEspAno}-${meta.objEspCod}-${meta.resAno}-${meta.resCod}-${meta.actAno}-${meta.actCod}-${meta.indAno}-${meta.indCod}-meta-${meta.metAno}-${meta.metCod}`;
-                });
-                console.log(metasKeys)
-                setCheckedKeys(metasKeys);
-                setInitialCheckedKeys(metasKeys);
+                // Usa los objetos de permiso tal como vienen del servidor
+                setCheckedKeys(data.map(permiso => permiso.usuAccPad));
+                setInitialCheckedKeys(data);
             });
+            
         };
     
         fetchDataAsync();
     }, []);
     
     
-
     const handleSubmit = async () => {
-        // Filtra las claves marcadas para obtener solo las de las metas
-        const metaKeys = checkedKeys.filter(key => key.includes('meta'));
-        
-        // Extrae metAno y metCod de las claves de las metas
-        const metas = metaKeys.map(key => {
+        let permisosObj = {};
+        checkedKeys.forEach(key => {
             const parts = key.split('-');
-            return {
-                usuAno,
-                usuCod,
-                metAno: parts[parts.length - 2],
-                metCod: parts[parts.length - 1]
-            };
+            for(let i = 0; i < parts.length; i += 3) {
+                const permisoKey = `${parts[i]}-${parts[i+1]}-${parts[i+2]}`;
+                const parentKey = parts.slice(0, i+3).join('-');
+                permisosObj[permisoKey] = { usuAno, usuCod, usuAccTip: parts[i], usuAccAno: parts[i+1], usuAccCod: parts[i+2], usuAccPad: parentKey };
+            }
         });
         
-        console.log(metas);
-    
-        // Calcula los accesos a insertar y eliminar
-        const metasToInsert = metaKeys.filter(key => !initialCheckedKeys.includes(key)).map(key => {
-            const parts = key.split('-');
-            return {
-                usuAno,
-                usuCod,
-                metAno: parts[parts.length - 2],
-                metCod: parts[parts.length - 1]
-            };
-        });
-
-        const metasToDelete = initialCheckedKeys.filter(key => !checkedKeys.includes(key)).map(key => {
-            const parts = key.split('-');
-            return {
-                usuAno,
-                usuCod,
-                metAno: parts[parts.length - 2],
-                metCod: parts[parts.length - 1]
-            };
-        });
-
+        // Convierte los objetos de permisos a un arreglo
+        const permisosArr = Object.values(permisosObj);
         
-        const MetasDto = {
-            MetasInsertar: metasToInsert,
-            MetasEliminar: metasToDelete,
+        // Calcula los permisos a insertar y eliminar
+        const permisosToInsert = permisosArr.filter(permiso => !initialCheckedKeys.some(initialPermiso => initialPermiso.usuAccPad === permiso.usuAccPad));
+        const permisosToDelete = initialCheckedKeys.filter(initialPermiso => !permisosArr.some(permiso => permiso.usuAccPad === initialPermiso.usuAccPad));
+        
+        const PermisosDto = {
+            AccesosInsertar: permisosToInsert,
+            AccesosEliminar: permisosToDelete,
         }
-        
-        handleSubmit2(MetasDto);
-    }
+        console.log(PermisosDto)
+        handleSubmit2(PermisosDto);
+    };
     
-
+    
+    
+    
+    
     const handleSubmit2 = async (env) => {
         try {
             Notiflix.Loading.pulse();
 
             const token = localStorage.getItem('token');
-            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Meta/access`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Usuario/access`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -168,7 +147,7 @@ const PermissionUser = () => {
                                                                             </span>
                                                                             {`Técnico: ${tecnico} | Implementador: ${implementador} | Ubicación: ${ubicacion} | Periodo: ${periodo} | Meta: ${metItem.metMetTec}`}
                                                                         </div>,
-                                                                        key: `${item.proAno}-${item.proCod}-${subItem.subProAno}-${subItem.subProCod}-${objItem.objAno}-${objItem.objCod}-${objEspItem.objEspAno}-${objEspItem.objEspCod}-${resItem.resAno}-${resItem.resCod}-${actItem.actAno}-${actItem.actCod}-${indItem.indAno}-${indItem.indCod}-meta-${metItem.metAno}-${metItem.metCod}`
+                                                                        key: `PROYECTO-${item.proAno}-${item.proCod}-SUB_PROYECTO-${subItem.subProAno}-${subItem.subProCod}-OBJETIVO-${objItem.objAno}-${objItem.objCod}-OBJETIVO_ESPECIFICO-${objEspItem.objEspAno}-${objEspItem.objEspCod}-RESULTADO-${resItem.resAno}-${resItem.resCod}-ACTIVIDAD-${actItem.actAno}-${actItem.actCod}-INDICADOR-${indItem.indAno}-${indItem.indCod}-META-${metItem.metAno}-${metItem.metCod}`
                                                                     };
                                                                 });
                                                             }
@@ -180,7 +159,7 @@ const PermissionUser = () => {
                                                                     </span>
                                                                     {indItem.indNom.charAt(0).toUpperCase() + indItem.indNom.slice(1).toLowerCase()}
                                                                 </div>,
-                                                                key: `${item.proAno}-${item.proCod}-${subItem.subProAno}-${subItem.subProCod}-${objItem.objAno}-${objItem.objCod}-${objEspItem.objEspAno}-${objEspItem.objEspCod}-${resItem.resAno}-${resItem.resCod}-${actItem.actAno}-${actItem.actCod}-${indItem.indAno}-${indItem.indCod}`,
+                                                                key: `PROYECTO-${item.proAno}-${item.proCod}-SUB_PROYECTO-${subItem.subProAno}-${subItem.subProCod}-OBJETIVO-${objItem.objAno}-${objItem.objCod}-OBJETIVO_ESPECIFICO-${objEspItem.objEspAno}-${objEspItem.objEspCod}-RESULTADO-${resItem.resAno}-${resItem.resCod}-ACTIVIDAD-${actItem.actAno}-${actItem.actCod}-INDICADOR-${indItem.indAno}-${indItem.indCod}`,
                                                                 children: metChildren
                                                             };
                                                         });
@@ -192,7 +171,7 @@ const PermissionUser = () => {
                                                                     Grupo sin sub-actividades{' '}
                                                                 </span>
                                                             </div>,
-                                                        key: `${item.proAno}-${item.proCod}-${subItem.subProAno}-${subItem.subProCod}-${objItem.objAno}-${objItem.objCod}-${objEspItem.objEspAno}-${objEspItem.objEspCod}-${resItem.resAno}-${resItem.resCod}-${actItem.actAno}-${actItem.actCod}`,
+                                                        key: `PROYECTO-${item.proAno}-${item.proCod}-SUB_PROYECTO-${subItem.subProAno}-${subItem.subProCod}-OBJETIVO-${objItem.objAno}-${objItem.objCod}-OBJETIVO_ESPECIFICO-${objEspItem.objEspAno}-${objEspItem.objEspCod}-RESULTADO-${resItem.resAno}-${resItem.resCod}-ACTIVIDAD-${actItem.actAno}-${actItem.actCod}`,
                                                         children: indChildren
                                                     };
                                                 });
@@ -205,7 +184,7 @@ const PermissionUser = () => {
                                                         </span>
                                                         {resItem.resNom.charAt(0).toUpperCase() + resItem.resNom.slice(1).toLowerCase()}
                                                     </div>,
-                                                key: `${item.proAno}-${item.proCod}-${subItem.subProAno}-${subItem.subProCod}-${objItem.objAno}-${objItem.objCod}-${objEspItem.objEspAno}-${objEspItem.objEspCod}-${resItem.resAno}-${resItem.resCod}`,
+                                                key: `PROYECTO-${item.proAno}-${item.proCod}-SUB_PROYECTO-${subItem.subProAno}-${subItem.subProCod}-OBJETIVO-${objItem.objAno}-${objItem.objCod}-OBJETIVO_ESPECIFICO-${objEspItem.objEspAno}-${objEspItem.objEspCod}-RESULTADO-${resItem.resAno}-${resItem.resCod}`,
                                                 children: actChildren
                                             };
                                         });
@@ -218,7 +197,7 @@ const PermissionUser = () => {
                                                 </span>
                                                 {objEspItem.objEspNom.charAt(0).toUpperCase() + objEspItem.objEspNom.slice(1).toLowerCase()}
                                             </div>,
-                                        key: `${item.proAno}-${item.proCod}-${subItem.subProAno}-${subItem.subProCod}-${objItem.objAno}-${objItem.objCod}-${objEspItem.objEspAno}-${objEspItem.objEspCod}`,
+                                        key: `PROYECTO-${item.proAno}-${item.proCod}-SUB_PROYECTO-${subItem.subProAno}-${subItem.subProCod}-OBJETIVO-${objItem.objAno}-${objItem.objCod}-OBJETIVO_ESPECIFICO-${objEspItem.objEspAno}-${objEspItem.objEspCod}`,
                                         children: resChildren
                                     };
                                 });
@@ -231,7 +210,7 @@ const PermissionUser = () => {
                                         </span>
                                         {objItem.objNom.charAt(0).toUpperCase() + objItem.objNom.slice(1).toLowerCase()}
                                     </div>,
-                                key: `${item.proAno}-${item.proCod}-${subItem.subProAno}-${subItem.subProCod}-${objItem.objAno}-${objItem.objCod}`,
+                                key: `PROYECTO-${item.proAno}-${item.proCod}-SUB_PROYECTO-${subItem.subProAno}-${subItem.subProCod}-OBJETIVO-${objItem.objAno}-${objItem.objCod}`,
                                 children: objChildren
                             };
                         });
@@ -244,7 +223,7 @@ const PermissionUser = () => {
                                 </span>
                                 {subItem.subProNom.charAt(0).toUpperCase() + subItem.subProNom.slice(1).toLowerCase()}
                             </div>,
-                        key: `${item.proAno}-${item.proCod}-${subItem.subProAno}-${subItem.subProCod}`,
+                        key: `PROYECTO-${item.proAno}-${item.proCod}-SUB_PROYECTO-${subItem.subProAno}-${subItem.subProCod}`,
                         children: subChildren
                     };
                 });
@@ -257,7 +236,7 @@ const PermissionUser = () => {
                         </span>
                         {item.proNom.charAt(0).toUpperCase() + item.proNom.slice(1).toLowerCase()}
                     </div>,
-                key: `${item.proAno}-${item.proCod}`,
+                key: `PROYECTO-${item.proAno}-${item.proCod}`,
                 children
             };
         });
@@ -271,9 +250,42 @@ const PermissionUser = () => {
         setExpandedKeys(expandedKeysValue);
         setAutoExpandParent(false);
     };
-    const onCheck = (checkedKeysValue) => {
-        setCheckedKeys(checkedKeysValue);
+
+    const onCheck = (checkedKeysValue, e) => {
+        let newCheckedKeys = [...checkedKeysValue.checked];
+        if (e.checked) {
+            let keyParts = e.node.key.split('-');
+            // Comprueba si el nodo marcado es un nodo de primer nivel (nodo principal)
+            if (keyParts.length === 3) {
+                // Si es un nodo principal, añade todas las claves de sus descendientes
+                let nodeAndAllDescendants = getAllDescendants(e.node);
+                newCheckedKeys = [...newCheckedKeys, ...nodeAndAllDescendants];
+            } else {
+                // Si no es un nodo principal, solo añade las claves de los nodos padres
+                for (let i = 0; i < keyParts.length; i += 3) {
+                    let parentKey = keyParts.slice(0, i+3).join('-');
+                    if (!newCheckedKeys.includes(parentKey)) {
+                        newCheckedKeys.push(parentKey);
+                    }
+                }
+            }
+        } else {
+            let nodeAndAllDescendants = getAllDescendants(e.node);
+            newCheckedKeys = newCheckedKeys.filter(key => !nodeAndAllDescendants.includes(key));
+        }
+        setCheckedKeys(newCheckedKeys);
     };
+    
+    const getAllDescendants = (node) => {
+        let descendants = [node.key];
+        if (node.children) {
+            node.children.forEach(child => {
+                descendants = [...descendants, ...getAllDescendants(child)];
+            });
+        }
+        return descendants;
+    };
+
 
     return (
         <div className="bg-white h-100 flex flex-column over">
@@ -281,7 +293,7 @@ const PermissionUser = () => {
                 <Bar currentStep={3} type='user' />
             </div>
             <div className="flex flex-grow-1 overflow-auto p1_25">
-                <div className="flex flex-grow-1  gap-1">
+                <div className="flex flex-grow-1 Large_12 gap-1">
                     <div className="PowerMas_ListPermission PowerMas_Form_Card p1 Large_6 overflow-auto">
                         <Tree
                             checkable
@@ -292,9 +304,12 @@ const PermissionUser = () => {
                             checkedKeys={checkedKeys}
                             selectedKeys={selectedKeys}
                             treeData={proyectos}
+                            checkStrictly={true}
                         />
                     </div>
-                    <UserInfo user={user} />
+                    <div className="Large_6 overflow-auto">
+                        <UserInfo user={user} />
+                    </div>
                 </div>
             </div>
             <footer className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">

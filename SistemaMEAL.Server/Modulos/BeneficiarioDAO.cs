@@ -804,46 +804,75 @@ namespace SistemaMEAL.Server.Modulos
         }
 
 
-        public IEnumerable<Beneficiario> ListadoNormal()
+        public IEnumerable<Beneficiario> ListadoNormal(ClaimsIdentity? identity, string? benAno = null, string? benCod = null, string? benNom = null, string? benApe = null, string? benFecNac = null, string? benTel = null, string? benCorEle = null, string? benSex = null, string? genCod = null, string? benFecReg = null, string? benCodUni = null, string? benTelCon = null, string? benNomApo = null, string? benApeApo = null, string? nacCod = null, string? benDir = null, string? benAut = null)
         {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
             List<Beneficiario> temporal = new List<Beneficiario>();
             try
             {
                 cn.getcn.Open();
 
-                SqlCommand cmd = new SqlCommand("SP_LISTAR_BENEFICIARIO", cn.getcn);
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_BENEFICIARIO", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@P_BENANO", string.IsNullOrEmpty(benAno) ? (object)DBNull.Value : benAno);
+                cmd.Parameters.AddWithValue("@P_BENCOD", string.IsNullOrEmpty(benCod) ? (object)DBNull.Value : benCod);
+                cmd.Parameters.AddWithValue("@P_BENNOM", string.IsNullOrEmpty(benNom) ? (object)DBNull.Value : benNom);
+                cmd.Parameters.AddWithValue("@P_BENAPE", string.IsNullOrEmpty(benApe) ? (object)DBNull.Value : benApe);
+                cmd.Parameters.AddWithValue("@P_BENFECNAC", string.IsNullOrEmpty(benFecNac) ? (object)DBNull.Value : benFecNac);
+                cmd.Parameters.AddWithValue("@P_BENTEL", string.IsNullOrEmpty(benTel) ? (object)DBNull.Value : benTel);
+                cmd.Parameters.AddWithValue("@P_BENCORELE", string.IsNullOrEmpty(benCorEle) ? (object)DBNull.Value : benCorEle);
+                cmd.Parameters.AddWithValue("@P_BENSEX", string.IsNullOrEmpty(benSex) ? (object)DBNull.Value : benSex);
+                cmd.Parameters.AddWithValue("@P_GENCOD", string.IsNullOrEmpty(genCod) ? (object)DBNull.Value : genCod);
+                cmd.Parameters.AddWithValue("@P_BENFECREG", string.IsNullOrEmpty(benFecReg) ? (object)DBNull.Value : benFecReg);
+                cmd.Parameters.AddWithValue("@P_BENCODUNI", string.IsNullOrEmpty(benCodUni) ? (object)DBNull.Value : benCodUni);
+                cmd.Parameters.AddWithValue("@P_BENTELCON", string.IsNullOrEmpty(benTelCon) ? (object)DBNull.Value : benTelCon);
+                cmd.Parameters.AddWithValue("@P_BENNOMAPO", string.IsNullOrEmpty(benNomApo) ? (object)DBNull.Value : benNomApo);
+                cmd.Parameters.AddWithValue("@P_BENAPEAPO", string.IsNullOrEmpty(benApeApo) ? (object)DBNull.Value : benApeApo);
+                cmd.Parameters.AddWithValue("@P_NACCOD", string.IsNullOrEmpty(nacCod) ? (object)DBNull.Value : nacCod);
+                cmd.Parameters.AddWithValue("@P_BENDIR", string.IsNullOrEmpty(benDir) ? (object)DBNull.Value : benDir);
+                cmd.Parameters.AddWithValue("@P_BENAUT", string.IsNullOrEmpty(benAut) ? (object)DBNull.Value : benAut);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+
                 SqlDataReader rd = cmd.ExecuteReader();
                 while (rd.Read())
                 {
-                    temporal.Add(new Beneficiario()
+                    Beneficiario beneficiario = new Beneficiario
                     {
-                        BenAno = rd.GetString(0),
-                        BenCod = rd.GetString(1),
-                        BenNom = rd.GetString(2),
-                        BenApe = rd.GetString(3),
-                        BenFecNac = rd.GetString(4),
-                        BenTel = rd.GetString(5),
-                        BenCorEle = rd.GetString(6),
-                        BenSex = rd.GetString(7),
-                        GenCod = rd.GetString(8),
-                        GenNom = rd.GetString(9),
-                        BenCodUni = rd.GetString(11),
-                        BenTelCon = rd.GetString(12),
-                        BenNomApo = rd.GetString(13),
-                        BenApeApo = rd.GetString(14),
-                        NacCod = rd.GetString(15),
-                        NacNom = rd.GetString(16),
-                        BenDir = rd.GetString(17),
-                        BenAut = rd.GetString(18),
-                        UsuIng = rd.GetString(19),
-                        FecIng = rd.IsDBNull(20) ? (DateTime?)null : rd.GetDateTime(20),
-                        UsuMod = rd.GetString(21),
-                        FecMod = rd.IsDBNull(22) ? (DateTime?)null : rd.GetDateTime(22),
-                        EstReg = rd.GetString(23)[0]
-                    });
+                        BenAno = rd["BENANO"].ToString(),
+                        BenCod = rd["BENCOD"].ToString(),
+                        BenNom = rd["BENNOM"].ToString(),
+                        BenApe = rd["BENAPE"].ToString(),
+                        BenFecNac = rd["BENFECNAC"].ToString(),
+                        BenTel = rd["BENTEL"].ToString(),
+                        BenCorEle = rd["BENCORELE"].ToString(),
+                        BenSex = rd["BENSEX"].ToString(),
+                        GenCod = rd["GENCOD"].ToString(),
+                        GenNom = rd["GENNOM"].ToString(),
+                        BenCodUni = rd["BENCODUNI"].ToString(),
+                        BenTelCon = rd["BENTELCON"].ToString(),
+                        BenNomApo = rd["BENNOMAPO"].ToString(),
+                        BenApeApo = rd["BENAPEAPO"].ToString(),
+                        NacCod = rd["NACCOD"].ToString(),
+                        NacNom = rd["NACNOM"].ToString(),
+                        BenDir = rd["BENDIR"].ToString(),
+                        BenAut = rd["BENAUT"].ToString(),
+                    };
+                    temporal.Add(beneficiario);
                 }
-                rd.Close();
             }
             catch (SqlException ex)
             {
@@ -856,6 +885,7 @@ namespace SistemaMEAL.Server.Modulos
             }
             return temporal;
         }
+
 
     }
 }
