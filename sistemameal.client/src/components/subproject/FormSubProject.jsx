@@ -544,6 +544,7 @@ const FormSubProject = () => {
         setValue(`finCod${selectCountFin - 1}`, '0');
         setSelectCountFin(prevCount => prevCount - 1);
     };
+
     const handleRemoveImplementador = (index) => {
         if (selectCount > 1) {
             // Recorre todos los selectores que vienen después del que estás eliminando
@@ -562,11 +563,43 @@ const FormSubProject = () => {
     
     const handleRemoveUbicacion = (index) => {
         if (locationSelects.length > 1) {
-            setValue(`select${index}`, '0');
+            // Elimina el grupo de selects de ubicación
             const newLocationSelects = locationSelects.filter((_, i) => i !== index);
             setLocationSelects(newLocationSelects);
+    
+            // Crea un nuevo objeto para los valores seleccionados
+            const newSelectedCountryValues = {};
+            const newSelectedLocationValues = {};
+    
+            // Recorre los grupos restantes
+            for (let i = 0; i < newLocationSelects.length; i++) {
+                // Actualiza los valores seleccionados para reflejar el nuevo índice
+                // Solo si el valor actual no es '0'
+                if (selectedCountryValues[i < index ? i : i + 1] !== '0') {
+                    newSelectedCountryValues[i] = selectedCountryValues[i < index ? i : i + 1];
+                }
+                newLocationSelects[i].selects.forEach((_, selectIndex) => {
+                    if (selectedLocationValues[`${i < index ? i : i + 1}-${selectIndex}`] !== '0') {
+                        newSelectedLocationValues[`${i}-${selectIndex}`] = selectedLocationValues[`${i < index ? i : i + 1}-${selectIndex}`];
+                    }
+                });
+            }
+            console.log(newSelectedCountryValues)
+    
+            // Elimina los valores seleccionados del último grupo (que ya no existe)
+            delete newSelectedCountryValues[newLocationSelects.length];
+            Object.keys(newSelectedLocationValues).forEach(key => {
+                if (key.startsWith(`${newLocationSelects.length}-`)) {
+                    delete newSelectedLocationValues[key];
+                }
+            });
+    
+            // Actualiza el estado con los nuevos valores seleccionados
+            setSelectedCountryValues(newSelectedCountryValues);
+            setSelectedLocationValues(newSelectedLocationValues);
         }
     }
+    
 
     const currentYear = new Date().getFullYear();
 

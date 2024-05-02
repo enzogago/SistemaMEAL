@@ -190,7 +190,7 @@ const Table = ({data, setUsersTable}) => {
                             <span
                                 data-tooltip-id="edit-tooltip" 
                                 data-tooltip-content="Editar" 
-                                className='flex f1_5 p_25' 
+                                className='flex f1_25 p_25' 
                                 onClick={() => Editar_Usuario(row)} 
                             >
                                 <Edit />
@@ -200,7 +200,7 @@ const Table = ({data, setUsersTable}) => {
                             <span
                                 data-tooltip-id="delete-tooltip" 
                                 data-tooltip-content="Eliminar" 
-                                className='flex f1_5 p_25'
+                                className='flex f1_25 p_25'
                                 onClick={() => handleDelete(row.original.usuAno, row.original.usuCod, setUsersTable)} 
                             >
                                 <Delete />

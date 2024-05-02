@@ -214,8 +214,6 @@ const Subproject = () => {
         }
     };
     
-    
-    
     const eliminarDocumento = async(index) => {
             const file = selectedFiles[index];
     
@@ -294,7 +292,7 @@ const Subproject = () => {
                 }}
             >
                 <span className="PowerMas_CloseModal" style={{position: 'absolute',right: 20, top: 10}} onClick={closeModal}>×</span>
-                <h2 className='PowerMas_Title_Modal f1_5 center'>Fuentes de Verificación</h2>
+                <h2 className='PowerMas_Title_Modal f1_5 center'>Documentación de Formulación</h2>
                 <div className="flex-grow-1 flex jc-center ai-center">
                     <div className="Large_10">
                         <article className="PowerMas_Article_Upload center">

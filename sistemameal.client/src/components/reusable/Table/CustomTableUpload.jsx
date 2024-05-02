@@ -70,7 +70,7 @@ const CustomTableUpload = ({
     }
 
     return (
-        <div className='TableMainContainer Large-p1 Medium-p1 Small-p_5 todos'>
+        <div className='TableMainContainer Large-p1 Medium-p1 Small-p_5'>
             <div className="">
                 <h1 className="Large-f1_5"> { title && `Listado de ${title}`}</h1>
                 <div className="flex">

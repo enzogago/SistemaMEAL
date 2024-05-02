@@ -8,6 +8,7 @@ import { Tooltip } from 'react-tippy';
 import IconCalendar from '../../icons/IconCalendar';
 import IconLocation from '../../icons/IconLocation';
 import User from '../../icons/User';
+import Expand from '../../icons/Expand';
 
 const ResultChain = () => {
     const [currency, setCurrency] = useState('');
@@ -271,7 +272,6 @@ const ResultChain = () => {
             combinedRenderData[key] = renderDataPorFinanciador[key];
         });
     
-        console.log(combinedRenderData)
         return combinedRenderData;
     }
     
@@ -307,34 +307,49 @@ const ResultChain = () => {
 
     const onSubmit = (data) => {
         // if (isSubmitDisabled) return;
-        console.log(data)
         delete data.subproyecto;
         // Crear los arreglos para almacenar los cambios
         let cambiosPorAno = [];
         let cambiosPorImplementador = [];
         let cambiosPorFinanciador = [];
         let cambiosPorUbicacion = [];
+        let cambiosPorIndicador = [];
+
         
         // Iterar sobre los datos del formulario
         for (let key in data) {
             // Obtener el valor inicial y el valor actual de la celda
-            let valorInicial = renderData[key] || '';
+            let valorInicial;
+            if (key.startsWith('total')) {  // Si comienza con 'total', entonces es un 'totalPorIndicador'
+                valorInicial = indTotPreState[key] || '';
+            } else {
+                valorInicial = renderData[key] ? renderData[key].value : '' ;
+            }
+
             let valorActual = data[key];
-            console.log(renderData)
             // Si el valor ha cambiado, agregar el cambio al arreglo correspondiente
             if (valorInicial !== valorActual) {
                 // Obtener la parte de la clave que corresponde al 'ano', 'implementador', 'ubicacion' o 'financiador'
                 let keyParts = key.split('_');
-                let indAno = keyParts[0];
-                let indCod = keyParts[1];
-                let keyType = keyParts[2];
-                let keyTypeU = keyParts[3];
+                let indAno, indCod, keyType, keyTypeU;
+
+                // Si la clave comienza con 'total', entonces es un 'totalPorIndicador'
+                if (key.startsWith('total')) {
+                    indAno = keyParts[1];
+                    indCod = keyParts[2];
+                    keyType = keyParts[0];
+                } else {
+                    indAno = keyParts[0];
+                    indCod = keyParts[1];
+                    keyType = keyParts[2];
+                    keyTypeU = keyParts[3];
+                }
 
                 let cambio = {
-                    indAno: indAno,
-                    indCod: indCod,
+                    indAno,
+                    indCod,
                 };
-                console.log(keyTypeU)
+                
                 if (keyType.startsWith('ano')) {  // Si comienza con 'ano', entonces es un 'ano'
                     cambio.cadResPerAno = keyTypeU;
                     cambio.cadResPerMetPre = valorActual;
@@ -352,12 +367,15 @@ const ResultChain = () => {
                     cambio.finCod = keyTypeU;
                     cambio.cadResFinMetPre = valorActual;
                     cambiosPorFinanciador.push(cambio);
+                } else if (key.startsWith('total')) {  // Si comienza con 'total', entonces es un 'totalPorIndicador'
+                    cambio.indTotPre = valorActual;
+                    cambiosPorIndicador.push(cambio);
                 }
             }
 
         }
 
-        if (cambiosPorAno.length === 0 && cambiosPorImplementador.length === 0 && cambiosPorFinanciador.length === 0 && cambiosPorUbicacion.length === 0) {
+        if (cambiosPorAno.length === 0 && cambiosPorImplementador.length === 0 && cambiosPorFinanciador.length === 0 && cambiosPorUbicacion.length === 0 && cambiosPorIndicador.length === 0) {
             Notiflix.Notify.warning('No se realizaron cambios.');
             return;
         }
@@ -366,11 +384,13 @@ const ResultChain = () => {
             CadenaPeriodos: cambiosPorAno,
             CadenaImplementadores: cambiosPorImplementador,
             CadenaFinanciadores: cambiosPorFinanciador,
-            CadenaUbicaciones: cambiosPorUbicacion
+            CadenaUbicaciones: cambiosPorUbicacion,
+            Indicadores: cambiosPorIndicador
         }
+
         console.log(CadenaIndicadorDto)
         
-        // handleInsert(CadenaIndicadorDto);
+        handleInsert(CadenaIndicadorDto);
     };
 
     const handleInsert = async (cadena) => {
@@ -445,12 +465,12 @@ const ResultChain = () => {
     return (
         <div className='p1 flex flex-column flex-grow-1 overflow-auto'>
             <h1 className="Large-f1_5"> Cadena de resultado | Metas Presupuesto </h1>
-            <div className='flex jc-space-between'>
-                <div className="m_25 flex-grow-1">
+            <div className='flex jc-space-between gap-1 p_5'>
+                <div className="flex-grow-1">
                     <select 
                         id='subproyecto'
                         style={{textTransform: 'capitalize'}}
-                        className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.subproyecto || isSubmitted ? (errors.subproyecto ? 'invalid' : 'valid') : ''}`} 
+                        className={`block Phone_12 p_5 PowerMas_Modal_Form_${dirtyFields.subproyecto || isSubmitted ? (errors.subproyecto ? 'invalid' : 'valid') : ''}`} 
                         {...register('subproyecto', { 
                             validate: {
                                 required: value => value !== '0' || 'El campo es requerido',
@@ -467,16 +487,9 @@ const ResultChain = () => {
                             </option>
                         ))}
                     </select>
-                    {errors.subproyecto ? (
-                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.subproyecto.message}</p>
-                    ) : (
-                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                            Espacio reservado para el mensaje de error
-                        </p>
-                    )}
                 </div>
-                <div className={`PowerMas_Dropdown_Export Large_3 Large-m_25 ${dropdownOpen ? 'open' : ''}`}>
-                    <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>Exportar <IconCalendar className='Large_1' /></button>
+                <div className={`PowerMas_Dropdown_Export Large_3 ${dropdownOpen ? 'open' : ''}`}>
+                    <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>Exportar <Expand className='Large_1' /></button>
                     <div className="PowerMas_Dropdown_Export_Content Phone_12">
                         <a onClick={() => {
                             Export_Excel();
@@ -583,6 +596,7 @@ const ResultChain = () => {
                                                 const newTotalsAll = totalIndTotPre - oldValue + newValue;
                                                 const newTotalPorImplementador = calculateTotal(item.indAno, item.indCod, 'porImplementador', totalsPorImplementador);
                                                 const newTotalPorFinanciador = calculateTotal(item.indAno, item.indCod, 'porFinanciador', totalsPorFinanciador);
+                                                const newTotalPorAno = calculateTotal(item.indAno, item.indCod, 'porAno', totalsPorAnoAll);
                                             
                                                 if (newTotalsAll !== newTotalPorImplementador) {
                                                     setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorImplementador, section: 'totalPorImplementador' });
@@ -590,7 +604,10 @@ const ResultChain = () => {
                                                 } else if (newTotalsAll !== newTotalPorFinanciador) {
                                                     setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorFinanciador, section: 'totalPorFinanciador' });
                                                     setIsSubmitDisabled(true);
-                                                } else {
+                                                 } else if (newTotalPorAno <= 0) {
+                                                    setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorAno, section: 'totalPorAno' });
+                                                    setIsSubmitDisabled(true);
+                                                 } else {
                                                     setUnmatchedTotal({ key: '', value: 0, section: '' });
                                                     setIsSubmitDisabled(false);
                                                 }
@@ -621,7 +638,6 @@ const ResultChain = () => {
                                         const cellData = renderData[`${item.indAno}_${item.indCod}_${header.key}`];
                                         const defaultValue = cellData ? cellData.value : '';
                                         const tecValue = cellData ? cellData.tecValue : null;
-
                                         // if (header.key === 'totalPorAno') {
                                         //     return (
                                         //         <td 
@@ -676,7 +692,7 @@ const ResultChain = () => {
                                                         arrow={true}
                                                         position="bottom"
                                                         key={i}
-                                                        />
+                                                    />
                                                 </td>
                                             );
                                         } else {
@@ -705,6 +721,8 @@ const ResultChain = () => {
                                                             section = 'porUbicacion';
                                                         } else if (header.key.startsWith('fin')) {
                                                             section = 'porFinanciador';
+                                                        } else if (header.key.startsWith('ano')) {
+                                                            section = 'porAno';
                                                         }
                                                     
                                                         let newTotalsAll = Number(indTotPreState[`total_${item.indAno}_${item.indCod}`]);
@@ -712,6 +730,7 @@ const ResultChain = () => {
                                                         let newTotalsPorImplementador = { ...totalsPorImplementador };
                                                         let newTotalsPorUbicacion = { ...totalsPorUbicacion };
                                                         let newTotalsPorFinanciador = { ...totalsPorFinanciador };
+                                                        let newTotalsPorAno = { ...totalsPorAnoAll };
                                                     
                                                         if (section === 'porImplementador') {
                                                             newTotalsPorImplementador = { ...newTotalsPorImplementador, [`${key}_${header.key}_porImplementador`]: newValue };
@@ -722,16 +741,18 @@ const ResultChain = () => {
                                                         } else if (section === 'porFinanciador') {
                                                             newTotalsPorFinanciador = { ...newTotalsPorFinanciador, [`${key}_${header.key}_porFinanciador`]: newValue };
                                                             setTotalsPorFinanciador(newTotalsPorFinanciador);
+                                                        } else if (section === 'porAno') {
+                                                            newTotalsPorAno = { ...newTotalsPorAno, [`${key}_${header.key}_porAno`]: newValue };
+                                                            setTotalsPorAnoAll(newTotalsPorAno);
                                                         }
                                                     
                                                         // Después de actualizar los totales, calcula los nuevos totales para cada sección
                                                         const newTotalPorImplementador = calculateTotal(item.indAno, item.indCod, 'porImplementador', newTotalsPorImplementador);
                                                         const newTotalPorFinanciador = calculateTotal(item.indAno, item.indCod, 'porFinanciador', newTotalsPorFinanciador);
-                                                        console.log(newTotalsAll)
-                                                        console.log(newTotalPorImplementador)
-                                                        console.log(newTotalPorFinanciador)
+                                                        const newTotalPorAno= calculateTotal(item.indAno, item.indCod, 'porAno', newTotalsPorAno);
+
                                                         // Comprueba si los totales de las cuatro secciones son iguales
-                                                        if (newTotalsAll === newTotalPorImplementador && newTotalsAll === newTotalPorFinanciador) {
+                                                        if (newTotalsAll === newTotalPorImplementador && newTotalsAll === newTotalPorFinanciador && newTotalPorAno > 0) {
 
                                                             // Si los totales de la fila actual son iguales, comprueba si los totales de todas las filas son iguales
                                                             const totalPorImplementadorAll = Object.values(newTotalsPorImplementador).reduce((a, b) => a + Number(b), 0);
@@ -751,6 +772,8 @@ const ResultChain = () => {
                                                             setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorImplementador, section: 'totalPorImplementador' });
                                                         } else if (newTotalsAll !== newTotalPorFinanciador) {
                                                             setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorFinanciador, section: 'totalPorFinanciador' });
+                                                        } else if (newTotalPorAno <= 0){
+                                                            setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorAno, section: 'totalPorAno' });
                                                         } else {
                                                             setUnmatchedTotal({ key: '', value: 0, section: '' });
                                                         }

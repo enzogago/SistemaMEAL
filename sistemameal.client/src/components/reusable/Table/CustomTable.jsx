@@ -35,7 +35,8 @@ const CustomTable = ({
     setSearchTags,
     sums,
     isLargePagination = false,
-    setActionsColumnWidth
+    setActionsColumnWidth,
+    setActionsWidth
 }) => {
     const navigate = useNavigate();
     
@@ -85,6 +86,17 @@ const CustomTable = ({
             animateScroll(tableRef.current, to, 500);
         }
     }
+
+    // Asume que setActionsWidth se pasa como prop
+    useEffect(() => {
+        // Calcula el ancho de las acciones
+        const actionsElement = document.querySelector('.PowerMas_IconsTable');
+        if (setActionsWidth && actionsElement) {
+            setActionsWidth(actionsElement.offsetWidth);
+            console.log(actionsElement.offsetWidth);
+        }
+    }, [actions]);
+
 
     return (
         <div className='TableMainContainer Large-p1 Medium-p1 Small-p_5'>

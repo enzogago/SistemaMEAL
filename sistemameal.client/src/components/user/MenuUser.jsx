@@ -4,9 +4,6 @@ import MenuItem from "./MenuItem";
 import { useNavigate, useParams } from "react-router-dom";
 import Bar from "./Bar";
 import CryptoJS from 'crypto-js';
-import avatar from '../../img/avatar.jpeg';
-import masculino from '../../img/PowerMas_Avatar_Masculino.svg';
-import femenino from '../../img/PowerMas_Avatar_Femenino.svg';
 import UserInfo from "./UserInfo";
 
 const MenuUser = () => {
@@ -32,7 +29,6 @@ const MenuUser = () => {
 
   const [ user, setUser ] = useState(null);
 
-
   const groupByParent = (menuData) => {
     const menuMap = {};
     const rootMenus = [];
@@ -56,6 +52,15 @@ const MenuUser = () => {
     return rootMenus;
   };
   
+  const handlePermissionCheck = useCallback((permission, isChecked) => {
+    console.log(permission)
+    setCheckedPermissions(prevCheckedPermissions => {
+      const newCheckedPermissions = {...prevCheckedPermissions, [permission.perCod]: isChecked}
+
+       return newCheckedPermissions;
+    });
+    console.log(checkedPermissions);
+  }, []);
 
   useEffect(() => {
     let activeRequests = 0;
@@ -97,6 +102,8 @@ const MenuUser = () => {
         endRequest();
       }
     };
+
+    
 
     const fetchMenus = async () => {
       try {
@@ -155,6 +162,7 @@ const MenuUser = () => {
           }
         });
         const groupData = groupByParent(markedMenus);
+        console.log(groupData);
         setMenus(groupData);
         const newCheckedMenus = userMenus.reduce((map, menu) => {
           map[menu.menCod] = true;
@@ -209,17 +217,7 @@ const MenuUser = () => {
   }, []);
   
   
-  const handlePermissionCheck = useCallback((permission, isChecked) => {
-    console.log(permission)
-    setCheckedPermissions(prevCheckedPermissions => {
-      const newCheckedPermissions = {...prevCheckedPermissions, [permission.perCod]: isChecked}
-
-       return newCheckedPermissions;
-    });
-    console.log(checkedPermissions);
-  }, []);
-
-
+  
 
   const renderMenu = (menu, level) => (
     <MenuItem 
@@ -228,10 +226,12 @@ const MenuUser = () => {
         level={level} 
         handleToggle={handleToggle} 
         handleCheck={handleCheck} 
-        handlePermissionCheck={handlePermissionCheck}
         openMenus={openMenus} 
         checkedMenus={checkedMenus}
         checkedPermissions={checkedPermissions}
+        setCheckedPermissions={setCheckedPermissions}
+        userPermissions={userPermissions}
+        handlePermissionCheck={handlePermissionCheck}
     />
   );
 
@@ -299,51 +299,53 @@ const MenuUser = () => {
       if (!responseRemove.ok) {
         // Manejar el error...
       }
+
+        // Identificar los permisos que se han marcado (agregados)
+        const addedPermissions = Object.keys(checkedPermissions).filter(perCod => checkedPermissions[perCod] && !userPermissions.some(userPermission => userPermission.perCod === perCod));
+    
+        // Identificar los permisos que se han desmarcado (eliminados)
+        const removedPermissions = userPermissions.filter(permission => !checkedPermissions[permission.perCod]).map(permission => permission.perCod);
+    
+        // Preparar los datos para las peticiones
+        const addedPermissionsData = addedPermissions.map(perCod => ({
+            UsuAno: usuAno,
+            UsuCod: usuCod,
+            PerCod: perCod.trim()
+        }));
+        const removedPermissionsData = removedPermissions.map(perCod => ({
+            UsuAno: usuAno,
+            UsuCod: usuCod,
+            PerCod: perCod.trim()
+        }));
+        console.log(addedPermissionsData)
+        console.log(removedPermissionsData)
+    
+        const responseAddPermissions = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Permiso/agregar`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(addedPermissionsData)
+        });
+        if (!responseAddPermissions.ok) {
+            // Manejar el error...
+        }
+    
+        // Realizar la petición para eliminar menús
+        const responseRemovePermissions = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Permiso/eliminar`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(removedPermissionsData)
+        });
+        if (!responseRemovePermissions.ok) {
+            // Manejar el error...
+        }
   
-      // Identificar los permisos que se han marcado (agregados)
-      const addedPermissions = Object.keys(checkedPermissions).filter(perCod => checkedPermissions[perCod] && !userPermissions.some(userPermission => userPermission.perCod === perCod));
-  
-      // Identificar los permisos que se han desmarcado (eliminados)
-      const removedPermissions = userPermissions.filter(permission => !checkedPermissions[permission.perCod]).map(permission => permission.perCod);
-  
-      // Preparar los datos para las peticiones
-      const addedPermissionsData = addedPermissions.map(perCod => ({
-        UsuAno: usuAno,
-        UsuCod: usuCod,
-        PerCod: perCod.trim()
-      }));
-      const removedPermissionsData = removedPermissions.map(perCod => ({
-        UsuAno: usuAno,
-        UsuCod: usuCod,
-        PerCod: perCod.trim()
-      }));
-      console.log(addedPermissionsData)
-      console.log(removedPermissionsData)
-  
-      const responseAddPermissions = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Permiso/agregar`, {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(addedPermissionsData)
-      });
-      if (!responseAddPermissions.ok) {
-        // Manejar el error...
-      }
-  
-      // Realizar la petición para eliminar menús
-      const responseRemovePermissions = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Permiso/eliminar`, {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(removedPermissionsData)
-      });
-      if (!responseRemovePermissions.ok) {
-        // Manejar el error...
-      }
+      
       Notiflix.Notify.success("Menus actualizados correctamente")
     } catch (error) {
       console.log(error)

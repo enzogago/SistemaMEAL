@@ -19,6 +19,11 @@ const PermissionUser = () => {
     const usuAno = id.slice(0, 4);
     const usuCod = id.slice(4);
     
+
+    const [expandedKeys, setExpandedKeys] = useState([]);
+    const [checkedKeys, setCheckedKeys] = useState([]);
+    const [selectedKeys, setSelectedKeys] = useState([]);
+    const [autoExpandParent, setAutoExpandParent] = useState(true);
     //
     const [ proyectos, setProyectos ] = useState([]);
 
@@ -28,17 +33,19 @@ const PermissionUser = () => {
 
 
     // EFECTO AL CARGAR COMPONENTE GET - LISTAR METAS
-        useEffect(() => {
+    useEffect(() => {
         const fetchDataAsync = async () => {
             console.log(usuAno,usuCod)
             await fetchData(`Usuario/${usuAno}/${usuCod}`, setUser);
             await fetchData(`Proyecto/proyectos-subproyectos`, (data) => {
                 const transformedData = transformData(data);
                 setProyectos(transformedData);
+                console.log(data);
             });
             await fetchData(`Usuario/access/${usuAno}/${usuCod}`, (data) => {
                 console.log(data)
                 // Usa los objetos de permiso tal como vienen del servidor
+                console.log(data.map(permiso => permiso.usuAccPad));
                 setCheckedKeys(data.map(permiso => permiso.usuAccPad));
                 setInitialCheckedKeys(data);
             });
@@ -71,6 +78,7 @@ const PermissionUser = () => {
             AccesosInsertar: permisosToInsert,
             AccesosEliminar: permisosToDelete,
         }
+        console.log(checkedKeys)
         console.log(PermisosDto)
         handleSubmit2(PermisosDto);
     };
@@ -131,6 +139,7 @@ const PermissionUser = () => {
                                                             let metChildren = [];
                                                             if (indItem.metas) {
                                                                 metChildren = indItem.metas.map((metItem) => {
+                                                                    console.log(metItem)
                                                                     const tecnico = metItem.usuNom.charAt(0).toUpperCase() + metItem.usuNom.slice(1).toLowerCase()
                                                                     const implementador = metItem.impNom.charAt(0).toUpperCase() + metItem.impNom.slice(1).toLowerCase()
                                                                     const ubicacion = metItem.ubiNom.charAt(0).toUpperCase() + metItem.ubiNom.slice(1).toLowerCase()
@@ -242,10 +251,7 @@ const PermissionUser = () => {
         });
     };
   
-    const [expandedKeys, setExpandedKeys] = useState([]);
-    const [checkedKeys, setCheckedKeys] = useState([]);
-    const [selectedKeys, setSelectedKeys] = useState([]);
-    const [autoExpandParent, setAutoExpandParent] = useState(true);
+    
     const onExpand = (expandedKeysValue) => {
         setExpandedKeys(expandedKeysValue);
         setAutoExpandParent(false);

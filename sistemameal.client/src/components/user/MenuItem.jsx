@@ -1,15 +1,28 @@
 import Notiflix from 'notiflix';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import Modal from 'react-modal';
+import { useParams } from 'react-router-dom';
+import CryptoJS from 'crypto-js';
 
-const MenuItem = ({ menu, level, handleToggle, handleCheck, openMenus, checkedMenus, handlePermissionCheck, checkedPermissions }) => {
+const MenuItem = ({ menu, level, handleToggle, handleCheck, openMenus, checkedMenus, checkedPermissions, setCheckedPermissions, userPermissions, handlePermissionCheck }) => {
+
+    const { id: safeCiphertext } = useParams();
+    const ciphertext = atob(safeCiphertext);
+    // Desencripta el ID
+    const bytes  = CryptoJS.AES.decrypt(ciphertext, 'secret key 123');
+    const id = bytes.toString(CryptoJS.enc.Utf8);
+
+    const usuAno = id.slice(0, 4);
+    const usuCod = id.slice(4);
+
     const [modalIsOpen, setModalIsOpen] = useState(false);
+
     const openModal = () => {
         setModalIsOpen(true);
     }
     const closeModal = () => {
-        Notiflix.Notify.success("Se actualizaron los permisos");
         setModalIsOpen(false);
+        Notiflix.Notify.success("Permisos Actualizados");
     }
 
     return (
@@ -52,10 +65,12 @@ const MenuItem = ({ menu, level, handleToggle, handleCheck, openMenus, checkedMe
                             level={level + 1} 
                             handleToggle={handleToggle} 
                             handleCheck={handleCheck} 
-                            handlePermissionCheck={handlePermissionCheck}
                             openMenus={openMenus} 
                             checkedMenus={checkedMenus} 
                             checkedPermissions={checkedPermissions}
+                            setCheckedPermissions={setCheckedPermissions}
+                            userPermissions={userPermissions}
+                            handlePermissionCheck={handlePermissionCheck}
                         />
                     ))}
                 </ul>
@@ -119,7 +134,7 @@ const MenuItem = ({ menu, level, handleToggle, handleCheck, openMenus, checkedMe
                         </div>
                         <br />
                         <div className='flex jc-center'>
-                            <button className='PowerMas_Buttom_Primary Large_6' onClick={closeModal}>Guardar</button>
+                            <button className='PowerMas_Buttom_Primary Large_6' onClick={closeModal}>Cerrar</button>
                         </div>
                     </div>
                 </Modal>

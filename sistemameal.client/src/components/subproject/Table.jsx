@@ -24,7 +24,7 @@ const Table = ({data = [], setData, setModalIsOpen}) => {
     // States locales
     const [searchFilter, setSearchFilter] = useState('');
     const [dropdownOpen, setDropdownOpen] = useState(false);
-
+    const [actionsWidth, setActionsWidth] = useState(0);
 
      /* TANSTACK */
      const actions = {
@@ -94,7 +94,7 @@ const Table = ({data = [], setData, setModalIsOpen}) => {
                 header: "FFVV",
                 accessorKey: "subProFueVer",
                 disableSorting: true,
-                stickyRight: 100,
+                stickyRight: actionsWidth+10,
                 cell: ({row}) => {
                     return (
                         <div className="flex jc-center ai-center" >
@@ -103,7 +103,7 @@ const Table = ({data = [], setData, setModalIsOpen}) => {
                                 style={{padding: '0.25rem 0.75rem'}}
                                 onClick={() => setModalIsOpen(row.original)}
                             >
-                                Documento Formulacion
+                                Documentación Formulacion
                             </button>
                         </div>
                     );
@@ -232,6 +232,7 @@ const Table = ({data = [], setData, setModalIsOpen}) => {
             resize={false}
             searchFilter={searchFilter} 
             setSearchFilter={setSearchFilter} 
+            setActionsWidth={setActionsWidth}
         />
     )
 }
