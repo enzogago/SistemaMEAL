@@ -109,7 +109,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var reult = _documentos.BuscarDocumentosHome(tags);
+            var reult = _documentos.BuscarDocumentosHome(identity, tags);
             return Ok(reult);
         }
     }

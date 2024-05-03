@@ -185,7 +185,7 @@ const Subproject = () => {
     };
 
     const downloadFile = async (fileName) => {
-        const url = `https://meal.ddns.net/uploads/${fileName}`
+        const url = `http://20.81.137.122:8080/uploads/${fileName}`
         try {
             Notiflix.Loading.pulse('Descargando...');
             // Obtenemos los datos

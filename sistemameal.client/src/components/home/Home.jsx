@@ -19,7 +19,7 @@ import BarEmpty from '../../img/PowerMas_BarEmpty.svg';
 import Search from '../../icons/Search';
 
 const Home = () => {
-    const [ monitoringData, setMonitoringData] = useState([])
+    const [ monitoringData, setMonitoringData] = useState(null)
     const [ searchTags, setSearchTags] = useState([]);
     const [ isInputEmpty, setIsInputEmpty] = useState(true);
     const [ inputValue, setInputValue] = useState('');
@@ -38,8 +38,14 @@ const Home = () => {
     const [ beneficiariosData, setBeneficiariosData ] = useState([]);
     const [ disabledFilter, setDisabledFilter ] = useState(false);
 
-    const fetchData = async (controller, setData) => {
+    const fetchData = async (controller, setData, clase) => {
         try {
+            if (document.querySelector(clase)) {
+                Notiflix.Block.pulse(clase, {
+                    svgSize: '100px',
+                    svgColor: '#F87C56',
+                });
+            }
             // Valores del storage
             const token = localStorage.getItem('token');
             
@@ -65,17 +71,20 @@ const Home = () => {
         } catch (error) {
             console.error('Error:', error);
         } finally {
+            if (document.querySelector(clase)) {
+                Notiflix.Block.remove(clase);
+            }
         }
     };
 
-   
     const fetchMonitoreo = async () => {
-        setMonitoringData(null); 
         try {
-            Notiflix.Block.pulse('.js-element5', {
-                svgSize: '100px',
-                svgColor: '#F87C56',
-            });
+            if (document.querySelector('.js-element5')) {
+                Notiflix.Block.pulse('.js-element5', {
+                    svgSize: '100px',
+                    svgColor: '#F87C56',
+                });
+            }
             const token = localStorage.getItem('token');
             const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/Filter/${searchTags.join(',')}`, {
                 headers: {
@@ -115,26 +124,12 @@ const Home = () => {
 
     const fetchContarBeneficiariosHome = async () => {
         try {
-            Notiflix.Block.pulse('.js-element6', {
-                svgSize: '100px',
-                svgColor: '#F87C56',
-            });
-            Notiflix.Block.pulse('.js-element', {
-                svgSize: '100px',
-                svgColor: '#F87C56',
-            });
-            Notiflix.Block.pulse('.js-element2', {
-                svgSize: '100px',
-                svgColor: '#F87C56',
-            });
-            Notiflix.Block.pulse('.js-element3', {
-                svgSize: '100px',
-                svgColor: '#F87C56',
-            });
-            Notiflix.Block.pulse('.js-element4', {
-                svgSize: '100px',
-                svgColor: '#F87C56',
-            });
+            if (document.querySelector('.js-element6')) {
+                Notiflix.Block.pulse('.js-element6', {
+                    svgSize: '100px',
+                    svgColor: '#F87C56',
+                });
+            }
             const token = localStorage.getItem('token');
             const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Beneficiario/contar-home/${searchTags.join(',')}`, {
                 headers: {
@@ -184,10 +179,12 @@ const Home = () => {
 
     const fetchDocumentosHome = async () => {
         try {
-            Notiflix.Block.pulse('.js-element4', {
-                svgSize: '100px',
-                svgColor: '#F87C56',
-            });
+            if (document.querySelector('.js-element4')) {
+                Notiflix.Block.pulse('.js-element4', {
+                    svgSize: '100px',
+                    svgColor: '#F87C56',
+                });
+            }
             const token = localStorage.getItem('token');
             const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/DocumentoIdentidad/home/${searchTags.join(',')}`, {
                 headers: {
@@ -215,10 +212,12 @@ const Home = () => {
     };
     const fetchNacionalidadesHome = async () => {
         try {
-            Notiflix.Block.pulse('.js-element2', {
-                svgSize: '100px',
-                svgColor: '#F87C56',
-            });
+            if (document.querySelector('.js-element2')) {
+                Notiflix.Block.pulse('.js-element2', {
+                    svgSize: '100px',
+                    svgColor: '#F87C56',
+                });
+            }
             const token = localStorage.getItem('token');
             const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Nacionalidad/home/${searchTags.join(',')}`, {
                 headers: {
@@ -245,10 +244,13 @@ const Home = () => {
     };
     const fetchSexosHome = async () => {
         try {
-            Notiflix.Block.pulse('.js-element', {
-                svgSize: '100px',
-                svgColor: '#F87C56',
-            });
+            if (document.querySelector('.js-element')) {
+                Notiflix.Block.pulse('.js-element', {
+                    svgSize: '100px',
+                    svgColor: '#F87C56',
+                });
+            }
+            
             const token = localStorage.getItem('token');
             const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Beneficiario/sexo-home/${searchTags.join(',')}`, {
                 headers: {
@@ -270,15 +272,19 @@ const Home = () => {
         } catch (error) {
             console.error('Error:', error);
         } finally {
-            Notiflix.Block.remove('.js-element');
+            if (document.querySelector('.js-element')) {
+                Notiflix.Block.remove('.js-element');
+            }
         }
     };
     const fetchRangoHome = async () => {
         try {
-            Notiflix.Block.pulse('.js-element3', {
-                svgSize: '100px',
-                svgColor: '#F87C56',
-            });
+            if (document.querySelector('.js-element3')) {
+                Notiflix.Block.pulse('.js-element3', {
+                    svgSize: '100px',
+                    svgColor: '#F87C56',
+                });
+            }
             const token = localStorage.getItem('token');
             const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Beneficiario/rango-home/${searchTags.join(',')}`, {
                 headers: {
@@ -324,19 +330,25 @@ const Home = () => {
         } finally {
         }
     };
-
-    useEffect(() => {
-        const fetchAllData = async () => {
-            setDisabledFilter(true);
-            await Promise.all([fetchContarBeneficiariosHome(), fetchMonitoreo()]);
-            await Promise.all([fetchSexosHome(), fetchRangoHome()]);
-            await Promise.all([fetchNacionalidadesHome(), fetchDocumentosHome()]);
-            await Promise.all([fetchBeneficiariosHome(), fetchUbicacionesHome()]);
-            fetchData('Log',setRecents);
-            setDisabledFilter(false);
-        };
     
-        fetchAllData();
+    
+    useEffect(() => {
+        fetchData('Log', setRecents, '.recents-block');
+    }, [])
+    
+    useEffect(() => {
+        const abortController = new AbortController(); 
+    
+        fetchContarBeneficiariosHome(abortController.signal);
+        fetchMonitoreo(abortController.signal);
+        fetchSexosHome(abortController.signal);
+        fetchRangoHome(abortController.signal);
+        fetchNacionalidadesHome(abortController.signal);
+        fetchDocumentosHome(abortController.signal);
+        fetchBeneficiariosHome(abortController.signal);
+        fetchUbicacionesHome(abortController.signal);
+    
+        setDisabledFilter(false);
     }, [searchTags]);
     
 
@@ -419,7 +431,7 @@ const Home = () => {
                 <div className=" flex Medium-flex-row Small-flex-column bg-white gap_5">
                     <div className="PowerMas_KPIRow Large_2 Medium_4 Small_12 Large-f1_25 Large-p1 Medium-p_5">
                         <p className="f1_25">Atenciones brindadas</p>
-                        <span className='Medium_f2 Small-f1_5'>{formatter.format(32415)}</span>
+                        <span className='Medium_f2 Small-f1_5'>{formatter.format(Number(totalAtenciones))}</span>
                     </div>
                     <div className="PowerMas_KPIRow Large_2 Medium_4 Small_12 js-element6 Large-f1_25 Large-p1 Medium-p_5">
                         <p className="f1_25">Beneficiarios totales</p>
@@ -427,11 +439,11 @@ const Home = () => {
                     </div>
                     <div className="PowerMas_KPIRow Large_2 Medium_4 Small_12 js-element6 Large-f1_25 Large-p1 Medium-p_5">
                         <p className="f1_25">Beneficiarios duplicados</p>
-                        <span className='Medium_f2 Small-f1_5'>{formatter.format(1500)}</span>
+                        <span className='Medium_f2 Small-f1_5'>{formatter.format(Number(0))}</span>
                     </div>
                     <div className="PowerMas_KPIRow Large_3 Medium_6 Small_12 gap_3 flex-column Large-f1_25">
                         <p className="f1_25" style={{whiteSpace: 'nowrap'}}>Avance presupuesto</p>
-                        <DonutChart percentage={32.43} wh={140} rad={20} newId={'Dona_Presupuesto'} colorText={'#000'} colorPc={'#F87C56'} colorSpc={'#F7775A20'} />
+                        <DonutChart percentage={avancePresupuesto} wh={140} rad={20} newId={'Dona_Presupuesto'} colorText={'#000'} colorPc={'#F87C56'} colorSpc={'#F7775A20'} />
                     </div>
                     <div className="PowerMas_KPIRow Large_3 Medium_6 Small_12 gap_3 flex-column Large-f1_25">
                         <p className="f1_25">Avance técnico</p>
@@ -512,11 +524,11 @@ const Home = () => {
                     </div>
                 </div>
                 <div className="flex Large-flex-row Medium-flex-row Small-flex-column gap-1">
-                    <div className='PowerMas_Home_Card Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
+                    <div className='PowerMas_Home_Card Large_6 Medium_6 Phone_12 flex flex-column ai-center' style={{minHeight: '24rem'}}>
                         <div className='Large_12 p_5 PowerMas_Tittle_Map'>
                             <h4>Beneficiarios por nacionalidad</h4>
                         </div>
-                        <div className='Large_12 Medium_12 Phone_12 Large-p1 Medium-p_75 flex flex-grow-1 js-element2 Medium-p1 Small-p_75'>
+                        <div className='Large_12 Medium_12 Phone_12 Large-p1 Medium-p_75 flex ai-center flex-grow-1 js-element2 Medium-p1 Small-p_75'>
                             {
                                 dataNac.length > 0 ?
                                     <HorizontalBarChart data={dataNac} id='NacionalidadBarChart' barColor='#F7775A' />
@@ -528,11 +540,11 @@ const Home = () => {
                                 }
                         </div>
                     </div>
-                    <div className='PowerMas_Home_Card Large_6 Medium_6 Phone_12 flex flex-column ai-center'>
+                    <div className='PowerMas_Home_Card Large_6 Medium_6 Phone_12 flex flex-column ai-center' style={{minHeight: '24rem'}}>
                         <div className='Large_12 p_5 PowerMas_Tittle_Map'>
                             <h4>Beneficiarios por tipo de documento</h4>
                         </div>
-                        <div className='Large_12 Medium_12 Phone_12 Large-p1 Medium-p_75 flex-grow-1 js-element4 Medium-p1 Small-p_75'>
+                        <div className='Large_12 Medium_12 Phone_12 Large-p1 Medium-p_75 flex ai-center flex-grow-1 js-element4 Medium-p1 Small-p_75'>
                             {
                                 docData.length > 0 ?
                                 <HorizontalBarChart data={docData} id='TipoDocBarChart' barColor='#F7775A' />
@@ -552,7 +564,7 @@ const Home = () => {
                     <div className='Large_12 p_5 PowerMas_Tittle_Map center'>
                         <h4>Actividades recientes</h4>
                     </div>
-                    <div className='Large-p1 flex flex-column gap_3 overflow-auto'>
+                    <div className='Large-p1 flex flex-column gap_3 overflow-auto recents-block flex-grow-1'>
                         {recents.map((item, index) => {
                             // Crea un objeto Date a partir de la cadena de fecha y horacon
                             const date = new Date(item.logFecIng);
@@ -603,11 +615,11 @@ const Home = () => {
                         })}
                     </div>
                 </div>
-                <div className='PowerMas_Home_Card Large-p0 Medium-p_75 Large_6 Medium_6 Phone_12 flex flex-column ai-center gap_3'>
+                <div className='PowerMas_Home_Card Large-p0 Medium-p_75 Large_6 Medium_6 Phone_12 flex flex-column ai-center gap_3' style={{minHeight: '24rem'}}>
                     <div className='Large_12 p_5 PowerMas_Tittle_Map center'>
                         <h4>Beneficiarios por ubicación</h4>
                     </div>
-                    <div className='flex flex-grow-1 Phone_12' style={{position: 'relative', minHeight: '20rem'}}>
+                    <div className='flex flex-grow-1 Phone_12' style={{position: 'relative'}}>
                         <article className='Medium_3 Phone_3 flex ai-center flex-grow-1' style={{position: 'absolute', bottom: '0', zIndex: '1'}}>
                             <div className='flex flex-column Medium-p_5 Small-p_25 Meidum-gap_5 Small-gap_25  Large_12'>
                                 <div className='bg-white' style={{borderRadius: '6px'}}>

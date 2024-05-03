@@ -667,8 +667,10 @@ namespace SistemaMEAL.Server.Modulos
             return temporal?? new List<Beneficiario>();
         }
 
-        public IEnumerable<Beneficiario> ContarBeneficiariosHome(string? tags)
+        public IEnumerable<Beneficiario> ContarBeneficiariosHome(ClaimsIdentity? identity, string? tags)
         {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
             List<Beneficiario>? temporal = new List<Beneficiario>();
             try
             {
@@ -677,6 +679,8 @@ namespace SistemaMEAL.Server.Modulos
                 SqlCommand cmd = new SqlCommand("SP_CONTAR_BENEFICIARIOS_HOME", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
+                cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
 
                 StringBuilder jsonResult = new StringBuilder();
                 SqlDataReader reader = cmd.ExecuteReader();
@@ -741,8 +745,10 @@ namespace SistemaMEAL.Server.Modulos
             }
             return temporal?? new List<Beneficiario>();
         }
-        public IEnumerable<Beneficiario> BuscarSexoHome(string? tags)
+        public IEnumerable<Beneficiario> BuscarSexoHome(ClaimsIdentity? identity, string? tags)
         {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+            
             List<Beneficiario>? temporal = new List<Beneficiario>();
             try
             {
@@ -751,6 +757,8 @@ namespace SistemaMEAL.Server.Modulos
                 SqlCommand cmd = new SqlCommand("SP_BUSCAR_SEXO_HOME", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
+                cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
 
                 StringBuilder jsonResult = new StringBuilder();
                 SqlDataReader reader = cmd.ExecuteReader();

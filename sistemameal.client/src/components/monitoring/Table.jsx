@@ -58,7 +58,6 @@ const Table = ({setModalIsOpen}) => {
     const startIndex = (currentPage - 1) * pageSize;
     const endIndex = startIndex + pageSize;
 
-    console.log("hola")
     useEffect(() => {
         fetchData(`Monitoreo/Filter/${searchTags.join(',')}`, (data) => {
             setMetas(data)
@@ -79,10 +78,10 @@ const Table = ({setModalIsOpen}) => {
             totalMetPre: 0,
             totalEjePre: 0,
         });
-        
+    
         const paginatedData = metas.slice(startIndex, endIndex);
     
-        return paginatedData.reduce((grouped, meta) => {
+        const grouped = paginatedData.reduce((grouped, meta) => {
             const key = `res_${meta.resAno}_${meta.resCod}`
             if (!grouped[key]) {
                 grouped[key] = { metas: [], resNom: meta.resNom, resNum: meta.resNum, totalMetTec: 0, totalEjeTec: 0, totalMetPre: 0, totalEjePre: 0 }
@@ -92,7 +91,7 @@ const Table = ({setModalIsOpen}) => {
             grouped[key].totalEjeTec += Number(meta.metEjeTec)
             grouped[key].totalMetPre += Number(meta.metMetPre)
             grouped[key].totalEjePre += Number(meta.metEjePre)
-
+    
             // Actualiza los totales
             setTotals(totals => ({
                 totalMetTec: totals.totalMetTec + Number(meta.metMetTec),
@@ -101,8 +100,16 @@ const Table = ({setModalIsOpen}) => {
                 totalEjePre: totals.totalEjePre + Number(meta.metEjePre),
             }));
     
-            return grouped
-        }, {})
+            return grouped;
+        }, {});
+    
+        // Obtenemos todas las claves de los resultados
+        const allKeys = Object.keys(grouped);
+    
+        // Asignamos todas las claves a expandedRes
+        setExpandedRes(allKeys);
+    
+        return grouped;
     }, [metas, startIndex, endIndex]);
     
 

@@ -160,7 +160,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var reult = _nacionalidades.BuscarNacionalidadesHome(tags);
+            var reult = _nacionalidades.BuscarNacionalidadesHome(identity, tags);
             return Ok(reult);
         }
     }

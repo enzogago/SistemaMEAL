@@ -221,7 +221,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var reult = _beneficiarios.ContarBeneficiariosHome(tags);
+            var reult = _beneficiarios.ContarBeneficiariosHome(identity, tags);
             return Ok(reult.FirstOrDefault());
         }
         
@@ -247,7 +247,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var reult = _beneficiarios.BuscarSexoHome(tags);
+            var reult = _beneficiarios.BuscarSexoHome(identity, tags);
             return Ok(reult);
         }
         [HttpGet]
