@@ -310,7 +310,7 @@ const Table = ({setModalIsOpen}) => {
 
                                         return (
                                         <Fragment key={key}>
-                                            <tr className='bold'>
+                                            <tr className='bold' style={{color: '#372e2ca6'}}>
                                                 <td></td>
                                                 <td>
                                                     <div 
@@ -341,7 +341,7 @@ const Table = ({setModalIsOpen}) => {
                                             {expandedInd.includes(key) && subMetas.map((meta, index) => {
                                                 const mesPeriodo = meta.metMesPlaTec ? (new Date(2024, meta.metMesPlaTec - 1).toLocaleString('es-ES', { month: 'short' })) : '';
                                                 return (
-                                                <tr key={index} style={{visibility: expandedInd.includes(key) ? 'visible' : 'collapse'}}>
+                                                <tr key={index} style={{color: '#878280', visibility: expandedInd.includes(key) ? 'visible' : 'collapse'}}>
                                                     <td></td>
                                                     <td></td>
                                                     <td>
