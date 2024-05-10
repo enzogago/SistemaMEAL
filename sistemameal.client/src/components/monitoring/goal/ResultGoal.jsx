@@ -113,6 +113,9 @@ const ResultGoal = () => {
     useEffect(() => {
         const subproyecto = watch('subproyecto');
         if (subproyecto && subproyecto !== '0') {
+            setIndicadores([]);
+            setAdditionalRows([]);
+            setValue('metAnoPlaTec','0');
             const { subProAno, subProCod } = JSON.parse(subproyecto);
             const selected = subproyectos.find(item => item.subProAno === subProAno && item.subProCod === subProCod);
             setSelectedSubProyecto(selected);

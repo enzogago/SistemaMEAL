@@ -78,28 +78,48 @@ const Table = ({setModalIsOpen}) => {
             totalMetPre: 0,
             totalEjePre: 0,
         });
-    
+        console.log(metas)
         const paginatedData = metas.slice(startIndex, endIndex);
     
         const grouped = paginatedData.reduce((grouped, meta) => {
             const key = `res_${meta.resAno}_${meta.resCod}`
             if (!grouped[key]) {
-                grouped[key] = { metas: [], resNom: meta.resNom, resNum: meta.resNum, totalMetTec: 0, totalEjeTec: 0, totalMetPre: 0, totalEjePre: 0 }
+                grouped[key] = { metas: [], resNom: meta.resNom, resNum: meta.resNum, totalMetTec: 0 , totalEjeTec: 0, totalMetPre: 0 , totalEjePre: 0 }
             }
-            grouped[key].metas.push(meta)
-            grouped[key].totalMetTec += Number(meta.metMetTec)
-            grouped[key].totalEjeTec += Number(meta.metEjeTec)
-            grouped[key].totalMetPre += Number(meta.metMetPre)
-            grouped[key].totalEjePre += Number(meta.metEjePre)
-    
+            // Evalúa metMetTec y metEjeTec como operaciones, si es posible
+            let metMetTec = Number(meta.metMetTec);
+            let metEjeTec = Number(meta.metEjeTec);
+            let metMetPre = Number(meta.metMetPre);
+            let metEjePre = Number(meta.metEjePre);
+            
+            if (isNaN(metMetTec)) {
+                metMetTec = eval(meta.metMetTec);
+            }
+            if (isNaN(metEjeTec)) {
+                metEjeTec = eval(meta.metEjeTec);
+            }
+            if (isNaN(metMetPre)) {
+                metMetPre = eval(meta.metMetPre);
+                console.log(metMetPre)
+            }
+            if (isNaN(metEjePre)) {
+                metEjePre = eval(meta.metEjePre);
+            }
+            // Agrega la meta al array, pero con metMetTec y metEjeTec evaluados como operaciones
+            grouped[key].metas.push({...meta, metMetTec, metEjeTec, metMetPre, metEjePre})
+            grouped[key].totalMetTec += metMetTec;
+            grouped[key].totalEjeTec += metEjeTec;
+            grouped[key].totalMetPre += metMetPre;
+            grouped[key].totalEjePre += metEjePre;
+        
             // Actualiza los totales
             setTotals(totals => ({
-                totalMetTec: totals.totalMetTec + Number(meta.metMetTec),
-                totalEjeTec: totals.totalEjeTec + Number(meta.metEjeTec),
-                totalMetPre: totals.totalMetPre + Number(meta.metMetPre),
-                totalEjePre: totals.totalEjePre + Number(meta.metEjePre),
+                totalMetTec: totals.totalMetTec + metMetTec,
+                totalEjeTec: totals.totalEjeTec + metEjeTec,
+                totalMetPre: totals.totalMetPre + metMetPre,
+                totalEjePre: totals.totalEjePre + metEjePre,
             }));
-    
+        
             return grouped;
         }, {});
     
@@ -172,16 +192,50 @@ const Table = ({setModalIsOpen}) => {
     const dataExport = metas;
     const headers = ['ESTADO', 'META_PROGRAMATICA', 'EJECUCION_PROGRAMATICA', 'PORCENTAJE_AVANCE_PROGRAMATICO', 'META_PRESUPUESTO', 'EJECUCION_PRESUPUESTO', 'PORCENTAJE_AVANCE_PRESUPUESTO','AÑO','MES','INDICADOR','TIPO_INDICADOR','RESULTADO','OBJETIVO_ESPECIFICO','OBJETIVO','SUBPROYECTO','PROYECTO','UBICACION', 'IMPLEMENTADOR', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
     const title = 'METAS';
-    const properties = ['estNom', 'metMetTec', 'metEjeTec', 'metPorAvaTec', 'metMetPre', 'metEjePre', 'metPorAvaPre', 'metAnoPlaTec', 'metMesPlaTec', 'indActResNom', 'tipInd', 'resNom', 'objEspNom', 'objNom', 'subProNom', 'proNom','ubiNom', 'impNom', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir en el Excel
+    const properties = ['estNom', 'metMetTec', 'metEjeTec', 'metPorAvaTec', 'metMetPre', 'metEjePre', 'metPorAvaPre', 'metAnoPlaTec', 'metMesPlaTec', 'indNom', 'tipInd', 'resNom', 'objEspNom', 'objNom', 'subProNom', 'proNom','ubiNom', 'impNom', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir en el Excel
     const format = [1200, 600];
 
     const Export_Excel = () => {
-        // Luego puedes llamar a la función Export_Excel de esta manera:
-        Export_Excel_Helper(dataExport, headers, title, properties);
+        // Primero, crea una copia de los datos que quieres exportar
+        const dataCopy = JSON.parse(JSON.stringify(dataExport));
+    
+        // Luego, recorre cada elemento en los datos y evalúa metMetTec y metEjeTec como operaciones
+        dataCopy.forEach(item => {
+            let metMetTec = Number(item.metMetTec);
+            let metEjeTec = Number(item.metEjeTec);
+            if (isNaN(metMetTec)) {
+                metMetTec = eval(item.metMetTec);
+            }
+            if (isNaN(metEjeTec)) {
+                metEjeTec = eval(item.metEjeTec);
+            }
+            item.metMetTec = metMetTec;
+            item.metEjeTec = metEjeTec;
+        });
+    
+        // Finalmente, pasa los datos modificados a la función Export_Excel_Helper
+        Export_Excel_Helper(dataCopy, headers, title, properties);
     };
+    
     const Export_PDF = () => {
+        // Primero, crea una copia de los datos que quieres exportar
+        const dataCopy = JSON.parse(JSON.stringify(dataExport));
+    
+        // Luego, recorre cada elemento en los datos y evalúa metMetTec y metEjeTec como operaciones
+        dataCopy.forEach(item => {
+            let metMetTec = Number(item.metMetTec);
+            let metEjeTec = Number(item.metEjeTec);
+            if (isNaN(metMetTec)) {
+                metMetTec = eval(item.metMetTec);
+            }
+            if (isNaN(metEjeTec)) {
+                metEjeTec = eval(item.metEjeTec);
+            }
+            item.metMetTec = metMetTec;
+            item.metEjeTec = metEjeTec;
+        });
         // Luego puedes llamar a la función Export_Excel de esta manera:
-        Export_PDF_Helper(dataExport, headers, title, properties, format);
+        Export_PDF_Helper(dataCopy, headers, title, properties, format);
     };
 
 
@@ -292,9 +346,9 @@ const Table = ({setModalIsOpen}) => {
                                         <td className='center' colSpan={2}></td>
                                     </tr>
                                     {expandedRes.includes(key) && Object.entries(metas.reduce((grouped, meta) => {
-                                        const key = `ind_${meta.indActResAno}_${meta.indActResCod}`
+                                        const key = `ind_${meta.indAno}_${meta.indCod}`
                                         if (!grouped[key]) {
-                                            grouped[key] = { metas: [], indActResNom: meta.indActResNom, indActResNum: meta.indActResNum, totalMetTec: 0 , totalEjeTec: 0, totalMetPre: 0 , totalEjePre: 0 }
+                                            grouped[key] = { metas: [], indNom: meta.indNom, indNum: meta.indNum, totalMetTec: 0 , totalEjeTec: 0, totalMetPre: 0 , totalEjePre: 0 }
                                         }
                                         grouped[key].metas.push(meta)
                                         grouped[key].totalMetTec += Number(meta.metMetTec)
@@ -302,10 +356,10 @@ const Table = ({setModalIsOpen}) => {
                                         grouped[key].totalMetPre += Number(meta.metMetPre)
                                         grouped[key].totalEjePre += Number(meta.metEjePre)
                                         return grouped
-                                    }, {})).map(([key, { metas: subMetas, indActResNom, indActResNum, totalMetTec, totalEjeTec, totalMetPre, totalEjePre }]) => {
+                                    }, {})).map(([key, { metas: subMetas, indNom, indNum, totalMetTec, totalEjeTec, totalMetPre, totalEjePre }]) => {
                                         const totalPorAvaTec = totalMetTec ? (totalEjeTec / totalMetTec) * 100 : 0
                                         const totalPorAvaPre = totalMetPre ? (totalEjePre / totalMetPre) * 100 : 0
-                                        const text = indActResNum + ' - ' + indActResNom;
+                                        const text = indNum + ' - ' + indNom;
                                         const shortText = text.length > 75 ? text.substring(0, 75) + '...' : text;
 
                                         return (
@@ -387,7 +441,7 @@ const Table = ({setModalIsOpen}) => {
                                                     <td className='center'>{formatter.format(meta.metEjeTec)}</td>
                                                     <td>
                                                         <div className="flex flex-column">
-                                                            <div className="bold" style={{color: meta.estCol}}>
+                                                            <div className="center bold" style={{color: meta.estCol}}>
                                                                 {meta.metPorAvaTec}%
                                                             </div>
                                                             <div 
@@ -405,8 +459,8 @@ const Table = ({setModalIsOpen}) => {
                                                     <td className='center'>{formatterBudget.format(meta.metEjePre)}</td>
                                                     <td>
                                                         <div className="flex flex-column">
-                                                            <div className="bold" style={{color: meta.estCol}}>
-                                                                {meta.metPorAvaPre}%
+                                                            <div className="center bold" style={{color: meta.estCol}}>
+                                                                {formatterBudget.format(meta.metPorAvaPre)}%
                                                             </div>
                                                             <div 
                                                                 className="progress-bar"
@@ -432,8 +486,8 @@ const Table = ({setModalIsOpen}) => {
                                     <td>{formatter.format(totals.totalMetTec)}</td>
                                     <td>{formatter.format(totals.totalEjeTec)}</td>
                                     <td>{(totals.totalEjeTec !== 0 ? (formatterBudget.format((totals.totalEjeTec/totals.totalMetTec)*100)) : 0)}%</td>
-                                    <td>{formatterBudget.format(totals.totalMetPre)} $</td>
-                                    <td>{formatterBudget.format(totals.totalEjePre)} $</td>
+                                    <td>{formatterBudget.format(totals.totalMetPre)} €</td>
+                                    <td>{formatterBudget.format(totals.totalEjePre)} €</td>
                                     <td>{(totals.totalMetPre !== 0 ? (formatterBudget.format((totals.totalEjePre/totals.totalMetPre)*100)) : 0)}%</td>
                                     <td colSpan={50}></td>
                                 </tr>

@@ -103,11 +103,13 @@ const Home = () => {
                 Notiflix.Notify.failure(data.message);
                 return;
             }
+            console.log(data);
             setMonitoringData(data);
-            const totalMeta = data.reduce((sum, item) => sum + Number(item.metMetTec), 0);
-            const totalAtenciones = data.reduce((sum, item) => sum + Number(item.metEjeTec), 0);
-            const totalMetaPre = data.reduce((sum, item) => sum + Number(item.metMetPre), 0);
-            const totalAtencionesPre = data.reduce((sum, item) => sum + Number(item.metEjePre), 0);
+            const totalMeta = data.reduce((sum, item) => item.indFor === '' ? sum + Number(item.metMetTec) : sum, 0);
+            const totalAtenciones = data.reduce((sum, item) => item.indFor === '' ? sum + Number(item.metEjeTec) : sum, 0);
+            const totalMetaPre = data.reduce((sum, item) => item.indFor === '' ? sum + Number(item.metMetPre) : sum, 0);
+            const totalAtencionesPre = data.reduce((sum, item) => item.indFor === '' ? sum + Number(item.metEjePre) : sum, 0);
+
             setTotalAtenciones(totalAtenciones);
             
             const porcentaje = totalMeta !== 0 ? (totalAtenciones / totalMeta) * 100 : 0;

@@ -524,6 +524,8 @@ namespace SistemaMEAL.Modulos
                         cmd.Parameters.AddWithValue("@P_TIPVALCOD", indicador.TipValCod);
                         cmd.Parameters.AddWithValue("@P_INDTOTPRE", "");
                         cmd.Parameters.AddWithValue("@P_MONCOD", "00");
+                        cmd.Parameters.AddWithValue("@P_INDLINBAS", "");
+                        cmd.Parameters.AddWithValue("@P_INDFOR", indicador.IndFor);
                         cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
                         cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                         cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
@@ -935,6 +937,7 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_INDTIPIND", indicador.IndTipInd);
                 cmd.Parameters.AddWithValue("@P_UNICOD", indicador.UniCod);
                 cmd.Parameters.AddWithValue("@P_TIPVALCOD", indicador.TipValCod);
+                cmd.Parameters.AddWithValue("@P_INDFOR", indicador.IndFor);
                 cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                 cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
@@ -1159,7 +1162,7 @@ namespace SistemaMEAL.Modulos
             return (mensaje, tipoMensaje);
         }
 
-        public (string? message, string? messageType) ModificarCadenaIndicadorTecnico(ClaimsIdentity? identity, List<CadenaPeriodo> cadenaPeriodos, List<CadenaImplementador> cadenaImplementadores, List<CadenaUbicacion> cadenaUbicaciones)
+        public (string? message, string? messageType) ModificarCadenaIndicadorTecnico(ClaimsIdentity? identity, List<CadenaPeriodo> cadenaPeriodos, List<CadenaImplementador> cadenaImplementadores, List<CadenaUbicacion> cadenaUbicaciones, List<Indicador> indicadores)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 
@@ -1183,6 +1186,49 @@ namespace SistemaMEAL.Modulos
                         {
                             connection.Open();
                         }
+
+                        if (indicadores.Count > 0)
+                        {
+                            foreach (var item in indicadores)
+                            {
+                                cmd = new SqlCommand("SP_MODIFICAR_CADENA_RESULTADO_INDICADOR_TECNICO", cn.getcn);
+                                cmd.CommandType = CommandType.StoredProcedure;
+                                cmd.Parameters.AddWithValue("@P_INDANO", item.IndAno);
+                                cmd.Parameters.AddWithValue("@P_INDCOD", item.IndCod);
+                                cmd.Parameters.AddWithValue("@P_INDLINBAS", item.IndLinBas);
+                                cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
+                                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                                pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                                cmd.Parameters.Add(pDescripcionMensaje);
+
+                                pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                                pTipoMensaje.Direction = ParameterDirection.Output;
+                                cmd.Parameters.Add(pTipoMensaje);
+
+                                cmd.ExecuteNonQuery();
+
+                                message = pDescripcionMensaje.Value.ToString();
+                                messageType = pTipoMensaje.Value.ToString();
+
+
+                                // Inserta el DocumentoBeneficiario
+                                if (messageType != "3")
+                                {
+                                    Console.WriteLine(message);
+                                    throw new Exception(message);
+                                } else {
+                                    Console.WriteLine("Insertado");
+
+                                }
+                            }
+                        }
+
                         if (cadenaPeriodos.Count > 0)
                         {
                             foreach (var periodo in cadenaPeriodos)

@@ -102,15 +102,33 @@ const Table = ({data}) => {
 
     const groupMetasIntoIndicators = (metas) => {
         return metas.reduce((grouped, meta) => {
-            const key = `ind_${meta.indActResAno}_${meta.indActResCod}`
+            const key = `ind_${meta.indAno}_${meta.indCod}`
             if (!grouped[key]) {
-                grouped[key] = { metas: [], indActResNom: meta.indActResNom, indActResNum: meta.indActResNum, totalMetTec: 0 , totalEjeTec: 0, totalMetPre: 0 , totalEjePre: 0, resAno: meta.resAno, resCod: meta.resCod, resNom: meta.resNom, resNum: meta.resNum  }
+                grouped[key] = { metas: [], indNom: meta.indNom, indNum: meta.indNum, totalMetTec: 0 , totalEjeTec: 0, totalMetPre: 0 , totalEjePre: 0, resAno: meta.resAno, resCod: meta.resCod, resNom: meta.resNom, resNum: meta.resNum  }
             }
-            grouped[key].metas.push(meta)
-            grouped[key].totalMetTec += Number(meta.metMetTec)
-            grouped[key].totalEjeTec += Number(meta.metEjeTec)
-            grouped[key].totalMetPre += Number(meta.metMetPre)
-            grouped[key].totalEjePre += Number(meta.metEjePre)
+
+            let metMetTec = Number(meta.metMetTec);
+            let metEjeTec = Number(meta.metEjeTec);
+            let metMetPre = Number(meta.metMetPre);
+            let metEjePre = Number(meta.metEjePre);
+            if (isNaN(metMetTec)) {
+                metMetTec = eval(meta.metMetTec);
+            }
+            if (isNaN(metEjeTec)) {
+                metEjeTec = eval(meta.metEjeTec);
+            }
+            if (isNaN(metMetPre)) {
+                metMetPre = eval(meta.metMetPre);
+            }
+            if (isNaN(metEjePre)) {
+                metEjePre = eval(meta.metEjePre);
+            }
+
+            grouped[key].metas.push({...meta, metMetTec, metEjeTec, metMetPre, metEjePre})
+            grouped[key].totalMetTec += metMetTec;
+            grouped[key].totalEjeTec += metEjeTec;
+            grouped[key].totalMetPre += metMetPre;
+            grouped[key].totalEjePre += metEjePre;
     
             const { statusName, statusColor } = getIndicatorStatus(grouped[key].metas);
             // Asignamos el estado al indicador
@@ -134,7 +152,6 @@ const Table = ({data}) => {
         const groupedIndicators = groupMetasIntoIndicators(data);
     
         return Object.entries(groupedIndicators).reduce((grouped, [key, indicador]) => {
-            console.log(indicador)
             const resKey = `res_${indicador.resAno}_${indicador.resCod}`
             if (!grouped[resKey]) {
                 grouped[resKey] = { indicadores: [], resNom: indicador.resNom, resNum: indicador.resNum, totalMetTec: 0, totalEjeTec: 0, totalMetPre: 0, totalEjePre: 0 }
@@ -237,10 +254,10 @@ const Table = ({data}) => {
                                         <td className='center'>{formatterBudget.format(totalEjePre)}</td>
                                         <td className='center'>{formatterBudget.format(totalPorAvaPre)}%</td>
                                     </tr>
-                                    {expandedRes.includes(key) && Object.entries(indicadores).map(([key, { metas, indActResNom, indActResNum, totalMetTec, totalEjeTec, totalMetPre, totalEjePre, estNom, estCol }]) => {
+                                    {expandedRes.includes(key) && Object.entries(indicadores).map(([key, { metas, indNom, indNum, totalMetTec, totalEjeTec, totalMetPre, totalEjePre, estNom, estCol }]) => {
                                         const totalPorAvaTec = totalMetTec ? (totalEjeTec / totalMetTec) * 100 : 0
                                         const totalPorAvaPre = totalMetPre ? (totalEjePre / totalMetPre) * 100 : 0
-                                        const text = indActResNum + ' - ' + indActResNom;
+                                        const text = indNum + ' - ' + indNom;
                                         const shortText = text.length > 50 ? text.substring(0, 50) + '...' : text;
 
                                         return (
@@ -284,8 +301,8 @@ const Table = ({data}) => {
                                     <td>{formatter.format(totals.totalMetTec)}</td>
                                     <td>{formatter.format(totals.totalEjeTec)}</td>
                                     <td>{(totals.totalEjeTec !== 0 ? (formatterBudget.format((totals.totalEjeTec/totals.totalMetTec)*100)) : 0)}%</td>
-                                    <td>{formatterBudget.format(totals.totalMetPre)} $</td>
-                                    <td>{formatterBudget.format(totals.totalEjePre)} $</td>
+                                    <td>{formatterBudget.format(totals.totalMetPre)} €</td>
+                                    <td>{formatterBudget.format(totals.totalEjePre)} €</td>
                                     <td>{(totals.totalMetPre !== 0 ? (formatterBudget.format((totals.totalEjePre/totals.totalMetPre)*100)) : 0)}%</td>
                                 </tr>
                         </tbody>

@@ -13,7 +13,7 @@ const ResultChain = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [subproyectos, setSubProyectos] = useState([]);
     const [indicadores, setIndicadores] = useState([]);
-    const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
+    const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
 
     const [headers, setHeaders] = useState([]);
     const [renderData, setRenderData] = useState([]);
@@ -27,6 +27,9 @@ const ResultChain = () => {
     const [numeroColumnasUbicacion, setNumeroColumnasUbicacion] = useState(0)
 
     const [unmatchedTotal, setUnmatchedTotal] = useState({ key: '', value: 0, section: '' });
+
+    const [indTotPreState, setIndTotPreState] = useState({});
+    const [totalIndTotPre, setTotalIndTotPre] = useState(0);
 
     useEffect(() => {
         const handleKeyDown = (event) => {
@@ -167,7 +170,22 @@ const ResultChain = () => {
             setHeaders([]);
             setIsSubmitDisabled(false);
             const { subProAno, subProCod } = JSON.parse(subproyecto);
-            fetchData(`Indicador/subproyecto/${subProAno}/${subProCod}`,setIndicadores)
+            fetchData(`Indicador/subproyecto/${subProAno}/${subProCod}`,(data) => {
+                setIndicadores(data);
+        
+                // Inicializar indTotPreState y totalIndTotPre
+                const initialIndTotPreState = {};
+                let initialTotalIndTotPre = 0;
+        
+                data.forEach(item => {
+                    const key = `total_${item.indAno}_${item.indCod}`;
+                    initialIndTotPreState[key] = item.indLinBas;
+                    initialTotalIndTotPre += Number(item.indLinBas);
+                });
+        
+                setIndTotPreState(initialIndTotPreState);
+                setTotalIndTotPre(initialTotalIndTotPre);
+            })
             
             Promise.all([
                 fetchDataReturn(`Indicador/cadena/${subProAno}/${subProCod}`),
@@ -274,26 +292,43 @@ const ResultChain = () => {
         let cambiosPorAno = [];
         let cambiosPorImplementador = [];
         let cambiosPorUbicacion = [];
+        let cambiosPorIndicador = [];
         
         console.log(renderData)
         console.log(data)
         // Iterar sobre los datos del formulario
         for (let key in data) {
             // Obtener el valor inicial y el valor actual de la celda
-            let valorInicial = renderData[key].value || '';
-            let valorActual = data[key];
+            let valorInicial;
+            if (key.startsWith('total')) {  // Si comienza con 'total', entonces es un 'totalPorIndicador'
+                valorInicial = indTotPreState[key] || '';
+            } else {
+                valorInicial = renderData[key] ? renderData[key].value : '' ;
+            }
 
+            let valorActual = data[key];
             // Si el valor ha cambiado, agregar el cambio al arreglo correspondiente
+
             if (valorInicial !== valorActual) {
                 // Obtener la parte de la clave que corresponde al 'ano', 'implementador' o 'ubicacion'
                 let keyParts = key.split('_');
-                let indAno = keyParts[0];
-                let indCod = keyParts[1];
-                let keyType = keyParts[2];
+                let indAno, indCod, keyType, keyTypeU;
+                console.log(keyParts)
+                // Si la clave comienza con 'total', entonces es un 'totalPorIndicador'
+                if (key.startsWith('total')) {
+                    indAno = keyParts[1];
+                    indCod = keyParts[2];
+                    keyType = keyParts[0];
+                } else {
+                    indAno = keyParts[0];
+                    indCod = keyParts[1];
+                    keyType = keyParts[2];
+                    keyTypeU = keyParts[3];
+                }
 
                 let cambio = {
-                    indAno: indAno,
-                    indCod: indCod,
+                    indAno,
+                    indCod,
                 };
 
                 if (keyType.length === 4) {  // Si la longitud es 4, entonces es un 'ano'
@@ -309,11 +344,14 @@ const ResultChain = () => {
                     cambio.ubiCod = keyType.substring(4);
                     cambio.cadResUbiMetTec = valorActual;
                     cambiosPorUbicacion.push(cambio);
+                } else if (key.startsWith('total')) {  // Si comienza con 'total', entonces es un 'totalPorIndicador'
+                    cambio.indLinBas = valorActual;
+                    cambiosPorIndicador.push(cambio);
                 }
             }
         }
 
-        if (cambiosPorAno.length === 0 && cambiosPorImplementador.length === 0 && cambiosPorUbicacion.length === 0) {
+        if (cambiosPorAno.length === 0 && cambiosPorImplementador.length === 0 && cambiosPorUbicacion.length === 0 && cambiosPorIndicador.length === 0 ) {
             Notiflix.Notify.warning('No se realizaron cambios.');
             return;
         }
@@ -321,9 +359,9 @@ const ResultChain = () => {
         const CadenaIndicadorDto = {
             CadenaPeriodos: cambiosPorAno,
             CadenaImplementadores: cambiosPorImplementador,
-            CadenaUbicaciones: cambiosPorUbicacion
+            CadenaUbicaciones: cambiosPorUbicacion,
+            Indicadores: cambiosPorIndicador
         }
-        console.log(CadenaIndicadorDto)
         
         handleInsert(CadenaIndicadorDto);
     };
@@ -370,6 +408,11 @@ const ResultChain = () => {
                 'CÓDIGO': item.indNum,
                 'NOMBRE': item.indNom.charAt(0).toUpperCase() + item.indNom.slice(1).toLowerCase(),
             };
+            let inputLineaBase = document.querySelector(`input[name="total_${item.indAno}_${item.indCod}"]`);
+            if (inputLineaBase){
+                rowData['LINEA_BASE'] = inputLineaBase.value !== '' ? inputLineaBase.value : '0';
+            }
+
             headers.forEach(header => {
                 let inputValue;
                 if (header.key === 'totalPorAno') {
@@ -390,7 +433,7 @@ const ResultChain = () => {
         });
     
         // Definir los encabezados
-        let headersExcel = ['#', 'SUB_PROYECTO', 'CÓDIGO', 'NOMBRE', ...headers.map(header => header.name)];
+        let headersExcel = ['#', 'SUB_PROYECTO', 'CÓDIGO', 'NOMBRE','LINEA_BASE', ...headers.map(header => header.name)];
     
         Export_Excel_Basic(data, headersExcel, 'GENERAL', false);
     };
@@ -435,9 +478,10 @@ const ResultChain = () => {
                 <table className="PowerMas_TableStatus">
                     <thead>
                         <tr>
-                            <th className='center' rowSpan={2}>Código</th>
                             <th className='center' rowSpan={2}>#</th>
+                            <th className='center' rowSpan={2}>Código</th>
                             <th className='center PowerMas_Borde_Total' rowSpan={2}>Nombre</th>
+                            <th className='center PowerMas_Borde_Total' style={{color: '#F87C56', whiteSpace: 'normal'}} rowSpan={2}>Linea Base</th>
                             <th className='center PowerMas_Borde_Total PowerMas_Borde_Total2 PowerMas_Combine_Header' colSpan={numeroColumnasAno}>
                                 <span className='flex ai-center jc-center gap-1'>
                                     Por Año
@@ -490,6 +534,74 @@ const ResultChain = () => {
                                         :
                                         <td className='PowerMas_Borde_Total'>{text}</td>
                                     }
+                                    <td className='PowerMas_Borde_Total'>
+                                        <Tooltip
+                                            title="Los totales no coinciden."
+                                            open={`total_${item.indAno}_${item.indCod}` === unmatchedTotal.key && unmatchedTotal.section === 'totalPorIndicador'}
+                                            arrow={true}
+                                            position="bottom"
+                                        />
+                                        <input
+                                            className={`
+                                            PowerMas_Input_Cadena Large_12 f_75 
+                                            PowerMas_Cadena_Form_${dirtyFields[`total_${item.indAno}_${item.indCod}`] || isSubmitted ? (errors[`total_${item.indAno}_${item.indCod}`] ? 'invalid' : 'valid') : ''}
+                                            ${false && 'PowerMas_Tooltip_Active'}
+                                            `} 
+                                            type="text"
+                                            onInput={(e) => {
+                                                e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                                                
+                                                // const newValue = Number(e.target.value);
+                                                // const oldValue = Number(indTotPreState[`total_${item.indAno}_${item.indCod}`] || 0);
+                                            
+                                                // setIndTotPreState(prevState => ({
+                                                //     ...prevState,
+                                                //     [`total_${item.indAno}_${item.indCod}`]: newValue
+                                                // }));
+                                            
+                                                // // Aquí es donde actualizas totalIndTotPre
+                                                // setTotalIndTotPre(prevTotal => prevTotal - oldValue + newValue);
+                                            
+                                                // // Validaciones de los totales
+                                                // // const newTotalsAll = totalIndTotPre - oldValue + newValue;
+                                                // const newTotalPorImplementador = calculateTotal(item.indAno, item.indCod, 'porImplementador', totalsPorImplementador);
+                                                // const newTotalPorUbicacion = calculateTotal(item.indAno, item.indCod, 'porUbicacion', totalsPorUbicacion);
+                                                // const newTotalPorAno = calculateTotal(item.indAno, item.indCod, 'porAno', totalsPorAnoAll);
+                                            
+                                                // if (newValue !== newTotalPorImplementador) {
+                                                //     setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorImplementador, section: 'totalPorImplementador' });
+                                                //     setIsSubmitDisabled(true);
+                                                // } else if (newValue !== newTotalPorUbicacion) {
+                                                //     setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorUbicacion, section: 'totalPorUbicacion' });
+                                                //     setIsSubmitDisabled(true);
+                                                //  } else if (newTotalPorAno <= 0) {
+                                                //     setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorAno, section: 'totalPorAno' });
+                                                //     setIsSubmitDisabled(true);
+                                                //  } else {
+                                                //     setUnmatchedTotal({ key: '', value: 0, section: '' });
+                                                //     setIsSubmitDisabled(false);
+                                                // }
+                                            
+                                                // // Validación de campo vacío
+                                                // if (e.target.value === '') {
+                                                //     setUnmatchedTotal({ key: `total_${item.indAno}_${item.indCod}`, value: 0, section: 'totalPorIndicador' });
+                                                //     setIsSubmitDisabled(true);
+                                                // }
+                                            }}
+                                            
+                                            defaultValue={indTotPreState[`total_${item.indAno}_${item.indCod}`]} 
+                                            {...register(`total_${item.indAno}_${item.indCod}`, {
+                                                pattern: {
+                                                    value: /^(?:[1-9]\d*|)$/,
+                                                    message: 'Valor no válido',
+                                                },
+                                                maxLength: {
+                                                    value: 10,
+                                                    message: ''
+                                                }
+                                            })}
+                                        />
+                                    </td>
                                     {/* Data dinamica */}
                                     {headers.map((header, i) => {
                                         const cellData = renderData[`${item.indAno}_${item.indCod}_${header.key}`];

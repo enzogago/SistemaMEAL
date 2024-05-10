@@ -14,7 +14,7 @@
 body {
 	font-family: DMMono;
 }
-input[type=text], select{
+input[type=text], select, textarea{
 	outline: none;
 }
 input[type=text],input[type=search], select{

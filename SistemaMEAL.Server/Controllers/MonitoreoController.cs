@@ -20,17 +20,30 @@ namespace SistemaMEAL.Server.Controllers
         }
 
         [HttpGet]
-        [Route("Filter/{tags?}")]
-        public dynamic Listado(string? tags = null)
+        [Route("pruebametas")]
+        public dynamic Listado()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var monitoreos = _monitoreos.Listado(identity, tags);
+            var monitoreos = _monitoreos.Listado(identity);
             return Ok(monitoreos);
         }
+
+        // [HttpGet]
+        // [Route("Filter/{tags?}")]
+        // public dynamic Listado(string? tags = null)
+        // {
+        //     var identity = HttpContext.User.Identity as ClaimsIdentity;
+        //     var rToken = Jwt.validarToken(identity, _usuarios);
+
+        //     if (!rToken.success) return Unauthorized(rToken);
+
+        //     var monitoreos = _monitoreos.Listado(identity, tags);
+        //     return Ok(monitoreos);
+        // }
 
         [HttpGet]
         [Route("BeneficiariosCount/{tags?}")]

@@ -502,8 +502,8 @@ const ResultChain = () => {
                 <table className="PowerMas_TableStatus">
                     <thead>
                         <tr className=''>
-                            <th className='center' rowSpan={2}>Código</th>
                             <th className='center' rowSpan={2}>#</th>
+                            <th className='center' rowSpan={2}>Código</th>
                             <th className='center' rowSpan={2}>Nombre</th>
                             <th className='center PowerMas_Borde_Total' style={{color: '#F87C56', whiteSpace: 'normal'}} rowSpan={2}>Total Presupuesto</th>
                             <th className='center PowerMas_Borde_Total PowerMas_Borde_Total2 PowerMas_Combine_Header' colSpan={numeroColumnasAno-1}>
@@ -593,15 +593,15 @@ const ResultChain = () => {
                                                 setTotalIndTotPre(prevTotal => prevTotal - oldValue + newValue);
                                             
                                                 // Validaciones de los totales
-                                                const newTotalsAll = totalIndTotPre - oldValue + newValue;
+                                                // const newTotalsAll = totalIndTotPre - oldValue + newValue;
                                                 const newTotalPorImplementador = calculateTotal(item.indAno, item.indCod, 'porImplementador', totalsPorImplementador);
                                                 const newTotalPorFinanciador = calculateTotal(item.indAno, item.indCod, 'porFinanciador', totalsPorFinanciador);
                                                 const newTotalPorAno = calculateTotal(item.indAno, item.indCod, 'porAno', totalsPorAnoAll);
                                             
-                                                if (newTotalsAll !== newTotalPorImplementador) {
+                                                if (newValue !== newTotalPorImplementador) {
                                                     setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorImplementador, section: 'totalPorImplementador' });
                                                     setIsSubmitDisabled(true);
-                                                } else if (newTotalsAll !== newTotalPorFinanciador) {
+                                                } else if (newValue !== newTotalPorFinanciador) {
                                                     setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorFinanciador, section: 'totalPorFinanciador' });
                                                     setIsSubmitDisabled(true);
                                                  } else if (newTotalPorAno <= 0) {
@@ -751,15 +751,16 @@ const ResultChain = () => {
                                                         const newTotalPorFinanciador = calculateTotal(item.indAno, item.indCod, 'porFinanciador', newTotalsPorFinanciador);
                                                         const newTotalPorAno= calculateTotal(item.indAno, item.indCod, 'porAno', newTotalsPorAno);
 
+                                                        console.log(newTotalsAll)
                                                         // Comprueba si los totales de las cuatro secciones son iguales
-                                                        if (newTotalsAll === newTotalPorImplementador && newTotalsAll === newTotalPorFinanciador && newTotalPorAno > 0) {
+                                                        if (newTotalsAll === newTotalPorImplementador && newTotalsAll === newTotalPorFinanciador && newTotalPorAno <= newTotalsAll && newTotalPorAno > 0) {
 
                                                             // Si los totales de la fila actual son iguales, comprueba si los totales de todas las filas son iguales
                                                             const totalPorImplementadorAll = Object.values(newTotalsPorImplementador).reduce((a, b) => a + Number(b), 0);
                                                             const totalPorFinanciadorAll = Object.values(newTotalsPorFinanciador).reduce((a, b) => a + Number(b), 0);
 
 
-                                                            if (totalIndTotPre === totalPorImplementadorAll && totalIndTotPre === totalPorFinanciadorAll) {
+                                                            if (totalIndTotPre === totalPorImplementadorAll && totalIndTotPre === totalPorFinanciadorAll ) {
                                                                 setIsSubmitDisabled(false);
                                                             } else {
                                                                 setIsSubmitDisabled(true);
@@ -772,7 +773,7 @@ const ResultChain = () => {
                                                             setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorImplementador, section: 'totalPorImplementador' });
                                                         } else if (newTotalsAll !== newTotalPorFinanciador) {
                                                             setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorFinanciador, section: 'totalPorFinanciador' });
-                                                        } else if (newTotalPorAno <= 0){
+                                                        } else if (newTotalPorAno < newTotalsAll){
                                                             setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorAno, section: 'totalPorAno' });
                                                         } else {
                                                             setUnmatchedTotal({ key: '', value: 0, section: '' });

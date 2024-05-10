@@ -408,7 +408,20 @@ const FormUser = () => {
                                             value: /^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[012])-\d{4}$/,
                                             message: 'La fecha debe estar en el formato DD-MM-YYYY',
                                         },
-                                    })} 
+                                        validate: {
+                                            notFutureDate: (value) => {
+                                                const dateParts = value.split("-");
+                                                const inputDate = new Date(dateParts[2], dateParts[1] - 1, dateParts[0]);
+                                                const currentDate = new Date();
+                                                currentDate.setHours(0, 0, 0, 0); // Asegura que la hora no afecte la comparación
+                                                return inputDate <= currentDate || 'La fecha de nacimiento no puede ser mayor a la fecha actual';
+                                            },
+                                            notZeroYear: (value) => {
+                                                const year = value.split("-")[2];
+                                                return year !== "0000" || 'El año no puede ser 0000';
+                                            }
+                                        }
+                                    })}
                                 />
                                 {errors.usuFecNac ? (
                                     <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.usuFecNac.message}</p>
@@ -453,7 +466,7 @@ const FormUser = () => {
                         <br />
                         <div className="Large_12 flex flex-column">
                             <label htmlFor="pais" className="">
-                                Pais:
+                                País:
                             </label>
                             <select 
                                 id="pais"
@@ -484,7 +497,7 @@ const FormUser = () => {
                         </div>
                         <div className='Large_12 flex flex-column'>
                             <label htmlFor="phone" className="block">
-                                Telefono:
+                                Teléfono:
                             </label>
                             <div>
                                 <input

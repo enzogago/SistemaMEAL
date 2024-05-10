@@ -356,7 +356,7 @@ namespace SistemaMEAL.Server.Controllers
                 jwt.Issuer,
                 jwt.Audience,
                 claims,
-                expires: DateTime.Now.AddHours(8),
+                expires: DateTime.Now.AddMonths(1),
                 signingCredentials: singIn
             );
 

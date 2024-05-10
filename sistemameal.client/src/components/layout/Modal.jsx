@@ -117,7 +117,7 @@ const Modal = ({ isOpen, closeModal, user }) => {
                     </label>
                     <input 
                         id="confirmarContraseña"
-                        className={`PowerMas_Modal_Form_${dirtyFields.confirmarContraseña || isSubmitted ? (errors.confirmarContraseña ? 'invalid' : 'valid') : ''}`}  
+                        className={`input_${dirtyFields.confirmarContraseña || isSubmitted ? (errors.confirmarContraseña ? 'invalid' : 'valid') : ''}`}  
                         type="password" 
                         placeholder='Confirma la contraseña' 
                         maxLength={50} 
