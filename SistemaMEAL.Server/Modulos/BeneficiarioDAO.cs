@@ -612,8 +612,8 @@ namespace SistemaMEAL.Server.Modulos
                 cmd.Parameters.AddWithValue("@P_UBIANO", string.IsNullOrEmpty(ubiAno) ? (object)DBNull.Value : ubiAno);
                 cmd.Parameters.AddWithValue("@P_UBICOD", string.IsNullOrEmpty(ubiCod) ? (object)DBNull.Value : ubiCod);
                 cmd.Parameters.AddWithValue("@P_METBENEDA", string.IsNullOrEmpty(metBenEda) ? (object)DBNull.Value : metBenEda);
-                cmd.Parameters.AddWithValue("@P_METBENMESEJETEC", string.IsNullOrEmpty(metBenAnoEjeTec) ? (object)DBNull.Value : metBenAnoEjeTec);
-                cmd.Parameters.AddWithValue("@P_METBENANOEJETEC", string.IsNullOrEmpty(metBenMesEjeTec) ? (object)DBNull.Value : metBenMesEjeTec);
+                cmd.Parameters.AddWithValue("@P_METBENMESEJETEC", string.IsNullOrEmpty(metBenMesEjeTec) ? (object)DBNull.Value : metBenMesEjeTec);
+                cmd.Parameters.AddWithValue("@P_METBENANOEJETEC", string.IsNullOrEmpty(metBenAnoEjeTec) ? (object)DBNull.Value : metBenAnoEjeTec);
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                 cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
                 cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
@@ -651,7 +651,12 @@ namespace SistemaMEAL.Server.Modulos
                         NacNom = rd["NACNOM"].ToString(),
                         BenDir = rd["BENDIR"].ToString(),
                         BenAut = rd["BENAUT"].ToString(),
+                        MetAno = rd["METANO"].ToString(),
+                        MetCod = rd["METCOD"].ToString(),
+                        MetBenAnoEjeTec = rd["METBENANOEJETEC"].ToString(),
                         MetBenMesEjeTec = rd["METBENMESEJETEC"].ToString(),
+                        UbiAno = rd["UBIANO"].ToString(),
+                        UbiCod = rd["UBICOD"].ToString(),
                     };
                     temporal.Add(beneficiario);
                 }

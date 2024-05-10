@@ -215,11 +215,11 @@ const CustomTable = ({
                                                         <div className='flex flex-column ai-center jc-center PowerMas_Icons_Sorter'>
                                                             {header.column.getIsSorted() === 'asc' && !header.column.columnDef.disableSorting ? 
                                                                 <span className="sort-icon active">
-                                                                    <Sort />
+                                                                    <Sort type='asc' />
                                                                 </span> :
                                                                 header.column.getIsSorted() === 'desc' && !header.column.columnDef.disableSorting ? 
                                                                 <span className="sort-icon active">
-                                                                    <Sort />
+                                                                    <Sort type='desc' />
                                                                 </span> :
                                                                 !header.column.columnDef.disableSorting &&
                                                                 <>

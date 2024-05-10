@@ -19,31 +19,31 @@ namespace SistemaMEAL.Server.Controllers
             _usuarios = usuarios;
         }
 
-        [HttpGet]
-        [Route("pruebametas")]
-        public dynamic Listado()
-        {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
-
-            if (!rToken.success) return Unauthorized(rToken);
-
-            var monitoreos = _monitoreos.Listado(identity);
-            return Ok(monitoreos);
-        }
-
         // [HttpGet]
-        // [Route("Filter/{tags?}")]
-        // public dynamic Listado(string? tags = null)
+        // [Route("pruebametas")]
+        // public dynamic Listado()
         // {
         //     var identity = HttpContext.User.Identity as ClaimsIdentity;
         //     var rToken = Jwt.validarToken(identity, _usuarios);
 
         //     if (!rToken.success) return Unauthorized(rToken);
 
-        //     var monitoreos = _monitoreos.Listado(identity, tags);
+        //     var monitoreos = _monitoreos.Listado(identity);
         //     return Ok(monitoreos);
         // }
+
+        [HttpGet]
+        [Route("Filter/{tags?}")]
+        public dynamic Listado(string? tags = null)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var monitoreos = _monitoreos.Listado(identity, tags);
+            return Ok(monitoreos);
+        }
 
         [HttpGet]
         [Route("BeneficiariosCount/{tags?}")]
@@ -192,22 +192,6 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return rToken;
 
-            dynamic data = rToken.result;
-            Usuario usuario = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "ELIMINAR ESTADO") && usuario.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para eliminar estados",
-                    result = ""
-                };
-            }
 
             var (message, messageType) = _monitoreos.EliminarBeneficiarioMonitoreo(identity, metAno, metCod, benAno, benCod, ubiAno, ubiCod, metBenAnoEjeTec, metBenMesEjeTec );
             if (messageType == "1")
@@ -246,7 +230,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var monitoreos = _monitoreos.BuscarMonitoreoForm(identity, metAno, metCod, benAno, benCod, ubiAno, ubiCod, metBenAnoEjeTec, metBenMesEjeTec);
+            var monitoreos = _monitoreos.BuscarMonitoreoForm(identity, metAno:metAno, metCod:metCod, benAno:benAno, benCod:benCod, ubiAno:ubiAno, ubiCod:ubiCod, metBenAnoEjeTec:metBenAnoEjeTec, metBenMesEjeTec:metBenMesEjeTec);
             var monitoreo = monitoreos.FirstOrDefault();
             return Ok(monitoreo);
         }

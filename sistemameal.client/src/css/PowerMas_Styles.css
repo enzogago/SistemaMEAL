@@ -1487,8 +1487,8 @@ textarea {
 
 .sort-icon {
     color: #006776; /* color para el estado inactivo */
-	width: 10px;
-	height: 10px;
+	/* width: 10px;
+	height: 10px; */
 }
 
 .sort-icon.active {
@@ -2291,4 +2291,10 @@ textarea {
 .PowerMas_Form_Content > div {
 	display: flex;
 	flex-direction: column;
+}
+
+
+.PowerMas_Style_Log{
+	color: var(--naranja-ayuda);
+	
 }

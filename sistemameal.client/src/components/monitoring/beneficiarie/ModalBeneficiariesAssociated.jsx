@@ -3,7 +3,7 @@ import TableForm from './TableForm';
 import Modal from 'react-modal';
 import { fetchData } from '../../reusable/helper';
 
-const ModalBeneficiariesAssociated = ({openModal, closeModal, metaData, update, setUpdate}) => {
+const ModalBeneficiariesAssociated = ({openModal, closeModal, metaData, update, setUpdate, initialSelectCount}) => {
     const [data, setData] = useState([]);
 
     useEffect(() => {
@@ -52,6 +52,7 @@ const ModalBeneficiariesAssociated = ({openModal, closeModal, metaData, update, 
                 openModal={openModal}
                 metaData={metaData}
                 setUpdate={setUpdate}
+                initialSelectCount={initialSelectCount}
             />
         </Modal>
     )

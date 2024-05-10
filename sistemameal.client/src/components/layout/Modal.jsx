@@ -93,7 +93,7 @@ const Modal = ({ isOpen, closeModal, user }) => {
                             'nuevaContraseña', { 
                                 required: 'El campo es requerido',
                                 maxLength: { value: 50, message: 'El campo no puede tener más de 50 caracteres' },
-                                minLength:  { value: 8, message: 'El campo no puede tener menos de 8 caracteres' },
+                                minLength:  { value: 4, message: 'El campo no puede tener menos de 4 caracteres' },
                                 pattern: {
                                     value: /^[A-Za-z0-9ñÑ\s@#.$%^&*()_+\-=\[\]{};':"\\|,<>\/?]+$/,
                                     message: 'Por favor, introduce solo letras, números y caracteres especiales permitidos',

@@ -19,7 +19,7 @@ import ModalEditBeneficiarie from "./ModalEditBeneficiarie";
 import Edit from "../../../icons/Edit";
 import Delete from "../../../icons/Delete";
 
-const TableForm = ({data, openModal, metaData, setUpdate }) => {
+const TableForm = ({data, openModal, metaData, setUpdate, initialSelectCount }) => {
     if(!openModal) return;
 
     // Variables State AuthContext 
@@ -314,7 +314,7 @@ const TableForm = ({data, openModal, metaData, setUpdate }) => {
                 searchTags={searchTags}
                 setSearchTags={setSearchTags}
             />
-            {/* {
+            {
                 currentRecord &&
                 <ModalEditBeneficiarie 
                     modalVisible={modalVisible}
@@ -322,8 +322,9 @@ const TableForm = ({data, openModal, metaData, setUpdate }) => {
                     metaData={metaData}
                     record={currentRecord}
                     setUpdate={setUpdate}
+                    initialSelectCount={initialSelectCount}
                 />
-            } */}
+            }
         </>
     )
 }

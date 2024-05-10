@@ -27,9 +27,8 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var tipos = _tipos.Listado(identity);
-            Console.WriteLine(tipos);
-            return Ok(tipos);
+            var result = _tipos.Listado(identity);
+            return Ok(result);
         }
 
         [HttpPost]

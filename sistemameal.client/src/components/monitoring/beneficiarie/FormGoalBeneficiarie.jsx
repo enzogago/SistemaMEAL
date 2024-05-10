@@ -549,7 +549,6 @@ const FormGoalBeneficiarie = () => {
                 const newSelectedValues = data.slice(1).map(location => JSON.stringify({ubiCod:location.ubiCod,ubiAno:location.ubiAno}));
                 setSelectedValues(newSelectedValues);
                 setInitialSelectCount(data.length);
-                console.log(newSelectedValues)
                 for (const [index, location] of data.slice(1).entries()) {
                     // Espera a que handleCountryChange termine antes de continuar con la siguiente iteración
                     await handleCountryChange(JSON.stringify({ubiCod: location.ubiCod,ubiAno: location.ubiAno}), index);
@@ -1216,6 +1215,17 @@ const FormGoalBeneficiarie = () => {
                                             value: /^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[012])-\d{4}$/,
                                             message: 'La fecha debe estar en el formato DD-MM-YYYY',
                                         },
+                                        validate: value => {
+                                            const dateParts = value.split("-");
+                                            const inputDate = new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]);
+                                            const currentDate = new Date();
+                                            currentDate.setHours(0, 0, 0, 0);  // Set the time to 00:00:00
+                                            return inputDate <= currentDate || 'La fecha no puede ser mayor que la fecha actual';
+                                        },
+                                        notZeroYear: (value) => {
+                                            const year = value.split("-")[2];
+                                            return year !== "0000" || 'El año no puede ser 0000';
+                                        }
                                     })} 
                                 />
                                 {errors.benFecNac ? (
@@ -1504,6 +1514,7 @@ const FormGoalBeneficiarie = () => {
                 metaData={metaData}
                 update={update}
                 setUpdate ={setUpdate}
+                initialSelectCount={initialSelectCount}
             />
 
             {/* Intervenciones del beneficiario */}

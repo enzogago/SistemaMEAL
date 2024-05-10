@@ -18,7 +18,6 @@ const Bar = ({showSidebarAndBar, isOpen, setIsOpen}) => {
     // Variables state AuthContext
     const { authInfo, authActions } = useContext(AuthContext);
     const { userLogged } = authInfo;
-    console.log(userLogged)
     const { setUserLogged } = authActions;
     // Variables State statusContext
     const { statusActions } = useContext(StatusContext);

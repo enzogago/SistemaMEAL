@@ -13,7 +13,7 @@ namespace SistemaMEAL.Modulos
     {
         private conexionDAO cn = new conexionDAO();
 
-        public IEnumerable<Monitoreo> Listado(ClaimsIdentity? identity)
+        public IEnumerable<Monitoreo> Listado(ClaimsIdentity? identity, string? tags)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 
@@ -22,8 +22,11 @@ namespace SistemaMEAL.Modulos
             {
                 cn.getcn.Open();
 
-                SqlCommand cmd = new SqlCommand("SP_PRUEBA_METAS", cn.getcn);
+                SqlCommand cmd = new SqlCommand("SP_LISTAR_MONITOREO", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
+                cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
 
                 StringBuilder jsonResult = new StringBuilder();
                 SqlDataReader reader = cmd.ExecuteReader();
@@ -51,6 +54,45 @@ namespace SistemaMEAL.Modulos
             }
              return temporal?? new List<Monitoreo>();
         }
+
+        // public IEnumerable<Monitoreo> Listado(ClaimsIdentity? identity)
+        // {
+        //     var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
+        //     List<Monitoreo>? temporal = new List<Monitoreo>();
+        //     try
+        //     {
+        //         cn.getcn.Open();
+
+        //         SqlCommand cmd = new SqlCommand("SP_PRUEBA_METAS", cn.getcn);
+        //         cmd.CommandType = CommandType.StoredProcedure;
+
+        //         StringBuilder jsonResult = new StringBuilder();
+        //         SqlDataReader reader = cmd.ExecuteReader();
+        //         if (!reader.HasRows)
+        //         {
+        //             jsonResult.Append("[]");
+        //         }
+        //         else
+        //         {
+        //             while (reader.Read())
+        //             {
+        //                 jsonResult.Append(reader.GetValue(0).ToString());
+        //             }
+        //         }
+        //         // Deserializa la cadena JSON en una lista de objetos Estado
+        //         temporal = JsonConvert.DeserializeObject<List<Monitoreo>>(jsonResult.ToString());
+        //     }
+        //     catch (SqlException ex)
+        //     {
+        //         Console.WriteLine(ex.Message);
+        //     }
+        //     finally
+        //     {
+        //         cn.getcn.Close();
+        //     }
+        //      return temporal?? new List<Monitoreo>();
+        // }
         
         public int GetBeneficiariosCount(string tags)
         {
@@ -898,7 +940,8 @@ namespace SistemaMEAL.Modulos
             return temporal?? new List<Monitoreo>();
         }
 
-        public IEnumerable<Beneficiario> BuscarMonitoreoForm(ClaimsIdentity? identity, string? metAno, string? metCod, string? benAno, string? benCod, string? ubiAno, string? ubiCod, string? metBenAnoEjeTec, string? metBenMesEjeTec, string? metBenEda = null)
+
+         public IEnumerable<Beneficiario> BuscarMonitoreoForm(ClaimsIdentity? identity, string? metAno = null, string? metCod = null, string? benAno = null, string? benCod = null, string? ubiAno = null, string? ubiCod = null, string? metBenEda = null, string? metBenAnoEjeTec = null, string? metBenMesEjeTec = null)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 
@@ -909,6 +952,7 @@ namespace SistemaMEAL.Modulos
 
                 SqlCommand cmd = new SqlCommand("SP_BUSCAR_META_BENEFICIARIO", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
+                
                 // Aquí puedes agregar los parámetros necesarios para tu procedimiento almacenado
                 cmd.Parameters.AddWithValue("@P_METANO", string.IsNullOrEmpty(metAno) ? (object)DBNull.Value : metAno);
                 cmd.Parameters.AddWithValue("@P_METCOD", string.IsNullOrEmpty(metCod) ? (object)DBNull.Value : metCod);
@@ -933,21 +977,38 @@ namespace SistemaMEAL.Modulos
                 pTipoMensaje.Direction = ParameterDirection.Output;
                 cmd.Parameters.Add(pTipoMensaje);
 
-                StringBuilder jsonResult = new StringBuilder();
-                SqlDataReader reader = cmd.ExecuteReader();
-                if (!reader.HasRows)
+                SqlDataReader rd = cmd.ExecuteReader();
+                while (rd.Read())
                 {
-                    jsonResult.Append("[]");
-                }
-                else
-                {
-                    while (reader.Read())
+                    Beneficiario beneficiario = new Beneficiario
                     {
-                        jsonResult.Append(reader.GetValue(0).ToString());
-                    }
+                        BenAno = rd["BENANO"].ToString(),
+                        BenCod = rd["BENCOD"].ToString(),
+                        BenNom = rd["BENNOM"].ToString(),
+                        BenApe = rd["BENAPE"].ToString(),
+                        BenFecNac = rd["BENFECNAC"].ToString(),
+                        BenTel = rd["BENTEL"].ToString(),
+                        BenCorEle = rd["BENCORELE"].ToString(),
+                        BenSex = rd["BENSEX"].ToString(),
+                        GenCod = rd["GENCOD"].ToString(),
+                        GenNom = rd["GENNOM"].ToString(),
+                        BenCodUni = rd["BENCODUNI"].ToString(),
+                        BenTelCon = rd["BENTELCON"].ToString(),
+                        BenNomApo = rd["BENNOMAPO"].ToString(),
+                        BenApeApo = rd["BENAPEAPO"].ToString(),
+                        NacCod = rd["NACCOD"].ToString(),
+                        NacNom = rd["NACNOM"].ToString(),
+                        BenDir = rd["BENDIR"].ToString(),
+                        BenAut = rd["BENAUT"].ToString(),
+                        MetAno = rd["METANO"].ToString(),
+                        MetCod = rd["METCOD"].ToString(),
+                        MetBenAnoEjeTec = rd["METBENANOEJETEC"].ToString(),
+                        MetBenMesEjeTec = rd["METBENMESEJETEC"].ToString(),
+                        UbiAno = rd["UBIANO"].ToString(),
+                        UbiCod = rd["UBICOD"].ToString(),
+                    };
+                    temporal.Add(beneficiario);
                 }
-                // Deserializa la cadena JSON en una lista de objetos Usuario
-                temporal = JsonConvert.DeserializeObject<List<Beneficiario>>(jsonResult.ToString());
             }
             catch (SqlException ex)
             {
@@ -987,7 +1048,6 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_BENCOD", metaBeneficiario.BenCod);
                 cmd.Parameters.AddWithValue("@P_UBIANO", metaBeneficiario.UbiAno);
                 cmd.Parameters.AddWithValue("@P_UBICOD", metaBeneficiario.UbiCod);
-                cmd.Parameters.AddWithValue("@P_METBENEDA", metaBeneficiario.MetBenEda);
                 cmd.Parameters.AddWithValue("@P_METBENMESEJETEC", metaBeneficiario.MetBenMesEjeTec);
                 cmd.Parameters.AddWithValue("@P_METBENANOEJETEC", metaBeneficiario.MetBenAnoEjeTec);
                 cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);

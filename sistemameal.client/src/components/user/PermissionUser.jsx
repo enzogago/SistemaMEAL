@@ -35,19 +35,16 @@ const PermissionUser = () => {
     // EFECTO AL CARGAR COMPONENTE GET - LISTAR METAS
     useEffect(() => {
         const fetchDataAsync = async () => {
-            console.log(usuAno,usuCod)
             await fetchData(`Usuario/${usuAno}/${usuCod}`, setUser);
             await fetchData(`Proyecto/proyectos-subproyectos`, (data) => {
                 const transformedData = transformData(data);
                 setProyectos(transformedData);
-                console.log(data);
             });
             await fetchData(`Usuario/access/${usuAno}/${usuCod}`, (data) => {
-                console.log(data)
                 // Usa los objetos de permiso tal como vienen del servidor
-                console.log(data.map(permiso => permiso.usuAccPad));
-                setCheckedKeys(data.map(permiso => permiso.usuAccPad));
+                setCheckedKeys(data.map(permiso => permiso.usuAccPad.trim()));
                 setInitialCheckedKeys(data);
+                
             });
             
         };
@@ -71,21 +68,15 @@ const PermissionUser = () => {
         const permisosArr = Object.values(permisosObj);
         
         // Calcula los permisos a insertar y eliminar
-        const permisosToInsert = permisosArr.filter(permiso => !initialCheckedKeys.some(initialPermiso => initialPermiso.usuAccPad === permiso.usuAccPad));
-        const permisosToDelete = initialCheckedKeys.filter(initialPermiso => !permisosArr.some(permiso => permiso.usuAccPad === initialPermiso.usuAccPad));
+        const permisosToInsert = permisosArr.filter(permiso => !initialCheckedKeys.some(initialPermiso => initialPermiso.usuAccPad.trim() === permiso.usuAccPad.trim()));
+        const permisosToDelete = initialCheckedKeys.filter(initialPermiso => !permisosArr.some(permiso => permiso.usuAccPad.trim() === initialPermiso.usuAccPad.trim()));
         
         const PermisosDto = {
             AccesosInsertar: permisosToInsert,
             AccesosEliminar: permisosToDelete,
         }
-        console.log(checkedKeys)
-        console.log(PermisosDto)
         handleSubmit2(PermisosDto);
     };
-    
-    
-    
-    
     
     const handleSubmit2 = async (env) => {
         try {
@@ -139,7 +130,6 @@ const PermissionUser = () => {
                                                             let metChildren = [];
                                                             if (indItem.metas) {
                                                                 metChildren = indItem.metas.map((metItem) => {
-                                                                    console.log(metItem)
                                                                     const tecnico = metItem.usuNom.charAt(0).toUpperCase() + metItem.usuNom.slice(1).toLowerCase()
                                                                     const implementador = metItem.impNom.charAt(0).toUpperCase() + metItem.impNom.slice(1).toLowerCase()
                                                                     const ubicacion = metItem.ubiNom.charAt(0).toUpperCase() + metItem.ubiNom.slice(1).toLowerCase()

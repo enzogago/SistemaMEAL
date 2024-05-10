@@ -134,7 +134,7 @@ const Table = ({data = [], setData, setModalIsOpen}) => {
                                 data-tooltip-id="delete-tooltip" 
                                 data-tooltip-content="Eliminar" 
                                 className='flex f1_25 p_25'
-                                onClick={() => handleDeleteMant(row.original, row.original, setData)} 
+                                onClick={() => handleDeleteMant('SubProyecto', row.original, setData)} 
                             >
                                 <Delete />
                             </span>

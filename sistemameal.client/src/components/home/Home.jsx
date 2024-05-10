@@ -105,10 +105,10 @@ const Home = () => {
             }
             console.log(data);
             setMonitoringData(data);
-            const totalMeta = data.reduce((sum, item) => item.indFor === '' ? sum + Number(item.metMetTec) : sum, 0);
-            const totalAtenciones = data.reduce((sum, item) => item.indFor === '' ? sum + Number(item.metEjeTec) : sum, 0);
-            const totalMetaPre = data.reduce((sum, item) => item.indFor === '' ? sum + Number(item.metMetPre) : sum, 0);
-            const totalAtencionesPre = data.reduce((sum, item) => item.indFor === '' ? sum + Number(item.metEjePre) : sum, 0);
+            const totalMeta = data.reduce((sum, item) => sum + Number(item.metMetTec) , 0);
+            const totalAtenciones = data.reduce((sum, item) => sum + Number(item.metEjeTec) , 0);
+            const totalMetaPre = data.reduce((sum, item) => sum + Number(item.metMetPre) , 0);
+            const totalAtencionesPre = data.reduce((sum, item) => sum + Number(item.metEjePre) , 0);
 
             setTotalAtenciones(totalAtenciones);
             
@@ -401,6 +401,14 @@ const Home = () => {
         { name: 'Femenino', value: 91949, color: femaleColor },
     ];
 
+    function formatText(text) {
+        // Reemplaza el texto entre corchetes con etiquetas span y la clase 'bold'
+        return text.replace(/\[(.*?)\]/g, "<span class='PowerMas_Style_Log bold'>$1</span>");
+    }
+    function formatTextForTooltip(text) {
+        // Reemplaza el texto entre corchetes sin las etiquetas span
+        return text.replace(/\[(.*?)\]/g, "$1");
+    }
     return(
     <>
         <div className="PowerMas_Search_Container_Home " style={{paddingBottom: '1rem'}} >
@@ -581,7 +589,9 @@ const Home = () => {
                             const formattedTime = `${hours}:${minutes}`;
 
                             let text = item.logDes ? item.logDes : '';
-                            let shortText = text.length > 50? text.substring(0, 50) + '...' : text;
+                            let tooltipText = formatTextForTooltip(text);  // Formatea el texto para el tooltip
+                            let shortText = text.length > 80 ? text.substring(0, 80) + '...' : text;
+                            shortText = formatText(shortText);
 
                             return (
                                 <Fragment key={index}>
@@ -595,11 +605,11 @@ const Home = () => {
                                             <span className='Large-f1 Small-f_75 bold' style={{textTransform: 'capitalize'}}>{item.usuNom.toLowerCase() + ' ' + item.usuApe.toLowerCase()}</span>
                                             <span 
                                                 data-tooltip-id="info-tooltip" 
-                                                data-tooltip-content={text} 
+                                                data-tooltip-content={tooltipText}  // Usa el texto formateado para el tooltip
                                                 className='Large-f_75 Small-f_5' 
                                                 style={{textTransform: 'capitalize'}}
+                                                dangerouslySetInnerHTML={{ __html: shortText }}
                                             >
-                                                {shortText.toLowerCase()}
                                             </span>
                                         </div>
                                         

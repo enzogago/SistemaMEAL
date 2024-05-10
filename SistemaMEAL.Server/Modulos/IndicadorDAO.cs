@@ -14,7 +14,7 @@ namespace SistemaMEAL.Modulos
     {
         private conexionDAO cn = new conexionDAO();
 
-        public IEnumerable<Indicador> Buscar(ClaimsIdentity? identity, string? actAno = null, string? actCod = null,string? indAno = null, string? indCod = null, string? indNom = null, string? indNum = null, string? indTipInd = null, string? uniCod = null, string? tipValCod = null)
+        public IEnumerable<Indicador> Buscar(ClaimsIdentity? identity, string? actAno = null, string? actCod = null,string? indAno = null, string? indCod = null, string? indNom = null, string? indNum = null, string? indTipInd = null, string? uniCod = null, string? tipValCod = null, string? indTotPre = null, string? monCod = null, string? indLinBas = null)
         {
             List<Indicador>? temporal = new List<Indicador>();
             try
@@ -35,6 +35,9 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_INDTIPIND", string.IsNullOrEmpty(indTipInd) ? (object)DBNull.Value : indTipInd);
                 cmd.Parameters.AddWithValue("@P_UNICOD", string.IsNullOrEmpty(uniCod) ? (object)DBNull.Value : uniCod);
                 cmd.Parameters.AddWithValue("@P_TIPVALCOD", string.IsNullOrEmpty(tipValCod) ? (object)DBNull.Value : tipValCod);
+                cmd.Parameters.AddWithValue("@P_INDTOTPRE", string.IsNullOrEmpty(indTotPre) ? (object)DBNull.Value : indTotPre);
+                cmd.Parameters.AddWithValue("@P_MONCOD", string.IsNullOrEmpty(monCod) ? (object)DBNull.Value : monCod);
+                cmd.Parameters.AddWithValue("@P_INDLINBAS", string.IsNullOrEmpty(indLinBas) ? (object)DBNull.Value : indLinBas);
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                 cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
                 cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);

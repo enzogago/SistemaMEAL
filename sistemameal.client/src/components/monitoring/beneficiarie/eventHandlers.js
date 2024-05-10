@@ -156,10 +156,10 @@ export const handleDeleteBeneficiarioMeta = async (controller,metAno,metCod,benA
         'Sí',
         'No',
         async () => {
+
+            Notiflix.Loading.pulse();
             const url = `${import.meta.env.VITE_APP_API_URL}/api/${controller}/eliminar-beneficiario/${metAno}/${metCod}/${benAno}/${benCod}/${ubiAno}/${ubiCod}/${metBenAnoEjeTec}/${metBenMesEjeTec}`;
-
             const token = localStorage.getItem('token');
-
             try {
                 const response = await fetch(url, {
                     method: 'DELETE',
@@ -174,11 +174,12 @@ export const handleDeleteBeneficiarioMeta = async (controller,metAno,metCod,benA
                     return;
                 }
 
-                Notiflix.Notify.success(data.message);
-                console.log(setUpdate)
                 setUpdate(prevUpdate => !prevUpdate);
+                Notiflix.Notify.success(data.message);
             } catch (error) {
                 console.error('Error:', error);
+            } finally {
+                Notiflix.Loading.remove();
             }
         },
         () => {
@@ -193,10 +194,8 @@ export const initPhoneInput = (inputRef, setIsValid, setTelefono, setErrorMessag
         'COLOMBIA': 'co',
         'ECUADOR': 'ec',
       };
-      console.log(ubiNom)
     // Obtén el código del país basado en metaData.ubiNom
     const initialCountryCode = countryNameToCode[ubiNom?.toUpperCase()];
-      console.log(initialCountryCode)
     const phoneInput = intlTelInput(inputRef.current, {
         initialCountry: initialCountryCode || "auto",
         geoIpLookup: function(callback) {

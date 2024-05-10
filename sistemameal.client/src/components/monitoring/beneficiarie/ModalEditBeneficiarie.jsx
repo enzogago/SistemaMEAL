@@ -7,7 +7,7 @@ import 'intl-tel-input/build/css/intlTelInput.css';
 import 'intl-tel-input/build/js/utils.js';
 import { initPhoneInput } from './eventHandlers';
 
-const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate, metaData}) => {
+const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate, metaData, initialSelectCount}) => {
 
     if (!modalVisible) return; 
     const [ paises, setPaises ] = useState([]);
@@ -35,6 +35,8 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
     const [contactIsTouched, setContactIsTouched] = useState(false);
 
     const [selectedValues, setSelectedValues] = useState([]);
+    const [firstEdit, setFirstEdit] = useState(false);
+    const [ verificarPais, setVerificarPais ] = useState(null);
 
     // Luego puedes llamar a esta función para cada input de teléfono en tu función afterOpenModal
     const afterOpenModal = () => {
@@ -105,11 +107,11 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
 
     const pais = watch('pais');
     useEffect(() => {
-        if (pais) {
+        if (pais && firstEdit) {
             if (pais == '0') {
                 setSelects([]);
                 return;
-            }
+            } 
             handleCountryChange(pais);
         }
     }, [pais]);
@@ -178,23 +180,25 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                 }
             });
 
-
-
             if (!hasChanged && !fieldsDisabled) { // No cambió y los campos habilitados
                 // UPDATE BENEFICIARIO
+                console.log(data)
                 handleSubmitBeneficiarie(data, closeModalEdit, setUpdate);
             } else if(fieldsDisabled){ // Cambió y los campos deshabilitados
                 // Update META_BENEFICIARIO
+                console.log(dataMetaBeneficiario)
                 handleSubmiMetaBeneficiario(dataMetaBeneficiario, closeModalEdit, setUpdate);
             } else if(!fieldsDisabled){
                 if(hasChanged && hasChangedBeneficiarie){ // Si cambian los datos de Meta_Beneficiario y Beneficiario
                     // UPDATE META_BENEFICAIRIO y BENEFICIARIO
+                    console.log(dataBeneficiarioMetaBeneficiario)
                     const dataBeneficiarioMetaBeneficiario= {
                         Beneficiario: { ...data },
                         MetaBeneficiario: { ...dataMetaBeneficiario},
                     }
                     handleSubmiBeneficiarioMetaBeneficiario(dataBeneficiarioMetaBeneficiario, closeModalEdit, setUpdate);
                 } else { // Solo cambia los datos de Meta_Beneficiario
+                    console.log(dataMetaBeneficiario)
                     // Update META_BENEFICIARIO
                     handleSubmiMetaBeneficiario(dataMetaBeneficiario, closeModalEdit, setUpdate);
                 }
@@ -320,17 +324,20 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
             fetchMetaForm(record);
         }
     }, [isDataLoaded, modalVisible]);
+
     useEffect(() => {
         Promise.all([
             fetchData('Genero', setGeneros),
             fetchData('Nacionalidad', setNacionalidades),
             fetchData('Ubicacion', setPaises),
+            setFirstEdit(false),
         ]).then(() => setIsDataLoaded(true));
     }, []);
     
 
     const fetchMetaForm = async (record) => {
         try {
+            console.log(record)
             const token = localStorage.getItem('token');
             Notiflix.Loading.pulse('Cargando...');
             
@@ -339,6 +346,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                     'Authorization': `Bearer ${token}`
                 }
             });
+            console.log(response)
             const data = await response.json();
             if (!response.ok) {
                 Notiflix.Notify.failure(data.message);
@@ -358,11 +366,11 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
             console.log(data)
             reset(newData);
             setInitialData(newData)
-            setValue('pais', JSON.stringify({ubiCod: metaData.ubiCod,ubiAno:metaData.ubiAno}));
-
+            console.log(verificarPais);
+            
             // RELLENAMOS EL SELECT
             fetchSelects(data.ubiAno,data.ubiCod);
-
+            
             fetchDataTable(data.benAno,data.benCod);
         } catch (error) {
             console.error('Error:', error);
@@ -410,13 +418,25 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                 Notiflix.Notify.failure(data.message);
                 return;
             }
-            const newSelectedValues = data.slice(1).map(location => JSON.stringify({ubiCod:location.ubiCod,ubiAno:location.ubiAno}));
-            setSelectedValues(newSelectedValues);
-
-            for (const [index, location] of data.slice(1).entries()) {
-                await handleCountryChange(JSON.stringify({ubiAno: location.ubiAno,ubiCod: location.ubiCod}), index);
+            console.log(data)
+            if (data.length > 1) {
+                setValue('pais', JSON.stringify({ ubiCod: data[0].ubiCod, ubiAno: data[0].ubiAno }));
+                await handleCountryChange(JSON.stringify({ ubiCod: data[0].ubiCod, ubiAno: data[0].ubiAno }));
+                const newSelectedValues = data.slice(1).map(location => JSON.stringify({ubiCod:location.ubiCod,ubiAno:location.ubiAno}));
+                setSelectedValues(newSelectedValues);
+                console.log(newSelectedValues)
+                for (const [index, location] of data.slice(1).entries()) {
+                    // Espera a que handleCountryChange termine antes de continuar con la siguiente iteración
+                    await handleCountryChange(JSON.stringify({ubiCod: location.ubiCod,ubiAno: location.ubiAno}), index);
+                }
+                setFirstEdit(true)
+            } else {
+                setValue('pais', JSON.stringify({ ubiCod: data[0].ubiCod, ubiAno: data[0].ubiAno }));
+                setFirstEdit(true);
             }
-
+            setVerificarPais({ ubiCod: data[0].ubiCod, ubiAno: data[0].ubiAno });
+            initPhoneInput(phoneInputRef, setIsValid, setPhoneNumber, setErrorMessage,'',data[0].ubiNom, setIsTouched);
+            initPhoneInput(phoneContactInputRef, setContactIsValid, setPhoneContactNumber, setErrorContactMessage,'',data[0].ubiNom, setContactIsTouched);
         } catch (error) {
             console.error('Error:', error);
         } finally {
@@ -427,7 +447,8 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
 
     const handleCountryChange = async (ubicacion, index) => {
         const selectedCountry = JSON.parse(ubicacion);
-        if (ubicacion === '0') {
+        console.log(selectedCountry)
+        if (ubicacion == '0') {
             setSelects(prevSelects => prevSelects.slice(0, index + 1));  // Reinicia los selects por debajo del nivel actual
 
             // Aquí actualizamos selectedValues para los selectores de nivel inferior
@@ -438,7 +459,6 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                 }
                 return newSelectedValues;
             });
-
             return;
         }
 
@@ -476,8 +496,10 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
 
     // Observar Cambios de campos registrados
     const selectedValue = watch('genCod', '0');
+    const selectedValue2 = watch('nacCod', '0');
     const benSex = watch('benSex');
     const benAut = watch('benAut');
+    const metBenAnoEjeTec = watch('metBenAnoEjeTec');
 
     return (
         <Modal
@@ -524,7 +546,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                             {...register('pais', { 
                                 validate: {
                                     required: value => value !== '0' || 'El campo es requerido',
-                                    equal: value => metaData && JSON.stringify({ ubiCod: metaData.ubiCod, ubiAno: metaData.ubiAno }) === value || 'El país debe ser el planificado'
+                                    equal: value => metaData && JSON.stringify(verificarPais) === value || 'El país debe ser el planificado'
                                 }
                             })}
                         >
@@ -546,8 +568,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                             </p>
                         )}
                     </div>
-                    {selects.map((options, index) => {
-                        return(
+                    {selects.map((options, index) => (
                         <div className="m_75" key={index}>
                             <label style={{textTransform: 'capitalize'}} htmlFor={index} className="">
                                 {options[0].ubiTip.toLowerCase()}
@@ -555,9 +576,14 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                             <select
                                 id={index}
                                 key={index} 
-                                name={`select-form${index}`}
-                                value={selectedValues[index]} // Aquí se establece el valor del select
+                                value={selectedValues[index]}
+                                name={`select-form${index}`} 
                                 onChange={(event) => {
+                                    // Si el selector está deshabilitado, no hagas nada
+                                    if (index+1 < initialSelectCount) {
+                                        return;
+                                    }
+                                    
                                     handleCountryChange(event.target.value, index);
                                     // Aquí actualizamos el valor seleccionado en el estado
                                     setSelectedValues(prevSelectedValues => {
@@ -568,16 +594,17 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                                 }} 
                                 style={{textTransform: 'capitalize'}}
                                 className="block Phone_12"
+                                disabled={index+1 < initialSelectCount}
                             >
                                 <option style={{textTransform: 'capitalize'}} value="0">--Seleccione {options[0].ubiTip.toLowerCase()}--</option>
                                 {options.map(option => (
-                                    <option key={option.ubiCod} value={JSON.stringify({ubiCod:option.ubiCod,ubiAno:option.ubiAno})}>
+                                    <option key={option.ubiCod} value={JSON.stringify({ ubiCod: option.ubiCod, ubiAno: option.ubiAno })}>
                                         {option.ubiNom.toLowerCase()}
                                     </option>
                                 ))}
                             </select>
                         </div>
-                    )})}
+                    ))}
                     {
                         cargando &&
                         <div id="loading" className="m_75">Cargando...</div>
