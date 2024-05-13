@@ -30,7 +30,8 @@ const ModalGoalBeneficiarie = ({modalGoalBeneficiarie, closeModal, dataGoalBenef
                     flexDirection: 'column'
                 },
                 overlay: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.5)'
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    zIndex: 30
                 }
             }}
         >   

@@ -45,7 +45,7 @@ const ResultChain = () => {
             const currentIndex = inputs.indexOf(target);
     
             // Calcula el número de columnas en la tabla
-            const numColumns = headers.length - 4; // Añade 4 por las columnas de totales
+            const numColumns = headers.length - 2; // Añade 4 por las columnas de totales
     
             // Calcula el índice de la fila y de la columna del input actual
             const currentRow = Math.floor(currentIndex / numColumns);
@@ -198,7 +198,15 @@ const ResultChain = () => {
                 fetchDataReturn(`Indicador/ubicacion-actividad/${subProAno}/${subProCod}`)
             ]).then(([dataPorAno, dataPorImplementador, dataPorFinanciador, dataPorUbicacion]) => {
                 if (dataPorFinanciador.length > 0) {
-                    setCurrency(dataPorFinanciador[0].monSim);
+                    // Obtén el valor de monSim del primer registro
+                    const firstMonSim = dataPorFinanciador[0].monSim;
+            
+                    // Verifica si todos los registros tienen el mismo valor de monSim
+                    const allSameMonSim = dataPorFinanciador.every(record => record.monSim === firstMonSim);
+            
+                    // Si todos los registros tienen el mismo valor de monSim, establece currency en ese valor
+                    // Si no, establece currency en '€'
+                    setCurrency(allSameMonSim ? firstMonSim : '€');
                 }
 
                 const totalsPorAno = calculateTotalsAll(dataPorAno, 'cadResPerAno', 'cadResPerMetPre', 'porAno', null, 'ano_');
@@ -435,6 +443,10 @@ const ResultChain = () => {
                 'CÓDIGO': item.indNum,
                 'NOMBRE': item.indNom.charAt(0).toUpperCase() + item.indNom.slice(1).toLowerCase(),
             };
+            let inputLineaBase = document.querySelector(`input[name="total_${item.indAno}_${item.indCod}"]`);
+            if (inputLineaBase){
+                rowData['TOTAL_PRESUPUESTO'] = inputLineaBase.value !== '' ? inputLineaBase.value : '0';
+            }
             headers.forEach(header => {
                 let inputValue;
                 if (header.key === 'totalPorAno') {
@@ -457,7 +469,7 @@ const ResultChain = () => {
         });
     
         // Definir los encabezados
-        let headersExcel = ['#', 'SUB_PROYECTO', 'CÓDIGO', 'NOMBRE', ...headers.map(header => header.name)];
+        let headersExcel = ['#', 'SUB_PROYECTO', 'CÓDIGO', 'NOMBRE','TOTAL_PRESUPUESTO', ...headers.map(header => header.name)];
     
         Export_Excel_Basic(data, headersExcel, 'GENERAL', false);
     };
@@ -524,7 +536,7 @@ const ResultChain = () => {
                                     <IconLocation />
                                 </span>
                             </th>
-                            <th className='center PowerMas_Borde_Total PowerMas_Borde_Total2 PowerMas_Combine_Header' colSpan={numeroColumnasFinanciador}>
+                            <th className='center PowerMas_Borde_Total Large_12 PowerMas_Borde_Total2 PowerMas_Combine_Header' colSpan={numeroColumnasFinanciador}>
                                 <span className='flex ai-center jc-center gap-1'>
                                     Por Financiador
                                     <User />

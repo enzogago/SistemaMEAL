@@ -293,23 +293,25 @@ const ModalProfile = ({openModal, closeModal}) => {
     
 
     return (
-        <div className={`PowerMas_Modal ${openModal ? 'show' : ''}`}>
+        <div className={`PowerMas_Modal ${openModal ? 'show' : ''}`}
+            style={{zIndex: '999'}}
+        >
             <div 
-                className="PowerMas_Modal_Content Large_4 Medium_6"
+                className="PowerMas_Modal_Content Large_4 Mediium_6 Phone_10"
                 style={{
                     height: '90%'
                 }}
             >
                 <header className='PowerMas_Modal_Header p_5'>
-                    <h1 className='Large-f2'>Editar Perfil</h1>
+                    <h1 className='Large-f2 Medium-f1_75 Small-f1_25'>Editar Perfil</h1>
                     <span 
-                        className="Large-f2" 
+                        className=" f2" 
                         onClick={closeModalAndReset}
                     >
                         ×
                     </span>
                 </header>
-                <section className='Large_12 flex ai-center jc-center flex-column flex-grow-1 Large-p1_5 Large-gap-1 overflow-auto'>
+                <section className='Large_12 flex ai-center jc-center flex-column flex-grow-1 Large-p1_5 Small-p1 Large-gap-1 Small-gap_5 overflow-auto'>
                     <div className='relative flex ai-center jc-center Large_12'>
                         {
                             isUpload ?
@@ -334,7 +336,7 @@ const ModalProfile = ({openModal, closeModal}) => {
                                     :
                                     <>
                                         <div
-                                            className="PowerMas_Input_Upload center p2 pointer"
+                                            className="PowerMas_Input_Upload center Large-p2 Small-p1 pointer"
                                             ref={dropRef}
                                             onClick={handleDivClick}
                                             onDragEnter={handleDragIn}
@@ -349,7 +351,7 @@ const ModalProfile = ({openModal, closeModal}) => {
                                                 onChange={handleFileChange} 
                                                 accept=".jpg,.jpeg"
                                             />
-                                            <img src={masculino}  className="Large_4" />
+                                            <img src={masculino}  className="Large_4 Phone_4" />
                                             {
                                                 dragging ?
                                                 <p className='f_75'>Suelta el archivo aquí</p>
@@ -394,13 +396,13 @@ const ModalProfile = ({openModal, closeModal}) => {
                             </div>
                         }
                     </div>
-                    <div className='PowerMas_Form_Content Large_12 Large-p1 Large-gap_25 flex flex-column flex-grow-1 overflow-auto'>
-                        <h2 className="f1_25 Large_12"> Datos Personales: </h2>
-                        <div className="flex flex-column">
-                            <label htmlFor="docIdeCod">Documento de identidad</label>
+                    <div className='PowerMas_Form_Content Phone_12 Medium-p1 Small-p_25 Small-gap_25 flex flex-column flex-grow-1 overflow-auto'>
+                        <h2 className="f1_25 Phone_12"> Datos Personales: </h2>
+                        <div className="flex flex-column Large_12">
+                            <label className='' htmlFor="docIdeCod">Documento de identidad</label>
                             <select 
                                 id="docIdeCod" 
-                                className={` PowerMas_Modal_Form_${dirtyFields.docIdeCod || isSubmitted ? (errors.docIdeCod ? 'invalid' : 'valid') : ''}`} 
+                                className={`PowerMas_Modal_Form_${dirtyFields.docIdeCod || isSubmitted ? (errors.docIdeCod ? 'invalid' : 'valid') : ''}`} 
                                 {...register('docIdeCod', { 
                                     validate: value => value !== '0' || 'El campo es requerido.' 
                                 })}
@@ -414,9 +416,9 @@ const ModalProfile = ({openModal, closeModal}) => {
                                 ))}
                             </select>
                             {errors.docIdeCod ? (
-                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.docIdeCod.message}</p>
+                                <p className="f_75 PowerMas_Message_Invalid">{errors.docIdeCod.message}</p>
                             ) : (
-                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                <p className="f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
                                     Espacio reservado para el mensaje de error
                                 </p>
                             )}
@@ -432,9 +434,9 @@ const ModalProfile = ({openModal, closeModal}) => {
                                 {...register('usuNumDoc', { required: 'El campo es requerido.' })} 
                             />
                             {errors.usuNumDoc ? (
-                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.usuNumDoc.message}</p>
+                                <p className="f_75 PowerMas_Message_Invalid">{errors.usuNumDoc.message}</p>
                             ) : (
-                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                <p className="f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
                                     Espacio reservado para el mensaje de error
                                 </p>
                             )}
@@ -452,9 +454,9 @@ const ModalProfile = ({openModal, closeModal}) => {
                                     })} 
                                 />
                                 {errors.usuNom ? (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.usuNom.message}</p>
+                                    <p className="f_75 PowerMas_Message_Invalid">{errors.usuNom.message}</p>
                                 ) : (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                    <p className="f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
                                     Espacio reservado para el mensaje de error
                                     </p>
                                 )}
@@ -473,9 +475,9 @@ const ModalProfile = ({openModal, closeModal}) => {
                                     })} 
                                 />
                                 {errors.usuApe ? (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.usuApe.message}</p>
+                                    <p className="f_75 PowerMas_Message_Invalid">{errors.usuApe.message}</p>
                                 ) : (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                    <p className="f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
                                     Espacio reservado para el mensaje de error
                                     </p>
                                 )}
@@ -488,18 +490,17 @@ const ModalProfile = ({openModal, closeModal}) => {
                                     <input
                                         ref={phoneInputRef}
                                         type="tel"
-                                        className={`Large_12 PowerMas_Modal_Form_${isTouched ? (!isValid ? 'invalid' : 'valid') : ''}`}
+                                        className={`Phone_12 PowerMas_Modal_Form_${isTouched ? (!isValid ? 'invalid' : 'valid') : ''}`}
                                         style={{
                                             paddingRight: '6px',
-                                            padding: '4px 6px 4px 52px',
                                             margin: 0,
                                         }}
                                     />
                                 </div>
                                 {!isValid ? (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errorMessage}</p>
+                                    <p className="f_75 PowerMas_Message_Invalid">{errorMessage}</p>
                                 ) : (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                    <p className="f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
                                         Espacio reservado para el mensaje de error
                                     </p>
                                 )}
@@ -548,9 +549,9 @@ const ModalProfile = ({openModal, closeModal}) => {
                                         })} 
                                     />
                                     {errors.usuFecNac ? (
-                                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.usuFecNac.message}</p>
+                                        <p className="f_75 PowerMas_Message_Invalid">{errors.usuFecNac.message}</p>
                                     ) : (
-                                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                        <p className="f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
                                         Espacio reservado para el mensaje de error
                                         </p>
                                     )}
@@ -575,18 +576,18 @@ const ModalProfile = ({openModal, closeModal}) => {
                                     ))}
                                 </select>
                                 {errors.carCod ? (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.carCod.message}</p>
+                                    <p className="f_75 PowerMas_Message_Invalid">{errors.carCod.message}</p>
                                 ) : (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                    <p className="f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
                                         Espacio reservado para el mensaje de error
                                     </p>
                                 )}
                             </div>
                     </div>
                 </section>
-                <footer className="PowerMas_Buttoms_Form_Beneficiarie Large-p1 Large-gap-1 flex ai-center jc-center">
-                    <button onClick={closeModalAndReset} className="Large-p_5 Large_5 PowerMas_Buttom_Secondary">Cerrar</button>
-                    <button onClick={handleNext} className="Large-p_5 Large_5 PowerMas_Buttom_Primary">Grabar</button>
+                <footer className="PowerMas_Buttoms_Form_Beneficiarie Large-p1 Small-p_5 Large-gap-1 Small-gap-1 flex ai-center jc-center">
+                    <button onClick={closeModalAndReset} className="Large-p_5 Small-p_5 Large_5 Small_4 PowerMas_Buttom_Secondary">Cerrar</button>
+                    <button onClick={handleNext} className="Large-p_5 Small-p_5 Large_5 Small_4 PowerMas_Buttom_Primary">Grabar</button>
                 </footer>
             </div>
         </div>

@@ -30,19 +30,19 @@ const   ModalAcerca = ({ isOpen, closeModal }) => {
 
     return (
         <div className={`color-black PowerMas_Modal ${isOpen ? 'show' : ''}`}>
-            <div className="bg-white Small-p1_5 Phone_10 Medium_4">
+            <div className="bg-white Small-p1_5 Phone_10 Medium_8 Large_4">
                 <span 
                     className="PowerMas_CloseModal" 
                     onClick={closeModalAndReset}
                 >
                     ×
                 </span>
-                <div className="PowerMas_SidebarHeader flex flex-row ai-center p_5">
-                    <img className='Large_4 Medium_10 Phone_6' height="auto"  title="Sistema MEAL Ayuda en Acción" src={logo} alt="Logo Ayuda En Accion" />
-                    <h2 className="Large_9 center Medium-f1_5 Small-f1"> SISTEMA MEAL </h2>
+                <div className="PowerMas_SidebarHeader flex flex-row ai-center p_5 gap_5">
+                    <img className='Medium_6 Phone_6' height="auto"  title="Sistema MEAL Ayuda en Acción" src={logo} alt="Logo Ayuda En Accion" />
+                    <h2 className="Large_9 center Large-f1_5 Medium-f1_5 Small-f1"> SISTEMA MEAL </h2>
                 </div>
                 <br />
-                <div className='Medium-f1 Small-f_75'>
+                <div className='Large-f1 Medium-f_75 Small-f_75'>
                     Una herramienta desarrollada por Ayuda en Acción Ecuador para optimizar el monitoreo, evaluación, aprendizaje y rendición de cuentas en nuestros proyectos. 
                     <br /><br />
                     <span className='bold'>  Versión 1.0.1.3 (Marzo 2024)</span>

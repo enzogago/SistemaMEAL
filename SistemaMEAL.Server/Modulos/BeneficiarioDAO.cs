@@ -361,7 +361,7 @@ namespace SistemaMEAL.Server.Modulos
                                 mensaje = pDescripcionMensaje.Value.ToString();
                                 tipoMensaje = pTipoMensaje.Value.ToString();
 
-                                if (tipoMensaje != "3")
+                                if (tipoMensaje == "1")
                                 {
                                     Console.WriteLine(mensaje);
                                     throw new Exception(mensaje);
@@ -713,8 +713,10 @@ namespace SistemaMEAL.Server.Modulos
             }
             return temporal?? new List<Beneficiario>();
         }
-        public IEnumerable<Beneficiario> BuscarBeneficiariosHome(string? tags)
+        public IEnumerable<Beneficiario> BuscarBeneficiariosHome(ClaimsIdentity? identity, string? tags)
         {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
             List<Beneficiario>? temporal = new List<Beneficiario>();
             try
             {
@@ -723,6 +725,8 @@ namespace SistemaMEAL.Server.Modulos
                 SqlCommand cmd = new SqlCommand("SP_BUSCAR_BENEFICIARIOS_HOME", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
+                cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
 
                 StringBuilder jsonResult = new StringBuilder();
                 SqlDataReader reader = cmd.ExecuteReader();

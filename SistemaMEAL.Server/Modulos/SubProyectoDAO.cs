@@ -964,6 +964,7 @@ namespace SistemaMEAL.Modulos
                             List<string> financiadoresParametro = subProyectoFinanciadores.Select(i => i.FinCod).ToList();
                             List<string> financiadoresEliminar = financiadoresActuales.Except(financiadoresParametro).ToList();
 
+
                             // Elimina los implementadores que ya no están en la lista de parámetros
                             foreach (string finCod in financiadoresEliminar)
                             {

@@ -261,7 +261,7 @@ const Table = ({data}) => {
                                         const shortText = text.length > 50 ? text.substring(0, 50) + '...' : text;
 
                                         return (
-                                            <tr className='bold' key={key}>
+                                            <tr className='bold' key={key} style={{color: '#372e2ca6'}}>
                                                 <td></td>
                                                 <td style={{color: estCol}}>{estNom}</td>
                                                 <td className='' colSpan={7}>

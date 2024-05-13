@@ -234,7 +234,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var reult = _beneficiarios.BuscarBeneficiariosHome(tags);
+            var reult = _beneficiarios.BuscarBeneficiariosHome(identity, tags);
             return Ok(reult);
         }
 

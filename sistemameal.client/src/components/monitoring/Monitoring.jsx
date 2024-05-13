@@ -7,26 +7,28 @@ import { fetchData } from '../reusable/helper';
 import Download from '../../icons/Download';
 import FileExcel from '../../icons/FileExcel';
 import Delete from '../../icons/Delete';
+import { useNavigate } from 'react-router-dom';
 
 const Monitoring = () => {
+    const navigate = useNavigate();
+
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [modalData, setModalData] = useState(null);
-
-    const [modalIsOpen, setModalIsOpen] = useState(false)
-
+    
+    const [modalConfirmData, setModalConfirmData] = useState(null);
+    
     const [dragging, setDragging] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
     const dragCounter = useRef(0);
     const dropRef = useRef(null);
     const fileInputRef = useRef();
-
+    
+    const [modalIsOpen, setModalIsOpen] = useState(false)
     const closeModal = () => {
         setModalIsOpen(false);
         setModalData(null);
         setSelectedFiles([]);
     };
-    
-
     const openModalWithData = (data) => {
         setModalData(data);
         console.log(data);
@@ -36,6 +38,17 @@ const Monitoring = () => {
             console.log(data)
             setSelectedFiles(data)
         })
+    };
+
+    const [modalConfirmIsOpen, setModalConfirmIsOpen] = useState(false)
+    const closeConfirmModal = () => {
+        setModalConfirmIsOpen(false);
+        setModalConfirmData(null);
+    };
+    const openConfirmModalWithData = (data) => {
+        setModalConfirmData(data);
+        console.log(data);
+        setModalConfirmIsOpen(true);
     };
 
 
@@ -174,7 +187,7 @@ const Monitoring = () => {
     };
 
     const downloadFile = async (fileName) => {
-        const url = `http://20.81.137.122:8080/uploads/${fileName}`
+        const url = `https://meal.ddns.net/uploads/${fileName}`
         try {
             Notiflix.Loading.pulse('Descargando..   .');
             // Obtenemos los datos
@@ -252,7 +265,50 @@ const Monitoring = () => {
         <>
             <Table 
                 setModalIsOpen={openModalWithData}
+                setModalConfirmIsOpen={openConfirmModalWithData}
             />
+            {/* Modal Confirmación */}
+            <Modal
+                ariaHideApp={false}
+                isOpen={modalConfirmIsOpen}
+                onRequestClose={closeConfirmModal}
+                closeTimeoutMS={200}
+                style={{
+                    content: {
+                        top: '50%',
+                        left: '50%',
+                        right: 'auto',
+                        bottom: 'auto',
+                        width: '30%',
+                        maxHeight: '100vh',
+                        marginRight: '-50%',
+                        transform: 'translate(-50%, -50%)',
+                        backgroundColor: '#fff',
+                        border: '1px solid #ccc',
+                        padding: '20px',
+                        display: 'flex',
+                        flexDirection: 'column'
+                    },
+                    overlay: {
+                        position: 'fixed',
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        top: '0',
+                        bottom: '0',
+                        right: '0',
+                        left: '0',
+                        zIndex: '30'
+                    }
+                }}
+            >
+                <span className="PowerMas_CloseModal" style={{position: 'absolute',right: 20, top: 10}} onClick={closeConfirmModal}>×</span>
+                <h2 className='PowerMas_Title_Modal f1 center'>¿Como deseas registrar a los benefiriacios?</h2>
+                <div className="center">
+                    <button className="PowerMas_Buttom_Primary Large_5 center p_5 m_25" onClick={() => navigate(`/upload-beneficiarie/${modalConfirmData}`)}>Masivo</button>
+                    <button className="PowerMas_Buttom_Secondary Large_5 center p_5 m_25" onClick={() => navigate(`/form-goal-beneficiarie/${modalConfirmData}`)}>Individual</button>
+                </div>
+            </Modal>
+
+            {/* Modal Fuentes de Verificación */}
             <Modal
                 ariaHideApp={false}
                 isOpen={modalIsOpen}
@@ -265,7 +321,7 @@ const Monitoring = () => {
                         right: 'auto',
                         bottom: 'auto',
                         width: '50%',
-                        height: '90%',
+                        maxHeight: '100vh',
                         marginRight: '-50%',
                         transform: 'translate(-50%, -50%)',
                         backgroundColor: '#fff',
@@ -275,8 +331,13 @@ const Monitoring = () => {
                         flexDirection: 'column'
                     },
                     overlay: {
+                        position: 'fixed',
                         backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                        zIndex: 30
+                        top: '0',
+                        bottom: '0',
+                        right: '0',
+                        left: '0',
+                        zIndex: '30'
                     }
                 }}
             >

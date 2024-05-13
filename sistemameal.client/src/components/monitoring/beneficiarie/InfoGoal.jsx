@@ -1,5 +1,6 @@
 import React from 'react'
 import DonutChart from '../../reusable/DonutChart'
+import { formatterBudget } from '../goal/helper';
 
 const InfoGoal = ({metaData, openModal, is = true}) => {
     
@@ -20,7 +21,7 @@ const InfoGoal = ({metaData, openModal, is = true}) => {
                         <div className="Large_6 flex flex-column ai-center">
                             <h3 className="f1_25 center">Avance Técnico</h3>
                             <DonutChart 
-                                percentage={(metaData ? metaData.metPorAvaTec : 0)} 
+                                percentage={(metaData ? formatterBudget.format(metaData.metPorAvaTec) : 0)} 
                                 wh={150}
                                 rad={20}
                                 newId={'MetaBeneficiario'}

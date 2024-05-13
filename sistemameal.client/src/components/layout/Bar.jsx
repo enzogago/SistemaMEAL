@@ -95,7 +95,7 @@ const Bar = ({showSidebarAndBar, isOpen, setIsOpen}) => {
     return (
         <div style={{backgroundColor: '#fff', boxShadow: 'inset 10px 0px 10px rgba(0, 0, 0, 0.2)'}}>
             <div 
-                className={`PowerMas_BarContainer flex ai-center ${showSidebarAndBar ? 'jc-space-between' : 'jc-flex-end'} c p1`}
+                className={`PowerMas_BarContainer flex ai-center ${showSidebarAndBar ? 'jc-space-between' : 'jc-flex-end'} Medium-p1 Small-p_5`}
                 style={{
                     backgroundColor: `${showSidebarAndBar? '#FFC65860' : '#ffffff'}`,
                     color: `${showSidebarAndBar? '#372E2C' : '#000000'}`,
@@ -128,7 +128,7 @@ const Bar = ({showSidebarAndBar, isOpen, setIsOpen}) => {
                         &gt;
                     </div>
                     {isOpen && (
-                        <div className={`Medium_2 Phone_6  PowerMas_DropdownMenu ${isOpen ? 'PowerMas_DropdownMenu--open' : ''}`}>
+                        <div className={`PowerMas_DropdownMenu ${isOpen ? 'PowerMas_DropdownMenu--open' : ''}`}>
                             <div className='PowerMas_Profile_Name p_75 flex flex-column jc-center ai-center gap_5'> 
                                 <div className="PowerMas_ProfilePicture2" style={{width: '75px'}}>
                                     <img src={userLogged && (userLogged.usuAva ? `data:image/jpeg;base64,${userLogged.usuAva}` : (userLogged.usuSex == 'M' ? masculino : femenino ))} alt="Descripción de la imagen" />
@@ -145,8 +145,8 @@ const Bar = ({showSidebarAndBar, isOpen, setIsOpen}) => {
                                         </span>
                                         <span className='flex'>Perfil</span>
                                     </Link>
-                                    <Link className='flex ai-center gap_75 p_5 grey-hover' onClick={CambiarContraseña}>
-                                        <span className='flex f'>
+                                    <Link className='flex ai-center gap_75 p_5' onClick={CambiarContraseña}>
+                                        <span className='flex f1'>
                                             <Chain />
                                         </span>
                                         <span className='flex'>Contraseña</span>

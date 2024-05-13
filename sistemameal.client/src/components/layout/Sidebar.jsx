@@ -104,7 +104,7 @@ const Sidebar = () => {
     }, []);
 
     // Establecer el estado inicial de isOpen en función del tamaño de la ventana
-    const [isOpen, setIsOpen] = useState(windowWidth > 768);
+    const [isOpen, setIsOpen] = useState(windowWidth >= 768);
 
     const handleMenuClick = () => {
         setIsOpen(!isOpen);

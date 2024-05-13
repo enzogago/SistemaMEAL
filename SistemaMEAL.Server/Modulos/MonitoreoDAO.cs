@@ -902,8 +902,10 @@ namespace SistemaMEAL.Modulos
             return (mensaje, tipoMensaje);
         }
 
-        public IEnumerable<Monitoreo> BuscarPaisesHome(string? tags)
+        public IEnumerable<Monitoreo> BuscarPaisesHome(ClaimsIdentity? identity, string? tags)
         {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
             List<Monitoreo>? temporal = new List<Monitoreo>();
             try
             {
@@ -912,6 +914,8 @@ namespace SistemaMEAL.Modulos
                 SqlCommand cmd = new SqlCommand("SP_BUSCAR_UBICACION_HOME", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
+                cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
 
                 StringBuilder jsonResult = new StringBuilder();
                 SqlDataReader reader = cmd.ExecuteReader();

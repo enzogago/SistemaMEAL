@@ -13,7 +13,7 @@ import Expand from '../../icons/Expand';
 const smallPageSizes = [10, 20, 30, 50];
 const largePageSizes = [100, 200, 300, 500];
 
-const Table = ({setModalIsOpen}) => {
+const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
     const navigate = useNavigate();
 
     const [ metas, setMetas ] = useState([])
@@ -136,24 +136,14 @@ const Table = ({setModalIsOpen}) => {
     const currentRecords = Object.entries(groupedMetas);
 
     const Register_Beneficiarie = (meta) => {
+        
+
         const id = `${meta.metAno}${meta.metCod}`;
         // Encripta el ID
         const ciphertext = CryptoJS.AES.encrypt(id, 'secret key 123').toString();
         // Codifica la cadena cifrada para que pueda ser incluida de manera segura en una URL
         const safeCiphertext = btoa(ciphertext).replace('+', '-').replace('/', '_').replace(/=+$/, '');
-
-        Notiflix.Confirm.show(
-            'Registrar Beneficiario',
-            '¿Como deseas registrar a los benefiriacios?',
-            'Masivo',
-            'Individual',
-            () => {
-                navigate(`/upload-beneficiarie/${safeCiphertext}`);
-            },
-            () => {
-                navigate(`/form-goal-beneficiarie/${safeCiphertext}`);
-            }
-        )
+        setModalConfirmIsOpen(safeCiphertext)
     }
 
     const Register_Execution = (meta) => {
@@ -442,7 +432,7 @@ const Table = ({setModalIsOpen}) => {
                                                     <td>
                                                         <div className="flex flex-column">
                                                             <div className="center bold" style={{color: meta.estCol}}>
-                                                                {meta.metPorAvaTec}%
+                                                                {formatterBudget.format(meta.metPorAvaTec)}%
                                                             </div>
                                                             <div 
                                                                 className="progress-bar"

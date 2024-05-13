@@ -217,7 +217,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var reult = _monitoreos.BuscarPaisesHome(tags);
+            var reult = _monitoreos.BuscarPaisesHome(identity, tags);
             return Ok(reult);
         }
 

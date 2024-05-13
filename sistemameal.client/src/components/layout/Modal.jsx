@@ -66,7 +66,7 @@ const Modal = ({ isOpen, closeModal, user }) => {
 
     return (
         <div className={`PowerMas_Modal ${isOpen ? 'show' : ''}`}>
-            <div className="bg-white Small-p1_5 Phone_10 Medium_3" style={{borderRadius: '5px'}}>
+            <div className="bg-white Small-p1_5 Phone_10 Medium_6" style={{borderRadius: '5px'}}>
                 <span 
                     className="PowerMas_CloseModal" 
                     onClick={closeModalAndReset}

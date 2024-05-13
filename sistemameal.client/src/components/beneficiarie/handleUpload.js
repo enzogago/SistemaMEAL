@@ -4,19 +4,19 @@ import Notiflix from 'notiflix';
 export const expectedHeaders = [
     { display: 'AUTORIZACION_DATOS', dbKey: 'benAutNom', validation: 'descripcion' },
     { display: 'DOCUMENTO DE IDENTIFICACION', dbKey: 'docIdeNom', validation: 'descripcion' },
-    { display: 'NUMERO_DOCUMENTO', dbKey: 'benCodUni', validation: 'descripcion' },
-    { display: 'NOMBRE', dbKey: 'benNom', validation: 'descripcion' },
-    { display: 'APELLIDOS', dbKey: 'benApe', validation: 'descripcion' },
-    { display: 'FECHA_NACIMIENTO', dbKey: 'benFecNac', validation: 'descripcion' },
+    { display: 'NUMERO_DOCUMENTO', dbKey: 'benCodUni', validation: 'numeroDocumento' },
+    { display: 'NOMBRE', dbKey: 'benNom', validation: 'nombre' },
+    { display: 'APELLIDOS', dbKey: 'benApe', validation: 'nombre' },
+    { display: 'FECHA_NACIMIENTO', dbKey: 'benFecNac', validation: 'fechaNacimiento' },
     { display: 'SEXO', dbKey: 'benSexNom', validation: 'descripcion' },
     { display: 'GENERO', dbKey: 'genNom', validation: 'descripcion' },
     { display: 'NACIONALIDAD', dbKey: 'nacNom', validation: 'descripcion' },
-    { display: 'CORREO', dbKey: 'benCorEle', validation: 'descripcion' },
-    { display: 'TELEFONO', dbKey: 'benTel', validation: 'descripcion' },
-    { display: 'TELEFONO DE CONTACTO', dbKey: 'benTelCon', validation: 'descripcion' },
-    { display: 'DIRECCION', dbKey: 'benDir', validation: 'descripcion' },
-    { display: 'NOMBRE_APODERADO', dbKey: 'benNomApo', validation: 'descripcion' },
-    { display: 'APELLIDO_APODERADO', dbKey: 'benApeApo', validation: 'descripcion' },
+    { display: 'CORREO', dbKey: 'benCorEle', validation: 'email' },
+    { display: 'TELEFONO', dbKey: 'benTel', validation: 'telefono' },
+    { display: 'TELEFONO DE CONTACTO', dbKey: 'benTelCon', validation: 'telefono' },
+    { display: 'DIRECCION', dbKey: 'benDir', validation: 'direccion' },
+    { display: 'NOMBRE_APODERADO', dbKey: 'benNomApo', validation: 'nombreApoderado' },
+    { display: 'APELLIDO_APODERADO', dbKey: 'benApeApo', validation: 'nombreApoderado' },
 ];
 
 const validateCell = (value, validationRules) => {
@@ -42,66 +42,55 @@ const validateCell = (value, validationRules) => {
 
 
 const validationRules = {
-    'nombreResultado': {
-        required: false,
-        maxLength: 300,
-        minLength: 5,
-        pattern: /^[0-9A-Za-zñÑáéíóúÁÉÍÓÚ()%/.,;üÜ\s-_]+$/,
-        patternMessage: 'Por favor, introduce solo letras y espacios',
-    },
     'nombre': {
         required: true,
-        maxLength: 300,
-        minLength: 5,
-        pattern: /^[0-9A-Za-zñÑáéíóúÁÉÍÓÚ():%/.,;üÜ\s-_]+$/,
-        patternMessage: 'Por favor, introduce solo letras y espacios',
+        maxLength: 100,
+        minLength: 3,
+        pattern: /^[A-Za-zñÑáéíóúÁÉÍÓÚüÜ\s-_]+$/,
+        patternMessage: 'Por favor, introduce solo letras y espacios.',
     },
     'descripcion': {
         required: false,
-        maxLength: 300,
+        maxLength: 100,
         minLength: 0,
         pattern: /^[0-9A-Za-zñÑáéíóúÁÉÍÓÚ()%/.,;üÜ\s-_]+$/,
-        patternMessage: 'Por favor, introduce solo letras y espacios',
+        patternMessage: 'Por favor, introduce solo letras y espacios.',
     },
-    'color': {
+    'numeroDocumento': {
         required: true,
-        minLength: 7,
-        maxLength: 7,
-        pattern: /^#([0-9A-Fa-f]{6})$/,
-        patternMessage: 'Por favor, introduce un color en formato hexadecimal',
+        minLength: 6,
+        maxLength: 10,
+        pattern: /^[0-9]*$/,
+        patternMessage: 'Solo se permite números',
     },
-    'indicador': {
+    'fechaNacimiento': {
         required: true,
-        pattern: /^(IAC|IRE|IOB|ISA)$/, // Acepta solo estos tipos
-        patternMessage: 'Por favor, introduce solo IAC,IRE,IOB O ISA',
+        pattern: /^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[012])-\d{4}$/,
+        patternMessage: 'Ingrese la fecha en formato DD-MM-YYYY.',
     },
-    'numero': {
-        required: true,
-        minLength: 2,
-        maxLength: 300,
-        pattern: /^[A-Za-z0-9ñÑ\s\.]+$/,
-        patternMessage: 'Por favor, introduce solo letras, números, puntos y espacios',
-    },
-    'numeroResultado': {
+    'email': {
         required: false,
-        minLength: 2,
-        maxLength: 300,
-        pattern: /^[A-Za-z0-9ñÑ\s\.]+$/,
-        patternMessage: 'Por favor, introduce solo letras, números, puntos y espacios',
+        pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+        patternMessage: 'Ingrese un email válido.',
     },
-    'año': {
-        required: true,
-        pattern: /^\d{4}$/,
-        patternMessage: 'Por favor, introduce un año válido con 4 dígitos',
+    'telefono': {
+        required: false,
+        pattern: /^[0-9]*$/,
+        patternMessage: 'Solo se permite números',
     },
-    'mes': {
-        required: true,
-        pattern: /^(0[1-9]|1[0-2])$/,
-        patternMessage: 'Por favor, introduce un mes válido del 01 al 12',
+    'direccion': {
+        required: false,
+        minLength: 3,
+        maxLength: 100,
+    },
+    'nombreApoderado': {
+        required: false,
+        maxLength: 100,
+        minLength: 3,
+        pattern: /^[A-Za-zñÑáéíóúÁÉÍÓÚüÜ\s-_]+$/,
+        patternMessage: 'Por favor, introduce solo letras y espacios.',
     },
 };
-
-
 
 // Función para comparar dos arreglos
 function arraysEqual(a, b) {

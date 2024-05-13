@@ -39,7 +39,7 @@ const ResultChain = () => {
             const currentIndex = inputs.indexOf(target);
     
             // Calcula el número de columnas en la tabla
-            const numColumns = headers.length - 3; // Añade 4 por las columnas de totales
+            const numColumns = headers.length - 2; // Añade 4 por las columnas de totales
     
             // Calcula el índice de la fila y de la columna del input actual
             const currentRow = Math.floor(currentIndex / numColumns);
