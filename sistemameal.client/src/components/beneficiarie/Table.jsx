@@ -1,10 +1,8 @@
 import { useContext, useMemo, useRef, useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import { Tooltip } from 'react-tooltip';
 import {
     useReactTable, 
     getCoreRowModel, 
-    flexRender, 
     getPaginationRowModel,
     getSortedRowModel, 
 } from '@tanstack/react-table';
@@ -14,10 +12,11 @@ import CryptoJS from 'crypto-js';
 // Context
 import { AuthContext } from '../../context/AuthContext';
 // Funciones reusables
-import { Export_Excel_Helper, Export_PDF_Helper, handleDelete } from '../reusable/helper';
+import { Export_Excel_Helper, Export_PDF_Helper } from '../reusable/helper';
 import CustomTable from '../reusable/Table/CustomTable';
 import masculino from '../../img/PowerMas_Avatar_Masculino.svg';
 import femenino from '../../img/PowerMas_Avatar_Femenino.svg';
+import Edit from '../../icons/Edit';
 
 const Table = ({ data }) => {
     const navigate = useNavigate();
@@ -43,8 +42,6 @@ const Table = ({ data }) => {
 
     /* TANSTACK */
     const actions = {
-        add: userPermissions.some(permission => permission.perNom === "INSERTAR BENEFICIARIO"),
-        delete: userPermissions.some(permission => permission.perNom === "ELIMINAR BENEFICIARIO"),
         edit: userPermissions.some(permission => permission.perNom === "MODIFICAR BENEFICIARIO"),
         pdf: userPermissions.some(permission => permission.perNom === `EXPORTAR PDF BENEFICIARIO`),
         excel: userPermissions.some(permission => permission.perNom === `EXPORTAR EXCEL BENEFICIARIO`),
@@ -132,29 +129,24 @@ const Table = ({ data }) => {
             },
         ]
     
-        if (actions.delete || actions.edit) {
+        if (actions.edit) {
             baseColumns.push({
                 header: () => <div style={{textAlign: 'center', flexGrow: '1'}}>Acciones</div>,
                 accessorKey: "acciones",
                 disableSorting: true,
                 cell: ({row}) => (
                     <div className='PowerMas_IconsTable flex jc-center ai-center'>
-                        {/* {actions.edit && 
-                            <FaEdit 
-                                data-tooltip-id="edit-tooltip" 
-                                data-tooltip-content="Editar" 
-                                className='Large-p_25' 
-                                onClick={() => Editar_Beneficiario(row)}  
-                            />
+                        {
+                            actions.edit &&
+                            <span className='flex f1'>
+                                <Edit 
+                                    data-tooltip-id="edit-tooltip" 
+                                    data-tooltip-content="Editar" 
+                                    className='Large-p_25' 
+                                    onClick={() => Editar_Beneficiario(row)}  
+                                />
+                            </span>
                         }
-                        {actions.delete && 
-                            <FaRegTrashAlt 
-                                data-tooltip-id="delete-tooltip" 
-                                data-tooltip-content="Eliminar" 
-                                className='Large-p_25' 
-                                // onClick={() => handleDelete('Beneficiario', row.original.uniCod, setData, setIsLoggedIn)} 
-                            />
-                        } */}
                     </div>
                 ),
             });
@@ -174,11 +166,17 @@ const Table = ({ data }) => {
                 item.benCorEle.includes(tag.toUpperCase()) ||
                 item.benTel.includes(tag.toUpperCase()) ||
                 item.benTelCon.includes(tag.toUpperCase()) ||
+                item.benCodUni.includes(tag.toUpperCase()) ||
                 (item.benSex === 'M' && 'MASCULINO'.includes(tag.toUpperCase())) ||
                 (item.benSex === 'F' && 'FEMENINO'.includes(tag.toUpperCase()))
             )
         ), [data, searchTags]
     );
+
+    const [pagination, setPagination] = useState({
+        pageIndex: 0, //initial page index
+        pageSize: 100, //default page size
+    });
 
     const table = useReactTable({
         data: filteredData,
@@ -186,8 +184,10 @@ const Table = ({ data }) => {
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
+        onPaginationChange: setPagination,
         state: {
-            sorting
+            sorting,
+            pagination,
         },
         onSortingChange: setSorting,
         columnResizeMode: "onChange"
@@ -257,6 +257,7 @@ const Table = ({ data }) => {
             removeTag={removeTag}
             searchTags={searchTags}
             setSearchTags={setSearchTags}
+            isLargePagination={true}
         />
     );
 }

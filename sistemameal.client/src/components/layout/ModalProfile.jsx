@@ -8,6 +8,8 @@ import imageCompression from 'browser-image-compression';
 import Edit from '../../icons/Edit';
 import masculino from '../../img/PowerMas_Avatar_Masculino.svg';
 import femenino from '../../img/PowerMas_Avatar_Femenino.svg';
+import 'intl-tel-input/build/css/intlTelInput.css';
+import 'intl-tel-input/build/js/utils.js';
 
 const ModalProfile = ({openModal, closeModal}) => {
     const { authInfo, authActions } = useContext(AuthContext);

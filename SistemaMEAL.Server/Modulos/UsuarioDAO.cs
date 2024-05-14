@@ -828,7 +828,6 @@ namespace SistemaMEAL.Server.Modulos
                 object[] values = new object[reader.FieldCount];
                 while (reader.Read())
                 {
-                    Console.WriteLine("ok");
                     reader.GetValues(values);
                     UsuarioAcceso usuarioAcceso = new UsuarioAcceso
                     {

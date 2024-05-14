@@ -204,7 +204,6 @@ namespace SistemaMEAL.Server.Controllers
         [Route("forgot-restablecer")]
         public dynamic RestablecerPasswordOlvidada(Usuario usuario)
         {
-            Console.WriteLine(usuario.UsuPas);
             using (SHA256 sha256Hash = SHA256.Create())
             {
                 byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(usuario.UsuPas));
@@ -215,7 +214,6 @@ namespace SistemaMEAL.Server.Controllers
                 }
                 usuario.UsuPas = builder.ToString();
             }
-            Console.WriteLine(usuario.UsuPas);
             var (message, messageType) = _usuarios.RestablecerPasswordOlvidada(usuario);
             if (messageType == "1") // Error
             {

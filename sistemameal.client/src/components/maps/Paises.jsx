@@ -15,6 +15,7 @@ const Paises = ({mapData, beneficiariosData}) => {
 
     const poblacionPorPais = combinedData.reduce((obj, item) => {
         obj[item.ubiNom] = item;  // Aquí puedes seleccionar las características que quieres mostrar
+        console.log(obj)
         return obj;
     }, {});
 

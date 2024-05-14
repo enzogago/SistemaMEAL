@@ -2,17 +2,38 @@ import { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import d3Tip from 'd3-tip';
 import ecuadorData from './geojson/ecuador.json'; // Asegúrate de que la ruta al archivo es correcta
+import { formatter } from '../monitoring/goal/helper';
 
-const Ecuador = () => {
-    const poblacionPorDepartamento = {
-        'Azuay' : 50000
-    };
+const Ecuador = ({mapData, beneficiariosData}) => {
+    // Combina los datos de ubicación y beneficiarios
+    const combinedData = mapData.map(ubicacion => {
+        const beneficiario = beneficiariosData.find(b => b.ubiNom === ubicacion.ubiNom);
+        return {
+            ...ubicacion,
+            cantidad: beneficiario ? beneficiario.cantidad : 0
+        };
+    });
+
+    // Crea un objeto con los datos de población por provincia
+    const poblacionPorProvincia = combinedData.reduce((obj, item) => {
+        obj[item.ubiNom] = item;
+        return obj;
+    }, {});
 
     const color = d3.scaleOrdinal()
-        .domain(Object.keys(poblacionPorDepartamento))
+        .domain(Object.keys(poblacionPorProvincia))
         .range(["#f0554d", "#ff7a54", "#ffad75"]);
 
     const ref = useRef();
+
+    function formatNumber(num) {
+        num = parseFloat(num);
+        if (isNaN(num)) return "0.00";
+    
+        let [whole, decimal] = num.toFixed(2).split(".");
+        whole = whole.padStart(2, '0');
+        return `${whole}.${decimal}`;
+    }
 
     useEffect(() => {
         d3.select('#Ecuador').html("");
@@ -48,9 +69,25 @@ const Ecuador = () => {
             .attr('class', 'd3-tip')
             .offset([-10, 0])
             .html(function(d) {
-                console.log(d)
-                const poblacion = poblacionPorDepartamento[d.province] || 'No disponible';
-                return `<strong> ${d.province}</strong><br />Población: ${poblacion}`;
+                const data = poblacionPorProvincia[d.province.toUpperCase()] || {};
+                const { cantidad, metMetTec, metEjeTec, metMetPre, metEjePre, metPorAvaTec, metPorAvaPre } = data;
+                return `
+                <div style="z-index: 100;">
+                    <p class="center Large-f1_25 bold">${d.province.toUpperCase()}</p>
+                    <p>Beneficiarios: ${formatter.format(Number(cantidad))} </p>
+                    <p>Atenciones: ${formatter.format(metEjeTec)}</p>
+                    <hr style="border:1px solid #fff;margin: 0.5rem 0" />
+                    <p class="" style="text-decoration: underline;">Técnico</p>
+                    <p>Meta: ${formatter.format(metMetTec)} </p>
+                    <p>Ejecución: ${formatter.format(metEjeTec)} </p>
+                    <p>Avance: ${formatNumber(metEjeTec/metMetTec*100)}% </p>
+                    <hr style="border:1px solid #fff;margin: 0.5rem 0" />
+                    <p style="text-decoration: underline;">Presupuesto</p>
+                    <p>Meta: $${formatter.format(metMetPre)} </p>
+                    <p>Ejecución: $${formatter.format(metEjePre)} </p>
+                    <p>Avance: ${formatNumber(metEjePre/metMetPre*100)}% </p>
+                </div>
+                `;
             });
 
         svg.call(tip);
@@ -60,12 +97,12 @@ const Ecuador = () => {
             .enter()
             .append('path')
             .attr('d', path)
-            .attr('fill', d => poblacionPorDepartamento[d.properties.province] ? color(poblacionPorDepartamento[d.properties.province]) : '#fde7bd')
+            .attr('fill', d => poblacionPorProvincia[d.properties.province.toUpperCase()] ? color(poblacionPorProvincia[d.properties.province.toUpperCase()]) : '#fde7bd')
             .attr('stroke', 'black')  // Esto establece el color del borde
             .attr('stroke-width', 1)  // Esto establece el grosor del borde
             .on('mouseover', function(event, d) {
                 d3.select(this).style('cursor', 'pointer');
-                if (poblacionPorDepartamento[d.properties.province]) {
+                if (poblacionPorProvincia[d.properties.province.toUpperCase()]) {
                     d3.select(this)
                         .transition()  // Inicia una transición
                         .duration(200)  // Duración de la transición en milisegundos
@@ -75,11 +112,11 @@ const Ecuador = () => {
                 } 
             })
             .on('mouseout', function(d) {
-                if (poblacionPorDepartamento[d.srcElement.__data__.properties.province]) {
+                if (poblacionPorProvincia[d.srcElement.__data__.properties.province.toUpperCase()]) {
                     d3.select(this)
                     .transition()  // Inicia una transición
                     .duration(200)  // Duración de la transición en milisegundos
-                    .attr('fill', d => color(poblacionPorDepartamento[d.properties.province] || 0));  // Color final de la transición
+                    .attr('fill', d => color(poblacionPorProvincia[d.properties.province.toUpperCase()] || 0));  // Color final de la transición
                 }
                 tip.hide();
             })
@@ -91,7 +128,7 @@ const Ecuador = () => {
             .enter()
             .append("text")
             .text(function(d) {
-                return poblacionPorDepartamento[d.properties.province] ? capitalize(d.properties.province) : '';
+                return poblacionPorProvincia[d.properties.province.toUpperCase()] ? capitalize(d.properties.province.toUpperCase()) : '';
             })
             .attr("x", function(d) {
                 return path.centroid(d)[0];
@@ -100,15 +137,15 @@ const Ecuador = () => {
                 return path.centroid(d)[1];
             })
             .attr("text-anchor","middle")
-            .attr('font-size', d => poblacionPorDepartamento[d.properties.province] ? '1rem' : '0.75rem')
-            .attr('font-weight', d => poblacionPorDepartamento[d.properties.province] ? 'bold' : '')
-            .attr('fill', d => poblacionPorDepartamento[d.properties.province] ? '#000' : '#000');
+            .attr('font-size', d => poblacionPorProvincia[d.properties.province.toUpperCase()] ? '1rem' : '0.75rem')
+            .attr('font-weight', d => poblacionPorProvincia[d.properties.province.toUpperCase()] ? 'bold' : '')
+            .attr('fill', d => poblacionPorProvincia[d.properties.province.toUpperCase()] ? '#000' : '#000');
 
             function clicked(event, d) {
                 const [[x0, y0], [x1, y1]] = path.bounds(d);
                 event.stopPropagation();
                 provincias.transition().style('fill', null);
-                if (poblacionPorDepartamento[d.properties.province]) {
+                if (poblacionPorProvincia[d.properties.province.toUpperCase()]) {
                     d3.select(this).transition().style('fill', '#ffc459');
                 }
                 svg.transition().duration(750).call(
@@ -124,7 +161,7 @@ const Ecuador = () => {
             function capitalize(str) {
                 return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
             }
-    }, []);
+    }, [mapData, beneficiariosData]);
 
     return (
         <div className='Small-relative' style={{width: '100%', height: '100%'}}>

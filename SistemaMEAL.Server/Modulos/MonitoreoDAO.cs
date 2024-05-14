@@ -245,48 +245,6 @@ namespace SistemaMEAL.Modulos
             }
              return temporal?? new List<Monitoreo>();
         }
-        
-        public IEnumerable<Monitoreo> ObtenerJerarquia(string? indAno, string? indCod)
-        {
-            List<Monitoreo>? temporal = new List<Monitoreo>();
-            try
-            {
-                cn.getcn.Open();
-
-                SqlCommand cmd = new SqlCommand("SP_OBTENER_JERARQUIA", cn.getcn);
-                cmd.CommandType = CommandType.StoredProcedure;
-
-                cmd.Parameters.AddWithValue("@P_INDANO", indAno);
-                cmd.Parameters.AddWithValue("@P_INDCOD", indCod);
-
-                StringBuilder jsonResult = new StringBuilder();
-                SqlDataReader reader = cmd.ExecuteReader();
-                if (!reader.HasRows)
-                {
-                    jsonResult.Append("[]");
-                }
-                else
-                {
-                    while (reader.Read())
-                    {
-                        jsonResult.Append(reader.GetValue(0).ToString());
-                    }
-                }
-                // Deserializa la cadena JSON en una lista de objetos Estado
-                temporal = JsonConvert.DeserializeObject<List<Monitoreo>>(jsonResult.ToString());
-            }
-            catch (SqlException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-                cn.getcn.Close();
-            }
-            return temporal?? new List<Monitoreo>();
-        }
-        
-
 
 
         public (string? benAnoOut,string? benCodOut,string? message, string? messageType) InsertarBeneficiario(ClaimsIdentity? identity, Beneficiario beneficiario)
@@ -912,6 +870,130 @@ namespace SistemaMEAL.Modulos
                 cn.getcn.Open();
 
                 SqlCommand cmd = new SqlCommand("SP_BUSCAR_UBICACION_HOME", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
+                cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
+
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (!reader.HasRows)
+                {
+                    jsonResult.Append("[]");
+                }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                // Deserializa la cadena JSON en una lista de objetos Usuario
+                temporal = JsonConvert.DeserializeObject<List<Monitoreo>>(jsonResult.ToString());
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return temporal?? new List<Monitoreo>();
+        }
+
+        public IEnumerable<Monitoreo> BuscarEcuadorHome(ClaimsIdentity? identity, string? tags)
+        {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
+            List<Monitoreo>? temporal = new List<Monitoreo>();
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_UBICACION_HOME_PROVINCIA", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
+                cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
+
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (!reader.HasRows)
+                {
+                    jsonResult.Append("[]");
+                }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                // Deserializa la cadena JSON en una lista de objetos Usuario
+                temporal = JsonConvert.DeserializeObject<List<Monitoreo>>(jsonResult.ToString());
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return temporal?? new List<Monitoreo>();
+        }
+        public IEnumerable<Monitoreo> BuscarPeruHome(ClaimsIdentity? identity, string? tags)
+        {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
+            List<Monitoreo>? temporal = new List<Monitoreo>();
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_UBICACION_HOME_DEPAARTAMENTO_PERU", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
+                cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
+
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (!reader.HasRows)
+                {
+                    jsonResult.Append("[]");
+                }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                // Deserializa la cadena JSON en una lista de objetos Usuario
+                temporal = JsonConvert.DeserializeObject<List<Monitoreo>>(jsonResult.ToString());
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return temporal?? new List<Monitoreo>();
+        }
+        public IEnumerable<Monitoreo> BuscarColombiaHome(ClaimsIdentity? identity, string? tags)
+        {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
+            List<Monitoreo>? temporal = new List<Monitoreo>();
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_UBICACION_HOME_DEPAARTAMENTO_COLOMBIA", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
                 cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);

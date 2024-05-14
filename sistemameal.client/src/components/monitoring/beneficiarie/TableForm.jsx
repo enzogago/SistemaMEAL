@@ -255,15 +255,21 @@ const TableForm = ({data, openModal, metaData, setUpdate, initialSelectCount }) 
         return baseColumns;
     }, [actions]);
 
-    
+    const [pagination, setPagination] = useState({
+        pageIndex: 0, //initial page index
+        pageSize: 100, //default page size
+    });
+
     const table = useReactTable({
         data: filteredData,
         columns,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
+        onPaginationChange: setPagination,
         state: {
-            sorting
+            sorting,
+            pagination,
         },
         onSortingChange: setSorting,
         columnResizeMode: "onChange"
@@ -313,6 +319,7 @@ const TableForm = ({data, openModal, metaData, setUpdate, initialSelectCount }) 
                 removeTag={removeTag}
                 searchTags={searchTags}
                 setSearchTags={setSearchTags}
+                isLargePagination={true}
             />
             {
                 currentRecord &&

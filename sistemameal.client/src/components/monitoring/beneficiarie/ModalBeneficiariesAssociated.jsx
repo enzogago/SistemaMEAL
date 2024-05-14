@@ -11,6 +11,7 @@ const ModalBeneficiariesAssociated = ({openModal, closeModal, metaData, update, 
             return;
         } else {
             fetchData(`Beneficiario/meta/${metaData.metAno}/${metaData.metCod}`, (data) => {
+                console.log(data)
                 setData(data)
             })
         }

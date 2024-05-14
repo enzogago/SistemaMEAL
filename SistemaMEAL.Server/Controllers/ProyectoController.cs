@@ -67,19 +67,6 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            // Imprime los proyectos y subproyectos en la consola
-            Console.WriteLine("Proyectos:");
-            foreach (var proyecto in request.Proyectos)
-            {
-                Console.WriteLine($"Año: {proyecto.ProAno}, Código: {proyecto.ProCod}");
-            }
-
-            Console.WriteLine("SubProyectos:");
-            foreach (var subProyecto in request.SubProyectos)
-            {
-                Console.WriteLine($"Año: {subProyecto.SubProAno}, Código: {subProyecto.SubProCod}");
-            }
-
             _proyectos.ModificarExclusiones(usuAno, usuCod, request.Proyectos, request.SubProyectos, "D");
 
             return Ok();

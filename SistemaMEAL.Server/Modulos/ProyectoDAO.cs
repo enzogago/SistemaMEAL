@@ -833,11 +833,6 @@ namespace SistemaMEAL.Modulos
                                             message = pDescripcionMensaje.Value.ToString();
                                             messageType = pTipoMensaje.Value.ToString();
 
-                                            Console.WriteLine(actCod);
-                                            Console.WriteLine(actCod);
-                                            Console.WriteLine(message);
-                                            Console.WriteLine(messageType);
-                                            
                                             int indiceIndicador = 0;
 
                                             foreach (var indicador in resultado.Indicadores)
@@ -894,7 +889,6 @@ namespace SistemaMEAL.Modulos
                                                 {
                                                     for (int ano = anoIni; ano <= anoFin; ano++)
                                                     {
-                                                        Console.WriteLine("Desde Periodo");
                                                         cmd = new SqlCommand("SP_INSERTAR_CADENA_RESULTADO_PERIODO", cn.getcn);
                                                         cmd.CommandType = CommandType.StoredProcedure;
                                                         SqlParameter param = new SqlParameter();

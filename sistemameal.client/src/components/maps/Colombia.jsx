@@ -2,23 +2,39 @@ import { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import d3Tip from 'd3-tip';
 import data from './geojson/colombia.json'; // Asegúrate de que la ruta al archivo es correcta
+import { formatter } from '../monitoring/goal/helper';
 
-const Colombia = () => {
-    const poblacionPorDepartamento = {
-        'ANTIOQUIA': 6600000,
-        'CUNDINAMARCA': 7700000,
-        'VALLE DEL CAUCA': 4600000,
-        'SANTAFE DE BOGOTA D.C': 4600000,
-        'VICHADA': 4600000,
-        'GUAINIA': 1000,
-        // Añade aquí el resto de los departamentos
-    };
+const Colombia = ({mapData, beneficiariosData}) => {
+    // Combina los datos de ubicación y beneficiarios
+    const combinedData = mapData.map(ubicacion => {
+        const beneficiario = beneficiariosData.find(b => b.ubiNom === ubicacion.ubiNom);
+        return {
+            ...ubicacion,
+            cantidad: beneficiario ? beneficiario.cantidad : 0
+        };
+    });
+
+    // Crea un objeto con los datos de población por provincia
+    const poblacionPorDepartamento = combinedData.reduce((obj, item) => {
+        obj[item.ubiNom] = item;
+        return obj;
+    }, {});
+
 
     const color = d3.scaleOrdinal()
         .domain(Object.keys(poblacionPorDepartamento))
         .range(["#f0554d", "#ff7a54", "#ffad75"]);
 
     const ref = useRef();
+
+    function formatNumber(num) {
+        num = parseFloat(num);
+        if (isNaN(num)) return "0.00";
+    
+        let [whole, decimal] = num.toFixed(2).split(".");
+        whole = whole.padStart(2, '0');
+        return `${whole}.${decimal}`;
+    }
 
     useEffect(() => {
         d3.select('#Colombia').html("");
@@ -54,9 +70,25 @@ const Colombia = () => {
             .attr('class', 'd3-tip')
             .offset([-10, 0])
             .html(function(d) {
-                console.log(d)
-                const poblacion = poblacionPorDepartamento[d.NOMBRE_DPT] || 'No disponible';
-                return `<strong> ${d.NOMBRE_DPT}</strong><br />Población: ${poblacion}`;
+                const data = poblacionPorDepartamento[d.NOMBRE_DPT.toUpperCase()] || {};
+                const { cantidad, metMetTec, metEjeTec, metMetPre, metEjePre, metPorAvaTec, metPorAvaPre } = data;
+                return `
+                <div style="z-index: 100;">
+                    <p class="center Large-f1_25 bold">${d.NOMBRE_DPT.toUpperCase()}</p>
+                    <p>Beneficiarios: ${formatter.format(Number(cantidad))} </p>
+                    <p>Atenciones: ${formatter.format(metEjeTec)}</p>
+                    <hr style="border:1px solid #fff;margin: 0.5rem 0" />
+                    <p class="" style="text-decoration: underline;">Técnico</p>
+                    <p>Meta: ${formatter.format(metMetTec)} </p>
+                    <p>Ejecución: ${formatter.format(metEjeTec)} </p>
+                    <p>Avance: ${formatNumber(metEjeTec/metMetTec*100)}% </p>
+                    <hr style="border:1px solid #fff;margin: 0.5rem 0" />
+                    <p style="text-decoration: underline;">Presupuesto</p>
+                    <p>Meta: $${formatter.format(metMetPre)} </p>
+                    <p>Ejecución: $${formatter.format(metEjePre)} </p>
+                    <p>Avance: ${formatNumber(metEjePre/metMetPre*100)}% </p>
+                </div>
+                `;
             });
 
         svg.call(tip);
@@ -130,7 +162,7 @@ const Colombia = () => {
             function capitalize(str) {
                 return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
             }
-    }, []);
+    }, [mapData, beneficiariosData]);
 
     return (
         <div className='Small-relative' style={{width: '100%', height: '100%'}}>

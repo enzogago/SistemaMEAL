@@ -95,7 +95,7 @@ const Bar = ({showSidebarAndBar, isOpen, setIsOpen}) => {
     return (
         <div style={{backgroundColor: '#fff', boxShadow: 'inset 10px 0px 10px rgba(0, 0, 0, 0.2)'}}>
             <div 
-                className={`PowerMas_BarContainer flex ai-center ${showSidebarAndBar ? 'jc-space-between' : 'jc-flex-end'} Medium-p1 Small-p_5`}
+                className={`PowerMas_BarContainer flex ai-center ${showSidebarAndBar ? 'jc-space-between' : 'jc-flex-end'} Large-p_75 Medium-p1 Small-p_5`}
                 style={{
                     backgroundColor: `${showSidebarAndBar? '#FFC65860' : '#ffffff'}`,
                     color: `${showSidebarAndBar? '#372E2C' : '#000000'}`,

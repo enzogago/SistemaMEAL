@@ -657,6 +657,7 @@ namespace SistemaMEAL.Server.Modulos
                         MetBenMesEjeTec = rd["METBENMESEJETEC"].ToString(),
                         UbiAno = rd["UBIANO"].ToString(),
                         UbiCod = rd["UBICOD"].ToString(),
+                        UbiNom = rd["UBINOM"].ToString(),
                     };
                     temporal.Add(beneficiario);
                 }
@@ -754,6 +755,129 @@ namespace SistemaMEAL.Server.Modulos
             }
             return temporal?? new List<Beneficiario>();
         }
+        public IEnumerable<Beneficiario> BuscarBeneficiariosEcuadorHome(ClaimsIdentity? identity, string? tags)
+        {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
+            List<Beneficiario>? temporal = new List<Beneficiario>();
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_BENEFICIARIOS_ECUADOR_HOME", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
+                cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
+
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (!reader.HasRows)
+                {
+                    jsonResult.Append("[]");
+                }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                // Deserializa la cadena JSON en una lista de objetos Usuario
+                temporal = JsonConvert.DeserializeObject<List<Beneficiario>>(jsonResult.ToString());
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return temporal?? new List<Beneficiario>();
+        }
+        public IEnumerable<Beneficiario> BuscarBeneficiariosPerurHome(ClaimsIdentity? identity, string? tags)
+        {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
+            List<Beneficiario>? temporal = new List<Beneficiario>();
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_BENEFICIARIOS_PERU_HOME", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
+                cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
+
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (!reader.HasRows)
+                {
+                    jsonResult.Append("[]");
+                }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                // Deserializa la cadena JSON en una lista de objetos Usuario
+                temporal = JsonConvert.DeserializeObject<List<Beneficiario>>(jsonResult.ToString());
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return temporal?? new List<Beneficiario>();
+        }
+        public IEnumerable<Beneficiario> BuscarBeneficiariosColombiaHome(ClaimsIdentity? identity, string? tags)
+        {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
+            List<Beneficiario>? temporal = new List<Beneficiario>();
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_BENEFICIARIOS_COLOMBIA_HOME", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
+                cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
+
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (!reader.HasRows)
+                {
+                    jsonResult.Append("[]");
+                }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                // Deserializa la cadena JSON en una lista de objetos Usuario
+                temporal = JsonConvert.DeserializeObject<List<Beneficiario>>(jsonResult.ToString());
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return temporal?? new List<Beneficiario>();
+        }
         public IEnumerable<Beneficiario> BuscarSexoHome(ClaimsIdentity? identity, string? tags)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
@@ -795,8 +919,9 @@ namespace SistemaMEAL.Server.Modulos
             }
             return temporal?? new List<Beneficiario>();
         }
-        public IEnumerable<Beneficiario> BuscarRangoHome(string? tags)
+        public IEnumerable<Beneficiario> BuscarRangoHome(ClaimsIdentity? identity, string? tags)
         {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
             List<Beneficiario>? temporal = new List<Beneficiario>();
             try
             {
@@ -805,6 +930,8 @@ namespace SistemaMEAL.Server.Modulos
                 SqlCommand cmd = new SqlCommand("SP_BUSCAR_RANGO_EDAD_HOME", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
+                cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
 
                 StringBuilder jsonResult = new StringBuilder();
                 SqlDataReader reader = cmd.ExecuteReader();

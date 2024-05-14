@@ -13,11 +13,9 @@ const Beneficiarie = () => {
     }, []);
 
     return (
-        <>
-            <Table
-                data={data} 
-            />
-        </>
+        <Table
+            data={data} 
+        />
     )
 }
 

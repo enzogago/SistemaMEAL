@@ -1,5 +1,5 @@
 import React, { useEffect, useState, Fragment, useMemo } from 'react'
-import { Export_Excel_Helper, Export_PDF_Helper, fetchData } from '../../components/reusable/helper'
+import { Export_Excel_Helper, Export_PDF_Helper, fetchDataBlock } from '../../components/reusable/helper'
 import { formatter, formatterBudget } from '../../components/monitoring/goal/helper'
 import CryptoJS from 'crypto-js';
 import { useNavigate } from 'react-router-dom';
@@ -59,10 +59,10 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
     const endIndex = startIndex + pageSize;
 
     useEffect(() => {
-        fetchData(`Monitoreo/Filter/${searchTags.join(',')}`, (data) => {
+        fetchDataBlock(`Monitoreo/Filter/${searchTags.join(',')}`, (data) => {
             setMetas(data)
             setTotalPages(Math.ceil(data.length / pageSize));
-        })
+        }, '.table-monitoring')
         
     }, [searchTags])
 
@@ -230,7 +230,7 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
 
 
     return (
-        <div className='TableMainContainer Large-p1'>
+        <div className='TableMainContainer Large-p1 table-monitoring'>
             <div className='flex gap-1'>
                 <div className="PowerMas_Search_Container flex-grow-1">
                     <div className="PowerMas_Input_Filter_Container flex">
@@ -292,12 +292,12 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                                 <th>Implementador</th>
                                 <th>Ubicacion</th>
                                 <th>Periodo</th>
-                                <th>Meta Programatica</th>
-                                <th>Ejeucion Programatica</th>
-                                <th>% Avance Programatico</th>
-                                <th>Meta Presupuesto</th>
-                                <th>Ejeucion Presupuesto</th>
-                                <th>% Avance Presupuesto</th>
+                                <th style={{color: 'var(--naranja-ayuda)'}}>Meta Programatica</th>
+                                <th style={{color: 'var(--naranja-ayuda)'}}>Ejeucion Programatica</th>
+                                <th style={{color: 'var(--naranja-ayuda)'}}>% Avance Programatico</th>
+                                <th style={{color: 'var(--turquesa)'}}>Meta Presupuesto</th>
+                                <th style={{color: 'var(--turquesa)'}}>% Avance Presupuesto</th>
+                                <th style={{color: 'var(--turquesa)'}}>Ejeucion Presupuesto</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -308,7 +308,7 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                                 const shortText = text.length > 80 ? text.substring(0, 80) + '...' : text;
                                 return (
                                 <Fragment key={key}>
-                                    <tr className='bold' style={{backgroundColor: '#F3F3F3'}}>
+                                    <tr className='' style={{backgroundColor: '#F3F3F3'}}>
                                         <td>
                                             <div 
                                                 className={`pointer bold round p_25 PowerMas_MenuIcon ${expandedRes.includes(key) ? 'PowerMas_MenuIcon--rotated' : ''}`} 
@@ -354,7 +354,7 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
 
                                         return (
                                         <Fragment key={key}>
-                                            <tr className='bold' style={{color: '#372e2ca6'}}>
+                                            <tr className='' style={{color: '#69625F'}}>
                                                 <td></td>
                                                 <td>
                                                     <div 
@@ -385,7 +385,7 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                                             {expandedInd.includes(key) && subMetas.map((meta, index) => {
                                                 const mesPeriodo = meta.metMesPlaTec ? (new Date(2024, meta.metMesPlaTec - 1).toLocaleString('es-ES', { month: 'short' })) : '';
                                                 return (
-                                                <tr key={index} style={{color: '#878280', visibility: expandedInd.includes(key) ? 'visible' : 'collapse'}}>
+                                                <tr key={index} style={{color: '#372e2ca6', visibility: expandedInd.includes(key) ? 'visible' : 'collapse'}}>
                                                     <td></td>
                                                     <td></td>
                                                     <td>
@@ -470,7 +470,7 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                                     )})}
                                 </Fragment>
                             )})}
-                                <tr className='PowerMas_Totales_Monitoreo'>
+                                <tr className='PowerMas_Totales_Monitoreo bold'>
                                     <td colSpan={8} ></td>
                                     <td style={{textAlign: 'right'}}>Totales:</td>
                                     <td>{formatter.format(totals.totalMetTec)}</td>

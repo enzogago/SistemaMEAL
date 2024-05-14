@@ -754,8 +754,6 @@ namespace SistemaMEAL.Modulos
         public IEnumerable<MetaFuente> BuscarArchivosPorMeta(ClaimsIdentity? identity, string? metAno, string? metCod, string? metFueVerNom = null, string? metFueVerPes = null)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
-            Console.WriteLine(metAno);
-            Console.WriteLine(metCod);
             
             List<MetaFuente>? temporal = new List<MetaFuente>();
             try

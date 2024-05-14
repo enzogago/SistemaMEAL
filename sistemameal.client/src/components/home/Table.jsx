@@ -54,7 +54,6 @@ const getResultStatus = (indicadores) => {
     } else if (indicadores.some(indicador => {
         const status = getIndicatorStatus(indicador.metas);
         if (status.statusCode === '02') {
-            console.log(status)
             statusName = status.statusName;
             statusColor = status.statusColor;
             return true;
@@ -176,7 +175,6 @@ const Table = ({data}) => {
             grouped[resKey].estNom = statusName;
             grouped[resKey].estCol = statusColor;
     
-            console.log(grouped)
             return grouped
         }, {})
     }, [data]);
@@ -192,13 +190,14 @@ const Table = ({data}) => {
                     <table className='PowerMas_Table_Monitoring'>
                         <thead>
                             <tr>
-                                <th colSpan={8}></th>
-                                <th>Meta Programatica</th>
-                                <th>Ejeucion Programatica</th>
-                                <th>% Avance Programatico</th>
-                                <th>Meta Presupuesto</th>
-                                <th>Ejeucion Presupuesto</th>
-                                <th>% Avance Presupuesto</th>
+                                <th> Estado </th>
+                                <th colSpan={7}> Actividades e Indicadores </th>
+                                <th style={{color: 'var(--naranja-ayuda)'}}>Meta Programática</th>
+                                <th style={{color: 'var(--naranja-ayuda)'}}>Ejecución Programática</th>
+                                <th style={{color: 'var(--naranja-ayuda)'}}>% Avance Programático</th>
+                                <th style={{color: 'var(--turquesa)'}}>Meta Presupuesto</th>
+                                <th style={{color: 'var(--turquesa)'}}>Ejecución Presupuesto</th>
+                                <th style={{color: 'var(--turquesa)'}}>% Avance Presupuesto</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -207,10 +206,9 @@ const Table = ({data}) => {
                                 const totalPorAvaPre = totalMetPre ? (totalEjePre / totalMetPre) * 100 : 0
                                 const text = resNum + ' - ' + resNom;
                                 const shortText = text.length > 50 ? text.substring(0, 50) + '...' : text;
-                                console.log(indicadores)
                                 return (
                                 <Fragment key={key}>
-                                    <tr className='bold' style={{backgroundColor: '#F3F3F3'}}>
+                                    <tr className='' style={{backgroundColor: '#F3F3F3'}}>
                                         <td>
                                             <div 
                                                 className={`pointer bold round p_25 PowerMas_MenuIcon ${expandedRes.includes(key) ? 'PowerMas_MenuIcon--rotated' : ''}`} 
@@ -261,7 +259,7 @@ const Table = ({data}) => {
                                         const shortText = text.length > 50 ? text.substring(0, 50) + '...' : text;
 
                                         return (
-                                            <tr className='bold' key={key} style={{color: '#372e2ca6'}}>
+                                            <tr className='' key={key} style={{color: '#69625F'}}>
                                                 <td></td>
                                                 <td style={{color: estCol}}>{estNom}</td>
                                                 <td className='' colSpan={7}>
@@ -295,7 +293,7 @@ const Table = ({data}) => {
                                     )})}
                                 </Fragment>
                             )})}
-                                <tr className='PowerMas_Totales_Monitoreo'>
+                                <tr className='PowerMas_Totales_Monitoreo bold'>
                                     <td colSpan={8} ></td>
                                     <td style={{textAlign: 'right'}}>Totales:</td>
                                     <td>{formatter.format(totals.totalMetTec)}</td>

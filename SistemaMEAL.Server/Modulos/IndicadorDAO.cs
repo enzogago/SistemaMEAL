@@ -1225,9 +1225,6 @@ namespace SistemaMEAL.Modulos
                                 {
                                     Console.WriteLine(message);
                                     throw new Exception(message);
-                                } else {
-                                    Console.WriteLine("Insertado");
-
                                 }
                             }
                         }
@@ -1270,10 +1267,7 @@ namespace SistemaMEAL.Modulos
                                 {
                                     Console.WriteLine(message);
                                     throw new Exception(message);
-                                } else {
-                                    Console.WriteLine("Insertado");
-
-                                }
+                                } 
                             }
                         }
 
@@ -1437,9 +1431,6 @@ namespace SistemaMEAL.Modulos
                                 {
                                     Console.WriteLine(message);
                                     throw new Exception(message);
-                                } else {
-                                    Console.WriteLine("Insertado");
-
                                 }
                             }
                         }
@@ -1482,9 +1473,6 @@ namespace SistemaMEAL.Modulos
                                 {
                                     Console.WriteLine(message);
                                     throw new Exception(message);
-                                } else {
-                                    Console.WriteLine("Insertado");
-
                                 }
                             }
                         }

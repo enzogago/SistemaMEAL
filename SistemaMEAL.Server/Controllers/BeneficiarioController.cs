@@ -226,7 +226,7 @@ namespace SistemaMEAL.Server.Controllers
         }
         
         [HttpGet]
-        [Route("home/{tags?}")]
+        [Route("todos-home/{tags?}")]
         public dynamic BuscarBeneficiariosHome(string? tags = null)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
@@ -235,6 +235,42 @@ namespace SistemaMEAL.Server.Controllers
             if (!rToken.success) return Unauthorized(rToken);
 
             var reult = _beneficiarios.BuscarBeneficiariosHome(identity, tags);
+            return Ok(reult);
+        }
+        [HttpGet]
+        [Route("ecuador-home/{tags?}")]
+        public dynamic BuscarBeneficiariosEcuadorHome(string? tags = null)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var reult = _beneficiarios.BuscarBeneficiariosEcuadorHome(identity, tags);
+            return Ok(reult);
+        }
+        [HttpGet]
+        [Route("peru-home/{tags?}")]
+        public dynamic BuscarBeneficiariosPerurHome(string? tags = null)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var reult = _beneficiarios.BuscarBeneficiariosPerurHome(identity, tags);
+            return Ok(reult);
+        }
+        [HttpGet]
+        [Route("colombia-home/{tags?}")]
+        public dynamic BuscarBeneficiariosColombiaHome(string? tags = null)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var reult = _beneficiarios.BuscarBeneficiariosColombiaHome(identity, tags);
             return Ok(reult);
         }
 
@@ -259,7 +295,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var reult = _beneficiarios.BuscarRangoHome(tags);
+            var reult = _beneficiarios.BuscarRangoHome(identity, tags);
             return Ok(reult);
         }
 

@@ -11,6 +11,8 @@ import MenuItem from './MenuItem';
 // Context
 import { AuthContext } from '../../context/AuthContext';
 import { StatusContext } from '../../context/StatusContext';
+import FaMosque from '../../icons/FaMosque';
+import HamburgerIcon from '../../icons/HamburgerIcon';
 const Sidebar = () => {
     // Estados del AuthContext
     const { authActions, authInfo } = useContext(AuthContext);
@@ -121,8 +123,8 @@ const Sidebar = () => {
         <div className={`PowerMas_Menu Large_2 Medium_3 flex flex-column`}>
             <div className="PowerMas_SidebarHeader Large-p1 Medium-p_75 Small-p1 center Medium-block Small-flex flex Small-jc-space-between jc-space-between">
                 <img className='Large_8 Medium_10 Phone_6' height="auto"  title="Sistema MEAL Ayuda en Acción" src={logo} alt="Logo Ayuda En Accion" />
-                <span className='flex ai-center jc-center Medium-none' onClick={handleMenuClick} style={{color: '#fff'}}>
-                    <FaHome size={1.5}  />
+                <span className='flex f2_5 ai-center jc-center Medium-none' onClick={handleMenuClick} style={{color: '#fff'}}>
+                    <HamburgerIcon />
                 </span>
             </div>
             <div className={`PowerMas_SidebarResponsive flex flex-column flex-grow-1 overflow-auto ${isOpen ? 'open' : 'closed'}`}>

@@ -43,7 +43,6 @@ const Permission = lazy(() => import('./components/permission/Permission'));
 const TypeValue = lazy(() => import('./components/type-value/TypeValue'));
 const Projects = lazy(() => import('./components/project/Projects'));
 const Dashboard = lazy(() => import('./components/dashboard/Dashboard'));
-const FormGoal = lazy(() => import('./components/monitoring/goal/FormGoal'));
 const Gender = lazy(() => import('./components/gender/Gender'));
 const Nationality = lazy(() => import('./components/Nationality.jsx/Nationality'));
 const Unit = lazy(() => import('./components/Unit/Unit'));
@@ -212,7 +211,6 @@ const App = () => {
                                                     <>
                                                         <Route path="form-goal-execution/:id" element={<FormGoalExecution />} />
                                                         <Route path="form-goal-beneficiarie/:id" element={<FormGoalBeneficiarie />} />
-                                                        <Route path="form-goal/:id?" element={<FormGoal />} />
                                                         <Route path="upload-beneficiarie/:id" element={<UploadBeneficiarie />} />
                                                         <Route path="validate-beneficiarie" element={<UploadValidate />} />
                                                     </>
