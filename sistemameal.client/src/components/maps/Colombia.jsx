@@ -68,7 +68,7 @@ const Colombia = ({mapData, beneficiariosData}) => {
 
         const tip = d3Tip()
             .attr('class', 'd3-tip')
-            .offset([-10, 0])
+            .offset([0, 0])
             .html(function(d) {
                 const data = poblacionPorDepartamento[d.NOMBRE_DPT.toUpperCase()] || {};
                 const { cantidad, metMetTec, metEjeTec, metMetPre, metEjePre, metPorAvaTec, metPorAvaPre } = data;

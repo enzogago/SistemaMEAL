@@ -567,6 +567,38 @@ export const Export_PDF_Helper = async (data, headers, title, properties, format
 
 
 // Esta es tu nueva función reutilizable
+export const fetchDataReturn = async (controller) => {
+    try {
+        Notiflix.Loading.pulse('Cargando...');
+        // Valores del storage
+        const token = localStorage.getItem('token');
+        // Obtenemos los datos
+        const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/${controller}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        if (!response.ok) {
+            if(response.status === 401 || response.status === 403){
+                const data = await response.json();
+                Notiflix.Notify.failure(data.message);
+            }
+            return;
+        }
+        console.log(response)
+        const data = await response.json();
+        console.log(data)
+        if (data.success === false) {
+            Notiflix.Notify.failure(data.message);
+            return;
+        }
+        return (data);
+    } catch (error) {
+        console.error('Error:', error);
+    } finally {
+        Notiflix.Loading.remove();
+    }
+};
 export const fetchData = async (controller, setData) => {
     try {
         Notiflix.Loading.pulse('Cargando...');

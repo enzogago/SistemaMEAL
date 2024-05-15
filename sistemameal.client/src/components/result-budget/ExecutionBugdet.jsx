@@ -560,7 +560,12 @@ const ExecutionBudget = () => {
                                                     `} 
                                                     style={{margin: '0'}}
                                                     onInput={(e) => {
-                                                        e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                                                        const value = e.target.value;
+                                                        if (value === '' || (/^\d*\.?\d*$/.test(value))) {
+                                                            e.target.value = value;
+                                                        } else {
+                                                            e.target.value = value.slice(0, -1);
+                                                        }
 
                                                         if (row.id !== undefined) {
                                                             const key = `${row.id}_${String(i+1).padStart(2, '0')}`;
@@ -581,7 +586,7 @@ const ExecutionBudget = () => {
                                                     maxLength={10}
                                                     {...register(`mes_${String(i+1).padStart(2, '0')}_${row.id}`, { 
                                                         pattern: {
-                                                            value: /^(?:[1-9]\d*(\.\d+)?|0\.\d*[1-9]\d*)$/,
+                                                            value: /^(?:\d+\.?\d*|\.\d+)$/,
                                                             message: 'Valor no válido',
                                                         },
                                                         maxLength: {

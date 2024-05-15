@@ -1311,6 +1311,7 @@ textarea {
     border-radius: 4px;
     overflow: auto;
     max-height: 90%;
+	position: relative;
 }
 
 .PowerMas_Modal_Content {
@@ -1332,10 +1333,11 @@ textarea {
 
 .PowerMas_CloseModal {
     color: #aaa;
-    float: right;
     font-size: 28px;
     font-weight: bold;
 	transition: color 0.3s ease;
+	position: absolute;
+	right: 30px;
 }
 
 .PowerMas_CloseModal:hover,
@@ -1938,6 +1940,8 @@ textarea {
 	padding: 10px;
 	border-radius: 4px;
 	font-size: 12px;
+	pointer-events: none;
+	position: fixed;
   }
 
 

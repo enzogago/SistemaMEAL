@@ -91,7 +91,7 @@ const getResultStatus = (indicadores) => {
 
 
 const Table = ({data}) => {
-    const [ expandedRes, setExpandedRes ] = useState([])
+    
     const  [totals, setTotals ] = useState({
         totalMetTec: 0,
         totalEjeTec: 0,
@@ -179,6 +179,7 @@ const Table = ({data}) => {
         }, {})
     }, [data]);
     
+    const [ expandedRes, setExpandedRes ] = useState(Object.keys(groupedMetas));
 
     const currentRecords = Object.entries(groupedMetas);
 
@@ -192,12 +193,12 @@ const Table = ({data}) => {
                             <tr>
                                 <th> Estado </th>
                                 <th colSpan={7}> Actividades e Indicadores </th>
-                                <th style={{color: 'var(--naranja-ayuda)'}}>Meta Programática</th>
-                                <th style={{color: 'var(--naranja-ayuda)'}}>Ejecución Programática</th>
-                                <th style={{color: 'var(--naranja-ayuda)'}}>% Avance Programático</th>
-                                <th style={{color: 'var(--turquesa)'}}>Meta Presupuesto</th>
-                                <th style={{color: 'var(--turquesa)'}}>Ejecución Presupuesto</th>
-                                <th style={{color: 'var(--turquesa)'}}>% Avance Presupuesto</th>
+                                <th className='center' style={{color: 'var(--naranja-ayuda)'}}>Meta Programática</th>
+                                <th className='center' style={{color: 'var(--naranja-ayuda)'}}>Ejecución Programática</th>
+                                <th className='center' style={{color: 'var(--naranja-ayuda)'}}>% Avance Programático</th>
+                                <th className='center' style={{color: 'var(--turquesa)'}}>Meta Presupuesto</th>
+                                <th className='center' style={{color: 'var(--turquesa)'}}>Ejecución Presupuesto</th>
+                                <th className='center' style={{color: 'var(--turquesa)'}}>% Avance Presupuesto</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -250,7 +251,22 @@ const Table = ({data}) => {
                                         </td>
                                         <td className='center'>{formatterBudget.format(totalMetPre)}</td>
                                         <td className='center'>{formatterBudget.format(totalEjePre)}</td>
-                                        <td className='center'>{formatterBudget.format(totalPorAvaPre)}%</td>
+                                        <td>
+                                            <div className="flex flex-column">
+                                                <div className="bold center" style={{color: estCol}}>
+                                                    {formatterBudget.format(totalPorAvaPre)}%
+                                                </div>
+                                                <div 
+                                                    className="progress-bar"
+                                                    style={{backgroundColor: '#d3d3d3', border: `0px solid ${estCol}`}}
+                                                >
+                                                    <div 
+                                                        className="progress-bar-fill" 
+                                                        style={{width: `${totalPorAvaPre > 100 ? 100 : totalPorAvaPre}%`, backgroundColor: estCol}}
+                                                    ></div>
+                                                </div>
+                                            </div>
+                                        </td>
                                     </tr>
                                     {expandedRes.includes(key) && Object.entries(indicadores).map(([key, { metas, indNom, indNum, totalMetTec, totalEjeTec, totalMetPre, totalEjePre, estNom, estCol }]) => {
                                         const totalPorAvaTec = totalMetTec ? (totalEjeTec / totalMetTec) * 100 : 0
@@ -288,7 +304,22 @@ const Table = ({data}) => {
                                                 </td>
                                                 <td className='center'>{formatterBudget.format(totalMetPre)}</td>
                                                 <td className='center'>{formatterBudget.format(totalEjePre)}</td>
-                                                <td className='center'>{formatterBudget.format(totalPorAvaPre)}%</td>
+                                                <td>
+                                                    <div className="flex flex-column">
+                                                        <div className="bold center" style={{color: estCol}}>
+                                                            {formatterBudget.format(totalPorAvaPre)}%
+                                                        </div>
+                                                        <div 
+                                                            className="progress-bar"
+                                                            style={{backgroundColor: '#d3d3d3', border: `0px solid ${estCol}`}}
+                                                        >
+                                                            <div 
+                                                                className="progress-bar-fill" 
+                                                                style={{width: `${totalPorAvaPre > 100 ? 100 : totalPorAvaPre}%`, backgroundColor: estCol}}
+                                                            ></div>
+                                                        </div>
+                                                    </div>
+                                                </td>
                                             </tr>
                                     )})}
                                 </Fragment>
@@ -307,7 +338,7 @@ const Table = ({data}) => {
                     </table>
                     :
                     <div className='Phone_12 flex flex-column ai-center jc-center'>
-                        <img src={TableEmpty} alt="TableEmpty" className='Medium_6 Phone_12' />
+                        <img src={TableEmpty} alt="TableEmpty" className='Medium_4 Phone_12' />
                         <p className='PowerMas_Text_Empty'>No se encontraron datos.</p>
                     </div>
                 }

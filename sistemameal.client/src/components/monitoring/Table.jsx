@@ -3,7 +3,6 @@ import { Export_Excel_Helper, Export_PDF_Helper, fetchDataBlock } from '../../co
 import { formatter, formatterBudget } from '../../components/monitoring/goal/helper'
 import CryptoJS from 'crypto-js';
 import { useNavigate } from 'react-router-dom';
-import Notiflix from 'notiflix';
 import TableEmpty from '../../img/PowerMas_TableEmpty.svg';
 import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
 import Pdf_Icon from '../../img/PowerMas_Pdf_Icon.svg';
@@ -12,6 +11,41 @@ import Expand from '../../icons/Expand';
 
 const smallPageSizes = [10, 20, 30, 50];
 const largePageSizes = [100, 200, 300, 500];
+
+const getIndicatorStatus = (metas) => {
+    let statusColor = '';
+    let statusName = '';
+    let statusCode = '';
+    if (metas.some(meta => meta.estCod === '04')) {
+        statusName = metas.find(meta => meta.estCod === '04').estNom;
+        statusColor = metas.find(meta => meta.estCod === '04').estCol;
+        statusCode = '04';
+    }
+    else if (metas.some(meta => meta.estCod === '02')) {
+        statusName = metas.find(meta => meta.estCod === '02').estNom;
+        statusColor = metas.find(meta => meta.estCod === '02').estCol;
+        statusCode = '02';
+    }
+    else if (metas.some(meta => meta.estCod === '01')) {
+        statusName =  metas.find(meta => meta.estCod === '01').estNom;
+        statusColor = metas.find(meta => meta.estCod === '01').estCol;
+        statusCode = '01';
+    }
+    else if (metas.every(meta => meta.estCod === '03')) {
+        statusName = metas.find(meta => meta.estCod === '03').estNom;
+        statusColor = metas.find(meta => meta.estCod === '03').estCol;
+        statusCode = '03';
+    }
+    else {
+        statusName = 'ESTADO DESCONOCIDO';
+        // Puedes asignar un color por defecto para 'ESTADO DESCONOCIDO'
+        statusColor = '#000000'; 
+        statusCode = '0';
+    }
+    return { statusName, statusColor, statusCode };
+};
+
+
 
 const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
     const navigate = useNavigate();
@@ -156,8 +190,6 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
     }
 
 
-    
-
     // Añade una nueva etiqueta al presionar Enter
     const handleKeyDown = (e) => {
         if (e.key === 'Enter' && inputValue && !searchTags.includes(inputValue)) {
@@ -180,9 +212,9 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
     }
 
     const dataExport = metas;
-    const headers = ['ESTADO', 'META_PROGRAMATICA', 'EJECUCION_PROGRAMATICA', 'PORCENTAJE_AVANCE_PROGRAMATICO', 'META_PRESUPUESTO', 'EJECUCION_PRESUPUESTO', 'PORCENTAJE_AVANCE_PRESUPUESTO','AÑO','MES','INDICADOR','TIPO_INDICADOR','RESULTADO','OBJETIVO_ESPECIFICO','OBJETIVO','SUBPROYECTO','PROYECTO','UBICACION', 'IMPLEMENTADOR', 'USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
+    const headers = ['ESTADO','TÉCNICO','IMPLEMENTADOR','UBICACIÓN','AÑO','MES','META_PROGRAMATICA', 'EJECUCION_PROGRAMATICA', 'PORCENTAJE_AVANCE_PROGRAMATICO', 'META_PRESUPUESTO', 'EJECUCION_PRESUPUESTO', 'PORCENTAJE_AVANCE_PRESUPUESTO','INDICADOR','TIPO_INDICADOR','RESULTADO','OBJETIVO_ESPECIFICO','OBJETIVO','SUBPROYECTO','PROYECTO','USUARIO_MODIFICADO','FECHA_MODIFICADO'];  // Tus encabezados
     const title = 'METAS';
-    const properties = ['estNom', 'metMetTec', 'metEjeTec', 'metPorAvaTec', 'metMetPre', 'metEjePre', 'metPorAvaPre', 'metAnoPlaTec', 'metMesPlaTec', 'indNom', 'tipInd', 'resNom', 'objEspNom', 'objNom', 'subProNom', 'proNom','ubiNom', 'impNom', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir en el Excel
+    const properties = ['estNom','usuNom','impNom','ubiNom','metAnoPlaTec','metMesPlaTec','metMetTec', 'metEjeTec', 'metPorAvaTec', 'metMetPre', 'metEjePre', 'metPorAvaPre', 'indNom', 'tipInd', 'resNom', 'objEspNom', 'objNom', 'subProNom', 'proNom', 'usuMod', 'fecMod'];  // Las propiedades de los objetos de datos que quieres incluir en el Excel
     const format = [1200, 600];
 
     const Export_Excel = () => {
@@ -283,21 +315,21 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                     currentRecords.length > 0 ?
                     <table className='PowerMas_Table_Monitoring'>
                         <thead>
-                            <tr>
+                            <tr className='center'>
                                 <th></th>
+                                <th>Estado</th>
                                 <th>FFVV</th>
                                 <th>Añadir</th>
-                                <th>Estado</th>
                                 <th>Técnico</th>
                                 <th>Implementador</th>
-                                <th>Ubicacion</th>
+                                <th>Ubicación</th>
                                 <th>Periodo</th>
-                                <th style={{color: 'var(--naranja-ayuda)'}}>Meta Programatica</th>
-                                <th style={{color: 'var(--naranja-ayuda)'}}>Ejeucion Programatica</th>
-                                <th style={{color: 'var(--naranja-ayuda)'}}>% Avance Programatico</th>
+                                <th style={{color: 'var(--naranja-ayuda)'}}>Meta Programática</th>
+                                <th style={{color: 'var(--naranja-ayuda)'}}>Ejecución Programática</th>
+                                <th style={{color: 'var(--naranja-ayuda)'}}>% Avance Programático</th>
                                 <th style={{color: 'var(--turquesa)'}}>Meta Presupuesto</th>
                                 <th style={{color: 'var(--turquesa)'}}>% Avance Presupuesto</th>
-                                <th style={{color: 'var(--turquesa)'}}>Ejeucion Presupuesto</th>
+                                <th style={{color: 'var(--turquesa)'}}>Ejecución Presupuesto</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -306,6 +338,8 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                                 const totalPorAvaPre = totalMetPre ? (totalEjePre / totalMetPre) * 100 : 0
                                 const text = resNum + ' - ' + resNom;
                                 const shortText = text.length > 80 ? text.substring(0, 80) + '...' : text;
+
+                                const {statusName, statusColor} = getIndicatorStatus(metas);
                                 return (
                                 <Fragment key={key}>
                                     <tr className='' style={{backgroundColor: '#F3F3F3'}}>
@@ -321,7 +355,13 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                                                 }}
                                             > &gt; </div>
                                         </td>
-                                        <td colSpan={8}>
+                                        <td></td>
+                                        <td>
+                                            <div className="bold" style={{ color: statusColor, whiteSpace: 'nowrap' }}>
+                                                {statusName}
+                                            </div>
+                                        </td>
+                                        <td colSpan={6}>
                                             <span 
                                                 data-tooltip-id="info-tooltip" 
                                                 data-tooltip-content={text} 
@@ -329,10 +369,40 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                                         </td>
                                         <td className='center'>{formatter.format(totalMetTec)}</td>
                                         <td className='center'>{formatter.format(totalEjeTec)}</td>
-                                        <td className='center'>{formatterBudget.format(totalPorAvaTec)}%</td>
+                                        <td>
+                                            <div className="flex flex-column">
+                                                <div className="center bold" style={{color: statusColor}}>
+                                                    {formatterBudget.format(totalPorAvaTec)}%
+                                                </div>
+                                                <div 
+                                                    className="progress-bar"
+                                                    style={{backgroundColor: '#d3d3d3', border: `0px solid ${statusColor}`}}
+                                                >
+                                                    <div 
+                                                        className="progress-bar-fill" 
+                                                        style={{width: `${totalPorAvaTec > 100 ? 100 : totalPorAvaTec}%`, backgroundColor: statusColor}}
+                                                    ></div>
+                                                </div>
+                                            </div>
+                                        </td>
                                         <td className='center'>{formatterBudget.format(totalMetPre)}</td>
                                         <td className='center'>{formatterBudget.format(totalEjePre)}</td>
-                                        <td className='center'>{formatterBudget.format(totalPorAvaPre)}%</td>
+                                        <td>
+                                            <div className="flex flex-column">
+                                                <div className="center bold" style={{color: statusColor}}>
+                                                    {formatterBudget.format(totalPorAvaPre)}%
+                                                </div>
+                                                <div 
+                                                    className="progress-bar"
+                                                    style={{backgroundColor: '#d3d3d3', border: `0px solid ${statusColor}`}}
+                                                >
+                                                    <div 
+                                                        className="progress-bar-fill" 
+                                                        style={{width: `${totalPorAvaPre > 100 ? 100 : totalPorAvaPre}%`, backgroundColor: statusColor}}
+                                                    ></div>
+                                                </div>
+                                            </div>
+                                        </td>
                                         <td className='center' colSpan={2}></td>
                                     </tr>
                                     {expandedRes.includes(key) && Object.entries(metas.reduce((grouped, meta) => {
@@ -350,8 +420,9 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                                         const totalPorAvaTec = totalMetTec ? (totalEjeTec / totalMetTec) * 100 : 0
                                         const totalPorAvaPre = totalMetPre ? (totalEjePre / totalMetPre) * 100 : 0
                                         const text = indNum + ' - ' + indNom;
-                                        const shortText = text.length > 75 ? text.substring(0, 75) + '...' : text;
+                                        const shortText = text.length > 80 ? text.substring(0, 80) + '...' : text;
 
+                                        const {statusName, statusColor} = getIndicatorStatus(subMetas);
                                         return (
                                         <Fragment key={key}>
                                             <tr className='' style={{color: '#69625F'}}>
@@ -368,7 +439,12 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                                                         }}
                                                     > &gt; </div>
                                                 </td>
-                                                <td className='' colSpan={7}>
+                                                <td>
+                                                    <div className="bold" style={{ color: statusColor, whiteSpace: 'nowrap' }}>
+                                                        {statusName}
+                                                    </div>
+                                                </td>
+                                                <td className='' colSpan={6}>
                                                     <span 
                                                         data-tooltip-id="info-tooltip" 
                                                         data-tooltip-content={text} 
@@ -376,18 +452,55 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                                                 </td>
                                                 <td className='center'>{formatter.format(totalMetTec)}</td>
                                                 <td className='center'>{formatter.format(totalEjeTec)}</td>
-                                                <td className='center'>{formatterBudget.format(totalPorAvaTec)}%</td>
+                                                <td>
+                                                    <div className="flex flex-column">
+                                                        <div className="center bold" style={{color: statusColor}}>
+                                                            {formatterBudget.format(totalPorAvaTec)}%
+                                                        </div>
+                                                        <div 
+                                                            className="progress-bar"
+                                                            style={{backgroundColor: '#d3d3d3', border: `0px solid ${statusColor}`}}
+                                                        >
+                                                            <div 
+                                                                className="progress-bar-fill" 
+                                                                style={{width: `${totalPorAvaTec > 100 ? 100 : totalPorAvaTec}%`, backgroundColor: statusColor}}
+                                                            ></div>
+                                                        </div>
+                                                    </div>
+                                                </td>
                                                 <td className='center'>{formatterBudget.format(totalMetPre)}</td>
                                                 <td className='center'>{formatterBudget.format(totalEjePre)}</td>
-                                                <td className='center'>{formatterBudget.format(totalPorAvaPre)}%</td>
+                                                <td>
+                                                    <div className="flex flex-column">
+                                                        <div className="center bold" style={{color: statusColor}}>
+                                                            {formatterBudget.format(totalPorAvaPre)}%
+                                                        </div>
+                                                        <div 
+                                                            className="progress-bar"
+                                                            style={{backgroundColor: '#d3d3d3', border: `0px solid ${statusColor}`}}
+                                                        >
+                                                            <div 
+                                                                className="progress-bar-fill" 
+                                                                style={{width: `${totalPorAvaPre > 100 ? 100 : totalPorAvaPre}%`, backgroundColor: statusColor}}
+                                                            ></div>
+                                                        </div>
+                                                    </div>
+                                                </td>
                                                 <td className='center' colSpan={2}></td>
                                             </tr>
                                             {expandedInd.includes(key) && subMetas.map((meta, index) => {
                                                 const mesPeriodo = meta.metMesPlaTec ? (new Date(2024, meta.metMesPlaTec - 1).toLocaleString('es-ES', { month: 'short' })) : '';
+                                                
+                                                
                                                 return (
                                                 <tr key={index} style={{color: '#372e2ca6', visibility: expandedInd.includes(key) ? 'visible' : 'collapse'}}>
                                                     <td></td>
                                                     <td></td>
+                                                            <td>
+                                                                <div className="bold" style={{ color: meta.estCol, whiteSpace: 'nowrap' }}>
+                                                                    {meta.estNom}
+                                                                </div>
+                                                            </td>
                                                     <td>
                                                         <div className="flex jc-center ai-center" >
                                                             <button  
@@ -416,11 +529,6 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                                                                 Ejecución
                                                             </button>
                                                         }
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <div className="bold" style={{ color: meta.estCol, whiteSpace: 'nowrap' }}>
-                                                            {meta.estNom}
                                                         </div>
                                                     </td>
                                                     <td>{meta.usuNom + ' ' + meta.usuApe}</td>

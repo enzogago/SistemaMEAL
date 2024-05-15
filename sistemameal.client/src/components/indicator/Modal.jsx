@@ -282,11 +282,11 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
     
     
     return (
-        <div className={` PowerMas_Modal ${modalVisible ? 'show' : ''}`}>
-            <div className="PowerMas_ModalContent" style={{width: '60%'}}>
+        <div className={`PowerMas_Modal ${modalVisible ? 'show' : ''}`}>
+            <div className="PowerMas_ModalContent flex flex-column" style={{width: '60%'}}>
                 <span className="PowerMas_CloseModal" onClick={closeModalAndReset}>×</span>
                 <h2 className="PowerMas_Title_Modal center f1_5">{estadoEditado ? 'Editar' : 'Nuevo'} {title}</h2>
-                <form className='Large-f1 PowerMas_FormStatus flex flex-column gap_3' onSubmit={validateForm(onSubmit)}>
+                <form className='Large-f1 PowerMas_FormStatus flex flex-column gap_3 flex-grow-1 overflow-auto' onSubmit={validateForm(onSubmit)}>
                     <div className='flex flex-row gap-1'>
                         <div className='Large_6'>
                             <div>

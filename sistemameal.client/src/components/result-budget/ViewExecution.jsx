@@ -64,7 +64,10 @@ const ViewExecution = () => {
         if (subproyecto && subproyecto !== '0'&& ano && ano !== '0') {
             const { subProAno, subProCod } = JSON.parse(subproyecto);
             const fetchDataInOrder = async () => {
-                await fetchData(`Indicador/subproyecto-actividad/${subProAno}/${subProCod}`,setIndicadores)
+                await fetchData(`Indicador/subproyecto-actividad/${subProAno}/${subProCod}`,(data) => {
+                    setIndicadores(data);
+                    setExpandedIndicators(data.map(ind => `${ind.indAno}_${ind.indCod}`));
+                })
                 fetchData(`Meta/${subProAno}/${subProCod}/${ano}`, (data) => {
                     setInitialMetas(data);
                     setTotals({});

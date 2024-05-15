@@ -8,6 +8,7 @@ import User from '../../icons/User';
 import IconLocation from '../../icons/IconLocation';
 import { Tooltip } from 'react-tippy';
 import Expand from '../../icons/Expand';
+import TableEmpty from '../../img/PowerMas_TableEmpty.svg';
 
 const ResultChain = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -90,7 +91,6 @@ const ResultChain = () => {
 
     const fetchDataReturn = async (controller) => {
         try {
-            Notiflix.Loading.pulse('Cargando...');
             // Valores del storage
             const token = localStorage.getItem('token');
             // Obtenemos los datos
@@ -114,8 +114,6 @@ const ResultChain = () => {
             return (data);
         } catch (error) {
             console.error('Error:', error);
-        } finally {
-            Notiflix.Loading.remove();
         }
     };
 
@@ -154,45 +152,59 @@ const ResultChain = () => {
     }
 
     useEffect(() => {
+        // Observa el valor del subproyecto seleccionado
         const subproyecto = watch('subproyecto');
+    
         if (subproyecto && subproyecto !== '0') {
-            // Obtén todos los nombres de los campos registrados
-            const fieldNames = Object.keys(getValues());
-
-            // Filtra los nombres de los campos que no comienzan con 'subproyecto'
-            const fieldsToUnregister = fieldNames.filter(fieldName => !fieldName.startsWith('subproyecto'));
-
-            // Desregistra los campos
-            fieldsToUnregister.forEach(fieldName => {
-                unregister(fieldName);
-            });
-
+            // Desregistra los campos que no son 'subproyecto'
+            Object.keys(getValues())
+                .filter(fieldName => !fieldName.startsWith('subproyecto'))
+                .forEach(unregister);
+    
+            // Reinicia los estados antes de realizar las peticiones
             setHeaders([]);
-            setIsSubmitDisabled(false);
+            setIsSubmitDisabled(true);
+            setIndicadores([]);
+            setRenderData([]);
+            setHeaders([]);
+    
+            // Parsea el valor seleccionado para obtener el año y código del subproyecto
             const { subProAno, subProCod } = JSON.parse(subproyecto);
-            fetchData(`Indicador/subproyecto/${subProAno}/${subProCod}`,(data) => {
-                setIndicadores(data);
-        
-                // Inicializar indTotPreState y totalIndTotPre
+    
+            // Inicia el bloqueo de Notiflix
+            if (document.querySelector('.result-chain-block')) {
+                Notiflix.Block.pulse('.result-chain-block', {
+                    svgSize: '100px',
+                    svgColor: '#F87C56',
+                });
+            }
+    
+            // Realiza todas las peticiones en paralelo
+            Promise.all([
+                fetchDataReturn(`Indicador/cadena/${subProAno}/${subProCod}`),
+                fetchDataReturn(`Indicador/implementador/${subProAno}/${subProCod}`),
+                fetchDataReturn(`Indicador/ubicacion/${subProAno}/${subProCod}`),
+                fetchDataReturn(`Indicador/subproyecto/${subProAno}/${subProCod}`)
+            ]).then(([dataPorAno, dataPorImplementador, dataPorUbicacion, dataSubproyecto]) => {
+                // Procesa los datos recibidos de cada petición
+    
+                // Establece los indicadores con los datos de la última petición
+                setIndicadores(dataSubproyecto);
+    
+                // Inicializa el estado de la línea base y el total
                 const initialIndTotPreState = {};
                 let initialTotalIndTotPre = 0;
-        
-                data.forEach(item => {
+    
+                dataSubproyecto.forEach(item => {
                     const key = `total_${item.indAno}_${item.indCod}`;
                     initialIndTotPreState[key] = item.indLinBas;
                     initialTotalIndTotPre += Number(item.indLinBas);
                 });
-        
+    
                 setIndTotPreState(initialIndTotPreState);
                 setTotalIndTotPre(initialTotalIndTotPre);
-            })
-            
-            Promise.all([
-                fetchDataReturn(`Indicador/cadena/${subProAno}/${subProCod}`),
-                fetchDataReturn(`Indicador/implementador/${subProAno}/${subProCod}`),
-                fetchDataReturn(`Indicador/ubicacion/${subProAno}/${subProCod}`)
-            ]).then(([dataPorAno, dataPorImplementador, dataPorUbicacion]) => {
-
+    
+                // Calcula los totales por año, implementador y ubicación
                 const totalsPorAno = calculateTotalsAll(dataPorAno, 'cadResPerAno', 'cadResPerMetTec', 'porAno');
                 const totalsPorImplementador = calculateTotalsAll(dataPorImplementador, 'impCod', 'cadResImpMetTec', 'porImplementador');
                 const totalsPorUbicacion = calculateTotalsAll(dataPorUbicacion, 'ubiAno', 'cadResUbiMetTec', 'porUbicacion', 'ubiCod');
@@ -201,6 +213,7 @@ const ResultChain = () => {
                 setTotalsPorImplementador(totalsPorImplementador)
                 setTotalsPorUbicacion(totalsPorUbicacion)
 
+                // Genera los encabezados y datos para renderizar en la tabla
                 const headersPorAno = generateHeaders(dataPorAno,'cadResPerAno','cadResPerAno');
                 const headersPorImplementador = generateHeaders(dataPorImplementador,'impNom','impCod');
                 const headersPorUbicacion = generateHeaders(dataPorUbicacion,'ubiNom','ubiAno', 'ubiCod');
@@ -224,13 +237,22 @@ const ResultChain = () => {
                 const combinedRenderData = combineRenderData(renderDataPorAno, renderDataPorImplementador, renderDataPorUbicacion);
 
                 setRenderData(combinedRenderData);
+            }).catch(error => {
+                // Maneja los errores
+                console.error('Error:', error);
+                Notiflix.Notify.failure('Ha ocurrido un error al cargar los datos.');
+            }).finally(() => {
+                // Quita el bloqueo de Notiflix una vez que todas las peticiones han terminado
+                Notiflix.Block.remove('.result-chain-block');
             });
         } else {
+            // Si no hay un subproyecto seleccionado, limpia los estados
             setIndicadores([]);
             setRenderData([]);
             setHeaders([]);
         }
-    }, [watch('subproyecto')]);
+    }, [watch('subproyecto')]); // Dependencias del useEffect
+    
     
     function combineRenderData(renderDataPorAno, renderDataPorImplementador, renderDataPorUbicacion) {
         const combinedRenderData = {};
@@ -474,280 +496,288 @@ const ResultChain = () => {
                     </div>
                 </div>
             </div>
-            <div className="PowerMas_TableContainer flex-column overflow-auto">
-                <table className="PowerMas_TableStatus">
-                    <thead>
-                        <tr>
-                            <th className='center' rowSpan={2}>#</th>
-                            <th className='center' rowSpan={2}>Código</th>
-                            <th className='center PowerMas_Borde_Total' rowSpan={2}>Nombre</th>
-                            <th className='center PowerMas_Borde_Total' style={{color: '#F87C56', whiteSpace: 'normal'}} rowSpan={2}>Linea Base</th>
-                            <th className='center PowerMas_Borde_Total PowerMas_Borde_Total2 PowerMas_Combine_Header' colSpan={numeroColumnasAno}>
-                                <span className='flex ai-center jc-center gap-1'>
-                                    Por Año
-                                    <IconCalendar />
-                                </span>
-                            </th>
-                            <th className='center PowerMas_Borde_Total PowerMas_Borde_Total2 PowerMas_Combine_Header' colSpan={numeroColumnasImplementador}>
-                                <span className='flex ai-center jc-center gap-1'>
-                                    Por Implementador
-                                    <User />
-                                </span>
-                            </th>
-                            <th className='center PowerMas_Borde_Total PowerMas_Borde_Total2 PowerMas_Combine_Header' colSpan={numeroColumnasUbicacion}>
-                                <span className='flex ai-center jc-center gap-1'>
-                                    Por Ubicación
-                                    <IconLocation />
-                                </span>
-                            </th>
-                        </tr>
-                        <tr style={{position: 'sticky', top: '32px', backgroundColor: '#fff'}}>
-                            {/* Encabezados */}
-                            {headers.map((header, index) => (
-                                <th 
-                                    style={{color: `${header.key.startsWith('total')? '#F87C56': '#000'}`}}
-                                    className={`${header.key.startsWith('total') ? 'PowerMas_Borde_Total' : ''} PowerMas_Borde_Total2`}
-                                    key={index}
-                                >
-                                    {header.name}
+            <div className="PowerMas_TableContainer flex-column overflow-auto result-chain-block flex">
+                {
+                    indicadores.length > 0 ?
+                    <table className="PowerMas_TableStatus">
+                        <thead>
+                            <tr>
+                                <th className='center' rowSpan={2}>#</th>
+                                <th className='center' rowSpan={2}>Código</th>
+                                <th className='center PowerMas_Borde_Total' rowSpan={2}>Nombre</th>
+                                <th className='center PowerMas_Borde_Total' style={{color: '#F87C56', whiteSpace: 'normal'}} rowSpan={2}>Linea Base</th>
+                                <th className='center PowerMas_Borde_Total PowerMas_Borde_Total2 PowerMas_Combine_Header' colSpan={numeroColumnasAno}>
+                                    <span className='flex ai-center jc-center gap-1'>
+                                        Por Año
+                                        <IconCalendar />
+                                    </span>
                                 </th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {
-                        indicadores.map((item, index) => {
-                            const rowKey = `${item.indAno}_${item.indCod}`;
-                            const text = item.indNom.charAt(0).toUpperCase() + item.indNom.slice(1).toLowerCase();
-                            const shortText = text.length > 30 ? text.substring(0, 30) + '...' : text;
+                                <th className='center PowerMas_Borde_Total PowerMas_Borde_Total2 PowerMas_Combine_Header' colSpan={numeroColumnasImplementador}>
+                                    <span className='flex ai-center jc-center gap-1'>
+                                        Por Implementador
+                                        <User />
+                                    </span>
+                                </th>
+                                <th className='center PowerMas_Borde_Total PowerMas_Borde_Total2 PowerMas_Combine_Header' colSpan={numeroColumnasUbicacion}>
+                                    <span className='flex ai-center jc-center gap-1'>
+                                        Por Ubicación
+                                        <IconLocation />
+                                    </span>
+                                </th>
+                            </tr>
+                            <tr style={{position: 'sticky', top: '32px', backgroundColor: '#fff'}}>
+                                {/* Encabezados */}
+                                {headers.map((header, index) => (
+                                    <th 
+                                        style={{color: `${header.key.startsWith('total')? '#F87C56': '#000'}`}}
+                                        className={`${header.key.startsWith('total') ? 'PowerMas_Borde_Total' : ''} PowerMas_Borde_Total2`}
+                                        key={index}
+                                    >
+                                        {header.name}
+                                    </th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                            indicadores.map((item, index) => {
+                                const rowKey = `${item.indAno}_${item.indCod}`;
+                                const text = item.indNom.charAt(0).toUpperCase() + item.indNom.slice(1).toLowerCase();
+                                const shortText = text.length > 30 ? text.substring(0, 30) + '...' : text;
 
-                            return (
-                                <tr key={index}>
-                                    <td>{index+1}</td>
-                                    <td>{item.indNum}</td>
-                                    {
-                                        text.length > 30 ?
-                                        <td className='PowerMas_Borde_Total' 
-                                            data-tooltip-id="info-tooltip" 
-                                            data-tooltip-content={text} 
-                                        >{shortText}</td>
-                                        :
-                                        <td className='PowerMas_Borde_Total'>{text}</td>
-                                    }
-                                    <td className='PowerMas_Borde_Total'>
-                                        <Tooltip
-                                            title="Los totales no coinciden."
-                                            open={`total_${item.indAno}_${item.indCod}` === unmatchedTotal.key && unmatchedTotal.section === 'totalPorIndicador'}
-                                            arrow={true}
-                                            position="bottom"
-                                        />
-                                        <input
-                                            className={`
-                                            PowerMas_Input_Cadena Large_12 f_75 
-                                            PowerMas_Cadena_Form_${dirtyFields[`total_${item.indAno}_${item.indCod}`] || isSubmitted ? (errors[`total_${item.indAno}_${item.indCod}`] ? 'invalid' : 'valid') : ''}
-                                            ${false && 'PowerMas_Tooltip_Active'}
-                                            `} 
-                                            type="text"
-                                            onInput={(e) => {
-                                                e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                                return (
+                                    <tr key={index}>
+                                        <td>{index+1}</td>
+                                        <td>{item.indNum}</td>
+                                        {
+                                            text.length > 30 ?
+                                            <td className='PowerMas_Borde_Total' 
+                                                data-tooltip-id="info-tooltip" 
+                                                data-tooltip-content={text} 
+                                            >{shortText}</td>
+                                            :
+                                            <td className='PowerMas_Borde_Total'>{text}</td>
+                                        }
+                                        <td className='PowerMas_Borde_Total'>
+                                            <Tooltip
+                                                title="Los totales no coinciden."
+                                                open={`total_${item.indAno}_${item.indCod}` === unmatchedTotal.key && unmatchedTotal.section === 'totalPorIndicador'}
+                                                arrow={true}
+                                                position="bottom"
+                                            />
+                                            <input
+                                                className={`
+                                                PowerMas_Input_Cadena Large_12 f_75 
+                                                PowerMas_Cadena_Form_${dirtyFields[`total_${item.indAno}_${item.indCod}`] || isSubmitted ? (errors[`total_${item.indAno}_${item.indCod}`] ? 'invalid' : 'valid') : ''}
+                                                ${false && 'PowerMas_Tooltip_Active'}
+                                                `} 
+                                                type="text"
+                                                onInput={(e) => {
+                                                    e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                                                    
+                                                    // const newValue = Number(e.target.value);
+                                                    // const oldValue = Number(indTotPreState[`total_${item.indAno}_${item.indCod}`] || 0);
                                                 
-                                                // const newValue = Number(e.target.value);
-                                                // const oldValue = Number(indTotPreState[`total_${item.indAno}_${item.indCod}`] || 0);
-                                            
-                                                // setIndTotPreState(prevState => ({
-                                                //     ...prevState,
-                                                //     [`total_${item.indAno}_${item.indCod}`]: newValue
-                                                // }));
-                                            
-                                                // // Aquí es donde actualizas totalIndTotPre
-                                                // setTotalIndTotPre(prevTotal => prevTotal - oldValue + newValue);
-                                            
-                                                // // Validaciones de los totales
-                                                // // const newTotalsAll = totalIndTotPre - oldValue + newValue;
-                                                // const newTotalPorImplementador = calculateTotal(item.indAno, item.indCod, 'porImplementador', totalsPorImplementador);
-                                                // const newTotalPorUbicacion = calculateTotal(item.indAno, item.indCod, 'porUbicacion', totalsPorUbicacion);
-                                                // const newTotalPorAno = calculateTotal(item.indAno, item.indCod, 'porAno', totalsPorAnoAll);
-                                            
-                                                // if (newValue !== newTotalPorImplementador) {
-                                                //     setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorImplementador, section: 'totalPorImplementador' });
-                                                //     setIsSubmitDisabled(true);
-                                                // } else if (newValue !== newTotalPorUbicacion) {
-                                                //     setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorUbicacion, section: 'totalPorUbicacion' });
-                                                //     setIsSubmitDisabled(true);
-                                                //  } else if (newTotalPorAno <= 0) {
-                                                //     setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorAno, section: 'totalPorAno' });
-                                                //     setIsSubmitDisabled(true);
-                                                //  } else {
-                                                //     setUnmatchedTotal({ key: '', value: 0, section: '' });
-                                                //     setIsSubmitDisabled(false);
-                                                // }
-                                            
-                                                // // Validación de campo vacío
-                                                // if (e.target.value === '') {
-                                                //     setUnmatchedTotal({ key: `total_${item.indAno}_${item.indCod}`, value: 0, section: 'totalPorIndicador' });
-                                                //     setIsSubmitDisabled(true);
-                                                // }
-                                            }}
-                                            
-                                            defaultValue={indTotPreState[`total_${item.indAno}_${item.indCod}`]} 
-                                            {...register(`total_${item.indAno}_${item.indCod}`, {
-                                                pattern: {
-                                                    value: /^(?:[1-9]\d*|)$/,
-                                                    message: 'Valor no válido',
-                                                },
-                                                maxLength: {
-                                                    value: 10,
-                                                    message: ''
-                                                }
-                                            })}
-                                        />
-                                    </td>
-                                    {/* Data dinamica */}
-                                    {headers.map((header, i) => {
-                                        const cellData = renderData[`${item.indAno}_${item.indCod}_${header.key}`];
-                                        const defaultValue = cellData ? cellData.value : '';
-                                        const preValue = cellData ? cellData.preValue : null;
+                                                    // setIndTotPreState(prevState => ({
+                                                    //     ...prevState,
+                                                    //     [`total_${item.indAno}_${item.indCod}`]: newValue
+                                                    // }));
+                                                
+                                                    // // Aquí es donde actualizas totalIndTotPre
+                                                    // setTotalIndTotPre(prevTotal => prevTotal - oldValue + newValue);
+                                                
+                                                    // // Validaciones de los totales
+                                                    // // const newTotalsAll = totalIndTotPre - oldValue + newValue;
+                                                    // const newTotalPorImplementador = calculateTotal(item.indAno, item.indCod, 'porImplementador', totalsPorImplementador);
+                                                    // const newTotalPorUbicacion = calculateTotal(item.indAno, item.indCod, 'porUbicacion', totalsPorUbicacion);
+                                                    // const newTotalPorAno = calculateTotal(item.indAno, item.indCod, 'porAno', totalsPorAnoAll);
+                                                
+                                                    // if (newValue !== newTotalPorImplementador) {
+                                                    //     setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorImplementador, section: 'totalPorImplementador' });
+                                                    //     setIsSubmitDisabled(true);
+                                                    // } else if (newValue !== newTotalPorUbicacion) {
+                                                    //     setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorUbicacion, section: 'totalPorUbicacion' });
+                                                    //     setIsSubmitDisabled(true);
+                                                    //  } else if (newTotalPorAno <= 0) {
+                                                    //     setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorAno, section: 'totalPorAno' });
+                                                    //     setIsSubmitDisabled(true);
+                                                    //  } else {
+                                                    //     setUnmatchedTotal({ key: '', value: 0, section: '' });
+                                                    //     setIsSubmitDisabled(false);
+                                                    // }
+                                                
+                                                    // // Validación de campo vacío
+                                                    // if (e.target.value === '') {
+                                                    //     setUnmatchedTotal({ key: `total_${item.indAno}_${item.indCod}`, value: 0, section: 'totalPorIndicador' });
+                                                    //     setIsSubmitDisabled(true);
+                                                    // }
+                                                }}
+                                                
+                                                defaultValue={indTotPreState[`total_${item.indAno}_${item.indCod}`]} 
+                                                {...register(`total_${item.indAno}_${item.indCod}`, {
+                                                    pattern: {
+                                                        value: /^(?:[1-9]\d*|)$/,
+                                                        message: 'Valor no válido',
+                                                    },
+                                                    maxLength: {
+                                                        value: 10,
+                                                        message: ''
+                                                    }
+                                                })}
+                                            />
+                                        </td>
+                                        {/* Data dinamica */}
+                                        {headers.map((header, i) => {
+                                            const cellData = renderData[`${item.indAno}_${item.indCod}_${header.key}`];
+                                            const defaultValue = cellData ? cellData.value : '';
+                                            const preValue = cellData ? cellData.preValue : null;
 
-                                        if (header.key === 'totalPorAno') {
-                                            return (
-                                                <td className='center PowerMas_Borde_Total' style={{color: '#F87C56'}} key={i}>
-                                                    {calculateTotal(item.indAno, item.indCod, 'porAno', totalsPorAnoAll)}
-                                                    <Tooltip
-                                                        title="Los totales no coinciden."
-                                                        open={`${item.indAno}_${item.indCod}` === unmatchedTotal.key && header.key.startsWith(unmatchedTotal.section)}
-                                                        arrow={true}
-                                                        position="bottom"
-                                                        key={i}
-                                                    />
-                                                </td>
-                                            );
-                                        } else if (header.key === 'totalPorImplementador') {
-                                            return (
-                                                <td className='center PowerMas_Borde_Total' style={{color: '#F87C56'}} key={i}>
-                                                    {calculateTotal(item.indAno, item.indCod, 'porImplementador', totalsPorImplementador)}
-                                                    <Tooltip
-                                                        title="Los totales no coinciden."
-                                                        open={`${item.indAno}_${item.indCod}` === unmatchedTotal.key && header.key.startsWith(unmatchedTotal.section)}
-                                                        arrow={true}
-                                                        position="bottom"
-                                                        key={i}
-                                                    />
-                                                </td>
-                                            );
-                                        } else if (header.key === 'totalPorUbicacion') {
-                                            return (
-                                                <td className='center PowerMas_Borde_Total' style={{color: '#F87C56'}} key={i}>
-                                                    {calculateTotal(item.indAno, item.indCod, 'porUbicacion', totalsPorUbicacion)}
-                                                    <Tooltip
-                                                        title="Los totales no coinciden."
-                                                        open={`${item.indAno}_${item.indCod}` === unmatchedTotal.key && header.key.startsWith(unmatchedTotal.section)}
-                                                        arrow={true}
-                                                        position="bottom"
-                                                        key={i}
-                                                    />
-                                                </td>
-                                            );
-                                        } else {
-                                            return (
-                                            <td key={i}>
-                                                <input
-                                                    data-tooltip-id="info-tooltip" 
-                                                    data-tooltip-content={preValue && `Presupuesto: ${preValue}`} 
-                                                    className={`
-                                                    PowerMas_Input_Cadena Large_12 f_75 
-                                                    PowerMas_Cadena_Form_${dirtyFields[`${item.indAno}_${item.indCod}_${header.key}`] || isSubmitted ? (errors[`${item.indAno}_${item.indCod}_${header.key}`] ? 'invalid' : 'valid') : ''}
-                                                    ${preValue && 'PowerMas_Tooltip_Active'}
-                                                    `} 
-                                                    onInput={(e) => {
-                                                        e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                                            if (header.key === 'totalPorAno') {
+                                                return (
+                                                    <td className='center PowerMas_Borde_Total' style={{color: '#F87C56'}} key={i}>
+                                                        {calculateTotal(item.indAno, item.indCod, 'porAno', totalsPorAnoAll)}
+                                                        <Tooltip
+                                                            title="Los totales no coinciden."
+                                                            open={`${item.indAno}_${item.indCod}` === unmatchedTotal.key && header.key.startsWith(unmatchedTotal.section)}
+                                                            arrow={true}
+                                                            position="bottom"
+                                                            key={i}
+                                                        />
+                                                    </td>
+                                                );
+                                            } else if (header.key === 'totalPorImplementador') {
+                                                return (
+                                                    <td className='center PowerMas_Borde_Total' style={{color: '#F87C56'}} key={i}>
+                                                        {calculateTotal(item.indAno, item.indCod, 'porImplementador', totalsPorImplementador)}
+                                                        <Tooltip
+                                                            title="Los totales no coinciden."
+                                                            open={`${item.indAno}_${item.indCod}` === unmatchedTotal.key && header.key.startsWith(unmatchedTotal.section)}
+                                                            arrow={true}
+                                                            position="bottom"
+                                                            key={i}
+                                                        />
+                                                    </td>
+                                                );
+                                            } else if (header.key === 'totalPorUbicacion') {
+                                                return (
+                                                    <td className='center PowerMas_Borde_Total' style={{color: '#F87C56'}} key={i}>
+                                                        {calculateTotal(item.indAno, item.indCod, 'porUbicacion', totalsPorUbicacion)}
+                                                        <Tooltip
+                                                            title="Los totales no coinciden."
+                                                            open={`${item.indAno}_${item.indCod}` === unmatchedTotal.key && header.key.startsWith(unmatchedTotal.section)}
+                                                            arrow={true}
+                                                            position="bottom"
+                                                            key={i}
+                                                        />
+                                                    </td>
+                                                );
+                                            } else {
+                                                return (
+                                                <td key={i}>
+                                                    <input
+                                                        data-tooltip-id="info-tooltip" 
+                                                        data-tooltip-content={preValue && `Presupuesto: ${preValue}`} 
+                                                        className={`
+                                                        PowerMas_Input_Cadena Large_12 f_75 
+                                                        PowerMas_Cadena_Form_${dirtyFields[`${item.indAno}_${item.indCod}_${header.key}`] || isSubmitted ? (errors[`${item.indAno}_${item.indCod}_${header.key}`] ? 'invalid' : 'valid') : ''}
+                                                        ${preValue && 'PowerMas_Tooltip_Active'}
+                                                        `} 
+                                                        onInput={(e) => {
+                                                            e.target.value = e.target.value.replace(/[^0-9]/g, '');
 
-                                                        const newValue = e.target.value;
-                                                        
-                                                        const key = `${item.indAno}_${item.indCod}`;
-                                                        // Determinar la sección basándose en la longitud de header.key
-                                                        
-                                                        let section;
-                                                        if (header.key.length === 4) {
-                                                            section = 'porAno';
-                                                        } else if (header.key.length === 2) {
-                                                            section = 'porImplementador';
-                                                        } else if (header.key.length === 10) {
-                                                            section = 'porUbicacion';
-                                                        }
+                                                            const newValue = e.target.value;
+                                                            
+                                                            const key = `${item.indAno}_${item.indCod}`;
+                                                            // Determinar la sección basándose en la longitud de header.key
+                                                            
+                                                            let section;
+                                                            if (header.key.length === 4) {
+                                                                section = 'porAno';
+                                                            } else if (header.key.length === 2) {
+                                                                section = 'porImplementador';
+                                                            } else if (header.key.length === 10) {
+                                                                section = 'porUbicacion';
+                                                            }
 
-                                                        let newTotalsPorAnoAll = { ...totalsPorAnoAll };
-                                                        let newTotalsPorImplementador = { ...totalsPorImplementador };
-                                                        let newTotalsPorUbicacion = { ...totalsPorUbicacion };
+                                                            let newTotalsPorAnoAll = { ...totalsPorAnoAll };
+                                                            let newTotalsPorImplementador = { ...totalsPorImplementador };
+                                                            let newTotalsPorUbicacion = { ...totalsPorUbicacion };
 
-                                                        if (section === 'porAno') {
-                                                            newTotalsPorAnoAll = { ...newTotalsPorAnoAll, [`${key}_${header.key}_porAno`]: newValue };
-                                                            setTotalsPorAnoAll(newTotalsPorAnoAll);
-                                                        } else if (section === 'porImplementador') {
-                                                            newTotalsPorImplementador = { ...newTotalsPorImplementador, [`${key}_${header.key}_porImplementador`]: newValue };
-                                                            setTotalsPorImplementador(newTotalsPorImplementador);
-                                                        } else if (section === 'porUbicacion') {
-                                                            newTotalsPorUbicacion = { ...newTotalsPorUbicacion, [`${key}_${header.key}_porUbicacion`]: newValue };
-                                                            setTotalsPorUbicacion(newTotalsPorUbicacion);
-                                                        }
+                                                            if (section === 'porAno') {
+                                                                newTotalsPorAnoAll = { ...newTotalsPorAnoAll, [`${key}_${header.key}_porAno`]: newValue };
+                                                                setTotalsPorAnoAll(newTotalsPorAnoAll);
+                                                            } else if (section === 'porImplementador') {
+                                                                newTotalsPorImplementador = { ...newTotalsPorImplementador, [`${key}_${header.key}_porImplementador`]: newValue };
+                                                                setTotalsPorImplementador(newTotalsPorImplementador);
+                                                            } else if (section === 'porUbicacion') {
+                                                                newTotalsPorUbicacion = { ...newTotalsPorUbicacion, [`${key}_${header.key}_porUbicacion`]: newValue };
+                                                                setTotalsPorUbicacion(newTotalsPorUbicacion);
+                                                            }
 
-                                                        // Después de actualizar los totales, calcula los nuevos totales para cada sección
-                                                        const newTotalPorAno = calculateTotal(item.indAno, item.indCod, 'porAno', newTotalsPorAnoAll);
-                                                        const newTotalPorImplementador = calculateTotal(item.indAno, item.indCod, 'porImplementador', newTotalsPorImplementador);
-                                                        const newTotalPorUbicacion = calculateTotal(item.indAno, item.indCod, 'porUbicacion', newTotalsPorUbicacion);
-                                                        
-                                                        // Comprueba si los totales de las cuatro secciones son iguales
-                                                        if (newTotalPorAno === newTotalPorImplementador && newTotalPorAno === newTotalPorUbicacion) {
-                                                            // Si los totales de la fila actual son iguales, comprueba si los totales de todas las filas son iguales
-                                                            const totalPorAnoAll = Object.values(newTotalsPorAnoAll).reduce((a, b) => a + Number(b), 0);
-                                                            const totalPorImplementadorAll = Object.values(newTotalsPorImplementador).reduce((a, b) => a + Number(b), 0);
-                                                            const totalPorUbicacionAll = Object.values(newTotalsPorUbicacion).reduce((a, b) => a + Number(b), 0);
+                                                            // Después de actualizar los totales, calcula los nuevos totales para cada sección
+                                                            const newTotalPorAno = calculateTotal(item.indAno, item.indCod, 'porAno', newTotalsPorAnoAll);
+                                                            const newTotalPorImplementador = calculateTotal(item.indAno, item.indCod, 'porImplementador', newTotalsPorImplementador);
+                                                            const newTotalPorUbicacion = calculateTotal(item.indAno, item.indCod, 'porUbicacion', newTotalsPorUbicacion);
+                                                            
+                                                            // Comprueba si los totales de las cuatro secciones son iguales
+                                                            if (newTotalPorAno === newTotalPorImplementador && newTotalPorAno === newTotalPorUbicacion) {
+                                                                // Si los totales de la fila actual son iguales, comprueba si los totales de todas las filas son iguales
+                                                                const totalPorAnoAll = Object.values(newTotalsPorAnoAll).reduce((a, b) => a + Number(b), 0);
+                                                                const totalPorImplementadorAll = Object.values(newTotalsPorImplementador).reduce((a, b) => a + Number(b), 0);
+                                                                const totalPorUbicacionAll = Object.values(newTotalsPorUbicacion).reduce((a, b) => a + Number(b), 0);
 
 
-                                                            if (totalPorAnoAll === totalPorImplementadorAll && totalPorAnoAll === totalPorUbicacionAll) {
-                                                                setIsSubmitDisabled(false);
+                                                                if (totalPorAnoAll === totalPorImplementadorAll && totalPorAnoAll === totalPorUbicacionAll) {
+                                                                    setIsSubmitDisabled(false);
+                                                                } else {
+                                                                    setIsSubmitDisabled(true);
+                                                                }
                                                             } else {
                                                                 setIsSubmitDisabled(true);
                                                             }
-                                                        } else {
-                                                            setIsSubmitDisabled(true);
-                                                        }
 
-                                                        if (newTotalPorAno === 0 && (newTotalPorImplementador > 0 || newTotalPorUbicacion > 0)) {
-                                                            setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorAno, section: 'totalPorAno' });
-                                                        } else if (newTotalPorAno !== newTotalPorImplementador) {
-                                                            setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorImplementador, section: 'totalPorImplementador' });
-                                                        } else if (newTotalPorAno !== newTotalPorUbicacion) {
-                                                            setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorUbicacion, section: 'totalPorUbicacion' });
-                                                        } else {
-                                                            setUnmatchedTotal({ key: '', value: 0, section: '' });
-                                                        }
-                                                    }}
-                                                    
-                                                    maxLength={10}
-                                                    style={{margin: 0}}
-                                                    type="text" 
-                                                    autoComplete='off'
-                                                    {...register(`${item.indAno}_${item.indCod}_${header.key}`, {
-                                                        pattern: {
-                                                            value: /^(?:[1-9]\d*|)$/,
-                                                            message: 'Valor no válido',
-                                                        },
-                                                        maxLength: {
-                                                            value: 10,
-                                                            message: ''
-                                                        }
-                                                    })}
-                                                    defaultValue={defaultValue}
-                                                />
-                                            </td>
-                                        );
-                                        }
-                                    })}
-                            </tr>)
-                        })
-                        }
-                    </tbody>
-                </table>
+                                                            if (newTotalPorAno === 0 && (newTotalPorImplementador > 0 || newTotalPorUbicacion > 0)) {
+                                                                setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorAno, section: 'totalPorAno' });
+                                                            } else if (newTotalPorAno !== newTotalPorImplementador) {
+                                                                setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorImplementador, section: 'totalPorImplementador' });
+                                                            } else if (newTotalPorAno !== newTotalPorUbicacion) {
+                                                                setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorUbicacion, section: 'totalPorUbicacion' });
+                                                            } else {
+                                                                setUnmatchedTotal({ key: '', value: 0, section: '' });
+                                                            }
+                                                        }}
+                                                        
+                                                        maxLength={10}
+                                                        style={{margin: 0}}
+                                                        type="text" 
+                                                        autoComplete='off'
+                                                        {...register(`${item.indAno}_${item.indCod}_${header.key}`, {
+                                                            pattern: {
+                                                                value: /^(?:[1-9]\d*|)$/,
+                                                                message: 'Valor no válido',
+                                                            },
+                                                            maxLength: {
+                                                                value: 10,
+                                                                message: ''
+                                                            }
+                                                        })}
+                                                        defaultValue={defaultValue}
+                                                    />
+                                                </td>
+                                            );
+                                            }
+                                        })}
+                                </tr>)
+                            })
+                            }
+                        </tbody>
+                    </table>
+                    :
+                    <div className='Phone_12 flex flex-grow-1 flex-column ai-center jc-center p1'>
+                        <img src={TableEmpty} alt="TableEmpty" className='w-auto' style={{height: '100%'}} />
+                        <p className='PowerMas_Text_Empty'>No se encontraron datos.</p>
+                    </div>
+                }
             </div>
             <div className='PowerMas_Footer_Box flex flex-column jc-center ai-center p_5 gap_5'>    
                 <button 
