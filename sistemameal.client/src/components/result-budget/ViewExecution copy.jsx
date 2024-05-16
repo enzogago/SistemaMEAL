@@ -30,61 +30,41 @@ const ViewExecution = () => {
 
     const [currencyGeneral, setCurrencyGeneral] = useState(null)
 
-    const [exchangeRatesMeta, setExchangeRatesMeta] = useState({});
-    const [exchangeRatesEjecucion, setExchangeRatesEjecucion] = useState({});
 
+    const applyExchangeRate = () => {
+        const rate = parseFloat(exchangeRate);
+        if (!isNaN(rate) && rate > 0) {
+            const newRows = { ...additionalRows };
+            const selectedMoneda = monedas.find(m => m.monCod === selectedCurrency);
+            setCurrencyGeneral(selectedMoneda)
 
-    const handleExchangeRateMetaChange = (month, rate) => {
-        setExchangeRatesMeta(prevRates => ({
-            ...prevRates,
-            [month]: rate
-        }));
-    };
-    
-    const handleExchangeRateEjecucionChange = (month, rate) => {
-        setExchangeRatesEjecucion(prevRates => ({
-            ...prevRates,
-            [month]: rate
-        }));
-    };
-    
+            Object.keys(newRows).forEach(rowKey => {
+                meses.forEach((mes, indexMes) => {
+                    const monthKey = formatMonthKey(indexMes);
+                    if (newRows[rowKey].cells[monthKey]) {
+                        newRows[rowKey].cells[monthKey].forEach((cell, cellIndex) => {
+                            // Utiliza los valores originales para la conversión
+                            const original = newRows[rowKey].originalValues[monthKey];
+                            if (currencyMeta.monCod !== selectedCurrency) {
+                                cell.metPre = (original.metPre * exchangeRate).toFixed(2); // Convierte Meta
+                            } else {
+                                cell.metPre = (original.metPre * 1).toFixed(2); // Convierte Meta
+                            }
 
-    const applyExchangeRates = () => {
-        const selectedMoneda = monedas.find(m => m.monCod === selectedCurrency);
-        setCurrencyGeneral(selectedMoneda);
-    
-        const newRows = { ...additionalRows };
-        Object.keys(newRows).forEach(rowKey => {
-            meses.forEach((mes, indexMes) => {
-                const monthKey = formatMonthKey(indexMes);
-                const rateMeta = parseFloat(exchangeRatesMeta[monthKey]);
-                const rateEjecucion = parseFloat(exchangeRatesEjecucion[monthKey]);
-    
-                if (newRows[rowKey].cells[monthKey]) {
-                    newRows[rowKey].cells[monthKey].forEach(cell => {
-                        const original = newRows[rowKey].originalValues[monthKey];
-                        if (selectedMoneda && selectedMoneda.monCod !== currencyMeta.monCod) {
-                            cell.metPre = (!isNaN(rateMeta) && rateMeta > 0) ? (original.metPre * rateMeta).toFixed(2) : original.metPre;
-                        } else {
-                            cell.metPre = original.metPre;
-                        }
-    
-                        if (selectedMoneda && selectedMoneda.monCod !== currencyEjecucion.monCod) {
-                            cell.ejePre = (!isNaN(rateEjecucion) && rateEjecucion > 0) ? (original.ejePre * rateEjecucion).toFixed(2) : original.ejePre;
-                        } else {
-                            cell.ejePre = original.ejePre;
-                        }
-                    });
-                }
+                            if (selectedCurrency !== '01') {
+                                cell.ejePre = (original.ejePre * exchangeRate).toFixed(2); // Convierte Ejecución
+                            } else {
+                                cell.ejePre = (original.ejePre * 1).toFixed(2); // Convierte Ejecución
+                            }
+                        });
+                    }
+                });
             });
-        });
-    
-        setAdditionalRows(newRows);
+            setAdditionalRows(newRows); // Actualiza el estado con los nuevos valores
+        } else {
+            Notiflix.Notify.failure('Por favor ingresa una tasa de cambio válida.')
+        }
     };
-    
-
-    
-    
 
     const processMetas = (metas) => {
         const rows = {};
@@ -267,7 +247,7 @@ const ViewExecution = () => {
                 <select 
                     id='monCod'
                     style={{margin: '0'}}
-                    className={`p_5 block Phone_2 PowerMas_Modal_Form_${dirtyFields.monCod || isSubmitted ? (errors.monCod ? 'invalid' : 'valid') : ''}`} 
+                    className={`p_5 block Phone_3 PowerMas_Modal_Form_${dirtyFields.monCod || isSubmitted ? (errors.monCod ? 'invalid' : 'valid') : ''}`} 
                     onChange={(e) => setSelectedCurrency(e.target.value)}
                 >
                     <option value="0">-- Seleccione Moneda--</option>
@@ -280,7 +260,7 @@ const ViewExecution = () => {
                         </option>
                     ))}
                 </select>
-                {/* <input
+                <input
                     className={`p_5 block Phone_3 PowerMas_Modal_Form_${dirtyFields.tipoCambio || isSubmitted ? (errors.tipoCambio ? 'invalid' : 'valid') : ''}`} 
                     type="text"
                     placeholder='Ejm: 3.14'
@@ -295,67 +275,36 @@ const ViewExecution = () => {
                         }
                         
                     }}
-                /> */}
-                <button className='PowerMas_Buttom_Primary Large_2' onClick={applyExchangeRates}>Cambiar</button>
+                />
+                <button onClick={applyExchangeRate}>Cambiar</button>
             </div>
             <div className="PowerMas_TableContainer flex-column overflow-auto result-chain-block flex view-execution-block">
                 {
                     indicadores.length > 0 ?
                     <table className="PowerMas_TableStatus">
                         <thead>
-                            <tr style={{ zIndex: '2' }}>
+                            <tr style={{zIndex: '2'}}>
                                 <th></th>
-                                <th style={{ position: 'sticky', left: '0', backgroundColor: '#fff' }}></th>
+                                <th style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}></th>
                                 <th colSpan={3}></th>
                                 {meses.map((mes, i) => (
-                                    <th colSpan={2} className='center' style={{ textTransform: 'capitalize' }} key={i + 1}>{mes.toLowerCase()}</th>
+                                    <th colSpan={2} className='center' style={{textTransform: 'capitalize'}} key={i+1}>{mes.toLowerCase()} </th>
                                 ))}
                             </tr>
-                            <tr className='center' style={{ position: 'sticky', top: '2rem', backgroundColor: '#fff', zIndex: '3'  }}>
+                            <tr className='center' style={{position: 'sticky', top: '2rem', backgroundColor: '#fff'}}>
                                 <th></th>
-                                <th style={{ position: 'sticky', left: '0', backgroundColor: '#fff' }}>Código</th>
+                                <th style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}>Código</th>
                                 <th>Financiador</th>
                                 <th>Implementador</th>
                                 <th>Ubicación</th>
                                 {meses.map((mes) => (
-                                    <Fragment key={mes}>
+                                    <Fragment>
                                         <th className='center'>Meta</th>
                                         <th className='center'>Ejecución</th>
                                     </Fragment>
                                 ))}
                             </tr>
-                            <tr className='center' style={{ position: 'sticky', top: '4rem', backgroundColor: '#fff', zIndex: '3' }}>
-                                <th></th>
-                                <th style={{ position: 'sticky', left: '0', backgroundColor: '#fff' }}></th>
-                                <th colSpan={3}></th>
-                                {meses.map((mes, indexMes) => {
-                                    const monthKey = formatMonthKey(indexMes);
-                                    return (
-                                        <Fragment key={monthKey}>
-                                            <th className='center'>
-                                                <input
-                                                    type="text"
-                                                    className='Large_12 f_75'
-                                                    placeholder="Tasa"
-                                                    value={exchangeRatesMeta[monthKey] || ''}
-                                                    onChange={(e) => handleExchangeRateMetaChange(monthKey, e.target.value)}
-                                                />
-                                            </th>
-                                            <th className='center'>
-                                                <input
-                                                    type="text"
-                                                    className='Large_12 f_75'
-                                                    placeholder="Tasa"
-                                                    value={exchangeRatesEjecucion[monthKey] || ''}
-                                                    onChange={(e) => handleExchangeRateEjecucionChange(monthKey, e.target.value)}
-                                                />
-                                            </th>
-                                        </Fragment>
-                                    );
-                                })}
-                            </tr>
                         </thead>
-
                         <tbody>
                         {
                             indicadores.map((item, index) => {

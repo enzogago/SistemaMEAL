@@ -57,6 +57,10 @@ namespace SistemaMEAL.Server.Models
         public String? SubProPerAnoFin { get; set; }
         public String? SubProPerMesFin { get; set; }
         public String? SubProInvSubAct { get; set; }
+        public String? MonCod { get; set; }
+        public String? MonNom { get; set; }
+        public String? MonSim { get; set; }
+        public String? MonAbr { get; set; }
          public List<Meta>? Metas { get; set; }
     }
 }

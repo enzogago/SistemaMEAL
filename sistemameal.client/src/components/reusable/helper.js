@@ -569,7 +569,6 @@ export const Export_PDF_Helper = async (data, headers, title, properties, format
 // Esta es tu nueva función reutilizable
 export const fetchDataReturn = async (controller) => {
     try {
-        Notiflix.Loading.pulse('Cargando...');
         // Valores del storage
         const token = localStorage.getItem('token');
         // Obtenemos los datos
@@ -585,9 +584,7 @@ export const fetchDataReturn = async (controller) => {
             }
             return;
         }
-        console.log(response)
         const data = await response.json();
-        console.log(data)
         if (data.success === false) {
             Notiflix.Notify.failure(data.message);
             return;
@@ -595,8 +592,6 @@ export const fetchDataReturn = async (controller) => {
         return (data);
     } catch (error) {
         console.error('Error:', error);
-    } finally {
-        Notiflix.Loading.remove();
     }
 };
 export const fetchData = async (controller, setData) => {

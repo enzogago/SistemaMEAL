@@ -222,7 +222,7 @@ const Table = ({data}) => {
                                                 }}
                                             > &gt; </div>
                                         </td>
-                                        <td style={{color: estCol}}>
+                                        <td className='bold' style={{color: estCol}}>
                                             {estNom}
                                         </td>
                                         <td colSpan={7}>
@@ -277,7 +277,7 @@ const Table = ({data}) => {
                                         return (
                                             <tr className='' key={key} style={{color: '#69625F'}}>
                                                 <td></td>
-                                                <td style={{color: estCol}}>{estNom}</td>
+                                                <td className='bold' style={{color: estCol}}>{estNom}</td>
                                                 <td className='' colSpan={7}>
                                                     <span 
                                                         data-tooltip-id="info-tooltip" 

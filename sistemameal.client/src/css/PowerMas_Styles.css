@@ -1219,7 +1219,7 @@ textarea {
 }
 .PowerMas_TableStatus thead tr:last-child th:hover{
 	/* background-color: #f0f0f0; */
-	cursor: pointer;
+	/* cursor: pointer; */
 }
 .PowerMas_TableStatus thead tr:last-child th::after{
 	content: "";
@@ -1931,7 +1931,13 @@ textarea {
 
 
 /* FIN FORM META */
-
+.prueadsa::after{
+	content: '';
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+	border-bottom: 1px solid red;
+}
 
 .d3-tip {
 	z-index: 100;
