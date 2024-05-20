@@ -216,50 +216,53 @@ const Monitoring = () => {
         }
     };
     
-    
-    
     const eliminarDocumento = async(index) => {
-            const file = selectedFiles[index];
-    
-            // Prepara los datos de MetasFuente
-            const metasFuente = modalData; // Asegúrate de que modalData tenga los datos correctos
-            console.log(file)
-            // Construye el objeto MetasFuenteDto
-            const metasFuenteDto = {
-                MetaFuente: metasFuente,
-                FileData: {
-                    fileName: file.metFueVerNom,
-                    fileSize: String(file.metFueVerPes)
-                }
-            };
-    
-            // Ahora puedes guardar los datos del archivo donde quieras
-            try {
-                Notiflix.Loading.pulse('Cargando...');
-                const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Meta/delete-file`, {
-                    method: 'POST',
-                    body: JSON.stringify(metasFuenteDto),
-                    headers: { 'Content-Type': 'application/json' },
-                });
-    
-                const data = await response.json();
+        const file = selectedFiles[index];
 
-                if (!response.ok) {
-                    Notiflix.Notify.failure(data.message);
-                    return;
-                }
-
-                // En lugar de actualizar el estado aquí, volvemos a llamar a fetchData
-                await fetchData(`Meta/files/${modalData.metAno}/${modalData.metCod}`, setSelectedFiles);
-
-                Notiflix.Notify.success(data.message);
-            } catch (error) {
-                Notiflix.Notify.failure(error.message);
-            } finally {
-                Notiflix.Loading.remove();
+        // Prepara los datos de MetasFuente
+        const metasFuente = modalData; // Asegúrate de que modalData tenga los datos correctos
+        console.log(file)
+        // Construye el objeto MetasFuenteDto
+        const metasFuenteDto = {
+            MetaFuente: metasFuente,
+            FileData: {
+                fileName: file.metFueVerNom,
+                fileSize: String(file.metFueVerPes)
             }
+        };
+
+        // Ahora puedes guardar los datos del archivo donde quieras
+        try {
+            Notiflix.Loading.pulse('Cargando...');
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Meta/delete-file`, {
+                method: 'POST',
+                body: JSON.stringify(metasFuenteDto),
+                headers: { 'Content-Type': 'application/json' },
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                Notiflix.Notify.failure(data.message);
+                return;
+            }
+            // En lugar de actualizar el estado aquí, volvemos a llamar a fetchData
+            await fetchData(`Meta/files/${modalData.metAno}/${modalData.metCod}`, setSelectedFiles);
+            Notiflix.Notify.success(data.message);
+        } catch (error) {
+            Notiflix.Notify.failure(error.message);
+        } finally {
+            Notiflix.Loading.remove();
+        }
     };
     
+    const goToMasivo = () => {
+        closeConfirmModal();
+        navigate(`/upload-beneficiarie/${modalConfirmData}`);
+    }
+    const goToIndividual = () => {
+        closeConfirmModal();
+        navigate(`/form-goal-beneficiarie/${modalConfirmData}`);
+    }
 
     return (
         <>
@@ -303,8 +306,8 @@ const Monitoring = () => {
                 <span className="PowerMas_CloseModal" style={{position: 'absolute',right: 20, top: 10}} onClick={closeConfirmModal}>×</span>
                 <h2 className='PowerMas_Title_Modal f1 center'>¿Como deseas registrar a los benefiriacios?</h2>
                 <div className="center">
-                    <button className="PowerMas_Buttom_Primary Large_5 center p_5 m_25" onClick={() => navigate(`/upload-beneficiarie/${modalConfirmData}`)}>Masivo</button>
-                    <button className="PowerMas_Buttom_Secondary Large_5 center p_5 m_25" onClick={() => navigate(`/form-goal-beneficiarie/${modalConfirmData}`)}>Individual</button>
+                    <button className="PowerMas_Buttom_Primary Large_5 center p_5 m_25" onClick={goToMasivo}>Masivo</button>
+                    <button className="PowerMas_Buttom_Secondary Large_5 center p_5 m_25" onClick={goToIndividual}>Individual</button>
                 </div>
             </Modal>
 

@@ -1,3 +1,4 @@
+// Importaciones necesarias de React y otros módulos
 import { useState, useEffect, useCallback, Fragment } from 'react';
 import { fetchData, fetchDataReturn } from '../reusable/helper';
 import { useForm } from 'react-hook-form';
@@ -5,35 +6,41 @@ import Expand from '../../icons/Expand';
 import Notiflix from 'notiflix';
 import TableEmpty from '../../img/PowerMas_TableEmpty.svg';
 import { formatterBudget } from '../monitoring/goal/helper';
-
-const meses = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
-
-const formatMonthKey = (index) => {
-    return (index + 1).toString().padStart(2, '0');
-};
+import { exportToExcel, formatMonthKey, meses } from '../../helpers/budget';
+import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
 
 const ViewExecution = () => {
+    // Estado para controlar la visibilidad del menú desplegable.
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    // Estado para almacenar la lista de subproyectos obtenidos de alguna fuente de datos.
     const [subproyectos, setSubProyectos] = useState([]);
+    // Estado para almacenar la lista de monedas disponibles.
     const [monedas, setMonedas] = useState([]);
+    // Estado para almacenar el subproyecto seleccionado por el usuario.
     const [selectedSubProyecto, setSelectedSubProyecto] = useState(null);
+    // Estado para almacenar los indicadores asociados con el subproyecto seleccionado.
     const [indicadores, setIndicadores] = useState([]);
-    const [expandedIndicators, setExpandedIndicators] = useState([])
+    // Estado para controlar qué indicadores están expandidos en la interfaz de usuario.
+    const [expandedIndicators, setExpandedIndicators] = useState([]);
+    // Estado para almacenar filas adicionales de datos, posiblemente para una tabla o listado.
     const [additionalRows, setAdditionalRows] = useState({});
-    
+    // Estado para almacenar la moneda predeterminada para las metas (objetivos).
     const [currencyMeta, setCurrencyMeta] = useState({ monCod: '02', monSim: '€', monAbr: 'EUR' });
+    // Estado para almacenar la moneda predeterminada para la ejecución (gastos reales).
     const [currencyEjecucion, setCurrencyEjecucion] = useState({ monCod: '01', monSim: '$', monAbr: 'USD' });
-
-    const [selectedCurrency, setSelectedCurrency] = useState('0'); // Estado para la moneda seleccionada
-    const [exchangeRate, setExchangeRate] = useState(1); // Estado para la tasa de cambio
-
-
-    const [currencyGeneral, setCurrencyGeneral] = useState(null)
-
+    // Estado para almacenar la moneda seleccionada por el usuario para realizar conversiones.
+    const [selectedCurrency, setSelectedCurrency] = useState('0');
+    // Estado para almacenar la moneda general que se aplicará a todos los cálculos.
+    const [currencyGeneral, setCurrencyGeneral] = useState(null);
+    // Estado para almacenar las tasas de cambio para las metas.
     const [exchangeRatesMeta, setExchangeRatesMeta] = useState({});
+    // Estado para almacenar las tasas de cambio para la ejecución.
     const [exchangeRatesEjecucion, setExchangeRatesEjecucion] = useState({});
+    // Estado para almacenar los valores originales antes de cualquier conversión de moneda.
+    const [originalValues, setOriginalValues] = useState(null);
 
 
+    // Funciones para manejar cambios en las tasas de cambio
     const handleExchangeRateMetaChange = (month, rate) => {
         setExchangeRatesMeta(prevRates => ({
             ...prevRates,
@@ -48,7 +55,7 @@ const ViewExecution = () => {
         }));
     };
     
-
+    // Función para aplicar las tasas de cambio
     const applyExchangeRates = () => {
         const selectedMoneda = monedas.find(m => m.monCod === selectedCurrency);
         setCurrencyGeneral(selectedMoneda);
@@ -81,11 +88,17 @@ const ViewExecution = () => {
     
         setAdditionalRows(newRows);
     };
-    
 
-    
-    
+    // Función para restablecer las tasas de cambio y monedas a los valores originales
+    const resetExchangeRates = () => {
+        setAdditionalRows(originalValues);
+        setCurrencyGeneral(null);
+        setExchangeRatesMeta({});
+        setExchangeRatesEjecucion({});
+        // Restablecer cualquier otro estado relacionado si es necesario
+    };
 
+    // Función para procesar las metas y almacenar los valores originales
     const processMetas = (metas) => {
         const rows = {};
         let counter = 0;
@@ -99,6 +112,7 @@ const ViewExecution = () => {
                     indAno: meta.indAno,
                     indCod: meta.indCod,
                     indNum: meta.indNum,
+                    indNom: meta.indNom,
                     finNom: meta.finNom,
                     impNom: meta.impNom,
                     ubiNom: meta.ubiNom,
@@ -125,8 +139,10 @@ const ViewExecution = () => {
         });
     
         setAdditionalRows(rows);
+        setOriginalValues(JSON.parse(JSON.stringify(rows)));
     };
 
+    // Hook useForm de react-hook-form para manejar formularios
     const { 
         register, 
         watch, 
@@ -135,10 +151,12 @@ const ViewExecution = () => {
     } = 
     useForm({ mode: "onChange"});
 
+    // Función para manejar la apertura/cierre del dropdown
     const handleToggleDropdown = useCallback(() => {
         setDropdownOpen(prevState => !prevState);
     }, []);
 
+    // Efectos secundarios para cargar datos iniciales
     useEffect(() => {
         fetchData('SubProyecto',setSubProyectos);
         fetchData('Moneda',setMonedas);
@@ -189,7 +207,6 @@ const ViewExecution = () => {
                     setCurrencyMeta({ monCod: '02', monSim: '€', monAbr: 'EUR' });
                 }
                 
-                console.log(dataIndicadores);
                 setIndicadores(dataIndicadores);
                 processMetas(dataMetas);
 
@@ -257,20 +274,20 @@ const ViewExecution = () => {
                     </button>
                     <div className="PowerMas_Dropdown_Export_Content Phone_12">
                         <a onClick={() => {
-                            exportToExcel(indicadores, totals, additionalRows);
+                            exportToExcel(additionalRows);
                             setDropdownOpen(false);
-                        }} className='flex jc-space-between p_5'>Excel <img className='Large_1' alt="" /> </a>
+                        }} className='flex jc-space-between p_5'>Excel <img className='Large_1' src={Excel_Icon} alt="" /> </a>
                     </div>
                 </div>
             </div>
-            <div className='flex jc-center gap-1 p_5'>
+            <div className='flex jc-center gap-1'>
                 <select 
                     id='monCod'
                     style={{margin: '0'}}
-                    className={`p_5 block Phone_2 PowerMas_Modal_Form_${dirtyFields.monCod || isSubmitted ? (errors.monCod ? 'invalid' : 'valid') : ''}`} 
+                    className={`p_25 block Phone_2 PowerMas_Modal_Form_${dirtyFields.monCod || isSubmitted ? (errors.monCod ? 'invalid' : 'valid') : ''}`} 
                     onChange={(e) => setSelectedCurrency(e.target.value)}
                 >
-                    <option value="0">-- Seleccione Moneda--</option>
+                    <option value="0"> Seleccione Moneda </option>
                     {monedas.map((item, index) => (
                         <option 
                             key={index} 
@@ -280,23 +297,8 @@ const ViewExecution = () => {
                         </option>
                     ))}
                 </select>
-                {/* <input
-                    className={`p_5 block Phone_3 PowerMas_Modal_Form_${dirtyFields.tipoCambio || isSubmitted ? (errors.tipoCambio ? 'invalid' : 'valid') : ''}`} 
-                    type="text"
-                    placeholder='Ejm: 3.14'
-                    maxLength={10}
-                    onChange={(e) => setExchangeRate(e.target.value)}
-                    onInput={(e) => {
-                        const value = e.target.value;
-                        if (value === '' || (/^\d*\.?\d*$/.test(value))) {
-                            e.target.value = value;
-                        } else {
-                            e.target.value = value.slice(0, -1);
-                        }
-                        
-                    }}
-                /> */}
                 <button className='PowerMas_Buttom_Primary Large_2' onClick={applyExchangeRates}>Cambiar</button>
+                <button className='PowerMas_Buttom_Secondary Large_2' onClick={resetExchangeRates}>Reiniciar</button>
             </div>
             <div className="PowerMas_TableContainer flex-column overflow-auto result-chain-block flex view-execution-block">
                 {
@@ -338,6 +340,14 @@ const ViewExecution = () => {
                                                     className='Large_12 f_75'
                                                     placeholder="Tasa"
                                                     value={exchangeRatesMeta[monthKey] || ''}
+                                                    onInput={(e) => {
+                                                        const value = e.target.value;
+                                                        if (value === '' || (/^\d*\.?\d*$/.test(value))) {
+                                                            e.target.value = value;
+                                                        } else {
+                                                            e.target.value = value.slice(0, -1);
+                                                        }
+                                                    }}
                                                     onChange={(e) => handleExchangeRateMetaChange(monthKey, e.target.value)}
                                                 />
                                             </th>
@@ -347,6 +357,14 @@ const ViewExecution = () => {
                                                     className='Large_12 f_75'
                                                     placeholder="Tasa"
                                                     value={exchangeRatesEjecucion[monthKey] || ''}
+                                                    onInput={(e) => {
+                                                        const value = e.target.value;
+                                                        if (value === '' || (/^\d*\.?\d*$/.test(value))) {
+                                                            e.target.value = value;
+                                                        } else {
+                                                            e.target.value = value.slice(0, -1);
+                                                        }
+                                                    }}
                                                     onChange={(e) => handleExchangeRateEjecucionChange(monthKey, e.target.value)}
                                                 />
                                             </th>

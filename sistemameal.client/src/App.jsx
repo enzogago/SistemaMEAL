@@ -1,13 +1,15 @@
 import { Suspense, lazy, useContext, useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 // Notiflix Configuracion estilos
-import './js/notiflixConfig';
+import './helpers/notiflixConfig';
 import 'react-tippy/dist/tippy.css';
 // Context
 import { AuthContext } from './context/AuthContext';
 
 // Componentes
 import LoadingComponent from './components/LoadingComponent';
+import ForgotPassword from './components/auth/ForgotPassword';
+import Login from './components/auth/Login';
 const ResultChain = lazy(() => import('./components/result-chain/ResultChain'));
 const Tutorial = lazy(() => import('./components/tutorial/Tutorial'));
 const ResultBudget = lazy(() => import('./components/result-budget/ResultBudget'));
@@ -16,13 +18,11 @@ const ResultGoal = lazy(() => import('./components/monitoring/goal/ResultGoal'))
 const UploadBeneficiarie = lazy(() => import('./components/beneficiarie/UploadBeneficiarie'));
 const UploadValidate = lazy(() => import('./components/beneficiarie/UploadValidate'));
 const ExecutionBugdet = lazy(() => import('./components/result-budget/ExecutionBugdet'));
-const ForgotPassword = lazy(() => import('./components/auth/ForgotPassword'));
 const UploadGoalBudget = lazy(() => import('./components/result-budget/UploadGoalBudget'));
 const SaveGoalBudget = lazy(() => import('./components/result-budget/SaveGoalBudget'));
 const ViewExecution = lazy(() => import('./components/result-budget/ViewExecution'));
 const FormGoalExecution = lazy(() => import('./components/monitoring/beneficiarie/FormGoalExecution'));
 const Prueba = lazy(() => import('./Prueba'));
-const Login = lazy(() => import('./components/auth/Login'));
 const Home = lazy(() => import('./components/home/Home'));
 const PrivateRoute = lazy(() => import('./components/router/PrivateRoute'));
 const PublicRoute = lazy(() => import('./components/router/PublicRoute'));
@@ -50,7 +50,6 @@ const NotFound = lazy(() => import('./components/NotFound'));
 const Beneficiarie = lazy(() => import('./components/beneficiarie/Beneficiarie'));
 const FormGoalBeneficiarie = lazy(() => import('./components/monitoring/beneficiarie/FormGoalBeneficiarie'));
 const FormBeneficiarie = lazy(() => import('./components/beneficiarie/FormBeneficiarie'));
-const FormatProject = lazy(() => import('./components/upload/project/FormatProject'));
 const Notiflix = lazy(() => import('notiflix'));
 const SaveProject = lazy(() => import('./components/upload/project/SaveProject'));
 const UploadProject = lazy(() => import('./components/upload/project/UploadProject'));
@@ -156,16 +155,12 @@ const App = () => {
                     <Routes>
                         <Route path='/login' element={
                             <PublicRoute>
-                                <Suspense fallback={<LoadingComponent />}>
-                                    <Login />
-                                </Suspense>
+                                <Login />
                             </PublicRoute>
                         } />
                         <Route path='/forgot-password' element={
                             <PublicRoute>
-                                <Suspense fallback={<LoadingComponent />}>
-                                    <ForgotPassword />
-                                </Suspense>
+                                <ForgotPassword />
                             </PublicRoute>
                         } />
                         <Route path='*' element={

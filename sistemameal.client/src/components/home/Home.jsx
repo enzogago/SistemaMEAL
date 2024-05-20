@@ -209,7 +209,7 @@ const Home = () => {
             <div className='PowerMas_Resume_Home overflow-auto'>
                 <div className="PowerMas_ResumeHome m1 flex flex-column">
                     <div className=" flex Medium-flex-row Small-flex-column bg-white gap_5">
-                        <div className="PowerMas_KPIRow Large_2 Medium_4 Small_12 Large-f1_25 Large-p1 Medium-p_5 Small-p1">
+                        <div className="PowerMas_KPIRow Large_2 Medium_4 Small_12 Large-f1_25 Large-p1 Medium-p_5 Small-p1 table-home-block">
                             <p className="f1_25">Atenciones brindadas</p>
                             <span className='Medium_f2 Small-f1_5'>{formatter.format(Number(totalAtenciones))}</span>
                         </div>
@@ -221,11 +221,11 @@ const Home = () => {
                             <p className="f1_25">Beneficiarios duplicados</p>
                             <span className='Medium_f2 Small-f1_5'>{formatter.format(Number(0))}</span>
                         </div>
-                        <div className="PowerMas_KPIRow Large_3 Medium_6 Small_12 gap_3 flex-column Large-f1_25">
+                        <div className="PowerMas_KPIRow Large_3 Medium_6 Small_12 gap_3 flex-column Large-f1_25 table-home-block">
                             <p className="f1_25">Avance técnico</p>
                             <DonutChart percentage={avanceTecnico} wh={140} rad={20} newId={'Dona_Tecnico'} colorText={'#000'} colorPc={'#F87C56'} colorSpc={'#F7775A20'} />
                         </div>
-                        <div className="PowerMas_KPIRow Large_3 Medium_6 Small_12 gap_3 flex-column Large-f1_25">
+                        <div className="PowerMas_KPIRow Large_3 Medium_6 Small_12 gap_3 flex-column Large-f1_25 table-home-block">
                             <p className="f1_25" style={{whiteSpace: 'nowrap'}}>Avance presupuesto</p>
                             <DonutChart percentage={avancePresupuesto} wh={140} rad={20} newId={'Dona_Presupuesto'} colorText={'#000'} colorPc={'#F87C56'} colorSpc={'#F7775A20'} />
                         </div>

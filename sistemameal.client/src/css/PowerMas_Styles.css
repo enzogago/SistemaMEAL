@@ -14,7 +14,7 @@
 body {
 	font-family: DMMono;
 }
-input[type=text], select, textarea{
+input, select, textarea{
 	outline: none;
 }
 input[type=text],input[type=search], select{
@@ -1428,7 +1428,6 @@ textarea {
 
 .PowerMas_Pagination{
 	background-color: #FCFCFC;
-	height: 5%;
 	box-shadow: 0 -10px 10px rgba(0, 0, 0, 0.1);
 }
 .PowerMas_Pagination button{
@@ -1488,8 +1487,8 @@ textarea {
 
 .sort-icon {
     color: #006776; /* color para el estado inactivo */
-	/* width: 10px;
-	height: 10px; */
+	width: 14px;
+	display: flex;
 }
 
 .sort-icon.active {
@@ -1826,10 +1825,7 @@ textarea {
 .gap-1{
 	gap: 1rem;
 }
-.PowerMas_Icons_Sorter{
-	width: 24px;
-	width: 24px;
-}
+
 .ws-nowrap{
 	white-space: nowrap;
 }

@@ -1027,6 +1027,8 @@ namespace SistemaMEAL.Server.Modulos
                         NacNom = rd["NACNOM"].ToString(),
                         BenDir = rd["BENDIR"].ToString(),
                         BenAut = rd["BENAUT"].ToString(),
+                        UsuMod = rd["USUMOD"].ToString(),
+                        FecMod = rd["FECMOD"] != DBNull.Value ? Convert.ToDateTime(rd["FECMOD"]) : (DateTime?)null,
                     };
                     temporal.Add(beneficiario);
                 }

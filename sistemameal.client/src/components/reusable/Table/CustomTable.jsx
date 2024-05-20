@@ -201,7 +201,8 @@ const CustomTable = ({
                                                         position: header.column.columnDef.stickyRight !== undefined ? 'sticky' : 'relative', 
                                                         textTransform: 'capitalize',
                                                         right: header.column.columnDef.stickyRight !== undefined ? `${header.column.columnDef.stickyRight}px` : 'auto',
-                                                        backgroundColor: '#fff', 
+                                                        backgroundColor: '#fff',
+                                                        cursor: 'pointer',
                                                     }} 
                                                     key={header.id} 
                                                     onClick={header.column.getToggleSortingHandler()}
