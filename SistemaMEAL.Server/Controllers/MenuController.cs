@@ -30,7 +30,7 @@ namespace SistemaMEAL.Server.Controllers
 
             foreach (var menuUsuario in menusAgregar)
             {
-                bool result = _menus.InsertarMenuUsuario(menuUsuario.UsuAno, menuUsuario.UsuCod, menuUsuario.MenAno, menuUsuario.MenCod);
+                bool result = _menus.InsertarMenuUsuario(identity, menuUsuario.UsuAno, menuUsuario.UsuCod, menuUsuario.MenAno, menuUsuario.MenCod);
                 if (!result)
                 {
                     return BadRequest("Error al agregar el menú al usuario");
@@ -50,7 +50,7 @@ namespace SistemaMEAL.Server.Controllers
 
             foreach (var menuUsuario in menusEliminar)
             {
-                bool result = _menus.EliminarMenuUsuario(menuUsuario.UsuAno, menuUsuario.UsuCod, menuUsuario.MenAno, menuUsuario.MenCod);
+                bool result = _menus.EliminarMenuUsuario(identity, menuUsuario.UsuAno, menuUsuario.UsuCod, menuUsuario.MenAno, menuUsuario.MenCod);
                 if (!result)
                 {
                     return BadRequest("Error al eliminar el menú del usuario");
@@ -61,27 +61,16 @@ namespace SistemaMEAL.Server.Controllers
         }
 
         [HttpGet]
-        public dynamic ListadoMenu()
+        public dynamic Buscar()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return Unauthorized(rToken);
-            var menu = _menus.ListadoMenu();
-            return Ok(menu);
+            var result = _menus.Buscar(identity);
+            return Ok(result);
         }
 
-        [HttpGet("{rolCod}")]
-        public dynamic ListadoMenuPorRol(string rolCod)
-        {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
-
-            if (!rToken.success) return Unauthorized(rToken);
-
-            var menu = _menus.ListadoMenuPorRol(rolCod);
-            return Ok(menu);
-        }
         [HttpGet("{usuAno}/{usuCod}")]
         public IActionResult ListadoMenuPorUsuario(string usuAno, string usuCod)
         {
@@ -90,7 +79,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var menu = _menus.ListadoMenuPorUsuario(usuAno, usuCod);
+            var menu = _menus.ListadoMenuPorUsuario(identity, usuAno:usuAno, usuCod:usuCod);
             return Ok(menu);
         }
 

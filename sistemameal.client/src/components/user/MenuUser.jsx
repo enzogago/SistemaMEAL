@@ -272,6 +272,7 @@ const MenuUser = () => {
         MenAno: menu.menAno,
         MenCod: menu.menCod
       }));
+      console.log(removedMenusData)
       console.log(addedMenusData)
       const token = localStorage.getItem('token');
       // Realizar la petición para agregar menús

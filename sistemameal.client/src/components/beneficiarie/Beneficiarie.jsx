@@ -1,11 +1,10 @@
-import { useContext, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 // Componentes reutilizables y hooks
 import CommonTable from '../reusable/Tables/CommonTable';
 import { fetchDataBlock } from '../reusable/fetchs';
 import { getColumns } from './columns';
 import { useSearchTags } from '../../hooks/useSearchTags';
 import SearchTagsInput from '../reusable/Tables/SearchTagsInput';
-import { AuthContext } from '../../context/AuthContext';
 import ExportMenu from '../reusable/Tables/ExportMenu';
 import useEntityActions from '../../hooks/useEntityActions';
 
@@ -14,10 +13,6 @@ import useEntityActions from '../../hooks/useEntityActions';
  * Permite la búsqueda por diferentes campos y la exportación de los datos filtrados.
  */
 const Beneficiarie = () => {
-   // Acceso al contexto de autenticación para obtener los permisos del usuario
-   const { authInfo } = useContext(AuthContext);
-   const { userPermissions } = authInfo;
-
    // Estados locales para manejar los datos y el refresco de la tabla
    const [ data, setData ] = useState([]);
    const [ refresh, setRefresh ] = useState([]);
@@ -71,7 +66,7 @@ const Beneficiarie = () => {
 
     return (
         <>
-            <div className="flex flex-column p1 gap_5 flex-grow-1 overflow-auto beneficiarie-block">
+            <div className="flex flex-column p1 gap_25 flex-grow-1 overflow-auto beneficiarie-block">
                 <h3>Listado de Beneficiarios</h3>
                 <div className="flex gap_5 p_25">
                     {/* Componente para la entrada de búsqueda con etiquetas */}

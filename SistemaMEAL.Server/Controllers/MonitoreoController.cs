@@ -85,19 +85,6 @@ namespace SistemaMEAL.Server.Controllers
             return Ok(resultData);
         }
 
-        [HttpGet]
-        [Route("autocomplete/{proAno}/{proCod}")]
-        public dynamic ListarIndicadoresPorProyecto(string proAno, string proCod)
-        {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
-
-            if (!rToken.success) return Unauthorized(rToken);
-
-            var data = _monitoreos.ListarIndicadoresPorProyecto(proAno,proCod);
-            return Ok(data);
-        }
-
         [HttpPost]
         public dynamic Insertar(BeneficiarioMonitoreo beneficiarioMonitoreo)
         {

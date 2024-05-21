@@ -10,33 +10,36 @@ const ForgotPassword = () => {
     const { register, handleSubmit, formState: { errors, dirtyFields, isSubmitted }, reset, setValue, watch, trigger } = useForm({ mode: "onChange"});
 
     const onSubmit = async(dataForm) => {
-        console.log(dataForm)
         try {
             Notiflix.Loading.pulse('Cargando...');
+            // Obtén la dirección IP del cliente
+            const ipResponse = await fetch('https://api.ipify.org?format=json');
+            const ipData = await ipResponse.json();
+            const clientIp = ipData.ip;
             // Obtenemos los datos
             const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Usuario/forgot-password/${dataForm.usuCorEle}`);
-            const data = await response.json();
-            if (data.length > 0) {
-                const { usuAno, usuCod, usuNom, usuApe, usuFecNac, usuCorEle } = data[0];
-                const password = (usuNom.charAt(0) + usuApe.split(' ')[0] + usuFecNac.slice(-4)).toLowerCase();
-                console.log(password)
-                const response2 = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Usuario/forgot-restablecer`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ usuAno, usuCod, usuPas: password })
-                });
-                const data2 = await response2.json();
-                if (!response2.ok) {
-                    console.log(data2);
-                    Notiflix.Notify.failure(data2.message);
-                    return;
-                }
-                await Send_Email_Forgot_Password(usuNom, usuCorEle, password);
-            } else {
+            console.log(response)
+            if (response.ok || response.status === 204) {
                 Notiflix.Notify.failure('Usuario no existe o esta inactivo.')
+                return;
             }
+
+            const data = await response.json();
+            const { usuAno, usuCod, usuNom, usuApe, usuFecNac, usuCorEle } = data;
+            const password = (usuNom.charAt(0) + usuApe.split(' ')[0] + usuFecNac.slice(-4)).toLowerCase();
+            const response2 = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Usuario/forgot-restablecer`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ usuAno, usuCod, usuPas: password, usuIp: clientIp })
+            });
+            const data2 = await response2.json();
+            if (!response2.ok) {
+                Notiflix.Notify.failure(data2.message);
+                return;
+            }
+            await Send_Email_Forgot_Password(usuNom, usuCorEle, password);
         } catch (error) {
             console.error('Error:', error);
         } finally {

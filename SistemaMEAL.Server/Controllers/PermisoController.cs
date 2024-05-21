@@ -29,7 +29,7 @@ namespace SistemaMEAL.Server.Controllers
 
             foreach (var permisoUsuario in permisosAgregar)
             {
-                bool result = _permisos.InsertarPermisoUsuario(permisoUsuario.UsuAno, permisoUsuario.UsuCod, permisoUsuario.PerCod);
+                bool result = _permisos.InsertarPermisoUsuario(identity, permisoUsuario.UsuAno, permisoUsuario.UsuCod, permisoUsuario.PerCod);
                 if (!result)
                 {
                     return BadRequest("Error al agregar el permiso al usuario");
@@ -49,7 +49,7 @@ namespace SistemaMEAL.Server.Controllers
 
             foreach (var permisoUsuario in permisosEliminar)
             {
-                bool result = _permisos.EliminarMenuUsuario(permisoUsuario.UsuAno, permisoUsuario.UsuCod, permisoUsuario.PerCod);
+                bool result = _permisos.EliminarPermisoUsuario(identity, permisoUsuario.UsuAno, permisoUsuario.UsuCod, permisoUsuario.PerCod);
                 if (!result)
                 {
                     return BadRequest("Error al eliminar el permiso del usuario");
@@ -79,7 +79,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var permiso = _permisos.ListadoPermisoPorUsuario(usuAno, usuCod);
+            var permiso = _permisos.ListadoPermisoPorUsuario(identity, usuAno:usuAno, usuCod:usuCod);
             return Ok(permiso);
         }
 
@@ -90,23 +90,6 @@ namespace SistemaMEAL.Server.Controllers
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return rToken;
-
-            dynamic data = rToken.result;
-            Usuario usuario = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "CREAR PERMISO") && usuario.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para insertar permisos",
-                    result = ""
-                };
-            }
 
             var (message, messageType) = _permisos.Insertar(identity, permiso);
             if (messageType == "1") // Error
@@ -130,23 +113,6 @@ namespace SistemaMEAL.Server.Controllers
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return rToken;
-
-            dynamic data = rToken.result;
-            Usuario usuario = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "MODIFICAR PERMISO") && usuario.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para modificar permisos",
-                    result = ""
-                };
-            }
 
             permiso.PerCod = perCod; 
             var (message, messageType) = _permisos.Modificar(identity, permiso);
@@ -172,23 +138,6 @@ namespace SistemaMEAL.Server.Controllers
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return rToken;
-
-            dynamic data = rToken.result;
-            Usuario usuario = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "ELIMINAR PERMISO") && usuario.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para eliminar permisos",
-                    result = ""
-                };
-            }
 
             var (message, messageType) = _permisos.Eliminar(identity, perCod);
             if (messageType == "1") // Error

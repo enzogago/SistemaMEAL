@@ -534,15 +534,17 @@ const FormSubProject = () => {
 
     const handleRemoveFinanciador = (index) => {
         // Recorre todos los selectores que vienen después del que estás eliminando
-        for (let i = index + 1; i < selectCountFin; i++) {
-            // Obtiene el valor del selector actual
-            const value = watch(`finCod${i}`);
-            // Asigna el valor al selector anterior
-            setValue(`finCod${i - 1}`, value);
+        if (selectCountFin > 1) {
+            for (let i = index + 1; i < selectCountFin; i++) {
+                // Obtiene el valor del selector actual
+                const value = watch(`finCod${i}`);
+                // Asigna el valor al selector anterior
+                setValue(`finCod${i - 1}`, value);
+            }
+            // Elimina el último selector
+            setValue(`finCod${selectCountFin - 1}`, '0');
+            setSelectCountFin(prevCount => prevCount - 1);
         }
-        // Elimina el último selector
-        setValue(`finCod${selectCountFin - 1}`, '0');
-        setSelectCountFin(prevCount => prevCount - 1);
     };
 
     const handleRemoveImplementador = (index) => {
@@ -662,14 +664,10 @@ const FormSubProject = () => {
                             id="subProSap"
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.subProSap || isSubmitted ? (errors.subProSap ? 'invalid' : 'valid') : ''}`}  
                             type="text" 
-                            placeholder='123456' 
+                            placeholder='Ayuda En Acción España' 
                             maxLength={10} 
                             name="subProSap" 
                             autoComplete='off'
-                            // onInput={(event) => {
-                            //     // Reemplaza cualquier carácter que no sea un número por una cadena vacía
-                            //     event.target.value = event.target.value.replace(/[^0-9]/g, '');
-                            // }}
                             {...register('subProSap', {
                                 required: 'El campo es requerido',
                                 minLength: {

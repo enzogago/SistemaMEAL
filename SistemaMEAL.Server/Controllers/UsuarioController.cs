@@ -277,8 +277,8 @@ namespace SistemaMEAL.Server.Controllers
         [Route("forgot-password/{usuCorEle}")]
         public dynamic BuscarUsuarioPorCorreo(string usuCorEle)
         {
-            var result = _usuarios.BuscarUsuarioPorCorreo(usuCorEle);
-            return Ok(result);
+            var result = _usuarios.Listado(usuCorEle:usuCorEle);
+            return Ok(result.FirstOrDefault());
         }
 
         [HttpGet]
@@ -317,8 +317,8 @@ namespace SistemaMEAL.Server.Controllers
                 password = builder.ToString();
             }
             // Recorrer usuarios y validar si hay un usuario con ese email
-            var usuario = _usuarios.ValidarUsuario(email, password);
-            if (usuario.UsuAno == null)
+            var usuario = _usuarios.Listado(usuCorEle: email, usuPas: password).FirstOrDefault();
+            if (usuario == null)
             {
                 return new
                 {
@@ -393,23 +393,6 @@ namespace SistemaMEAL.Server.Controllers
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return rToken;
-
-            dynamic data = rToken.result;
-            Usuario usuario = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "ELIMINAR ESTADO") && usuario.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para eliminar estados",
-                    result = ""
-                };
-            }
 
             var (message, messageType) = _usuarios.Eliminar(identity, usuAno, usuCod);
             if (messageType == "1") // Error

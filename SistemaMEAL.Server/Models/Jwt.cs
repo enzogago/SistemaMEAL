@@ -88,7 +88,7 @@ namespace SistemaMEAL.Server.Models
             var cod = identity.Claims.FirstOrDefault(x => x.Type == "USUCOD")?.Value;
 
             // Buscar usuario
-            var usuario = usuarios.BuscarUsuario(ano, cod);
+            var usuario = usuarios.Listado(usuAno: ano, usuCod: cod).FirstOrDefault();
             if (usuario == null)
             {
                 return new

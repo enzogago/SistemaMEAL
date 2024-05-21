@@ -43,6 +43,7 @@ const ModalProfile = ({openModal, closeModal}) => {
                     'Authorization': `Bearer ${token}`
                 }
             });
+            console.log(response)
             if (!response.ok) {
                 if(response.status === 401 || response.status === 403){
                     const data = await response.json();
@@ -77,6 +78,7 @@ const ModalProfile = ({openModal, closeModal}) => {
 
                 // Ahora que todas las operaciones anteriores se han completado, ejecuta fetchData('Usuario/${usuAno}/${usuCod}')
                 fetchDataReturn(`Usuario/${usuAno}/${usuCod}`).then((data) => {
+                    console.log(data)
                     // Desestructura los datos del usuario
                     const { usuAno, usuCod, docIdeCod, usuNumDoc, usuNom, usuApe, usuTel, usuFecNac, carCod } = data;
 

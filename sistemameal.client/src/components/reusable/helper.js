@@ -694,6 +694,8 @@ export const fetchDataBlockHome = async (controller, setData, element, signal) =
             console.error('Error:', error);
         }
     } finally {
-        Notiflix.Block.remove(element);
+        if (document.querySelector(element)) {
+            Notiflix.Block.remove(element);
+        }
     }
 };

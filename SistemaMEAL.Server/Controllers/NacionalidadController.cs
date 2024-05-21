@@ -39,23 +39,6 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return rToken;
 
-            dynamic data = rToken.result;
-            Usuario usuario = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-                if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "INSERTAR NACIONALIDAD") && usuario.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para insertar nacionaldes",
-                    result = ""
-                };
-            }
-
             var (message, messageType) = _nacionalidades.Insertar(identity, nacionalidad);
             if (messageType == "1") // Error
             {
@@ -79,23 +62,6 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return rToken;
 
-            dynamic data = rToken.result;
-            Usuario usuario = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "MODIFICAR NACIONALIDAD") && usuario.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para modificar nacionalidad",
-                    result = ""
-                };
-            }
-
             var (message, messageType) = _nacionalidades.Modificar(identity, nacionalidad);
             if (messageType == "1") // Error
             {
@@ -118,23 +84,6 @@ namespace SistemaMEAL.Server.Controllers
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return rToken;
-
-            dynamic data = rToken.result;
-            Usuario usuario = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (!_usuarios.TienePermiso(usuario.UsuAno, usuario.UsuCod, "ELIMINAR NACIONALIDAD") && usuario.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para eliminar nacionalidades",
-                    result = ""
-                };
-            }
 
             var (message, messageType) = _nacionalidades.Eliminar(identity, nacionalidad);
             if (messageType == "1") // Error

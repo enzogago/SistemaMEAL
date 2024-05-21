@@ -58,12 +58,14 @@ const Login = () => {
                 body: JSON.stringify({ email, password, clientIp })
             });
         
-            if (!response.ok) {
+            console.log(response)
+            if (!response.ok || response.status === 204) {
                 console.error(`HTTP error! status: ${response.status}`);
                 return;
             }
         
             const data = await response.json();
+            console.log(data)
             if (data.success) {
                 setUserLogged(data.user);
                 if (rememberMe) {

@@ -27,8 +27,14 @@ namespace SistemaMEAL.Server.Models
             }
             else
             {
-                // Maneja el caso en que identity es null, por ejemplo, devolviendo un UserClaims vacío
-                return new UserClaims();
+                return new UserClaims
+                {
+                    UsuIp = "0.0.0.0",
+                    UsuAno = "0000",
+                    UsuCod = "000000",
+                    UsuNom = "SYSTEM",
+                    UsuApe = "SYSTEM"
+                };
             }
         }
     }

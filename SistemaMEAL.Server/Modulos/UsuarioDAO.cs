@@ -351,17 +351,31 @@ namespace SistemaMEAL.Server.Modulos
             {
                 cn.getcn.Open();
 
-                SqlCommand cmd = new SqlCommand("SP_RESTABLECER_PASSWORD", cn.getcn);
+                SqlCommand cmd = new SqlCommand("SP_CAMBIAR_CONTRASEÑA", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 cmd.Parameters.AddWithValue("@P_USUANO", usuario.UsuAno);
                 cmd.Parameters.AddWithValue("@P_USUCOD", usuario.UsuCod);
                 cmd.Parameters.AddWithValue("@P_USUPAS", usuario.UsuPas);
+                cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
 
                 cmd.ExecuteNonQuery();
 
-                mensaje = "Se restableció la contraseña";
-                tipoMensaje = "3";
+                mensaje = pDescripcionMensaje.Value.ToString();
+                tipoMensaje = pTipoMensaje.Value.ToString();
             }
             catch (SqlException ex)
             {
@@ -383,17 +397,31 @@ namespace SistemaMEAL.Server.Modulos
             {
                 cn.getcn.Open();
 
-                SqlCommand cmd = new SqlCommand("SP_RESTABLECER_PASSWORD", cn.getcn);
+                SqlCommand cmd = new SqlCommand("SP_CAMBIAR_CONTRASEÑA", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 cmd.Parameters.AddWithValue("@P_USUANO", usuario.UsuAno);
                 cmd.Parameters.AddWithValue("@P_USUCOD", usuario.UsuCod);
                 cmd.Parameters.AddWithValue("@P_USUPAS", usuario.UsuPas);
+                cmd.Parameters.AddWithValue("@P_USUMOD", "SYSTEM");
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", usuario.UsuIp);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", "0000");
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", "000000");
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", "SYSTEM");
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", "SYSTEM");
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
 
                 cmd.ExecuteNonQuery();
 
-                mensaje = "Se restableció la contraseña";
-                tipoMensaje = "3";
+                mensaje = pDescripcionMensaje.Value.ToString();
+                tipoMensaje = pTipoMensaje.Value.ToString();
             }
             catch (SqlException ex)
             {
@@ -445,7 +473,7 @@ namespace SistemaMEAL.Server.Modulos
             return temporal?? new List<Usuario>();
         }
 
-        public IEnumerable<Usuario> Listado(ClaimsIdentity? identity, string? usuAno = null, string? usuCod = null, string? docIdeCod = null, string? usuNumDoc = null, string? usuNom = null, string? usuApe = null, string? usuFecNac = null, string? usuSex = null, string? usuCorEle = null, string? usuCarCod = null, string? usuFecInc = null, string? usuTel = null, string? usuNomUsu = null, string? usuPas = null, string? usuEst = null, string? rolCod = null, string? ubiAno = null, string? ubiCod = null)
+        public IEnumerable<Usuario> Listado(ClaimsIdentity? identity = null, string? usuAno = null, string? usuCod = null, string? docIdeCod = null, string? usuNumDoc = null, string? usuNom = null, string? usuApe = null, string? usuFecNac = null, string? usuSex = null, string? usuCorEle = null, string? usuCarCod = null, string? usuFecInc = null, string? usuTel = null, string? usuNomUsu = null, string? usuPas = null, string? usuEst = null, string? rolCod = null, string? ubiAno = null, string? ubiCod = null)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 
@@ -475,11 +503,11 @@ namespace SistemaMEAL.Server.Modulos
                 cmd.Parameters.AddWithValue("@P_ROLCOD", string.IsNullOrEmpty(rolCod) ? (object)DBNull.Value : rolCod);
                 cmd.Parameters.AddWithValue("@P_UBIANO", string.IsNullOrEmpty(ubiAno) ? (object)DBNull.Value : ubiAno);
                 cmd.Parameters.AddWithValue("@P_UBICOD", string.IsNullOrEmpty(ubiCod) ? (object)DBNull.Value : ubiCod);
-                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
-                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
-                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
-                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
-                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe ?? (object)DBNull.Value);
 
                 SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                 pDescripcionMensaje.Direction = ParameterDirection.Output;
@@ -514,175 +542,6 @@ namespace SistemaMEAL.Server.Modulos
                 cn.getcn.Close();
             }
             return temporal?? new List<Usuario>();
-        }
-
-        public bool TienePermiso(string usuAno, string usuCod, string perNom)
-        {
-            bool tienePermiso = false;
-
-            try
-            {
-                cn.getcn.Open();
-
-                SqlCommand cmd = new SqlCommand("SP_VERIFICAR_PERMISO", cn.getcn);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@UsuAno", usuAno);
-                cmd.Parameters.AddWithValue("@UsuCod", usuCod);
-                cmd.Parameters.AddWithValue("@PerNom", perNom);
-
-                SqlDataReader rd = cmd.ExecuteReader();
-                if (rd.Read())
-                {
-                    tienePermiso = rd.GetInt32(0) > 0;
-                }
-                rd.Close();
-            }
-            catch (SqlException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-                cn.getcn.Close();
-            }
-
-            return tienePermiso;
-        }
-
-        public Usuario BuscarUsuario(string? ano, string? cod)
-        {
-            List<Usuario>? usuarios = null;
-            Usuario? usuario = null;
-
-            try
-            {
-                cn.getcn.Open();
-
-                SqlCommand cmd = new SqlCommand("SP_BUSCAR_USUARIO_AUTH", cn.getcn);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@Ano", ano);
-                cmd.Parameters.AddWithValue("@Cod", cod);
-
-                StringBuilder jsonResult = new StringBuilder();
-                SqlDataReader reader = cmd.ExecuteReader();
-                if (!reader.HasRows)
-                {
-                    jsonResult.Append("[]");
-                }
-                else
-                {
-                    while (reader.Read())
-                    {
-                        jsonResult.Append(reader.GetValue(0).ToString());
-                    }
-                }
-                // Deserializa la cadena JSON en una lista de objetos Usuario
-                usuarios = JsonConvert.DeserializeObject<List<Usuario>>(jsonResult.ToString());
-                if (usuarios.Count > 0)
-                {
-                    usuario = usuarios[0];
-                }
-            }
-            catch (SqlException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-                cn.getcn.Close();
-            }
-
-            return usuario; // Devuelve null si no se encontró ningún usuario
-        }
-
-
-        public Usuario BuscarUsuarioLog(string ano, string cod)
-        {
-            List<Usuario>? usuarios = null;
-            Usuario? usuario = null;
-
-            try
-            {
-                SqlCommand cmd = new SqlCommand("SP_BUSCAR_USUARIO_AUTH", cn.getcn);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@Ano", ano);
-                cmd.Parameters.AddWithValue("@Cod", cod);
-
-                StringBuilder jsonResult = new StringBuilder();
-                SqlDataReader reader = cmd.ExecuteReader();
-                if (!reader.HasRows)
-                {
-                    jsonResult.Append("[]");
-                }
-                else
-                {
-                    while (reader.Read())
-                    {
-                        jsonResult.Append(reader.GetValue(0).ToString());
-                    }
-                }
-                // Deserializa la cadena JSON en una lista de objetos Usuario
-                usuarios = JsonConvert.DeserializeObject<List<Usuario>>(jsonResult.ToString());
-                if (usuarios.Count > 0)
-                {
-                    usuario = usuarios[0];
-                }
-            }
-            catch (SqlException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-            }
-
-            return usuario?? new Usuario();
-        }
-
-        public Usuario ValidarUsuario(string email, string password)
-        {
-            List<Usuario>? usuarios = null;
-            Usuario? usuario = null;
-
-            try
-            {
-                cn.getcn.Open();
-
-                SqlCommand cmd = new SqlCommand("SP_VALIDAR_USUARIO", cn.getcn);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@Email", email);
-                cmd.Parameters.AddWithValue("@Password", password);
-
-                StringBuilder jsonResult = new StringBuilder();
-                SqlDataReader reader = cmd.ExecuteReader();
-                if (!reader.HasRows)
-                {
-                    jsonResult.Append("[]");
-                }
-                else
-                {
-                    while (reader.Read())
-                    {
-                        jsonResult.Append(reader.GetValue(0).ToString());
-                    }
-                }
-                // Deserializa la cadena JSON en una lista de objetos Usuario
-                usuarios = JsonConvert.DeserializeObject<List<Usuario>>(jsonResult.ToString());
-                if (usuarios.Count > 0)
-                {
-                    usuario = usuarios[0];
-                }
-            }
-            catch (SqlException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-                cn.getcn.Close();
-            }
-
-            return usuario ?? new Usuario();
         }
 
         public (string? message, string? messageType) Eliminar(ClaimsIdentity? identity, string usuAno, string usuCod)

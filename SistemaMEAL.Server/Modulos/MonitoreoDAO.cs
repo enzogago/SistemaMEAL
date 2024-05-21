@@ -206,46 +206,6 @@ namespace SistemaMEAL.Modulos
              return temporal?? new List<Monitoreo>();
         }
 
-        public IEnumerable<Monitoreo> ListarIndicadoresPorProyecto(string? proAno, string? proCod)
-        {
-            List<Monitoreo>? temporal = new List<Monitoreo>();
-            try
-            {
-                cn.getcn.Open();
-
-                SqlCommand cmd = new SqlCommand("SP_LISTAR_INDICADORES_POR_PROYECTO", cn.getcn);
-                cmd.CommandType = CommandType.StoredProcedure;
-
-                cmd.Parameters.AddWithValue("@P_PROANO", proAno);
-                cmd.Parameters.AddWithValue("@P_PROCOD", proCod);
-
-                StringBuilder jsonResult = new StringBuilder();
-                SqlDataReader reader = cmd.ExecuteReader();
-                if (!reader.HasRows)
-                {
-                    jsonResult.Append("[]");
-                }
-                else
-                {
-                    while (reader.Read())
-                    {
-                        jsonResult.Append(reader.GetValue(0).ToString());
-                    }
-                }
-                // Deserializa la cadena JSON en una lista de objetos Estado
-                temporal = JsonConvert.DeserializeObject<List<Monitoreo>>(jsonResult.ToString());
-            }
-            catch (SqlException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-                cn.getcn.Close();
-            }
-             return temporal?? new List<Monitoreo>();
-        }
-
 
         public (string? benAnoOut,string? benCodOut,string? message, string? messageType) InsertarBeneficiario(ClaimsIdentity? identity, Beneficiario beneficiario)
         {

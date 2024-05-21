@@ -59,7 +59,7 @@ const Sidebar = () => {
                 const usuCod = userLogged.usuCod;
     
                 try {
-                    const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Menu/${usuAno}/${usuCod}`, {
+                    const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Menu`, {
                         headers: {
                             'Authorization': `Bearer ${token}`
                         }

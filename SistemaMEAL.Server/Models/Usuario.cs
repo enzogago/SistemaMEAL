@@ -41,6 +41,7 @@ namespace SistemaMEAL.Server.Models
 
         public String? UsuPas { get; set; }
 
+        public String? UsuIp { get; set; }
         public Char? UsuEst { get; set; }
 
         [ForeignKey("Rol")]

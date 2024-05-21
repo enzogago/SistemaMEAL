@@ -12,17 +12,34 @@ namespace SistemaMEAL.Modulos
     {
         private conexionDAO cn = new conexionDAO();
 
-        public bool InsertarPermisoUsuario(string usuAno, string usuCod, string perCod)
+        public bool InsertarPermisoUsuario(ClaimsIdentity? identity, string usuAno, string usuCod, string perCod)
         {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
             try
             {
                 cn.getcn.Open();
 
                 SqlCommand cmd = new SqlCommand("SP_INSERTAR_PERMISO_USUARIO", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@USUANO", usuAno);
-                cmd.Parameters.AddWithValue("@USUCOD", usuCod);
-                cmd.Parameters.AddWithValue("@PERCOD", perCod);
+                cmd.Parameters.AddWithValue("@P_USUANO", usuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD", usuCod);
+                cmd.Parameters.AddWithValue("@P_PERCOD", perCod);
+                cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+
                 cmd.ExecuteNonQuery();
 
                 return true;
@@ -38,17 +55,34 @@ namespace SistemaMEAL.Modulos
             }
         }
 
-        public bool EliminarMenuUsuario(string usuAno, string usuCod, string perCod)
+        public bool EliminarPermisoUsuario(ClaimsIdentity? identity, string usuAno, string usuCod, string perCod)
         {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
             try
             {
                 cn.getcn.Open();
 
                 SqlCommand cmd = new SqlCommand("SP_ELIMINAR_PERMISO_USUARIO", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@USUANO", usuAno);
-                cmd.Parameters.AddWithValue("@USUCOD", usuCod);
-                cmd.Parameters.AddWithValue("@PERCOD", perCod);
+                cmd.Parameters.AddWithValue("@P_USUANO", usuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD", usuCod);
+                cmd.Parameters.AddWithValue("@P_PERCOD", perCod);
+                cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+                
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+                
                 cmd.ExecuteNonQuery();
 
                 return true;
@@ -256,39 +290,61 @@ namespace SistemaMEAL.Modulos
             return (mensaje, tipoMensaje);
         }
 
-        public IEnumerable<Permiso> ListadoPermisoPorUsuario(string usuAno, string usuCod)
+        public IEnumerable<Permiso> ListadoPermisoPorUsuario(ClaimsIdentity? identity, string? perCod = null, string? usuAno = null, string? usuCod = null)
         {
-            List<Permiso> temporal = new List<Permiso>();
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
+            List<Permiso>? temporal = new List<Permiso>();
             try
             {
                 cn.getcn.Open();
 
-                SqlCommand cmd = new SqlCommand("SP_LISTAR_PERMISO_POR_USUARIO", cn.getcn);
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_PERMISO_USUARIO", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@UsuAno", usuAno);
-                cmd.Parameters.AddWithValue("@UsuCod", usuCod);
-                SqlDataReader rd = cmd.ExecuteReader();
-                while (rd.Read())
+                cmd.Parameters.AddWithValue("@P_PERCOD", string.IsNullOrEmpty(perCod) ? (object)DBNull.Value : perCod);
+                cmd.Parameters.AddWithValue("@P_USUANO", string.IsNullOrEmpty(usuAno) ? (object)DBNull.Value : usuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD", string.IsNullOrEmpty(usuCod) ? (object)DBNull.Value : usuCod);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                if (!reader.HasRows)
                 {
-                    temporal.Add(new Permiso()
-                    {
-                        PerCod = rd.GetString(0),
-                        PerNom = rd.GetString(1),
-                        PerRef = rd.GetString(2),
-                    });
+                    jsonResult.Append("[]");
                 }
-                rd.Close();
+                else
+                {
+                    while (reader.Read())
+                    {
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                // Deserializa la cadena JSON en una lista de objetos Estado
+                temporal = JsonConvert.DeserializeObject<List<Permiso>>(jsonResult.ToString());
             }
             catch (SqlException ex)
             {
-                temporal = new List<Permiso>();
                 Console.WriteLine(ex.Message);
             }
             finally
             {
                 cn.getcn.Close();
             }
-            return temporal;
+            return temporal?? new List<Permiso>();
         }
 
 
