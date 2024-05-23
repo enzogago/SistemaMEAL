@@ -356,18 +356,23 @@ const ResultChain = () => {
                     indCod,
                 };
 
+                const preValue = renderData[key] ? renderData[key].preValue : '' ;
+
                 if (keyType.length === 4) {  // Si la longitud es 4, entonces es un 'ano'
                     cambio.cadResPerAno = keyType;
                     cambio.cadResPerMetTec = valorActual;
+                    cambio.cadResPerMetPre = preValue;
                     cambiosPorAno.push(cambio);
                 } else if (keyType.length === 2) {  // Si la longitud es 2, entonces es un 'implementador'
                     cambio.impCod = keyType;
                     cambio.cadResImpMetTec = valorActual;
+                    cambio.cadResImpMetPre = preValue;
                     cambiosPorImplementador.push(cambio);
                 } else if (keyType.length === 10) {  // Si la longitud es 10, entonces es una 'ubicacion'
                     cambio.ubiAno = keyType.substring(0, 4);
                     cambio.ubiCod = keyType.substring(4);
                     cambio.cadResUbiMetTec = valorActual;
+                    cambio.cadResUbiMetPre = preValue;
                     cambiosPorUbicacion.push(cambio);
                 } else if (key.startsWith('total')) {  // Si comienza con 'total', entonces es un 'totalPorIndicador'
                     cambio.indLinBas = valorActual;
@@ -388,6 +393,7 @@ const ResultChain = () => {
             Indicadores: cambiosPorIndicador
         }
         
+        console.log(CadenaIndicadorDto);
         handleInsert(CadenaIndicadorDto);
     };
 

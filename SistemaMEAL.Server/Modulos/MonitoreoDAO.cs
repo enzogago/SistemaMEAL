@@ -55,45 +55,6 @@ namespace SistemaMEAL.Modulos
              return temporal?? new List<Monitoreo>();
         }
 
-        // public IEnumerable<Monitoreo> Listado(ClaimsIdentity? identity)
-        // {
-        //     var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
-
-        //     List<Monitoreo>? temporal = new List<Monitoreo>();
-        //     try
-        //     {
-        //         cn.getcn.Open();
-
-        //         SqlCommand cmd = new SqlCommand("SP_PRUEBA_METAS", cn.getcn);
-        //         cmd.CommandType = CommandType.StoredProcedure;
-
-        //         StringBuilder jsonResult = new StringBuilder();
-        //         SqlDataReader reader = cmd.ExecuteReader();
-        //         if (!reader.HasRows)
-        //         {
-        //             jsonResult.Append("[]");
-        //         }
-        //         else
-        //         {
-        //             while (reader.Read())
-        //             {
-        //                 jsonResult.Append(reader.GetValue(0).ToString());
-        //             }
-        //         }
-        //         // Deserializa la cadena JSON en una lista de objetos Estado
-        //         temporal = JsonConvert.DeserializeObject<List<Monitoreo>>(jsonResult.ToString());
-        //     }
-        //     catch (SqlException ex)
-        //     {
-        //         Console.WriteLine(ex.Message);
-        //     }
-        //     finally
-        //     {
-        //         cn.getcn.Close();
-        //     }
-        //      return temporal?? new List<Monitoreo>();
-        // }
-        
         public int GetBeneficiariosCount(string tags)
         {
             int count = 0;
@@ -993,6 +954,7 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_UBICOD", metaBeneficiario.UbiCod);
                 cmd.Parameters.AddWithValue("@P_METBENMESEJETEC", metaBeneficiario.MetBenMesEjeTec);
                 cmd.Parameters.AddWithValue("@P_METBENANOEJETEC", metaBeneficiario.MetBenAnoEjeTec);
+                cmd.Parameters.AddWithValue("@P_METBENEDA", metaBeneficiario.MetBenEda);
                 cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                 cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
@@ -1114,6 +1076,7 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_METBENEDA", metaBeneficiario.MetBenEda);
                 cmd.Parameters.AddWithValue("@P_METBENMESEJETEC", metaBeneficiario.MetBenMesEjeTec);
                 cmd.Parameters.AddWithValue("@P_METBENANOEJETEC", metaBeneficiario.MetBenAnoEjeTec);
+                cmd.Parameters.AddWithValue("@P_METBENEDA", metaBeneficiario.MetBenEda);
                 cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                 cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);

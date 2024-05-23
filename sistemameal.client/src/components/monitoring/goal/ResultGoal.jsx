@@ -142,6 +142,7 @@ const ResultGoal = () => {
                     })
                 })
                 fetchData(`Meta/${subProAno}/${subProCod}/${ano}`, (data) => {
+                    console.log(data)
                     // Obtén todos los nombres de los campos registrados
                     const fieldNames = Object.keys(getValues());
 

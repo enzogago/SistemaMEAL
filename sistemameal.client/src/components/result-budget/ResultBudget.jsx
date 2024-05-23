@@ -360,7 +360,7 @@ const ResultChain = () => {
                 // Obtener la parte de la clave que corresponde al 'ano', 'implementador', 'ubicacion' o 'financiador'
                 let keyParts = key.split('_');
                 let indAno, indCod, keyType, keyTypeU;
-
+                
                 // Si la clave comienza con 'total', entonces es un 'totalPorIndicador'
                 if (key.startsWith('total')) {
                     indAno = keyParts[1];
@@ -372,24 +372,29 @@ const ResultChain = () => {
                     keyType = keyParts[2];
                     keyTypeU = keyParts[3];
                 }
-
+                
                 let cambio = {
                     indAno,
                     indCod,
                 };
+
+                const tecValue = renderData[key] ? renderData[key].tecValue : ''
                 
                 if (keyType.startsWith('ano')) {  // Si comienza con 'ano', entonces es un 'ano'
                     cambio.cadResPerAno = keyTypeU;
                     cambio.cadResPerMetPre = valorActual;
+                    cambio.cadResPerMetTec = tecValue;
                     cambiosPorAno.push(cambio);
                 } else if (keyType.startsWith('imp')) {  // Si comienza con 'imp', entonces es un 'implementador'
                     cambio.impCod = keyTypeU;
                     cambio.cadResImpMetPre = valorActual;
+                    cambio.cadResImpMetTec = tecValue;
                     cambiosPorImplementador.push(cambio);
                 } else if (keyType.startsWith('ubi')) {  // Si comienza con 'ubi', entonces es una 'ubicacion'
                     cambio.ubiAno = keyTypeU.slice(0, 4);
                     cambio.ubiCod = keyTypeU.slice(4);
                     cambio.cadResUbiMetPre = valorActual;
+                    cambio.cadResUbiMetTec = tecValue;
                     cambiosPorUbicacion.push(cambio);
                 } else if (keyType.startsWith('fin')) {  // Si comienza con 'fin', entonces es un 'financiador'
                     cambio.finCod = keyTypeU;

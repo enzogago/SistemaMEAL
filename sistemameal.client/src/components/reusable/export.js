@@ -51,7 +51,14 @@ export const exportToExcel = async (data, headers, title, properties) => {
     // Añadir los datos a la hoja de trabajo
     data.forEach(item => {
         // Mapear las propiedades a las celdas, incluyendo conversiones especiales
-        const rowData = properties.map(prop => prop === 'metPorAvaTec' ? item[prop] / 100 : item[prop]);
+        const rowData = properties.map(prop => {
+            // Si 'prop' es un arreglo, concatenar los valores con un guión
+            if (Array.isArray(prop)) {
+                return prop.map(p => item[p]).join(' - ');
+            }
+            // Si 'prop' es un string, usar el valor tal cual
+            return item[prop];
+        });
 
         // Agregar datos de usuario y fecha de modificación al final de cada fila
         rowData.push(item.usuMod); // Usuario que modificó
@@ -122,7 +129,14 @@ export const exportToPdf = async (data, headers, title, properties, format) => {
 
         // Definir los datos de la tabla, incluyendo la conversión de 'benSex' y el formato de 'fecMod'
         const tableData = data.map(item => {
-            const rowData = properties.map(prop => item[prop]);
+            const rowData = properties.map(prop => {
+                // Si 'prop' es un arreglo, concatenar los valores con un guión
+                if (Array.isArray(prop)) {
+                    return prop.map(p => item[p]).join(' - ');
+                }
+                // Si 'prop' es un string, usar el valor tal cual
+                return item[prop];
+            });
             // Convertir 'benSex' a 'MASCULINO' o 'FEMENINO'
             const sexIndex = properties.indexOf('benSex');
             if (sexIndex !== -1) {

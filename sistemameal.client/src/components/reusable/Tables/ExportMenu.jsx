@@ -11,6 +11,10 @@ const ExportMenu = ({ filteredData, headers, title, properties, format, actions 
         setDropdownOpen(!dropdownOpen);
     }
 
+    if (!actions.pdf && !actions.excel) {
+       return; 
+    }
+
     return (
         <div className={`PowerMas_Dropdown_Export Large_3 ${dropdownOpen ? 'open' : ''}`}>
             <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>

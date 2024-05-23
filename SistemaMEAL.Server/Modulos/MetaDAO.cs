@@ -867,7 +867,7 @@ namespace SistemaMEAL.Modulos
             return temporal?? new List<MetaUsuario>();
         }
 
-        public IEnumerable<Meta> BuscarMeta(ClaimsIdentity? identity, string? metAno = null, string? metCod = null, string? estCod = null, string? metMetTec = null, string? metEjeTec = null, string? metPorAvaTec = null, string? metMetPre = null, string? metEjePre = null, string? metPorAvaPre = null, string? metMesPlaTec = null, string? metAnoPlaTec = null, string? metMesPlaPre = null, string? metAnoPlaPre = null, string? metEstPre = null, string? impCod = null, string? ubiAno = null, string? ubiCod = null, string? indAno = null, string? indCod = null, string? usuAno = null, string? usuCod = null, string? finCod = null)
+        public IEnumerable<Meta> Buscar(ClaimsIdentity? identity, string? metAno = null, string? metCod = null, string? estCod = null, string? metMetTec = null, string? metEjeTec = null, string? metPorAvaTec = null, string? metMetPre = null, string? metEjePre = null, string? metPorAvaPre = null, string? metMesPlaTec = null, string? metAnoPlaTec = null, string? metMesPlaPre = null, string? metAnoPlaPre = null, string? metEstPre = null, string? impCod = null, string? ubiAno = null, string? ubiCod = null, string? indAno = null, string? indCod = null, string? usuAno = null, string? usuCod = null, string? finCod = null, string? subProAno = null, string? subProCod = null)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 
@@ -901,6 +901,8 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_USUANO", string.IsNullOrEmpty(usuAno) ? (object)DBNull.Value : usuAno);
                 cmd.Parameters.AddWithValue("@P_USUCOD", string.IsNullOrEmpty(usuCod) ? (object)DBNull.Value : usuCod);
                 cmd.Parameters.AddWithValue("@P_FINCOD", string.IsNullOrEmpty(finCod) ? (object)DBNull.Value : finCod);
+                cmd.Parameters.AddWithValue("@P_SUBPROANO", string.IsNullOrEmpty(subProAno) ? (object)DBNull.Value : subProAno);
+                cmd.Parameters.AddWithValue("@P_SUBPROCOD", string.IsNullOrEmpty(subProCod) ? (object)DBNull.Value : subProCod);
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                 cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
                 cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);

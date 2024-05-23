@@ -35,3 +35,43 @@ export const fetchDataBlock = async (controller, setData, element) => {
         Notiflix.Block.remove(element);
     }
 };
+
+export const handleDelete = async (controller, obj, setRefresh) => {
+    Notiflix.Confirm.show(
+        'Eliminar Registro',
+        '¿Está seguro que quieres eliminar este registro?',
+        'Sí',
+        'No',
+        async () => {
+            const url = `${import.meta.env.VITE_APP_API_URL}/api/${controller}`;
+
+            try {
+                Notiflix.Loading.pulse();
+                const token = localStorage.getItem('token');
+                const response = await fetch(url, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(obj),
+                });
+                const data = await response.json();
+                if (!response.ok) {
+                    Notiflix.Notify.failure(data.message);
+                    return;
+                }
+                
+                setRefresh(prevRefresh => !prevRefresh);
+                Notiflix.Notify.success(data.message);
+            } catch (error) {
+                console.error('Error:', error);
+            } finally {
+                Notiflix.Loading.remove();
+            }
+        },
+        () => {
+            // El usuario ha cancelado la operación de eliminación
+        }
+    );
+};

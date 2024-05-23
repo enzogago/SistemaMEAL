@@ -22,7 +22,6 @@ const UploadGoalBudget = lazy(() => import('./components/result-budget/UploadGoa
 const SaveGoalBudget = lazy(() => import('./components/result-budget/SaveGoalBudget'));
 const ViewExecution = lazy(() => import('./components/result-budget/ViewExecution'));
 const FormGoalExecution = lazy(() => import('./components/monitoring/beneficiarie/FormGoalExecution'));
-const Prueba = lazy(() => import('./Prueba'));
 const Home = lazy(() => import('./components/home/Home'));
 const PrivateRoute = lazy(() => import('./components/router/PrivateRoute'));
 const PublicRoute = lazy(() => import('./components/router/PublicRoute'));
@@ -211,7 +210,6 @@ const App = () => {
                                                     </>
                                                 )}
                                                 <Route path="tutorial" element={<Tutorial />} />
-                                                <Route path="prueba" element={<Prueba />} />
                                                 <Route path="*" element={<NotFound />} />
                                             </Routes>
                                     </Layout>

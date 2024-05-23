@@ -27,14 +27,14 @@ namespace SistemaMEAL.Server.Controllers
 
         [HttpGet]
         [Route("{metAno}/{metCod}")]
-        public dynamic BuscarMeta(string metAno, string metCod)
+        public dynamic Buscar(string metAno, string metCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var result = _metas.BuscarMeta(identity, metAno: metAno, metCod: metCod);
+            var result = _metas.Buscar(identity, metAno: metAno, metCod: metCod);
             return Ok(result.FirstOrDefault());
         }
 
@@ -47,7 +47,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var result = _metas.BuscarMetasPorSubProyecto(identity, subProAno, subProCod, metAnoPlaTec);
+            var result = _metas.Buscar(identity, subProAno:subProAno, subProCod:subProCod, metAnoPlaTec:metAnoPlaTec);
             return Ok(result);
         }
 

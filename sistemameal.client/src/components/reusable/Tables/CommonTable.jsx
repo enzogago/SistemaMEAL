@@ -5,32 +5,67 @@ import {
     getSortedRowModel,
     flexRender,
 } from '@tanstack/react-table';
-import { useMemo, useState } from 'react';
+import { createRef, useEffect, useMemo, useRef, useState } from 'react';
 import Sort from '../../../icons/Sort';
 import TableEmpty from '../../../img/PowerMas_TableEmpty.svg';
 
 const smallPageSizes = [10, 20, 30, 50];
 const largePageSizes = [100, 200, 300, 500];
 
-const CommonTable = ({data = [], columns = []}) => {
+const CommonTable = ({data = [], columns = [], isLargePagination = false}) => {
+    const pageSizes = isLargePagination ? largePageSizes : smallPageSizes;
+
     const [sorting, setSorting] = useState([]);
 
-    // Filtrar columnas que no tienen datos
+    const stickyColumns = ['actions']; // Ejemplo de columnas que quieres sticky
+
+    // Referencias para las columnas
+    const columnRefs = useRef(new Map());
+
+    // Estado para almacenar los anchos de las columnas
+    const [columnWidths, setColumnWidths] = useState({});
+
+    // Medir el ancho de las columnas después de que se hayan renderizado
+    useEffect(() => {
+        const newColumnWidths = {};
+        let totalWidth = 0;
+        stickyColumns.forEach(key => {
+            if (columnRefs.current.has(key) && columnRefs.current.get(key).current) {
+                const width = columnRefs.current.get(key).current.getBoundingClientRect().width;
+                newColumnWidths[key] = totalWidth; // Asigna el total acumulado antes de esta columna
+                totalWidth += width; // Suma el ancho de esta columna al total
+            }
+        });
+        setColumnWidths(newColumnWidths);
+    }, [data]); // Dependencia en los datos para recalcular cuando cambien
+
+    // Filtrar columnas que no tienen datos, excepto las columnas de acción
     const filteredColumns = useMemo(() => {
         return columns.filter(column => {
-            // Verificar si alguna fila tiene un valor no nulo o no indefinido para esta columna
+            // Si la columna es de acciones, siempre la incluimos
+            if (column.accessorKey === 'actions') {
+                return true;
+            }
+            // Para las demás columnas, verificamos si tienen datos
             return data.some(row => row[column.accessorKey] != null && row[column.accessorKey] !== '');
         });
     }, [columns, data]);
-    
+
+    const [pagination, setPagination] = useState({
+        pageIndex: 0, //initial page index
+        pageSize: isLargePagination ? 100 : 10, //default page size
+    });
+
     const table = useReactTable({
         data,
         columns: filteredColumns,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
+        onPaginationChange: setPagination,
         state: {
-            sorting
+            sorting,
+            pagination,
         },
         onSortingChange: setSorting,
         columnResizeMode: "onChange"
@@ -53,11 +88,30 @@ const CommonTable = ({data = [], columns = []}) => {
                         <thead className=''>
                             {
                                 table.getHeaderGroups().map(headerGroup => (
-                                    <tr key={headerGroup.id} className=''>
+                                    <tr key={headerGroup.id} className='' style={{zIndex: 2}}>
                                         {
-                                            headerGroup.headers.map((header, index, array) => (
+                                            headerGroup.headers.map((header, index, array) => {
+                                                // Asignar una referencia a cada celda de encabezado
+                                                if (!columnRefs.current.has(header.id)) {
+                                                    columnRefs.current.set(header.id, createRef());
+                                                }
+                                                const ref = columnRefs.current.get(header.id);
+
+                                                const isSticky = stickyColumns.includes(header.id);
+                                                const stickyStyle = isSticky ? {
+                                                    position: 'sticky',
+                                                    right: `${columnWidths[header.id] || 0}px`,
+                                                    zIndex: 1,
+                                                    background: 'white',
+                                                } : {};
+
+                                                return (
                                                 <th
-                                                    style={{whiteSpace: 'nowrap'}}
+                                                    ref={ref}
+                                                    style={{
+                                                        ...stickyStyle,
+                                                        whiteSpace: 'nowrap'
+                                                    }}
                                                     key={header.id} 
                                                     onClick={header.column.getToggleSortingHandler()}
                                                 >
@@ -86,7 +140,7 @@ const CommonTable = ({data = [], columns = []}) => {
                                                         </div>
                                                     </div>
                                                 </th>
-                                            ))
+                                            )})
                                         }
                                     </tr>
                                 ))
@@ -98,12 +152,30 @@ const CommonTable = ({data = [], columns = []}) => {
                             <>
                                 {table.getRowModel().rows.map(row => (
                                     <tr key={row.id}>
-                                        {row.getVisibleCells().map(cell => (
-                                            <td style={{ width:  cell.column.getSize(), whiteSpace: 'nowrap'}} key={cell.id}>
+                                    {row.getVisibleCells().map(cell => {
+                                        // Aplicar el estilo sticky a las celdas del cuerpo si corresponde
+                                        const isSticky = stickyColumns.includes(cell.column.id);
+                                        const stickyStyle = isSticky ? {
+                                            position: 'sticky',
+                                            right: `${columnWidths[cell.column.id] || 0}px`,
+                                            zIndex: 1,
+                                            background: 'white',
+                                        } : {};
+        
+                                        return (
+                                            <td
+                                                style={{
+                                                    ...stickyStyle,
+                                                    width: cell.column.getSize(),
+                                                    whiteSpace: 'nowrap'
+                                                }}
+                                                key={cell.id}
+                                            >
                                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                             </td>
-                                        ))}
-                                    </tr>
+                                        );
+                                    })}
+                                </tr>
                                 ))}
                             </>
                         }
@@ -123,7 +195,7 @@ const CommonTable = ({data = [], columns = []}) => {
                         onChange={(e) => table.setPageSize(e.target.value)}
                         className="p_25"
                     > 
-                        {smallPageSizes.map(pageSize => {
+                        {pageSizes.map(pageSize => {
                             return  <option key={pageSize} value={pageSize}> 
                                         {pageSize} 
                                     </option>;
