@@ -490,7 +490,7 @@ namespace SistemaMEAL.Server.Modulos
         }
 
 
-        public IEnumerable<Beneficiario> BuscarBeneficiarioPorDocumento(ClaimsIdentity? identity, string? docIdeCod = null, string? docIdeBenNum = null)
+        public IEnumerable<Beneficiario> BuscarBeneficiarioPorDocumento(ClaimsIdentity? identity, string? benAno = null, string? benCod = null, string? docIdeCod = null, string? docIdeBenNum = null)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 
@@ -499,9 +499,11 @@ namespace SistemaMEAL.Server.Modulos
             {
                 cn.getcn.Open();
 
-                SqlCommand cmd = new SqlCommand("SP_BUSCAR_BENEFICIARIO_POR_DOCUMENTO", cn.getcn);
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_DOCUMENTO_IDENTIDAD_BENEFICIARIO", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 // Aquí puedes agregar los parámetros necesarios para tu procedimiento almacenado
+                cmd.Parameters.AddWithValue("@P_BENANO", string.IsNullOrEmpty(benAno) ? (object)DBNull.Value : benAno);
+                cmd.Parameters.AddWithValue("@P_BENCOD", string.IsNullOrEmpty(benCod) ? (object)DBNull.Value : benCod);
                 cmd.Parameters.AddWithValue("@P_DOCIDECOD", string.IsNullOrEmpty(docIdeCod) ? (object)DBNull.Value : docIdeCod);
                 cmd.Parameters.AddWithValue("@P_DOCIDEBENNUM", string.IsNullOrEmpty(docIdeBenNum) ? (object)DBNull.Value : docIdeBenNum);
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
@@ -628,39 +630,22 @@ namespace SistemaMEAL.Server.Modulos
                 pTipoMensaje.Direction = ParameterDirection.Output;
                 cmd.Parameters.Add(pTipoMensaje);
 
-                SqlDataReader rd = cmd.ExecuteReader();
-                while (rd.Read())
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                if (!reader.HasRows)
                 {
-                    Beneficiario beneficiario = new Beneficiario
-                    {
-                        BenAno = rd["BENANO"].ToString(),
-                        BenCod = rd["BENCOD"].ToString(),
-                        BenNom = rd["BENNOM"].ToString(),
-                        BenApe = rd["BENAPE"].ToString(),
-                        BenFecNac = rd["BENFECNAC"].ToString(),
-                        BenTel = rd["BENTEL"].ToString(),
-                        BenCorEle = rd["BENCORELE"].ToString(),
-                        BenSex = rd["BENSEX"].ToString(),
-                        GenCod = rd["GENCOD"].ToString(),
-                        GenNom = rd["GENNOM"].ToString(),
-                        BenCodUni = rd["BENCODUNI"].ToString(),
-                        BenTelCon = rd["BENTELCON"].ToString(),
-                        BenNomApo = rd["BENNOMAPO"].ToString(),
-                        BenApeApo = rd["BENAPEAPO"].ToString(),
-                        NacCod = rd["NACCOD"].ToString(),
-                        NacNom = rd["NACNOM"].ToString(),
-                        BenDir = rd["BENDIR"].ToString(),
-                        BenAut = rd["BENAUT"].ToString(),
-                        MetAno = rd["METANO"].ToString(),
-                        MetCod = rd["METCOD"].ToString(),
-                        MetBenAnoEjeTec = rd["METBENANOEJETEC"].ToString(),
-                        MetBenMesEjeTec = rd["METBENMESEJETEC"].ToString(),
-                        UbiAno = rd["UBIANO"].ToString(),
-                        UbiCod = rd["UBICOD"].ToString(),
-                        UbiNom = rd["UBINOM"].ToString(),
-                    };
-                    temporal.Add(beneficiario);
+                    jsonResult.Append("[]");
                 }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                // Deserializa la cadena JSON en una lista de objetos Usuario
+                temporal = JsonConvert.DeserializeObject<List<Beneficiario>>(jsonResult.ToString());
             }
             catch (SqlException ex)
             {
@@ -764,11 +749,14 @@ namespace SistemaMEAL.Server.Modulos
             {
                 cn.getcn.Open();
 
-                SqlCommand cmd = new SqlCommand("SP_BUSCAR_BENEFICIARIOS_ECUADOR_HOME", cn.getcn);
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_BENEFICIARIOS_SEGUNDO_NIVEL_HOME", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
                 cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
                 cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_UBIANOPAD", "2024");
+                cmd.Parameters.AddWithValue("@P_UBICODPAD", "000001");
+
 
                 StringBuilder jsonResult = new StringBuilder();
                 SqlDataReader reader = cmd.ExecuteReader();
@@ -805,11 +793,14 @@ namespace SistemaMEAL.Server.Modulos
             {
                 cn.getcn.Open();
 
-                SqlCommand cmd = new SqlCommand("SP_BUSCAR_BENEFICIARIOS_PERU_HOME", cn.getcn);
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_BENEFICIARIOS_SEGUNDO_NIVEL_HOME", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
                 cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
                 cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_UBIANOPAD", "2024");
+                cmd.Parameters.AddWithValue("@P_UBICODPAD", "000002");
+
 
                 StringBuilder jsonResult = new StringBuilder();
                 SqlDataReader reader = cmd.ExecuteReader();
@@ -846,11 +837,14 @@ namespace SistemaMEAL.Server.Modulos
             {
                 cn.getcn.Open();
 
-                SqlCommand cmd = new SqlCommand("SP_BUSCAR_BENEFICIARIOS_COLOMBIA_HOME", cn.getcn);
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_BENEFICIARIOS_SEGUNDO_NIVEL_HOME", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
                 cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
                 cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_UBIANOPAD", "2024");
+                cmd.Parameters.AddWithValue("@P_UBICODPAD", "000003");
+
 
                 StringBuilder jsonResult = new StringBuilder();
                 SqlDataReader reader = cmd.ExecuteReader();

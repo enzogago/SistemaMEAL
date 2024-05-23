@@ -21,7 +21,7 @@ namespace SistemaMEAL.Server.Controllers
         }
 
         [HttpGet]
-        public dynamic BuscarSubproyecto()
+        public dynamic Buscar()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);

@@ -193,6 +193,7 @@ const ResultChain = () => {
                 // Procesa los datos recibidos de cada petición
     
                 // Establece los indicadores con los datos de la última petición
+                console.log(dataPorFinanciador);
                 setIndicadores(dataSubproyecto);
         
                 // Inicializar indTotPreState y totalIndTotPre

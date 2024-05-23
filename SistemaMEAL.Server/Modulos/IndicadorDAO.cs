@@ -14,7 +14,7 @@ namespace SistemaMEAL.Modulos
     {
         private conexionDAO cn = new conexionDAO();
 
-        public IEnumerable<Indicador> Buscar(ClaimsIdentity? identity, string? actAno = null, string? actCod = null,string? indAno = null, string? indCod = null, string? indNom = null, string? indNum = null, string? indTipInd = null, string? uniCod = null, string? tipValCod = null, string? indTotPre = null, string? monCod = null, string? indLinBas = null, string? indFor = null)
+        public IEnumerable<Indicador> Buscar(ClaimsIdentity? identity, string? actAno = null, string? actCod = null,string? indAno = null, string? indCod = null, string? indNom = null, string? indNum = null, string? indTipInd = null, string? uniCod = null, string? tipValCod = null, string? indTotPre = null, string? monCod = null, string? indLinBas = null, string? indFor = null, string? subProAno = null, string? subProCod = null)
         {
             List<Indicador>? temporal = new List<Indicador>();
             try
@@ -26,6 +26,8 @@ namespace SistemaMEAL.Modulos
                 SqlCommand cmd = new SqlCommand("SP_BUSCAR_INDICADOR", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
 
+                cmd.Parameters.AddWithValue("@P_SUBPROANO", string.IsNullOrEmpty(subProAno) ? (object)DBNull.Value : subProAno);
+                cmd.Parameters.AddWithValue("@P_SUBPROCOD", string.IsNullOrEmpty(subProCod) ? (object)DBNull.Value : subProCod);
                 cmd.Parameters.AddWithValue("@P_INDANO", string.IsNullOrEmpty(indAno) ? (object)DBNull.Value : indAno);
                 cmd.Parameters.AddWithValue("@P_INDCOD", string.IsNullOrEmpty(indCod) ? (object)DBNull.Value : indCod);
                 cmd.Parameters.AddWithValue("@P_ACTANO", string.IsNullOrEmpty(actAno) ? (object)DBNull.Value : actAno);
@@ -55,6 +57,7 @@ namespace SistemaMEAL.Modulos
 
                 StringBuilder jsonResult = new StringBuilder();
                 SqlDataReader reader = cmd.ExecuteReader();
+
                 if (!reader.HasRows)
                 {
                     jsonResult.Append("[]");
@@ -120,18 +123,100 @@ namespace SistemaMEAL.Modulos
             return temporal?? new List<Indicador>();
         }
         
-        public IEnumerable<CadenaIndicador> BuscarCadenaPorPeriodo(string? subProAno, string? subProCod)
+        public IEnumerable<CadenaIndicador> BuscarCadenaPorPeriodo(ClaimsIdentity? identity, string? subProAno = null, string? subProCod = null, string? indAno = null, string? indCod = null, string? indTipInd = null, string? carResPerAno = null, string? cadResPerMetTec = null, string? cadResPerMetPre = null)
         {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+            
             List<CadenaIndicador>? temporal = new List<CadenaIndicador>();
             try
             {
                 cn.getcn.Open();
 
-                SqlCommand cmd = new SqlCommand("SP_BUSCAR_CADENA_PERIODO", cn.getcn);
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_CADENA_RESULTADO_PERIODO", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
 
+                cmd.Parameters.AddWithValue("@P_INDANO", string.IsNullOrEmpty(indAno) ? (object)DBNull.Value : indAno);
+                cmd.Parameters.AddWithValue("@P_INDCOD", string.IsNullOrEmpty(indCod) ? (object)DBNull.Value : indCod);
+                cmd.Parameters.AddWithValue("@P_INDTIPIND", string.IsNullOrEmpty(indTipInd) ? (object)DBNull.Value : indTipInd);
                 cmd.Parameters.AddWithValue("@P_SUBPROANO", string.IsNullOrEmpty(subProAno) ? (object)DBNull.Value : subProAno);
                 cmd.Parameters.AddWithValue("@P_SUBPROCOD", string.IsNullOrEmpty(subProCod) ? (object)DBNull.Value : subProCod);
+                cmd.Parameters.AddWithValue("@P_CADRESPERANO", string.IsNullOrEmpty(carResPerAno) ? (object)DBNull.Value : carResPerAno);
+                cmd.Parameters.AddWithValue("@P_CADRESPERMETTEC", string.IsNullOrEmpty(cadResPerMetTec) ? (object)DBNull.Value : cadResPerMetTec);
+                cmd.Parameters.AddWithValue("@P_CADRESPERMETPRE", string.IsNullOrEmpty(cadResPerMetPre) ? (object)DBNull.Value : cadResPerMetPre);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                if (!reader.HasRows)
+                {
+                    jsonResult.Append("[]");
+                }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                // Deserializa la cadena JSON en una lista de objetos Estado
+                temporal = JsonConvert.DeserializeObject<List<CadenaIndicador>>(jsonResult.ToString());
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return temporal?? new List<CadenaIndicador>();
+        }
+
+        public IEnumerable<CadenaIndicador> BuscarCadenaPorImplementador(ClaimsIdentity? identity, string? subProAno = null, string? subProCod = null, string? indAno = null, string? indCod = null, string? indTipInd = null, string? impCod = null, string? cadResImpMetTec = null, string? cadResImpMetPre = null)
+        {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+            List<CadenaIndicador>? temporal = new List<CadenaIndicador>();
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_CADENA_RESULTADO_IMPLEMENTADOR", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@P_INDANO", string.IsNullOrEmpty(indAno) ? (object)DBNull.Value : indAno);
+                cmd.Parameters.AddWithValue("@P_INDCOD", string.IsNullOrEmpty(indCod) ? (object)DBNull.Value : indCod);
+                cmd.Parameters.AddWithValue("@P_IMPCOD", string.IsNullOrEmpty(impCod) ? (object)DBNull.Value : impCod);
+                cmd.Parameters.AddWithValue("@P_CADRESIMPMETTEC", string.IsNullOrEmpty(cadResImpMetTec) ? (object)DBNull.Value : cadResImpMetTec);
+                cmd.Parameters.AddWithValue("@P_CADRESIMPMETPRE", string.IsNullOrEmpty(cadResImpMetPre) ? (object)DBNull.Value : cadResImpMetPre);
+                cmd.Parameters.AddWithValue("@P_INDTIPIND", string.IsNullOrEmpty(indTipInd) ? (object)DBNull.Value : indTipInd);
+                cmd.Parameters.AddWithValue("@P_SUBPROANO", string.IsNullOrEmpty(subProAno) ? (object)DBNull.Value : subProAno);
+                cmd.Parameters.AddWithValue("@P_SUBPROCOD", string.IsNullOrEmpty(subProCod) ? (object)DBNull.Value : subProCod);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
 
                 StringBuilder jsonResult = new StringBuilder();
                 SqlDataReader reader = cmd.ExecuteReader();
@@ -159,57 +244,40 @@ namespace SistemaMEAL.Modulos
             }
             return temporal?? new List<CadenaIndicador>();
         }
-        public IEnumerable<CadenaIndicador> BuscarCadenaPorImplementador(string? subProAno, string? subProCod)
+        public IEnumerable<CadenaIndicador> BuscarCadenaPorUbicacion(ClaimsIdentity? identity, string? subProAno = null, string? subProCod = null, string? indAno = null, string? indCod = null, string? indTipInd = null, string? ubiAno = null, string? ubiCod = null, string? cadResUbiMetTec = null, string? cadResUbiMetPre = null)
         {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
             List<CadenaIndicador>? temporal = new List<CadenaIndicador>();
             try
             {
                 cn.getcn.Open();
 
-                SqlCommand cmd = new SqlCommand("SP_BUSCAR_CADENA_IMPLEMENTADOR", cn.getcn);
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_CADENA_RESULTADO_UBICACION", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
 
+                cmd.Parameters.AddWithValue("@P_INDANO", string.IsNullOrEmpty(indAno) ? (object)DBNull.Value : indAno);
+                cmd.Parameters.AddWithValue("@P_INDCOD", string.IsNullOrEmpty(indCod) ? (object)DBNull.Value : indCod);
+                cmd.Parameters.AddWithValue("@P_UBIANO", string.IsNullOrEmpty(ubiAno) ? (object)DBNull.Value : ubiAno);
+                cmd.Parameters.AddWithValue("@P_UBICOD", string.IsNullOrEmpty(ubiCod) ? (object)DBNull.Value : ubiCod);
+                cmd.Parameters.AddWithValue("@P_CADRESUBIMETTEC", string.IsNullOrEmpty(cadResUbiMetTec) ? (object)DBNull.Value : cadResUbiMetTec);
+                cmd.Parameters.AddWithValue("@P_CADRESUBIMETPRE", string.IsNullOrEmpty(cadResUbiMetPre) ? (object)DBNull.Value : cadResUbiMetPre);
+                cmd.Parameters.AddWithValue("@P_INDTIPIND", string.IsNullOrEmpty(indTipInd) ? (object)DBNull.Value : indTipInd);
                 cmd.Parameters.AddWithValue("@P_SUBPROANO", string.IsNullOrEmpty(subProAno) ? (object)DBNull.Value : subProAno);
                 cmd.Parameters.AddWithValue("@P_SUBPROCOD", string.IsNullOrEmpty(subProCod) ? (object)DBNull.Value : subProCod);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
 
-                StringBuilder jsonResult = new StringBuilder();
-                SqlDataReader reader = cmd.ExecuteReader();
-                if (!reader.HasRows)
-                {
-                    jsonResult.Append("[]");
-                }
-                else
-                {
-                    while (reader.Read())
-                    {
-                        jsonResult.Append(reader.GetValue(0).ToString());
-                    }
-                }
-                // Deserializa la cadena JSON en una lista de objetos Estado
-                temporal = JsonConvert.DeserializeObject<List<CadenaIndicador>>(jsonResult.ToString());
-            }
-            catch (SqlException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-                cn.getcn.Close();
-            }
-            return temporal?? new List<CadenaIndicador>();
-        }
-        public IEnumerable<CadenaIndicador> BuscarCadenaPorUbicacion(string? subProAno, string? subProCod)
-        {
-            List<CadenaIndicador>? temporal = new List<CadenaIndicador>();
-            try
-            {
-                cn.getcn.Open();
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
 
-                SqlCommand cmd = new SqlCommand("SP_BUSCAR_CADENA_UBICACION", cn.getcn);
-                cmd.CommandType = CommandType.StoredProcedure;
-
-                cmd.Parameters.AddWithValue("@P_SUBPROANO", string.IsNullOrEmpty(subProAno) ? (object)DBNull.Value : subProAno);
-                cmd.Parameters.AddWithValue("@P_SUBPROCOD", string.IsNullOrEmpty(subProCod) ? (object)DBNull.Value : subProCod);
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
 
                 StringBuilder jsonResult = new StringBuilder();
                 SqlDataReader reader = cmd.ExecuteReader();
@@ -318,57 +386,38 @@ namespace SistemaMEAL.Modulos
             }
             return temporal?? new List<CadenaIndicador>();
         }
-        public IEnumerable<CadenaIndicador> BuscarCadenaPorImplementadorActividad(string? subProAno, string? subProCod)
+        public IEnumerable<CadenaFinanciador> BuscarCadenaPorFinanciador(ClaimsIdentity? identity, string? subProAno = null, string? subProCod = null, string? indAno = null, string? indCod = null, string? indTipInd = null, string? finCod = null, string? cadResFinMetPre = null)
         {
-            List<CadenaIndicador>? temporal = new List<CadenaIndicador>();
-            try
-            {
-                cn.getcn.Open();
-
-                SqlCommand cmd = new SqlCommand("SP_BUSCAR_CADENA_IMPLEMENTADOR_ACTIVIDAD", cn.getcn);
-                cmd.CommandType = CommandType.StoredProcedure;
-
-                cmd.Parameters.AddWithValue("@P_SUBPROANO", string.IsNullOrEmpty(subProAno) ? (object)DBNull.Value : subProAno);
-                cmd.Parameters.AddWithValue("@P_SUBPROCOD", string.IsNullOrEmpty(subProCod) ? (object)DBNull.Value : subProCod);
-
-                StringBuilder jsonResult = new StringBuilder();
-                SqlDataReader reader = cmd.ExecuteReader();
-                if (!reader.HasRows)
-                {
-                    jsonResult.Append("[]");
-                }
-                else
-                {
-                    while (reader.Read())
-                    {
-                        jsonResult.Append(reader.GetValue(0).ToString());
-                    }
-                }
-                // Deserializa la cadena JSON en una lista de objetos Estado
-                temporal = JsonConvert.DeserializeObject<List<CadenaIndicador>>(jsonResult.ToString());
-            }
-            catch (SqlException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-                cn.getcn.Close();
-            }
-            return temporal?? new List<CadenaIndicador>();
-        }
-        public IEnumerable<CadenaFinanciador> BuscarCadenaPorFinanciadorActividad(string? subProAno, string? subProCod)
-        {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+            
             List<CadenaFinanciador>? temporal = new List<CadenaFinanciador>();
             try
             {
                 cn.getcn.Open();
 
-                SqlCommand cmd = new SqlCommand("SP_BUSCAR_CADENA_FINANCIADOR_ACTIVIDAD", cn.getcn);
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_CADENA_RESULTADO_FINANCIADOR", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
 
+                cmd.Parameters.AddWithValue("@P_INDANO", string.IsNullOrEmpty(indAno) ? (object)DBNull.Value : indAno);
+                cmd.Parameters.AddWithValue("@P_INDCOD", string.IsNullOrEmpty(indCod) ? (object)DBNull.Value : indCod);
+                cmd.Parameters.AddWithValue("@P_FINCOD", string.IsNullOrEmpty(finCod) ? (object)DBNull.Value : finCod);
+                cmd.Parameters.AddWithValue("@P_CADRESFINMETPRE", string.IsNullOrEmpty(cadResFinMetPre) ? (object)DBNull.Value : cadResFinMetPre);
+                cmd.Parameters.AddWithValue("@P_INDTIPIND", string.IsNullOrEmpty(indTipInd) ? (object)DBNull.Value : indTipInd);
                 cmd.Parameters.AddWithValue("@P_SUBPROANO", string.IsNullOrEmpty(subProAno) ? (object)DBNull.Value : subProAno);
                 cmd.Parameters.AddWithValue("@P_SUBPROCOD", string.IsNullOrEmpty(subProCod) ? (object)DBNull.Value : subProCod);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
 
                 StringBuilder jsonResult = new StringBuilder();
                 SqlDataReader reader = cmd.ExecuteReader();
@@ -395,45 +444,6 @@ namespace SistemaMEAL.Modulos
                 cn.getcn.Close();
             }
             return temporal?? new List<CadenaFinanciador>();
-        }
-        public IEnumerable<CadenaIndicador> BuscarCadenaPorUbicacionActividad(string? subProAno, string? subProCod)
-        {
-            List<CadenaIndicador>? temporal = new List<CadenaIndicador>();
-            try
-            {
-                cn.getcn.Open();
-
-                SqlCommand cmd = new SqlCommand("SP_BUSCAR_CADENA_UBICACION_ACTIVIDAD", cn.getcn);
-                cmd.CommandType = CommandType.StoredProcedure;
-
-                cmd.Parameters.AddWithValue("@P_SUBPROANO", string.IsNullOrEmpty(subProAno) ? (object)DBNull.Value : subProAno);
-                cmd.Parameters.AddWithValue("@P_SUBPROCOD", string.IsNullOrEmpty(subProCod) ? (object)DBNull.Value : subProCod);
-
-                StringBuilder jsonResult = new StringBuilder();
-                SqlDataReader reader = cmd.ExecuteReader();
-                if (!reader.HasRows)
-                {
-                    jsonResult.Append("[]");
-                }
-                else
-                {
-                    while (reader.Read())
-                    {
-                        jsonResult.Append(reader.GetValue(0).ToString());
-                    }
-                }
-                // Deserializa la cadena JSON en una lista de objetos Estado
-                temporal = JsonConvert.DeserializeObject<List<CadenaIndicador>>(jsonResult.ToString());
-            }
-            catch (SqlException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-                cn.getcn.Close();
-            }
-            return temporal?? new List<CadenaIndicador>();
         }
 
         public (string? anoOut,string? codOut,string? message, string? messageType) Insertar(ClaimsIdentity? identity, Indicador indicador)
@@ -941,7 +951,10 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_INDTIPIND", indicador.IndTipInd);
                 cmd.Parameters.AddWithValue("@P_UNICOD", indicador.UniCod);
                 cmd.Parameters.AddWithValue("@P_TIPVALCOD", indicador.TipValCod);
+                cmd.Parameters.AddWithValue("@P_MONCOD", indicador.MonCod);
+                cmd.Parameters.AddWithValue("@P_INDTOTPRE", indicador.IndTotPre);
                 cmd.Parameters.AddWithValue("@P_INDFOR", indicador.IndFor);
+                cmd.Parameters.AddWithValue("@P_INDLINBAS", indicador.IndLinBas);
                 cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                 cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);

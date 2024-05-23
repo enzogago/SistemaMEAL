@@ -189,6 +189,9 @@ const ResultChain = () => {
                 // Procesa los datos recibidos de cada petición
     
                 // Establece los indicadores con los datos de la última petición
+                console.log(dataPorAno);
+                console.log(dataPorImplementador);
+                console.log(dataPorUbicacion);
                 setIndicadores(dataSubproyecto);
     
                 // Inicializa el estado de la línea base y el total

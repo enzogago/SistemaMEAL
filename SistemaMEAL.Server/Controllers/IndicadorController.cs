@@ -21,7 +21,7 @@ namespace SistemaMEAL.Server.Controllers
         }
 
         [HttpGet]
-        public dynamic BuscarSubproyecto()
+        public dynamic Buscar()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
@@ -52,7 +52,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var data = _indicadores.BuscarIndicadorPorSubproyecto(subProAno,subProCod);
+            var data = _indicadores.Buscar(identity, subProAno:subProAno, subProCod:subProCod);
             return Ok(data);
         }
         
@@ -64,7 +64,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var data = _indicadores.BuscarCadenaPorPeriodo(subProAno,subProCod);
+            var data = _indicadores.BuscarCadenaPorPeriodo(identity, subProAno:subProAno,subProCod:subProCod);
             return Ok(data);
         }
 
@@ -76,7 +76,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var data = _indicadores.BuscarCadenaPorImplementador(subProAno,subProCod);
+            var data = _indicadores.BuscarCadenaPorImplementador(identity, subProAno:subProAno,subProCod:subProCod);
             return Ok(data);
         }
         [HttpGet("ubicacion/{subProAno}/{subProCod}")]
@@ -87,7 +87,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var data = _indicadores.BuscarCadenaPorUbicacion(subProAno,subProCod);
+            var data = _indicadores.BuscarCadenaPorUbicacion(identity, subProAno:subProAno,subProCod:subProCod);
             return Ok(data);
         }
 
@@ -100,7 +100,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var data = _indicadores.BuscarIndicadorPorSubproyectoActividad(subProAno,subProCod);
+            var data = _indicadores.Buscar(identity, subProAno:subProAno ,subProCod:subProCod, indTipInd: "IAC");
             return Ok(data);
         }
         
@@ -112,7 +112,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var data = _indicadores.BuscarCadenaPorPeriodoActividad(subProAno,subProCod);
+            var data = _indicadores.BuscarCadenaPorPeriodo(identity, subProAno:subProAno,subProCod:subProCod, indTipInd: "IAC");
             return Ok(data);
         }
 
@@ -124,7 +124,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var data = _indicadores.BuscarCadenaPorImplementadorActividad(subProAno,subProCod);
+            var data = _indicadores.BuscarCadenaPorImplementador(identity, subProAno:subProAno,subProCod:subProCod, indTipInd: "IAC");
             return Ok(data);
         }
         [HttpGet("financiador-actividad/{subProAno}/{subProCod}")]
@@ -135,7 +135,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var data = _indicadores.BuscarCadenaPorFinanciadorActividad(subProAno,subProCod);
+            var data = _indicadores.BuscarCadenaPorFinanciador(identity, subProAno:subProAno, subProCod:subProCod, indTipInd: "IAC");
             return Ok(data);
         }
         [HttpGet("ubicacion-actividad/{subProAno}/{subProCod}")]
@@ -146,7 +146,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var data = _indicadores.BuscarCadenaPorUbicacionActividad(subProAno,subProCod);
+            var data = _indicadores.BuscarCadenaPorUbicacion(identity, subProAno:subProAno,subProCod:subProCod, indTipInd: "IAC");
             return Ok(data);
         }
 

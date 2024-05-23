@@ -127,45 +127,6 @@ namespace SistemaMEAL.Modulos
             return count;
         }
 
-        public IEnumerable<Monitoreo> BuscarMonitoreo(string? metAno, string? metCod)
-        {
-            List<Monitoreo>? temporal = new List<Monitoreo>();
-            try
-            {
-                cn.getcn.Open();
-
-                SqlCommand cmd = new SqlCommand("SP_BUSCAR_MONITOREO", cn.getcn);
-                cmd.CommandType = CommandType.StoredProcedure;
-
-                cmd.Parameters.AddWithValue("@P_METANO", metAno);
-                cmd.Parameters.AddWithValue("@P_METCOD", metCod);
-
-                StringBuilder jsonResult = new StringBuilder();
-                SqlDataReader reader = cmd.ExecuteReader();
-                if (!reader.HasRows)
-                {
-                    jsonResult.Append("[]");
-                }
-                else
-                {
-                    while (reader.Read())
-                    {
-                        jsonResult.Append(reader.GetValue(0).ToString());
-                    }
-                }
-                // Deserializa la cadena JSON en una lista de objetos Estado
-                temporal = JsonConvert.DeserializeObject<List<Monitoreo>>(jsonResult.ToString());
-            }
-            catch (SqlException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-                cn.getcn.Close();
-            }
-             return temporal?? new List<Monitoreo>();
-        }
         public IEnumerable<Monitoreo> BuscarMonitoreoPorBeneficiario(string? benAno, string? benCod)
         {
             List<Monitoreo>? temporal = new List<Monitoreo>();
@@ -441,61 +402,7 @@ namespace SistemaMEAL.Modulos
 
             return (mensaje, tipoMensaje);
         }
-
-        public (string? message, string? messageType) ModificarMeta(ClaimsIdentity? identity, Meta meta)
-        {
-            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
-
-            string? mensaje = "";
-            string? tipoMensaje = "";
-            try
-            {
-                cn.getcn.Open();
-                SqlCommand cmd = new SqlCommand("SP_MODIFICAR_META", cn.getcn);
-                cmd.CommandType = CommandType.StoredProcedure;
-
-                cmd.Parameters.AddWithValue("@P_METANO", meta.MetAno);
-                cmd.Parameters.AddWithValue("@P_METCOD", meta.MetCod);
-                cmd.Parameters.AddWithValue("@P_METMETTEC", meta.MetMetTec);
-                cmd.Parameters.AddWithValue("@P_METMESPLATEC", meta.MetMesPlaTec);
-                cmd.Parameters.AddWithValue("@P_METANOPLATEC", meta.MetAnoPlaTec);
-                cmd.Parameters.AddWithValue("@P_METMETPRE", meta.MetMetPre);
-                cmd.Parameters.AddWithValue("@P_IMPCOD", meta.ImpCod);
-                cmd.Parameters.AddWithValue("@P_UBIANO", meta.UbiAno);
-                cmd.Parameters.AddWithValue("@P_UBICOD", meta.UbiCod);
-                cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
-                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
-                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
-                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
-                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
-                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
-
-                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
-                pDescripcionMensaje.Direction = ParameterDirection.Output;
-                cmd.Parameters.Add(pDescripcionMensaje);
-
-                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
-                pTipoMensaje.Direction = ParameterDirection.Output;
-                cmd.Parameters.Add(pTipoMensaje);
-
-                cmd.ExecuteNonQuery();
-
-                mensaje = pDescripcionMensaje.Value.ToString();
-                tipoMensaje = pTipoMensaje.Value.ToString();
-            }
-            catch (SqlException ex)
-            {
-                mensaje = ex.Message;
-                tipoMensaje = "1";
-                Console.WriteLine(mensaje);
-            }
-            finally
-            {
-                cn.getcn.Close();
-            }
-            return (mensaje, tipoMensaje);
-        }
-
+        
         public (string? metAnoOut,string? metCodOut,string? message, string? messageType) InsertarMeta(ClaimsIdentity? identity, Meta meta)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
@@ -871,11 +778,13 @@ namespace SistemaMEAL.Modulos
             {
                 cn.getcn.Open();
 
-                SqlCommand cmd = new SqlCommand("SP_BUSCAR_UBICACION_HOME_PROVINCIA", cn.getcn);
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_UBICACION_HOME_SEGUNDO_NIVEL", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
                 cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
                 cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_UBIANOPAD", "2024");
+                cmd.Parameters.AddWithValue("@P_UBICODPAD", "000001");
 
                 StringBuilder jsonResult = new StringBuilder();
                 SqlDataReader reader = cmd.ExecuteReader();
@@ -912,11 +821,13 @@ namespace SistemaMEAL.Modulos
             {
                 cn.getcn.Open();
 
-                SqlCommand cmd = new SqlCommand("SP_BUSCAR_UBICACION_HOME_DEPAARTAMENTO_PERU", cn.getcn);
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_UBICACION_HOME_SEGUNDO_NIVEL", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
                 cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
                 cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_UBIANOPAD", "2024");
+                cmd.Parameters.AddWithValue("@P_UBICODPAD", "000002");
 
                 StringBuilder jsonResult = new StringBuilder();
                 SqlDataReader reader = cmd.ExecuteReader();
@@ -953,11 +864,13 @@ namespace SistemaMEAL.Modulos
             {
                 cn.getcn.Open();
 
-                SqlCommand cmd = new SqlCommand("SP_BUSCAR_UBICACION_HOME_DEPAARTAMENTO_COLOMBIA", cn.getcn);
+                SqlCommand cmd = new SqlCommand("SP_BUSCAR_UBICACION_HOME_SEGUNDO_NIVEL", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
                 cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
                 cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_UBIANOPAD", "2024");
+                cmd.Parameters.AddWithValue("@P_UBICODPAD", "000003");
 
                 StringBuilder jsonResult = new StringBuilder();
                 SqlDataReader reader = cmd.ExecuteReader();
@@ -1023,38 +936,22 @@ namespace SistemaMEAL.Modulos
                 pTipoMensaje.Direction = ParameterDirection.Output;
                 cmd.Parameters.Add(pTipoMensaje);
 
-                SqlDataReader rd = cmd.ExecuteReader();
-                while (rd.Read())
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                if (!reader.HasRows)
                 {
-                    Beneficiario beneficiario = new Beneficiario
-                    {
-                        BenAno = rd["BENANO"].ToString(),
-                        BenCod = rd["BENCOD"].ToString(),
-                        BenNom = rd["BENNOM"].ToString(),
-                        BenApe = rd["BENAPE"].ToString(),
-                        BenFecNac = rd["BENFECNAC"].ToString(),
-                        BenTel = rd["BENTEL"].ToString(),
-                        BenCorEle = rd["BENCORELE"].ToString(),
-                        BenSex = rd["BENSEX"].ToString(),
-                        GenCod = rd["GENCOD"].ToString(),
-                        GenNom = rd["GENNOM"].ToString(),
-                        BenCodUni = rd["BENCODUNI"].ToString(),
-                        BenTelCon = rd["BENTELCON"].ToString(),
-                        BenNomApo = rd["BENNOMAPO"].ToString(),
-                        BenApeApo = rd["BENAPEAPO"].ToString(),
-                        NacCod = rd["NACCOD"].ToString(),
-                        NacNom = rd["NACNOM"].ToString(),
-                        BenDir = rd["BENDIR"].ToString(),
-                        BenAut = rd["BENAUT"].ToString(),
-                        MetAno = rd["METANO"].ToString(),
-                        MetCod = rd["METCOD"].ToString(),
-                        MetBenAnoEjeTec = rd["METBENANOEJETEC"].ToString(),
-                        MetBenMesEjeTec = rd["METBENMESEJETEC"].ToString(),
-                        UbiAno = rd["UBIANO"].ToString(),
-                        UbiCod = rd["UBICOD"].ToString(),
-                    };
-                    temporal.Add(beneficiario);
+                    jsonResult.Append("[]");
                 }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                // Deserializa la cadena JSON en una lista de objetos Usuario
+                temporal = JsonConvert.DeserializeObject<List<Beneficiario>>(jsonResult.ToString());
             }
             catch (SqlException ex)
             {
@@ -1403,189 +1300,6 @@ namespace SistemaMEAL.Modulos
             }
             return (mensaje, tipoMensaje);
         }
-
-        public (string? message, string? messageType) ModificarMetaIndicador(ClaimsIdentity? identity, MetaIndicador metaIndicador)
-        {
-            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
-
-            string? mensaje = "";
-            string? tipoMensaje = "";
-            try
-            {
-                cn.getcn.Open();
-
-                SqlCommand cmd = new SqlCommand("SP_MODIFICAR_META_INDICADOR", cn.getcn);
-                cmd.CommandType = CommandType.StoredProcedure;
-
-                cmd.Parameters.AddWithValue("@P_METANO_ORIGINAL", metaIndicador.MetAnoOri);
-                cmd.Parameters.AddWithValue("@P_METCOD_ORIGINAL", metaIndicador.MetCodOri);
-                cmd.Parameters.AddWithValue("@P_INDANO_ORIGINAL", metaIndicador.IndAnoOri);
-                cmd.Parameters.AddWithValue("@P_INDCOD_ORIGINAL", metaIndicador.IndCodOri);
-                cmd.Parameters.AddWithValue("@P_METANO", metaIndicador.MetAno);
-                cmd.Parameters.AddWithValue("@P_METCOD", metaIndicador.MetCod);
-                cmd.Parameters.AddWithValue("@P_INDANO", metaIndicador.IndAno);
-                cmd.Parameters.AddWithValue("@P_INDCOD", metaIndicador.IndCod);
-                cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
-                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
-                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
-                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
-                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
-                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
-
-                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
-                pDescripcionMensaje.Direction = ParameterDirection.Output;
-                cmd.Parameters.Add(pDescripcionMensaje);
-
-                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
-                pTipoMensaje.Direction = ParameterDirection.Output;
-                cmd.Parameters.Add(pTipoMensaje);
-
-                cmd.ExecuteNonQuery();
-
-                mensaje = pDescripcionMensaje.Value.ToString();
-                tipoMensaje = pTipoMensaje.Value.ToString();
-            }
-            catch (SqlException ex)
-            {
-                mensaje = ex.Message;
-                tipoMensaje = "1";
-            }
-            finally
-            {
-                cn.getcn.Close();
-            }
-            return (mensaje, tipoMensaje);
-        }
-
-
-         public (string? message, string? messageType) ModificarMetaIndicadorTransaction(ClaimsIdentity? identity, Meta meta, MetaIndicador metaIndicador)
-        {
-            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
-
-            string? mensaje = "";
-            string? tipoMensaje = "";
-
-            using (TransactionScope scope = new TransactionScope())
-            {
-                using (SqlConnection connection = cn.getcn)
-                {
-                    try
-                    {
-                        if (connection.State == ConnectionState.Closed)
-                        {
-                            connection.Open();
-                        }
-
-                        // Modiciar Meta
-                        try
-                        {
-                            SqlCommand cmd = new SqlCommand("SP_MODIFICAR_META", cn.getcn);
-                            cmd.CommandType = CommandType.StoredProcedure;
-
-                            cmd.Parameters.AddWithValue("@P_METANO", meta.MetAno);
-                            cmd.Parameters.AddWithValue("@P_METCOD", meta.MetCod);
-                            cmd.Parameters.AddWithValue("@P_METMETTEC", meta.MetMetTec);
-                            cmd.Parameters.AddWithValue("@P_METMESPLATEC", meta.MetMesPlaTec);
-                            cmd.Parameters.AddWithValue("@P_METANOPLATEC", meta.MetAnoPlaTec);
-                            cmd.Parameters.AddWithValue("@P_METMETPRE", meta.MetMetPre);
-                            cmd.Parameters.AddWithValue("@P_IMPCOD", meta.ImpCod);
-                            cmd.Parameters.AddWithValue("@P_UBIANO", meta.UbiAno);
-                            cmd.Parameters.AddWithValue("@P_UBICOD", meta.UbiCod);
-                            cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
-                            cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
-                            cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
-                            cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
-                            cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
-                            cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
-
-                            SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
-                            pDescripcionMensaje.Direction = ParameterDirection.Output;
-                            cmd.Parameters.Add(pDescripcionMensaje);
-
-                            SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
-                            pTipoMensaje.Direction = ParameterDirection.Output;
-                            cmd.Parameters.Add(pTipoMensaje);
-
-                            cmd.ExecuteNonQuery();
-
-                            mensaje = pDescripcionMensaje.Value.ToString();
-                            tipoMensaje = pTipoMensaje.Value.ToString();
-                        }
-                        catch (SqlException ex)
-                        {
-                            mensaje = ex.Message;
-                            Console.WriteLine(mensaje);
-                            tipoMensaje = "1";
-                        }
-
-                        if (tipoMensaje != "3")
-                        {
-                            Console.WriteLine(mensaje);
-                            return (mensaje,tipoMensaje);
-                        }
-
-                        // Modificar Indicador
-                        try
-                        {
-                            SqlCommand cmd = new SqlCommand("SP_MODIFICAR_META_INDICADOR", cn.getcn);
-                            cmd.CommandType = CommandType.StoredProcedure;
-
-                            cmd.Parameters.AddWithValue("@P_METANO_ORIGINAL", metaIndicador.MetAnoOri);
-                            cmd.Parameters.AddWithValue("@P_METCOD_ORIGINAL", metaIndicador.MetCodOri);
-                            cmd.Parameters.AddWithValue("@P_INDANO_ORIGINAL", metaIndicador.IndAnoOri);
-                            cmd.Parameters.AddWithValue("@P_INDCOD_ORIGINAL", metaIndicador.IndCodOri);
-                            cmd.Parameters.AddWithValue("@P_METANO", metaIndicador.MetAno);
-                            cmd.Parameters.AddWithValue("@P_METCOD", metaIndicador.MetCod);
-                            cmd.Parameters.AddWithValue("@P_INDANO", metaIndicador.IndAno);
-                            cmd.Parameters.AddWithValue("@P_INDCOD", metaIndicador.IndCod);
-                            cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
-                            cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
-                            cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
-                            cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
-                            cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
-                            cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
-
-                            SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
-                            pDescripcionMensaje.Direction = ParameterDirection.Output;
-                            cmd.Parameters.Add(pDescripcionMensaje);
-
-                            SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
-                            pTipoMensaje.Direction = ParameterDirection.Output;
-                            cmd.Parameters.Add(pTipoMensaje);
-
-                            cmd.ExecuteNonQuery();
-
-                            mensaje = pDescripcionMensaje.Value.ToString();
-                            tipoMensaje = pTipoMensaje.Value.ToString();
-                        }
-                        catch (SqlException ex)
-                        {
-                            mensaje = ex.Message;
-                            tipoMensaje = "1";
-                            Console.WriteLine(mensaje);
-                        }
-                        if (tipoMensaje != "3")
-                        {
-                            Console.WriteLine(mensaje);
-                            return (mensaje,tipoMensaje);
-                        }
-                        // Si todas las operaciones fueron exitosas, confirma la transacción
-                        scope.Complete();
-                    }
-                    catch (Exception ex)
-                    {
-                        // Si alguna operación falló, la transacción se revierte.
-                        mensaje = ex.Message;
-                        tipoMensaje = "1";
-                        Console.WriteLine(ex);
-                    }
-                }
-            }
-
-            return (mensaje, tipoMensaje);
-        }
-
-
 
     }
 }

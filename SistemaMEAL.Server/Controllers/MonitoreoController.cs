@@ -60,19 +60,6 @@ namespace SistemaMEAL.Server.Controllers
 
 
         [HttpGet]
-        [Route("{metAno}/{metCod}")]
-        public dynamic BuscarMonitoreo(string metAno, string metCod)
-        {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
-
-            if (!rToken.success) return Unauthorized(rToken);
-
-            var monitoreos = _monitoreos.BuscarMonitoreo(metAno,metCod);
-            var monitoreo = monitoreos.FirstOrDefault();
-            return Ok(monitoreo);
-        }
-        [HttpGet]
         [Route("beneficiario/{benAno}/{benCod}")]
         public dynamic BuscarMonitoreoPorBeneficiario(string benAno, string benCod)
         {
@@ -252,22 +239,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return rToken;
 
-            dynamic data = rToken.result;
-            Usuario usuarioActual = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (usuarioActual.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para modificar usuarios",
-                    result = ""
-                };
-            }
+
             var (message, messageType) = _monitoreos.ModificarMetaBeneficiario(identity, metaBeneficiario);
             if (messageType == "1")
             {
@@ -386,23 +358,6 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return rToken;
 
-            dynamic data = rToken.result;
-            Usuario usuario = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (usuario.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para eliminar estados",
-                    result = ""
-                };
-            }
-
             var (message, messageType) = _monitoreos.EliminarMetaIndicador(identity, metAno, metCod, metIndAno, metIndCod);
             if (messageType == "1")
             {
@@ -417,129 +372,6 @@ namespace SistemaMEAL.Server.Controllers
                 return Ok(message);
             }
         }
-
-        [HttpPut]
-        [Route("meta")]
-        public dynamic Modificar(Meta meta)
-        {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
-
-            if (!rToken.success) return rToken;
-
-            dynamic data = rToken.result;
-            Usuario usuario = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (usuario.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para modificar estados",
-                    result = ""
-                };
-            }
-
-            var (message, messageType) = _monitoreos.ModificarMeta(identity, meta);
-            if (messageType == "1")
-            {
-                return new BadRequestObjectResult(new { success = false, message });
-            }
-            else if (messageType == "2")
-            {
-                return new ConflictObjectResult(new { success = false, message });
-            }
-            else
-            {
-                return new OkObjectResult(new { success = true, message });
-            }
-        }
-
-        [HttpPut]
-        [Route("indicador")]
-        public dynamic ModificarMetaIndicador(MetaIndicador? metaIndicador)
-        {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
-
-            if (!rToken.success) return rToken;
-
-            dynamic data = rToken.result;
-            Usuario usuarioActual = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (usuarioActual.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para modificar usuarios",
-                    result = ""
-                };
-            }
-            var (message, messageType) = _monitoreos.ModificarMetaIndicador(identity, metaIndicador);
-            if (messageType == "1")
-            {
-                return new BadRequestObjectResult(new { success = false, message });
-            }
-            else if (messageType == "2")
-            {
-                return new ConflictObjectResult(new { success = false, message });
-            }
-            else
-            {
-                return new OkObjectResult(new { success = true, message });
-            }
-        }
-
-        [HttpPut]
-        [Route("meta-indicador")]
-        public dynamic ModificarMetaIndicadorTransaction(MetaIndicadorDto? metaIndicadorDto)
-        {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
-
-            if (!rToken.success) return rToken;
-
-            dynamic data = rToken.result;
-            Usuario usuarioActual = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (usuarioActual.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para modificar usuarios",
-                    result = ""
-                };
-            }
-            var (message, messageType) = _monitoreos.ModificarMetaIndicadorTransaction(identity, metaIndicadorDto.Meta, metaIndicadorDto.MetaIndicador);
-            if (messageType == "1")
-            {
-                return new BadRequestObjectResult(new { success = false, message });
-            }
-            else if (messageType == "2")
-            {
-                return new ConflictObjectResult(new { success = false, message });
-            }
-            else
-            {
-                return new OkObjectResult(new { success = true, message });
-            }
-        }
-
-
 
     }
 

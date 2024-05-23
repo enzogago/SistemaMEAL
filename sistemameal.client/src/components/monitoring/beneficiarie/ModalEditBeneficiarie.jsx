@@ -187,7 +187,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
             } else if(fieldsDisabled){ // Cambió y los campos deshabilitados
                 // Update META_BENEFICIARIO
                 console.log(dataMetaBeneficiario)
-                handleSubmiMetaBeneficiario(dataMetaBeneficiario, closeModalEdit, setUpdate);
+                handleSubmiMetaBeneficiario(dataMetaBeneficiario, closeModalEdit);
             } else if(!fieldsDisabled){
                 if(hasChanged && hasChangedBeneficiarie){ // Si cambian los datos de Meta_Beneficiario y Beneficiario
                     // UPDATE META_BENEFICAIRIO y BENEFICIARIO
@@ -200,7 +200,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                 } else { // Solo cambia los datos de Meta_Beneficiario
                     console.log(dataMetaBeneficiario)
                     // Update META_BENEFICIARIO
-                    handleSubmiMetaBeneficiario(dataMetaBeneficiario, closeModalEdit, setUpdate);
+                    handleSubmiMetaBeneficiario(dataMetaBeneficiario, closeModalEdit);
                 }
             }
         })();
@@ -290,7 +290,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
             Notiflix.Loading.remove();
         }
     };
-    const handleSubmiMetaBeneficiario = async (newData, closeModalEdit, updateData, setUpdateData) => {
+    const handleSubmiMetaBeneficiario = async (newData, closeModalEdit) => {
         try {
             Notiflix.Loading.pulse('Cargando...');
             const token = localStorage.getItem('token');
@@ -321,6 +321,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
 
     useEffect(() => {
         if (modalVisible && isDataLoaded) {
+            console.log(record)
             fetchMetaForm(record);
         }
     }, [isDataLoaded, modalVisible]);

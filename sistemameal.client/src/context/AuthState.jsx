@@ -51,7 +51,7 @@ const AuthState = ({ children }) => {
         const token = localStorage.getItem('token');
         if(!token) return;
         // Obtenemos los permisos del usuario
-        const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Permiso/${userLogged.usuAno}/${userLogged.usuCod}`, {
+        const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Permiso`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }

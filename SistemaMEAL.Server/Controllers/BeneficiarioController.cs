@@ -76,7 +76,7 @@ namespace SistemaMEAL.Server.Controllers
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return Unauthorized(rToken);
-            var resultado = _beneficiarios.BuscarMetaBeneficiario(identity, metAno, metCod);
+            var resultado = _beneficiarios.BuscarMetaBeneficiario(identity, metAno:metAno, metCod:metCod);
             return Ok(resultado);
         }
 
@@ -194,14 +194,14 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
            
-            var beneficiarios = _beneficiarios.BuscarBeneficiarioPorDocumento(identity, docIdeCod, docIdeBenNum);
+            var beneficiarios = _beneficiarios.BuscarBeneficiarioPorDocumento(identity, docIdeCod:docIdeCod, docIdeBenNum:docIdeBenNum);
             var beneficiario = beneficiarios.FirstOrDefault();
             return Ok(beneficiario);
         }
 
          [HttpGet]
         [Route("nombres/{nombres}")]
-        public dynamic BuscarBeneficiarioPorDocumento(string nombres)
+        public dynamic BuscarBeneficiarioPorNombre(string nombres)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);

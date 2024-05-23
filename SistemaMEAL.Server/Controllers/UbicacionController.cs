@@ -20,15 +20,15 @@ namespace SistemaMEAL.Server.Controllers
         }
 
         [HttpGet]
-        public dynamic ListadoPaises()
+        public dynamic BuscarPaises()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var paises = _ubicaciones.ListadoPaises();
-            return Ok(paises);
+            var result = _ubicaciones.Buscar(identity, ubiTip: "PAIS");
+            return Ok(result);
         }
 
         [HttpGet("subproyecto/{subProAno}/{subProCod}")]
@@ -52,8 +52,8 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var ubicaciones = _ubicaciones.ListadoJerarquiaUbicacion(ubiAno, ubiCod);
-            return Ok(ubicaciones);
+            var result = _ubicaciones.Buscar(identity, ubiAnoPad: ubiAno, ubiCodPad: ubiCod);
+            return Ok(result);
         }
 
         [HttpGet("select/{ubiAno}/{ubiCod}")]

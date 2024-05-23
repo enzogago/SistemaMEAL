@@ -591,66 +591,6 @@ namespace SistemaMEAL.Server.Modulos
         }
 
 
-        // public IEnumerable<UsuarioAcceso> BuscarUsuarioAcceso(ClaimsIdentity? identity, string? usuAno, string? usuCod, string? usuAccTip = null, string? usuAccAno = null, string? usuAccCod = null, string? usuAccPad = null)
-        // {
-        //     var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
-            
-        //     List<UsuarioAcceso>? temporal = new List<UsuarioAcceso>();
-        //     try
-        //     {
-        //         cn.getcn.Open();
-
-        //         SqlCommand cmd = new SqlCommand("SP_BUSCAR_USUARIO_ACCESO", cn.getcn);
-        //         cmd.CommandType = CommandType.StoredProcedure;
-        //         // Aquí puedes agregar los parámetros necesarios para tu procedimiento almacenado
-        //         cmd.Parameters.AddWithValue("@P_USUANO", usuAno);
-        //         cmd.Parameters.AddWithValue("@P_USUCOD", usuCod);
-        //         cmd.Parameters.AddWithValue("@P_USUACCTIP", string.IsNullOrEmpty(usuAccTip) ? (object)DBNull.Value : usuAccTip);
-        //         cmd.Parameters.AddWithValue("@P_USUACCANO", string.IsNullOrEmpty(usuAccAno) ? (object)DBNull.Value : usuAccAno);
-        //         cmd.Parameters.AddWithValue("@P_USUACCCOD", string.IsNullOrEmpty(usuAccCod) ? (object)DBNull.Value : usuAccCod);
-        //         cmd.Parameters.AddWithValue("@P_USUACCPAD", string.IsNullOrEmpty(usuAccPad) ? (object)DBNull.Value : usuAccPad);
-        //         cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
-        //         cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
-        //         cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
-        //         cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
-        //         cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
-
-        //         SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
-        //         pDescripcionMensaje.Direction = ParameterDirection.Output;
-        //         cmd.Parameters.Add(pDescripcionMensaje);
-
-        //         SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
-        //         pTipoMensaje.Direction = ParameterDirection.Output;
-        //         cmd.Parameters.Add(pTipoMensaje);
-
-        //         StringBuilder jsonResult = new StringBuilder();
-        //         SqlDataReader reader = cmd.ExecuteReader();
-
-        //         if (!reader.HasRows)
-        //         {
-        //             jsonResult.Append("[]");
-        //         }
-        //         else
-        //         {
-        //             while (reader.Read())
-        //             {
-        //                 jsonResult.Append(reader.GetValue(0).ToString());
-        //             }
-        //         }
-        //         // Deserializa la cadena JSON en una lista de objetos UsuarioAcceso
-        //         temporal = JsonConvert.DeserializeObject<List<UsuarioAcceso>>(jsonResult.ToString());
-        //     }
-        //     catch (SqlException ex)
-        //     {
-        //         Console.WriteLine(ex.Message);
-        //     }
-        //     finally
-        //     {
-        //         cn.getcn.Close();
-        //     }
-        //     return temporal?? new List<UsuarioAcceso>();
-        // }
-
         public IEnumerable<UsuarioAcceso> BuscarUsuarioAcceso(ClaimsIdentity? identity, string? usuAno, string? usuCod, string? usuAccTip = null, string? usuAccAno = null, string? usuAccCod = null, string? usuAccPad = null)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
@@ -683,22 +623,21 @@ namespace SistemaMEAL.Server.Modulos
                 pTipoMensaje.Direction = ParameterDirection.Output;
                 cmd.Parameters.Add(pTipoMensaje);
 
+                StringBuilder jsonResult = new StringBuilder();
                 SqlDataReader reader = cmd.ExecuteReader();
-                object[] values = new object[reader.FieldCount];
-                while (reader.Read())
+                if (!reader.HasRows)
                 {
-                    reader.GetValues(values);
-                    UsuarioAcceso usuarioAcceso = new UsuarioAcceso
-                    {
-                        UsuAno = values[0].ToString(),
-                        UsuCod = values[1].ToString(),
-                        UsuAccTip = values[2].ToString(),
-                        UsuAccAno = values[3].ToString(),
-                        UsuAccCod = values[4].ToString(),
-                        UsuAccPad = values[5].ToString()
-                    };
-                    temporal.Add(usuarioAcceso);
+                    jsonResult.Append("[]");
                 }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                // Deserializa la cadena JSON en una lista de objetos Usuario
+                temporal = JsonConvert.DeserializeObject<List<UsuarioAcceso>>(jsonResult.ToString());
             }
             catch (SqlException ex)
             {
