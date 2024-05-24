@@ -71,6 +71,17 @@ namespace SistemaMEAL.Server.Controllers
             return Ok(result);
         }
 
+        [HttpGet("recursivo")]
+        public dynamic BuscarRecursivo()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+            var result = _menus.BuscarRecursivo(identity);
+            return Ok(result);
+        }
+
         [HttpGet("{usuAno}/{usuCod}")]
         public IActionResult ListadoMenuPorUsuario(string usuAno, string usuCod)
         {

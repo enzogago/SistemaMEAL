@@ -220,6 +220,47 @@ namespace SistemaMEAL.Modulos
             }
             return temporal?? new List<Menu>();
         }
+        
+        public IEnumerable<Menu> BuscarRecursivo(ClaimsIdentity? identity, string? menAno = null, string? menCod = null, string? menNom = null, string? menRef = null, string? menIco = null, string? menOrd = null, string? menAnoPad = null, string? menCodPad = null)
+        {
+            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
+            List<Menu>? temporal = new List<Menu>();
+            try
+            {
+                cn.getcn.Open();
+
+                SqlCommand cmd = new SqlCommand("SP_LISTAR_MENU_RECURSIVO", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                StringBuilder jsonResult = new StringBuilder();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                if (!reader.HasRows)
+                {
+                    jsonResult.Append("[]");
+                }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        jsonResult.Append(reader.GetValue(0).ToString());
+                    }
+                }
+                // Deserializa la cadena JSON en una lista de objetos Estado
+                temporal = JsonConvert.DeserializeObject<List<Menu>>(jsonResult.ToString());
+            }
+            catch (SqlException ex)
+            {
+                temporal = new List<Menu>();
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                cn.getcn.Close();
+            }
+            return temporal?? new List<Menu>();
+        }
 
     }
 }

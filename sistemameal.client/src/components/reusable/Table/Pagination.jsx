@@ -7,7 +7,7 @@ const Pagination = ({ table, isLargePagination }) => {
     const pageSizes = isLargePagination ? largePageSizes : smallPageSizes;
 
     return (
-        <div className="PowerMas_Pagination Large_12 flex column jc-space-between ai-center Large-p2">
+        <div className="PowerMas_Pagination Large_12 flex column jc-space-between ai-center Large-p_25">
             <div className="todo">
                 <button onClick={() => table.setPageIndex(0)} disabled={!table.getCanPreviousPage()}>{"<<"}</button>
                 <button onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>{"<"}</button>

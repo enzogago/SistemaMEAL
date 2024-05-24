@@ -230,6 +230,7 @@ const ModalProfile = ({openModal, closeModal}) => {
     const handleSubmitImage = async () => {
         try {
             Notiflix.Loading.pulse();
+            const token = localStorage.getItem('token');
     
             // Si hay una imagen seleccionada para recortar
             if (selectedFile && cropper) {
@@ -266,9 +267,12 @@ const ModalProfile = ({openModal, closeModal}) => {
                     console.log(dataAvatar);
     
                     const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Usuario/update-avatar`, {
-                        method: 'POST',
+                        method: 'PUT',
                         body: JSON.stringify(dataAvatar),
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
                     });
     
                     const data = await response.json();

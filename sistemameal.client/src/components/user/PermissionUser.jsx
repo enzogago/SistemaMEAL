@@ -5,7 +5,7 @@ import Bar from "./Bar";
 import CryptoJS from 'crypto-js';
 import { Tree } from 'antd';
 import UserInfo from "./UserInfo";
-import { fetchData } from "../reusable/helper";
+import { fetchDataBlock, fetchDataReturn } from "../reusable/fetchs";
 
 
 const PermissionUser = () => {
@@ -22,7 +22,6 @@ const PermissionUser = () => {
 
     const [expandedKeys, setExpandedKeys] = useState([]);
     const [checkedKeys, setCheckedKeys] = useState([]);
-    const [selectedKeys, setSelectedKeys] = useState([]);
     const [autoExpandParent, setAutoExpandParent] = useState(true);
     //
     const [ proyectos, setProyectos ] = useState([]);
@@ -34,22 +33,34 @@ const PermissionUser = () => {
 
     // EFECTO AL CARGAR COMPONENTE GET - LISTAR METAS
     useEffect(() => {
-        const fetchDataAsync = async () => {
-            await fetchData(`Usuario/${usuAno}/${usuCod}`, setUser);
-            await fetchData(`Proyecto/proyectos-subproyectos`, (data) => {
-                const transformedData = transformData(data);
-                setProyectos(transformedData);
+        fetchDataBlock(`Usuario/${usuAno}/${usuCod}`, setUser, '.user-block');
+
+        // Inicia el bloqueo de Notiflix
+        if (document.querySelector('.access-block')) {
+            Notiflix.Block.pulse('.access-block', {
+                svgSize: '100px',
+                svgColor: '#F87C56',
             });
-            await fetchData(`Usuario/access/${usuAno}/${usuCod}`, (data) => {
-                // Usa los objetos de permiso tal como vienen del servidor
-                setCheckedKeys(data.map(permiso => permiso.usuAccPad.trim()));
-                setInitialCheckedKeys(data);
-                
-            });
-            
-        };
+        }
+
+        Promise.all([
+            fetchDataReturn(`Proyecto/proyectos-subproyectos`),
+            fetchDataReturn(`Usuario/access/${usuAno}/${usuCod}`),
+        ]).then(([proyectosData, accesosData]) => {
+            const transformedData = transformData(proyectosData);
+            setProyectos(transformedData);
+
+            setCheckedKeys(accesosData.map(permiso => permiso.usuAccPad.trim()));
+            setInitialCheckedKeys(accesosData);
+        }).catch(error => {
+            // Maneja los errores
+            console.error('Error:', error);
+            Notiflix.Notify.failure('Ha ocurrido un error al cargar los datos.');
+        }).finally(() => {
+            // Quita el bloqueo de Notiflix una vez que todas las peticiones han terminado
+            Notiflix.Block.remove('.access-block');
+        });
     
-        fetchDataAsync();
     }, []);
     
     
@@ -290,7 +301,7 @@ const PermissionUser = () => {
             </div>
             <div className="flex flex-grow-1 overflow-auto p1_25">
                 <div className="flex flex-grow-1 Large_12 gap-1">
-                    <div className="PowerMas_ListPermission PowerMas_Form_Card p1 Large_6 overflow-auto">
+                    <div className="PowerMas_ListPermission PowerMas_Form_Card p1 Large_6 overflow-auto access-block">
                         <Tree
                             checkable
                             onExpand={onExpand}
@@ -298,12 +309,11 @@ const PermissionUser = () => {
                             autoExpandParent={autoExpandParent}
                             onCheck={onCheck}
                             checkedKeys={checkedKeys}
-                            selectedKeys={selectedKeys}
                             treeData={proyectos}
                             checkStrictly={true}
                         />
                     </div>
-                    <div className="Large_6 overflow-auto">
+                    <div className="Large_6 overflow-auto user-block">
                         <UserInfo user={user} />
                     </div>
                 </div>

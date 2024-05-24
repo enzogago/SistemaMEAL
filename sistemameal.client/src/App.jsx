@@ -10,6 +10,7 @@ import { AuthContext } from './context/AuthContext';
 import LoadingComponent from './components/LoadingComponent';
 import ForgotPassword from './components/auth/ForgotPassword';
 import Login from './components/auth/Login';
+const Ubication = lazy(() => import('./components/user/Ubication'));
 const ResultChain = lazy(() => import('./components/result-chain/ResultChain'));
 const Tutorial = lazy(() => import('./components/tutorial/Tutorial'));
 const ResultBudget = lazy(() => import('./components/result-budget/ResultBudget'));
@@ -48,7 +49,6 @@ const Unit = lazy(() => import('./components/Unit/Unit'));
 const NotFound = lazy(() => import('./components/NotFound'));
 const Beneficiarie = lazy(() => import('./components/beneficiarie/Beneficiarie'));
 const FormGoalBeneficiarie = lazy(() => import('./components/monitoring/beneficiarie/FormGoalBeneficiarie'));
-const FormBeneficiarie = lazy(() => import('./components/beneficiarie/FormBeneficiarie'));
 const Notiflix = lazy(() => import('notiflix'));
 const SaveProject = lazy(() => import('./components/upload/project/SaveProject'));
 const UploadProject = lazy(() => import('./components/upload/project/UploadProject'));
@@ -138,6 +138,7 @@ const App = () => {
         "goal-budget": ExecutionBugdet,
         "upload-goal-budget": UploadGoalBudget,
         "execution-budget": ViewExecution,
+        "ubication": Ubication,
     };
 
     let defaultRoute;
@@ -177,12 +178,6 @@ const App = () => {
                                                 {menuData.some(menu => menu.menRef === 'subproject') && (
                                                     <Route path="form-subproject/:id?" element={<FormSubProject />} />
                                                 )}
-                                                {menuData.some(menu => menu.menRef === 'beneficiarie') && (
-                                                    <>
-                                                        <Route path="form-beneficiarie/:id?" element={<FormBeneficiarie />} />
-                                                        
-                                                    </>
-                                                    )}
                                                 {menuData.some(menu => menu.menRef === 'user') && (
                                                     <>
                                                         <Route path="form-user/:id?" element={<FormUser />} />

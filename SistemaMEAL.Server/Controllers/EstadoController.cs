@@ -25,6 +25,7 @@ namespace SistemaMEAL.Server.Controllers
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
+            
             if (!rToken.success) return Unauthorized(rToken);
 
             // Pasa los parámetros al método Listado

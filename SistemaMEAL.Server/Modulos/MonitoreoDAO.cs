@@ -13,7 +13,7 @@ namespace SistemaMEAL.Modulos
     {
         private conexionDAO cn = new conexionDAO();
 
-        public IEnumerable<Monitoreo> Listado(ClaimsIdentity? identity, string? tags)
+        public IEnumerable<Monitoreo> Listado(ClaimsIdentity? identity, string? tags = null, string? periodoInicio = null, string? periodoFin = null)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 
@@ -24,7 +24,9 @@ namespace SistemaMEAL.Modulos
 
                 SqlCommand cmd = new SqlCommand("SP_LISTAR_MONITOREO", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
+                cmd.Parameters.AddWithValue("@P_TAGS", (tags == "null" ||  string.IsNullOrEmpty(tags)) ? string.Empty : tags);
+                cmd.Parameters.AddWithValue("@P_PERINI", (periodoInicio == "null" ||  string.IsNullOrEmpty(periodoInicio)) ? string.Empty : periodoInicio);
+                cmd.Parameters.AddWithValue("@P_PERFIN", (periodoFin == "null" ||  string.IsNullOrEmpty(periodoFin)) ? string.Empty : periodoFin);
                 cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
                 cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
 
@@ -53,39 +55,6 @@ namespace SistemaMEAL.Modulos
                 cn.getcn.Close();
             }
              return temporal?? new List<Monitoreo>();
-        }
-
-        public int GetBeneficiariosCount(string tags)
-        {
-            int count = 0;
-            
-            try
-            {
-                cn.getcn.Open();
-                SqlCommand cmd = new SqlCommand("SP_CONTAR_BENEFICIARIOS", cn.getcn);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
-
-                var result = cmd.ExecuteScalar().ToString();
-
-                if (!string.IsNullOrEmpty(result))
-                {
-                    var jsonObject = JsonConvert.DeserializeObject<List<Dictionary<string, int>>>(result);
-                    if (jsonObject != null && jsonObject.Count > 0 && jsonObject[0].ContainsKey("TOTAL_BENEFICIARIOS"))
-                    {
-                        count = jsonObject[0]["TOTAL_BENEFICIARIOS"];
-                    }
-                }
-            }
-            catch (SqlException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-                cn.getcn.Close();
-            }
-            return count;
         }
 
         public IEnumerable<Monitoreo> BuscarMonitoreoPorBeneficiario(string? benAno, string? benCod)
@@ -688,7 +657,7 @@ namespace SistemaMEAL.Modulos
             return (mensaje, tipoMensaje);
         }
 
-        public IEnumerable<Monitoreo> BuscarPaisesHome(ClaimsIdentity? identity, string? tags)
+        public IEnumerable<Monitoreo> BuscarPaisesHome(ClaimsIdentity? identity, string? tags = null, string? periodoInicio = null, string? periodoFin = null)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 
@@ -699,7 +668,9 @@ namespace SistemaMEAL.Modulos
 
                 SqlCommand cmd = new SqlCommand("SP_BUSCAR_UBICACION_HOME", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
+                cmd.Parameters.AddWithValue("@P_TAGS", (tags == "null" ||  string.IsNullOrEmpty(tags)) ? string.Empty : tags);
+                cmd.Parameters.AddWithValue("@P_PERINI", (periodoInicio == "null" ||  string.IsNullOrEmpty(periodoInicio)) ? string.Empty : periodoInicio);
+                cmd.Parameters.AddWithValue("@P_PERFIN", (periodoFin == "null" ||  string.IsNullOrEmpty(periodoFin)) ? string.Empty : periodoFin);
                 cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
                 cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
 
@@ -730,7 +701,7 @@ namespace SistemaMEAL.Modulos
             return temporal?? new List<Monitoreo>();
         }
 
-        public IEnumerable<Monitoreo> BuscarEcuadorHome(ClaimsIdentity? identity, string? tags)
+        public IEnumerable<Monitoreo> BuscarEcuadorHome(ClaimsIdentity? identity, string? tags = null, string? periodoInicio = null, string? periodoFin = null)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 
@@ -741,7 +712,9 @@ namespace SistemaMEAL.Modulos
 
                 SqlCommand cmd = new SqlCommand("SP_BUSCAR_UBICACION_HOME_SEGUNDO_NIVEL", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
+                cmd.Parameters.AddWithValue("@P_TAGS", (tags == "null" ||  string.IsNullOrEmpty(tags)) ? string.Empty : tags);
+                cmd.Parameters.AddWithValue("@P_PERINI", (periodoInicio == "null" ||  string.IsNullOrEmpty(periodoInicio)) ? string.Empty : periodoInicio);
+                cmd.Parameters.AddWithValue("@P_PERFIN", (periodoFin == "null" ||  string.IsNullOrEmpty(periodoFin)) ? string.Empty : periodoFin);
                 cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
                 cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
                 cmd.Parameters.AddWithValue("@P_UBIANOPAD", "2024");
@@ -773,7 +746,7 @@ namespace SistemaMEAL.Modulos
             }
             return temporal?? new List<Monitoreo>();
         }
-        public IEnumerable<Monitoreo> BuscarPeruHome(ClaimsIdentity? identity, string? tags)
+        public IEnumerable<Monitoreo> BuscarPeruHome(ClaimsIdentity? identity, string? tags = null, string? periodoInicio = null, string? periodoFin = null)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 
@@ -784,7 +757,9 @@ namespace SistemaMEAL.Modulos
 
                 SqlCommand cmd = new SqlCommand("SP_BUSCAR_UBICACION_HOME_SEGUNDO_NIVEL", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
+                cmd.Parameters.AddWithValue("@P_TAGS", (tags == "null" ||  string.IsNullOrEmpty(tags)) ? string.Empty : tags);
+                cmd.Parameters.AddWithValue("@P_PERINI", (periodoInicio == "null" ||  string.IsNullOrEmpty(periodoInicio)) ? string.Empty : periodoInicio);
+                cmd.Parameters.AddWithValue("@P_PERFIN", (periodoFin == "null" ||  string.IsNullOrEmpty(periodoFin)) ? string.Empty : periodoFin);
                 cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
                 cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
                 cmd.Parameters.AddWithValue("@P_UBIANOPAD", "2024");
@@ -816,7 +791,7 @@ namespace SistemaMEAL.Modulos
             }
             return temporal?? new List<Monitoreo>();
         }
-        public IEnumerable<Monitoreo> BuscarColombiaHome(ClaimsIdentity? identity, string? tags)
+        public IEnumerable<Monitoreo> BuscarColombiaHome(ClaimsIdentity? identity, string? tags = null, string? periodoInicio = null, string? periodoFin = null)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 
@@ -827,7 +802,9 @@ namespace SistemaMEAL.Modulos
 
                 SqlCommand cmd = new SqlCommand("SP_BUSCAR_UBICACION_HOME_SEGUNDO_NIVEL", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
+                cmd.Parameters.AddWithValue("@P_TAGS", (tags == "null" ||  string.IsNullOrEmpty(tags)) ? string.Empty : tags);
+                cmd.Parameters.AddWithValue("@P_PERINI", (periodoInicio == "null" ||  string.IsNullOrEmpty(periodoInicio)) ? string.Empty : periodoInicio);
+                cmd.Parameters.AddWithValue("@P_PERFIN", (periodoFin == "null" ||  string.IsNullOrEmpty(periodoFin)) ? string.Empty : periodoFin);
                 cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
                 cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
                 cmd.Parameters.AddWithValue("@P_UBIANOPAD", "2024");

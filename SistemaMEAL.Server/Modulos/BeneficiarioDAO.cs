@@ -658,7 +658,7 @@ namespace SistemaMEAL.Server.Modulos
             return temporal?? new List<Beneficiario>();
         }
 
-        public IEnumerable<Beneficiario> ContarBeneficiariosHome(ClaimsIdentity? identity, string? tags)
+        public IEnumerable<Beneficiario> ContarBeneficiariosHome(ClaimsIdentity? identity, string? tags = null, string? periodoInicio = null, string? periodoFin = null)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 
@@ -669,7 +669,9 @@ namespace SistemaMEAL.Server.Modulos
 
                 SqlCommand cmd = new SqlCommand("SP_CONTAR_BENEFICIARIOS_HOME", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
+                cmd.Parameters.AddWithValue("@P_TAGS", (tags == "null" ||  string.IsNullOrEmpty(tags)) ? string.Empty : tags);
+                cmd.Parameters.AddWithValue("@P_PERINI", (periodoInicio == "null" ||  string.IsNullOrEmpty(periodoInicio)) ? string.Empty : periodoInicio);
+                cmd.Parameters.AddWithValue("@P_PERFIN", (periodoFin == "null" ||  string.IsNullOrEmpty(periodoFin)) ? string.Empty : periodoFin);
                 cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
                 cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
 
@@ -699,7 +701,7 @@ namespace SistemaMEAL.Server.Modulos
             }
             return temporal?? new List<Beneficiario>();
         }
-        public IEnumerable<Beneficiario> BuscarBeneficiariosHome(ClaimsIdentity? identity, string? tags)
+        public IEnumerable<Beneficiario> BuscarBeneficiariosHome(ClaimsIdentity? identity, string? tags = null, string? periodoInicio = null, string? periodoFin = null)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 
@@ -710,7 +712,9 @@ namespace SistemaMEAL.Server.Modulos
 
                 SqlCommand cmd = new SqlCommand("SP_BUSCAR_BENEFICIARIOS_HOME", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
+                cmd.Parameters.AddWithValue("@P_TAGS", (tags == "null" ||  string.IsNullOrEmpty(tags)) ? string.Empty : tags);
+                cmd.Parameters.AddWithValue("@P_PERINI", (periodoInicio == "null" ||  string.IsNullOrEmpty(periodoInicio)) ? string.Empty : periodoInicio);
+                cmd.Parameters.AddWithValue("@P_PERFIN", (periodoFin == "null" ||  string.IsNullOrEmpty(periodoFin)) ? string.Empty : periodoFin);
                 cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
                 cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
 
@@ -740,7 +744,7 @@ namespace SistemaMEAL.Server.Modulos
             }
             return temporal?? new List<Beneficiario>();
         }
-        public IEnumerable<Beneficiario> BuscarBeneficiariosEcuadorHome(ClaimsIdentity? identity, string? tags)
+        public IEnumerable<Beneficiario> BuscarBeneficiariosEcuadorHome(ClaimsIdentity? identity, string? tags = null, string? periodoInicio = null, string? periodoFin = null)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 
@@ -751,7 +755,9 @@ namespace SistemaMEAL.Server.Modulos
 
                 SqlCommand cmd = new SqlCommand("SP_BUSCAR_BENEFICIARIOS_SEGUNDO_NIVEL_HOME", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
+                cmd.Parameters.AddWithValue("@P_TAGS", (tags == "null" ||  string.IsNullOrEmpty(tags)) ? string.Empty : tags);
+                cmd.Parameters.AddWithValue("@P_PERINI", (periodoInicio == "null" ||  string.IsNullOrEmpty(periodoInicio)) ? string.Empty : periodoInicio);
+                cmd.Parameters.AddWithValue("@P_PERFIN", (periodoFin == "null" ||  string.IsNullOrEmpty(periodoFin)) ? string.Empty : periodoFin);
                 cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
                 cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
                 cmd.Parameters.AddWithValue("@P_UBIANOPAD", "2024");
@@ -784,7 +790,7 @@ namespace SistemaMEAL.Server.Modulos
             }
             return temporal?? new List<Beneficiario>();
         }
-        public IEnumerable<Beneficiario> BuscarBeneficiariosPerurHome(ClaimsIdentity? identity, string? tags)
+        public IEnumerable<Beneficiario> BuscarBeneficiariosPerurHome(ClaimsIdentity? identity, string? tags = null, string? periodoInicio = null, string? periodoFin = null)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 
@@ -795,7 +801,9 @@ namespace SistemaMEAL.Server.Modulos
 
                 SqlCommand cmd = new SqlCommand("SP_BUSCAR_BENEFICIARIOS_SEGUNDO_NIVEL_HOME", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
+                cmd.Parameters.AddWithValue("@P_TAGS", (tags == "null" ||  string.IsNullOrEmpty(tags)) ? string.Empty : tags);
+                cmd.Parameters.AddWithValue("@P_PERINI", (periodoInicio == "null" ||  string.IsNullOrEmpty(periodoInicio)) ? string.Empty : periodoInicio);
+                cmd.Parameters.AddWithValue("@P_PERFIN", (periodoFin == "null" ||  string.IsNullOrEmpty(periodoFin)) ? string.Empty : periodoFin);
                 cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
                 cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
                 cmd.Parameters.AddWithValue("@P_UBIANOPAD", "2024");
@@ -828,7 +836,7 @@ namespace SistemaMEAL.Server.Modulos
             }
             return temporal?? new List<Beneficiario>();
         }
-        public IEnumerable<Beneficiario> BuscarBeneficiariosColombiaHome(ClaimsIdentity? identity, string? tags)
+        public IEnumerable<Beneficiario> BuscarBeneficiariosColombiaHome(ClaimsIdentity? identity, string? tags = null, string? periodoInicio = null, string? periodoFin = null)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 
@@ -839,7 +847,9 @@ namespace SistemaMEAL.Server.Modulos
 
                 SqlCommand cmd = new SqlCommand("SP_BUSCAR_BENEFICIARIOS_SEGUNDO_NIVEL_HOME", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
+                cmd.Parameters.AddWithValue("@P_TAGS", (tags == "null" ||  string.IsNullOrEmpty(tags)) ? string.Empty : tags);
+                cmd.Parameters.AddWithValue("@P_PERINI", (periodoInicio == "null" ||  string.IsNullOrEmpty(periodoInicio)) ? string.Empty : periodoInicio);
+                cmd.Parameters.AddWithValue("@P_PERFIN", (periodoFin == "null" ||  string.IsNullOrEmpty(periodoFin)) ? string.Empty : periodoFin);
                 cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
                 cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
                 cmd.Parameters.AddWithValue("@P_UBIANOPAD", "2024");
@@ -872,7 +882,7 @@ namespace SistemaMEAL.Server.Modulos
             }
             return temporal?? new List<Beneficiario>();
         }
-        public IEnumerable<Beneficiario> BuscarSexoHome(ClaimsIdentity? identity, string? tags)
+        public IEnumerable<Beneficiario> BuscarSexoHome(ClaimsIdentity? identity, string? tags = null, string? periodoInicio = null, string? periodoFin = null)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
             
@@ -883,7 +893,9 @@ namespace SistemaMEAL.Server.Modulos
 
                 SqlCommand cmd = new SqlCommand("SP_BUSCAR_SEXO_HOME", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
+                cmd.Parameters.AddWithValue("@P_TAGS", (tags == "null" ||  string.IsNullOrEmpty(tags)) ? string.Empty : tags);
+                cmd.Parameters.AddWithValue("@P_PERINI", (periodoInicio == "null" ||  string.IsNullOrEmpty(periodoInicio)) ? string.Empty : periodoInicio);
+                cmd.Parameters.AddWithValue("@P_PERFIN", (periodoFin == "null" ||  string.IsNullOrEmpty(periodoFin)) ? string.Empty : periodoFin);
                 cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
                 cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
 
@@ -913,7 +925,7 @@ namespace SistemaMEAL.Server.Modulos
             }
             return temporal?? new List<Beneficiario>();
         }
-        public IEnumerable<Beneficiario> BuscarRangoHome(ClaimsIdentity? identity, string? tags)
+        public IEnumerable<Beneficiario> BuscarRangoHome(ClaimsIdentity? identity, string? tags = null, string? periodoInicio = null, string? periodoFin = null)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
             List<Beneficiario>? temporal = new List<Beneficiario>();
@@ -923,7 +935,9 @@ namespace SistemaMEAL.Server.Modulos
 
                 SqlCommand cmd = new SqlCommand("SP_BUSCAR_RANGO_EDAD_HOME", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
+                cmd.Parameters.AddWithValue("@P_TAGS", (tags == "null" ||  string.IsNullOrEmpty(tags)) ? string.Empty : tags);
+                cmd.Parameters.AddWithValue("@P_PERINI", (periodoInicio == "null" ||  string.IsNullOrEmpty(periodoInicio)) ? string.Empty : periodoInicio);
+                cmd.Parameters.AddWithValue("@P_PERFIN", (periodoFin == "null" ||  string.IsNullOrEmpty(periodoFin)) ? string.Empty : periodoFin);
                 cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
                 cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
 

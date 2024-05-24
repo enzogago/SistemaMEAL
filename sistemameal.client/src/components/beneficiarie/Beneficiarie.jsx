@@ -26,7 +26,7 @@ const Beneficiarie = () => {
     }, [refresh]);
 
     // Columnas de la tabla definidas en un hook personalizado
-    const columns = useMemo(() => getColumns(), []);
+    const columns = useMemo(() => getColumns(actions), [actions]);
 
     // Hook personalizado para manejar las etiquetas de búsqueda
     const {
@@ -90,7 +90,8 @@ const Beneficiarie = () => {
                 {/* Tabla común para mostrar los datos filtrados */}
                 <CommonTable 
                     data={filteredData} 
-                    columns={columns} 
+                    columns={columns}
+                    isLargePagination={true}
                 />
             </div>
         </>

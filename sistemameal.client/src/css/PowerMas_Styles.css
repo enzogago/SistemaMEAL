@@ -230,7 +230,7 @@ input::placeholder,select::placeholder{
 	box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5);
 	background-color: #dedddd;
 }
-.PowerMas_Search_Container_Home svg{
+/* .PowerMas_Search_Container_Home svg{
 	position: absolute;
     left: 0;
     top: 50%;
@@ -246,8 +246,7 @@ input::placeholder,select::placeholder{
 	color: black;
 	transition: box-shadow 0.3s ease-in-out;
 	padding-left: 50px;
-	min-width: 200px;
-}
+} */
 
 
 .PowerMas_MainHome {

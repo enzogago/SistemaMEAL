@@ -139,10 +139,13 @@ namespace SistemaMEAL.Server.Controllers
             }
         }
 
-        [HttpPost("update-avatar")]
+        [HttpPut("update-avatar")]
         public dynamic ModificarAvatarUsuario(Usuario usuario)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return rToken;
 
             var (message, messageType, user) = _usuarios.ModificarAvatarUsuario(identity, usuario);
             if (messageType == "1") // Error
@@ -158,6 +161,7 @@ namespace SistemaMEAL.Server.Controllers
                 return new OkObjectResult(new { success = true, message, user });
             }
         }
+
 
         [HttpPut]
         [Route("restablecerPassword")]

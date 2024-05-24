@@ -8,9 +8,21 @@ import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
 import Pdf_Icon from '../../img/PowerMas_Pdf_Icon.svg';
 import Search from '../../icons/Search';
 import Expand from '../../icons/Expand';
+import IconCalendar from '../../icons/IconCalendar';
+import useDateRange from '../../hooks/useDateRange';
 
 const smallPageSizes = [10, 20, 30, 50];
 const largePageSizes = [100, 200, 300, 500];
+
+const handleInput = (event) => {
+    // Permite solo números y un guion en el formato MM-YYYY
+    event.target.value = event.target.value.replace(/[^0-9-]/g, '');
+
+    // Limita la longitud del input para que no exceda el formato MM-YYYY
+    if (event.target.value.length > 7) {
+        event.target.value = event.target.value.slice(0, 7);
+    }
+};
 
 const getIndicatorStatus = (metas) => {
     let statusColor = '';
@@ -69,6 +81,14 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
     const [pageSize, setPageSize] = useState(100);
     const [totalPages, setTotalPages] = useState(0);
 
+    const {
+        periodoInicio,
+        setPeriodoInicio,
+        periodoFin,
+        setPeriodoFin,
+        handlePeriodoChange,
+    } = useDateRange();
+
     const toggleDropdown = () => {
         setDropdownOpen(!dropdownOpen);
     }
@@ -93,12 +113,15 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
     const endIndex = startIndex + pageSize;
 
     useEffect(() => {
-        fetchDataBlock(`Monitoreo/Filter/${searchTags.join(',')}`, (data) => {
-            setMetas(data)
+        const tagsParam = searchTags.length > 0 ? searchTags.join(',') : null;
+        const periodoInicioParam = periodoInicio ? periodoInicio : null;
+        const periodoFinParam = periodoFin ? periodoFin : null;
+        const url = `Monitoreo/Filter/${tagsParam}/${periodoInicioParam}/${periodoFinParam}`;
+        fetchDataBlock(url, (data) => {
+            setMetas(data);
             setTotalPages(Math.ceil(data.length / pageSize));
-        }, '.table-monitoring')
-        
-    }, [searchTags])
+        }, '.table-monitoring');
+    }, [searchTags, periodoInicio, periodoFin]);
 
     useEffect(() => {
         setTotalPages(Math.ceil(metas.length / pageSize));
@@ -170,8 +193,6 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
     const currentRecords = Object.entries(groupedMetas);
 
     const Register_Beneficiarie = (meta) => {
-        
-
         const id = `${meta.metAno}${meta.metCod}`;
         // Encripta el ID
         const ciphertext = CryptoJS.AES.encrypt(id, 'secret key 123').toString();
@@ -263,7 +284,7 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
 
     return (
         <div className='TableMainContainer Large-p1 table-monitoring'>
-            <div className='flex gap-1'>
+            <div className='flex gap_25'>
                 <div className="PowerMas_Search_Container flex-grow-1">
                     <div className="PowerMas_Input_Filter_Container flex">
                         <div className="flex ai-center">
@@ -287,7 +308,39 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                         </div>
                     </div>
                 </div>
-                <div className={`PowerMas_Dropdown_Export Large_3 ${dropdownOpen ? 'open' : ''}`}>
+                <span className='flex ai-center'>
+                    |   
+                </span>
+                <div style={{border: '1px solid #F7CEAD', borderRadius: '5px'}} className="Phone_2 flex ai-center relative">
+                    <span style={{position: 'absolute', left: 15}}>
+                        <IconCalendar />
+                    </span>
+                    <input 
+                        className='PowerMas_Input_Filter Large_12 Large-p_5 m0'
+                        type="text"
+                        placeholder='MM-YYYY'
+                        onInput={handleInput}
+                        onKeyDown={handlePeriodoChange(setPeriodoInicio)}
+                        maxLength={7}
+                    />
+                </div>
+                <span className='flex ai-center'>
+                    -
+                </span>
+                <div style={{border: '1px solid #F7CEAD', borderRadius: '5px'}} className="Phone_2 flex ai-center relative">
+                    <span style={{position: 'absolute', left: 15}}>
+                        <IconCalendar />
+                    </span>
+                    <input 
+                        className='PowerMas_Input_Filter Large_12 Large-p_5 m0'
+                        type="text"
+                        placeholder='MM-YYYY'
+                        onInput={handleInput}
+                        onKeyDown={handlePeriodoChange(setPeriodoFin)}
+                        maxLength={7}
+                    />
+                </div>
+                <div className={`PowerMas_Dropdown_Export Large_2 ${dropdownOpen ? 'open' : ''}`}>
                     <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>
                         Exportar
                         <span className='flex'>
@@ -598,7 +651,7 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                     </div>
                 }
             </div>
-            <div className="PowerMas_Pagination Large_12 flex column jc-space-between ai-center Large-p2">
+            <div className="PowerMas_Pagination Large_12 flex column jc-space-between ai-center Large-p_5">
                 <div className="todo">
                     <div className="todo">
                         <button onClick={goToFirstPage} disabled={currentPage === 1}>{"<<"}</button>

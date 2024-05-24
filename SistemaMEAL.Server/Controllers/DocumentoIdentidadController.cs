@@ -101,15 +101,15 @@ namespace SistemaMEAL.Server.Controllers
         }
 
         [HttpGet]
-        [Route("home/{tags?}")]
-        public dynamic BuscarDocumentosHome(string? tags = null)
+        [Route("home/{tags}/{periodoInicio}/{periodoFin}")]
+        public dynamic BuscarDocumentosHome(string? tags = null, string? periodoInicio = null, string? periodoFin = null)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var reult = _documentos.BuscarDocumentosHome(identity, tags);
+            var reult = _documentos.BuscarDocumentosHome(identity, tags, periodoInicio, periodoFin);
             return Ok(reult);
         }
     }

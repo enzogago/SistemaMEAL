@@ -153,6 +153,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
         const subProyecto = watch('subProyecto');
         if (subProyecto !== '0' && subProyecto !== '') {
             const { subProAno, subProCod, subProInvSubAct } = JSON.parse(subProyecto);
+            console.log(subProInvSubAct)
             fetchData(`Objetivo/subproyecto/${subProAno}/${subProCod}`, (data) => {
                 setValue('objetivo', '0');
                 if(data.length > 0 ) {
@@ -163,6 +164,8 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
             });
             if (subProInvSubAct.trim() === 'S') {
                 setInvolucraSubActividad(true);
+            } else {
+                setInvolucraSubActividad(false);
             }
             fetchData(`Indicador/subproyecto-actividad/${subProAno}/${subProCod}`, (data) => {
                 setIndicadoresSelect(data);

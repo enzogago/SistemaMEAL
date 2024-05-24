@@ -22,6 +22,19 @@ import DivergingEmpty from '../../img/PowerMas_DivergingEmpty.svg';
 import PieEmpty from '../../img/PowerMas_PieEmpty.svg';
 import BarEmpty from '../../img/PowerMas_BarEmpty.svg';
 import Search from '../../icons/Search';
+import IconCalendar from '../../icons/IconCalendar';
+import useDateRange from '../../hooks/useDateRange';
+
+
+const handleInput = (event) => {
+    // Permite solo números y un guion en el formato MM-YYYY
+    event.target.value = event.target.value.replace(/[^0-9-]/g, '');
+
+    // Limita la longitud del input para que no exceda el formato MM-YYYY
+    if (event.target.value.length > 7) {
+        event.target.value = event.target.value.slice(0, 7);
+    }
+};
 
 // Componentes de mapas (perezosos para optimizar la carga)
 const MapComponents = {
@@ -41,6 +54,14 @@ const Home = () => {
         handleKeyDown,
         removeTag
     } = useSearchTags();
+
+    const {
+        periodoInicio,
+        setPeriodoInicio,
+        periodoFin,
+        setPeriodoFin,
+        handlePeriodoChange,
+    } = useDateRange();
 
     // Estados para almacenar datos de la API
     const [monitoringData, setMonitoringData] = useState(null);
@@ -65,6 +86,11 @@ const Home = () => {
     }, []);
 
     useEffect(() => {
+        const tagsParam = searchTags.length > 0 ? searchTags.join(',') : null;
+        const periodoInicioParam = periodoInicio ? periodoInicio : null;
+        const periodoFinParam = periodoFin ? periodoFin : null;
+        const url = `${tagsParam}/${periodoInicioParam}/${periodoFinParam}`;
+
         // Inicializa el AbortController para manejar la cancelación de las solicitudes fetch
         const abortController = new AbortController(); 
     
@@ -91,49 +117,54 @@ const Home = () => {
         };
     
         // Llamada para obtener y procesar datos de monitoreo
-        fetchDataBlockHome(`Monitoreo/Filter/${searchTags.join(',')}`, calculateAndSetProgress, '.table-home-block', abortController.signal);
+        fetchDataBlockHome(`Monitoreo/Filter/${url}`, calculateAndSetProgress, '.table-home-block', abortController.signal);
     
         // Llamada para obtener el total de beneficiarios
-        fetchDataBlockHome(`Beneficiario/contar-home/${searchTags.join(',')}`, (data) => {
+        fetchDataBlockHome(`Beneficiario/contar-home/${url}`, (data) => {
             setTotalBeneficiarios(data.cantidad);
         }, '.js-element6', abortController.signal);
         
         // Llamada para obtener datos de rango de edad
-        fetchDataBlockHome(`Beneficiario/rango-home/${searchTags.join(',')}`, setRangeData, '.js-element3', abortController.signal);
+        fetchDataBlockHome(`Beneficiario/rango-home/${url}`, setRangeData, '.js-element3', abortController.signal);
         
         // Llamada para obtener datos de beneficiarios por sexo
-        fetchDataBlockHome(`Beneficiario/sexo-home/${searchTags.join(',')}`, (data) => {
+        fetchDataBlockHome(`Beneficiario/sexo-home/${url}`, (data) => {
             const dataFormat = data.map(item => ({ name: item.benSex, value: item.cantidad }));
             setPieData(dataFormat);
         }, '.sex-block', abortController.signal);
         
         // Llamada para obtener datos de beneficiarios por nacionalidad
-        fetchDataBlockHome(`Nacionalidad/home/${searchTags.join(',')}`, (data) => {
+        fetchDataBlockHome(`Nacionalidad/home/${url}`, (data) => {
             const dataFormat = data.map(item => ({ name: item.nacNom, value: item.cantidad }));
             setDataNac(dataFormat);
         }, '.js-element2', abortController.signal);
         
         // Llamada para obtener datos de beneficiarios por tipo de documento
-        fetchDataBlockHome(`DocumentoIdentidad/home/${searchTags.join(',')}`, (data) => {
+        fetchDataBlockHome(`DocumentoIdentidad/home/${url}`, (data) => {
             const docDataFormat = data.map(item => ({ name: item.docIdeAbr, value: item.cantidad, tip: item.docIdeNom }));
             setDocData(docDataFormat);
         }, '.js-element4', abortController.signal);
         
         // Función de limpieza para cancelar las solicitudes fetch si el componente se desmonta
         return () => abortController.abort();
-    }, [searchTags]);
+    }, [searchTags, periodoInicio, periodoFin]);
 
     useEffect(() => {
+        const tagsParam = searchTags.length > 0 ? searchTags.join(',') : null;
+        const periodoInicioParam = periodoInicio ? periodoInicio : null;
+        const periodoFinParam = periodoFin ? periodoFin : null;
+        const url = `${tagsParam}/${periodoInicioParam}/${periodoFinParam}`;
+        
         // Cancela cualquier fetch anterior
         const abortController = new AbortController(); 
       
         // Función para obtener datos del mapa y beneficiarios según el país
         const fetchDataForMap = (country) => {
           // Llamada para obtener datos de ubicación para el mapa
-          fetchDataBlockHome(`Monitoreo/${country}-home/${searchTags.join(',')}`, setMapData, '.ubication-block', abortController.signal);
+          fetchDataBlockHome(`Monitoreo/${country}-home/${url}`, setMapData, '.ubication-block', abortController.signal);
       
           // Llamada para obtener datos de beneficiarios
-          fetchDataBlockHome(`Beneficiario/${country}-home/${searchTags.join(',')}`, setBeneficiariosData, '.ubication-block', abortController.signal);
+          fetchDataBlockHome(`Beneficiario/${country}-home/${url}`, setBeneficiariosData, '.ubication-block', abortController.signal);
         };
       
         // Ejecuta la función fetchDataForMap con el país actual
@@ -183,8 +214,8 @@ const Home = () => {
 
     return (
         <>
-            <div className="PowerMas_Search_Container_Home Medium-p_25 Small-p_75" style={{paddingBottom: '1rem'}} >
-                <div className="PowerMas_Input_Filter_Container flex" style={{border: '1px solid #FFC658'}}>
+            <div className="PowerMas_Search_Container_Home flex gap_25 Medium-p_25 Small-p_75" style={{paddingBottom: '1rem'}} >
+                <div className="PowerMas_Input_Filter_Container flex flex-grow-1" style={{border: '1px solid #FFC658'}}>
                     <div className="flex ai-center">
                         {searchTags.map(tag => (
                             <span key={tag} className="PowerMas_InputTag flex">
@@ -193,8 +224,10 @@ const Home = () => {
                             </span>
                         ))}
                     </div>
-                    <div className="Phone_12 relative">
-                        <Search />
+                    <div className="Phone_12 flex ai-center relative">
+                        <span style={{position: 'absolute', left: 15}}>
+                            <Search />
+                        </span>
                         <input 
                             className='PowerMas_Input_Filter Phone_12 Large-p_5'
                             type="search"
@@ -204,6 +237,38 @@ const Home = () => {
                             value={inputValue}
                         />
                     </div>
+                </div>
+                <span className='flex ai-center'>
+                    |   
+                </span>
+                <div style={{border: '1px solid var(--naranja-ayuda)', borderRadius: '5px'}} className="Phone_2 flex ai-center relative">
+                    <span style={{position: 'absolute', left: 15}}>
+                        <IconCalendar />
+                    </span>
+                    <input 
+                        className='PowerMas_Input_Filter Large_12 Large-p_5 m0'
+                        type="text"
+                        placeholder='MM-YYYY'
+                        onInput={handleInput}
+                        onKeyDown={handlePeriodoChange(setPeriodoInicio)}
+                        maxLength={7}
+                    />
+                </div>
+                <span className='flex ai-center'>
+                    -
+                </span>
+                <div style={{border: '1px solid var(--naranja-ayuda)', borderRadius: '5px'}} className="Phone_2 flex ai-center relative">
+                    <span style={{position: 'absolute', left: 15}}>
+                        <IconCalendar />
+                    </span>
+                    <input 
+                        className='PowerMas_Input_Filter Large_12 Large-p_5 m0'
+                        type="text"
+                        placeholder='MM-YYYY'
+                        onInput={handleInput}
+                        onKeyDown={handlePeriodoChange(setPeriodoFin)}
+                        maxLength={7}
+                    />
                 </div>
             </div>
             <div className='PowerMas_Resume_Home overflow-auto'>

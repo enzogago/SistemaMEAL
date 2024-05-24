@@ -203,7 +203,7 @@ namespace SistemaMEAL.Modulos
             return (mensaje, tipoMensaje);
         }
 
-        public IEnumerable<Nacionalidad> BuscarNacionalidadesHome(ClaimsIdentity? identity, string? tags)
+        public IEnumerable<Nacionalidad> BuscarNacionalidadesHome(ClaimsIdentity? identity, string? tags = null, string? periodoInicio = null, string? periodoFin = null)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
             
@@ -214,7 +214,9 @@ namespace SistemaMEAL.Modulos
 
                 SqlCommand cmd = new SqlCommand("SP_BUSCAR_NACIONALIDAD_HOME", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@P_TAGS", tags ?? string.Empty);
+                cmd.Parameters.AddWithValue("@P_TAGS", (tags == "null" ||  string.IsNullOrEmpty(tags)) ? string.Empty : tags);
+                cmd.Parameters.AddWithValue("@P_PERINI", (periodoInicio == "null" ||  string.IsNullOrEmpty(periodoInicio)) ? string.Empty : periodoInicio);
+                cmd.Parameters.AddWithValue("@P_PERFIN", (periodoFin == "null" ||  string.IsNullOrEmpty(periodoFin)) ? string.Empty : periodoFin);
                 cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
                 cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
 

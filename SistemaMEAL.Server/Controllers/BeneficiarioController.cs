@@ -213,89 +213,89 @@ namespace SistemaMEAL.Server.Controllers
         }
 
         [HttpGet]
-        [Route("contar-home/{tags?}")]
-        public dynamic ContarBeneficiariosHome(string? tags = null)
+        [Route("contar-home/{tags}/{periodoInicio}/{periodoFin}")]
+        public dynamic ContarBeneficiariosHome(string? tags = null, string? periodoInicio = null, string? periodoFin = null)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var reult = _beneficiarios.ContarBeneficiariosHome(identity, tags);
+            var reult = _beneficiarios.ContarBeneficiariosHome(identity, tags, periodoInicio, periodoFin);
             return Ok(reult.FirstOrDefault());
         }
         
         [HttpGet]
-        [Route("todos-home/{tags?}")]
-        public dynamic BuscarBeneficiariosHome(string? tags = null)
+        [Route("todos-home/{tags}/{periodoInicio}/{periodoFin}")]
+        public dynamic BuscarBeneficiariosHome(string? tags = null, string? periodoInicio = null, string? periodoFin = null)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var reult = _beneficiarios.BuscarBeneficiariosHome(identity, tags);
+            var reult = _beneficiarios.BuscarBeneficiariosHome(identity, tags, periodoInicio, periodoFin);
             return Ok(reult);
         }
         [HttpGet]
-        [Route("ecuador-home/{tags?}")]
-        public dynamic BuscarBeneficiariosEcuadorHome(string? tags = null)
+        [Route("ecuador-home/{tags}/{periodoInicio}/{periodoFin}")]
+        public dynamic BuscarBeneficiariosEcuadorHome(string? tags = null, string? periodoInicio = null, string? periodoFin = null)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var reult = _beneficiarios.BuscarBeneficiariosEcuadorHome(identity, tags);
+            var reult = _beneficiarios.BuscarBeneficiariosEcuadorHome(identity, tags, periodoInicio, periodoFin);
             return Ok(reult);
         }
         [HttpGet]
-        [Route("peru-home/{tags?}")]
-        public dynamic BuscarBeneficiariosPerurHome(string? tags = null)
+        [Route("peru-home/{tags}/{periodoInicio}/{periodoFin}")]
+        public dynamic BuscarBeneficiariosPerurHome(string? tags = null, string? periodoInicio = null, string? periodoFin = null)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var reult = _beneficiarios.BuscarBeneficiariosPerurHome(identity, tags);
+            var reult = _beneficiarios.BuscarBeneficiariosPerurHome(identity, tags, periodoInicio, periodoFin);
             return Ok(reult);
         }
         [HttpGet]
-        [Route("colombia-home/{tags?}")]
-        public dynamic BuscarBeneficiariosColombiaHome(string? tags = null)
+        [Route("colombia-home/{tags}/{periodoInicio}/{periodoFin}")]
+        public dynamic BuscarBeneficiariosColombiaHome(string? tags = null, string? periodoInicio = null, string? periodoFin = null)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var reult = _beneficiarios.BuscarBeneficiariosColombiaHome(identity, tags);
+            var reult = _beneficiarios.BuscarBeneficiariosColombiaHome(identity, tags, periodoInicio, periodoFin);
             return Ok(reult);
         }
 
         [HttpGet]
-        [Route("sexo-home/{tags?}")]
-        public dynamic BuscarSexoHome(string? tags = null)
+        [Route("sexo-home/{tags}/{periodoInicio}/{periodoFin}")]
+        public dynamic BuscarSexoHome(string? tags = null, string? periodoInicio = null, string? periodoFin = null)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var reult = _beneficiarios.BuscarSexoHome(identity, tags);
+            var reult = _beneficiarios.BuscarSexoHome(identity, tags, periodoInicio, periodoFin);
             return Ok(reult);
         }
         [HttpGet]
-        [Route("rango-home/{tags?}")]
-        public dynamic BuscarRangoHome(string? tags = null)
+        [Route("rango-home/{tags}/{periodoInicio}/{periodoFin}")]
+        public dynamic BuscarRangoHome(string? tags = null, string? periodoInicio = null, string? periodoFin = null)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var reult = _beneficiarios.BuscarRangoHome(identity, tags);
+            var reult = _beneficiarios.BuscarRangoHome(identity, tags, periodoInicio, periodoFin);
             return Ok(reult);
         }
 

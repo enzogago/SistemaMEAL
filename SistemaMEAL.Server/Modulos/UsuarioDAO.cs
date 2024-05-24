@@ -200,12 +200,12 @@ namespace SistemaMEAL.Server.Modulos
                 cmd.Parameters.AddWithValue("@P_USUANO", usuario.UsuAno);
                 cmd.Parameters.AddWithValue("@P_USUCOD", usuario.UsuCod);
                 cmd.Parameters.AddWithValue("@P_USUAVA", usuario.UsuAva);
-                cmd.Parameters.AddWithValue("@P_USUMOD", "");
-                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", "");
-                cmd.Parameters.AddWithValue("@P_USUANO_U", "");
-                cmd.Parameters.AddWithValue("@P_USUCOD_U", "");
-                cmd.Parameters.AddWithValue("@P_USUNOM_U", "");
-                cmd.Parameters.AddWithValue("@P_USUAPE_U", "");
+                cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
 
                 pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
                 pDescripcionMensaje.Direction = ParameterDirection.Output;
@@ -473,7 +473,7 @@ namespace SistemaMEAL.Server.Modulos
             return temporal?? new List<Usuario>();
         }
 
-        public IEnumerable<Usuario> Listado(ClaimsIdentity? identity = null, string? usuAno = null, string? usuCod = null, string? docIdeCod = null, string? usuNumDoc = null, string? usuNom = null, string? usuApe = null, string? usuFecNac = null, string? usuSex = null, string? usuCorEle = null, string? usuCarCod = null, string? usuFecInc = null, string? usuTel = null, string? usuNomUsu = null, string? usuPas = null, string? usuEst = null, string? rolCod = null, string? ubiAno = null, string? ubiCod = null)
+        public IEnumerable<Usuario> Listado(ClaimsIdentity? identity = null, string? usuAno = null, string? usuCod = null, string? docIdeCod = null, string? usuNumDoc = null, string? usuNom = null, string? usuApe = null, string? usuFecNac = null, string? usuSex = null, string? usuCorEle = null, string? usuCarCod = null, string? usuFecInc = null, string? usuTel = null, string? usuNomUsu = null, string? usuPas = null, string? usuEst = null, string? rolCod = null, string? ubiAno = null, string? ubiCod = null, byte[]? usuAva = null)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 
