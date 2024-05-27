@@ -20,44 +20,27 @@ namespace SistemaMEAL.Server.Controllers
         }
 
 
-        [HttpPost("agregar")]
-        public IActionResult AgregarMenuUsuario([FromBody] List<MenuUsuario> menusAgregar)
+        [HttpPost("usuario")]
+        public dynamic InsertarMenuUsuario(MenuUsuarioDto menuUsuarioDto)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
 
-            if (!rToken.success) return Unauthorized(rToken);
+            if (!rToken.success) return rToken;
 
-            foreach (var menuUsuario in menusAgregar)
+            var (message, messageType) = _menus.InsertarMenuUsuario(identity, menuUsuarioDto.Usuario, menuUsuarioDto.MenuUsuarioInsertar, menuUsuarioDto.MenuUsuarioEliminar);
+            if (messageType == "1") // Error
             {
-                bool result = _menus.InsertarMenuUsuario(identity, menuUsuario.UsuAno, menuUsuario.UsuCod, menuUsuario.MenAno, menuUsuario.MenCod);
-                if (!result)
-                {
-                    return BadRequest("Error al agregar el menú al usuario");
-                }
+                return new BadRequestObjectResult(new { success = false, message });
             }
-
-            return Ok("Menús agregados correctamente");
-        }
-
-        [HttpPost("eliminar")]
-        public IActionResult EliminarMenuUsuario([FromBody] List<MenuUsuario> menusEliminar)
-        {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
-
-            if (!rToken.success) return Unauthorized(rToken);
-
-            foreach (var menuUsuario in menusEliminar)
+            else if (messageType == "2") // Registro ya existe
             {
-                bool result = _menus.EliminarMenuUsuario(identity, menuUsuario.UsuAno, menuUsuario.UsuCod, menuUsuario.MenAno, menuUsuario.MenCod);
-                if (!result)
-                {
-                    return BadRequest("Error al eliminar el menú del usuario");
-                }
+                return new ConflictObjectResult(new { success = false, message });
             }
-
-            return Ok("Menús eliminados correctamente");
+            else // Registro modificado correctamente
+            {
+                return new OkObjectResult(new { success = true, message });
+            }
         }
 
         [HttpGet]

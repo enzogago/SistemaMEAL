@@ -18,7 +18,7 @@ const SearchTagsInput = ({searchTags, inputValue, handleInputChange, handleKeyDo
                     </span>
                     <input 
                         className='PowerMas_Input_Filter Phone_12 Large-p_5'
-                        type="search"
+                        type="text"
                         placeholder='Buscar'
                         onChange={handleInputChange}
                         onKeyDown={handleKeyDown}

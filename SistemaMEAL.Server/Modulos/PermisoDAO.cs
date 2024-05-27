@@ -12,93 +12,95 @@ namespace SistemaMEAL.Modulos
     {
         private conexionDAO cn = new conexionDAO();
 
-        public bool InsertarPermisoUsuario(ClaimsIdentity? identity, string usuAno, string usuCod, string perCod)
+        public (string? message, string? messageType) InsertarPermisoUsuario(ClaimsIdentity? identity, Usuario? usuario, List<PermisoUsuario>? permisoUsuarioInsertar,List<PermisoUsuario>? permisoUsuarioEliminar)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
+            string? mensaje = "No se realizaron cambios.";
+            string? tipoMensaje = "3";
 
             try
             {
                 cn.getcn.Open();
 
-                SqlCommand cmd = new SqlCommand("SP_INSERTAR_PERMISO_USUARIO", cn.getcn);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@P_USUANO", usuAno);
-                cmd.Parameters.AddWithValue("@P_USUCOD", usuCod);
-                cmd.Parameters.AddWithValue("@P_PERCOD", perCod);
-                cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
-                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
-                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
-                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
-                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
-                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+                if (permisoUsuarioInsertar.Count > 0)
+                {
+                    foreach (var item in permisoUsuarioInsertar)
+                    {
+                        SqlCommand cmd = new SqlCommand("SP_INSERTAR_PERMISO_USUARIO", cn.getcn);
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@P_USUANO", usuario.UsuAno);
+                        cmd.Parameters.AddWithValue("@P_USUCOD", usuario.UsuCod);
+                        cmd.Parameters.AddWithValue("@P_PERCOD", item.PerCod);
+                        cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
+                        cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                        cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                        cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                        cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                        cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
 
-                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
-                pDescripcionMensaje.Direction = ParameterDirection.Output;
-                cmd.Parameters.Add(pDescripcionMensaje);
+                        SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                        pDescripcionMensaje.Direction = ParameterDirection.Output;
+                        cmd.Parameters.Add(pDescripcionMensaje);
 
-                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
-                pTipoMensaje.Direction = ParameterDirection.Output;
-                cmd.Parameters.Add(pTipoMensaje);
+                        SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                        pTipoMensaje.Direction = ParameterDirection.Output;
+                        cmd.Parameters.Add(pTipoMensaje);
 
-                cmd.ExecuteNonQuery();
+                        cmd.ExecuteNonQuery();
 
-                return true;
+                        mensaje = pDescripcionMensaje.Value.ToString();
+                        tipoMensaje = pTipoMensaje.Value.ToString();
+                    }
+                }
+
+                if (permisoUsuarioEliminar.Count > 0)
+                {
+                    foreach (var item in permisoUsuarioEliminar)
+                    {
+                        SqlCommand cmd = new SqlCommand("SP_ELIMINAR_PERMISO_USUARIO", cn.getcn);
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@P_USUANO", usuario.UsuAno);
+                        cmd.Parameters.AddWithValue("@P_USUCOD", usuario.UsuCod);
+                        cmd.Parameters.AddWithValue("@P_PERCOD", item.PerCod);
+                        cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
+                        cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                        cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                        cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                        cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                        cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                        SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                        pDescripcionMensaje.Direction = ParameterDirection.Output;
+                        cmd.Parameters.Add(pDescripcionMensaje);
+
+                        SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                        pTipoMensaje.Direction = ParameterDirection.Output;
+                        cmd.Parameters.Add(pTipoMensaje);
+
+                        cmd.ExecuteNonQuery();
+
+                        mensaje = pDescripcionMensaje.Value.ToString();
+                        tipoMensaje = pTipoMensaje.Value.ToString();
+                    }
+                }
+
+                mensaje = "No se realizaron cambios.";
+                tipoMensaje = "3";
             }
             catch (SqlException ex)
             {
-                Console.WriteLine(ex.Message);
-                return false;
+                mensaje = ex.Message;
+                tipoMensaje = "1";
             }
             finally
             {
                 cn.getcn.Close();
             }
+            return (mensaje, tipoMensaje);
         }
-
-        public bool EliminarPermisoUsuario(ClaimsIdentity? identity, string usuAno, string usuCod, string perCod)
-        {
-            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
-
-            try
-            {
-                cn.getcn.Open();
-
-                SqlCommand cmd = new SqlCommand("SP_ELIMINAR_PERMISO_USUARIO", cn.getcn);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@P_USUANO", usuAno);
-                cmd.Parameters.AddWithValue("@P_USUCOD", usuCod);
-                cmd.Parameters.AddWithValue("@P_PERCOD", perCod);
-                cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
-                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
-                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
-                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
-                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
-                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
-                
-                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
-                pDescripcionMensaje.Direction = ParameterDirection.Output;
-                cmd.Parameters.Add(pDescripcionMensaje);
-
-                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
-                pTipoMensaje.Direction = ParameterDirection.Output;
-                cmd.Parameters.Add(pTipoMensaje);
-                
-                cmd.ExecuteNonQuery();
-
-                return true;
-            }
-            catch (SqlException ex)
-            {
-                Console.WriteLine(ex.Message);
-                return false;
-            }
-            finally
-            {
-                cn.getcn.Close();
-            }
-        }
-
-        public IEnumerable<Permiso> Listado(ClaimsIdentity? identity, string? perCod = null, string? perNom = null, string? perRef = null)
+        
+        public IEnumerable<Permiso> Buscar(ClaimsIdentity? identity, string? perCod = null, string? perNom = null, string? perRef = null)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 

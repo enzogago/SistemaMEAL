@@ -19,45 +19,29 @@ namespace SistemaMEAL.Server.Controllers
             _usuarios = usuarios;
         }
 
-        [HttpPost("agregar")]
-        public IActionResult AgregarPermisoUsuario([FromBody] List<PermisoUsuario> permisosAgregar)
+        [HttpPost("usuario")]
+        public dynamic InsertarPermisoUsuario(PermisoUsuarioDto permisoUsuarioDto)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
 
-            if (!rToken.success) return Unauthorized(rToken);
+            if (!rToken.success) return rToken;
 
-            foreach (var permisoUsuario in permisosAgregar)
+            var (message, messageType) = _permisos.InsertarPermisoUsuario(identity, permisoUsuarioDto.Usuario, permisoUsuarioDto.PermisoUsuarioInsertar, permisoUsuarioDto.PermisoUsuarioEliminar);
+            if (messageType == "1") // Error
             {
-                bool result = _permisos.InsertarPermisoUsuario(identity, permisoUsuario.UsuAno, permisoUsuario.UsuCod, permisoUsuario.PerCod);
-                if (!result)
-                {
-                    return BadRequest("Error al agregar el permiso al usuario");
-                }
+                return new BadRequestObjectResult(new { success = false, message });
             }
-
-            return Ok("Permisos agregados correctamente");
+            else if (messageType == "2") // Registro ya existe
+            {
+                return new ConflictObjectResult(new { success = false, message });
+            }
+            else // Registro modificado correctamente
+            {
+                return new OkObjectResult(new { success = true, message });
+            }
         }
 
-        [HttpPost("eliminar")]
-        public IActionResult EliminarPermisoUsuario([FromBody] List<PermisoUsuario> permisosEliminar)
-        {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
-
-            if (!rToken.success) return Unauthorized(rToken);
-
-            foreach (var permisoUsuario in permisosEliminar)
-            {
-                bool result = _permisos.EliminarPermisoUsuario(identity, permisoUsuario.UsuAno, permisoUsuario.UsuCod, permisoUsuario.PerCod);
-                if (!result)
-                {
-                    return BadRequest("Error al eliminar el permiso del usuario");
-                }
-            }
-
-            return Ok("Permisos eliminados correctamente");
-        }
 
         [HttpGet]
         public dynamic Listado()
@@ -67,7 +51,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var permisos = _permisos.Listado(identity);
+            var permisos = _permisos.Buscar(identity);
             return Ok(permisos);
         }
 
@@ -80,6 +64,18 @@ namespace SistemaMEAL.Server.Controllers
             if (!rToken.success) return Unauthorized(rToken);
 
             var permiso = _permisos.ListadoPermisoPorUsuario(identity, usuAno:usuAno, usuCod:usuCod);
+            return Ok(permiso);
+        }
+
+        [HttpGet("{perRef}")]
+        public IActionResult BuscarPermisoPorReferencia(string perRef)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var permiso = _permisos.Buscar(identity, perRef:perRef);
             return Ok(permiso);
         }
 

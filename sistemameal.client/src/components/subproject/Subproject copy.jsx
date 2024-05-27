@@ -1,4 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+// Componentes
+import Table from "./Table";
 // Fetch Get
 import { fetchData } from '../reusable/helper';
 import Modal from 'react-modal';
@@ -7,29 +9,35 @@ import FileExcel from '../../icons/FileExcel';
 import Delete from '../../icons/Delete';
 import { formatterBudget } from '../monitoring/goal/helper';
 import Notiflix from 'notiflix';
-import { getColumns } from './columns';
-import SearchInput from '../reusable/Tables/SearchInput';
-import ExportMenu from '../reusable/Tables/ExportMenu';
-import CommonTable from '../reusable/Tables/CommonTable';
-import useEntityActions from '../../hooks/useEntityActions';
-import Plus from '../../icons/Plus';
-import { fetchDataBlock } from '../reusable/fetchs';
-import { getMonthYearText } from '../reusable/columns';
-import { useNavigate } from 'react-router-dom';
-import CryptoJS from 'crypto-js';
 
 const Subproject = () => {
-    const navigate = useNavigate();
     // States locales
     const [ data, setData ] = useState([])
-    const [ refresh, setRefresh ] = useState([]);
 
-    const [ modalIsOpen, setModalIsOpen ] = useState(false)
+    // Cargar los registros
+    useEffect(() => {
+        fetchData('SubProyecto', setData);
+    }, []);
+
+
+    const [selectedFiles, setSelectedFiles] = useState([]);
+    const [modalData, setModalData] = useState(null);
+
+    const [modalIsOpen, setModalIsOpen] = useState(false)
+
+    const [dragging, setDragging] = useState(false);
+    const [selectedFile, setSelectedFile] = useState(null);
+    const dragCounter = useRef(0);
+    const dropRef = useRef(null);
+    const fileInputRef = useRef();
+
     const closeModal = () => {
         setModalIsOpen(false);
         setModalData(null);
         setSelectedFiles([]);
     };
+    
+
     const openModalWithData = (data) => {
         setModalData(data);
         console.log(data);
@@ -41,61 +49,6 @@ const Subproject = () => {
         })
     };
 
-    const handleEditNavigate = (item) => {
-        const id = `${item.subProAno}${item.subProCod}`;
-        // Encripta el ID
-        const ciphertext = CryptoJS.AES.encrypt(id, 'secret key 123').toString();
-        // Codifica la cadena cifrada para que pueda ser incluida de manera segura en una URL
-        const safeCiphertext = btoa(ciphertext).replace('+', '-').replace('/', '_').replace(/=+$/, '');
-        navigate(`/form-subproject/${safeCiphertext}`);
-    }
-
-    const actions = useEntityActions('SUBPROYECTO');
-    // Columnas de la tabla definidas en un hook personalizado
-    const columns = useMemo(() => getColumns(actions, 'SubProyecto', openModalWithData, setRefresh, handleEditNavigate), [actions, 'Indicador', openModalWithData, setRefresh, handleEditNavigate]);
-  
-    // Efecto para cargar los datos de los beneficiarios al montar el componente
-    useEffect(() => {
-        fetchDataBlock('SubProyecto', setData, '.subproject-block');
-    }, [refresh]);
-
-    const [searchFilter, setSearchFilter] = useState('');
-    const filteredData = useMemo(() => 
-        data.filter(item => {
-            // Genera el texto del mes y año de inicio y fin
-            const periodoInicio = getMonthYearText(item.subProPerMesIni, item.subProPerAnoIni);
-            const periodoFin = getMonthYearText(item.subProPerMesFin, item.subProPerAnoFin);
-
-            return (
-                (item.subProNom ? item.subProNom.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
-                (item.subProSap ? item.subProSap.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
-                (item.proIde ? item.proIde.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
-                (item.proNom ? item.proNom.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
-                (item.subProInvSubAct === 'S' && 'PROYECTO CON SUB ACTIVIDADES'.includes(searchFilter.toUpperCase())) ||
-                (item.subProInvSubAct === 'N' && 'PROYECTO SIN SUB ACTIVIDADES'.includes(searchFilter.toUpperCase())) ||
-                (periodoInicio ? periodoInicio.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
-                (periodoFin ? periodoFin.toUpperCase().includes(searchFilter.toUpperCase()) : false)
-            );
-        }), [data, searchFilter]
-    );
-
-    const headers = ['CODIGO_FINANCIACION', 'NOMBRE', 'RESPONSABLE','AÑO_INICIO','MES_INICIO','AÑO_FIN','MES_FIN','INVOLUCRA_SUB_ACTIVIDAD', 'PROYECTO'];  // Tus encabezados
-    const properties = ['subProSap', 'subProNom', 'subProRes', 'subProPerAnoIni', 'subProPerMesIni', 'subProPerAnoFin', 'subProPerMesFin', 'subProInvSubAct', 'proNom'];  // Las propiedades de los objetos de datos que quieres incluir
-    // Preparar los datos
-    let dataExport = [...filteredData]; 
-    // Modificar el campo 'uniInvPer' en los datos
-    dataExport = dataExport.map(item => ({
-        ...item,
-        subProInvSubAct: item.subProInvSubAct === 'S' ? 'PROYECTO CON SUB ACTIVIDADES' : 'PROYECTO SIN SUB ACTIVIDADES',
-
-    }));
-
-    const [selectedFiles, setSelectedFiles] = useState([]);
-    const [modalData, setModalData] = useState(null);
-    const [dragging, setDragging] = useState(false);
-    const dragCounter = useRef(0);
-    const dropRef = useRef(null);
-    const fileInputRef = useRef();
 
     const handleFileUpload = (file) => {
         Notiflix.Loading.pulse();
@@ -148,6 +101,7 @@ const Subproject = () => {
     
         reader.readAsDataURL(file);
     };
+    
 
     const handleDrag = (e) => {
         e.preventDefault();
@@ -225,6 +179,7 @@ const Subproject = () => {
         }
     };
     
+    
     const handleDivClick = () => {
         fileInputRef.current.click();
     };
@@ -301,43 +256,14 @@ const Subproject = () => {
             }
     };
 
+
     return (
         <>
-            <div className="flex flex-column p1 gap_25 flex-grow-1 overflow-auto subproject-block">
-                <h3>Listado de Indicadores</h3>
-                <div className="flex gap_5 p_25">
-                    {/* Componente para la entrada de búsqueda con etiquetas */}
-                    <SearchInput
-                        value={searchFilter}
-                        onChange={(e) => setSearchFilter(e.target.value)}
-                    />
-                    <button 
-                        className='flex jc-space-between ai-center Large_3 Large-p_5 PowerMas_Buttom_Primary'
-                        onClick={() => navigate('/form-subproject')} 
-                        disabled={!actions.add}
-                    >
-                        Nuevo 
-                        <span className='flex f1_25'>
-                            <Plus />
-                        </span>
-                    </button>
-                    {/* Menú de exportación con opciones condicionales basadas en los permisos */}
-                    <ExportMenu
-                        filteredData={dataExport}
-                        headers={headers}
-                        title={'SUB PROYECTOS'}
-                        properties={properties}
-                        format={[500,250]}
-                        actions={actions}
-                    />
-                </div>
-                {/* Tabla común para mostrar los datos filtrados */}
-                <CommonTable 
-                    data={filteredData} 
-                    columns={columns}
-                    isLargePagination={true}
-                />
-            </div>
+            <Table 
+                data={data}
+                setData= {setData}
+                setModalIsOpen={openModalWithData}
+            />
             <Modal
                 ariaHideApp={false}
                 isOpen={modalIsOpen}
@@ -398,7 +324,12 @@ const Subproject = () => {
                                 <p>Suelta el archivo aquí</p>
                                 :
                                 <>
-                                <p>Arrastra el documento o solo da click para abrir tu escritorio y escoger el documento.</p>
+                                    {
+                                        !selectedFile ?
+                                        <p>Arrastra el documento o solo da click para abrir tu escritorio y escoger el documento.</p>
+                                        :
+                                        <p>Archivo seleccionado: {selectedFile.name}</p>
+                                    }
                                 </>
                             }
                         </div>

@@ -6,52 +6,25 @@ import CryptoJS from 'crypto-js';
 import { Tree } from 'antd';
 import UserInfo from "./UserInfo";
 import { fetchDataBlock, fetchDataReturn } from "../reusable/fetchs";
+import AccessIcon from "../../icons/AccessIcon";
+import useModal from "../../hooks/useModal";
+import ModalPermission from "./ModalPermission";
 
-// Función para encontrar y organizar los submenús de manera recursiva
-function organizarSubmenus(menuData) {
-    // Función para construir la estructura jerárquica
-    const construirEstructura = (menus, menAnoPad, menCodPad) => {
-      return menus
-        .filter(menu => menu.menAnoPad === menAnoPad && menu.menCodPad === menCodPad)
-        .map(menu => ({
-          ...menu,
-          subMenus: construirEstructura(menus, menu.menAno, menu.menCod),
-        }));
+const generarClavesDeAcceso = (menuData) => {
+    const construirClaves = (menus, menAnoPad, menCodPad, parentKey = '') => {
+        return menus
+            .filter(menu => menu.menAnoPad === menAnoPad && menu.menCodPad === menCodPad)
+            .reduce((keys, menu) => {
+            const currentKey = parentKey ? `${parentKey}-${menu.menAno}-${menu.menCod}` : `${menu.menAno}-${menu.menCod}`;
+            keys.push(currentKey);
+            const clavesDeSubmenus = construirClaves(menus, menu.menAno, menu.menCod, currentKey);
+            return keys.concat(clavesDeSubmenus);
+        }, []);
     };
   
-    // Ordenamos los menús por menAnoPad y menCodPad
-    const menusOrdenados = menuData.sort((a, b) => {
-      if (a.menAnoPad === b.menAnoPad) {
-        return a.menCodPad - b.menCodPad;
-      }
-      return a.menAnoPad - b.menAnoPad;
-    });
+    return construirClaves(menuData, null, null);
+};
   
-    // Iniciamos la construcción de la estructura desde el nivel más alto (menAnoPad y menCodPad nulos)
-    return construirEstructura(menusOrdenados, null, null);
-  }
-  
-  const transformMenuData = (menuData) => {
-    // Función para construir la estructura jerárquica
-    const buildTree = (menus, menAnoPad, menCodPad, parentKey = '') => {
-      return menus
-        .filter(menu => menu.menAnoPad === menAnoPad && menu.menCodPad === menCodPad)
-        .map(menu => {
-          const currentKey = parentKey ? `${parentKey}-${menu.menAno}-${menu.menCod}` : `${menu.menAno}-${menu.menCod}`;
-          return {
-            title: menu.menNom,
-            key: currentKey,
-            children: buildTree(menus, menu.menAno, menu.menCod, currentKey),
-          };
-        });
-    };
-  
-    // Iniciamos la construcción de la estructura desde el nivel más alto (menAnoPad y menCodPad nulos)
-    return buildTree(menuData, null, null);
-  };
-  
-  
-
 const MenuUser = () => {
     const navigate = useNavigate();
 
@@ -63,18 +36,53 @@ const MenuUser = () => {
     const usuAno = id.slice(0, 4);
     const usuCod = id.slice(4);
     
-
     const [expandedKeys, setExpandedKeys] = useState([]);
     const [checkedKeys, setCheckedKeys] = useState([]);
     const [autoExpandParent, setAutoExpandParent] = useState(true);
-    //
-    const [ proyectos, setProyectos ] = useState([]);
+
     const [ menus, setMenus ] = useState([]);
 
     const [ user, setUser ] = useState(null);
 
     const [initialCheckedKeys, setInitialCheckedKeys] = useState([]);
 
+    const { modalVisible, estadoEditado, openModal, closeModal } = useModal();
+
+    const transformMenuData = (menuData) => {
+        // Función para construir la estructura jerárquica
+        const buildTree = (menus, menAnoPad, menCodPad, parentKey = '') => {
+            return menus
+                .filter(menu => menu.menAnoPad === menAnoPad && menu.menCodPad === menCodPad)
+                .map(menu => {
+                const currentKey = parentKey ? `${parentKey}-${menu.menAno}-${menu.menCod}` : `${menu.menAno}-${menu.menCod}`;
+                return {
+                    title:
+                    <div className="flex ai-center gap-1 PowerMas_IconsTable">
+                        <span>
+                            {menu.menNom}
+                        </span>
+                        {
+                            (menu.menRef !== '#' && menu.menRef !== '') &&
+                            <span
+                                data-tooltip-id="edit-tooltip" 
+                                data-tooltip-content="Permisos" 
+                                className='flex f1_25 p_25' 
+                                onClick={() => openModal(menu)}
+                            >
+                                <AccessIcon />
+                            </span>
+                        }
+                    </div>,
+                    key: currentKey,
+                    children: buildTree(menus, menu.menAno, menu.menCod, currentKey),
+                };
+            });
+        };
+      
+        // Iniciamos la construcción de la estructura desde el nivel más alto (menAnoPad y menCodPad nulos)
+        return buildTree(menuData, null, null);
+    };
+    
 
     // EFECTO AL CARGAR COMPONENTE GET - LISTAR METAS
     useEffect(() => {
@@ -92,8 +100,12 @@ const MenuUser = () => {
             fetchDataReturn(`Menu`),
             fetchDataReturn(`Menu/${usuAno}/${usuCod}`),
         ]).then(([menuData, menuAccessData]) => {
-            setMenus(transformMenuData(menuData))
-            console.log(menuAccessData)
+            const treeData = transformMenuData(menuData)
+            setMenus(treeData)
+            
+            const userAccessKeys = generarClavesDeAcceso(menuAccessData);
+            setCheckedKeys(userAccessKeys);
+            setInitialCheckedKeys(userAccessKeys);
         }).catch(error => {
             // Maneja los errores
             console.error('Error:', error);
@@ -105,61 +117,6 @@ const MenuUser = () => {
     
     }, []);
     
-    
-    const handleSubmit = async () => {
-        let permisosObj = {};
-        checkedKeys.forEach(key => {
-            const parts = key.split('-');
-            for(let i = 0; i < parts.length; i += 3) {
-                const permisoKey = `${parts[i]}-${parts[i+1]}-${parts[i+2]}`;
-                const parentKey = parts.slice(0, i+3).join('-');
-                permisosObj[permisoKey] = { usuAno, usuCod, usuAccTip: parts[i], usuAccAno: parts[i+1], usuAccCod: parts[i+2], usuAccPad: parentKey };
-            }
-        });
-        
-        // Convierte los objetos de permisos a un arreglo
-        const permisosArr = Object.values(permisosObj);
-        
-        // Calcula los permisos a insertar y eliminar
-        const permisosToInsert = permisosArr.filter(permiso => !initialCheckedKeys.some(initialPermiso => initialPermiso.usuAccPad.trim() === permiso.usuAccPad.trim()));
-        const permisosToDelete = initialCheckedKeys.filter(initialPermiso => !permisosArr.some(permiso => permiso.usuAccPad.trim() === initialPermiso.usuAccPad.trim()));
-        
-        const PermisosDto = {
-            AccesosInsertar: permisosToInsert,
-            AccesosEliminar: permisosToDelete,
-        }
-        handleSubmit2(PermisosDto);
-    };
-    
-    const handleSubmit2 = async (env) => {
-        try {
-            Notiflix.Loading.pulse();
-
-            const token = localStorage.getItem('token');
-            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Usuario/access`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(env),
-            });
-            const data = await response.json();
-            if (!response.ok) {
-                Notiflix.Notify.failure(data.message);
-                return;
-            }
-            
-            Notiflix.Notify.success(data.message);
-            navigate(`/user`)
-        } catch (error) {
-            console.error('Error:', error);
-        } finally {
-            Notiflix.Loading.remove();
-        }
-    };
-  
-    
     const onExpand = (expandedKeysValue) => {
         setExpandedKeys(expandedKeysValue);
         setAutoExpandParent(false);
@@ -170,14 +127,19 @@ const MenuUser = () => {
         if (e.checked) {
             let keyParts = e.node.key.split('-');
             // Comprueba si el nodo marcado es un nodo de primer nivel (nodo principal)
-            if (keyParts.length === 3) {
+            if (keyParts.length === 2) {
                 // Si es un nodo principal, añade todas las claves de sus descendientes
                 let nodeAndAllDescendants = getAllDescendants(e.node);
-                newCheckedKeys = [...newCheckedKeys, ...nodeAndAllDescendants];
+                // Asegúrate de que no estás añadiendo claves duplicadas
+                nodeAndAllDescendants.forEach(key => {
+                    if (!newCheckedKeys.includes(key)) {
+                        newCheckedKeys.push(key);
+                    }
+                });
             } else {
                 // Si no es un nodo principal, solo añade las claves de los nodos padres
-                for (let i = 0; i < keyParts.length; i += 3) {
-                    let parentKey = keyParts.slice(0, i+3).join('-');
+                for (let i = 0; i < keyParts.length; i += 2) {
+                    let parentKey = keyParts.slice(0, i+2).join('-');
                     if (!newCheckedKeys.includes(parentKey)) {
                         newCheckedKeys.push(parentKey);
                     }
@@ -200,36 +162,100 @@ const MenuUser = () => {
         return descendants;
     };
 
+    const handleSubmit = async() => {
+        // Convertir los Sets a arreglos para poder trabajar con ellos
+        const currentKeys = Array.from(checkedKeys);
+        const initialKeys = Array.from(initialCheckedKeys);
+    
+        // Determinar las claves añadidas y eliminadas
+        const keysAñadidas = currentKeys.filter(key => !initialKeys.includes(key));
+        const keysEliminadas = initialKeys.filter(key => !currentKeys.includes(key));
+    
+        // Extraer menAno y menCod de las claves añadidas y eliminadas
+        const permisosInsertar = keysAñadidas.map(key => {
+            const parts = key.split('-');
+            return { menAno: parts[parts.length - 2], menCod: parts[parts.length - 1] };
+        });
+    
+        const permisosAEliminar = keysEliminadas.map(key => {
+            const parts = key.split('-');
+            return { menAno: parts[parts.length - 2], menCod: parts[parts.length - 1] };
+        });
+
+        const MenuUsuarioDto = {
+            MenuUsuarioInsertar: permisosInsertar,
+            MenuUsuarioEliminar: permisosAEliminar,
+            Usuario: {
+                usuAno,
+                usuCod
+            }
+        };
+
+
+        try {
+            Notiflix.Loading.pulse();
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Menu/usuario`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(MenuUsuarioDto),
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                Notiflix.Notify.failure(data.message)
+                return;
+            }
+            Notiflix.Notify.success(data.message)
+            navigate(`/permiso-user/${safeCiphertext}`);
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            Notiflix.Loading.remove();
+        }
+    };
+    
 
     return (
-        <div className="bg-white h-100 flex flex-column over">
-            <div className="PowerMas_Header_Form_Beneficiarie flex ai-center">
-                <Bar currentStep={3} type='user' />
-            </div>
-            <div className="flex flex-grow-1 overflow-auto p1_25">
-                <div className="flex flex-grow-1 Large_12 gap-1">
-                    <div className="PowerMas_ListPermission PowerMas_Form_Card p1 Large_6 overflow-auto access-block">
-                        <Tree
-                            checkable
-                            onExpand={onExpand}
-                            expandedKeys={expandedKeys}
-                            autoExpandParent={autoExpandParent}
-                            onCheck={onCheck}
-                            checkedKeys={checkedKeys}
-                            treeData={menus}
-                            checkStrictly={true}
-                        />
-                    </div>
-                    <div className="Large_6 overflow-auto user-block">
-                        <UserInfo user={user} />
+        <>
+            <div className="bg-white h-100 flex flex-column">
+                <div className="PowerMas_Header_Form_Beneficiarie flex ai-center">
+                    <Bar currentStep={3} type='user' />
+                </div>
+                <div className="flex flex-grow-1 overflow-auto p1_25">
+                    <div className="flex flex-grow-1 Large_12 gap-1">
+                        <div className="PowerMas_ListPermission PowerMas_Form_Card p1 Large_6 overflow-auto access-block">
+                            <Tree
+                                className="tree-node-custom"
+                                checkable
+                                onExpand={onExpand}
+                                expandedKeys={expandedKeys}
+                                autoExpandParent={autoExpandParent}
+                                onCheck={onCheck}
+                                checkedKeys={checkedKeys}
+                                treeData={menus}
+                                checkStrictly={true}
+                            />
+                        </div>
+                        <div className="Large_6 overflow-auto user-block">
+                            <UserInfo user={user} />
+                        </div>
                     </div>
                 </div>
+                <footer className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
+                    <button onClick={() => navigate(`/form-user/${safeCiphertext}`)} className="Large_3 m_75 PowerMas_Buttom_Secondary">Atras</button>
+                    <button onClick={handleSubmit} className="Large_3 m_75 PowerMas_Buttom_Primary">Grabar y Finalizar</button>
+                </footer>
             </div>
-            <footer className="PowerMas_Buttoms_Form_Beneficiarie flex ai-center jc-center">
-                <button onClick={() => navigate(`/form-user/${safeCiphertext}`)} className="Large_3 m_75 PowerMas_Buttom_Secondary">Atras</button>
-                <button onClick={handleSubmit} className="Large_3 m_75 PowerMas_Buttom_Primary">Grabar y Finalizar</button>
-            </footer>
-        </div>
+            <ModalPermission 
+                modalVisible={modalVisible}
+                estadoEditado={estadoEditado}
+                closeModal={closeModal}
+                user={{usuAno,usuCod}}
+            />
+        </>
     )
 }
 

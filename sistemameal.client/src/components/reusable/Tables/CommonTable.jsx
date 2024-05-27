@@ -17,7 +17,7 @@ const CommonTable = ({data = [], columns = [], isLargePagination = false}) => {
 
     const [sorting, setSorting] = useState([]);
 
-    const stickyColumns = ['actions']; // Ejemplo de columnas que quieres sticky
+    const stickyColumns = ['actions','subProFueVer','password'];
 
     // Referencias para las columnas
     const columnRefs = useRef(new Map());
@@ -43,7 +43,11 @@ const CommonTable = ({data = [], columns = [], isLargePagination = false}) => {
     const filteredColumns = useMemo(() => {
         return columns.filter(column => {
             // Si la columna es de acciones, siempre la incluimos
-            if (column.accessorKey === 'actions') {
+            if (column.accessorKey === 'actions' ||
+                column.accessorKey === 'subProFueVer' ||
+                column.accessorKey === 'password' ||
+                column.accessorKey === 'avatar'
+            ) {
                 return true;
             }
             // Para las demás columnas, verificamos si tienen datos

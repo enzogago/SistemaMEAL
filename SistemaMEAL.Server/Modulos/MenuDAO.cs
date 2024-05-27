@@ -12,93 +12,93 @@ namespace SistemaMEAL.Modulos
     {
         private conexionDAO cn = new conexionDAO();
 
-        public bool InsertarMenuUsuario(ClaimsIdentity? identity, string usuAno, string usuCod, string menAno, string menCod)
+        public (string? message, string? messageType) InsertarMenuUsuario(ClaimsIdentity? identity, Usuario? usuario, List<MenuUsuario>? menuUsuarioInsertar,List<MenuUsuario>? menuUsuarioEliminar)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
+
+            string? mensaje = "No se realizaron cambios.";
+            string? tipoMensaje = "3";
 
             try
             {
                 cn.getcn.Open();
 
-                SqlCommand cmd = new SqlCommand("SP_INSERTAR_MENU_USUARIO", cn.getcn);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@P_USUANO", usuAno);
-                cmd.Parameters.AddWithValue("@P_USUCOD", usuCod);
-                cmd.Parameters.AddWithValue("@P_MENANO", menAno);
-                cmd.Parameters.AddWithValue("@P_MENCOD", menCod);
-                cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
-                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
-                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
-                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
-                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
-                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+                if (menuUsuarioInsertar.Count > 0)
+                {
+                    foreach (var item in menuUsuarioInsertar)
+                    {
+                        SqlCommand cmd = new SqlCommand("SP_INSERTAR_MENU_USUARIO", cn.getcn);
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@P_USUANO", usuario.UsuAno);
+                        cmd.Parameters.AddWithValue("@P_USUCOD", usuario.UsuCod);
+                        cmd.Parameters.AddWithValue("@P_MENANO", item.MenAno);
+                        cmd.Parameters.AddWithValue("@P_MENCOD", item.MenCod);
+                        cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
+                        cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                        cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                        cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                        cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                        cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
 
-                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
-                pDescripcionMensaje.Direction = ParameterDirection.Output;
-                cmd.Parameters.Add(pDescripcionMensaje);
+                        SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                        pDescripcionMensaje.Direction = ParameterDirection.Output;
+                        cmd.Parameters.Add(pDescripcionMensaje);
 
-                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
-                pTipoMensaje.Direction = ParameterDirection.Output;
-                cmd.Parameters.Add(pTipoMensaje);
+                        SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                        pTipoMensaje.Direction = ParameterDirection.Output;
+                        cmd.Parameters.Add(pTipoMensaje);
 
-                cmd.ExecuteNonQuery();
+                        cmd.ExecuteNonQuery();
 
-                return true;
+                        mensaje = pDescripcionMensaje.Value.ToString();
+                        tipoMensaje = pTipoMensaje.Value.ToString();
+                    }
+                }
+
+                if (menuUsuarioEliminar.Count > 0)
+                {
+                    foreach (var item in menuUsuarioEliminar)
+                    {
+                        SqlCommand cmd = new SqlCommand("SP_ELIMINAR_MENU_USUARIO", cn.getcn);
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@P_USUANO", usuario.UsuAno);
+                        cmd.Parameters.AddWithValue("@P_USUCOD", usuario.UsuCod);
+                        cmd.Parameters.AddWithValue("@P_MENANO", item.MenAno);
+                        cmd.Parameters.AddWithValue("@P_MENCOD", item.MenCod);
+                        cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
+                        cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                        cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                        cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                        cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                        cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                        SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                        pDescripcionMensaje.Direction = ParameterDirection.Output;
+                        cmd.Parameters.Add(pDescripcionMensaje);
+
+                        SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                        pTipoMensaje.Direction = ParameterDirection.Output;
+                        cmd.Parameters.Add(pTipoMensaje);
+
+                        cmd.ExecuteNonQuery();
+
+                        mensaje = pDescripcionMensaje.Value.ToString();
+                        tipoMensaje = pTipoMensaje.Value.ToString();
+                    }
+                }
             }
             catch (SqlException ex)
             {
-                Console.WriteLine(ex.Message);
-                return false;
+                mensaje = ex.Message;
+                tipoMensaje = "1";
             }
             finally
             {
                 cn.getcn.Close();
             }
+            return (mensaje, tipoMensaje);
         }
-
-        public bool EliminarMenuUsuario(ClaimsIdentity? identity, string usuAno, string usuCod, string menAno, string menCod)
-        {
-            var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
-
-            try
-            {
-                cn.getcn.Open();
-
-                SqlCommand cmd = new SqlCommand("SP_ELIMINAR_MENU_USUARIO", cn.getcn);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@P_USUANO", usuAno);
-                cmd.Parameters.AddWithValue("@P_USUCOD", usuCod);
-                cmd.Parameters.AddWithValue("@P_MENANO", menAno);
-                cmd.Parameters.AddWithValue("@P_MENCOD", menCod);
-                cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
-                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
-                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
-                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
-                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
-                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
-
-                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
-                pDescripcionMensaje.Direction = ParameterDirection.Output;
-                cmd.Parameters.Add(pDescripcionMensaje);
-
-                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
-                pTipoMensaje.Direction = ParameterDirection.Output;
-                cmd.Parameters.Add(pTipoMensaje);
-
-                cmd.ExecuteNonQuery();
-
-                return true;
-            }
-            catch (SqlException ex)
-            {
-                Console.WriteLine(ex.Message);
-                return false;
-            }
-            finally
-            {
-                cn.getcn.Close();
-            }
-        }
+        
         public IEnumerable<Menu> ListadoMenuPorUsuario(ClaimsIdentity? identity, string? menAno = null, string? menCod = null, string? usuAno = null, string? usuCod = null)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
