@@ -230,7 +230,7 @@ const Subproject = () => {
     };
 
     const downloadFile = async (fileName) => {
-        const url = `http://20.81.137.122:8080/uploads/${fileName}`
+        const url = `https://meal.ddns.net/uploads/${fileName}`
         try {
             Notiflix.Loading.pulse('Descargando...');
             // Obtenemos los datos
@@ -357,7 +357,7 @@ const Subproject = () => {
                         border: '1px solid #ccc',
                         padding: '20px',
                         display: 'flex',
-                        flexDirection: 'column'
+                        flexDirection: 'column',
                     },
                     overlay: {
                         backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -367,7 +367,7 @@ const Subproject = () => {
             >
                 <span className="PowerMas_CloseModal" style={{position: 'absolute',right: 20, top: 10}} onClick={closeModal}>×</span>
                 <h2 className='PowerMas_Title_Modal f1_5 center'>Documentación de Formulación</h2>
-                <div className="flex-grow-1 flex jc-center ai-center">
+                <div className="flex-grow-1 flex jc-center ai-center overflow-auto">
                     <div className="Large_10">
                         <article className="PowerMas_Article_Upload center">
                             <p style={{color: '#878280'}}>Solo se puede subir documentos en formato PDF,XLS,XLSM,XLSX,PPTX,JPG,PNG,MP4</p>
@@ -390,7 +390,7 @@ const Subproject = () => {
                                 onChange={handleFileChange} 
                                 accept="*/*"
                             />
-                            <span className="Large-f5 flex ai-center jc-center" >
+                            <span className="Large-f4 flex ai-center jc-center" >
                                 <FileExcel />
                             </span>
                             {

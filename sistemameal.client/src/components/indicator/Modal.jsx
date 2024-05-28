@@ -256,16 +256,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
     // Efecto para manejar la edición del estado
     useEffect(() => {
         if (estadoEditado) {
-            let newData = {};
-            for (let key in estadoEditado) {
-                if (key === 'indFor') {
-                } else if (typeof estadoEditado[key] === 'string') {
-                    newData[key] = estadoEditado[key].trim().toLowerCase();
-                } else {
-                    newData[key] = estadoEditado[key];
-                }
-            }
-            reset(newData);
+            reset(estadoEditado);
         }
     }, [estadoEditado, reset, setValue]);
 
@@ -286,7 +277,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
     
     return (
         <div className={`PowerMas_Modal ${modalVisible ? 'show' : ''}`}>
-            <div className="PowerMas_ModalContent flex flex-column" style={{width: '60%'}}>
+            <div className="PowerMas_ModalContent flex flex-column" style={{width: '80%'}}>
                 <span className="PowerMas_CloseModal" onClick={closeModalAndReset}>×</span>
                 <h2 className="PowerMas_Title_Modal center f1_5">{estadoEditado ? 'Editar' : 'Nuevo'} {title}</h2>
                 <form className='Large-f1 PowerMas_FormStatus flex flex-column gap_3 flex-grow-1 overflow-auto' onSubmit={validateForm(onSubmit)}>
@@ -298,7 +289,6 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                                 </label>
                                 <select 
                                     id='subProyecto'
-                                    style={{textTransform: 'capitalize'}}
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.subProyecto || isSubmitted ? (errors.subProyecto ? 'invalid' : 'valid') : ''}`} 
                                     {...register('subProyecto', { 
                                         validate: {
@@ -312,7 +302,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                                             key={index} 
                                             value={JSON.stringify({ subProAno: item.subProAno, subProCod: item.subProCod, subProInvSubAct: item.subProInvSubAct.trim() })}
                                         > 
-                                            {item.subProSap + ' - ' + item.subProNom.toLowerCase() + ' | ' + item.proNom.toLowerCase()}
+                                            {item.subProSap + ' - ' + item.subProNom + ' | ' + item.proNom}
                                         </option>
                                     ))}
                                 </select>
@@ -330,7 +320,6 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                                 </label>
                                 <select 
                                     id='objetivo'
-                                    style={{textTransform: 'capitalize'}}
                                     disabled={!objetivoEnable}
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.objetivo || isSubmitted ? (errors.objetivo ? 'invalid' : 'valid') : ''}`} 
                                     {...register('objetivo', { 
@@ -341,7 +330,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                                 >
                                     <option value="0">--Seleccione Objetivo--</option>
                                     {objetivos.map((item, index) => {
-                                        const text = item.objNom.toLowerCase();
+                                        const text = item.objNom;
                                         const shortText = text.length > 50 ? text.substring(0, 50) + '...' : text;
                                         return(
                                             <option 
@@ -367,7 +356,6 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                                 </label>
                                 <select 
                                     id='objetivoEspecifico'
-                                    style={{textTransform: 'capitalize'}}
                                     disabled={!objetivoEspecificoEnable}
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.objetivoEspecifico || isSubmitted ? (errors.objetivoEspecifico ? 'invalid' : 'valid') : ''}`} 
                                     {...register('objetivoEspecifico', { 
@@ -378,7 +366,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                                 >
                                     <option value="0">--Seleccione Objetivo Específico--</option>
                                     {objetivosEspecificos.map((item, index) => {
-                                        const text = item.objEspNom.toLowerCase();
+                                        const text = item.objEspNom;
                                         const shortText = text.length > 40 ? text.substring(0, 40) + '...' : text;
                                         return(
                                             <option 
@@ -404,7 +392,6 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                                 </label>
                                 <select 
                                     id='resultado'
-                                    style={{textTransform: 'capitalize'}}
                                     disabled={!resultadoEnable}
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.resultado || isSubmitted ? (errors.resultado ? 'invalid' : 'valid') : ''}`} 
                                     {...register('resultado', { 
@@ -415,7 +402,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                                 >
                                     <option value="0">--Seleccione Resultado--</option>
                                     {resultados.map((item, index) => {
-                                        const text = item.resNom.toLowerCase();
+                                        const text = item.resNom;
                                         const shortText = text.length > 40 ? text.substring(0, 40) + '...' : text;
                                         return(
                                             <option 
@@ -443,7 +430,6 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                                     </label>
                                     <select 
                                         id='actividad'
-                                        style={{textTransform: 'capitalize'}}
                                         disabled={!resultadoEnable}
                                         className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.actividad || isSubmitted ? (errors.actividad ? 'invalid' : 'valid') : ''}`} 
                                         {...register('actividad', { 
@@ -454,7 +440,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                                     >
                                         <option value="0">--Seleccione Actividad--</option>
                                         {actividades.map((item, index) => {
-                                            const text = item.actNom.toLowerCase();
+                                            const text = item.actNom;
                                             const shortText = text.length > 40 ? text.substring(0, 40) + '...' : text;
                                             return(
                                                 <option 
@@ -477,16 +463,47 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                             }
                         </div>
                         <div className='Large_6'>
+                            <div>
+                                <label htmlFor='indTipInd' className="">
+                                    Seleccione si el registro es Actividad o Indicador:
+                                </label>
+                                <select 
+                                    id='indTipInd'
+                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.indTipInd || isSubmitted ? (errors.indTipInd ? 'invalid' : 'valid') : ''}`} 
+                                    {...register('indTipInd', { 
+                                        validate: {
+                                            required: value => value !== '0' || 'El campo es requerido',
+                                        }
+                                    })}
+                                >
+                                    <option value="0">--Seleccione Tipo de Indicador--</option>
+                                    {
+                                        involucraSubActividad ?
+                                        <option value="ISA">Indicador de Sub Actividad</option>
+                                        :
+                                        <option value="IAC">ACTIVIDAD</option>
+                                    }
+                                    <option value="IRE">INDICADOR DE RESULTADO</option>
+                                    <option value="IOB">INDICADOR DE OBJETIVO</option>
+                                    <option value="IOE">INDICADOR DE OBJETIVO ESPECÍFICO</option>
+                                </select>
+                                {errors.indTipInd ? (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.indTipInd.message}</p>
+                                ) : (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                        Espacio reservado para el mensaje de error
+                                    </p>
+                                )}
+                            </div>
                             <div className="flex flex-column">
                                 <label className="" htmlFor='indNum'>
-                                    Código del Indicador
+                                    Código de Actividad o Indicador
                                 </label>
                                 <input 
                                     id="indNum"
                                     className={`PowerMas_Modal_Form_${dirtyFields.indNum || isSubmitted ? (errors.indNum ? 'invalid' : 'valid') : ''}`}  
                                     type="text" 
-                                    style={{textTransform: 'uppercase'}}
-                                    placeholder='123456' 
+                                    placeholder='A1.1.1' 
                                     maxLength={100} 
                                     name="indNum" 
                                     autoComplete='off'
@@ -512,13 +529,12 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                             </div>
                             <div className="">
                                 <label htmlFor="indNom" className="">
-                                    Nombre del Indicador
+                                    Nombre de Actividad o Indicador
                                 </label>
                                 <input type="text"
                                     id="indNom"
-                                    style={{textTransform: 'capitalize'}}
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.indNom || isSubmitted ? (errors.indNom ? 'invalid' : 'valid') : ''}`} 
-                                    placeholder="Movilidad Humana"
+                                    placeholder="Número de personas que se benefician..."
                                     autoComplete='off'
                                     maxLength={300}
                                     {...register('indNom', { 
@@ -539,46 +555,13 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                                     </p>
                                 )}
                             </div>
-                            <div>
-                                <label htmlFor='indTipInd' className="">
-                                    Tipo de Indicador:
-                                </label>
-                                <select 
-                                    id='indTipInd'
-                                    style={{textTransform: 'capitalize'}}
-                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.indTipInd || isSubmitted ? (errors.indTipInd ? 'invalid' : 'valid') : ''}`} 
-                                    {...register('indTipInd', { 
-                                        validate: {
-                                            required: value => value !== '0' || 'El campo es requerido',
-                                        }
-                                    })}
-                                >
-                                    <option value="0">--Seleccione Unidad--</option>
-                                    {
-                                        involucraSubActividad ?
-                                        <option value="isa">Indicador de Sub Actividad</option>
-                                        :
-                                        <option value="iac">Indicador de Actividad</option>
-                                    }
-                                    <option value="ire">Indicador de Resultado</option>
-                                    <option value="iob">Indicador de Objetivo</option>
-                                    <option value="ioe">Indicador de Objetivo Específico</option>
-                                </select>
-                                {errors.indTipInd ? (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.indTipInd.message}</p>
-                                ) : (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                        Espacio reservado para el mensaje de error
-                                    </p>
-                                )}
-                            </div>
+                            
                             <div>
                                 <label htmlFor='uniCod' className="">
                                     Unidad:
                                 </label>
                                 <select 
                                     id='uniCod'
-                                    style={{textTransform: 'capitalize'}}
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.uniCod || isSubmitted ? (errors.uniCod ? 'invalid' : 'valid') : ''}`} 
                                     {...register('uniCod', { 
                                         validate: {
@@ -592,7 +575,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                                             key={index} 
                                             value={item.uniCod}
                                         > 
-                                            {item.uniNom.toLowerCase()}
+                                            {item.uniNom}
                                         </option>
                                     ))}
                                 </select>
@@ -610,7 +593,6 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                                 </label>
                                 <select 
                                     id='tipValCod'
-                                    style={{textTransform: 'capitalize'}}
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.tipValCod || isSubmitted ? (errors.tipValCod ? 'invalid' : 'valid') : ''}`} 
                                     {...register('tipValCod', { 
                                         validate: {
@@ -624,7 +606,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                                             key={index} 
                                             value={item.tipValCod}
                                         > 
-                                            {item.tipValNom.toLowerCase()}
+                                            {item.tipValNom}
                                         </option>
                                     ))}
                                 </select>
@@ -641,11 +623,10 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                     
                     <div className='flex flex-column gap-1 p_5' style={{border: '1px solid black'}}>
                         <label htmlFor='formulaInput' className="">
-                            Formula:
+                            Fórmula:
                         </label>
                         <select 
                             id=''
-                            style={{textTransform: 'capitalize'}}
                             className=''
                             onChange={(event) => {
                                 // Solo agrega el indicador si el valor seleccionado no es 0

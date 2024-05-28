@@ -51,6 +51,7 @@ namespace SistemaMEAL.Modulos
 
                         mensaje = pDescripcionMensaje.Value.ToString();
                         tipoMensaje = pTipoMensaje.Value.ToString();
+                        Console.WriteLine(mensaje);
                     }
                 }
 
@@ -82,11 +83,9 @@ namespace SistemaMEAL.Modulos
 
                         mensaje = pDescripcionMensaje.Value.ToString();
                         tipoMensaje = pTipoMensaje.Value.ToString();
+                        Console.WriteLine(mensaje);
                     }
                 }
-
-                mensaje = "No se realizaron cambios.";
-                tipoMensaje = "3";
             }
             catch (SqlException ex)
             {

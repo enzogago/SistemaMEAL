@@ -119,6 +119,34 @@ namespace SistemaMEAL.Modulos
                 codOut = pCod.Value.ToString();
                 mensaje = pDescripcionMensaje.Value.ToString();
                 tipoMensaje = pTipoMensaje.Value.ToString();
+
+                cmd = new SqlCommand("SP_INSERTAR_USUARIO_ACCESO", cn.getcn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUACCTIP", "OBJETIVO_ESPECIFICO");
+                cmd.Parameters.AddWithValue("@P_USUACCANO", anoOut);
+                cmd.Parameters.AddWithValue("@P_USUACCCOD", codOut);
+                cmd.Parameters.AddWithValue("@P_USUACCPAD", "");
+                cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
+
+                cmd.ExecuteNonQuery();
+
+                mensaje = pDescripcionMensaje.Value.ToString();
+                tipoMensaje = pTipoMensaje.Value.ToString();
             }
             catch (SqlException ex)
             {

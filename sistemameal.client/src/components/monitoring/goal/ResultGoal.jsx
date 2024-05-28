@@ -89,7 +89,6 @@ const ResultGoal = () => {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            console.log(response)
             if (!response.ok) {
                 if(response.status === 401 || response.status === 403){
                     const data = await response.json();
@@ -142,7 +141,6 @@ const ResultGoal = () => {
                     })
                 })
                 fetchData(`Meta/${subProAno}/${subProCod}/${ano}`, (data) => {
-                    console.log(data)
                     // Obtén todos los nombres de los campos registrados
                     const fieldNames = Object.keys(getValues());
 
@@ -166,7 +164,6 @@ const ResultGoal = () => {
                     data.forEach(meta => {
                         // Usa meta.impCod, la ubicación y el indicador para crear una clave única para cada fila
                         const rowKey = `${meta.impCod}_${JSON.stringify({ ubiAno: meta.ubiAno, ubiCod: meta.ubiCod })}_${meta.indAno}_${meta.indCod}`;
-
                         if (!rows[rowKey]) {
                             counter++;
                         }
@@ -222,7 +219,6 @@ const ResultGoal = () => {
             }
             fetchDataInOrder();
         } else {
-            setIndicadores([]);
         }
     }, [watch('metAnoPlaTec')]);
     
@@ -341,9 +337,6 @@ const ResultGoal = () => {
             metas,
             metasEliminar
         }
-        console.log(data);
-        console.log(additionalRows);
-        console.log(Metas);
         handleUpdate(Metas);
         
     };
@@ -433,6 +426,7 @@ const ResultGoal = () => {
                     nombreUbicacion = ubicacionName;
                 }
                 const ubicacion = selects.flat().find(u => u.ubiAno === currentUbiAno && u.ubiCod === currentUbiCod);
+                console.log(ubicacion)
                 if (ubicacion) {
                     currentUbiAno = ubicacion.ubiAnoPad;
                     currentUbiCod = ubicacion.ubiCodPad;
@@ -463,7 +457,6 @@ const ResultGoal = () => {
                 Notiflix.Notify.failure(data.message);
                 return;
             }
-            console.log(data)
             setUbicacionesSelect(prevUbicaciones => {
                 // Verifica si el arreglo ya contiene un objeto con el mismo ubiAno y ubiCod
                 const isAlreadyIncluded = prevUbicaciones.some(ubicacion => ubicacion.ubiAno === data[0].ubiAno && ubicacion.ubiCod === data[0].ubiCod);
@@ -539,8 +532,16 @@ const ResultGoal = () => {
             ext: { width: 200, height: 50 }
         });
 
+        // Añadir un título
+        let titleRow = worksheet.addRow([]);
+        let titleCell = titleRow.getCell(5);
+        titleCell.value = `CADENA DE RESULTADO | METAS TÉCNICAS PROGRAMÁTICAS`;
+        titleCell.font = { bold: true, size: 16 };
+        titleCell.alignment = { horizontal: 'center' };
+        worksheet.mergeCells('F3:R3');
+
         // Agregar 5 filas vacías al inicio
-        for (let i = 0; i < 4; i++) {
+        for (let i = 0; i < 3; i++) {
             worksheet.addRow([]);
         }
     

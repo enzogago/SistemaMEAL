@@ -159,6 +159,126 @@ namespace SistemaMEAL.Modulos
                                         Console.WriteLine(mensaje);
                                         throw new Exception(mensaje);
                                     }
+
+                                    cmd = new SqlCommand("SP_BUSCAR_META", cn.getcn);
+                                    cmd.CommandType = CommandType.StoredProcedure;
+                                    // Aquí puedes agregar los parámetros necesarios para tu procedimiento almacenado
+                                    cmd.Parameters.AddWithValue("@P_METANO", metAno);
+                                    cmd.Parameters.AddWithValue("@P_METCOD", metCod);
+                                    cmd.Parameters.AddWithValue("@P_ESTCOD", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_METMETTEC", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_METEJETEC", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_METPORAVATEC", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_METMETPRE", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_METEJEPRE", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_METPORAVAPRE", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_METMESPLATEC", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_METANOPLATEC", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_METMESPLAPRE", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_METANOPLAPRE", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_METESTPRE", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_IMPCOD", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_UBIANO", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_UBICOD", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_INDANO", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_INDCOD", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_USUANO", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_USUCOD", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_FINCOD", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_SUBPROANO", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_SUBPROCOD", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                                    cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                                    cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                                    cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                                    cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                                    pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                                    pDescripcionMensaje.Direction = ParameterDirection.Output;
+                                    cmd.Parameters.Add(pDescripcionMensaje);
+
+                                    pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                                    pTipoMensaje.Direction = ParameterDirection.Output;
+                                    cmd.Parameters.Add(pTipoMensaje);
+
+                                    StringBuilder jsonResult = new StringBuilder();
+                                    SqlDataReader reader = cmd.ExecuteReader();
+
+                                    if (!reader.HasRows)
+                                    {
+                                        jsonResult.Append("[]");
+                                    }
+                                    else
+                                    {
+                                        while (reader.Read())
+                                        {
+                                            jsonResult.Append(reader.GetValue(0).ToString());
+                                        }
+                                    }
+                                    // Deserializa la cadena JSON en una lista de objetos Usuario
+                                    List<Meta>? temporal = JsonConvert.DeserializeObject<List<Meta>>(jsonResult.ToString());
+                                    
+                                    Meta metaConsulta = temporal[0];
+
+                                    var accPad = "PROYECTO-" + metaConsulta.ProAno + "-" + metaConsulta.ProCod + "-SUB_PROYECTO-" + metaConsulta.SubProAno + "-" + metaConsulta.SubProCod + "-OBJETIVO-" + metaConsulta.ObjAno + "-" + metaConsulta.ObjCod + "-OBJETIVO_ESPECIFICO-" + metaConsulta.ObjEspAno + "-" + metaConsulta.ObjEspCod + "-RESULTADO-" + metaConsulta.ResAno + "-" + metaConsulta.ResCod + "-ACTIVIDAD-" + metaConsulta.ActAno + "-" + metaConsulta.ActCod + "-INDICADOR-" + metaConsulta.IndAno + "-" + metaConsulta.IndCod + "-META-" + metAno + "-" + metCod;
+
+                                    cmd = new SqlCommand("SP_INSERTAR_USUARIO_ACCESO", cn.getcn);
+                                    cmd.CommandType = CommandType.StoredProcedure;
+
+                                    cmd.Parameters.AddWithValue("@P_USUANO", meta.UsuAno);
+                                    cmd.Parameters.AddWithValue("@P_USUCOD", meta.UsuCod);
+                                    cmd.Parameters.AddWithValue("@P_USUACCTIP", "META");
+                                    cmd.Parameters.AddWithValue("@P_USUACCANO", metAno);
+                                    cmd.Parameters.AddWithValue("@P_USUACCCOD", metCod);
+                                    cmd.Parameters.AddWithValue("@P_USUACCPAD", accPad);
+                                    cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
+                                    cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                                    cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                                    cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                                    cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                                    cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                                    pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                                    pDescripcionMensaje.Direction = ParameterDirection.Output;
+                                    cmd.Parameters.Add(pDescripcionMensaje);
+
+                                    pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                                    pTipoMensaje.Direction = ParameterDirection.Output;
+                                    cmd.Parameters.Add(pTipoMensaje);
+
+                                    cmd.ExecuteNonQuery();
+
+                                    mensaje = pDescripcionMensaje.Value.ToString();
+                                    tipoMensaje = pTipoMensaje.Value.ToString();
+
+                                    cmd = new SqlCommand("SP_INSERTAR_USUARIO_ACCESO", cn.getcn);
+                                    cmd.CommandType = CommandType.StoredProcedure;
+
+                                    cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
+                                    cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
+                                    cmd.Parameters.AddWithValue("@P_USUACCTIP", "META");
+                                    cmd.Parameters.AddWithValue("@P_USUACCANO", metAno);
+                                    cmd.Parameters.AddWithValue("@P_USUACCCOD", metCod);
+                                    cmd.Parameters.AddWithValue("@P_USUACCPAD", accPad);
+                                    cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
+                                    cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                                    cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                                    cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                                    cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                                    cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                                    pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                                    pDescripcionMensaje.Direction = ParameterDirection.Output;
+                                    cmd.Parameters.Add(pDescripcionMensaje);
+
+                                    pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                                    pTipoMensaje.Direction = ParameterDirection.Output;
+                                    cmd.Parameters.Add(pTipoMensaje);
+
+                                    cmd.ExecuteNonQuery();
+
+                                    mensaje = pDescripcionMensaje.Value.ToString();
+                                    tipoMensaje = pTipoMensaje.Value.ToString();
                                 } else {
                                     // Update
                                     cmd = new SqlCommand("SP_MODIFICAR_META_CADENA", cn.getcn);
@@ -210,6 +330,61 @@ namespace SistemaMEAL.Modulos
                         {
                             foreach (var meta in metasEliminar)
                             {
+                                cmd = new SqlCommand("SP_ELIMINAR_USUARIO_ACCESO", cn.getcn);
+                                    cmd.CommandType = CommandType.StoredProcedure;
+
+                                    cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
+                                    cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
+                                    cmd.Parameters.AddWithValue("@P_USUACCTIP", "META");
+                                    cmd.Parameters.AddWithValue("@P_USUACCANO", meta.MetAno);
+                                    cmd.Parameters.AddWithValue("@P_USUACCCOD", meta.MetCod);
+                                    cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
+                                    cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                                    cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                                    cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                                    cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                                    cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                                    pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                                    pDescripcionMensaje.Direction = ParameterDirection.Output;
+                                    cmd.Parameters.Add(pDescripcionMensaje);
+
+                                    pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                                    pTipoMensaje.Direction = ParameterDirection.Output;
+                                    cmd.Parameters.Add(pTipoMensaje);
+
+                                    cmd.ExecuteNonQuery();
+
+                                    mensaje = pDescripcionMensaje.Value.ToString();
+                                    tipoMensaje = pTipoMensaje.Value.ToString();
+
+                                cmd = new SqlCommand("SP_ELIMINAR_USUARIO_ACCESO", cn.getcn);
+                                    cmd.CommandType = CommandType.StoredProcedure;
+
+                                    cmd.Parameters.AddWithValue("@P_USUANO", meta.UsuAno);
+                                    cmd.Parameters.AddWithValue("@P_USUCOD", meta.UsuCod);
+                                    cmd.Parameters.AddWithValue("@P_USUACCTIP", "META");
+                                    cmd.Parameters.AddWithValue("@P_USUACCANO", meta.MetAno);
+                                    cmd.Parameters.AddWithValue("@P_USUACCCOD", meta.MetCod);
+                                    cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
+                                    cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                                    cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                                    cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                                    cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                                    cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                                    pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                                    pDescripcionMensaje.Direction = ParameterDirection.Output;
+                                    cmd.Parameters.Add(pDescripcionMensaje);
+
+                                    pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                                    pTipoMensaje.Direction = ParameterDirection.Output;
+                                    cmd.Parameters.Add(pTipoMensaje);
+
+                                    cmd.ExecuteNonQuery();
+
+                                    mensaje = pDescripcionMensaje.Value.ToString();
+                                    tipoMensaje = pTipoMensaje.Value.ToString();
                                 // Delete
                                 cmd = new SqlCommand("SP_ELIMINAR_META", cn.getcn);
                                     cmd.CommandType = CommandType.StoredProcedure;
@@ -283,25 +458,27 @@ namespace SistemaMEAL.Modulos
                         SqlParameter pDescripcionMensaje;
                         SqlParameter pTipoMensaje;
 
-                        DataTable dtMetaUsuariosInsertar = new DataTable();
-                        dtMetaUsuariosInsertar.Columns.Add("METANO", typeof(string));
-                        dtMetaUsuariosInsertar.Columns.Add("METCOD", typeof(string));
+                        DataTable dtAccesosUsuarioInsertar = new DataTable();
+                        dtAccesosUsuarioInsertar.Columns.Add("USUACCTIP", typeof(string));
+                        dtAccesosUsuarioInsertar.Columns.Add("USUACCANO", typeof(string));
+                        dtAccesosUsuarioInsertar.Columns.Add("USUACCCOD", typeof(string));
+                        dtAccesosUsuarioInsertar.Columns.Add("USUACCPAD", typeof(string));
 
                         if (metasInsertar.Count > 0)
                         {
                             foreach (var meta in metasInsertar)
                             {
-                                dtMetaUsuariosInsertar.Rows.Add(meta.MetAno,meta.MetCod);
+                                dtAccesosUsuarioInsertar.Rows.Add("META",meta.MetAno,meta.MetCod,"");
                             }
 
-                            cmd = new SqlCommand("SP_INSERTAR_META_USUARIO_MASIVO", cn.getcn);
+                            cmd = new SqlCommand("SP_INSERTAR_USUARIO_ACCESO_MASIVO", cn.getcn);
                             cmd.CommandType = CommandType.StoredProcedure;
 
                             SqlParameter param = new SqlParameter();
-                            param.ParameterName = "@MetaUsuario";
+                            param.ParameterName = "@UsuarioAcceso";
                             param.SqlDbType = SqlDbType.Structured;
-                            param.Value = dtMetaUsuariosInsertar;
-                            param.TypeName = "MetaUsuarioType";
+                            param.Value = dtAccesosUsuarioInsertar;
+                            param.TypeName = "UsuarioAccesoType";
 
                             cmd.Parameters.Add(param);
                             cmd.Parameters.AddWithValue("@P_USUANO", metasInsertar[0].UsuAno);
@@ -332,25 +509,27 @@ namespace SistemaMEAL.Modulos
                             }
                         }
 
-                        DataTable dtMetaUsuariosEliminar = new DataTable();
-                        dtMetaUsuariosEliminar.Columns.Add("METANO", typeof(string));
-                        dtMetaUsuariosEliminar.Columns.Add("METCOD", typeof(string));
+                        DataTable dtAccesosUsuarioEliminar = new DataTable();
+                        dtAccesosUsuarioEliminar.Columns.Add("USUACCTIP", typeof(string));
+                        dtAccesosUsuarioEliminar.Columns.Add("USUACCANO", typeof(string));
+                        dtAccesosUsuarioEliminar.Columns.Add("USUACCCOD", typeof(string));
+                        dtAccesosUsuarioEliminar.Columns.Add("USUACCPAD", typeof(string));
                         
                         if (metasEliminar.Count > 0)
                         {
                             foreach (var meta in metasEliminar)
                             {
-                                dtMetaUsuariosEliminar.Rows.Add(meta.MetAno,meta.MetCod);
+                                dtAccesosUsuarioEliminar.Rows.Add("META",meta.MetAno,meta.MetCod);
                             }
 
-                            cmd = new SqlCommand("SP_ELIMINAR_META_USUARIO_MASIVO", cn.getcn);
+                            cmd = new SqlCommand("SP_ELIMINAR_USUARIO_ACCESO_MASIVO", cn.getcn);
                             cmd.CommandType = CommandType.StoredProcedure;
 
                             SqlParameter param = new SqlParameter();
-                            param.ParameterName = "@MetaUsuario";
+                            param.ParameterName = "@UsuarioAcceso";
                             param.SqlDbType = SqlDbType.Structured;
-                            param.Value = dtMetaUsuariosEliminar;
-                            param.TypeName = "MetaUsuarioType";
+                            param.Value = dtAccesosUsuarioEliminar;
+                            param.TypeName = "UsuarioAccesoType";
 
                             cmd.Parameters.Add(param);
                             cmd.Parameters.AddWithValue("@P_USUANO", metasEliminar[0].UsuAno);
@@ -490,6 +669,97 @@ namespace SistemaMEAL.Modulos
                                         Console.WriteLine(mensaje);
                                         throw new Exception(mensaje);
                                     }
+
+                                    cmd = new SqlCommand("SP_BUSCAR_META", cn.getcn);
+                                    cmd.CommandType = CommandType.StoredProcedure;
+                                    // Aquí puedes agregar los parámetros necesarios para tu procedimiento almacenado
+                                    cmd.Parameters.AddWithValue("@P_METANO", metAno);
+                                    cmd.Parameters.AddWithValue("@P_METCOD", metCod);
+                                    cmd.Parameters.AddWithValue("@P_ESTCOD", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_METMETTEC", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_METEJETEC", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_METPORAVATEC", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_METMETPRE", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_METEJEPRE", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_METPORAVAPRE", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_METMESPLATEC", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_METANOPLATEC", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_METMESPLAPRE", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_METANOPLAPRE", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_METESTPRE", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_IMPCOD", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_UBIANO", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_UBICOD", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_INDANO", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_INDCOD", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_USUANO", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_USUCOD", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_FINCOD", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_SUBPROANO", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_SUBPROCOD", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                                    cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                                    cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                                    cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                                    cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                                    pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                                    pDescripcionMensaje.Direction = ParameterDirection.Output;
+                                    cmd.Parameters.Add(pDescripcionMensaje);
+
+                                    pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                                    pTipoMensaje.Direction = ParameterDirection.Output;
+                                    cmd.Parameters.Add(pTipoMensaje);
+
+                                    StringBuilder jsonResult = new StringBuilder();
+                                    SqlDataReader reader = cmd.ExecuteReader();
+
+                                    if (!reader.HasRows)
+                                    {
+                                        jsonResult.Append("[]");
+                                    }
+                                    else
+                                    {
+                                        while (reader.Read())
+                                        {
+                                            jsonResult.Append(reader.GetValue(0).ToString());
+                                        }
+                                    }
+                                    // Deserializa la cadena JSON en una lista de objetos Usuario
+                                    List<Meta>? temporal = JsonConvert.DeserializeObject<List<Meta>>(jsonResult.ToString());
+                                    
+                                    Meta metaConsulta = temporal[0];
+
+                                    var accPad = "PROYECTO-" + metaConsulta.ProAno + "-" + metaConsulta.ProCod + "-SUB_PROYECTO-" + metaConsulta.SubProAno + "-" + metaConsulta.SubProCod + "-OBJETIVO-" + metaConsulta.ObjAno + "-" + metaConsulta.ObjCod + "-OBJETIVO_ESPECIFICO-" + metaConsulta.ObjEspAno + "-" + metaConsulta.ObjEspCod + "-RESULTADO-" + metaConsulta.ResAno + "-" + metaConsulta.ResCod + "-ACTIVIDAD-" + metaConsulta.ActAno + "-" + metaConsulta.ActCod + "-INDICADOR-" + metaConsulta.IndAno + "-" + metaConsulta.IndCod + "-META-" + metAno + "-" + metCod;
+
+                                    cmd = new SqlCommand("SP_INSERTAR_USUARIO_ACCESO", cn.getcn);
+                                    cmd.CommandType = CommandType.StoredProcedure;
+
+                                    cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
+                                    cmd.Parameters.AddWithValue("@P_USUCOD", userClaims.UsuCod);
+                                    cmd.Parameters.AddWithValue("@P_USUACCTIP", "META");
+                                    cmd.Parameters.AddWithValue("@P_USUACCANO", metAno);
+                                    cmd.Parameters.AddWithValue("@P_USUACCCOD", metCod);
+                                    cmd.Parameters.AddWithValue("@P_USUACCPAD", accPad);
+                                    cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
+                                    cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                                    cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                                    cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                                    cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                                    cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                                    pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                                    pDescripcionMensaje.Direction = ParameterDirection.Output;
+                                    cmd.Parameters.Add(pDescripcionMensaje);
+
+                                    pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                                    pTipoMensaje.Direction = ParameterDirection.Output;
+                                    cmd.Parameters.Add(pTipoMensaje);
+
+                                    cmd.ExecuteNonQuery();
+
+                                    mensaje = pDescripcionMensaje.Value.ToString();
+                                    tipoMensaje = pTipoMensaje.Value.ToString();
                                 } else {
                                     // Modificar Presupuesto de la Meta
                                     cmd = new SqlCommand("SP_MODIFICAR_META_PRESUPUESTO", cn.getcn);

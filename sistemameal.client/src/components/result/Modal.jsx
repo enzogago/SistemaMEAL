@@ -116,15 +116,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
     // Efecto para manejar la edición del estado
     useEffect(() => {
         if (estadoEditado) {
-            let newData = {};
-            for (let key in estadoEditado) {
-                if (typeof estadoEditado[key] === 'string') {
-                    newData[key] = estadoEditado[key].trim().toLowerCase();
-                } else {
-                    newData[key] = estadoEditado[key];
-                }
-            }
-            reset(newData);
+            reset(estadoEditado);
         }
     }, [estadoEditado, reset, setValue]);
 
@@ -143,7 +135,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                         </label>
                         <select 
                             id='subProyecto'
-                            style={{textTransform: 'capitalize'}}
+                           
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.subProyecto || isSubmitted ? (errors.subProyecto ? 'invalid' : 'valid') : ''}`} 
                             {...register('subProyecto', { 
                                 validate: {
@@ -157,7 +149,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                                     key={index} 
                                     value={JSON.stringify({ subProAno: item.subProAno, subProCod: item.subProCod })}
                                 > 
-                                    {item.subProSap + ' - ' + item.subProNom.toLowerCase() + ' | ' + item.proNom.toLowerCase()}
+                                    {item.subProSap + ' - ' + item.subProNom + ' | ' + item.proNom}
                                 </option>
                             ))}
                         </select>
@@ -175,7 +167,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                         </label>
                         <select 
                             id='objetivo'
-                            style={{textTransform: 'capitalize'}}
+                           
                             disabled={!objetivoEnable}
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.objetivo || isSubmitted ? (errors.objetivo ? 'invalid' : 'valid') : ''}`} 
                             {...register('objetivo', { 
@@ -186,7 +178,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                         >
                             <option value="0">--Seleccione Objetivo--</option>
                             {objetivos.map((item, index) => {
-                                const text = item.objNom.toLowerCase();
+                                const text = item.objNom;
                                 const shortText = text.length > 50 ? text.substring(0, 50) + '...' : text;
                                 return(
                                     <option 
@@ -212,7 +204,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                         </label>
                         <select 
                             id='objetivoEspecifico'
-                            style={{textTransform: 'capitalize'}}
+                           
                             disabled={!objetivoEspecificoEnable}
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.objetivoEspecifico || isSubmitted ? (errors.objetivoEspecifico ? 'invalid' : 'valid') : ''}`} 
                             {...register('objetivoEspecifico', { 
@@ -223,7 +215,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                         >
                             <option value="0">--Seleccione Objetivo Específico--</option>
                             {objetivosEspecificos.map((item, index) => {
-                                const text = item.objEspNom.toLowerCase();
+                                const text = item.objEspNom;
                                 const shortText = text.length > 40 ? text.substring(0, 40) + '...' : text;
                                 return(
                                     <option 
@@ -251,7 +243,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                             id="resNum"
                             className={`PowerMas_Modal_Form_${dirtyFields.resNum || isSubmitted ? (errors.resNum ? 'invalid' : 'valid') : ''}`}  
                             type="text" 
-                            style={{textTransform: 'capitalize'}}
+                           
                             placeholder='123456' 
                             maxLength={100} 
                             name="resNum" 
@@ -282,7 +274,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                         </label>
                         <input type="text"
                             id="resNom"
-                            style={{textTransform: 'capitalize'}}
+                           
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.resNom || isSubmitted ? (errors.resNom ? 'invalid' : 'valid') : ''}`} 
                             placeholder="Movilidad Humana"
                             autoComplete='off'

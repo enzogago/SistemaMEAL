@@ -1,6 +1,6 @@
 import Delete from "../../icons/Delete";
 import Edit from "../../icons/Edit";
-import { getMonthYearText } from "../reusable/columns";
+import { getMonthYearText, renderCellWithTooltip } from "../reusable/columns";
 import { handleDelete } from "../reusable/fetchs";
 
 export const getColumns = (actions, controller, openModal, setRefresh, handleEditNavigate) => {
@@ -8,10 +8,12 @@ export const getColumns = (actions, controller, openModal, setRefresh, handleEdi
         {
             header: "Sub Proyecto",
             accessorKey: "subProNom",
+            cell: ({row}) => renderCellWithTooltip([row.original.subProNom])
         },
         {
             header: "Proyecto",
             accessorKey: "proNom",
+            cell: ({row}) => renderCellWithTooltip([row.original.proNom])
         },
         {
             header: "Responsable",

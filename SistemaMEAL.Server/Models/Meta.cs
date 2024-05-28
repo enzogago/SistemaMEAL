@@ -69,6 +69,10 @@ namespace SistemaMEAL.Server.Models
         public String? ResCod { get; set; }
         public String? ResNum { get; set; }
         public String? ResNom { get; set; }
+        public String? ActAno { get; set; }
+        public String? ActCod { get; set; }
+        public String? ActNum { get; set; }
+        public String? ActNom { get; set; }
 
         public String? TipValCod { get; set; }
         public String? TipValNom { get; set; }

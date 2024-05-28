@@ -304,11 +304,19 @@ export const Export_Excel_Basic = async (data, headersExcel, active, isPresupues
         ext: { width: 200, height: 50 }
     });
 
+    
+    // Añadir un título
+    let titleRow = worksheet.addRow([]);
+    let titleCell = titleRow.getCell(3);
+    titleCell.value = `CADENA DE RESULTADO | METAS ${isPresupuesto ? 'PRESUPUESTO' : 'PROGRAMÁTICAS'}`;
+    titleCell.font = { bold: true, size: 16 };
+    titleCell.alignment = { horizontal: 'center' };
+    worksheet.mergeCells('D3:K3');
+    
     // Añadir filas vacías
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 3; i++) {
         worksheet.addRow([]);
     }
-
     // Crear la fila para los encabezados
     let headerRow = worksheet.addRow([]);
 
@@ -372,7 +380,7 @@ export const Export_Excel_Basic = async (data, headersExcel, active, isPresupues
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `CADENA DE ${isPresupuesto ? 'PRESUPUESTO' : 'RESULTADO'} ${active.toUpperCase()}.xlsx`;
+    a.download = `CADENA_${isPresupuesto ? 'PRESUPUESTO' : 'RESULTADO'} ${active.toUpperCase()}.xlsx`;
     a.click();
 };
 

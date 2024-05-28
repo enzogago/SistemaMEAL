@@ -229,19 +229,9 @@ const FormSubProject = () => {
                             Notiflix.Notify.failure(data.message);
                             return;
                         }
-                        console.log(data)
-                        let newData = {};
-                        for (let key in data) {
-                            if (typeof data[key] === 'string') {
-                                // Convierte cada cadena a minúsculas
-                                newData[key] = data[key].trim().toLowerCase();
-                            } else {
-                                // Mantiene los valores no string tal como están
-                                newData[key] = data[key];
-                            }
-                        }
-                        setInitialSubProject({...newData, proyecto: JSON.stringify({ proAno: data.proAno, proCod: data.proCod })})
-                        reset(newData);
+     
+                        setInitialSubProject({...data, proyecto: JSON.stringify({ proAno: data.proAno, proCod: data.proCod })})
+                        reset(data);
                         // Establece el valor inicial del select de proyecto
                         setValue('proyecto', JSON.stringify({ proAno: data.proAno, proCod: data.proCod }));
                     } catch (error) {
@@ -630,7 +620,6 @@ const FormSubProject = () => {
                         </label>
                         <select 
                             id='proyecto'
-                            style={{textTransform: 'capitalize'}}
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.proyecto || isSubmitted ? (errors.proyecto ? 'invalid' : 'valid') : ''}`} 
                             {...register('proyecto', { 
                                 validate: {
@@ -665,7 +654,7 @@ const FormSubProject = () => {
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.subProSap || isSubmitted ? (errors.subProSap ? 'invalid' : 'valid') : ''}`}  
                             type="text" 
                             placeholder='Ayuda En Acción España' 
-                            maxLength={10} 
+                            maxLength={100} 
                             name="subProSap" 
                             autoComplete='off'
                             {...register('subProSap', {
@@ -698,7 +687,6 @@ const FormSubProject = () => {
                         </label>
                         <input type="text"
                             id="subProNom"
-                            style={{textTransform: 'capitalize'}}
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.subProNom || isSubmitted ? (errors.subProNom ? 'invalid' : 'valid') : ''}`} 
                             placeholder="Sub proyecto Movilidad Humana"
                             autoComplete='off'
@@ -724,7 +712,6 @@ const FormSubProject = () => {
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.subProRes || isSubmitted ? (errors.subProRes ? 'invalid' : 'valid') : ''}`} 
                             placeholder="Andres Eras"
                             autoComplete='off'
-                            style={{textTransform: 'capitalize'}}
                             {...register('subProRes', { 
                                 required: 'El campo es requerido',
                                 pattern: {
@@ -798,25 +785,25 @@ const FormSubProject = () => {
                                             const mesFin = watchInicio[1];
                                             const añoInicio = watchInicio[0];
                                             const añoFin = watchFin[0];
-                                            return (añoInicio < añoFin) || (añoInicio === añoFin && mesInicio <= mesFin) || 'El mes y el año de Inicio no pueden ser mayores al de Fin';
+                                            return (añoInicio < añoFin) || (añoInicio === añoFin && mesInicio <= mesFin) || 'El mes y el año de Inicio no pueden ser MAYOres al de Fin';
                                         }
                                     }
                                 })}
                                 id="subProPerMesIni" 
                             >
                                 <option value="0">--Seleccione Mes--</option>
-                                <option value="01">Enero</option>
-                                <option value="02">Febrero</option>
-                                <option value="03">Marzo</option>
-                                <option value="04">Abril</option>
-                                <option value="05">Mayo</option>
-                                <option value="06">Junio</option>
-                                <option value="07">Julio</option>
-                                <option value="08">Agosto</option>
-                                <option value="09">Septiembre</option>
-                                <option value="10">Octubre</option>
-                                <option value="11">Noviembre</option>
-                                <option value="12">Diciembre</option>
+                                <option value="01">ENERO</option>
+                                <option value="02">FEBRERO</option>
+                                <option value="03">MARZO</option>
+                                <option value="04">ABRIL</option>
+                                <option value="05">MAYO</option>
+                                <option value="06">JUNIO</option>
+                                <option value="07">JULIO</option>
+                                <option value="08">AGOSTO</option>
+                                <option value="09">SEPTIEMBRE</option>
+                                <option value="10">OCTUBRE</option>
+                                <option value="11">NOVIEMBRE</option>
+                                <option value="12">DICIEMBRE</option>
                             </select>
                             {errors.subProPerMesIni ? (
                                 <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.subProPerMesIni.message}</p>
@@ -910,18 +897,18 @@ const FormSubProject = () => {
                                 id="subProPerMesFin" 
                             >
                                 <option value="0">--Seleccione Mes--</option>
-                                <option value="01">Enero</option>
-                                <option value="02">Febrero</option>
-                                <option value="03">Marzo</option>
-                                <option value="04">Abril</option>
-                                <option value="05">Mayo</option>
-                                <option value="06">Junio</option>
-                                <option value="07">Julio</option>
-                                <option value="08">Agosto</option>
-                                <option value="09">Septiembre</option>
-                                <option value="10">Octubre</option>
-                                <option value="11">Noviembre</option>
-                                <option value="12">Diciembre</option>
+                                <option value="01">ENERO</option>
+                                <option value="02">FEBRERO</option>
+                                <option value="03">MARZO</option>
+                                <option value="04">ABRIL</option>
+                                <option value="05">MAYO</option>
+                                <option value="06">JUNIO</option>
+                                <option value="07">JULIO</option>
+                                <option value="08">AGOSTO</option>
+                                <option value="09">SEPTIEMBRE</option>
+                                <option value="10">OCTUBRE</option>
+                                <option value="11">NOVIEMBRE</option>
+                                <option value="12">DICIEMBRE</option>
                             </select>
                             {errors.subProPerMesFin ? (
                                 <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.subProPerMesFin.message}</p>
@@ -960,7 +947,7 @@ const FormSubProject = () => {
                                         }
 
                                         if (parseInt(value) < parseInt(watchInicio[0])) {
-                                            return 'El año de Fin debe ser mayor o igual al año de Inicio.';
+                                            return 'El año de Fin debe ser MAYOr o igual al año de Inicio.';
                                         }
                                     },
                                     minLength: {
@@ -1002,7 +989,7 @@ const FormSubProject = () => {
                             <div key={index} className="flex gap_5">
                                 <select 
                                     id={`impCod${index}`} 
-                                    style={{textTransform: 'capitalize'}}
+                                    
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields[`impCod${index}`] || isSubmitted ? (errors[`impCod${index}`] ? 'invalid' : 'valid') : ''}`} 
                                     {...register(`impCod${index}`, { 
                                         validate: value => value !== '0' || 'El campo es requerido' 
@@ -1013,7 +1000,7 @@ const FormSubProject = () => {
                                         <option 
                                             key={item.impCod} 
                                             value={item.impCod}
-                                            style={{textTransform: 'capitalize'}}
+                                            
                                         > 
                                             {item.impNom}
                                         </option>
@@ -1046,7 +1033,7 @@ const FormSubProject = () => {
                             <div key={index} className="flex gap_5">
                                 <select 
                                     id={`finCod${index}`} 
-                                    style={{textTransform: 'capitalize'}}
+                                    
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields[`finCod${index}`] || isSubmitted ? (errors[`finCod${index}`] ? 'invalid' : 'valid') : ''}`} 
                                     {...register(`finCod${index}`, { 
                                         validate: value => value !== '0' || 'El campo es requerido' 
@@ -1057,7 +1044,7 @@ const FormSubProject = () => {
                                         <option 
                                             key={item.finCod} 
                                             value={item.finCod}
-                                            style={{textTransform: 'capitalize'}}
+                                            
                                         > 
                                             {`${item.finIde}-${item.finSap}-${item.monAbr}(${item.monSim})`}
                                         </option>
@@ -1106,7 +1093,7 @@ const FormSubProject = () => {
                                 </div>
                                 <select 
                                     id={`pais${countryIndex}`}
-                                    style={{textTransform: 'capitalize'}}
+                                    
                                     value={selectedCountryValues[countryIndex]}
                                     name={`select${countryIndex}`}
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields[`pais${countryIndex}`] || isSubmitted ? (errors[`pais${countryIndex}`] ? 'invalid' : 'valid') : ''}`} 
@@ -1128,10 +1115,10 @@ const FormSubProject = () => {
                                         name={`select${countryIndex}${selectIndex}`}
                                         value={selectedLocationValues[`${countryIndex}-${selectIndex}`]}
                                         onChange={(event) => handleSelectChange(event.target.value, countryIndex, selectIndex)}
-                                        style={{textTransform: 'capitalize'}}
+                                        
                                         className="block Phone_12"
                                     >
-                                        <option style={{textTransform: 'capitalize'}} value="0">--Seleccione {select[0].ubiTip.toLowerCase()}--</option>
+                                        <option  value="0">--Seleccione {select[0].ubiTip.toLowerCase()}--</option>
                                         {select.map(option => (
                                             <option key={option.ubiCod} value={JSON.stringify({ ubiCod: option.ubiCod, ubiAno: option.ubiAno })}>
                                                 {option.ubiNom}

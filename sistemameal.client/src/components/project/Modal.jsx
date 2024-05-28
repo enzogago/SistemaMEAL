@@ -39,17 +39,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
     // Efecto al editar estado
     useEffect(() => {
         if (estadoEditado) {
-            let newData = {};
-            for (let key in estadoEditado) {
-                if (typeof estadoEditado[key] === 'string') {
-                    // Convierte cada cadena a minúsculas
-                    newData[key] = estadoEditado[key].trim();
-                } else {
-                    // Mantiene los valores no string tal como están
-                    newData[key] = estadoEditado[key];
-                }
-            }
-           reset(newData)
+           reset(estadoEditado)
         }
     }, [estadoEditado, reset]);
 
@@ -132,7 +122,6 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                         </label>
                         <input type="text"
                             id="proNom"
-                            style={{textTransform: 'capitalize'}}
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.proNom || isSubmitted ? (errors.proNom ? 'invalid' : 'valid') : ''}`} 
                             placeholder="Movilidad Humana"
                             autoComplete='off'
@@ -158,7 +147,6 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.proDes || isSubmitted ? (errors.proDes ? 'invalid' : 'valid') : ''}`} 
                             placeholder="Descripción del proyecto"
                             autoComplete='off'
-                            style={{textTransform: 'capitalize'}}
                             {...register('proDes', { 
                             })} 
                         />

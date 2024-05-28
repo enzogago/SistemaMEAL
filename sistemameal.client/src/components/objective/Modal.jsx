@@ -61,17 +61,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
     // Efecto al editar estado
     useEffect(() => {
         if (estadoEditado) {
-            let newData = {};
-            for (let key in estadoEditado) {
-                if (typeof estadoEditado[key] === 'string') {
-                    // Convierte cada cadena a minúsculas
-                    newData[key] = estadoEditado[key].trim().toLowerCase();
-                } else {
-                    // Mantiene los valores no string tal como están
-                    newData[key] = estadoEditado[key];
-                }
-            }
-            reset(newData);
+            reset(estadoEditado);
         }
     }, [estadoEditado, reset, setValue]);
 
@@ -89,7 +79,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                         </label>
                         <select 
                             id='subProyecto'
-                            style={{textTransform: 'capitalize'}}
+                            
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.subProyecto || isSubmitted ? (errors.subProyecto ? 'invalid' : 'valid') : ''}`} 
                             {...register('subProyecto', { 
                                 validate: {
@@ -103,7 +93,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                                     key={index} 
                                     value={JSON.stringify({ subProAno: item.subProAno, subProCod: item.subProCod })}
                                 > 
-                                    {item.subProSap + ' - ' + item.subProNom.toLowerCase() + ' | ' + item.proNom.toLowerCase()}
+                                    {item.subProSap + ' - ' + item.subProNom + ' | ' + item.proNom}
                                 </option>
                             ))}
                         </select>
@@ -123,7 +113,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                             id="objNum"
                             className={`PowerMas_Modal_Form_${dirtyFields.objNum || isSubmitted ? (errors.objNum ? 'invalid' : 'valid') : ''}`}  
                             type="text" 
-                            style={{textTransform: 'capitalize'}}
+                            
                             placeholder='123456' 
                             maxLength={100} 
                             name="objNum" 
@@ -154,7 +144,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                         </label>
                         <input type="text"
                             id="objNom"
-                            style={{textTransform: 'capitalize'}}
+                            
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.objNom || isSubmitted ? (errors.objNom ? 'invalid' : 'valid') : ''}`} 
                             placeholder="Movilidad Humana"
                             autoComplete='off'

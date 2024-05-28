@@ -49,6 +49,8 @@ const PermissionUser = () => {
         ]).then(([proyectosData, accesosData]) => {
             const transformedData = transformData(proyectosData);
             setProyectos(transformedData);
+            console.log(proyectosData)
+            console.log(accesosData)
 
             setCheckedKeys(accesosData.map(permiso => permiso.usuAccPad.trim()));
             setInitialCheckedKeys(accesosData);
