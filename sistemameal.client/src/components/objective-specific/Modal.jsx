@@ -215,8 +215,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                             Nombre del Objetivo Específico
                         </label>
                         <input type="text"
-                            id="objEspNom"
-                            
+                            id="objEspNom" 
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.objEspNom || isSubmitted ? (errors.objEspNom ? 'invalid' : 'valid') : ''}`} 
                             placeholder="Movilidad Humana"
                             autoComplete='off'
@@ -224,7 +223,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                             {...register('objEspNom', { 
                                 required: 'El campo es requerido',
                                 pattern: {
-                                    value: /^[A-Za-zñÑáéíóúÁÉÍÓÚ0-9().,;üÜ/\s-_]+$/,
+                                    value: /^[A-Za-zñÑáéíóúÁÉÍÓÚ0-9().,;üÜ/\s-%_]+$/,
                                     message: 'Por favor, introduce caracteres válidos.',
                                 },
                                 minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },

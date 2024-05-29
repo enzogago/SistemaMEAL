@@ -668,8 +668,8 @@ const FormSubProject = () => {
                                     message: 'El campo no debe tener más de 30 dígitos'
                                 },
                                 pattern: {
-                                    value: /^[A-Za-zñÑáéíóúÁÉÍÓÚüÜ/\s-_]+$/,
-                                    message: 'Por favor, introduce solo letras y espacios',
+                                    value: /^[A-Za-zñÑáéíóúÁÉÍÓÚ0-9().,;üÜ/\s-%_]+$/,
+                                    message: 'Por favor, introduce caracteres válidos.',
                                 },
                             })}
                         />
@@ -691,6 +691,10 @@ const FormSubProject = () => {
                             placeholder="Sub proyecto Movilidad Humana"
                             autoComplete='off'
                             {...register('subProNom', { 
+                                pattern: {
+                                    value: /^[A-Za-zñÑáéíóúÁÉÍÓÚ0-9().,;üÜ/\s-%_]+$/,
+                                    message: 'Por favor, introduce caracteres válidos.',
+                                },
                                 required: 'El campo es requerido',
                                 minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
                             })} 

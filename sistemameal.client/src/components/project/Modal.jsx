@@ -126,6 +126,10 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                             placeholder="Movilidad Humana"
                             autoComplete='off'
                             {...register('proNom', { 
+                                pattern: {
+                                    value: /^[A-Za-zñÑáéíóúÁÉÍÓÚ0-9().,;üÜ/\s-%_]+$/,
+                                    message: 'Por favor, introduce caracteres válidos.',
+                                },
                                 required: 'El campo es requerido',
                                 minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
                             })} 
@@ -147,7 +151,11 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.proDes || isSubmitted ? (errors.proDes ? 'invalid' : 'valid') : ''}`} 
                             placeholder="Descripción del proyecto"
                             autoComplete='off'
-                            {...register('proDes', { 
+                            {...register('proDes', {
+                                pattern: {
+                                    value: /^[A-Za-zñÑáéíóúÁÉÍÓÚ0-9().,;üÜ/\s-%_]+$/,
+                                    message: 'Por favor, introduce caracteres válidos.',
+                                },
                             })} 
                         />
                         {errors.proDes ? (
