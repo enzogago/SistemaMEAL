@@ -93,36 +93,37 @@ namespace SistemaMEAL.Modulos
                 cn.getcn.Open();
 
                 SqlCommand cmd = new SqlCommand("SP_BUSCAR_INDICADOR", cn.getcn);
-                            cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandType = CommandType.StoredProcedure;
 
-                            cmd.Parameters.AddWithValue("@P_SUBPROANO", string.IsNullOrEmpty(subProAno) ? (object)DBNull.Value : subProAno);
-                            cmd.Parameters.AddWithValue("@P_SUBPROCOD", string.IsNullOrEmpty(subProCod) ? (object)DBNull.Value : subProCod);
-                            cmd.Parameters.AddWithValue("@P_INDANO", (object)DBNull.Value);
-                            cmd.Parameters.AddWithValue("@P_INDCOD", (object)DBNull.Value);
-                            cmd.Parameters.AddWithValue("@P_ACTANO", (object)DBNull.Value);
-                            cmd.Parameters.AddWithValue("@P_ACTCOD", (object)DBNull.Value);
-                            cmd.Parameters.AddWithValue("@P_INDNOM", (object)DBNull.Value);
-                            cmd.Parameters.AddWithValue("@P_INDNUM", (object)DBNull.Value);
-                            cmd.Parameters.AddWithValue("@P_INDTIPIND", (object)DBNull.Value);
-                            cmd.Parameters.AddWithValue("@P_UNICOD", (object)DBNull.Value);
-                            cmd.Parameters.AddWithValue("@P_TIPVALCOD", (object)DBNull.Value);
-                            cmd.Parameters.AddWithValue("@P_INDTOTPRE", (object)DBNull.Value);
-                            cmd.Parameters.AddWithValue("@P_MONCOD", (object)DBNull.Value);
-                            cmd.Parameters.AddWithValue("@P_INDLINBAS", (object)DBNull.Value);
-                            cmd.Parameters.AddWithValue("@P_INDFOR", (object)DBNull.Value);
-                            cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
-                            cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
-                            cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
-                            cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
-                            cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+                cmd.Parameters.AddWithValue("@P_SUBPROANO", string.IsNullOrEmpty(subProAno) ? (object)DBNull.Value : subProAno);
+                cmd.Parameters.AddWithValue("@P_SUBPROCOD", string.IsNullOrEmpty(subProCod) ? (object)DBNull.Value : subProCod);
+                cmd.Parameters.AddWithValue("@P_INDANO", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_INDCOD", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_ACTANO", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_ACTCOD", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_INDNOM", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_INDNUM", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_INDTIPIND", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_UNICOD", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_TIPVALCOD", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_INDTOTPRE", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_MONCOD", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_INDLINBAS", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_INDFOR", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
 
-                            SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
-                            pDescripcionMensaje.Direction = ParameterDirection.Output;
-                            cmd.Parameters.Add(pDescripcionMensaje);
+                SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
 
-                            SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
-                            pTipoMensaje.Direction = ParameterDirection.Output;
-                            cmd.Parameters.Add(pTipoMensaje);
+                SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+
+                cmd.Parameters.Add(pTipoMensaje);
 
                 StringBuilder jsonResult = new StringBuilder();
                 SqlDataReader reader = cmd.ExecuteReader();
@@ -580,6 +581,48 @@ namespace SistemaMEAL.Modulos
                                 throw new Exception(message);
                             }
 
+                            cmd = new SqlCommand("SP_BUSCAR_RESULTADO", cn.getcn);
+                            cmd.CommandType = CommandType.StoredProcedure;
+
+                            cmd.Parameters.AddWithValue("@P_RESANO", indicador.ResAno);
+                            cmd.Parameters.AddWithValue("@P_RESCOD", indicador.ResCod);
+                            cmd.Parameters.AddWithValue("@P_OBJESPANO", (object)DBNull.Value);
+                            cmd.Parameters.AddWithValue("@P_OBJESPCOD", (object)DBNull.Value);
+                            cmd.Parameters.AddWithValue("@P_RESNOM", (object)DBNull.Value);
+                            cmd.Parameters.AddWithValue("@P_RESNUM", (object)DBNull.Value);
+                            cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                            cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                            cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                            cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                            cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                            pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                            pDescripcionMensaje.Direction = ParameterDirection.Output;
+                            cmd.Parameters.Add(pDescripcionMensaje);
+
+                            pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                            pTipoMensaje.Direction = ParameterDirection.Output;
+                            cmd.Parameters.Add(pTipoMensaje);
+
+                            jsonResult = new StringBuilder();
+                            reader = cmd.ExecuteReader();
+                            if (!reader.HasRows)
+                            {
+                                jsonResult.Append("[]");
+                            }
+                            else
+                            {
+                                while (reader.Read())
+                                {
+                                    jsonResult.Append(reader.GetValue(0).ToString());
+                                }
+                            }
+                            // Deserializa la cadena JSON en una lista de objetos Estado
+                            List<Resultado>? temporalAct = JsonConvert.DeserializeObject<List<Resultado>>(jsonResult.ToString());
+                            Resultado consultaAct = temporalAct[0];
+
+                            var accPadAct = "PROYECTO-" + consultaAct.ProAno + "-" + consultaAct.ProCod + "-SUB_PROYECTO-" + consultaAct.SubProAno + "-" + consultaAct.SubProCod + "-OBJETIVO-" + consultaAct.ObjAno + "-" + consultaAct.ObjCod + "-OBJETIVO_ESPECIFICO-" + consultaAct.ObjEspAno + "-" + consultaAct.ObjEspCod + "-RESULTADO-" + consultaAct.ResAno + "-" + consultaAct.ResCod + "-ACTIVIDAD-" + actAno + "-" + actCod;
+
                             cmd = new SqlCommand("SP_INSERTAR_USUARIO_ACCESO", cn.getcn);
                             cmd.CommandType = CommandType.StoredProcedure;
                             cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
@@ -587,7 +630,7 @@ namespace SistemaMEAL.Modulos
                             cmd.Parameters.AddWithValue("@P_USUACCTIP", "ACTIVIDAD");
                             cmd.Parameters.AddWithValue("@P_USUACCANO", actAno);
                             cmd.Parameters.AddWithValue("@P_USUACCCOD", actCod);
-                            cmd.Parameters.AddWithValue("@P_USUACCPAD", "");
+                            cmd.Parameters.AddWithValue("@P_USUACCPAD", accPadAct);
                             cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
                             cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                             cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
@@ -662,6 +705,49 @@ namespace SistemaMEAL.Modulos
                             throw new Exception(message);
                         }
 
+                        cmd = new SqlCommand("SP_BUSCAR_ACTIVIDAD", cn.getcn);
+                        cmd.CommandType = CommandType.StoredProcedure;
+
+                        cmd.Parameters.AddWithValue("@P_ACTANO", indicador.ActAno);
+                        cmd.Parameters.AddWithValue("@P_ACTCOD", indicador.ActCod);
+                        cmd.Parameters.AddWithValue("@P_RESANO", (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@P_RESCOD", (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@P_ACTNOM", (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@P_ACTNUM", (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                        cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                        cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                        cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                        cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                        pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                        pDescripcionMensaje.Direction = ParameterDirection.Output;
+                        cmd.Parameters.Add(pDescripcionMensaje);
+
+                        pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                        pTipoMensaje.Direction = ParameterDirection.Output;
+                        cmd.Parameters.Add(pTipoMensaje);
+
+                        jsonResult = new StringBuilder();
+                        reader = cmd.ExecuteReader();
+
+                        if (!reader.HasRows)
+                        {
+                            jsonResult.Append("[]");
+                        }
+                        else
+                        {
+                            while (reader.Read())
+                            {
+                                jsonResult.Append(reader.GetValue(0).ToString());
+                            }
+                        }
+                        // Deserializa la cadena JSON en una lista de objetos Estado
+                        List<Actividad>? temporal = JsonConvert.DeserializeObject<List<Actividad>>(jsonResult.ToString());
+                        Actividad consulta = temporal[0];
+
+                        var accPad = "PROYECTO-" + consulta.ProAno + "-" + consulta.ProCod + "-SUB_PROYECTO-" + consulta.SubProAno + "-" + consulta.SubProCod + "-OBJETIVO-" + consulta.ObjAno + "-" + consulta.ObjCod + "-OBJETIVO_ESPECIFICO-" + consulta.ObjEspAno + "-" + consulta.ObjEspCod + "-RESULTADO-" + consulta.ResAno + "-" + consulta.ResCod + "-ACTIVIDAD-" + consulta.ActAno + "-" + consulta.ActCod + "-INDICADOR-" + indAno + "-" + indCod;     
+
                         cmd = new SqlCommand("SP_INSERTAR_USUARIO_ACCESO", cn.getcn);
                         cmd.CommandType = CommandType.StoredProcedure;
                         
@@ -670,7 +756,7 @@ namespace SistemaMEAL.Modulos
                         cmd.Parameters.AddWithValue("@P_USUACCTIP", "INDICADOR");
                         cmd.Parameters.AddWithValue("@P_USUACCANO", indAno);
                         cmd.Parameters.AddWithValue("@P_USUACCCOD", indCod);
-                        cmd.Parameters.AddWithValue("@P_USUACCPAD", "");
+                        cmd.Parameters.AddWithValue("@P_USUACCPAD", accPad);
                         cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
                         cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                         cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
@@ -701,7 +787,8 @@ namespace SistemaMEAL.Modulos
                         cmd.Parameters.AddWithValue("@P_SUBPRONOM", (object)DBNull.Value);
                         cmd.Parameters.AddWithValue("@P_SUBPROSAP", (object)DBNull.Value);
                         cmd.Parameters.AddWithValue("@P_SUBPROINVSUBACT", (object)DBNull.Value);
-                        cmd.Parameters.AddWithValue("@P_SUBPRORES", (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@P_USUANO", (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@P_USUCOD", (object)DBNull.Value);
                         cmd.Parameters.AddWithValue("@P_SUBPROPERANOINI", (object)DBNull.Value);
                         cmd.Parameters.AddWithValue("@P_SUBPROPERMESINI", (object)DBNull.Value);
                         cmd.Parameters.AddWithValue("@P_SUBPROPERANOFIN", (object)DBNull.Value);
@@ -940,10 +1027,6 @@ namespace SistemaMEAL.Modulos
                                 }
                             }
                         }
-                        else
-                        {
-                            throw new Exception("Error al insertar Indicador");
-                        }
 
                         cmd = new SqlCommand("SP_BUSCAR_SUB_PROYECTO_UBICACION", cn.getcn);
                         cmd.CommandType = CommandType.StoredProcedure;
@@ -968,6 +1051,7 @@ namespace SistemaMEAL.Modulos
 
                         jsonResult = new StringBuilder();
                         reader = cmd.ExecuteReader();
+
                         if (!reader.HasRows)
                         {
                             jsonResult.Append("[]");
@@ -1021,11 +1105,7 @@ namespace SistemaMEAL.Modulos
                                 }
                             }
                         }
-                        else
-                        {
-                            throw new Exception("Error al insertar Indicador");
-                        }
-
+                        
                         // Si todas las operaciones fueron exitosas, confirma la transacción
                         scope.Complete();
                         mensaje = message;

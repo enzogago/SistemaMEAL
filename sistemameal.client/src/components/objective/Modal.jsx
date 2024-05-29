@@ -32,7 +32,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
             subProCod
         }
         console.log(data)
-        handleSubmitMant('Objetivo',!!estadoEditado,data, setData, closeModalAndReset)
+        handleSubmitMant('Objetivo',!!estadoEditado, data, setData, closeModalAndReset)
     };
 
     const [subProyectosLoaded, setSubProyectosLoaded] = useState(false);
@@ -107,7 +107,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                     </div>
                     <div className="">
                         <label className="block" htmlFor='objNum'>
-                            Código del Objetivo:
+                            Código del Objetivo General:
                         </label>
                         <input 
                             id="objNum"
@@ -140,7 +140,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                     </div>
                     <div className="">
                         <label htmlFor="objNom" className="">
-                            Nombre del Objetivo
+                            Nombre del Objetivo General
                         </label>
                         <input type="text"
                             id="objNom"

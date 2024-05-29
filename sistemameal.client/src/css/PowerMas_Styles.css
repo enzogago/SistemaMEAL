@@ -100,7 +100,6 @@ input::placeholder,select::placeholder{
 	border: none;
 	border-bottom: 1px solid black;
 	padding: 8px 0;
-	margin: 8px 0;
 	width: 100%;
 	border-radius: 0;
 }

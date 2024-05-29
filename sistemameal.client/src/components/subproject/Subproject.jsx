@@ -71,6 +71,8 @@ const Subproject = () => {
                 (item.subProSap ? item.subProSap.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
                 (item.proIde ? item.proIde.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
                 (item.proNom ? item.proNom.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
+                (item.usuNom ? item.usuNom.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
+                (item.usuApe ? item.usuApe.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
                 (item.subProInvSubAct === 'S' && 'PROYECTO CON SUB ACTIVIDADES'.includes(searchFilter.toUpperCase())) ||
                 (item.subProInvSubAct === 'N' && 'PROYECTO SIN SUB ACTIVIDADES'.includes(searchFilter.toUpperCase())) ||
                 (periodoInicio ? periodoInicio.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
@@ -80,7 +82,7 @@ const Subproject = () => {
     );
 
     const headers = ['CODIGO_FINANCIACION', 'NOMBRE', 'RESPONSABLE','AÑO_INICIO','MES_INICIO','AÑO_FIN','MES_FIN','INVOLUCRA_SUB_ACTIVIDAD', 'PROYECTO'];  // Tus encabezados
-    const properties = ['subProSap', 'subProNom', 'subProRes', 'subProPerAnoIni', 'subProPerMesIni', 'subProPerAnoFin', 'subProPerMesFin', 'subProInvSubAct', 'proNom'];  // Las propiedades de los objetos de datos que quieres incluir
+    const properties = ['subProSap', 'subProNom', ['usuNom','usuApe'], 'subProPerAnoIni', 'subProPerMesIni', 'subProPerAnoFin', 'subProPerMesFin', 'subProInvSubAct', 'proNom'];  // Las propiedades de los objetos de datos que quieres incluir
     // Preparar los datos
     let dataExport = [...filteredData]; 
     // Modificar el campo 'uniInvPer' en los datos
@@ -230,7 +232,8 @@ const Subproject = () => {
     };
 
     const downloadFile = async (fileName) => {
-        const url = `https://meal.ddns.net/uploads/${fileName}`
+        const url = `https://meal.ddns.net/fuentes/sub-proyecto/${fileName}`
+        console.log(url)
         try {
             Notiflix.Loading.pulse('Descargando...');
             // Obtenemos los datos
@@ -304,7 +307,7 @@ const Subproject = () => {
     return (
         <>
             <div className="flex flex-column p1 gap_25 flex-grow-1 overflow-auto subproject-block">
-                <h3>Listado de Indicadores</h3>
+                <h3>Listado de Sub Proyectos</h3>
                 <div className="flex gap_5 p_25">
                     {/* Componente para la entrada de búsqueda con etiquetas */}
                     <SearchInput
@@ -373,9 +376,8 @@ const Subproject = () => {
                             <p style={{color: '#878280'}}>Solo se puede subir documentos en formato PDF,XLS,XLSM,XLSX,PPTX,JPG,PNG,MP4</p>
                             <h3>Subir Archivo</h3>
                         </article>
-                        <br />
                         <div
-                            className="PowerMas_Input_Upload center p2 pointer"
+                            className="PowerMas_Input_Upload center p1 pointer"
                             ref={dropRef}
                             onClick={handleDivClick}
                             onDragEnter={handleDragIn}

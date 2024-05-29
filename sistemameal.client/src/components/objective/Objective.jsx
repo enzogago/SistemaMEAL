@@ -56,7 +56,7 @@ const Objective = () => {
                 setData={setData}
                 controller={controller}
                 fieldMapping={fieldMapping}
-                title='Objetivos'
+                title='Objetivos Generales'
                 resize={false}
                 format='A2'
                 filterProperties={filterProperties}
@@ -66,7 +66,7 @@ const Objective = () => {
                 estadoEditado={estadoEditado}
                 closeModal={closeModal} 
                 setData={setData}
-                title='Objetivo'
+                title='Objetivo General'
             />  
         </>
     );

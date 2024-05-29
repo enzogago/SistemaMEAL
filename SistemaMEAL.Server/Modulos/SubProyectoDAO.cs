@@ -13,7 +13,7 @@ namespace SistemaMEAL.Modulos
     {
         private conexionDAO cn = new conexionDAO();
 
-        public IEnumerable<SubProyecto> Buscar(ClaimsIdentity? identity, string? subProAno = null, string? subProCod = null,string? proAno = null, string? proCod = null, string? subProNom = null, string? subProSap = null, string? subProRes = null, string? subProPerAnoIni = null, string? subProPerMesIni = null, string? subProPerAnoFin = null, string? subProPerMesFin = null, string? subProInvSubAct = null)
+        public IEnumerable<SubProyecto> Buscar(ClaimsIdentity? identity, string? subProAno = null, string? subProCod = null,string? proAno = null, string? proCod = null, string? subProNom = null, string? subProSap = null, string? usuAno = null, string? usuCod = null, string? subProPerAnoIni = null, string? subProPerMesIni = null, string? subProPerAnoFin = null, string? subProPerMesFin = null, string? subProInvSubAct = null)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 
@@ -32,7 +32,8 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_SUBPRONOM", string.IsNullOrEmpty(subProNom) ? (object)DBNull.Value : subProNom);
                 cmd.Parameters.AddWithValue("@P_SUBPROSAP", string.IsNullOrEmpty(subProSap) ? (object)DBNull.Value : subProSap);
                 cmd.Parameters.AddWithValue("@P_SUBPROINVSUBACT", string.IsNullOrEmpty(subProInvSubAct) ? (object)DBNull.Value : subProInvSubAct);
-                cmd.Parameters.AddWithValue("@P_SUBPRORES", string.IsNullOrEmpty(subProRes) ? (object)DBNull.Value : subProRes);
+                cmd.Parameters.AddWithValue("@P_USUANO", string.IsNullOrEmpty(usuAno) ? (object)DBNull.Value : usuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD", string.IsNullOrEmpty(usuCod) ? (object)DBNull.Value : usuCod);
                 cmd.Parameters.AddWithValue("@P_SUBPROPERANOINI", string.IsNullOrEmpty(subProPerAnoIni) ? (object)DBNull.Value : subProPerAnoIni);
                 cmd.Parameters.AddWithValue("@P_SUBPROPERMESINI", string.IsNullOrEmpty(subProPerMesIni) ? (object)DBNull.Value : subProPerMesIni);
                 cmd.Parameters.AddWithValue("@P_SUBPROPERANOFIN", string.IsNullOrEmpty(subProPerAnoFin) ? (object)DBNull.Value : subProPerAnoFin);
@@ -97,7 +98,8 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_PROCOD", subProyecto.ProCod);
                 cmd.Parameters.AddWithValue("@P_SUBPRONOM", subProyecto.SubProNom);
                 cmd.Parameters.AddWithValue("@P_SUBPROSAP", subProyecto.SubProSap);
-                cmd.Parameters.AddWithValue("@P_SUBPRORES", subProyecto.SubProRes);
+                cmd.Parameters.AddWithValue("@P_USUANO", subProyecto.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD", subProyecto.UsuCod);
                 cmd.Parameters.AddWithValue("@P_SUBPROPERANOINI", subProyecto.SubProPerAnoIni);
                 cmd.Parameters.AddWithValue("@P_SUBPROPERMESINI", subProyecto.SubProPerMesIni);
                 cmd.Parameters.AddWithValue("@P_SUBPROPERANOFIN", subProyecto.SubProPerAnoFin);
@@ -174,56 +176,6 @@ namespace SistemaMEAL.Modulos
             return (anoOut, codOut, mensaje, tipoMensaje);
         }
 
-        // public (string? message, string? messageType) Modificar(ClaimsIdentity? identity, SubProyecto subProyecto)
-        // {
-        //     var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
-
-        //     string? mensaje = "";
-        //     string? tipoMensaje = "";
-        //     try
-        //     {
-        //         cn.getcn.Open();
-
-        //         SqlCommand cmd = new SqlCommand("SP_MODIFICAR_SUB_PROYECTO", cn.getcn);
-        //         cmd.CommandType = CommandType.StoredProcedure;
-
-        //         cmd.Parameters.AddWithValue("@P_PROANO", subProyecto.ProAno);
-        //         cmd.Parameters.AddWithValue("@P_PROCOD", subProyecto.ProCod);
-        //         cmd.Parameters.AddWithValue("@P_SUBPROANO", subProyecto.SubProAno);
-        //         cmd.Parameters.AddWithValue("@P_SUBPROCOD", subProyecto.SubProCod);
-        //         cmd.Parameters.AddWithValue("@P_SUBPRONOM", subProyecto.SubProNom);
-        //         cmd.Parameters.AddWithValue("@P_SUBPROSAP", subProyecto.SubProSap);
-        //         cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
-        //         cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
-        //         cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
-        //         cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
-        //         cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
-        //         cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
-
-        //         SqlParameter pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
-        //         pDescripcionMensaje.Direction = ParameterDirection.Output;
-        //         cmd.Parameters.Add(pDescripcionMensaje);
-
-        //         SqlParameter pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
-        //         pTipoMensaje.Direction = ParameterDirection.Output;
-        //         cmd.Parameters.Add(pTipoMensaje);
-
-        //         cmd.ExecuteNonQuery();
-
-        //         mensaje = pDescripcionMensaje.Value.ToString();
-        //         tipoMensaje = pTipoMensaje.Value.ToString();
-        //     }
-        //     catch (SqlException ex)
-        //     {
-        //         mensaje = ex.Message;
-        //         tipoMensaje = "1";
-        //     }
-        //     finally
-        //     {
-        //         cn.getcn.Close();
-        //     }
-        //     return (mensaje, tipoMensaje);
-        // }
         public (string? message, string? messageType) Eliminar(ClaimsIdentity? identity, SubProyecto subProyecto)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
@@ -306,7 +258,8 @@ namespace SistemaMEAL.Modulos
                         cmd.Parameters.AddWithValue("@P_PROCOD", subProyecto.ProCod);
                         cmd.Parameters.AddWithValue("@P_SUBPRONOM", subProyecto.SubProNom);
                         cmd.Parameters.AddWithValue("@P_SUBPROSAP", subProyecto.SubProSap);
-                        cmd.Parameters.AddWithValue("@P_SUBPRORES", subProyecto.SubProRes);
+                        cmd.Parameters.AddWithValue("@P_USUANO", subProyecto.UsuAno);
+                        cmd.Parameters.AddWithValue("@P_USUCOD", subProyecto.UsuCod);
                         cmd.Parameters.AddWithValue("@P_SUBPROPERANOINI", subProyecto.SubProPerAnoIni);
                         cmd.Parameters.AddWithValue("@P_SUBPROPERMESINI", subProyecto.SubProPerMesIni);
                         cmd.Parameters.AddWithValue("@P_SUBPROPERANOFIN", subProyecto.SubProPerAnoFin);
@@ -613,7 +566,8 @@ namespace SistemaMEAL.Modulos
                             cmd.Parameters.AddWithValue("@P_SUBPRONOM", (object)DBNull.Value);
                             cmd.Parameters.AddWithValue("@P_SUBPROSAP", (object)DBNull.Value);
                             cmd.Parameters.AddWithValue("@P_SUBPROINVSUBACT", (object)DBNull.Value);
-                            cmd.Parameters.AddWithValue("@P_SUBPRORES", (object)DBNull.Value);
+                            cmd.Parameters.AddWithValue("@P_USUANO", (object)DBNull.Value);
+                            cmd.Parameters.AddWithValue("@P_USUCOD", (object)DBNull.Value);
                             cmd.Parameters.AddWithValue("@P_SUBPROPERANOINI", (object)DBNull.Value);
                             cmd.Parameters.AddWithValue("@P_SUBPROPERMESINI", (object)DBNull.Value);
                             cmd.Parameters.AddWithValue("@P_SUBPROPERANOFIN", (object)DBNull.Value);
@@ -769,7 +723,8 @@ namespace SistemaMEAL.Modulos
                             cmd.Parameters.AddWithValue("@P_PROCOD", subProyecto.ProCod);
                             cmd.Parameters.AddWithValue("@P_SUBPRONOM", subProyecto.SubProNom);
                             cmd.Parameters.AddWithValue("@P_SUBPROSAP", subProyecto.SubProSap);
-                            cmd.Parameters.AddWithValue("@P_SUBPRORES", subProyecto.SubProRes);
+                            cmd.Parameters.AddWithValue("@P_USUANO", subProyecto.UsuAno);
+                            cmd.Parameters.AddWithValue("@P_USUCOD", subProyecto.UsuCod);
                             cmd.Parameters.AddWithValue("@P_SUBPROPERANOINI", subProyecto.SubProPerAnoIni);
                             cmd.Parameters.AddWithValue("@P_SUBPROPERMESINI", subProyecto.SubProPerMesIni);
                             cmd.Parameters.AddWithValue("@P_SUBPROPERANOFIN", subProyecto.SubProPerAnoFin);

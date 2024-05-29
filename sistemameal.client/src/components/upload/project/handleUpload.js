@@ -197,6 +197,7 @@ export const handleUpload = async (file, setTableData, setPostData, setIsValid, 
                 const cellValueForUni = row.getCell(29).text.trim();
                 const cellValueForTipVal = row.getCell(30).text.trim();
                 const cellValueForInvSubAct = row.getCell(31).text.trim();
+                const cellValueForRes = row.getCell(32).text.trim();
 
                 const cell = row.getCell(colNumber);
                 const cellValue = cell.text.trim();
@@ -215,6 +216,9 @@ export const handleUpload = async (file, setTableData, setPostData, setIsValid, 
                         subprojectData[databaseKey] = cellValueForProMesFin;
                     } else if (databaseKey === 'subProInvSubAct') {
                         subprojectData[databaseKey] = cellValueForInvSubAct;
+                    } else if (databaseKey === 'subProRes') {
+                        subprojectData['usuAno'] = cellValueForRes.slice(0,4);
+                        subprojectData['usuCod'] = cellValueForRes.slice(4);
                     } else {
                         subprojectData[databaseKey] = cellValue;
                     }

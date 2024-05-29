@@ -69,7 +69,7 @@ const Indicator = () => {
     return (
         <>
             <div className="flex flex-column p1 gap_25 flex-grow-1 overflow-auto indicator-block">
-                <h3>Listado de Indicadores</h3>
+                <h3>Listado de Actividades o Indicadores</h3>
                 <div className="flex gap_5 p_25">
                     {/* Componente para la entrada de búsqueda con etiquetas */}
                     <SearchInput
@@ -109,7 +109,7 @@ const Indicator = () => {
                 estadoEditado={estadoEditado}
                 closeModal={closeModal} 
                 setData={setData}
-                title='Indicador'
+                title='Actividad o Indicador'
                 unidades={unidades}
                 tiposDeValor={tiposDeValor}
             />  

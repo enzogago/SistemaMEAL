@@ -8,6 +8,8 @@ import logo from '../../img/Logo_Normal.webp';
 import portadaLogin from '../../img/PowerMas_Portada_Login.webp';
 
 import CryptoJS from 'crypto-js';
+import EyeIcon from '../../icons/EyeIcon';
+import EyeOffIcon from '../../icons/EyeOffIcon';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -17,8 +19,12 @@ const Login = () => {
     // States locales
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-
+    const [showPassword, setShowPassword] = useState(false);
     const [rememberMe, setRememberMe] = useState(false);
+
+    const toggleShowPassword = () => {
+        setShowPassword(!showPassword);
+    };
 
     useEffect(() => {
         setMenuData([]);
@@ -90,7 +96,6 @@ const Login = () => {
         }
        
     };
-    
 
     return (
         <section className="container-fluid allvh PowerMas_ParentLogin">
@@ -111,8 +116,8 @@ const Login = () => {
                                         Tu plataforma central para gestionar y monitorear proyectos de AEA Ecuador. Explora de forma intuitiva el registro y seguimiento de beneficiarios, metas y presupuestos, garantizando una experiencia fácil y eficiente.
                                     </font>
                                 </p>
-
-                                <form id="formulario" className="left" autoComplete="on">
+                                <br />
+                                <form id="formulario" className="left flex flex-column gap_25" autoComplete="on">
                                     <input
                                         aria-label='Correo Electronico'
                                         id="txtCorreoElectronico" 
@@ -125,17 +130,22 @@ const Login = () => {
                                         maxLength="50" 
                                         autoComplete="email" 
                                     />
-                                    <input
-                                        aria-label="Contraseña"
-                                        id="txtPassword" 
-                                        value={password}
-                                        onChange={e => setPassword(e.target.value)} 
-                                        className="block PowerMas_InputLogin Medium-f1 Small-f_75" 
-                                        placeholder="Password" 
-                                        type="password" 
-                                        name="txtPassword" 
-                                        autoComplete="current-password" 
-                                    />
+                                    <div className='flex relative ai-center'>
+                                        <input
+                                            aria-label="Contraseña"
+                                            id="txtPassword" 
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            className="block PowerMas_InputLogin Medium-f1 Small-f_75" 
+                                            placeholder="Password" 
+                                            type={showPassword ? 'text' : 'password'}
+                                            name="txtPassword" 
+                                            autoComplete="current-password" 
+                                        />
+                                        <span className='flex pointer f1_5' style={{position: 'absolute', right: 0}} onClick={toggleShowPassword}>
+                                            {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+                                        </span>
+                                    </div>
                                     <p className="p2 Small-p0 Small-f_75 Large-f1 Medium-f_75 PowerMas_RememberMe">
                                         <label className='flex gap_5' >
                                             <input 

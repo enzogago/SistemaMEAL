@@ -8,6 +8,7 @@ import FaRegObjectGroup from "../../icons/FaRegObjectGroup";
 import FaFlag from "../../icons/FaFlag";
 import FaMosque from "../../icons/FaMosque";
 import FaSquare from "../../icons/FaSquare";
+import FaAdministration from "../../icons/FaAdministration";
 
 const componentMap = {
     'FaProjectDiagram': FaProjectDiagram,
@@ -18,7 +19,8 @@ const componentMap = {
     'FaRegObjectGroup': FaRegObjectGroup,
     'FaFlag': FaFlag,
     'FaMosque': FaMosque,
-    'FaSquare': FaSquare
+    'FaSquare': FaSquare,
+    'FaAdministration': FaAdministration
 };
 
 

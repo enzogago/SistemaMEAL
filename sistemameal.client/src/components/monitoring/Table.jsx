@@ -312,7 +312,7 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                     |   
                 </span>
                 <div style={{border: '1px solid #F7CEAD', borderRadius: '5px'}} className="Phone_2 flex ai-center relative">
-                    <span style={{position: 'absolute', left: 15}}>
+                    <span className='flex' style={{position: 'absolute', left: 15}}>
                         <IconCalendar />
                     </span>
                     <input 
@@ -328,7 +328,7 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                     -
                 </span>
                 <div style={{border: '1px solid #F7CEAD', borderRadius: '5px'}} className="Phone_2 flex ai-center relative">
-                    <span style={{position: 'absolute', left: 15}}>
+                    <span className='flex' style={{position: 'absolute', left: 15}}>
                         <IconCalendar />
                     </span>
                     <input 

@@ -33,6 +33,8 @@ namespace SistemaMEAL.Server.Models
         public String? SubProAno { get; set; }
         public String? SubProCod { get; set; }
         public String? SubProSap { get; set; }
+        public String? ProAno { get; set; }
+        public String? ProCod { get; set; }
         public String? ProNom { get; set; }
         public String? ProIde { get; set; }
         public String? SubProRes { get; set; }

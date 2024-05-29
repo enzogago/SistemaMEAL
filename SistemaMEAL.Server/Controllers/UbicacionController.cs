@@ -19,6 +19,30 @@ namespace SistemaMEAL.Server.Controllers
             _usuarios = usuarios;
         }
 
+        [HttpGet("todos")]
+        public dynamic Buscar()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var result = _ubicaciones.Buscar(identity);
+            return Ok(result);
+        }
+
+        [HttpGet("activo")]
+        public dynamic BuscarUbicacionesActivo()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var result = _ubicaciones.Buscar(identity, ubiEst:"A");
+            return Ok(result);
+        }
+
         [HttpGet]
         public dynamic BuscarPaises()
         {
@@ -68,6 +92,29 @@ namespace SistemaMEAL.Server.Controllers
             return Ok(ubicaciones);
         }
 
+        [HttpPost]
+        [Route("acceso")]
+        public dynamic AccesoUbicaciones(UbicacionDto ubicacionDto)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var (message, messageType) = _ubicaciones.AccesoUbicaciones(identity, ubicacionDto.UbicacionActivo, ubicacionDto.UbicacionInactivo);
+            if (messageType == "1")
+            {
+                return new BadRequestObjectResult(new { success = false, message });
+            }
+            else if (messageType == "2")
+            {
+                return new ConflictObjectResult(new { success = false, message });
+            }
+            else
+            {
+                return new OkObjectResult(new { success = true, message });
+            }
+        }
 
     }
 

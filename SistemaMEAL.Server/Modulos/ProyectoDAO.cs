@@ -599,7 +599,8 @@ namespace SistemaMEAL.Modulos
                             cmd.Parameters.AddWithValue("@P_PROCOD", subproyecto.ProCod);
                             cmd.Parameters.AddWithValue("@P_SUBPRONOM", subproyecto.SubProNom);
                             cmd.Parameters.AddWithValue("@P_SUBPROSAP", subproyecto.SubProSap);
-                            cmd.Parameters.AddWithValue("@P_SUBPRORES", subproyecto.SubProRes);
+                            cmd.Parameters.AddWithValue("@P_USUANO", subproyecto.UsuAno);
+                            cmd.Parameters.AddWithValue("@P_USUCOD", subproyecto.UsuCod);
                             cmd.Parameters.AddWithValue("@P_SUBPROPERANOINI", subproyecto.SubProPerAnoIni);
                             cmd.Parameters.AddWithValue("@P_SUBPROPERMESINI", subproyecto.SubProPerMesIni);
                             cmd.Parameters.AddWithValue("@P_SUBPROPERANOFIN", subproyecto.SubProPerAnoFin);

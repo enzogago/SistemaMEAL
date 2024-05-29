@@ -228,6 +228,7 @@ const ViewExecution = () => {
 
     return (
         <div className='p1 flex flex-column flex-grow-1 overflow-auto'>
+            <h1 className="Large-f1_5"> Reporte de Gasto vs Presupuesto </h1>
             <div className='flex jc-space-between gap-1 p_5'>
                 <select 
                     id='subproyecto'

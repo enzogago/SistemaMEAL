@@ -278,6 +278,19 @@ namespace SistemaMEAL.Server.Controllers
         }
 
         [HttpGet]
+        [Route("coordinador")]
+        public dynamic BuscarUsuariosCoordinador()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var usuarios = _usuarios.Listado(identity, rolCod: "02");
+            return Ok(usuarios);
+        }
+
+        [HttpGet]
         [Route("forgot-password/{usuCorEle}")]
         public dynamic BuscarUsuarioPorCorreo(string usuCorEle)
         {
@@ -294,7 +307,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
            
-            var usuarios = _usuarios.Listado(identity, usuAno, usuCod);
+            var usuarios = _usuarios.Listado(identity, usuAno:usuAno, usuCod:usuCod);
             var usuarioData = usuarios.FirstOrDefault();
             return Ok(usuarioData);
         }

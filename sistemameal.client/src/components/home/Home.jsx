@@ -241,8 +241,8 @@ const Home = () => {
                 <span className='ai-center Small-none Medium-flex'>
                     |   
                 </span>
-                <div style={{border: '1px solid var(--naranja-ayuda)', borderRadius: '5px'}} className="Phone_3 Medium_2 flex ai-center relative">
-                    <span style={{position: 'absolute', left: 15}}>
+                <div style={{border: '1px solid #FFC658', borderRadius: '5px'}} className="Phone_3 Medium_2 flex ai-center relative">
+                    <span className='flex' style={{position: 'absolute', left: 15}}>
                         <IconCalendar />
                     </span>
                     <input 
@@ -257,8 +257,8 @@ const Home = () => {
                 <span className='flex ai-center'>
                     -
                 </span>
-                <div style={{border: '1px solid var(--naranja-ayuda)', borderRadius: '5px'}} className="Phone_3 Medium_2 flex ai-center relative">
-                    <span style={{position: 'absolute', left: 15}}>
+                <div style={{border: '1px solid #FFC658', borderRadius: '5px'}} className="Phone_3 Medium_2 flex ai-center relative">
+                    <span className='flex' style={{position: 'absolute', left: 15}}>
                         <IconCalendar />
                     </span>
                     <input 

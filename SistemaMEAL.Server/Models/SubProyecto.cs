@@ -27,8 +27,6 @@ namespace SistemaMEAL.Server.Models
 
         [ForeignKey("Proyecto")]
         public String? ProAno { get; set; }
-
-        [ForeignKey("Proyecto")]
         public String? ProCod { get; set; }
         public String? ProIde { get; set; }
         public String? ProNom { get; set; }
@@ -38,6 +36,11 @@ namespace SistemaMEAL.Server.Models
         public String? SubProPerAnoFin { get; set; }
         public String? SubProPerMesFin { get; set; }
         public String? SubProInvSubAct { get; set; }
+        [ForeignKey("Usuario")]
+        public String? UsuAno { get; set; }
+        public String? UsuCod { get; set; }
+        public String? UsuNom { get; set; }
+        public String? UsuApe { get; set; }
         public List<Objetivo>? Objetivos { get; set; }
     }
 }

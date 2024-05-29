@@ -32,6 +32,7 @@ const FormSubProject = () => {
     const [ locationSelects, setLocationSelects ] = useState([{ count: 1, selects: [] }]);
     const [ paises, setPaises ] = useState([]);
     const [ proyectos, setProyectos ] = useState([]);
+    const [ usuarios, setUsuarios ] = useState([]);
 
     const [selectedLocationValues, setSelectedLocationValues] = useState([]);
     const [selectedCountryValues, setSelectedCountryValues] = useState([]);
@@ -206,6 +207,7 @@ const FormSubProject = () => {
                 fetchData('Financiador',setFinanciadores),
                 fetchData('Ubicacion', setPaises),
                 fetchData('Proyecto', setProyectos),
+                fetchData('Usuario/coordinador', setUsuarios),
             ]);
         };
     
@@ -230,10 +232,11 @@ const FormSubProject = () => {
                             return;
                         }
      
-                        setInitialSubProject({...data, proyecto: JSON.stringify({ proAno: data.proAno, proCod: data.proCod })})
+                        setInitialSubProject({...data, proyecto: JSON.stringify({ proAno: data.proAno, proCod: data.proCod }), usuario: JSON.stringify({ usuAno: data.usuAno, usuCod: data.usuCod })})
                         reset(data);
                         // Establece el valor inicial del select de proyecto
                         setValue('proyecto', JSON.stringify({ proAno: data.proAno, proCod: data.proCod }));
+                        setValue('usuario', JSON.stringify({ usuAno: data.usuAno, usuCod: data.usuCod }));
                     } catch (error) {
                         console.error('Error:', error);
                     } finally {
@@ -465,11 +468,14 @@ const FormSubProject = () => {
             console.log(hasSubProjectChanged);
 
             const {proAno, proCod} = JSON.parse(data.proyecto)
+            const {usuAno, usuCod} = JSON.parse(data.usuario)
             const SubProyectoImplementadorDto = {
                 SubProyecto: hasSubProjectChanged ? {
                     ...data,
                     proAno,
-                    proCod
+                    proCod,
+                    usuAno,
+                    usuCod
                 } : null,
                 SubProyectoFinanciadores: selectValuesFin,
                 SubProyectoImplementadores: selectValues,
@@ -482,15 +488,6 @@ const FormSubProject = () => {
 
     const handleSubmit = async (data, isEditing, navigate) => {
         const method = isEditing ? 'PUT' : 'POST';
-        let newData = {...data}; // Crea una copia de data
-        if (newData.SubProyecto) {
-            for (let key in newData.SubProyecto) {
-                if (typeof newData.SubProyecto[key] === 'string') {
-                    // Convierte cada cadena a mayúsculas
-                    newData.SubProyecto[key] = newData.SubProyecto[key].toUpperCase();
-                }
-            }
-        }
 
         try {
             Notiflix.Loading.pulse();
@@ -501,7 +498,7 @@ const FormSubProject = () => {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify(newData),
+                body: JSON.stringify(data),
             });
             console.log(response)
             const dataResult = await response.json();
@@ -708,28 +705,33 @@ const FormSubProject = () => {
                         )}
                     </div>
                     <div className="m_75">
-                        <label htmlFor="subProRes" className="">
+                        <label htmlFor="usuario" className="">
                             Responsable del Sub proyecto
                         </label>
-                        <input type="text"
-                            id="subProRes"
-                            className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.subProRes || isSubmitted ? (errors.subProRes ? 'invalid' : 'valid') : ''}`} 
-                            placeholder="Andres Eras"
-                            autoComplete='off'
-                            {...register('subProRes', { 
-                                required: 'El campo es requerido',
-                                pattern: {
-                                    value: /^[A-Za-zñÑáéíóúÁÉÍÓÚüÜ/\s-_]+$/,
-                                    message: 'Por favor, introduce solo letras y espacios',
-                                },
-                                minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
-                            })} 
-                        />
-                        {errors.subProRes ? (
-                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.subProRes.message}</p>
+                        <select 
+                            id='usuario'
+                            className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.usuario || isSubmitted ? (errors.usuario ? 'invalid' : 'valid') : ''}`} 
+                            {...register('usuario', { 
+                                validate: {
+                                    required: value => value !== '0' || 'El campo es requerido',
+                                }
+                            })}
+                        >
+                            <option value="0">--Seleccione Responsable--</option>
+                            {usuarios.map((item, index) => (
+                                <option
+                                    key={index} 
+                                    value={JSON.stringify({ usuAno: item.usuAno, usuCod: item.usuCod })}
+                                > 
+                                    {item.usuNom+' '+item.usuApe}   
+                                </option>
+                            ))}
+                        </select>
+                        {errors.usuario ? (
+                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.usuario.message}</p>
                         ) : (
                             <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                            Espacio reservado para el mensaje de error
+                                Espacio reservado para el mensaje de error
                             </p>
                         )}
                     </div>
@@ -743,7 +745,7 @@ const FormSubProject = () => {
                                     type="radio" 
                                     id="si" 
                                     name="subProInvSubAct" 
-                                    value="s"
+                                    value="S"
                                     {...register('subProInvSubAct', { required: 'Por favor, selecciona una opción' })}
                                 />
                                 <label htmlFor="si">Si</label>
@@ -753,7 +755,7 @@ const FormSubProject = () => {
                                     type="radio" 
                                     id="no" 
                                     name="subProInvSubAct" 
-                                    value="n"
+                                    value="N"
                                     {...register('subProInvSubAct', { required: 'Por favor, selecciona una opción' })}
                                 />
                                 <label htmlFor="no">No</label>
