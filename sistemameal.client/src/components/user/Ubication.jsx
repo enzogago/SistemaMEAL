@@ -74,9 +74,6 @@ const Ubication = () => {
             const treeData = transformMenuData(data)
             setUbicaciones(treeData)
 
-            const allKeys = generarClavesDeAcceso(data);
-            setExpandedKeys(allKeys);
-
             const userAccessKeys = generarClavesDeAcceso(dataAccess);
             setCheckedKeys(userAccessKeys);
             setInitialCheckedKeys(userAccessKeys);
@@ -91,35 +88,48 @@ const Ubication = () => {
     
     }, [refresh]);
 
+
+    const getAllParents = (node, treeData) => {
+        let parents = [];
+        for (let i = 0; i < treeData.length; i++) {
+            if (treeData[i].key === node.key) {
+                return parents;
+            }
+            if (treeData[i].children) {
+                parents.push(treeData[i].key);
+                let foundParents = getAllParents(node, treeData[i].children);
+                if (foundParents) {
+                    return parents.concat(foundParents);
+                }
+                parents.pop();
+            }
+        }
+        return null;
+    };
+
     const onCheck = (checkedKeysValue, e) => {
         let newCheckedKeys = [...checkedKeysValue.checked];
         if (e.checked) {
-            let keyParts = e.node.key.split('-');
-            // Comprueba si el nodo marcado es un nodo de primer nivel (nodo principal)
-            if (keyParts.length === 2) {
-                // Si es un nodo principal, añade todas las claves de sus descendientes
-                let nodeAndAllDescendants = getAllDescendants(e.node);
-                // Asegúrate de que no estás añadiendo claves duplicadas
-                nodeAndAllDescendants.forEach(key => {
-                    if (!newCheckedKeys.includes(key)) {
-                        newCheckedKeys.push(key);
-                    }
-                });
-            } else {
-                // Si no es un nodo principal, solo añade las claves de los nodos padres
-                for (let i = 0; i < keyParts.length; i += 2) {
-                    let parentKey = keyParts.slice(0, i+2).join('-');
-                    if (!newCheckedKeys.includes(parentKey)) {
-                        newCheckedKeys.push(parentKey);
-                    }
+            let nodeAndAllDescendants = getAllDescendants(e.node);
+            let nodeAndAllParents = getAllParents(e.node, ubicaciones);
+            nodeAndAllDescendants.forEach(key => {
+                if (!newCheckedKeys.includes(key)) {
+                    newCheckedKeys.push(key);
                 }
-            }
+            });
+            nodeAndAllParents.forEach(key => {
+                if (!newCheckedKeys.includes(key)) {
+                    newCheckedKeys.push(key);
+                }
+            });
         } else {
             let nodeAndAllDescendants = getAllDescendants(e.node);
             newCheckedKeys = newCheckedKeys.filter(key => !nodeAndAllDescendants.includes(key));
         }
         setCheckedKeys(newCheckedKeys);
-    };
+};
+
+    
     
     const getAllDescendants = (node) => {
         let descendants = [node.key];
@@ -192,7 +202,7 @@ const Ubication = () => {
     return (
         <>
            <div className="flex flex-column flex-grow-1 overflow-auto p1_25 gap_5">
-                <h3 className="center">Administrar Ubicaciones</h3>
+                <h3 className="">Administrar Ubicaciones</h3>
                 <div className="flex flex-grow-1 Large_12 gap-1 overflow-auto">
                     <div className="PowerMas_ListPermission PowerMas_Form_Card Large_12 overflow-auto access-block">
                         <Tree

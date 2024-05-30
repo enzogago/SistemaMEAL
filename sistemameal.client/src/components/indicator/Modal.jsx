@@ -11,6 +11,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
     const [objetivosEspecificos, setObjetivosEspecificos] = useState([]);
     const [resultados, setResultados] = useState([]);
     const [actividades, setActividades] = useState([]);
+    const [subProyectoEnable, setSubProyectoEnable] = useState(false);
     const [objetivoEnable, setObjetivoEnable] = useState(false);
     const [objetivoEspecificoEnable, setObjetivoEspecificoEnable] = useState(false);
     const [resultadoEnable, setResultadoEnable] = useState(false);
@@ -19,6 +20,9 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
     const [objetivosLoaded, setObjetivosLoaded] = useState(false);
     const [objetivosEspecificosLoaded, setObjetivosEspecificosLoaded] = useState(false);
     const [resultadosLoaded, setResultadosLoaded] = useState(false);
+
+    const [ objetivoMode, setObjetivoMode] = useState(true);
+    const [ objetivoEspMode, setObjetivoEspMode] = useState(true);
 
     // Función para extraer todos los indicadores de la fórmula
     const extractIndicators = (formula) => {
@@ -47,6 +51,8 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
     // Función para cerrar el modal y resetear el formulario
     const closeModalAndReset = () => {
         closeModal();
+        setObjetivoEspMode(true);
+        setObjetivoMode(true);
         reset({
             subProyecto: '0',
             objetivo: '0',
@@ -59,6 +65,10 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
             indTipInd: '0',
             indFor: '',
         });
+        setObjetivos([])
+        setObjetivosEspecificos([])
+        setResultados([])
+        setActividades([])
         setObjetivosLoaded(false);
         setObjetivosEspecificosLoaded(false);
         setResultadosLoaded(false);
@@ -79,33 +89,63 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
 
     // Función para manejar el envío del formulario
     const onSubmit = (data) => {
-        data.indFor = replaceIndicatorsWithCodes(data.indFor);
+        const formula = replaceIndicatorsWithCodes(data.indFor);
+        let dataSubmit = {
+            indFor: formula,
+            indNum: data.indNum,
+            indNom: data.indNom,
+            indTipInd: data.indTipInd,
+            tipValCod: data.tipValCod,
+            uniCod: data.uniCod,
+            indAno: data.indAno,
+            indCod: data.indCod,
+            indTotPre: data.indTotPre,
+            actAno: data.actAno,
+            actCod: data.actCod,
+            monCod: data.monCod,
+            indLinBas: data.indLinBas
+        }
 
-        if (involucraSubActividad) {
-            const { actAno, actCod } = JSON.parse(data.actividad);
-            data = {
-                ...data,
-                actAno,
-                actCod
+        if (!objetivoMode && !objetivoEspMode) {
+            const { objAno, objCod } = JSON.parse(data.objetivo);
+            dataSubmit = {
+                ...dataSubmit,
+                objAno,
+                objCod
+            }
+        } else if (objetivoMode && !objetivoEspMode) {
+            const { objEspAno, objEspCod } = JSON.parse(data.objetivoEspecifico);
+            dataSubmit = {
+                ...dataSubmit,
+                objEspAno,
+                objEspCod
             }
         } else {
-            const { resAno, resCod } = JSON.parse(data.resultado);
-            data = {
-                ...data,
-                resAno,
-                resCod
+            if (involucraSubActividad) {
+                const { actAno, actCod } = JSON.parse(data.actividad);
+                dataSubmit = {
+                    ...dataSubmit,
+                    actAno,
+                    actCod
+                }
+            } else {
+                const { resAno, resCod } = JSON.parse(data.resultado);
+                dataSubmit = {
+                    ...dataSubmit,
+                    resAno,
+                    resCod
+                }
             }
         }
+
         const { subProAno, subProCod } = JSON.parse(data.subProyecto);
-        console.log(subProAno)
-        console.log(subProCod)
-        data = {
-            ...data,
+        dataSubmit = {
+            ...dataSubmit,
             subProAno,
             subProCod
         }
-        console.log(data)
-        handleSubmitMant('Indicador', !!estadoEditado, data, setData, closeModalAndReset)
+
+        handleSubmitMant('Indicador', !!estadoEditado, dataSubmit, setData, closeModalAndReset)
     };
 
 
@@ -150,8 +190,33 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
 
     // Efecto para manejar el cambio en el subproyecto seleccionado
     useEffect(() => {
+        const indicador = watch('indTipInd');
+        if (indicador !== '0' && indicador !== '') {
+
+            if (indicador === 'IOB') {
+                setObjetivoMode(false);
+                setObjetivoEspMode(false);
+            } else if (indicador === 'IOE') {
+                setObjetivoMode(true);
+                setObjetivoEspMode(false);
+            } else {
+                setObjetivoMode(true);
+                setObjetivoEspMode(true);
+            }
+            setSubProyectoEnable(true);
+        } else {
+            setObjetivoMode(true);
+            setObjetivoEspMode(true);
+            setValue('subProyecto', '0');
+            setSubProyectoEnable(false);
+        }
+    }, [watch('indTipInd')]);
+    
+    // Efecto para manejar el cambio en el subproyecto seleccionado
+    useEffect(() => {
         const subProyecto = watch('subProyecto');
-        if (subProyecto !== '0' && subProyecto !== '') {
+        if (subProyecto !== '0' && subProyecto !== '' && subProyecto) {
+            console.log(subProyecto)
             const { subProAno, subProCod, subProInvSubAct } = JSON.parse(subProyecto);
             console.log(subProInvSubAct)
             fetchData(`Objetivo/subproyecto/${subProAno}/${subProCod}`, (data) => {
@@ -168,6 +233,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                 setInvolucraSubActividad(false);
             }
             fetchData(`Indicador/subproyecto-actividad/${subProAno}/${subProCod}`, (data) => {
+                console.log(data)
                 setIndicadoresSelect(data);
                 if (estadoEditado) {
                     const newIndFor = replaceCodesWithIndicators(estadoEditado.indFor, data);
@@ -222,12 +288,11 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
     // Efecto para manejar la edición del estado
     useEffect(() => {
         if (estadoEditado && objetivosLoaded) {
+            console.log(estadoEditado)
             const { objAno, objCod } = estadoEditado;
             setValue('objetivo', JSON.stringify({ objAno, objCod }));
         }
     }, [estadoEditado, objetivosLoaded, setValue]);
-
-
 
     const [indicadoresSelect, setIndicadoresSelect] = useState([])
 
@@ -256,6 +321,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
     // Efecto para manejar la edición del estado
     useEffect(() => {
         if (estadoEditado) {
+            console.log(estadoEditado)
             reset(estadoEditado);
         }
     }, [estadoEditado, reset, setValue]);
@@ -277,11 +343,172 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
     
     return (
         <div className={`PowerMas_Modal ${modalVisible ? 'show' : ''}`}>
-            <div className="PowerMas_ModalContent flex flex-column" style={{width: '80%'}}>
+            <div className="PowerMas_ModalContent flex flex-column" style={{maxWidth: '80%',width: '60%'}}>
                 <span className="PowerMas_CloseModal" onClick={closeModalAndReset}>×</span>
                 <h2 className="PowerMas_Title_Modal center f1_5">{estadoEditado ? 'Editar' : 'Nuevo'} {title}</h2>
                 <form className='Large-f1 PowerMas_FormStatus flex flex-column gap_3 flex-grow-1 overflow-auto' onSubmit={validateForm(onSubmit)}>
                     <div className='flex flex-row gap-1'>
+                    <div className='Large_6'>
+                            <div>
+                                <label htmlFor='indTipInd' className="">
+                                    Seleccione si el registro es Actividad o Indicador:
+                                </label>
+                                <select 
+                                    id='indTipInd'
+                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.indTipInd || isSubmitted ? (errors.indTipInd ? 'invalid' : 'valid') : ''}`} 
+                                    {...register('indTipInd', { 
+                                        validate: {
+                                            required: value => value !== '0' || 'El campo es requerido',
+                                        }
+                                    })}
+                                >
+                                    <option value="0">--Seleccione Tipo de Indicador--</option>
+                                    {
+                                        involucraSubActividad ?
+                                        <option value="ISA">Indicador de Sub Actividad</option>
+                                        :
+                                        <option value="IAC">ACTIVIDAD</option>
+                                    }
+                                    <option value="IRE">INDICADOR DE RESULTADO</option>
+                                    <option value="IOB">INDICADOR DE OBJETIVO</option>
+                                    <option value="IOE">INDICADOR DE OBJETIVO ESPECÍFICO</option>
+                                </select>
+                                {errors.indTipInd ? (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.indTipInd.message}</p>
+                                ) : (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                        Espacio reservado para el mensaje de error
+                                    </p>
+                                )}
+                            </div>
+                            <div className="flex flex-column">
+                                <label className="" htmlFor='indNum'>
+                                    Código de Actividad o Indicador
+                                </label>
+                                <input 
+                                    id="indNum"
+                                    className={`PowerMas_Modal_Form_${dirtyFields.indNum || isSubmitted ? (errors.indNum ? 'invalid' : 'valid') : ''}`}  
+                                    type="text" 
+                                    disabled={!subProyectoEnable}
+                                    placeholder='A1.1.1' 
+                                    maxLength={100} 
+                                    name="indNum" 
+                                    autoComplete='off'
+                                    {...register(
+                                        'indNum', { 
+                                            required: 'El campo es requerido',
+                                            maxLength: { value: 100, message: 'El campo no puede tener más de 100 caracteres' },
+                                            minLength:  { value: 2, message: 'El campo no puede tener menos de 2 caracteres' },
+                                            pattern: {
+                                                value: /^[A-Za-z0-9.\s]+$/,
+                                                message: 'Por favor, introduce solo letras, numeros y puntos',
+                                            },
+                                        }
+                                    )}
+                                />
+                                {errors.indNum ? (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.indNum.message}</p>
+                                ) : (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                        Espacio reservado para el mensaje de error
+                                    </p>
+                                )}
+                            </div>
+                            <div className="">
+                                <label htmlFor="indNom" className="">
+                                    Nombre de Actividad o Indicador
+                                </label>
+                                <input type="text"
+                                    id="indNom"
+                                    disabled={!subProyectoEnable}
+                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.indNom || isSubmitted ? (errors.indNom ? 'invalid' : 'valid') : ''}`} 
+                                    placeholder="Número de personas que se benefician..."
+                                    autoComplete='off'
+                                    maxLength={300}
+                                    {...register('indNom', { 
+                                        required: 'El campo es requerido',
+                                        pattern: {
+                                            value: /^[A-Za-zñÑáéíóúÁÉÍÓÚ0-9().,;üÜ/\s-%_]+$/,
+                                            message: 'Por favor, introduce caracteres válidos.',
+                                        },
+                                        minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
+                                        maxLength: { value: 300, message: 'El campo no puede tener más de 300 caracteres' },
+                                    })} 
+                                />
+                                {errors.indNom ? (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.indNom.message}</p>
+                                ) : (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                    Espacio reservado para el mensaje de error
+                                    </p>
+                                )}
+                            </div>
+                            
+                            <div>
+                                <label htmlFor='uniCod' className="">
+                                    Unidad:
+                                </label>
+                                <select 
+                                    id='uniCod'
+                                    disabled={!subProyectoEnable}
+                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.uniCod || isSubmitted ? (errors.uniCod ? 'invalid' : 'valid') : ''}`} 
+                                    {...register('uniCod', { 
+                                        validate: {
+                                            required: value => value !== '0' || 'El campo es requerido',
+                                        }
+                                    })}
+                                >
+                                    <option value="0">--Seleccione Unidad--</option>
+                                    {unidades.map((item, index) => (
+                                        <option 
+                                            key={index} 
+                                            value={item.uniCod}
+                                        > 
+                                            {item.uniNom}
+                                        </option>
+                                    ))}
+                                </select>
+                                {errors.uniCod ? (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.uniCod.message}</p>
+                                ) : (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                        Espacio reservado para el mensaje de error
+                                    </p>
+                                )}
+                            </div>
+                            <div>
+                                <label htmlFor='tipValCod' className="">
+                                    Tipo de Valor:
+                                </label>
+                                <select 
+                                    id='tipValCod'
+                                    disabled={!subProyectoEnable}
+                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.tipValCod || isSubmitted ? (errors.tipValCod ? 'invalid' : 'valid') : ''}`} 
+                                    {...register('tipValCod', { 
+                                        validate: {
+                                            required: value => value !== '0' || 'El campo es requerido',
+                                        }
+                                    })}
+                                >
+                                    <option value="0">--Seleccione Tipo de Valor--</option>
+                                    {tiposDeValor.map((item, index) => (
+                                        <option 
+                                            key={index} 
+                                            value={item.tipValCod}
+                                        > 
+                                            {item.tipValNom}
+                                        </option>
+                                    ))}
+                                </select>
+                                {errors.tipValCod ? (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.tipValCod.message}</p>
+                                ) : (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                        Espacio reservado para el mensaje de error
+                                    </p>
+                                )}
+                            </div>
+                        </div>
                         <div className='Large_6'>
                             <div>
                                 <label htmlFor='subProyecto' className="">
@@ -289,6 +516,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                                 </label>
                                 <select 
                                     id='subProyecto'
+                                    disabled={!subProyectoEnable}
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.subProyecto || isSubmitted ? (errors.subProyecto ? 'invalid' : 'valid') : ''}`} 
                                     {...register('subProyecto', { 
                                         validate: {
@@ -350,275 +578,129 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                                     </p>
                                 )}
                             </div>
-                            <div>
-                                <label htmlFor='objetivoEspecifico' className="">
-                                    Objetivo Específico:
-                                </label>
-                                <select 
-                                    id='objetivoEspecifico'
-                                    disabled={!objetivoEspecificoEnable}
-                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.objetivoEspecifico || isSubmitted ? (errors.objetivoEspecifico ? 'invalid' : 'valid') : ''}`} 
-                                    {...register('objetivoEspecifico', { 
-                                        validate: {
-                                            required: value => value !== '0' || 'El campo es requerido',
-                                        }
-                                    })}
-                                >
-                                    <option value="0">--Seleccione Objetivo Específico--</option>
-                                    {objetivosEspecificos.map((item, index) => {
-                                        const text = item.objEspNom;
-                                        const shortText = text.length > 40 ? text.substring(0, 40) + '...' : text;
-                                        return(
-                                            <option 
-                                                key={index} 
-                                                value={JSON.stringify({ objEspAno: item.objEspAno, objEspCod: item.objEspCod })}
-                                            > 
-                                                {item.objEspNum + ' - ' + shortText}
-                                            </option>
-                                        )
-                                    })}
-                                </select>
-                                {errors.objetivoEspecifico ? (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.objetivoEspecifico.message}</p>
-                                ) : (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                        Espacio reservado para el mensaje de error
-                                    </p>
-                                )}
-                            </div>
-                            <div>
-                                <label htmlFor='resultado' className="">
-                                    Resultado:
-                                </label>
-                                <select 
-                                    id='resultado'
-                                    disabled={!resultadoEnable}
-                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.resultado || isSubmitted ? (errors.resultado ? 'invalid' : 'valid') : ''}`} 
-                                    {...register('resultado', { 
-                                        validate: {
-                                            required: value => value !== '0' || 'El campo es requerido',
-                                        }
-                                    })}
-                                >
-                                    <option value="0">--Seleccione Resultado--</option>
-                                    {resultados.map((item, index) => {
-                                        const text = item.resNom;
-                                        const shortText = text.length > 40 ? text.substring(0, 40) + '...' : text;
-                                        return(
-                                            <option 
-                                                key={index} 
-                                                value={JSON.stringify({ resAno: item.resAno, resCod: item.resCod })}
-                                            > 
-                                                {item.resNum + ' - ' + shortText}
-                                            </option>
-                                        )
-                                    })}
-                                </select>
-                                {errors.resultado ? (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.resultado.message}</p>
-                                ) : (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                        Espacio reservado para el mensaje de error
-                                    </p>
-                                )}
-                            </div>
                             {
-                                involucraSubActividad &&
-                                <div>
-                                    <label htmlFor='actividad' className="">
-                                        Actividad:
-                                    </label>
-                                    <select 
-                                        id='actividad'
-                                        disabled={!resultadoEnable}
-                                        className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.actividad || isSubmitted ? (errors.actividad ? 'invalid' : 'valid') : ''}`} 
-                                        {...register('actividad', { 
-                                            validate: {
-                                                required: value => value !== '0' || 'El campo es requerido',
+                                objetivoMode &&
+                                <>
+                                    <div>
+                                        <label htmlFor='objetivoEspecifico' className="">
+                                            Objetivo Específico:
+                                        </label>
+                                        <select 
+                                            id='objetivoEspecifico'
+                                            disabled={!objetivoEspecificoEnable}
+                                            className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.objetivoEspecifico || isSubmitted ? (errors.objetivoEspecifico ? 'invalid' : 'valid') : ''}`} 
+                                            {...register('objetivoEspecifico', { 
+                                                validate: {
+                                                    required: value => value !== '0' || 'El campo es requerido',
+                                                }
+                                            })}
+                                        >
+                                            <option value="0">--Seleccione Objetivo Específico--</option>
+                                            {objetivosEspecificos.map((item, index) => {
+                                                const text = item.objEspNom;
+                                                const shortText = text.length > 40 ? text.substring(0, 40) + '...' : text;
+                                                return(
+                                                    <option 
+                                                        key={index} 
+                                                        value={JSON.stringify({ objEspAno: item.objEspAno, objEspCod: item.objEspCod })}
+                                                    > 
+                                                        {item.objEspNum + ' - ' + shortText}
+                                                    </option>
+                                                )
+                                            })}
+                                        </select>
+                                        {errors.objetivoEspecifico ? (
+                                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.objetivoEspecifico.message}</p>
+                                        ) : (
+                                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                                Espacio reservado para el mensaje de error
+                                            </p>
+                                        )}
+                                    </div>
+                                    {
+                                        objetivoEspMode &&
+                                        <>
+                                            <div>
+                                                <label htmlFor='resultado' className="">
+                                                    Resultado:
+                                                </label>
+                                                <select 
+                                                    id='resultado'
+                                                    disabled={!resultadoEnable}
+                                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.resultado || isSubmitted ? (errors.resultado ? 'invalid' : 'valid') : ''}`} 
+                                                    {...register('resultado', { 
+                                                        validate: {
+                                                            required: value => value !== '0' || 'El campo es requerido',
+                                                        }
+                                                    })}
+                                                >
+                                                    <option value="0">--Seleccione Resultado--</option>
+                                                    {resultados.map((item, index) => {
+                                                        const text = item.resNom;
+                                                        const shortText = text.length > 40 ? text.substring(0, 40) + '...' : text;
+                                                        return(
+                                                            <option 
+                                                                key={index} 
+                                                                value={JSON.stringify({ resAno: item.resAno, resCod: item.resCod })}
+                                                            > 
+                                                                {item.resNum + ' - ' + shortText}
+                                                            </option>
+                                                        )
+                                                    })}
+                                                </select>
+                                                {errors.resultado ? (
+                                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.resultado.message}</p>
+                                                ) : (
+                                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                                        Espacio reservado para el mensaje de error
+                                                    </p>
+                                                )}
+                                            </div>
+                                            {
+                                                involucraSubActividad &&
+                                                <div>
+                                                    <label htmlFor='actividad' className="">
+                                                        Actividad:
+                                                    </label>
+                                                    <select 
+                                                        id='actividad'
+                                                        disabled={!resultadoEnable}
+                                                        className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.actividad || isSubmitted ? (errors.actividad ? 'invalid' : 'valid') : ''}`} 
+                                                        {...register('actividad', { 
+                                                            validate: {
+                                                                required: value => value !== '0' || 'El campo es requerido',
+                                                            }
+                                                        })}
+                                                    >
+                                                        <option value="0">--Seleccione Actividad--</option>
+                                                        {actividades.map((item, index) => {
+                                                            const text = item.actNom;
+                                                            const shortText = text.length > 40 ? text.substring(0, 40) + '...' : text;
+                                                            return(
+                                                                <option 
+                                                                    key={index} 
+                                                                    value={JSON.stringify({ actAno: item.actAno, actCod: item.actCod })}
+                                                                > 
+                                                                    {item.actNum + ' - ' + shortText}
+                                                                </option>
+                                                            )
+                                                        })}
+                                                    </select>
+                                                    {errors.actividad ? (
+                                                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.actividad.message}</p>
+                                                    ) : (
+                                                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                                            Espacio reservado para el mensaje de error
+                                                        </p>
+                                                    )}
+                                                </div>
                                             }
-                                        })}
-                                    >
-                                        <option value="0">--Seleccione Actividad--</option>
-                                        {actividades.map((item, index) => {
-                                            const text = item.actNom;
-                                            const shortText = text.length > 40 ? text.substring(0, 40) + '...' : text;
-                                            return(
-                                                <option 
-                                                    key={index} 
-                                                    value={JSON.stringify({ actAno: item.actAno, actCod: item.actCod })}
-                                                > 
-                                                    {item.actNum + ' - ' + shortText}
-                                                </option>
-                                            )
-                                        })}
-                                    </select>
-                                    {errors.actividad ? (
-                                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.actividad.message}</p>
-                                    ) : (
-                                        <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                            Espacio reservado para el mensaje de error
-                                        </p>
-                                    )}
-                                </div>
+                                        </>
+                                    }
+                                </>
                             }
                         </div>
-                        <div className='Large_6'>
-                            <div>
-                                <label htmlFor='indTipInd' className="">
-                                    Seleccione si el registro es Actividad o Indicador:
-                                </label>
-                                <select 
-                                    id='indTipInd'
-                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.indTipInd || isSubmitted ? (errors.indTipInd ? 'invalid' : 'valid') : ''}`} 
-                                    {...register('indTipInd', { 
-                                        validate: {
-                                            required: value => value !== '0' || 'El campo es requerido',
-                                        }
-                                    })}
-                                >
-                                    <option value="0">--Seleccione Tipo de Indicador--</option>
-                                    {
-                                        involucraSubActividad ?
-                                        <option value="ISA">Indicador de Sub Actividad</option>
-                                        :
-                                        <option value="IAC">ACTIVIDAD</option>
-                                    }
-                                    <option value="IRE">INDICADOR DE RESULTADO</option>
-                                    <option value="IOB">INDICADOR DE OBJETIVO</option>
-                                    <option value="IOE">INDICADOR DE OBJETIVO ESPECÍFICO</option>
-                                </select>
-                                {errors.indTipInd ? (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.indTipInd.message}</p>
-                                ) : (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                        Espacio reservado para el mensaje de error
-                                    </p>
-                                )}
-                            </div>
-                            <div className="flex flex-column">
-                                <label className="" htmlFor='indNum'>
-                                    Código de Actividad o Indicador
-                                </label>
-                                <input 
-                                    id="indNum"
-                                    className={`PowerMas_Modal_Form_${dirtyFields.indNum || isSubmitted ? (errors.indNum ? 'invalid' : 'valid') : ''}`}  
-                                    type="text" 
-                                    placeholder='A1.1.1' 
-                                    maxLength={100} 
-                                    name="indNum" 
-                                    autoComplete='off'
-                                    {...register(
-                                        'indNum', { 
-                                            required: 'El campo es requerido',
-                                            maxLength: { value: 100, message: 'El campo no puede tener más de 100 caracteres' },
-                                            minLength:  { value: 2, message: 'El campo no puede tener menos de 2 caracteres' },
-                                            pattern: {
-                                                value: /^[A-Za-z0-9.\s]+$/,
-                                                message: 'Por favor, introduce solo letras, numeros y puntos',
-                                            },
-                                        }
-                                    )}
-                                />
-                                {errors.indNum ? (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.indNum.message}</p>
-                                ) : (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                        Espacio reservado para el mensaje de error
-                                    </p>
-                                )}
-                            </div>
-                            <div className="">
-                                <label htmlFor="indNom" className="">
-                                    Nombre de Actividad o Indicador
-                                </label>
-                                <input type="text"
-                                    id="indNom"
-                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.indNom || isSubmitted ? (errors.indNom ? 'invalid' : 'valid') : ''}`} 
-                                    placeholder="Número de personas que se benefician..."
-                                    autoComplete='off'
-                                    maxLength={300}
-                                    {...register('indNom', { 
-                                        required: 'El campo es requerido',
-                                        pattern: {
-                                            value: /^[A-Za-zñÑáéíóúÁÉÍÓÚ0-9().,;üÜ/\s-%_]+$/,
-                                            message: 'Por favor, introduce caracteres válidos.',
-                                        },
-                                        minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
-                                        maxLength: { value: 300, message: 'El campo no puede tener más de 300 caracteres' },
-                                    })} 
-                                />
-                                {errors.indNom ? (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.indNom.message}</p>
-                                ) : (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                    Espacio reservado para el mensaje de error
-                                    </p>
-                                )}
-                            </div>
-                            
-                            <div>
-                                <label htmlFor='uniCod' className="">
-                                    Unidad:
-                                </label>
-                                <select 
-                                    id='uniCod'
-                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.uniCod || isSubmitted ? (errors.uniCod ? 'invalid' : 'valid') : ''}`} 
-                                    {...register('uniCod', { 
-                                        validate: {
-                                            required: value => value !== '0' || 'El campo es requerido',
-                                        }
-                                    })}
-                                >
-                                    <option value="0">--Seleccione Unidad--</option>
-                                    {unidades.map((item, index) => (
-                                        <option 
-                                            key={index} 
-                                            value={item.uniCod}
-                                        > 
-                                            {item.uniNom}
-                                        </option>
-                                    ))}
-                                </select>
-                                {errors.uniCod ? (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.uniCod.message}</p>
-                                ) : (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                        Espacio reservado para el mensaje de error
-                                    </p>
-                                )}
-                            </div>
-                            <div>
-                                <label htmlFor='tipValCod' className="">
-                                    Tipo de Valor:
-                                </label>
-                                <select 
-                                    id='tipValCod'
-                                    className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.tipValCod || isSubmitted ? (errors.tipValCod ? 'invalid' : 'valid') : ''}`} 
-                                    {...register('tipValCod', { 
-                                        validate: {
-                                            required: value => value !== '0' || 'El campo es requerido',
-                                        }
-                                    })}
-                                >
-                                    <option value="0">--Seleccione Tipo de Valor--</option>
-                                    {tiposDeValor.map((item, index) => (
-                                        <option 
-                                            key={index} 
-                                            value={item.tipValCod}
-                                        > 
-                                            {item.tipValNom}
-                                        </option>
-                                    ))}
-                                </select>
-                                {errors.tipValCod ? (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.tipValCod.message}</p>
-                                ) : (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                        Espacio reservado para el mensaje de error
-                                    </p>
-                                )}
-                            </div>
-                        </div>
+                        
                     </div>
                     
                     <div className='flex flex-column gap-1 p_5' style={{border: '1px solid black'}}>
@@ -628,6 +710,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                         <select 
                             id=''
                             className=''
+                            disabled={!objetivoEnable}
                             onChange={(event) => {
                                 // Solo agrega el indicador si el valor seleccionado no es 0
                                 if (event.target.value !== '0') {
@@ -649,6 +732,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                             rows="4" cols="50"
                             id="formulaInput"
                             autoComplete='off'
+                            disabled={!subProyectoEnable}
                             placeholder='Ingresa Formula'
                             className={`block PowerMas_Modal_Form_${dirtyFields.indFor   || isSubmitted ? (errors.indFor   ? 'invalid' : 'valid') : ''}`} 
                             {...register('indFor', { 
@@ -693,7 +777,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                     </div>
 
                     <br />
-                    <div className='PowerMas_StatusSubmit flex jc-center ai-center'>
+                    <div className='PowerMas_StatusSubmit flex jc-center ai-center p1' style={{position: 'sticky', bottom: 0, background: '#FFF'}}>
                         <input className='' type="submit" value="Guardar" />
                     </div>
                 </form>

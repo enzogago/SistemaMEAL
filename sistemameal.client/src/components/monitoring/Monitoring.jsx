@@ -9,8 +9,6 @@ import FileExcel from '../../icons/FileExcel';
 import Delete from '../../icons/Delete';
 import { useNavigate } from 'react-router-dom';
 
-
-
 const Monitoring = () => {
     const navigate = useNavigate();
 
@@ -76,9 +74,7 @@ const Monitoring = () => {
                     fileSize: String(file.size)
                 }
             };
-    
-            // Ahora puedes guardar los datos del archivo donde quieras
-            // Por ejemplo, podrías hacer una solicitud a tu servidor para guardar el archivo
+
             try {
                 const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Meta/save-file`, {
                     method: 'POST',

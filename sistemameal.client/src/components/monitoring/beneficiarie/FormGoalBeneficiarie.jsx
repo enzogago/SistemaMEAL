@@ -167,7 +167,7 @@ const FormGoalBeneficiarie = () => {
         setValue, 
         trigger,
         setFocus
-    } = useForm({ mode: "onChange", defaultValues: {benNom: '', benNomApo: '', benApeApo: '', genCod: '0', nacCod: '0'}});
+    } = useForm({ mode: "onChange", defaultValues: {benNom: '', benNomApo: '', benApeApo: ''}});
 
     const pais = watch('pais');
     useEffect(() => {
@@ -193,20 +193,9 @@ const FormGoalBeneficiarie = () => {
 
     const buscarDataMetas = (data) => {
         console.log(data)
-        let newData = {};
-    
-        for (let key in data) {
-            if (typeof data[key] === 'string') {
-                // Convierte cada cadena a minúsculas
-                newData[key] = data[key].toLowerCase();
-            } else {
-                // Mantiene los valores no string tal como están
-                newData[key] = data[key];
-            }
-        }
 
         setDataGoalBeneficiarie(data)
-        reset(newData);
+        reset(data);
         setExisteBeneficiario(true);
         fetchDataTable(data.benAno, data.benCod)
         setModalGoalBeneficiarie(true);
@@ -244,7 +233,7 @@ const FormGoalBeneficiarie = () => {
                         benDir: '',
                         benTel: '0',
                         benTelCon: '0',
-                        genCod: '0',
+                        genCod: '01',
                         nacCod: '0',
                     });
                     setDocumentosAgregados([]);
@@ -267,7 +256,7 @@ const FormGoalBeneficiarie = () => {
                         docIdeBenNum: '',
                         docIdeCod: '0',
                     });
-                    setValue('benAut','s');
+                    setValue('benAut','S');
                     setFocus('benNom');
                     return;
                 }
@@ -323,7 +312,7 @@ const FormGoalBeneficiarie = () => {
                         benDir: '',
                         benTel: '0',
                         benTelCon: '0',
-                        genCod: '0',
+                        genCod: '01',
                         nacCod: '0',
                     });
                     setDocumentosAgregados([]);
@@ -682,7 +671,7 @@ const FormGoalBeneficiarie = () => {
             benSex: '',
             benAut: '',
             benDir: '',
-            genCod: '0',
+            genCod: '01',
             nacCod: '0',
             benTel: '0',
             pais: '0',
@@ -710,7 +699,7 @@ const FormGoalBeneficiarie = () => {
     };
 
     // Observar Cambios de campos registrados
-    const selectedValue = watch('genCod', '0');
+    const selectedValue = watch('genCod', '01');
     const selectedValue2 = watch('nacCod', '0');
     const benSex = watch('benSex');
     const benAut = watch('benAut');
@@ -1037,8 +1026,8 @@ const FormGoalBeneficiarie = () => {
                                                 id="si"
                                                 className="m0"
                                                 name="benAut" 
-                                                disabled={fieldsDisabled && benAut !== 's'}
-                                                value="s" 
+                                                disabled={fieldsDisabled && benAut !== 'S'}
+                                                value="S" 
                                                 {...register('benAut', { required: 'Por favor, selecciona una opción' })}
                                             />
                                             <label htmlFor="si" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} >Si</label>
@@ -1049,8 +1038,8 @@ const FormGoalBeneficiarie = () => {
                                                 id="no" 
                                                 className="m0"
                                                 name="benAut" 
-                                                disabled={fieldsDisabled && benAut !== 'n'}
-                                                value="n" 
+                                                disabled={fieldsDisabled && benAut !== 'N'}
+                                                value="N" 
                                                 {...register('benAut', { required: 'Por favor, selecciona una opción' })}
                                             />
                                             <label style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} htmlFor="no">No</label>
@@ -1080,7 +1069,6 @@ const FormGoalBeneficiarie = () => {
                                 </label>
                                 <input type="text"
                                     id="benNom"
-                                    style={{textTransform: 'capitalize'}}
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benNom || isSubmitted ? (errors.benNom ? 'invalid' : 'valid') : ''}`} 
                                     placeholder="Enzo Fabricio"
                                     autoComplete='off'
@@ -1134,8 +1122,8 @@ const FormGoalBeneficiarie = () => {
                                             type="radio" 
                                             id="masculino" 
                                             name="benSex" 
-                                            disabled={fieldsDisabled && benSex !== 'm'}
-                                            value="m" 
+                                            disabled={fieldsDisabled && benSex !== 'M'}
+                                            value="M" 
                                             {...register('benSex', { required: 'Por favor, selecciona una opción' })}
                                         />
                                         <label htmlFor="masculino" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} >Masculino</label>
@@ -1145,8 +1133,8 @@ const FormGoalBeneficiarie = () => {
                                             type="radio" 
                                             id="femenino" 
                                             name="benSex" 
-                                            disabled={fieldsDisabled && benSex !== 'f'}
-                                            value="f" 
+                                            disabled={fieldsDisabled && benSex !== 'F'}
+                                            value="F" 
                                             {...register('benSex', { required: 'Por favor, selecciona una opción' })}
                                         />
                                         <label style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} htmlFor="femenino">Femenino</label>
@@ -1168,7 +1156,7 @@ const FormGoalBeneficiarie = () => {
                                 <select 
                                     id="genCod" 
                                     disabled={fieldsDisabled}
-                                    style={{ color: selectedValue == '0' ? '#372e2c60' : '#000000', textTransform: 'capitalize'}}
+                                    style={{ color: selectedValue == '0' ? '#372e2c60' : '#000000'}}
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.genCod || isSubmitted ? (errors.genCod ? 'invalid' : 'valid') : ''}`}
                                     name="genCod"
                                     {...register('genCod', { 
@@ -1181,7 +1169,7 @@ const FormGoalBeneficiarie = () => {
                                             key={genero.genCod} 
                                             value={genero.genCod}
                                         > 
-                                            {genero.genNom.toLowerCase()}
+                                            {genero.genNom}
                                         </option>
                                     ))}
                                 </select>
@@ -1243,7 +1231,7 @@ const FormGoalBeneficiarie = () => {
                                 <select 
                                     id="nacCod" 
                                     disabled={fieldsDisabled}
-                                    style={{ color: selectedValue2 == '0' ? '#372e2c60' : '#000000', textTransform: 'capitalize'}}
+                                    style={{ color: selectedValue2 == '0' ? '#372e2c60' : '#000000'}}
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.nacCod || isSubmitted ? (errors.nacCod ? 'invalid' : 'valid') : ''}`} 
                                     {...register('nacCod', { 
                                         validate: value => value !== '0' || 'El campo es requerido' 
@@ -1255,7 +1243,7 @@ const FormGoalBeneficiarie = () => {
                                             key={nacionalidad.nacCod} 
                                             value={nacionalidad.nacCod}
                                         > 
-                                            {nacionalidad.nacNom.toLowerCase()}
+                                            {nacionalidad.nacNom}
                                         </option>
                                     ))}
                                 </select>
@@ -1351,7 +1339,6 @@ const FormGoalBeneficiarie = () => {
                                 <input 
                                     type="text" 
                                     id="benDir"
-                                    style={{textTransform: 'capitalize'}}
                                     autoComplete='off'
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benDir || isSubmitted ? (errors.benDir ? 'invalid' : 'valid') : ''}`} 
                                     placeholder="Dirección del beneficiario"

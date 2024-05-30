@@ -3,6 +3,14 @@ import Edit from "../../icons/Edit";
 import { getMonthYearText, renderCellWithTooltip } from "../reusable/columns";
 import { handleDelete } from "../reusable/fetchs";
 
+const tipoIndicadorMapping = {
+    'IRE': 'Indicador de Resultado',
+    'IAC': 'Indicador de Actividad',
+    'IOB': 'Indicador de Objetivo',
+    'IOE': 'Indicador de Objetivo Específico',
+    'ISA': 'Indicador de Sub Actividad',
+};
+
 export const getColumns = (actions, controller, openModal, setRefresh) => {
     let baseColumns = [
         {
@@ -13,6 +21,11 @@ export const getColumns = (actions, controller, openModal, setRefresh) => {
             header: "Nombre",
             accessorKey: "indNom",
             cell: ({row}) => renderCellWithTooltip([row.original.indNom])
+        },
+        {
+            header: "Tipo",
+            accessorKey: "indTipInd",
+            cell: ({row}) => tipoIndicadorMapping[row.original.indTipInd].toUpperCase()
         },
         {
             header: "Unidad",
@@ -29,12 +42,24 @@ export const getColumns = (actions, controller, openModal, setRefresh) => {
         {
             header: "Resultado",
             accessorKey: "resNum",
-            cell: ({row}) => renderCellWithTooltip([row.original.resNum, row.original.resNom])
+            cell: ({row}) => {
+                if (row.original.resNum == 'NA') {
+                    return '';
+                } else {
+                    renderCellWithTooltip([row.original.resNum, row.original.resNom]);
+                }
+            }
         },
         {
             header: "Objetivo Específico",
             accessorKey: "objEspNum",
-            cell: ({row}) => renderCellWithTooltip([row.original.objEspNum, row.original.objEspNom])
+            cell: ({row}) => {
+                if (row.original.objEspNum == 'NA') {
+                    return '';
+                } else {
+                    return renderCellWithTooltip([row.original.objEspNum, row.original.objEspNom]);
+                }
+            }
         },
         {
             header: "Objetivo",

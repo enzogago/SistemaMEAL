@@ -16,8 +16,7 @@ namespace SistemaMEAL.Server.Models
         public String? ProIde { get; set; }
         public String? SubProSap { get; set; }
         public String? ResNum { get; set; }
-        public String? IndActResNum { get; set; }
-
+        public String? IndNum { get; set; }
         public String? UsuIng { get; set; }
         public DateTime? FecIng { get; set; }
         public String? UsuMod { get; set; }

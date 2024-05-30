@@ -160,33 +160,24 @@ namespace SistemaMEAL.Modulos
                                         throw new Exception(mensaje);
                                     }
 
-                                    cmd = new SqlCommand("SP_BUSCAR_META", cn.getcn);
+                                    cmd = new SqlCommand("SP_BUSCAR_INDICADOR", cn.getcn);
                                     cmd.CommandType = CommandType.StoredProcedure;
-                                    // Aquí puedes agregar los parámetros necesarios para tu procedimiento almacenado
-                                    cmd.Parameters.AddWithValue("@P_METANO", metAno);
-                                    cmd.Parameters.AddWithValue("@P_METCOD", metCod);
-                                    cmd.Parameters.AddWithValue("@P_ESTCOD", (object)DBNull.Value);
-                                    cmd.Parameters.AddWithValue("@P_METMETTEC", (object)DBNull.Value);
-                                    cmd.Parameters.AddWithValue("@P_METEJETEC", (object)DBNull.Value);
-                                    cmd.Parameters.AddWithValue("@P_METPORAVATEC", (object)DBNull.Value);
-                                    cmd.Parameters.AddWithValue("@P_METMETPRE", (object)DBNull.Value);
-                                    cmd.Parameters.AddWithValue("@P_METEJEPRE", (object)DBNull.Value);
-                                    cmd.Parameters.AddWithValue("@P_METPORAVAPRE", (object)DBNull.Value);
-                                    cmd.Parameters.AddWithValue("@P_METMESPLATEC", (object)DBNull.Value);
-                                    cmd.Parameters.AddWithValue("@P_METANOPLATEC", (object)DBNull.Value);
-                                    cmd.Parameters.AddWithValue("@P_METMESPLAPRE", (object)DBNull.Value);
-                                    cmd.Parameters.AddWithValue("@P_METANOPLAPRE", (object)DBNull.Value);
-                                    cmd.Parameters.AddWithValue("@P_METESTPRE", (object)DBNull.Value);
-                                    cmd.Parameters.AddWithValue("@P_IMPCOD", (object)DBNull.Value);
-                                    cmd.Parameters.AddWithValue("@P_UBIANO", (object)DBNull.Value);
-                                    cmd.Parameters.AddWithValue("@P_UBICOD", (object)DBNull.Value);
-                                    cmd.Parameters.AddWithValue("@P_INDANO", (object)DBNull.Value);
-                                    cmd.Parameters.AddWithValue("@P_INDCOD", (object)DBNull.Value);
-                                    cmd.Parameters.AddWithValue("@P_USUANO", (object)DBNull.Value);
-                                    cmd.Parameters.AddWithValue("@P_USUCOD", (object)DBNull.Value);
-                                    cmd.Parameters.AddWithValue("@P_FINCOD", (object)DBNull.Value);
+
+                                    cmd.Parameters.AddWithValue("@P_INDANO", meta.IndAno);
+                                    cmd.Parameters.AddWithValue("@P_INDCOD", meta.IndCod);
                                     cmd.Parameters.AddWithValue("@P_SUBPROANO", (object)DBNull.Value);
                                     cmd.Parameters.AddWithValue("@P_SUBPROCOD", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_ACTANO", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_ACTCOD", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_INDNOM", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_INDNUM", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_INDTIPIND", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_UNICOD", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_TIPVALCOD", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_INDTOTPRE", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_MONCOD", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_INDLINBAS", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_INDFOR", (object)DBNull.Value);
                                     cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                                     cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
                                     cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
@@ -216,11 +207,11 @@ namespace SistemaMEAL.Modulos
                                         }
                                     }
                                     // Deserializa la cadena JSON en una lista de objetos Usuario
-                                    List<Meta>? temporal = JsonConvert.DeserializeObject<List<Meta>>(jsonResult.ToString());
+                                    List<Indicador>? temporal = JsonConvert.DeserializeObject<List<Indicador>>(jsonResult.ToString());
                                     
-                                    Meta metaConsulta = temporal[0];
+                                    Indicador indicadorConsulta = temporal[0];
 
-                                    var accPad = "PROYECTO-" + metaConsulta.ProAno + "-" + metaConsulta.ProCod + "-SUB_PROYECTO-" + metaConsulta.SubProAno + "-" + metaConsulta.SubProCod + "-OBJETIVO-" + metaConsulta.ObjAno + "-" + metaConsulta.ObjCod + "-OBJETIVO_ESPECIFICO-" + metaConsulta.ObjEspAno + "-" + metaConsulta.ObjEspCod + "-RESULTADO-" + metaConsulta.ResAno + "-" + metaConsulta.ResCod + "-ACTIVIDAD-" + metaConsulta.ActAno + "-" + metaConsulta.ActCod + "-INDICADOR-" + metaConsulta.IndAno + "-" + metaConsulta.IndCod + "-META-" + metAno + "-" + metCod;
+                                    var accPad = "PROYECTO-" + indicadorConsulta.ProAno + "-" + indicadorConsulta.ProCod + "-SUB_PROYECTO-" + indicadorConsulta.SubProAno + "-" + indicadorConsulta.SubProCod + "-OBJETIVO-" + indicadorConsulta.ObjAno + "-" + indicadorConsulta.ObjCod + "-OBJETIVO_ESPECIFICO-" + indicadorConsulta.ObjEspAno + "-" + indicadorConsulta.ObjEspCod + "-RESULTADO-" + indicadorConsulta.ResAno + "-" + indicadorConsulta.ResCod + "-ACTIVIDAD-" + indicadorConsulta.ActAno + "-" + indicadorConsulta.ActCod + "-INDICADOR-" + indicadorConsulta.IndAno + "-" + indicadorConsulta.IndCod + "-META-" + metAno + "-" + metCod;
 
                                     cmd = new SqlCommand("SP_INSERTAR_USUARIO_ACCESO", cn.getcn);
                                     cmd.CommandType = CommandType.StoredProcedure;
@@ -606,8 +597,6 @@ namespace SistemaMEAL.Modulos
                         {
                             foreach (var meta in metas)
                             {
-                                Console.WriteLine(meta.MetAno.IsNullOrEmpty());
-                                Console.WriteLine(meta.MetCod.IsNullOrEmpty());
                                 if (meta.MetAno.IsNullOrEmpty() && meta.MetCod.IsNullOrEmpty())
                                 {
                                     // Insertar Nueva Meta con Presupuesto
@@ -911,7 +900,7 @@ namespace SistemaMEAL.Modulos
 
                 // Aquí tienes los datos del archivo
                 var data = fileData.Data;
-                var fileName = metaFuente.SubProSap  + "_" + metaFuente.ResNum + "_" + metaFuente.IndActResNum + "_" + fileData.FileName;
+                var fileName = metaFuente.SubProSap  + "_" + metaFuente.ResNum + "_" + metaFuente.IndNum + "_" + fileData.FileName;
                 var fileSize = fileData.FileSize;
 
                 System.IO.Directory.CreateDirectory(uploadsDirectory); // Crea el directorio si no existe
@@ -970,7 +959,7 @@ namespace SistemaMEAL.Modulos
 
                 // Aquí tienes los datos del archivo
                 var data = fileData.Data;
-                var fileName = metaFuente.SubProSap  + "_" + metaFuente.ResNum + "_" + metaFuente.IndActResNum + "_" + fileData.FileName;
+                var fileName = metaFuente.SubProSap  + "_" + metaFuente.ResNum + "_" + metaFuente.IndNum + "_" + fileData.FileName;
                 var fileSize = fileData.FileSize;
 
                 var path = Path.Combine(uploadsDirectory, fileData.FileName);

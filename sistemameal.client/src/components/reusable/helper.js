@@ -112,7 +112,6 @@ export const handleDelete = async (controller, codigo, setRegistros) => {
 };
 
 export const handleSubmit = async (controller, objetoEditado, objeto, setRegistros, setModalVisible, codeField, closeModalAndReset) => {
-    console.log(codeField)
     const url = objetoEditado 
                 ? `${import.meta.env.VITE_APP_API_URL}/api/${controller}/${objeto[codeField]}` 
                 : `${import.meta.env.VITE_APP_API_URL}/api/${controller}`;
@@ -176,10 +175,8 @@ export const handleSubmitMant = async (controller, objetoEditado, objeto, setReg
             },
             body: JSON.stringify(newData),
         });
-        console.log(response)
         const data = await response.json();
         if (!response.ok) {
-            console.log(data.message)
             Notiflix.Notify.failure(data.message);
             return;
         }
@@ -201,8 +198,6 @@ export const handleSubmitMant = async (controller, objetoEditado, objeto, setReg
     }
 };
 export const Export_Excel_Basic2 = async (data, headersExcel, active, isPresupuesto) => {
-    console.log(data)
-    console.log(headersExcel)
     let workbook = new ExcelJS.Workbook();
     let worksheet = workbook.addWorksheet(`CADENA DE ${isPresupuesto ? 'PRESUPUESTO' : 'RESULTADO'} ${active.toUpperCase()}`);
 
@@ -620,9 +615,7 @@ export const fetchData = async (controller, setData) => {
             }
             return;
         }
-        console.log(response)
         const data = await response.json();
-        console.log(data)
         if (data.success === false) {
             Notiflix.Notify.failure(data.message);
             return;

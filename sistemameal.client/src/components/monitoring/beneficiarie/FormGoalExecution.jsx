@@ -408,18 +408,18 @@ const FormGoalExecution = () => {
                                         id="metEjeMesEjeTec" 
                                     >
                                         <option value="0">--Seleccione Mes--</option>
-                                        <option value="01">Enero</option>
-                                        <option value="02">Febrero</option>
-                                        <option value="03">Marzo</option>
-                                        <option value="04">Abril</option>
-                                        <option value="05">Mayo</option>
-                                        <option value="06">Junio</option>
-                                        <option value="07">Julio</option>
-                                        <option value="08">Agosto</option>
-                                        <option value="09">Septiembre</option>
-                                        <option value="10">Octubre</option>
-                                        <option value="11">Noviembre</option>
-                                        <option value="12">Diciembre</option>
+                                        <option value="01">ENERO</option>
+                                        <option value="02">FEBRERO</option>
+                                        <option value="03">MARZO</option>
+                                        <option value="04">ABRIL</option>
+                                        <option value="05">MAYO</option>
+                                        <option value="06">JUNIO</option>
+                                        <option value="07">JULIO</option>
+                                        <option value="08">AGOSTO</option>
+                                        <option value="09">SEPTIEMBRE</option>
+                                        <option value="10">OCTUBRE</option>
+                                        <option value="11">NOVIEMBRE</option>
+                                        <option value="12">DICIEMBRE</option>
                                     </select>
                                     {errors.metEjeMesEjeTec ? (
                                         <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.metEjeMesEjeTec.message}</p>

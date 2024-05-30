@@ -30,7 +30,7 @@ const   ModalAcerca = ({ isOpen, closeModal }) => {
 
     return (
         <div className={`color-black PowerMas_Modal ${isOpen ? 'show' : ''}`}>
-            <div className="bg-white Small-p1_5 Phone_10 Medium_8 Large_4">
+            <div className="bg-white Small-p1_5 Phone_10 Medium_8 Large_4 relative">
                 <span 
                     className="PowerMas_CloseModal" 
                     onClick={closeModalAndReset}

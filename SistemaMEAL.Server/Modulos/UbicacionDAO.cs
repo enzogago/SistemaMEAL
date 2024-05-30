@@ -252,7 +252,7 @@ namespace SistemaMEAL.Modulos
             string? mensaje = "";
             string? tipoMensaje = "";
 
-            using (TransactionScope scope = new TransactionScope())
+            using (TransactionScope scope = new TransactionScope(TransactionScopeOption.Required, TimeSpan.FromMinutes(5)))
             {
                 using (SqlConnection connection = cn.getcn)
                 {

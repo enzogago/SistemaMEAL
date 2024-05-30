@@ -150,6 +150,7 @@ const FormUser = () => {
                     Notiflix.Notify.failure(data.message);
                     return;
                 }
+                console.log(data)
                 // Pasamos todo a minusculas para pintar los campos capitalizados
                 let newData = {};
                 

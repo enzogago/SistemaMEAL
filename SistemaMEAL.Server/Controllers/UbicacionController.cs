@@ -51,7 +51,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var result = _ubicaciones.Buscar(identity, ubiTip: "PAIS");
+            var result = _ubicaciones.Buscar(identity, ubiTip: "PAIS", ubiEst:"A");
             return Ok(result);
         }
 
@@ -76,7 +76,7 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var result = _ubicaciones.Buscar(identity, ubiAnoPad: ubiAno, ubiCodPad: ubiCod);
+            var result = _ubicaciones.Buscar(identity, ubiAnoPad: ubiAno, ubiCodPad: ubiCod, ubiEst:"A");
             return Ok(result);
         }
 

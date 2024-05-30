@@ -107,7 +107,7 @@ const UploadGoalBudget = () => {
                 </div>
                     <article className="PowerMas_Article_Upload center">
                         <p style={{color: '#878280'}}>Solo se puede subir documentos en formato Excel</p>
-                        <h3>Subir Ejecución Presupuestal</h3>
+                        <h3>Subir Gasto Presupuestal</h3>
                     </article>
                     <br />
                     <div

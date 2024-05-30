@@ -95,7 +95,6 @@ const App = () => {
                     }
         
                     const data = await response.json();
-                    console.log(data)
                     setMenuData(data);
                 } catch (error) {
                     console.error(error);

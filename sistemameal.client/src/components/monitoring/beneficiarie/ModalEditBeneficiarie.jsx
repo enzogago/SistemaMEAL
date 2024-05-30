@@ -353,21 +353,9 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                 Notiflix.Notify.failure(data.message);
                 return;
             }
-            let newData = {};
     
-            for (let key in data) {
-                if (typeof data[key] === 'string') {
-                    // Convierte cada cadena a minúsculas
-                    newData[key] = data[key].toLowerCase();
-                } else {
-                    // Mantiene los valores no string tal como están
-                    newData[key] = data[key];
-                }
-            }
-            console.log(data)
-            reset(newData);
-            setInitialData(newData)
-            console.log(verificarPais);
+            reset(data);
+            setInitialData(data)
             
             // RELLENAMOS EL SELECT
             fetchSelects(data.ubiAno,data.ubiCod);
@@ -404,6 +392,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
             Notiflix.Loading.remove();
         }
     }
+
     const fetchSelects = async (ubiAno,ubiCod) => {
         try {
             const token = localStorage.getItem('token');
@@ -664,18 +653,18 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                                 id="metBenMesEjeTec" 
                             >
                                 <option value="0">--Seleccione Mes--</option>
-                                <option value="01">Enero</option>
-                                <option value="02">Febrero</option>
-                                <option value="03">Marzo</option>
-                                <option value="04">Abril</option>
-                                <option value="05">Mayo</option>
-                                <option value="06">Junio</option>
-                                <option value="07">Julio</option>
-                                <option value="08">Agosto</option>
-                                <option value="09">Septiembre</option>
-                                <option value="10">Octubre</option>
-                                <option value="11">Noviembre</option>
-                                <option value="12">Diciembre</option>
+                                <option value="01">ENERO</option>
+                                <option value="02">FEBRERO</option>
+                                <option value="03">MARZO</option>
+                                <option value="04">ABRIL</option>
+                                <option value="05">MAYO</option>
+                                <option value="06">JUNIO</option>
+                                <option value="07">JULIO</option>
+                                <option value="08">AGOSTO</option>
+                                <option value="09">SEPTIEMBRE</option>
+                                <option value="10">OCTUBRE</option>
+                                <option value="11">NOVIEMBRE</option>
+                                <option value="12">DICIEMBRE</option>
                             </select>
                             {errors.metBenMesEjeTec ? (
                                 <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.metBenMesEjeTec.message}</p>
@@ -700,8 +689,8 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                                         id="si"
                                         className="m0"
                                         name="benAut" 
-                                        disabled={fieldsDisabled && benAut !== 's'}
-                                        value="s" 
+                                        disabled={fieldsDisabled && benAut !== 'S'}
+                                        value="S" 
                                         {...register('benAut', { required: 'Por favor, selecciona una opción' })}
                                     />
                                     <label htmlFor="si" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} >Si</label>
@@ -712,8 +701,8 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                                         id="no" 
                                         className="m0"
                                         name="benAut" 
-                                        disabled={fieldsDisabled && benAut !== 'n'}
-                                        value="n" 
+                                        disabled={fieldsDisabled && benAut !== 'N'}
+                                        value="N" 
                                         {...register('benAut', { required: 'Por favor, selecciona una opción' })}
                                     />
                                     <label style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} htmlFor="no">No</label>
@@ -735,7 +724,6 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                         </label>
                         <input type="text"
                             id="benNom"
-                            style={{textTransform: 'capitalize'}}
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benNom || isSubmitted ? (errors.benNom ? 'invalid' : 'valid') : ''}`} 
                             placeholder="Enzo Fabricio"
                             autoComplete='off'
@@ -760,7 +748,6 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                         <input 
                             type="text" 
                             id="benApe"
-                            style={{textTransform: 'capitalize'}}
                             autoComplete='off'
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benApe || isSubmitted ? (errors.benApe ? 'invalid' : 'valid') : ''}`} 
                             placeholder="Gago Aguirre"
@@ -823,7 +810,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                         <select 
                             id="genCod" 
                             disabled={fieldsDisabled}
-                            style={{ color: selectedValue == '0' ? '#372e2c60' : '#000000', textTransform: 'capitalize'}}
+                            style={{ color: selectedValue == '0' ? '#372e2c60' : '#000000'}}
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.genCod || isSubmitted ? (errors.genCod ? 'invalid' : 'valid') : ''}`}
                             name="genCod"
                             {...register('genCod', { 
@@ -836,7 +823,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                                     key={genero.genCod} 
                                     value={genero.genCod}
                                 > 
-                                    {genero.genNom.toLowerCase()}
+                                    {genero.genNom}
                                 </option>
                             ))}
                         </select>
@@ -887,7 +874,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                         <select 
                             id="nacCod" 
                             disabled={fieldsDisabled}
-                            style={{ color: selectedValue == '0' ? '#372e2c60' : '#000000', textTransform: 'capitalize'}}
+                            style={{ color: selectedValue == '0' ? '#372e2c60' : '#000000'}}
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.nacCod || isSubmitted ? (errors.nacCod ? 'invalid' : 'valid') : ''}`} 
                             {...register('nacCod', { 
                                 validate: value => value !== '0' || 'El campo es requerido' 
@@ -899,7 +886,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                                     key={nacionalidad.nacCod} 
                                     value={nacionalidad.nacCod}
                                 > 
-                                    {nacionalidad.nacNom.toLowerCase()}
+                                    {nacionalidad.nacNom}
                                 </option>
                             ))}
                         </select>
@@ -995,7 +982,6 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                         <input 
                             type="text" 
                             id="benDir"
-                            style={{textTransform: 'capitalize'}}
                             autoComplete='off'
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benDir || isSubmitted ? (errors.benDir ? 'invalid' : 'valid') : ''}`} 
                             placeholder="Dirección del beneficiario"

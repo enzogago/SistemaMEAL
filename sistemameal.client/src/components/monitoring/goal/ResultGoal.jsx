@@ -141,7 +141,6 @@ const ResultGoal = () => {
                     })
                 })
                 fetchData(`Meta/${subProAno}/${subProCod}/${ano}`, (data) => {
-                    console.log(data)
                     // Obtén todos los nombres de los campos registrados
                     const fieldNames = Object.keys(getValues());
 
@@ -417,18 +416,17 @@ const ResultGoal = () => {
 
         // Si el usuario seleccionó más que solo el país, construir la cadena de ubicación
         if (selects.length > 1 || (selects.length === 1 && selects[0].length > 1)) {
-            console.log(selects)
             let currentUbiAno = ubiAno;
             let currentUbiCod = ubiCod;
+            
             while (currentUbiAno && currentUbiCod) {
                 const ubicacionName = getUbicacionName(currentUbiAno, currentUbiCod);
                 if (nombreUbicacion) {
-                    nombreUbicacion = ubicacionName + ', ' + nombreUbicacion;
+                    nombreUbicacion = nombreUbicacion + ', ' + ubicacionName;
                 } else {
                     nombreUbicacion = ubicacionName;
                 }
                 const ubicacion = selects.flat().find(u => u.ubiAno === currentUbiAno && u.ubiCod === currentUbiCod);
-                console.log(ubicacion)
                 if (ubicacion) {
                     currentUbiAno = ubicacion.ubiAnoPad;
                     currentUbiCod = ubicacion.ubiCodPad;
@@ -500,7 +498,6 @@ const ResultGoal = () => {
                 return;
             }
             const data = await response.json();
-            console.log(data)
             if (data.success == false) {
                 Notiflix.Notify.failure(data.message);
                 return;
