@@ -3,73 +3,16 @@ import Edit from "../../icons/Edit";
 import { getMonthYearText, renderCellWithTooltip } from "../reusable/columns";
 import { handleDelete } from "../reusable/fetchs";
 
-const tipoIndicadorMapping = {
-    'IRE': 'Indicador de Resultado',
-    'IAC': 'Actividad',
-    'IOB': 'Indicador de Objetivo',
-    'IOE': 'Indicador de Objetivo Específico',
-    'ISA': 'Indicador de Sub Actividad',
-};
-
 export const getColumns = (actions, controller, openModal, setRefresh) => {
     let baseColumns = [
         {
             header: "Código",
-            accessorKey: "indNum"
+            accessorKey: "objNum"
         },
         {
             header: "Nombre",
-            accessorKey: "indNom",
-            cell: ({row}) => renderCellWithTooltip([row.original.indNom])
-        },
-        {
-            header: "Tipo",
-            accessorKey: "indTipInd",
-            cell: ({row}) => tipoIndicadorMapping[row.original.indTipInd].toUpperCase()
-        },
-        {
-            header: "Unidad",
-            accessorKey: "uniNom",
-        },
-        {
-            header: "Tipo Valor",
-            accessorKey: "tipValNom"
-        },
-        {
-            header: "Fórmula",
-            accessorKey: "indFor",
-            cell: ({row}) => {
-                if (row.original.indFor) {
-                    return row.original.indFor.replace(/{/g, '[').replace(/}/g, ']')
-                }
-            }
-        },
-        {
-            header: "Resultado",
-            accessorKey: "resNum",
-            cell: ({row}) => {
-                if (row.original.resNum == 'NA') {
-                    return '';
-                } else {
-                    return renderCellWithTooltip([row.original.resNum, row.original.resNom]);
-                }
-            }
-        },
-        {
-            header: "Objetivo Específico",
-            accessorKey: "objEspNum",
-            cell: ({row}) => {
-                if (row.original.objEspNum == 'NA') {
-                    return '';
-                } else {
-                    return renderCellWithTooltip([row.original.objEspNum, row.original.objEspNom]);
-                }
-            }
-        },
-        {
-            header: "Objetivo",
-            accessorKey: "objNum",
-            cell: ({row}) => renderCellWithTooltip([row.original.objNum, row.original.objNom])
+            accessorKey: "objNom",
+            cell: ({row}) => renderCellWithTooltip([row.original.objNom])
         },
         {
             header: "Sub Proyecto",
@@ -83,7 +26,10 @@ export const getColumns = (actions, controller, openModal, setRefresh) => {
         },
         {
             header: "Responsable",
-            accessorKey: "subProRes"
+            accessorKey: "usuNom",
+            cell: ({row}) => (
+                `${row.original.usuNom} ${row.original.usuApe}`
+            )
         },
         {
             header: "Periodo Inicio",
@@ -102,19 +48,14 @@ export const getColumns = (actions, controller, openModal, setRefresh) => {
             header: () => <div style={{textAlign: 'center', flexGrow: '1'}}>Acciones</div>,
             accessorKey: "actions",
             disableSorting: true,
-            cell: ({row}) => (
+            cell: ({row}) => (  
                 <div className='PowerMas_IconsTable flex jc-center ai-center'>
                     {actions.edit &&
                         <span
                             data-tooltip-id="edit-tooltip" 
                             data-tooltip-content="Editar" 
                             className='flex f1_25 p_25' 
-                            onClick={() => {
-                                let data = row.original;
-                                // Reemplaza todas las ocurrencias de llaves por corchetes
-                                data.indFor = data.indFor.replace(/{/g, '[').replace(/}/g, ']');
-                                openModal(data);
-                            }}
+                            onClick={() => openModal(row.original)}
                         >
                             <Edit />
                         </span>

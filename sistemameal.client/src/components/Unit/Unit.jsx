@@ -13,7 +13,7 @@ const Unit = () => {
 
     // Definir controller y fieldMapping como variables
     const controller = 'Unidad';
-    const fieldMapping = { codigo: 'uniCod', nombre: 'uniNom', involucra: 'uniInvPer' };
+    const fieldMapping = { codigo: 'uniCod', nombre: 'uniNom', '¿involucra beneficiario?': 'uniInvPer' };
     const filterProperties = {
         'CODIGO': 'uniCod',
         'NOMBRE': 'uniNom',
@@ -46,6 +46,7 @@ const Unit = () => {
                 fieldMapping={fieldMapping}
                 title='Unidades'
                 filterProperties={filterProperties}
+                isLargePagination={true}
             />
 
             <Modal

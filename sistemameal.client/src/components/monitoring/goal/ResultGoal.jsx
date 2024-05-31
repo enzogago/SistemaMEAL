@@ -114,7 +114,6 @@ const ResultGoal = () => {
         if (subproyecto && subproyecto !== '0') {
             setIndicadores([]);
             setAdditionalRows([]);
-            setValue('metAnoPlaTec','0');
             const { subProAno, subProCod } = JSON.parse(subproyecto);
             const selected = subproyectos.find(item => item.subProAno === subProAno && item.subProCod === subProCod);
             setSelectedSubProyecto(selected);
@@ -546,8 +545,8 @@ const ResultGoal = () => {
         }
     
         // Definir los encabezados
-        const headers = ['CODIGO', 'NOMBRE', 'NOMBRE2', 'NOMBRE3', ...meses, 'TOTAL'];
-        worksheet.columns = headers.map(header => ({ key: header, width: 10 }));
+        const headers = ['CODIGO', 'NOMBRE', 'TÉCNICO', 'IMPLEMENTADOR', 'UBICACIONES', ...meses, 'TOTAL'];
+        worksheet.columns = headers.map(header => ({ key: header, width: 15 }));
 
         // Insertar una columna vacía al principio
         worksheet.spliceColumns(1, 0, []);
@@ -558,7 +557,7 @@ const ResultGoal = () => {
             cell.value = header;
         
             // Establecer el color de fondo y el color del texto para los dos primeros encabezados
-            if (index < 2) {
+            if (index < 5) {
                 cell.fill = {
                     type: 'pattern',
                     pattern: 'solid',
@@ -582,10 +581,6 @@ const ResultGoal = () => {
             }
         });
     
-        // Combinar las celdas de los encabezados
-        worksheet.mergeCells('C6:E6');
-        
-    
         indicadores.forEach(indicador => {
             const row = {
                 'CODIGO': indicador.indNum,
@@ -605,14 +600,13 @@ const ResultGoal = () => {
             // Aplicar el formato de número a las celdas numéricas (columna 3 en adelante)
             const rowExcel = worksheet.getRow(rowIndex);
             rowExcel.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-                if (colNumber >= 3) {
+                if (colNumber >= 4) {
                     cell.numFmt = '#,##0';
                 }
             });
-    
-            // Combinar las celdas horizontalmente para el nombre del indicador principal
-            worksheet.mergeCells(`C${rowIndex}:E${rowIndex}`);
 
+            
+    
             // Agregar las filas adicionales para este indicador
             additionalRows.filter(row => row.indAno === indicador.indAno && row.indCod === indicador.indCod).forEach(additionalRow => {
                 const { usuAno, usuCod } = JSON.parse(getValues(`tecnico_${additionalRow.id}`));
@@ -622,10 +616,11 @@ const ResultGoal = () => {
                 const implementador = implementadoresSelect.find(imp => imp.impCod === impCod);
 
                 const additionalRowData = {
-                    'CODIGO': '',
-                    'NOMBRE': userTecnico ? (userTecnico.usuNom + ' ' + userTecnico.usuApe) : '',
-                    'NOMBRE2': implementador ? implementador.impNom : '',
-                    'NOMBRE3': getValues(`nombreUbicacion_${additionalRow.id}`)?.toUpperCase(),
+                    'CODIGO': indicador.indNum,
+                    'NOMBRE': indicador.indNom,
+                    'TÉCNICO': userTecnico ? (userTecnico.usuNom + ' ' + userTecnico.usuApe) : '',
+                    'IMPLEMENTADOR': implementador ? implementador.impNom : '',
+                    'UBICACIONES': getValues(`nombreUbicacion_${additionalRow.id}`)?.toUpperCase(),
                     ...meses.reduce((obj, mes, i) => {
                         const fieldValue = getValues(`mes_${String(i+1).padStart(2, '0')}_${additionalRow.id}`);
                         obj[mes] = Number(fieldValue) || 0;
@@ -639,12 +634,14 @@ const ResultGoal = () => {
 
                 // Aplicar el formato de número a las celdas numéricas (columna 3 en adelante)
                 additionalRowExcel.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-                    if (colNumber >= 3) {
+                    if (colNumber >= 4) {
                         cell.numFmt = '#,##0';
                     }
                 });
             });
         });
+
+        
     
         // Crear el archivo de Excel y descargarlo
         const buffer = await workbook.xlsx.writeBuffer();

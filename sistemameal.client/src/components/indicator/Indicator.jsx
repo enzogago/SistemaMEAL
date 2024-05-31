@@ -13,6 +13,14 @@ import ExportMenu from '../reusable/Tables/ExportMenu';
 import Plus from '../../icons/Plus';
 import useModal from '../../hooks/useModal';
 
+const tipoIndicadorMapping = {
+    'IRE': 'Indicador de Resultado',
+    'IAC': 'Actividad',
+    'IOB': 'Indicador de Objetivo',
+    'IOE': 'Indicador de Objetivo Específico',
+    'ISA': 'Indicador de Sub Actividad',
+};
+
 const Indicator = () => {
     // States locales
     const [ unidades, setUnidades] = useState([]);
@@ -47,7 +55,7 @@ const Indicator = () => {
                 (item.indNum ? item.indNum.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
                 (item.uniNom ? item.uniNom.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
                 (item.tipValNom ? item.tipValNom.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
-                (item.indFor ? item.indFor.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
+                (item.indFor ? item.indFor.replace(/{/g, '').replace(/}/g, '').toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
                 (item.resNum ? item.resNum.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
                 (item.resNom ? item.resNom.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
                 (item.objEspNum ? item.objEspNum.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
@@ -63,8 +71,16 @@ const Indicator = () => {
         }), [data, searchFilter]
     );
 
-    const headers = ['CÓDIGO','NOMBRE','UNIDAD','TIPO_VALOR','FORMULA','RESULTADO','OBJETIVO_ESPECIFICO','OBJETIVO','SUBPROYECTO','PROYECTO','RESPONSABLE','MES_INICIO','AÑO_INICIO','MES_FIN','AÑO_FIN'];
-    const properties = ['indNum','indNom','uniNom','tipValNom','indFor',['resNum','resNom'],['objEspNum','objEspNom'],['objNum','objNom'],'subProNom','proNom','subProRes','subProPerMesIni','subProPerAnoIni','subProPerMesFin','subProPerAnoFin'];
+    const headers = ['CÓDIGO','NOMBRE','TIPO','UNIDAD','TIPO_VALOR','FORMULA','RESULTADO','OBJETIVO_ESPECIFICO','OBJETIVO','SUBPROYECTO','PROYECTO','RESPONSABLE','MES_INICIO','AÑO_INICIO','MES_FIN','AÑO_FIN'];
+    const properties = ['indNum','indNom','indTipInd','uniNom','tipValNom','indFor',['resNum','resNom'],['objEspNum','objEspNom'],['objNum','objNom'],'subProNom','proNom','subProRes','subProPerMesIni','subProPerAnoIni','subProPerMesFin','subProPerAnoFin'];
+    // Preparar los datos
+    let dataExport = [...filteredData]; 
+    // Modificar el campo 'uniInvPer' en los datos
+    dataExport = dataExport.map(item => ({
+        ...item,
+        indFor: item.indFor.replace(/{/g, '[').replace(/}/g, ']'),
+        indTipInd: tipoIndicadorMapping[item.indTipInd].toUpperCase()
+    }));
 
     return (
         <>
@@ -88,7 +104,7 @@ const Indicator = () => {
                     </button>
                     {/* Menú de exportación con opciones condicionales basadas en los permisos */}
                     <ExportMenu
-                        filteredData={filteredData}
+                        filteredData={dataExport}
                         headers={headers}
                         title={'INDICADORES'}
                         properties={properties}

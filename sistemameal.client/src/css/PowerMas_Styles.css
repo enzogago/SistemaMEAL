@@ -11,6 +11,20 @@
 	--turquesa: #006776;
 }
   
+body *::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+
+
+body *::-webkit-scrollbar-thumb {
+	background: #888;
+}
+
+body *::-webkit-scrollbar-thumb:hover {
+	background: #555;
+}
+
 body {
 	font-family: DMMono;
 }
@@ -263,20 +277,9 @@ input::placeholder,select::placeholder{
 }
 
 /* Personaliza la barra de desplazamiento */
-.PowerMas_MenuContainer::-webkit-scrollbar {
-	width: 6px;
-}
 
 .PowerMas_MenuContainer::-webkit-scrollbar-track {
 	background: #F87C56;
-}
-
-.PowerMas_MenuContainer::-webkit-scrollbar-thumb {
-	background: #888;
-}
-
-.PowerMas_MenuContainer::-webkit-scrollbar-thumb:hover {
-	background: #555;
 }
 
 .PowerMas_MainRender{

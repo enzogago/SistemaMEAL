@@ -67,16 +67,15 @@ const Subproject = () => {
             const periodoFin = getMonthYearText(item.subProPerMesFin, item.subProPerAnoFin);
 
             return (
-                (item.subProNom ? item.subProNom.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
-                (item.subProSap ? item.subProSap.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
-                (item.proIde ? item.proIde.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
-                (item.proNom ? item.proNom.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
-                (item.usuNom ? item.usuNom.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
-                (item.usuApe ? item.usuApe.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
-                (item.subProInvSubAct === 'S' && 'PROYECTO CON SUB ACTIVIDADES'.includes(searchFilter.toUpperCase())) ||
-                (item.subProInvSubAct === 'N' && 'PROYECTO SIN SUB ACTIVIDADES'.includes(searchFilter.toUpperCase())) ||
-                (periodoInicio ? periodoInicio.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
-                (periodoFin ? periodoFin.toUpperCase().includes(searchFilter.toUpperCase()) : false)
+                (item.subProNom ? item.subProNom.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
+                (item.subProSap ? item.subProSap.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
+                (item.proIde ? item.proIde.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
+                (item.proNom ? item.proNom.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
+                (item.usuNom && item.usuApe ? (item.usuNom + ' ' + item.usuApe).toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
+                (item.subProInvSubAct === 'S' && 'PROYECTO CON SUB ACTIVIDADES'.includes(searchFilter.toUpperCase()).trim()) ||
+                (item.subProInvSubAct === 'N' && 'PROYECTO SIN SUB ACTIVIDADES'.includes(searchFilter.toUpperCase()).trim()) ||
+                (periodoInicio ? periodoInicio.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
+                (periodoFin ? periodoFin.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false)
             );
         }), [data, searchFilter]
     );
@@ -314,16 +313,19 @@ const Subproject = () => {
                         value={searchFilter}
                         onChange={(e) => setSearchFilter(e.target.value)}
                     />
-                    <button 
-                        className='flex jc-space-between ai-center Large_3 Large-p_5 PowerMas_Buttom_Primary'
-                        onClick={() => navigate('/form-subproject')} 
-                        disabled={!actions.add}
-                    >
-                        Nuevo 
-                        <span className='flex f1_25'>
-                            <Plus />
-                        </span>
-                    </button>
+                    {
+                        actions.add &&
+                        <button 
+                            className='flex jc-space-between ai-center Large_3 Large-p_5 PowerMas_Buttom_Primary'
+                            onClick={() => navigate('/form-subproject')} 
+                            disabled={!actions.add}
+                        >
+                            Nuevo 
+                            <span className='flex f1_25'>
+                                <Plus />
+                            </span>
+                        </button>
+                    }
                     {/* Menú de exportación con opciones condicionales basadas en los permisos */}
                     <ExportMenu
                         filteredData={dataExport}

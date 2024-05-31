@@ -54,7 +54,12 @@ export const exportToExcel = async (data, headers, title, properties) => {
         const rowData = properties.map(prop => {
             // Si 'prop' es un arreglo, concatenar los valores con un guión
             if (Array.isArray(prop)) {
-                return prop.map(p => item[p]).join(' - ');
+                const values = prop.map(p => item[p]);
+                // Si todos los valores son 'NA', retornar una cadena vacía
+                if (values.every(value => value === 'NA')) {
+                    return '';
+                }
+                return values.join(' - ');
             }
             // Si 'prop' es un string, usar el valor tal cual
             return item[prop];
@@ -132,7 +137,12 @@ export const exportToPdf = async (data, headers, title, properties, format) => {
             const rowData = properties.map(prop => {
                 // Si 'prop' es un arreglo, concatenar los valores con un guión
                 if (Array.isArray(prop)) {
-                    return prop.map(p => item[p]).join(' - ');
+                    const values = prop.map(p => item[p]);
+                    // Si todos los valores son 'NA', retornar una cadena vacía
+                    if (values.every(value => value === 'NA')) {
+                        return '';
+                    }
+                    return values.join(' - ');
                 }
                 // Si 'prop' es un string, usar el valor tal cual
                 return item[prop];

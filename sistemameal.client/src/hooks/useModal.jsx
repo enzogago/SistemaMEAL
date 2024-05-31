@@ -5,6 +5,8 @@ const useModal = (fetchDataFunctions = []) => {
     const [estadoEditado, setEstadoEditado] = useState(null);
 
     const openModal = async (estado = null) => {
+        
+        console.log(estado)
         // Limpieza de los datos del estado si es necesario
         if (estado) {
             for (let key in estado) {

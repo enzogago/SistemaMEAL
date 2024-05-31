@@ -17,7 +17,7 @@ export const getColumns = (actions, controller, openModal, setRefresh, handleEdi
         },
         {
             header: "Responsable",
-            accessorKey: "usuAno",
+            accessorKey: "usuNom",
             cell: ({row}) => (
                 `${row.original.usuNom} ${row.original.usuApe}`
             )

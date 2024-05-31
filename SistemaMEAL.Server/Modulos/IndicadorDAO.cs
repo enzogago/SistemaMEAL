@@ -535,8 +535,7 @@ namespace SistemaMEAL.Modulos
                             connection.Open();
                         }
 
-                        if (!indicador.ObjAno.IsNullOrEmpty() && !indicador.ObjCod.IsNullOrEmpty() && indicador.ObjEspAno.IsNullOrEmpty() && indicador.ObjEspCod.IsNullOrEmpty())
-                        {
+                        if (!indicador.ObjAno.IsNullOrEmpty() && !indicador.ObjCod.IsNullOrEmpty() && indicador.ObjEspAno.IsNullOrEmpty() && indicador.ObjEspCod.IsNullOrEmpty()) {
                             cmd = new SqlCommand("SP_BUSCAR_OBJETIVO_ESPECIFICO", cn.getcn);
                             cmd.CommandType = CommandType.StoredProcedure;
 
@@ -812,7 +811,9 @@ namespace SistemaMEAL.Modulos
 
                             indicador.ActAno = dataAct.ActAno;
                             indicador.ActCod = dataAct.ActCod;
-                        } else if(!indicador.ObjEspAno.IsNullOrEmpty() && !indicador.ObjEspCod.IsNullOrEmpty()){
+                        } 
+                        else if(!indicador.ObjEspAno.IsNullOrEmpty() && !indicador.ObjEspCod.IsNullOrEmpty()) 
+                        {
                             cmd = new SqlCommand("SP_BUSCAR_RESULTADO", cn.getcn);
                             cmd.CommandType = CommandType.StoredProcedure;
 
@@ -999,8 +1000,7 @@ namespace SistemaMEAL.Modulos
                             indicador.ActAno = dataAct.ActAno;
                             indicador.ActCod = dataAct.ActCod;
                         }
-
-                        if (indicador.ActAno.IsNullOrEmpty() && indicador.ActCod.IsNullOrEmpty())
+                        else if (indicador.ActAno.IsNullOrEmpty() && indicador.ActCod.IsNullOrEmpty())
                         {
                             cmd = new SqlCommand("SP_INSERTAR_ACTIVIDAD", cn.getcn);
                             cmd.CommandType = CommandType.StoredProcedure;
@@ -1088,6 +1088,8 @@ namespace SistemaMEAL.Modulos
 
                             var accPadAct = "PROYECTO-" + consultaAct.ProAno + "-" + consultaAct.ProCod + "-SUB_PROYECTO-" + consultaAct.SubProAno + "-" + consultaAct.SubProCod + "-OBJETIVO-" + consultaAct.ObjAno + "-" + consultaAct.ObjCod + "-OBJETIVO_ESPECIFICO-" + consultaAct.ObjEspAno + "-" + consultaAct.ObjEspCod + "-RESULTADO-" + consultaAct.ResAno + "-" + consultaAct.ResCod + "-ACTIVIDAD-" + actAno + "-" + actCod;
 
+                            Console.WriteLine(accPadAct);
+
                             cmd = new SqlCommand("SP_INSERTAR_USUARIO_ACCESO", cn.getcn);
                             cmd.CommandType = CommandType.StoredProcedure;
                             cmd.Parameters.AddWithValue("@P_USUANO", userClaims.UsuAno);
@@ -1115,6 +1117,8 @@ namespace SistemaMEAL.Modulos
 
                             mensaje = pDescripcionMensaje.Value.ToString();
                             tipoMensaje = pTipoMensaje.Value.ToString();
+
+                            Console.WriteLine(mensaje);
 
                             indicador.ActAno = actAno;
                             indicador.ActCod = actCod;
@@ -1163,7 +1167,7 @@ namespace SistemaMEAL.Modulos
                         var indCod = pCod.Value.ToString();
                         message = pDescripcionMensaje.Value.ToString();
                         messageType = pTipoMensaje.Value.ToString();
-
+  
                         // Inserta el DocumentoBeneficiario
                         if (messageType != "3")
                         {
@@ -1210,7 +1214,12 @@ namespace SistemaMEAL.Modulos
                         }
                         // Deserializa la cadena JSON en una lista de objetos Estado
                         List<Actividad>? temporal = JsonConvert.DeserializeObject<List<Actividad>>(jsonResult.ToString());
-                        Actividad consulta = temporal[0];
+                        Actividad consulta = new Actividad();
+
+                        if (temporal.Count > 0)
+                        {
+                            consulta = temporal[0];
+                        }
 
                         var accPad = "PROYECTO-" + consulta.ProAno + "-" + consulta.ProCod + "-SUB_PROYECTO-" + consulta.SubProAno + "-" + consulta.SubProCod + "-OBJETIVO-" + consulta.ObjAno + "-" + consulta.ObjCod + "-OBJETIVO_ESPECIFICO-" + consulta.ObjEspAno + "-" + consulta.ObjEspCod + "-RESULTADO-" + consulta.ResAno + "-" + consulta.ResCod + "-ACTIVIDAD-" + consulta.ActAno + "-" + consulta.ActCod + "-INDICADOR-" + indAno + "-" + indCod;     
 

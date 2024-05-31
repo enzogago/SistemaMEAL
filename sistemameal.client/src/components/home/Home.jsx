@@ -443,7 +443,7 @@ const Home = () => {
                                                 <span className='Large-f1 Small-f_75 bold' style={{textTransform: 'capitalize'}}>{item.usuNom.toLowerCase() + ' ' + item.usuApe.toLowerCase()}</span>
                                                 <span 
                                                     data-tooltip-id="info-tooltip" 
-                                                    data-tooltip-content={tooltipText}  // Usa el texto formateado para el tooltip
+                                                    data-tooltip-content={tooltipText}
                                                     className='Large-f_75 Small-f_5' 
                                                     style={{textTransform: 'capitalize'}}
                                                     dangerouslySetInnerHTML={{ __html: shortText }}
@@ -465,7 +465,7 @@ const Home = () => {
                             })}
                         </div>
                     </div>
-                    <div className='PowerMas_Home_Card Large-p0 Medium-p_75 Large_6 Medium_6 Phone_12 flex flex-column ai-center gap_3' style={{minHeight: '24rem'}}>
+                    <div className='PowerMas_Home_Card Large-p0 Medium-p_75 Large_6 Medium_6 Phone_12 flex flex-column ai-center gap_25' style={{minHeight: '24rem'}}>
                         <div className='Large_12 p_5 PowerMas_Tittle_Map center'>
                             <h4>Beneficiarios por ubicación</h4>
                         </div>

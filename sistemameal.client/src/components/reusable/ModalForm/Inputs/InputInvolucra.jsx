@@ -2,7 +2,7 @@ const InputInvolucra = ({register, errors, dirtyFields, isSubmitted}) => {
     return (
         <>
             <label className="block f1">
-                Involucra Persona:
+                ¿Involucra Beneficiario?
             </label>
             <div className="flex gap-1">
                 <div className="flex gap_5">

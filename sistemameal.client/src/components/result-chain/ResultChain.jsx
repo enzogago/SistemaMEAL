@@ -539,7 +539,7 @@ const ResultChain = () => {
                                 {headers.map((header, index) => (
                                     <th 
                                         style={{color: `${header.key.startsWith('total')? '#F87C56': '#000'}`}}
-                                        className={`${header.key.startsWith('total') ? 'PowerMas_Borde_Total' : ''} PowerMas_Borde_Total2`}
+                                        className={`center ${header.key.startsWith('total') ? 'PowerMas_Borde_Total' : ''} PowerMas_Borde_Total2`}
                                         key={index}
                                     >
                                         {header.name}

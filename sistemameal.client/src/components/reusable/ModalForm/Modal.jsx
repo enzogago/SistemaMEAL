@@ -159,7 +159,7 @@ const Modal = ({ estadoEditado, modalVisible, setModalVisible, closeModal, setDa
                                 return <InputNombre key={field} register={register} errors={errors} dirtyFields={dirtyFields} isSubmitted={isSubmitted} />;
                             case 'abreviatura':
                                 return <InputAbreviatura key={field} register={register} errors={errors} dirtyFields={dirtyFields} isSubmitted={isSubmitted} />;
-                            case 'involucra':
+                            case '¿involucra beneficiario?':
                                 return <InputInvolucra key={field} register={register} errors={errors} dirtyFields={dirtyFields} isSubmitted={isSubmitted} />;
                             case 'color':
                                 return <InputColor key={field} register={register} errors={errors} dirtyFields={dirtyFields} isSubmitted={isSubmitted} setValue={setValue} color={color} setColor={setColor} />;

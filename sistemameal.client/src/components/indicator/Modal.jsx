@@ -144,7 +144,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
             subProAno,
             subProCod
         }
-
+        console.log(dataSubmit)
         handleSubmitMant('Indicador', !!estadoEditado, dataSubmit, setData, closeModalAndReset)
     };
 
@@ -321,7 +321,6 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
     // Efecto para manejar la edición del estado
     useEffect(() => {
         if (estadoEditado) {
-            console.log(estadoEditado)
             reset(estadoEditado);
         }
     }, [estadoEditado, reset, setValue]);
@@ -737,8 +736,8 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                             className={`block PowerMas_Modal_Form_${dirtyFields.indFor   || isSubmitted ? (errors.indFor   ? 'invalid' : 'valid') : ''}`} 
                             {...register('indFor', { 
                                 pattern: {
-                                    value: /^(\[[A-Za-z0-9.]+\]|\d+|\s|\+|-|\*|\/|\(|\))*$/,
-                                    message: 'La fórmula contiene caracteres no válidos.',
+                                    value: /^=(\[[A-Za-z0-9.]+\]|\d+|\s|\+|-|\*|\/|\(|\))*$/,
+                                    message: 'La fórmula contiene caracteres no válidos o no comienza con "=".',
                                 },
                                 validate: {
                                     balancedBrackets: value => {
@@ -754,7 +753,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                                         return indicators.every(indicatorExists) || 'Uno o más indicadores no existen.';
                                     },
                                     noOperatorAtStartOrEnd: value => {
-                                        return !/^[\+\-\*\/]|[\+\-\*\/]$/.test(value) || 'La fórmula no puede comenzar ni terminar con un operador.';
+                                        return !/^=[\+\-\*\/]|[\+\-\*\/]$/.test(value) || 'La fórmula no puede comenzar ni terminar con un operador.';
                                     },
                                     noNumberAdjacentToIndicator: value => {
                                         return !/\d\[[A-Za-z0-9.]+\]|\[[A-Za-z0-9.]+\]\d/.test(value) || 'No puede haber un número inmediatamente antes o después de un indicador.';
@@ -766,6 +765,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                             })}
                         >
                         </textarea>
+
                         {errors.indFor ? (
                             <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.indFor.message}</p>
                         ) : (

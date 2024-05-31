@@ -250,7 +250,10 @@ const FormSubProject = () => {
                 fetchData(`Financiador/subproyecto/${ano}/${cod}`,(data) => {
                     setFinanciadoresEdit(data);
                 });
-                fetchData(`Ubicacion/subproyecto/${ano}/${cod}`,setUbicacionesEdit);
+                fetchData(`Ubicacion/subproyecto/${ano}/${cod}`,(data) => {
+                    setUbicacionesEdit(data)
+                    console.log(data)
+                });
             }
         });
     }, [isEditing]);
