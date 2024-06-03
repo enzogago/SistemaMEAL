@@ -67,7 +67,6 @@ const CustomTable = ({
         useEffect(() => {
             if (actionsColumnRef.current) {
                 setActionsColumnWidth(actionsColumnRef.current.offsetWidth);
-                console.log(actionsColumnRef.current.offsetWidth)
             }
         }, [sums]);
     }
@@ -93,7 +92,6 @@ const CustomTable = ({
         const actionsElement = document.querySelector('.PowerMas_IconsTable');
         if (setActionsWidth && actionsElement) {
             setActionsWidth(actionsElement.offsetWidth);
-            console.log(actionsElement.offsetWidth);
         }
     }, [actions]);
 

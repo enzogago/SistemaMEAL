@@ -28,7 +28,6 @@ const SaveProject = () => {
                     const dbKey = headerInfo.dbKey;
                     let cell = row[index];
                     // Si la key no contiene 'Num', convierte el valor a minúsculas
-                    console.log(dbKey)
                     if (!dbKey.includes('Num') && !dbKey.includes('Ide')) {
                         cell = cell.toLowerCase();
                     }
@@ -36,7 +35,6 @@ const SaveProject = () => {
                     return obj;
                 }, {});
             });
-            console.log(transformedData)
             setTransformedData(transformedData)
         } else {
             navigate('/upload-project');
@@ -83,8 +81,6 @@ const SaveProject = () => {
         }
         
         // Aquí puedes procesar los datos y enviarlos al servidor
-        console.log('Procesando datos...');
-        console.log(postData);
         try {
             Notiflix.Loading.pulse();
             const token = localStorage.getItem('token');
@@ -96,14 +92,11 @@ const SaveProject = () => {
                 },
                 body: JSON.stringify(postData),
             });
-            console.log("desde response: ",response)
             const data = await response.json();
             if (!response.ok) {
-                console.log(data)
                 Notiflix.Notify.failure(data.message)
                 return;
             }
-            console.log(data)
             Notiflix.Notify.success(data.message)
             const {subProAnoOut, subProCodOut} = data;
 

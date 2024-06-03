@@ -7,8 +7,20 @@ const ModalPermission = ({modalVisible, estadoEditado, closeModal, user}) => {
     const [ permisos, setPermisos ] = useState([])
     const [ permisosActuales, setPermisosActuales ] = useState(new Set());
     const [ permisosIniciales, setPermisosIniciales ] = useState(new Set());
-    const [ permisosUser, setPermisosUser ] = useState([]);
+    const [selectAll, setSelectAll] = useState(false);
 
+    const handleSelectAllChange = (event) => {
+        setSelectAll(event.target.checked);
+        if (event.target.checked) {
+            // Si el usuario ha seleccionado "Seleccionar todos", selecciona todos los permisos
+            setPermisosActuales(new Set(permisos.map(permiso => permiso.perCod)));
+        } else {
+            // Si el usuario ha deseleccionado "Seleccionar todos", deselecciona todos los permisos
+            setPermisosActuales(new Set());
+        }
+    };
+    
+    
     useEffect(() => {
         if (modalVisible && estadoEditado) {
             // Inicia el bloqueo de Notiflix
@@ -19,10 +31,12 @@ const ModalPermission = ({modalVisible, estadoEditado, closeModal, user}) => {
                 fetchDataReturn(`Permiso/${user.usuAno}/${user.usuCod}`),
             ]).then(([menuData, permissionAccessData]) => {
                 setPermisos(menuData)
-                setPermisosUser(permissionAccessData)
                 const permisosInicialesSet = new Set(permissionAccessData.map(permiso => permiso.perCod));
                 setPermisosIniciales(permisosInicialesSet);
                 setPermisosActuales(permisosInicialesSet);
+
+                // Establece el estado inicial de "Seleccionar todos"
+                setSelectAll(permisosInicialesSet.size === menuData.length);
             }).catch(error => {
                 // Maneja los errores
                 console.error('Error:', error);
@@ -43,6 +57,10 @@ const ModalPermission = ({modalVisible, estadoEditado, closeModal, user}) => {
             } else {
                 newPermisos.add(perCod);
             }
+    
+            // Actualiza el estado de 'selectAll'
+            setSelectAll(newPermisos.size === permisos.length);
+    
             return newPermisos;
         });
     };
@@ -50,12 +68,8 @@ const ModalPermission = ({modalVisible, estadoEditado, closeModal, user}) => {
     const closeModalAndReset = () => {
         closeModal();
         setPermisos([]);
-        setPermisosUser([]);
+        setSelectAll(false);
     }
-
-    const isPermissionChecked = (perCod) => {
-        return permisosUser.some(permisoUsuario => permisoUsuario.perCod === perCod);
-    };
 
     const handleSubmit = async() => {
         const permisosInsertar = [...permisosActuales].filter(perCod => !permisosIniciales.has(perCod));
@@ -80,7 +94,6 @@ const ModalPermission = ({modalVisible, estadoEditado, closeModal, user}) => {
             });
             const data = await response.json();
             if (!response.ok) {
-                console.log(data)
                 Notiflix.Notify.failure(data.message)
                 return;
             }
@@ -141,6 +154,15 @@ const ModalPermission = ({modalVisible, estadoEditado, closeModal, user}) => {
                         <p className='PowerMas_Description_Modal_Permission center f_75'>
                             Selecciona las funcionalidades(acciones) que deseas otorgar para este usuario.
                         </p>
+                        <div className='flex p_25 gap_25'>
+                            <input
+                                id='all'
+                                type="checkbox"
+                                checked={selectAll}
+                                onChange={handleSelectAllChange}
+                            />
+                            <label htmlFor='all'>Seleccionar todos</label>
+                        </div>
                         <div className='flex flex-column'>
                             {estadoEditado && permisos.map((permission, index) => (
                                 <div className='flex p_25 gap_5' key={index}>
@@ -149,7 +171,7 @@ const ModalPermission = ({modalVisible, estadoEditado, closeModal, user}) => {
                                         type="checkbox"
                                         className='m0'
                                         value={permission.perCod} 
-                                        defaultChecked={isPermissionChecked(permission.perCod)}
+                                        checked={permisosActuales.has(permission.perCod)}
                                         onChange={() => handleCheckboxChange(permission.perCod)}
                                     />
                                     <label style={{textTransform: 'capitalize', textWrap: 'nowrap'}} htmlFor={permission.perCod}>

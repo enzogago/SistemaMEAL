@@ -164,13 +164,11 @@ export const handleUpload = async (file, setTableData, setIsValid, setErrorCells
                 const cellValueForNacCod = row.getCell(22).text.trim();
 
                 let cellValue = row.getCell(colNumber).text;
-                console.log(cellValue)
                 const headerInfo = expectedHeaders[colNumber - 3]
                 const validationKey = headerInfo.validation;
 
                 const fieldValidationRules = validationRules[validationKey];
                 const validationMessage = validateCell(cellValue, fieldValidationRules);
-                console.log(validationMessage)
                 if (validationMessage !== true) {
                     newErrorCells.push({ row: rowNumber - 10, column: colNumber - 3,  message: validationMessage});
                     setIsValid(false);
@@ -188,7 +186,6 @@ export const handleUpload = async (file, setTableData, setIsValid, setErrorCells
             rowNumber++;
         }
         
-        console.log(tableData);
         setTableData(tableData);
         setErrorCells(newErrorCells);
         navigate('/validate-beneficiarie');

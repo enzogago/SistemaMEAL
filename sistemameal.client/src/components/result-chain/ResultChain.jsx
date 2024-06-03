@@ -189,9 +189,6 @@ const ResultChain = () => {
                 // Procesa los datos recibidos de cada petición
     
                 // Establece los indicadores con los datos de la última petición
-                console.log(dataPorAno);
-                console.log(dataPorImplementador);
-                console.log(dataPorUbicacion);
                 setIndicadores(dataSubproyecto);
     
                 // Inicializa el estado de la línea base y el total
@@ -275,7 +272,6 @@ const ResultChain = () => {
             combinedRenderData[key] = renderDataPorUbicacion[key];
         });
     
-        console.log(combinedRenderData)
         return combinedRenderData;
     }
     
@@ -319,8 +315,6 @@ const ResultChain = () => {
         let cambiosPorUbicacion = [];
         let cambiosPorIndicador = [];
         
-        console.log(renderData)
-        console.log(data)
         // Iterar sobre los datos del formulario
         for (let key in data) {
             // Obtener el valor inicial y el valor actual de la celda
@@ -338,7 +332,6 @@ const ResultChain = () => {
                 // Obtener la parte de la clave que corresponde al 'ano', 'implementador' o 'ubicacion'
                 let keyParts = key.split('_');
                 let indAno, indCod, keyType, keyTypeU;
-                console.log(keyParts)
                 // Si la clave comienza con 'total', entonces es un 'totalPorIndicador'
                 if (key.startsWith('total')) {
                     indAno = keyParts[1];
@@ -393,7 +386,6 @@ const ResultChain = () => {
             Indicadores: cambiosPorIndicador
         }
         
-        console.log(CadenaIndicadorDto);
         handleInsert(CadenaIndicadorDto);
     };
 

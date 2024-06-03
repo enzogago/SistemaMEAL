@@ -5,7 +5,6 @@ import data from './geojson/peru.json'; // Asegúrate de que la ruta al archivo 
 import { formatter } from '../monitoring/goal/helper';
 
 const Peru = ({mapData, beneficiariosData}) => {
-    console.log(mapData)
 
     // Combina los datos de ubicación y beneficiarios
     const combinedData = mapData.map(ubicacion => {

@@ -18,7 +18,6 @@ const ForgotPassword = () => {
             const clientIp = ipData.ip;
             // Obtenemos los datos
             const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Usuario/forgot-password/${dataForm.usuCorEle}`);
-            console.log(response)
             if (response.ok || response.status === 204) {
                 Notiflix.Notify.failure('Usuario no existe o esta inactivo.')
                 return;

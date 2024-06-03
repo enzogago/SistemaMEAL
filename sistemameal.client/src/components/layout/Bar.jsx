@@ -111,7 +111,7 @@ const Bar = ({showSidebarAndBar, isOpen, setIsOpen}) => {
                     '' // <img className='Large_1 Medium_10 Phone_6' height="auto"  title="Sistema MEAL Ayuda en Acción" src={Logo} alt="Logo Ayuda En Accion" />
                 }
                 <div className="PowerMas_ProfileContainer">
-                    <div className="PowerMas_ProfilePicture">
+                    <div className="PowerMas_ProfilePicture pointer" onClick={editarPerfil}>
                         <img src={userLogged && (userLogged.usuAva ? `data:image/jpeg;base64,${userLogged.usuAva}` : (userLogged.usuSex == 'M' ? masculino : femenino ))} alt="Descripción de la imagen" />
                     </div>
                     {

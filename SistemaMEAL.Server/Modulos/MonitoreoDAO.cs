@@ -634,7 +634,7 @@ namespace SistemaMEAL.Modulos
             return (mensaje, tipoMensaje);
         }
 
-        public (string? message, string? messageType) EliminarBeneficiarioMonitoreo(ClaimsIdentity? identity, string metAno, string metCod, string benAno, string benCod, string ubiAno, string ubiCod, string metBenAnoEjeTec, string metBenMesEjeTec)
+        public (string? message, string? messageType) EliminarBeneficiarioMonitoreo(ClaimsIdentity? identity, MetaBeneficiario metaBeneficiario)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 
@@ -647,14 +647,14 @@ namespace SistemaMEAL.Modulos
                 SqlCommand cmd = new SqlCommand("SP_ELIMINAR_META_BENEFICIARIO", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
 
-                cmd.Parameters.AddWithValue("@P_METANO", metAno);
-                cmd.Parameters.AddWithValue("@P_METCOD", metCod);
-                cmd.Parameters.AddWithValue("@P_BENANO", benAno);
-                cmd.Parameters.AddWithValue("@P_BENCOD", benCod);
-                cmd.Parameters.AddWithValue("@P_UBIANO", ubiAno);
-                cmd.Parameters.AddWithValue("@P_UBICOD", ubiCod);
-                cmd.Parameters.AddWithValue("@P_METBENANOEJETEC", metBenAnoEjeTec);
-                cmd.Parameters.AddWithValue("@P_METBENMESEJETEC", metBenMesEjeTec);
+                cmd.Parameters.AddWithValue("@P_METANO", metaBeneficiario.MetAno);
+                cmd.Parameters.AddWithValue("@P_METCOD", metaBeneficiario.MetCod);
+                cmd.Parameters.AddWithValue("@P_BENANO", metaBeneficiario.BenAno);
+                cmd.Parameters.AddWithValue("@P_BENCOD", metaBeneficiario.BenCod);
+                cmd.Parameters.AddWithValue("@P_UBIANO", metaBeneficiario.UbiAno);
+                cmd.Parameters.AddWithValue("@P_UBICOD", metaBeneficiario.UbiCod);
+                cmd.Parameters.AddWithValue("@P_METBENANOEJETEC", metaBeneficiario.MetBenAnoEjeTec);
+                cmd.Parameters.AddWithValue("@P_METBENMESEJETEC", metaBeneficiario.MetBenMesEjeTec);
                 cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                 cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);

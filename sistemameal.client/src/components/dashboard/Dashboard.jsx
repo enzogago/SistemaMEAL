@@ -8,7 +8,6 @@ const Dashboard = () => {
 
     
     useEffect(() => {
-        console.log(userLogged)
     }, [])
     
 

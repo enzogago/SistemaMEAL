@@ -74,7 +74,6 @@ const Modal = ({ estadoEditado, modalVisible, setModalVisible, closeModal, setDa
     useEffect(() => {
         if (modalVisible && fieldMapping) {
             const firstField = Object.keys(fieldMapping)[0];
-            console.log(firstField)
             document.getElementById(firstField).focus();
         }
     }, [modalVisible, fieldMapping]);

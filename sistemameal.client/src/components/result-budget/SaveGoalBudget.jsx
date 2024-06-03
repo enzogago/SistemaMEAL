@@ -54,7 +54,6 @@ const SaveGoalBudget = () => {
         const subProCod = subProjectUpload ? subProjectUpload.slice(4) : null; 
         
         if (subProAno && subProCod) {
-            console.log("hola")
             fetchData(`Indicador/subproyecto-actividad/${subProAno}/${subProCod}`,setIndicadores)
             fetchData(`Meta/${subProAno}/${subProCod}/${anoUpload}`, (data) => {
                 setInitialMetas(tableData); //
@@ -160,7 +159,6 @@ const SaveGoalBudget = () => {
             });
         });
 
-        console.log(metas);
         handleUpdate(metas);
         
     };

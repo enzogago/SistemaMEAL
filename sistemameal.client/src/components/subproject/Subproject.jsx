@@ -32,11 +32,9 @@ const Subproject = () => {
     };
     const openModalWithData = (data) => {
         setModalData(data);
-        console.log(data);
         setModalIsOpen(true);
 
         fetchData(`SubProyecto/files/${data.subProAno}/${data.subProCod}`, (data) => {
-            console.log(data)
             setSelectedFiles(data)
         })
     };
@@ -158,7 +156,6 @@ const Subproject = () => {
     const handleDragIn = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log(dragCounter)
         dragCounter.current++;
         if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
             setDragging(true);
@@ -206,7 +203,6 @@ const Subproject = () => {
     };
     
     const handleFileChange = (event) => {
-        console.log(event.target.files[0])
         if ([
             'application/pdf', 
             'application/vnd.ms-excel', 
@@ -232,7 +228,6 @@ const Subproject = () => {
 
     const downloadFile = async (fileName) => {
         const url = `https://meal.ddns.net/fuentes/sub-proyecto/${fileName}`
-        console.log(url)
         try {
             Notiflix.Loading.pulse('Descargando...');
             // Obtenemos los datos
@@ -266,7 +261,6 @@ const Subproject = () => {
     
             // Prepara los datos de MetasFuente
             const fuentes = modalData; // Asegúrate de que modalData tenga los datos correctos
-            console.log(file)
             // Construye el objeto MetasFuenteDto
             const SubProyectoFuenteDto = {
                 SubProyectoFuente: fuentes,

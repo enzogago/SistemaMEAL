@@ -193,7 +193,6 @@ const ResultChain = () => {
                 // Procesa los datos recibidos de cada petición
     
                 // Establece los indicadores con los datos de la última petición
-                console.log(dataPorFinanciador);
                 setIndicadores(dataSubproyecto);
         
                 // Inicializar indTotPreState y totalIndTotPre
@@ -421,8 +420,6 @@ const ResultChain = () => {
             Indicadores: cambiosPorIndicador
         }
 
-        console.log(CadenaIndicadorDto)
-        
         handleInsert(CadenaIndicadorDto);
     };
 
@@ -800,20 +797,12 @@ const ResultChain = () => {
                                                             const newTotalPorFinanciador = calculateTotal(item.indAno, item.indCod, 'porFinanciador', newTotalsPorFinanciador);
                                                             const newTotalPorAno= calculateTotal(item.indAno, item.indCod, 'porAno', newTotalsPorAno);
 
-                                                            console.log(newTotalsAll)
-                                                            console.log(newTotalPorImplementador)
-                                                            console.log(newTotalPorFinanciador)
-                                                            console.log(newTotalPorAno)
                                                             // Comprueba si los totales de las cuatro secciones son iguales
                                                             if (newTotalsAll === newTotalPorImplementador && newTotalsAll === newTotalPorFinanciador && newTotalPorAno <= newTotalsAll && newTotalPorAno > 0) {
                                                                 
                                                                 // Si los totales de la fila actual son iguales, comprueba si los totales de todas las filas son iguales
                                                                 const totalPorImplementadorAll = Object.values(newTotalsPorImplementador).reduce((a, b) => a + Number(b), 0);
                                                                 const totalPorFinanciadorAll = Object.values(newTotalsPorFinanciador).reduce((a, b) => a + Number(b), 0);
-                                                                console.log(totalIndTotPre)
-                                                                console.log(totalPorImplementadorAll)
-                                                                console.log(totalPorFinanciadorAll)
-
 
                                                                 if (totalIndTotPre === totalPorImplementadorAll && totalIndTotPre === totalPorFinanciadorAll ) {
                                                                     setIsSubmitDisabled(false);

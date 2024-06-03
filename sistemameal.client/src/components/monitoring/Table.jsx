@@ -135,7 +135,6 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
             totalMetPre: 0,
             totalEjePre: 0,
         });
-        console.log(metas)
         const paginatedData = metas.slice(startIndex, endIndex);
     
         const grouped = paginatedData.reduce((grouped, meta) => {
@@ -157,7 +156,6 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
             }
             if (isNaN(metMetPre)) {
                 metMetPre = eval(meta.metMetPre);
-                console.log(metMetPre)
             }
             if (isNaN(metEjePre)) {
                 metEjePre = eval(meta.metEjePre);

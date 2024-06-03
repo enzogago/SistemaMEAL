@@ -33,7 +33,6 @@ const UploadGoalBudget = () => {
     const handleDragIn = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log(dragCounter)
         dragCounter.current++;
         if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
             setDragging(true);
@@ -74,7 +73,6 @@ const UploadGoalBudget = () => {
 
      
     const handleFileChange = (event) => {
-        console.log(event.target.files[0])
         if (event.target.files[0].type === 'application/vnd.ms-excel.sheet.macroEnabled.12') {
             setSelectedFile(event.target.files[0]);
         } else {

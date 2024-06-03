@@ -20,14 +20,11 @@ export const handleSubmit = async (data, isEditing, navigate, safeCiphertext) =>
         
         if (!response.ok) {
             const errorData = await response.json();
-            console.log(errorData)
             if(response.status === 409){
                 Notiflix.Notify.warning(`${errorData.message} ${(data.usuCorEle).toUpperCase()}`);
-                console.log(errorData.message)
                 return;
             } else {
                 Notiflix.Notify.failure(errorData.message);
-                console.log(errorData.message)
                 return;
             }
         }

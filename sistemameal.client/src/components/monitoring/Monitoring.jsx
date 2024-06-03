@@ -31,11 +31,9 @@ const Monitoring = () => {
     };
     const openModalWithData = (data) => {
         setModalData(data);
-        console.log(data);
         setModalIsOpen(true);
 
         fetchData(`Meta/files/${data.metAno}/${data.metCod}`, (data) => {
-            console.log(data)
             setSelectedFiles(data)
         })
     };
@@ -47,7 +45,6 @@ const Monitoring = () => {
     };
     const openConfirmModalWithData = (data) => {
         setModalConfirmData(data);
-        console.log(data);
         setModalConfirmIsOpen(true);
     };
 
@@ -111,7 +108,6 @@ const Monitoring = () => {
     const handleDragIn = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log(dragCounter)
         dragCounter.current++;
         if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
             setDragging(true);
@@ -159,7 +155,6 @@ const Monitoring = () => {
     };
     
     const handleFileChange = (event) => {
-        console.log(event.target.files[0])
         if ([
             'application/pdf', 
             'application/vnd.ms-excel', 
@@ -219,7 +214,6 @@ const Monitoring = () => {
 
         // Prepara los datos de MetasFuente
         const metasFuente = modalData; // Asegúrate de que modalData tenga los datos correctos
-        console.log(file)
         // Construye el objeto MetasFuenteDto
         const metasFuenteDto = {
             MetaFuente: metasFuente,

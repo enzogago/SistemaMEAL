@@ -192,9 +192,6 @@ export const handleUpload = async (file, setTableData, setSubprojectUpload, setA
         setSubprojectUpload(subprojectUpload);
         setAnoUpload(anoUpload);
         
-        console.log(tableData);
-        console.log(subprojectUpload);
-        console.log(anoUpload);
         setTableData(tableData);
         navigate('/save-goal-budget');
     };

@@ -14,23 +14,19 @@ export const handleSubmitMetaBeneficiario = async (data, handleReset, updateData
             },
             body: JSON.stringify(data),
         });
-        console.log(response)
         if (!response.ok) {
             const errorData = await response.json();
             if(response.status === 409){
                 Notiflix.Notify.warning(`${errorData.message}`);
-                console.log(errorData.message)
                 return;
             } else {
                 Notiflix.Notify.failure(errorData.message);
-                console.log(errorData.message)
                 return;
             }
         }
 
         const successData = await response.json();
         Notiflix.Notify.success(successData.message);
-        console.log(successData);
         fetchBeneficiarie();
         setUpdateData(!updateData);
         handleReset();
@@ -59,11 +55,9 @@ export const handleSubmitMetaBeneficiarioExiste = async (data, handleReset, upda
             const errorData = await response.json();
             if(response.status === 409){
                 Notiflix.Notify.warning(`${errorData.message}`);
-                console.log(errorData.message)
                 return;
             } else {
                 Notiflix.Notify.failure(errorData.message);
-                console.log(errorData.message)
                 return;
             }
         }
@@ -98,11 +92,9 @@ export const handleSubmitMetaEjecucion = async (data, handleReset, fetchBenefici
             const errorData = await response.json();
             if(response.status === 409){
                 Notiflix.Notify.warning(`${errorData.message}`);
-                console.log(errorData)
                 return;
             } else {
                 Notiflix.Notify.failure(errorData.message);
-                console.log(errorData)
                 return;
             }
         }
@@ -127,7 +119,6 @@ export const fetchBeneficiariosMeta = async (metAno, metCod, setBeneficiariosMet
                 'Authorization': `Bearer ${token}`
             }
         });
-        console.log(response)
         if (!response.ok) {
             if(response.status == 401 || response.status == 403){
                 const data = await response.json();
@@ -140,7 +131,6 @@ export const fetchBeneficiariosMeta = async (metAno, metCod, setBeneficiariosMet
             Notiflix.Notify.failure(data.message);
             return;
         }
-        console.log(data)
         setBeneficiariosMeta(data)
     } catch (error) {
         console.error('Error:', error);
@@ -168,7 +158,6 @@ export const handleDeleteBeneficiarioMeta = async (controller,metAno,metCod,benA
                     },
                 });
                 const data = await response.json();
-                console.log(response)
                 if (!response.ok) {
                     Notiflix.Notify.failure(data.message);
                     return;
@@ -220,7 +209,6 @@ export const initPhoneInput = (inputRef, setIsValid, setTelefono, setErrorMessag
     inputRef.current.addEventListener('countrychange', function() {
         setIsValid(false)
         const countryData = phoneInput.getSelectedCountryData();
-        console.log(countryData)
     });
 
     inputRef.current.addEventListener('input', function() {

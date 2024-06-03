@@ -9,6 +9,7 @@ import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { logoBase64 } from "../../../img/Powermas_Logo_Ayuda_En_Accion";
 import Expand from '../../../icons/Expand';
+import { fetchDataReturn } from '../../reusable/fetchs';
 
 const ResultGoal = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -35,6 +36,12 @@ const ResultGoal = () => {
     const [rowIdCounter, setRowIdCounter] = useState(0);
 
     const [initialMetas, setInitialMetas] = useState([]);
+
+    const [allUbicaciones, setAllUbicaciones] = useState([]);
+
+    const [cadenaPeriodoGrouped, setCadenaPeriodoGrouped] = useState(null)
+    const [cadenaImplementadorGrouped, setCadenaImplementadorGrouped] = useState(null)
+    const [cadenaUbicacionGrouped, setCadenaUbicacionGrouped] = useState(null)
 
     const { 
         register,
@@ -129,95 +136,148 @@ const ResultGoal = () => {
         const ano = watch('metAnoPlaTec');
 
         if (subproyecto && subproyecto !== '0'&& ano && ano !== '0') {
-            const { subProAno, subProCod } = JSON.parse(subproyecto);
-            const fetchDataInOrder = async () => {
-                await fetchData(`Indicador/subproyecto/${subProAno}/${subProCod}`,setIndicadores)
-                await fetchData(`Implementador/subproyecto/${subProAno}/${subProCod}`,setImplementadoresSelect)
-                fetchData(`Ubicacion/subproyecto/${subProAno}/${subProCod}`, (data) => {
-                    setUbicacionesSelect([]);
-                    data.map(ubi => {
-                        fetchSelect(ubi.ubiAno, ubi.ubiCod);
-                    })
-                })
-                fetchData(`Meta/${subProAno}/${subProCod}/${ano}`, (data) => {
-                    // Obtén todos los nombres de los campos registrados
-                    const fieldNames = Object.keys(getValues());
-
-                    // Define los patrones de los campos que deseas desregistrar
-                    const patterns = ['financiador_', 'implementador_', 'ubicacion_', 'mes_', 'nombreUbicacion_', 'meta_', 'metMetTec_'];
-
-                    // Filtra los nombres de los campos que coincidan con alguno de los patrones
-                    const fieldsToUnregister = fieldNames.filter(fieldName =>
-                        patterns.some(pattern => fieldName.startsWith(pattern))
-                    );
-
-                    // Desregistra los campos
-                    fieldsToUnregister.forEach(fieldName => {
-                        unregister(fieldName);
-                    });
-
-                    setInitialMetas(data);
-                    setTotals({});
-                    const rows = {};
-                    let counter = rowIdCounter;
-                    data.forEach(meta => {
-                        // Usa meta.impCod, la ubicación y el indicador para crear una clave única para cada fila
-                        const rowKey = `${meta.impCod}_${JSON.stringify({ ubiAno: meta.ubiAno, ubiCod: meta.ubiCod })}_${meta.indAno}_${meta.indCod}`;
-                        if (!rows[rowKey]) {
-                            counter++;
-                        }
-                        // Crea un objeto con los valores que necesitas para tus inputs
-                        const inputValues = {
-                            tecnico: JSON.stringify({ usuAno: meta.usuAno, usuCod: meta.usuCod }),
-                            mes: meta.metMetTec,
-                            implementador: meta.impCod,
-                            ubicacion: JSON.stringify({ ubiAno: meta.ubiAno, ubiCod: meta.ubiCod }),
-                            meta: JSON.stringify({ metAno: meta.metAno, metCod: meta.metCod }),
-                        };
-                            
-                        setValue(`tecnico_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.tecnico);
-                        setValue(`implementador_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.implementador);
-                        setValue(`ubicacion_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.ubicacion);
-                        setValue(`mes_${meta.metMesPlaTec}_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.mes);
-                        setValue(`nombreUbicacion_${meta.indAno}_${meta.indCod}_${counter}`, meta.ubiNom.toLowerCase());
-                        setValue(`meta_${meta.metMesPlaTec}_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.meta);
-                        
-                        setValue(`metMetPre_${meta.metMesPlaTec}_${meta.indAno}_${meta.indCod}_${counter}`, meta.metMetPre);
-                        // Calcula los totales aquí
-                        const key = `${meta.indAno}_${meta.indCod}_${counter}_${meta.metMesPlaTec}`;
-                        const totalKey = `${meta.indAno}_${meta.indCod}_${counter}_total`;
-                        const newValue = Number(inputValues.mes);
-                        setTotals(prevTotals => ({
-                            ...prevTotals,
-                            [key]: (prevTotals[key] || 0) + newValue,
-                            [totalKey]: (prevTotals[totalKey] || 0) + newValue
-                        }));
-                        setPrevValues(prevValues => ({
-                            ...prevValues,
-                            [key]: newValue
-                        }));
-
-                        if (!rows[rowKey]) {
-                            // Si la fila no existe todavía, crea una nueva
-                            rows[rowKey] = {
-                                id: `${meta.indAno}_${meta.indCod}_${counter}`, // Usa el contador para generar un ID único
-                                indAno: meta.indAno,
-                                indCod: meta.indCod,
-                                indNum: meta.indNum,
-                                cells: [],
-                            };
-                        }
-
-                        // Agrega la celda a la fila
-                        rows[rowKey].cells.push(inputValues);
-                    });
-                    const filas = Object.values(rows);
-                    setAdditionalRows(filas);
-                    setRowIdCounter(counter+1);
+            // Inicia el bloqueo de Notiflix
+            if (document.querySelector('.content-block')) {
+                Notiflix.Block.pulse('.content-block', {
+                    svgSize: '100px',
+                    svgColor: '#F87C56',
                 });
             }
-            fetchDataInOrder();
+            
+            const { subProAno, subProCod } = JSON.parse(subproyecto);
+            // Realiza todas las peticiones en paralelo
+            Promise.all([
+                fetchDataReturn(`Indicador/subproyecto/${subProAno}/${subProCod}`),
+                fetchDataReturn(`Implementador/subproyecto/${subProAno}/${subProCod}`),
+                fetchDataReturn(`Ubicacion/subproyecto/${subProAno}/${subProCod}`),
+                fetchDataReturn(`Meta/${subProAno}/${subProCod}/${ano}`),
+                fetchDataReturn(`Indicador/cadena/${subProAno}/${subProCod}/${ano}`),
+                fetchDataReturn(`Indicador/implementador/${subProAno}/${subProCod}`),
+                fetchDataReturn(`Indicador/ubicacion/${subProAno}/${subProCod}`),
+            ]).then(([indicatorData, implementadorData, ubicacionData, metaData, cadenaPeriodoData, cadenaImplementadorData, cadenaUbicacionData]) => {
+                setIndicadores(indicatorData);
+
+                setImplementadoresSelect(implementadorData);
+
+                setUbicacionesSelect([]);
+                ubicacionData.map(ubi => {
+                    fetchSelect(ubi.ubiAno, ubi.ubiCod);
+                })
+
+                // Obtén todos los nombres de los campos registrados
+                const fieldNames = Object.keys(getValues());
+
+                // Define los patrones de los campos que deseas desregistrar
+                const patterns = ['financiador_', 'implementador_', 'ubicacion_', 'mes_', 'nombreUbicacion_', 'meta_', 'metMetTec_'];
+
+                // Filtra los nombres de los campos que coincidan con alguno de los patrones
+                const fieldsToUnregister = fieldNames.filter(fieldName =>
+                    patterns.some(pattern => fieldName.startsWith(pattern))
+                );
+
+                // Desregistra los campos
+                fieldsToUnregister.forEach(fieldName => {
+                    unregister(fieldName);
+                });
+
+                setInitialMetas(metaData);
+                setTotals({});
+                const rows = {};
+                let counter = rowIdCounter;
+                metaData.forEach(meta => {
+                    // Usa meta.impCod, la ubicación y el indicador para crear una clave única para cada fila
+                    const rowKey = `${meta.impCod}_${JSON.stringify({ ubiAno: meta.ubiAno, ubiCod: meta.ubiCod })}_${meta.indAno}_${meta.indCod}`;
+                    if (!rows[rowKey]) {
+                        counter++;
+                    }
+                    // Crea un objeto con los valores que necesitas para tus inputs
+                    const inputValues = {
+                        tecnico: JSON.stringify({ usuAno: meta.usuAno, usuCod: meta.usuCod }),
+                        mes: meta.metMetTec,
+                        implementador: meta.impCod,
+                        ubicacion: JSON.stringify({ ubiAno: meta.ubiAno, ubiCod: meta.ubiCod }),
+                        meta: JSON.stringify({ metAno: meta.metAno, metCod: meta.metCod }),
+                    };
+                        
+                    setValue(`tecnico_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.tecnico);
+                    setValue(`implementador_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.implementador);
+                    setValue(`ubicacion_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.ubicacion);
+                    setValue(`mes_${meta.metMesPlaTec}_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.mes);
+                    setValue(`nombreUbicacion_${meta.indAno}_${meta.indCod}_${counter}`, meta.ubiNom.toLowerCase());
+                    setValue(`meta_${meta.metMesPlaTec}_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.meta);
+                    
+                    setValue(`metMetPre_${meta.metMesPlaTec}_${meta.indAno}_${meta.indCod}_${counter}`, meta.metMetPre);
+                    // Calcula los totales aquí
+                    const key = `${meta.indAno}_${meta.indCod}_${counter}_${meta.metMesPlaTec}`;
+                    const totalKey = `${meta.indAno}_${meta.indCod}_${counter}_total`;
+                    const newValue = Number(inputValues.mes);
+                    setTotals(prevTotals => ({
+                        ...prevTotals,
+                        [key]: (prevTotals[key] || 0) + newValue,
+                        [totalKey]: (prevTotals[totalKey] || 0) + newValue
+                    }));
+                    setPrevValues(prevValues => ({
+                        ...prevValues,
+                        [key]: newValue
+                    }));
+
+                    if (!rows[rowKey]) {
+                        // Si la fila no existe todavía, crea una nueva
+                        rows[rowKey] = {
+                            id: `${meta.indAno}_${meta.indCod}_${counter}`, // Usa el contador para generar un ID único
+                            indAno: meta.indAno,
+                            indCod: meta.indCod,
+                            indNum: meta.indNum,
+                            cells: [],
+                        };
+                    }
+
+                    // Agrega la celda a la fila
+                    rows[rowKey].cells.push(inputValues);
+                });
+                const filas = Object.values(rows);
+                setAdditionalRows(filas);
+                setRowIdCounter(counter+1);
+
+                let groupedImplementadorData = {};
+                cadenaImplementadorData.forEach(item => {
+                    let key = `${item.indAno}-${item.indCod}`;
+
+                    if (!groupedImplementadorData[key]) {
+                        groupedImplementadorData[key] = {};
+                    }
+
+                    groupedImplementadorData[key][item.impCod] = item.cadResImpMetPre;
+                });
+
+                let groupedUbicacionData = {};
+                cadenaUbicacionData.forEach(item => {
+                    let key = `${item.indAno}-${item.indCod}`;
+                    if (!groupedUbicacionData[key]) {
+                        groupedUbicacionData[key] = {};
+                    }
+                    groupedUbicacionData[key][`${item.ubiAno}-${item.ubiCod}`] = item.cadResUbiMetTec;
+                });
+
+                let groupedPeriodoData = {};
+                cadenaPeriodoData.forEach(item => {
+                    let key = `${item.indAno}-${item.indCod}`;
+                    groupedPeriodoData[key]  = item.cadResPerMetTec;
+                });
+
+                setCadenaPeriodoGrouped(groupedPeriodoData);
+                setCadenaUbicacionGrouped(groupedUbicacionData);
+                setCadenaImplementadorGrouped(groupedImplementadorData);
+            }).catch(error => {
+                // Maneja los errores
+                console.error('Error:', error);
+                Notiflix.Notify.failure('Ha ocurrido un error al cargar los datos.');
+            }).finally(() => {
+                // Quita el bloqueo de Notiflix una vez que todas las peticiones han terminado
+                Notiflix.Block.remove('.content-block');
+            });
         } else {
+            setIndicadores([])
         }
     }, [watch('metAnoPlaTec')]);
     
@@ -227,7 +287,6 @@ const ResultGoal = () => {
     }
 
     const onSubmit = (data) => {
-
         let metas = [];
         let metasIniciales = [];
         additionalRows.forEach((row, rowIndex) => {
@@ -456,6 +515,17 @@ const ResultGoal = () => {
                 Notiflix.Notify.failure(data.message);
                 return;
             }
+            setAllUbicaciones(prevAllUbicaciones => {
+                // Verifica si el arreglo ya contiene un objeto con el mismo ubiAno y ubiCod
+                const isAlreadyIncluded = prevAllUbicaciones.some(ubicacion => ubicacion.ubiAno === data[0].ubiAno && ubicacion.ubiCod === data[0].ubiCod);
+                // Si no está incluido, agrega los nuevos objetos al arreglo
+                if (!isAlreadyIncluded) {
+                    return [...prevAllUbicaciones, ...data];
+                }
+                // Si ya está incluido, devuelve el arreglo sin cambios
+                return prevAllUbicaciones;
+            });
+
             setUbicacionesSelect(prevUbicaciones => {
                 // Verifica si el arreglo ya contiene un objeto con el mismo ubiAno y ubiCod
                 const isAlreadyIncluded = prevUbicaciones.some(ubicacion => ubicacion.ubiAno === data[0].ubiAno && ubicacion.ubiCod === data[0].ubiCod);
@@ -501,10 +571,22 @@ const ResultGoal = () => {
                 Notiflix.Notify.failure(data.message);
                 return;
             }
+
             if (data.length > 0) {
-                setSelects(prevSelects => prevSelects.slice(0, index + 1).concat([data]));  // Reinicia los selects por debajo del nivel actual
+                // Filtra los datos devueltos por la API
+                const filteredData = data.filter(d => {
+                    // Verifica si el objeto ya está en allUbicaciones
+                    return allUbicaciones.some(ubicacion => ubicacion.ubiAno === d.ubiAno && ubicacion.ubiCod === d.ubiCod);
+                });
+            
+                // Si filteredData tiene elementos, entonces actualiza el estado
+                if (filteredData.length > 0) {
+                    setSelects(prevSelects => prevSelects.slice(0, index + 1).concat([filteredData]));  // Reinicia los selects por debajo del nivel actual
+                } else {
+                    setSelects(prevSelects => prevSelects.slice(0, index + 1).concat([data]));  // Agrega todos los datos si no se encontró ninguno en allUbicaciones
+                }
             } else {
-                setSelects(prevSelects => prevSelects.slice(0, index + 1));  // Reinicia los selects por debajo del nivel actual
+                setSelects(prevSelects => prevSelects.slice(0, index + 1));
             }
         } catch (error) {
             console.error('Error:', error);
@@ -641,8 +723,6 @@ const ResultGoal = () => {
             });
         });
 
-        
-    
         // Crear el archivo de Excel y descargarlo
         const buffer = await workbook.xlsx.writeBuffer();
         const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -650,7 +730,7 @@ const ResultGoal = () => {
     };
      
     return (
-        <div className='p1 flex flex-column flex-grow-1 overflow-auto'>
+        <div className='p1 flex flex-column flex-grow-1 overflow-auto content-block'>
             <h1 className="Large-f1_5"> Metas técnicas programáticas </h1>
             <div className='flex jc-space-between gap-1 p_5'>
                 <div className="flex-grow-1">
@@ -926,6 +1006,10 @@ const ResultGoal = () => {
                                                     style={{margin: '0'}}
                                                     onInput={(e) => {
                                                         e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                                                        const implementadorValue = watch(`implementador_${row.id}`);
+                                                        const ubicacionValue = watch(`ubicacion_${row.id}`);
+
+                                                        const { ubiAno, ubiCod} = JSON.parse(ubicacionValue);
 
                                                         if (row.id !== undefined) {
                                                             const key = `${row.id}_${String(i+1).padStart(2, '0')}`;

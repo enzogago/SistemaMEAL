@@ -128,7 +128,6 @@ export const handleUpload = async (file, setTableData, setPostData, setIsValid, 
 
     // Comprueba el nombre del archivo
     const fileName = file.name;
-    console.log(fileName)
     const expectedFileName = 'MARCO_LOGICO.xlsm'; // Reemplaza esto con el nombre de archivo esperado
     if (fileName !== expectedFileName) {
         alert(`El nombre del archivo debe ser "${expectedFileName}"`);
@@ -155,10 +154,8 @@ export const handleUpload = async (file, setTableData, setPostData, setIsValid, 
 
         // Extrae los encabezados legibles por humanos de expectedHeaders
         const expectedHeaderDisplays = expectedHeaders.map(header => header.display.toUpperCase());
-        console.log(expectedHeaderDisplays);
         // Verifica que los encabezados son correctos
         const headers = worksheet.getRow(12).values.slice(3, 26); // Tomando en cuenta los encabezados estan en la fila 4 a partir de la columna 2
-        console.log(headers);
         if (!arraysEqual(headers, expectedHeaderDisplays)) {
             alert('Los encabezados no son válidos');
             setIsValid(false);
@@ -340,7 +337,6 @@ export const handleUpload = async (file, setTableData, setPostData, setIsValid, 
         setTableData(tableData);
         setPostData(projectsArray);
         setErrorCells(newErrorCells);
-        console.log(tableData)
         navigate('/guardar-proyecto');
     };
     reader.readAsArrayBuffer(file);

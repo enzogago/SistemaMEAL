@@ -49,12 +49,14 @@ const FormGoalExecution = () => {
                 Notiflix.Notify.failure(data.message);
                 return;
             }
-            setMetaData(data);
-            console.log(data)
-            setValue('metEjeMesEjeTec', data.metMesPlaTec)
-            setValue('metEjeAnoEjeTec', data.metAnoPlaTec)
-            // setValue('pais', JSON.stringify({ ubiCod: data.ubiCod, ubiAno: data.ubiAno }))
-            fetchSelects(data.ubiAno, data.ubiCod);
+            if (data.uniInvPer === 'N') {
+                setMetaData(data);
+                setValue('metEjeMesEjeTec', data.metMesPlaTec)
+                setValue('metEjeAnoEjeTec', data.metAnoPlaTec)
+                fetchSelects(data.ubiAno, data.ubiCod);
+            } else {
+                navigate(`/form-goal-beneficiarie/${safeCiphertext}`);
+            }
         } catch (error) {
             console.error('Error:', error);
         } finally {
@@ -165,14 +167,12 @@ const FormGoalExecution = () => {
                 Notiflix.Notify.failure(data.message);
                 return;
             }
-            console.log(data)
             if (data.length > 1) {
                 setValue('pais', JSON.stringify({ ubiCod: data[0].ubiCod, ubiAno: data[0].ubiAno }));
                 await handleCountryChange(JSON.stringify({ ubiCod: data[0].ubiCod, ubiAno: data[0].ubiAno }));
                 const newSelectedValues = data.slice(1).map(location => JSON.stringify({ubiCod:location.ubiCod,ubiAno:location.ubiAno}));
                 setSelectedValues(newSelectedValues);   
                 setInitialSelectCount(data.length);
-                console.log(newSelectedValues)
                 for (const [index, location] of data.slice(1).entries()) {
                     // Espera a que handleCountryChange termine antes de continuar con la siguiente iteración
                     await handleCountryChange(JSON.stringify({ubiCod: location.ubiCod,ubiAno: location.ubiAno}), index);
@@ -242,7 +242,6 @@ const FormGoalExecution = () => {
                 metEjeVal
             }
 
-            console.log(MetaEjecucion);
             handleSubmitMetaEjecucion(MetaEjecucion, handleReset, fetchMetaDetails);
         })();
     };

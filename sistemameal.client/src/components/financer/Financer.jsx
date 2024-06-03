@@ -31,7 +31,6 @@ const Financer = () => {
                 estado[key] = estado[key].replace(/\s+/g, ' ').trim();
             }
         }
-        console.log(estado)
         setEstadoEditado(estado);
         setModalVisible(true);
     };

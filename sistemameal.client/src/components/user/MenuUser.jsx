@@ -191,7 +191,6 @@ const MenuUser = () => {
             }
         };
 
-
         try {
             Notiflix.Loading.pulse();
             const token = localStorage.getItem('token');

@@ -57,7 +57,6 @@ const UploadBeneficiarie = () => {
     const handleDragIn = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log(dragCounter)
         dragCounter.current++;
         if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
             setDragging(true);
@@ -93,7 +92,6 @@ const UploadBeneficiarie = () => {
         fileInputRef.current.click();
     };
     const handleFileChange = (event) => {
-        console.log(event.target.files[0])
         if (event.target.files[0].type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"){
             setSelectedFile(event.target.files[0]);
         } else {
@@ -131,7 +129,6 @@ const UploadBeneficiarie = () => {
                 return;
             }
             setMetaData(data);
-            console.log(data)
             setValue('metBenMesEjeTec', data.metMesPlaTec)
             setValue('metBenAnoEjeTec', data.metAnoPlaTec)
             // setValue('pais', JSON.stringify({ ubiCod: data.ubiCod, ubiAno: data.ubiAno }))
@@ -237,14 +234,12 @@ const UploadBeneficiarie = () => {
                 Notiflix.Notify.failure(data.message);
                 return;
             }
-            console.log(data)
             if (data.length > 1) {
                 setValue('pais', JSON.stringify({ ubiCod: data[0].ubiCod, ubiAno: data[0].ubiAno }));
                 await handleCountryChange(JSON.stringify({ ubiCod: data[0].ubiCod, ubiAno: data[0].ubiAno }));
                 const newSelectedValues = data.slice(1).map(location => JSON.stringify({ubiCod:location.ubiCod,ubiAno:location.ubiAno}));
                 setSelectedValues(newSelectedValues);   
                 setInitialSelectCount(data.length);
-                console.log(newSelectedValues)
                 for (const [index, location] of data.slice(1).entries()) {
                     // Espera a que handleCountryChange termine antes de continuar con la siguiente iteración
                     await handleCountryChange(JSON.stringify({ubiCod: location.ubiCod,ubiAno: location.ubiAno}), index);

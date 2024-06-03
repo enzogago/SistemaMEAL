@@ -49,7 +49,6 @@ const ExecutionBudget = () => {
         if (subproyecto && subproyecto !== '0') {
             const { subProAno, subProCod } = JSON.parse(subproyecto);
             const selected = subproyectos.find(item => item.subProAno === subProAno && item.subProCod === subProCod);
-            console.log(selected)
             setSelectedSubProyecto(selected);
         } else {
             setIndicadores([]);

@@ -16,7 +16,6 @@ import Edit from "../../../icons/Edit";
 
 const TableExecuting = ({data, openModalGoalExecuting, metaData }) => {
     if(!openModalGoalExecuting) return;
-    console.log("asdad")
 
     // Variables State AuthContext 
     const { authInfo } = useContext(AuthContext);

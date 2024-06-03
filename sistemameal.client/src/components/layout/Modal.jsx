@@ -26,10 +26,8 @@ const Modal = ({ isOpen, closeModal, user }) => {
                 },
                 body: JSON.stringify(payload),
             });
-            console.log("desde response: ",response)
             const data = await response.json();
             if (!response.ok) {
-                console.log(data);
                 Notiflix.Notify.failure(data.message);
                 return;
             }

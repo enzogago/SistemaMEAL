@@ -45,7 +45,6 @@ const Table = ({data, setUsersTable}) => {
 
     const Restablecer_Password = (row) => {
         setSelectedUser({ usuAno: row.original.usuAno, usuCod: row.original.usuCod });
-        console.log({ usuAno: row.original.usuAno, usuCod: row.original.usuCod })
         openModal();
     }
 
@@ -285,9 +284,7 @@ const Table = ({data, setUsersTable}) => {
     };
  
     const Editar_Usuario = (row) => {
-        console.log(row)
         const id = `${row.original.usuAno}${row.original.usuCod}`;
-        console.log(id)
         // Encripta el ID
         const ciphertext = CryptoJS.AES.encrypt(id, 'secret key 123').toString();
         // Codifica la cadena cifrada para que pueda ser incluida de manera segura en una URL

@@ -10,7 +10,6 @@ const ModalGoalExecuting = ({openModalGoalExecuting, closeModalExecuting, metaDa
             return;
         } else {
             fetchData(`Meta/executing/${metaData.metAno}/${metaData.metCod}`, (data) => {
-                console.log(data)
                 setData(data)
             })
         }

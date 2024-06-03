@@ -142,10 +142,40 @@ namespace SistemaMEAL.Server.Modulos
                 mensaje = pDescripcionMensaje.Value.ToString();
                 tipoMensaje = pTipoMensaje.Value.ToString();
 
-                cmd = new SqlCommand("SP_BUSCAR_USUARIO_AUTH", cn.getcn);
+                cmd = new SqlCommand("SP_BUSCAR_USUARIO", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@Ano", usuario.UsuAno);
-                cmd.Parameters.AddWithValue("@Cod", usuario.UsuCod);
+                // Aquí puedes agregar los parámetros necesarios para tu procedimiento almacenado
+                cmd.Parameters.AddWithValue("@P_USUANO", usuario.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD", usuario.UsuCod);
+                cmd.Parameters.AddWithValue("@P_DOCIDECOD", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUNUMDOC", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUNOM", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUAPE", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUFECNAC", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUSEX", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUCORELE", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_CARCOD", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUFECINC", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUTEL", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUNOMUSU", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUPAS", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUEST", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_ROLCOD", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_UBIANO", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_UBICOD", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe ?? (object)DBNull.Value);
+
+                pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
 
                 StringBuilder jsonResult = new StringBuilder();
                 SqlDataReader reader = cmd.ExecuteReader();
@@ -220,10 +250,40 @@ namespace SistemaMEAL.Server.Modulos
                 mensaje = pDescripcionMensaje.Value.ToString();
                 tipoMensaje = pTipoMensaje.Value.ToString();
 
-                cmd = new SqlCommand("SP_BUSCAR_USUARIO_AUTH", cn.getcn);
+                cmd = new SqlCommand("SP_BUSCAR_USUARIO", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@Ano", usuario.UsuAno);
-                cmd.Parameters.AddWithValue("@Cod", usuario.UsuCod);
+                // Aquí puedes agregar los parámetros necesarios para tu procedimiento almacenado
+                cmd.Parameters.AddWithValue("@P_USUANO", usuario.UsuAno);
+                cmd.Parameters.AddWithValue("@P_USUCOD", usuario.UsuCod);
+                cmd.Parameters.AddWithValue("@P_DOCIDECOD", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUNUMDOC", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUNOM", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUAPE", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUFECNAC", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUSEX", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUCORELE", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_CARCOD", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUFECINC", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUTEL", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUNOMUSU", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUPAS", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUEST", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_ROLCOD", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_UBIANO", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_UBICOD", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe ?? (object)DBNull.Value);
+
+                pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                pDescripcionMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pDescripcionMensaje);
+
+                pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                pTipoMensaje.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(pTipoMensaje);
 
                 StringBuilder jsonResult = new StringBuilder();
                 SqlDataReader reader = cmd.ExecuteReader();

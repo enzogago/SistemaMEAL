@@ -9,7 +9,6 @@ import { initPhoneInput } from './eventHandlers';
 
 const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate, metaData, initialSelectCount}) => {
 
-    if (!modalVisible) return; 
     const [ paises, setPaises ] = useState([]);
     const [ generos, setGeneros ] = useState([]);
     const [ nacionalidades, setNacionalidades ] = useState([]);
@@ -182,23 +181,19 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
 
             if (!hasChanged && !fieldsDisabled) { // No cambió y los campos habilitados
                 // UPDATE BENEFICIARIO
-                console.log(data)
                 handleSubmitBeneficiarie(data, closeModalEdit, setUpdate);
             } else if(fieldsDisabled){ // Cambió y los campos deshabilitados
                 // Update META_BENEFICIARIO
-                console.log(dataMetaBeneficiario)
                 handleSubmiMetaBeneficiario(dataMetaBeneficiario, closeModalEdit);
             } else if(!fieldsDisabled){
                 if(hasChanged && hasChangedBeneficiarie){ // Si cambian los datos de Meta_Beneficiario y Beneficiario
                     // UPDATE META_BENEFICAIRIO y BENEFICIARIO
-                    console.log(dataBeneficiarioMetaBeneficiario)
                     const dataBeneficiarioMetaBeneficiario= {
                         Beneficiario: { ...data },
                         MetaBeneficiario: { ...dataMetaBeneficiario},
                     }
                     handleSubmiBeneficiarioMetaBeneficiario(dataBeneficiarioMetaBeneficiario, closeModalEdit, setUpdate);
                 } else { // Solo cambia los datos de Meta_Beneficiario
-                    console.log(dataMetaBeneficiario)
                     // Update META_BENEFICIARIO
                     handleSubmiMetaBeneficiario(dataMetaBeneficiario, closeModalEdit);
                 }
@@ -231,7 +226,6 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                 body: JSON.stringify(newData),
             });
             const data = await response.json();
-            console.log(data)
             if (!response.ok) {
                 Notiflix.Notify.failure(data.message);
                 return;
@@ -273,7 +267,6 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                 },
                 body: JSON.stringify(dataForm),
             });
-            console.log(response)
             const data = await response.json();
             
             if (!response.ok) {
@@ -321,7 +314,6 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
 
     useEffect(() => {
         if (modalVisible && isDataLoaded) {
-            console.log(record)
             fetchMetaForm(record);
         }
     }, [isDataLoaded, modalVisible]);
@@ -338,7 +330,6 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
 
     const fetchMetaForm = async (record) => {
         try {
-            console.log(record)
             const token = localStorage.getItem('token');
             Notiflix.Loading.pulse('Cargando...');
             
@@ -347,7 +338,6 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                     'Authorization': `Bearer ${token}`
                 }
             });
-            console.log(response)
             const data = await response.json();
             if (!response.ok) {
                 Notiflix.Notify.failure(data.message);
@@ -408,13 +398,11 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                 Notiflix.Notify.failure(data.message);
                 return;
             }
-            console.log(data)
             if (data.length > 1) {
                 setValue('pais', JSON.stringify({ ubiCod: data[0].ubiCod, ubiAno: data[0].ubiAno }));
                 await handleCountryChange(JSON.stringify({ ubiCod: data[0].ubiCod, ubiAno: data[0].ubiAno }));
                 const newSelectedValues = data.slice(1).map(location => JSON.stringify({ubiCod:location.ubiCod,ubiAno:location.ubiAno}));
                 setSelectedValues(newSelectedValues);
-                console.log(newSelectedValues)
                 for (const [index, location] of data.slice(1).entries()) {
                     // Espera a que handleCountryChange termine antes de continuar con la siguiente iteración
                     await handleCountryChange(JSON.stringify({ubiCod: location.ubiCod,ubiAno: location.ubiAno}), index);
@@ -437,7 +425,6 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
 
     const handleCountryChange = async (ubicacion, index) => {
         const selectedCountry = JSON.parse(ubicacion);
-        console.log(selectedCountry)
         if (ubicacion == '0') {
             setSelects(prevSelects => prevSelects.slice(0, index + 1));  // Reinicia los selects por debajo del nivel actual
 

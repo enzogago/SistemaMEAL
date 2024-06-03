@@ -18,7 +18,6 @@ import Select from "../../../icons/Select";
 const ModalBeneficiariesName = ({data, modalBeneficiariesName, closeBeneficiariesName,buscarDataMetas }) => {
 
     if(!modalBeneficiariesName) return;
-    console.log(data)
     // Variables State AuthContext 
     const { authInfo } = useContext(AuthContext);
     const { userPermissions } = authInfo;

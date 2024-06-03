@@ -343,8 +343,6 @@ const RegisterProject = () => {
                     } else {
                         // Si solo hay un select (el de país) y su valor es '0', obtén el ubiAno y ubiCod del país
                         const paisSelectElement = document.querySelector(`select[name=select${countryIndex}]`);
-                        console.log(countryIndex)
-                        console.log(paisSelectElement)
                         const paisSelect = JSON.parse(paisSelectElement.value);
                         ubiAno = paisSelect.ubiAno;
                         ubiCod = paisSelect.ubiCod;
@@ -374,7 +372,6 @@ const RegisterProject = () => {
                 SubProyectoImplementadores: selectValues,
                 SubProyectoUbicaciones: ubicaciones
             }
-            console.log(SubProyectoImplementadorDto)
             handleSubmit(SubProyectoImplementadorDto, navigate);
         })();
     }
@@ -390,7 +387,6 @@ const RegisterProject = () => {
                 newData[key] = data[key];
             }
         }
-        console.log(newData)
     
         try {
             Notiflix.Loading.pulse();

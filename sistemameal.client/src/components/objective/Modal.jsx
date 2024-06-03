@@ -31,7 +31,6 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
             subProAno,
             subProCod
         }
-        console.log(data)
         handleSubmitMant('Objetivo',!!estadoEditado, data, setData, closeModalAndReset)
     };
 

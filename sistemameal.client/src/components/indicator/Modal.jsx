@@ -144,7 +144,6 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
             subProAno,
             subProCod
         }
-        console.log(dataSubmit)
         handleSubmitMant('Indicador', !!estadoEditado, dataSubmit, setData, closeModalAndReset)
     };
 
@@ -168,7 +167,6 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
     useEffect(() => {
         const resultado = watch('resultado');
         if (resultado && resultado !== '0' && resultado !== '') {
-            console.log(resultado)
             const { resAno, resCod } = JSON.parse(resultado);
             fetchData(`Actividad/resultado/${resAno}/${resCod}`, (data) => {
                 if (involucraSubActividad) {
@@ -216,9 +214,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
     useEffect(() => {
         const subProyecto = watch('subProyecto');
         if (subProyecto !== '0' && subProyecto !== '' && subProyecto) {
-            console.log(subProyecto)
             const { subProAno, subProCod, subProInvSubAct } = JSON.parse(subProyecto);
-            console.log(subProInvSubAct)
             fetchData(`Objetivo/subproyecto/${subProAno}/${subProCod}`, (data) => {
                 setValue('objetivo', '0');
                 if(data.length > 0 ) {
@@ -233,7 +229,6 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                 setInvolucraSubActividad(false);
             }
             fetchData(`Indicador/subproyecto-actividad/${subProAno}/${subProCod}`, (data) => {
-                console.log(data)
                 setIndicadoresSelect(data);
                 if (estadoEditado) {
                     const newIndFor = replaceCodesWithIndicators(estadoEditado.indFor, data);
@@ -288,7 +283,6 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
     // Efecto para manejar la edición del estado
     useEffect(() => {
         if (estadoEditado && objetivosLoaded) {
-            console.log(estadoEditado)
             const { objAno, objCod } = estadoEditado;
             setValue('objetivo', JSON.stringify({ objAno, objCod }));
         }

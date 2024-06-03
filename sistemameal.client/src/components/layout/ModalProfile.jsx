@@ -43,7 +43,6 @@ const ModalProfile = ({openModal, closeModal}) => {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            console.log(response)
             if (!response.ok) {
                 if(response.status === 401 || response.status === 403){
                     const data = await response.json();
@@ -78,7 +77,6 @@ const ModalProfile = ({openModal, closeModal}) => {
 
                 // Ahora que todas las operaciones anteriores se han completado, ejecuta fetchData('Usuario/${usuAno}/${usuCod}')
                 fetchDataReturn(`Usuario/${usuAno}/${usuCod}`).then((data) => {
-                    console.log(data)
                     // Desestructura los datos del usuario
                     const { usuAno, usuCod, docIdeCod, usuNumDoc, usuNom, usuApe, usuTel, usuFecNac, carCod } = data;
 
@@ -106,7 +104,6 @@ const ModalProfile = ({openModal, closeModal}) => {
                 return;
             }
             data.usuTel=phoneNumber;
-            console.log(data)
             handleSubmit(data);
         })();
     }
@@ -180,7 +177,6 @@ const ModalProfile = ({openModal, closeModal}) => {
     const handleDragIn = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log(dragCounter)
         dragCounter.current++;
         if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
             setDragging(true);
@@ -201,7 +197,6 @@ const ModalProfile = ({openModal, closeModal}) => {
         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
             const file = e.dataTransfer.files[0];
             const fileType = file.name.split('.').pop().toLowerCase(); // Convertir a minúsculas para evitar problemas de mayúsculas y minúsculas
-            console.log(fileType)
             if (fileType === 'jpg' || fileType === 'jpeg') { // Aceptar jpg y jpeg
                 fileInputRef.current.files = e.dataTransfer.files;
                 setSelectedFile(e.dataTransfer.files[0]);
@@ -214,7 +209,6 @@ const ModalProfile = ({openModal, closeModal}) => {
     };
     
     const handleFileChange = (event) => {
-        console.log(event.target.files[0])
         const fileType = event.target.files[0].type;
         if (fileType === "image/jpeg" || fileType === "image/jpg") { // Aceptar jpg y jpeg
             setSelectedFile(event.target.files[0]);
@@ -264,8 +258,6 @@ const ModalProfile = ({openModal, closeModal}) => {
                         usuAva: fileData,
                     };
     
-                    console.log(dataAvatar);
-    
                     const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Usuario/update-avatar`, {
                         method: 'PUT',
                         body: JSON.stringify(dataAvatar),
@@ -279,7 +271,6 @@ const ModalProfile = ({openModal, closeModal}) => {
     
                     if (!response.ok) {
                         Notiflix.Notify.failure(data.message);
-                        console.log(data)
                         return;
                     }
     

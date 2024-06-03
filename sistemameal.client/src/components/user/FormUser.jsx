@@ -113,9 +113,7 @@ const FormUser = () => {
                     }
                 };
                 generarContrasena();
-                console.log("entro")
             } else{
-                console.log("else")
                 setValue('usuPas', '');
             }
         }
@@ -150,7 +148,6 @@ const FormUser = () => {
                     Notiflix.Notify.failure(data.message);
                     return;
                 }
-                console.log(data)
                 // Pasamos todo a minusculas para pintar los campos capitalizados
                 let newData = {};
                 
@@ -211,7 +208,6 @@ const FormUser = () => {
                 const { ubiAno, ubiCod } = JSON.parse(data.pais);
                 newData.ubiAno = ubiAno;
                 newData.ubiCod = ubiCod;
-                console.log(newData)
                 handleSubmit(newData, isEditing, navigate, safeCiphertext);
             } else {
                 Notiflix.Notify.info("No se realizaron cambios");

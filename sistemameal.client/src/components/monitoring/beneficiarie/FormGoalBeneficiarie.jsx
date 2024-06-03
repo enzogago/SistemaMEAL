@@ -99,7 +99,11 @@ const FormGoalBeneficiarie = () => {
                     Notiflix.Notify.failure(data.message);
                     return;
                 }
-                setMetaData(data);
+                if (data.uniInvPer === 'S') {
+                    setMetaData(data);
+                } else {
+                    navigate(`/form-goal-execution/${safeCiphertext}`);
+                }
             } catch (error) {
                 console.error('Error:', error);
             } finally {
@@ -128,7 +132,6 @@ const FormGoalBeneficiarie = () => {
                 return;
             }
             setMetaData(data);
-            console.log(data)
             setValue('metBenMesEjeTec', data.metMesPlaTec)
             setValue('metBenAnoEjeTec', data.metAnoPlaTec)
             // setValue('pais', JSON.stringify({ ubiCod: data.ubiCod, ubiAno: data.ubiAno }))
@@ -192,7 +195,6 @@ const FormGoalBeneficiarie = () => {
     = useForm({ mode: "onChange"});
 
     const buscarDataMetas = (data) => {
-        console.log(data)
 
         setDataGoalBeneficiarie(data)
         reset(data);
@@ -323,7 +325,6 @@ const FormGoalBeneficiarie = () => {
                     return;
                 }
 
-                console.log(data)
                 setDataBeneficiariesName(data)
                 setModalBeneficiariesName(true);
             } catch (error) {
@@ -469,7 +470,6 @@ const FormGoalBeneficiarie = () => {
     
     const handleCountryChange = async (ubicacion, index) => {
         const selectedCountry = JSON.parse(ubicacion);
-        console.log(selectedCountry)
         if (ubicacion == '0') {
             setSelects(prevSelects => prevSelects.slice(0, index + 1));  // Reinicia los selects por debajo del nivel actual
 
@@ -531,7 +531,6 @@ const FormGoalBeneficiarie = () => {
                 Notiflix.Notify.failure(data.message);
                 return;
             }
-            console.log(data)
             if (data.length > 1) {
                 setValue('pais', JSON.stringify({ ubiCod: data[0].ubiCod, ubiAno: data[0].ubiAno }));
                 await handleCountryChange(JSON.stringify({ ubiCod: data[0].ubiCod, ubiAno: data[0].ubiAno }));
@@ -559,7 +558,6 @@ const FormGoalBeneficiarie = () => {
 
     const Registrar_Beneficiario =  () => {
         validateForm( (data) => {
-            console.log(data)
             const {metBenAnoEjeTec,metBenMesEjeTec} = data;
             // Obtiene el ubiAno y ubiCod del último select
             // Definimos variables de ubicacion
@@ -600,8 +598,6 @@ const FormGoalBeneficiarie = () => {
             }
 
             if (!isValid || !contactIsValid) {
-                console.log(isValid)
-                console.log(contactIsValid)
                 return;
             }
             
@@ -640,7 +636,6 @@ const FormGoalBeneficiarie = () => {
                 beneficiarioMonitoreo.Beneficiario.benTel=phoneNumber;
                 beneficiarioMonitoreo.Beneficiario.benTelCon=phoneContactNumber;
 
-                console.log(beneficiarioMonitoreo)
                 handleSubmitMetaBeneficiario(beneficiarioMonitoreo, handleReset, updateData, setUpdateData, fetchMetaDetails);
             } else { // Si existe el beneficairio solo insertar MetaBeneficiario
                 const { benAno, benCod } = data;
@@ -654,7 +649,6 @@ const FormGoalBeneficiarie = () => {
                     metBenMesEjeTec,
                     metBenAnoEjeTec
                 }
-                console.log(MetaBeneficiario)
                 handleSubmitMetaBeneficiarioExiste(MetaBeneficiario, handleReset, updateData, setUpdateData, fetchMetaDetails);
             }
         })();

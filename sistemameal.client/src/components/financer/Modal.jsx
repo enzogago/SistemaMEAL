@@ -26,7 +26,6 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
     };
 
     const onSubmit = (data) => {
-        console.log(data)
         handleSubmitMant('Financiador',!!estadoEditado,data, setData, closeModalAndReset)
     };
 

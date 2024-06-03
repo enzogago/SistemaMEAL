@@ -14,7 +14,6 @@ import Edit from '../../../icons/Edit';
 import Delete from '../../../icons/Delete';
 
 const Table = ({ data, openModal, setData, controller, fieldMapping, title, resize, isLargePagination=false,format='A4',filterProperties }) => {
-    console.log(data)
     // Variables State AuthContext 
     const { authInfo } = useContext(AuthContext);
     const { userPermissions } = authInfo;
@@ -202,7 +201,6 @@ const Table = ({ data, openModal, setData, controller, fieldMapping, title, resi
             item.subProPerMesIniNombre = (new Date(2024, item.subProPerMesIni - 1).toLocaleString('es-ES', { month: 'long' })).toUpperCase();
         }
         if (item.indTipInd) {
-            console.log(item.indTipInd)
             item.indTipIndNombre = tipoIndicadorMapping[item.indTipInd].toUpperCase();
         }
     });

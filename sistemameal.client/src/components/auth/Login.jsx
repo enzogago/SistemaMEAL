@@ -30,7 +30,6 @@ const Login = () => {
         setMenuData([]);
         const savedCredentials = JSON.parse(localStorage.getItem('credentials'));
         if (savedCredentials) {
-            console.log(savedCredentials)
             const bytes  = CryptoJS.AES.decrypt(savedCredentials.encryptedPassword, 'secret key 123');
             const originalPassword = bytes.toString(CryptoJS.enc.Utf8);
             setEmail(savedCredentials.email);
@@ -64,14 +63,12 @@ const Login = () => {
                 body: JSON.stringify({ email, password, clientIp })
             });
         
-            console.log(response)
             if (!response.ok || response.status === 204) {
                 console.error(`HTTP error! status: ${response.status}`);
                 return;
             }
         
             const data = await response.json();
-            console.log(data)
             if (data.success) {
                 setUserLogged(data.user);
                 if (rememberMe) {

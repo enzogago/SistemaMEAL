@@ -19,7 +19,6 @@ const UploadValidate = () => {
     const { statusInfo, statusActions } = useContext(StatusContext);
     const { tableData, isValid, errorCells, metaBeneficiario } = statusInfo;
     const { setTableData } = statusActions;
-    console.log(metaBeneficiario)
     useEffect(() => {
         if (tableData.length == 0) {
             navigate('/monitoring');
@@ -65,10 +64,6 @@ const UploadValidate = () => {
         }
         
         // Aquí puedes procesar los datos y enviarlos al servidor
-        console.log('Procesando datos...');
-        console.log(metaBeneficiario);
-        console.log(tableData);
-
         const MetaBeneficiarioDto = {
             Beneficiarios: tableData,
             MetaBeneficiario: metaBeneficiario
@@ -85,14 +80,11 @@ const UploadValidate = () => {
                 },
                 body: JSON.stringify(MetaBeneficiarioDto),
             });
-            console.log("desde response: ",response)
             const data = await response.json();
             if (!response.ok) {
-                console.log(data)
                 Notiflix.Notify.failure(data.message)
                 return;
             }
-            console.log(data)
             Notiflix.Notify.success(data.message)
             setTableData([]);
             navigate('/monitoring')

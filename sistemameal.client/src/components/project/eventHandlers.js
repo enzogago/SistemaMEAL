@@ -12,7 +12,6 @@ export const handleSubmit = async (data, isEditing, setRegistros, closeModalAndR
             newData[key] = data[key];
         }
     }
-    console.log(newData)
 
     try {
         Notiflix.Loading.pulse();

@@ -225,7 +225,6 @@ const FormSubProject = () => {
                                 'Authorization': `Bearer ${token}`
                             }
                         });
-                        console.log(response)
                         const data = await response.json();
                         if (!response.ok) {
                             Notiflix.Notify.failure(data.message);
@@ -252,7 +251,6 @@ const FormSubProject = () => {
                 });
                 fetchData(`Ubicacion/subproyecto/${ano}/${cod}`,(data) => {
                     setUbicacionesEdit(data)
-                    console.log(data)
                 });
             }
         });
@@ -422,8 +420,6 @@ const FormSubProject = () => {
                     } else {
                         // Si solo hay un select (el de país) y su valor es '0', obtén el ubiAno y ubiCod del país
                         const paisSelectElement = document.querySelector(`select[name=select${countryIndex}]`);
-                        console.log(countryIndex)
-                        console.log(paisSelectElement)
                         const paisSelect = JSON.parse(paisSelectElement.value);
                         ubiAno = paisSelect.ubiAno;
                         ubiCod = paisSelect.ubiCod;
@@ -465,10 +461,7 @@ const FormSubProject = () => {
                 }
             }
         
-            console.log(initialSubProject)
-            console.log(subProjectData)
             const hasSubProjectChanged = JSON.stringify(initialSubProject) !== JSON.stringify(subProjectData);
-            console.log(hasSubProjectChanged);
 
             const {proAno, proCod} = JSON.parse(data.proyecto)
             const {usuAno, usuCod} = JSON.parse(data.usuario)
@@ -484,7 +477,6 @@ const FormSubProject = () => {
                 SubProyectoImplementadores: selectValues,
                 SubProyectoUbicaciones: ubicaciones
             }
-            console.log(SubProyectoImplementadorDto)
             handleSubmit(SubProyectoImplementadorDto, isEditing, navigate);
         })();
     }
@@ -503,10 +495,8 @@ const FormSubProject = () => {
                 },
                 body: JSON.stringify(data),
             });
-            console.log(response)
             const dataResult = await response.json();
             if (!response.ok) {
-                console.log(dataResult)
                 Notiflix.Notify.failure(dataResult.message)
                 return;
             }
@@ -576,7 +566,6 @@ const FormSubProject = () => {
                     }
                 });
             }
-            console.log(newSelectedCountryValues)
     
             // Elimina los valores seleccionados del último grupo (que ya no existe)
             delete newSelectedCountryValues[newLocationSelects.length];

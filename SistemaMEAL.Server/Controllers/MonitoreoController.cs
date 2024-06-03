@@ -118,8 +118,8 @@ namespace SistemaMEAL.Server.Controllers
         }
 
         [HttpDelete]
-        [Route("eliminar-beneficiario/{metAno}/{metCod}/{benAno}/{benCod}/{ubiAno}/{ubiCod}/{metBenAnoEjeTec}/{metBenMesEjeTec}")]
-        public dynamic EliminarBeneficiarioMonitoreo(string metAno, string metCod, string benAno, string benCod, string ubiAno, string ubiCod, string metBenAnoEjeTec, string metBenMesEjeTec)
+        [Route("eliminar-beneficiario")]
+        public dynamic EliminarBeneficiarioMonitoreo(MetaBeneficiario metaBeneficiario)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
@@ -127,7 +127,7 @@ namespace SistemaMEAL.Server.Controllers
             if (!rToken.success) return rToken;
 
 
-            var (message, messageType) = _monitoreos.EliminarBeneficiarioMonitoreo(identity, metAno, metCod, benAno, benCod, ubiAno, ubiCod, metBenAnoEjeTec, metBenMesEjeTec );
+            var (message, messageType) = _monitoreos.EliminarBeneficiarioMonitoreo(identity, metaBeneficiario);
             if (messageType == "1")
             {
                 return new BadRequestObjectResult(new { success = false, message });

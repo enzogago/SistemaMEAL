@@ -147,8 +147,6 @@ const Ubication = () => {
     };
 
     const handleSubmit = async() => {
-        console.log(checkedKeys)
-        console.log(initialCheckedKeys)
         // Convertir los Sets a arreglos para poder trabajar con ellos
         const currentKeys = Array.from(checkedKeys);
         const initialKeys = Array.from(initialCheckedKeys);
@@ -164,7 +162,6 @@ const Ubication = () => {
         });
     
         const ubicacionEliminar = keysEliminadas.map(key => {
-            console.log(key)
             const parts = key.split('-');
             return { ubiAno: parts[parts.length - 2], ubiCod: parts[parts.length - 1] };
         });

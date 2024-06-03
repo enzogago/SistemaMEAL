@@ -38,7 +38,6 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
             objAno,
             objCod
         }
-        console.log(data)
         handleSubmitMant('ObjetivoEspecifico',!!estadoEditado,data, setData, closeModalAndReset)
     };
     
