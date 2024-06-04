@@ -190,7 +190,9 @@ const Subproject = () => {
                 'video/mp4', 
                 'video/quicktime', 
                 'video/x-msvideo',
-                'application/vnd.openxmlformats-officedocument.presentationml.presentation' // Aquí se agrega el tipo MIME para .pptx
+                'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
             ].includes(fileType)) {
                 fileInputRef.current.files = e.dataTransfer.files;
                 handleFileUpload(e.dataTransfer.files[0]); // Aquí se sube el archivo
@@ -214,7 +216,9 @@ const Subproject = () => {
             'video/mp4', 
             'video/quicktime', 
             'video/x-msvideo',
-            'application/vnd.openxmlformats-officedocument.presentationml.presentation' // Aquí se agrega el tipo MIME para .pptx
+            'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
         ].includes(event.target.files[0].type)) {
             handleFileUpload(event.target.files[0]); // Aquí se sube el archivo
         } else {
