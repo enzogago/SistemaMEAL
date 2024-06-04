@@ -10,8 +10,12 @@ import masculino from '../../img/PowerMas_Avatar_Masculino.svg';
 import femenino from '../../img/PowerMas_Avatar_Femenino.svg';
 import 'intl-tel-input/build/css/intlTelInput.css';
 import 'intl-tel-input/build/js/utils.js';
+import { StatusContext } from '../../context/StatusContext';
 
 const ModalProfile = ({openModal, closeModal}) => {
+    const { statusActions } = useContext(StatusContext);
+    const { setRefresh } = statusActions;
+
     const { authInfo, authActions } = useContext(AuthContext);
     const { userLogged } = authInfo;
     const { setUserLogged } = authActions;
@@ -30,7 +34,7 @@ const ModalProfile = ({openModal, closeModal}) => {
     const [isTouched, setIsTouched] = useState(false);
 
      // Estado para almacenar la referencia a Cropper
-  const [cropper, setCropper] = useState(null);
+    const [cropper, setCropper] = useState(null);
 
     const fetchDataReturn = async (controller) => {
         try {
@@ -278,6 +282,8 @@ const ModalProfile = ({openModal, closeModal}) => {
                     setUserLogged(data.user);
                     setSelectedFile(null);
                     setIsUpload(false);
+                    //
+                    setRefresh(prevRefresh => !prevRefresh);
                 };
                 reader.readAsDataURL(compressedFile);
             }

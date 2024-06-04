@@ -1,5 +1,5 @@
 // React y hooks
-import { Fragment, Suspense, lazy, useEffect, useState } from 'react';
+import { Fragment, Suspense, lazy, useContext, useEffect, useState } from 'react';
 
 // Componentes y gráficos reutilizables
 import Table from './Table';
@@ -24,6 +24,7 @@ import BarEmpty from '../../img/PowerMas_BarEmpty.svg';
 import Search from '../../icons/Search';
 import IconCalendar from '../../icons/IconCalendar';
 import useDateRange from '../../hooks/useDateRange';
+import { StatusContext } from '../../context/StatusContext';
 
 
 const handleInput = (event) => {
@@ -46,7 +47,10 @@ const MapComponents = {
 
 
 const Home = () => {
-   // Custom hooks para manejar la lógica de etiquetas de búsqueda
+    const { statusInfo } = useContext(StatusContext);
+    const { refresh } = statusInfo;
+
+    // Custom hooks para manejar la lógica de etiquetas de búsqueda
     const {
         searchTags,
         inputValue,
@@ -82,8 +86,9 @@ const Home = () => {
 
     // Efecto para cargar datos iniciales
     useEffect(() => {
+        setRecents([]);
         fetchDataBlock('Log', setRecents, '.recents-block');
-    }, []);
+    }, [refresh]);
 
     useEffect(() => {
         const tagsParam = searchTags.length > 0 ? searchTags.join(',') : null;
@@ -214,7 +219,7 @@ const Home = () => {
 
     return (
         <>
-            <div className="PowerMas_Search_Container_Home flex gap_25 Medium-p_25 Small-p_75" style={{paddingBottom: '1rem'}} >
+            <div className="PowerMas_Search_Container_Home flex Medium-flex-row Small-flex-column gap_25 Medium-p_25 Small-p_75" style={{paddingBottom: '1rem'}} >
                 <div className="PowerMas_Input_Filter_Container flex flex-grow-1" style={{border: '1px solid #FFC658'}}>
                     <div className="flex ai-center">
                         {searchTags.map(tag => (
@@ -241,34 +246,36 @@ const Home = () => {
                 <span className='ai-center Small-none Medium-flex'>
                     |   
                 </span>
-                <div style={{border: '1px solid #FFC658', borderRadius: '5px'}} className="Phone_3 Medium_2 flex ai-center relative">
-                    <span className='flex' style={{position: 'absolute', left: 15}}>
-                        <IconCalendar />
+                <div className='flex Medium-gap_25 Phone_12 Medium_4'>
+                    <div style={{border: '1px solid #FFC658', borderRadius: '5px'}} className="Phone_6 flex ai-center relative">
+                        <span className='flex' style={{position: 'absolute', left: 15}}>
+                            <IconCalendar />
+                        </span>
+                        <input 
+                            className='PowerMas_Input_Filter Large_12 Large-p_5 m0'
+                            type="text"
+                            placeholder='MM-YYYY'
+                            onInput={handleInput}
+                            onKeyDown={handlePeriodoChange(setPeriodoInicio)}
+                            maxLength={7}
+                        />
+                    </div>
+                    <span className='Small-none Medium-flex ai-center'>
+                        -
                     </span>
-                    <input 
-                        className='PowerMas_Input_Filter Large_12 Large-p_5 m0'
-                        type="text"
-                        placeholder='MM-YYYY'
-                        onInput={handleInput}
-                        onKeyDown={handlePeriodoChange(setPeriodoInicio)}
-                        maxLength={7}
-                    />
-                </div>
-                <span className='flex ai-center'>
-                    -
-                </span>
-                <div style={{border: '1px solid #FFC658', borderRadius: '5px'}} className="Phone_3 Medium_2 flex ai-center relative">
-                    <span className='flex' style={{position: 'absolute', left: 15}}>
-                        <IconCalendar />
-                    </span>
-                    <input 
-                        className='PowerMas_Input_Filter Large_12 Large-p_5 m0'
-                        type="text"
-                        placeholder='MM-YYYY'
-                        onInput={handleInput}
-                        onKeyDown={handlePeriodoChange(setPeriodoFin)}
-                        maxLength={7}
-                    />
+                    <div style={{border: '1px solid #FFC658', borderRadius: '5px'}} className="Phone_6 flex ai-center relative">
+                        <span className='flex' style={{position: 'absolute', left: 15}}>
+                            <IconCalendar />
+                        </span>
+                        <input 
+                            className='PowerMas_Input_Filter Large_12 Large-p_5 m0'
+                            type="text"
+                            placeholder='MM-YYYY'
+                            onInput={handleInput}
+                            onKeyDown={handlePeriodoChange(setPeriodoFin)}
+                            maxLength={7}
+                        />
+                    </div>
                 </div>
             </div>
             <div className='PowerMas_Resume_Home overflow-auto'>

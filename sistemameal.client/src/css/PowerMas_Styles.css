@@ -981,7 +981,6 @@ textarea {
 
 .PowerMas_Input_Filter_Container{
 	border-radius: 5px;
-	flex-wrap: nowrap;
 	overflow-x: auto;
 	scrollbar-width: thin;
 	/* border: 1px solid #F7CEAD; */

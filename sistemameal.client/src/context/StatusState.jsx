@@ -9,6 +9,7 @@ const StatusState = ({ children }) => {
         nombreEstado: '',
         estadoEditado: null,
     }
+    const [refresh, setRefresh] = useState(true);
 
     const [tableData, setTableData] = useState([]);
     const [postData, setPostData] = useState([]);
@@ -49,7 +50,8 @@ const StatusState = ({ children }) => {
         errorCells,
         subProjectUpload,
         anoUpload,
-        metaBeneficiario
+        metaBeneficiario,
+        refresh
     };
 
     const statusActions = {
@@ -63,7 +65,8 @@ const StatusState = ({ children }) => {
         setErrorCells,
         setSubprojectUpload,
         setAnoUpload,
-        setMetaBeneficiario
+        setMetaBeneficiario,
+        setRefresh
     };
 
     return (

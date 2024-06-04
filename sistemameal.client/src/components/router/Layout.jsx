@@ -80,6 +80,13 @@ const Layout = ({ children }) => {
                         <section className="PowerMas_Content Large-m1">
                             {children}
                         </section>
+                        <footer 
+                            className='p_25 flex flex-column center Medium-none'
+                            style={{backgroundColor: '#372E2C', color: '#FFFFFF'}}
+                        >
+                            <p className='f_75'>Todos los derechos reservados </p>
+                            <p className='f_75'>Copyright 2024 © </p>
+                        </footer>
                     </div>
                 </>
                 :

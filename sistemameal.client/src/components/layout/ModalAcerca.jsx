@@ -1,19 +1,8 @@
-import { useContext, useEffect, useState } from 'react';
-import { AuthContext } from '../../context/AuthContext';
-import { StatusContext } from '../../context/StatusContext';
+import { useEffect } from 'react';
 // sources
 import logo from '../../img/PowerMas_LogoAyudaEnAccion.svg';
 
 const   ModalAcerca = ({ isOpen, closeModal }) => {
-    // variables state de AuthContext
-    const { authActions } = useContext(AuthContext);
-    const { setIsLoggedIn } = authActions;
-    // variables state de StatusContext
-    const { statusInfo, statusActions } = useContext(StatusContext);
-    const { estadoEditado, modalVisible } = statusInfo;
-    const { setModalVisible } = statusActions;
-
-    
     // Activar focus en input
     useEffect(() => {
         if (isOpen) {
@@ -21,12 +10,9 @@ const   ModalAcerca = ({ isOpen, closeModal }) => {
         }
     }, [isOpen]);
 
-
-    
     const closeModalAndReset = () => {
         closeModal();
     };
-
 
     return (
         <div className={`color-black PowerMas_Modal ${isOpen ? 'show' : ''}`}>
@@ -45,7 +31,7 @@ const   ModalAcerca = ({ isOpen, closeModal }) => {
                 <div className='Large-f1 Medium-f_75 Small-f_75'>
                     Una herramienta desarrollada por Ayuda en Acción Ecuador para optimizar el monitoreo, evaluación, aprendizaje y rendición de cuentas en nuestros proyectos. 
                     <br /><br />
-                    <span className='bold'>  Versión 1.0.1.3 (Marzo 2024)</span>
+                    <span className='bold'>  Versión 1.0 (Junio 2024)</span>
                     <br />
                     <br />
                     Queremos agradecer especialmente al equipo de Monitoreo, Evaluación Aprendizaje y Rendición de Cuentas por su dedicación en la conceptualización y desarrollo del proceso MEAL. También reconocemos el esfuerzo del equipo de PowerMAs, quienes han contribuido con su experiencia y habilidades técnicas en el desarrollo de esta plataforma. 

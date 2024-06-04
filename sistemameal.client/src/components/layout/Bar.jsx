@@ -76,7 +76,6 @@ const Bar = ({showSidebarAndBar, isOpen, setIsOpen}) => {
         setIsOpen(false);
     }
 
-
     useEffect(() => {
         // Función para manejar el clic en el documento
         const handleDocumentClick = () => {
