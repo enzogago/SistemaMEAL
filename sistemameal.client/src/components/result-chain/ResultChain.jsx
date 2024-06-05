@@ -482,7 +482,7 @@ const ResultChain = () => {
                                 key={index} 
                                 value={JSON.stringify({ subProAno: item.subProAno, subProCod: item.subProCod })}
                             > 
-                                {item.subProSap + ' - ' + item.subProNom.toLowerCase() + ' | ' + item.proNom.toLowerCase()}
+                                {item.subProSap + ' - ' + item.subProNom + ' | ' + item.proNom}
                             </option>
                         ))}
                     </select>

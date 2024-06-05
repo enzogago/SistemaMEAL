@@ -40,10 +40,7 @@ const Indicator = () => {
   
     // Efecto para cargar los datos de los beneficiarios al montar el componente
     useEffect(() => {
-        fetchDataBlock('Indicador', (data) => {
-            const filteredData = data.filter(item => item.indTipInd !== 'IAC');
-            setData(filteredData)
-        }, '.indicator-block');
+        fetchDataBlock('Indicador', setData, '.indicator-block');
     }, [refresh]);
 
 
@@ -94,7 +91,7 @@ const Indicator = () => {
     return (
         <>
             <div className="flex flex-column p1 gap_25 flex-grow-1 overflow-auto indicator-block">
-                <h3>Listado de Indicadores</h3>
+                <h3>Listado de Actividades o Indicadores</h3>
                 <div className="flex gap_5 p_25">
                     {/* Componente para la entrada de búsqueda con etiquetas */}
                     <SearchInput
@@ -115,7 +112,7 @@ const Indicator = () => {
                     <ExportMenu
                         filteredData={dataExport}
                         headers={headers}
-                        title={'INDICADORES'}
+                        title={'INDICADORES O ACTIVIDADES'}
                         properties={properties}
                         format={[1000,500]}
                         actions={actions}
@@ -134,7 +131,7 @@ const Indicator = () => {
                 estadoEditado={estadoEditado}
                 closeModal={closeModal} 
                 setData={setData}
-                title='Indicador'
+                title='Actividad o Indicador'
                 unidades={unidades}
                 tiposDeValor={tiposDeValor}
             />  

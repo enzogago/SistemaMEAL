@@ -56,8 +56,9 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
         if (subProyecto !== '0' && subProyecto !== '') {
             const { subProAno, subProCod } = JSON.parse(subProyecto);
             fetchData(`Objetivo/subproyecto/${subProAno}/${subProCod}`, (data) => {
+                const filteredData = data.filter(item => item.objNum !== 'NA' && item.objNom !== 'NA');
                 setValue('objetivo', '0');
-                setObjetivos(data);
+                setObjetivos(filteredData);
                 setObjetivosLoaded(true);
             });
             setObjetivoEnable(true);
@@ -73,8 +74,9 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
         if (objetivo !== '0' && objetivo !== '') {
             const { objAno, objCod } = JSON.parse(objetivo);
             fetchData(`ObjetivoEspecifico/objetivo/${objAno}/${objCod}`, (data) => {
+                const filteredData = data.filter(item => item.objEspNum !== 'NA' && item.objEspNom !== 'NA');
                 setValue('objetivoEspecifico', '0');
-                setObjetivosEspecificos(data);
+                setObjetivosEspecificos(filteredData);
                 setObjetivosEspecificosLoaded(true);
             });
             setObjetivoEspecificoEnable(true);
@@ -243,15 +245,14 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                             id="resNum"
                             className={`PowerMas_Modal_Form_${dirtyFields.resNum || isSubmitted ? (errors.resNum ? 'invalid' : 'valid') : ''}`}  
                             type="text" 
-                           
-                            placeholder='123456' 
-                            maxLength={100} 
+                            placeholder='R1.1' 
+                            maxLength={10} 
                             name="resNum" 
                             autoComplete='off'
                             {...register(
                                 'resNum', { 
                                     required: 'El campo es requerido',
-                                    maxLength: { value: 100, message: 'El campo no puede tener más de 100 caracteres' },
+                                    maxLength: { value: 10, message: 'El campo no puede tener más de 10 caracteres' },
                                     minLength:  { value: 2, message: 'El campo no puede tener menos de 2 caracteres' },
                                     pattern: {
                                         value: /^[A-Za-z0-9.\s]+$/,
@@ -275,9 +276,9 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                         <input type="text"
                             id="resNom"
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.resNom || isSubmitted ? (errors.resNom ? 'invalid' : 'valid') : ''}`} 
-                            placeholder="Movilidad Humana"
+                            placeholder="Acelerados emprendimientos con la población migrante-refugiada."
                             autoComplete='off'
-                            maxLength={300}
+                            maxLength={400}
                             {...register('resNom', { 
                                 required: 'El campo es requerido',
                                 pattern: {
@@ -285,7 +286,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                                     message: 'Por favor, introduce caracteres válidos.',
                                 },
                                 minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
-                                maxLength: { value: 300, message: 'El campo no puede tener más de 300 caracteres' },
+                                maxLength: { value: 400, message: 'El campo no puede tener más de 400 caracteres' },
                             })} 
                         />
                         {errors.resNom ? (

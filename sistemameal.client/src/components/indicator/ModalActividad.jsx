@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { fetchData, handleSubmitMant } from '../reusable/helper';
 
-const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidades, tiposDeValor }) => {
+const ModalActividad = ({ estadoEditado, modalVisible, closeModal, setData, title, unidades, tiposDeValor }) => {
     // Variables de estado
     const [involucraSubActividad, setInvolucraSubActividad] = useState(false);
     const [subProyectos, setSubProyectos] = useState([]);
@@ -363,7 +363,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                     <div className='Large_6'>
                             <div>
                                 <label htmlFor='indTipInd' className="">
-                                    Tipo de Indicador:
+                                    Seleccione Tipo:
                                 </label>
                                 <select 
                                     id='indTipInd'
@@ -374,17 +374,8 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                                         }
                                     })}
                                 >
-                                    <option value="0">--Seleccione Tipo de Indicador--</option>
-                                    {/* {
-                                        involucraSubActividad ?
-                                        <option value="ISA">Indicador de Sub Actividad</option>
-                                        :
-                                        <option value="IAC">ACTIVIDAD</option>
-                                    } */}
-                                    <option value="IRE">INDICADOR DE RESULTADO</option>
-                                    <option value="IOB">INDICADOR DE OBJETIVO</option>
-                                    <option value="IOE">INDICADOR DE OBJETIVO ESPECÍFICO</option>
-                                    <option value="IIN">INDICADOR INSTITUCIONAL</option>
+                                    <option value="0">--Seleccione Tipo--</option>
+                                    <option value="IAC">ACTIVIDAD</option>
                                 </select>
                                 {errors.indTipInd ? (
                                     <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.indTipInd.message}</p>
@@ -396,7 +387,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                             </div>
                             <div className="flex flex-column">
                                 <label className="" htmlFor='indNum'>
-                                    Código de Indicador
+                                    Código de Actividad
                                 </label>
                                 <input 
                                     id="indNum"
@@ -429,7 +420,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
                             </div>
                             <div className="">
                                 <label htmlFor="indNom" className="">
-                                    Nombre de Indicador
+                                    Nombre de Actividad
                                 </label>
                                 <input type="text"
                                     id="indNom"
@@ -812,4 +803,4 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title, unidad
     )
 }
 
-export default Modal
+export default ModalActividad

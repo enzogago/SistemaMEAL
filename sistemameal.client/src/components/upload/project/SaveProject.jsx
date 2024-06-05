@@ -82,7 +82,7 @@ const SaveProject = () => {
         
         // Aquí puedes procesar los datos y enviarlos al servidor
         try {
-            Notiflix.Loading.pulse();
+            Notiflix.Loading.pulse('Se está cargando Marco Lógico...');
             const token = localStorage.getItem('token');
             const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Proyecto/Masivo`, {
                 method: 'POST',

@@ -22,12 +22,22 @@ export const getColumns = (actions, controller, openModal, setRefresh) => {
         {
             header: "Sub Proyecto",
             accessorKey: "subProNom",
-            cell: ({row}) => renderCellWithTooltip([row.original.subProNom])
+            cell: ({row}) => renderCellWithTooltip([row.original.subProSap, row.original.subProNom])
         },
         {
             header: "Proyecto",
             accessorKey: "proNom",
             cell: ({row}) => renderCellWithTooltip([row.original.proNom])
+        },
+        {
+            header: "Código",
+            accessorKey: "proIde",
+            cell: ({row}) => renderCellWithTooltip([row.original.proIde])
+        },
+        {
+            header: "Línea de Intervención",
+            accessorKey: "proLinInt",
+            cell: ({row}) => renderCellWithTooltip([row.original.proLinInt])
         },
         {
             header: "Responsable",

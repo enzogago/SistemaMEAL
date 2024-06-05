@@ -31,23 +31,6 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return rToken;
 
-            dynamic data = rToken.result;
-            Usuario usuarioActual = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (usuarioActual.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para insertar usuarios",
-                    result = ""
-                };
-            }
-
             using (SHA256 sha256Hash = SHA256.Create())
             {
                 byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(usuario.UsuPas.ToLower()));
@@ -81,24 +64,7 @@ namespace SistemaMEAL.Server.Controllers
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return rToken;
-
-            dynamic data = rToken.result;
-            Usuario usuarioActual = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (usuarioActual.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para modificar usuarios",
-                    result = ""
-                };
-            }
-
+            
             usuario.UsuAno = usuAno;
             usuario.UsuCod = usuCod;
             var (message, messageType) = _usuarios.Modificar(identity, usuario);

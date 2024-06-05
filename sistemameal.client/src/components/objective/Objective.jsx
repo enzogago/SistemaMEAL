@@ -6,7 +6,7 @@ import CommonTable from "../reusable/Tables/CommonTable";
 import useEntityActions from "../../hooks/useEntityActions";
 import Plus from "../../icons/Plus";
 import { fetchDataBlock } from "../reusable/fetchs";
-import { getMonthYearText } from "../reusable/columns";
+import { getMonth, getMonthYearText } from "../reusable/columns";
 import Modal from "./Modal";
 import { getColumns } from "./columns";
 
@@ -23,32 +23,47 @@ const Objective = () => {
  
    // Efecto para cargar los datos de los beneficiarios al montar el componente
    useEffect(() => {
-       fetchDataBlock('Objetivo', setData, '.content-block');
+        fetchDataBlock('Objetivo', (data) => {
+            // Filtramos los datos para excluir los objetos que no queremos
+            const filteredData = data.filter(item => item.objNum !== 'NA' && item.objNom !== 'NA');
+            // Luego llamamos a setData con los datos filtrados
+            setData(filteredData);
+        }, '.content-block');
    }, [refresh]);
 
 
-   const [searchFilter, setSearchFilter] = useState('');
-   const filteredData = useMemo(() => 
-       data.filter(item => {
-           // Genera el texto del mes y año de inicio y fin
-           const periodoInicio = getMonthYearText(item.subProPerMesIni, item.subProPerAnoIni);
-           const periodoFin = getMonthYearText(item.subProPerMesFin, item.subProPerAnoFin);
+    const [searchFilter, setSearchFilter] = useState('');
+    const filteredData = useMemo(() => 
+        data.filter(item => {
+            // Genera el texto del mes y año de inicio y fin
+            const periodoInicio = getMonthYearText(item.subProPerMesIni, item.subProPerAnoIni);
+            const periodoFin = getMonthYearText(item.subProPerMesFin, item.subProPerAnoFin);
 
-           return (
-               (item.objNum ? item.objNum.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
-               (item.objNom ? item.objNom.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
-               (item.subProNom ? item.subProNom.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
-               (item.proNom ? item.proNom.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
-               (item.usuNom && item.usuApe ? (item.usuNom + ' ' + item.usuApe).toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
-               (item.subProRes ? item.subProRes.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
-               (periodoInicio ? periodoInicio.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
-               (periodoFin ? periodoFin.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false)
-           );
-       }), [data, searchFilter]
-   );
+            return (
+                (item.objNum ? item.objNum.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
+                (item.objNom ? item.objNom.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
+                (item.subProSap ? item.subProSap.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
+                (item.subProNom ? item.subProNom.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
+                (item.proLinInt ? item.proLinInt.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
+                (item.proIde ? item.proIde.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
+                (item.proNom ? item.proNom.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
+                (item.usuNom && item.usuApe ? (item.usuNom + ' ' + item.usuApe).toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
+                (periodoInicio ? periodoInicio.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
+                (periodoFin ? periodoFin.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false)
+            );
+        }), [data, searchFilter]
+    );
 
-   const headers = ['CÓDIGO','NOMBRE','SUBPROYECTO','PROYECTO','RESPONSABLE','MES_INICIO','AÑO_INICIO','MES_FIN','AÑO_FIN'];
-   const properties = ['objNum','objNom','subProNom','proNom','subProRes','subProPerMesIni','subProPerAnoIni','subProPerMesFin','subProPerAnoFin'];
+    const headers = ['CÓDIGO','NOMBRE','SUBPROYECTO','PROYECTO','CÓDIGO','LINEA_INTERVENCIÓN','RESPONSABLE','MES_INICIO','AÑO_INICIO','MES_FIN','AÑO_FIN'];
+    const properties = ['objNum','objNom',['subProSap','subProNom'],'proNom','proIde','proLinInt',['usuNom','usuApe'],'subProPerMesIni','subProPerAnoIni','subProPerMesFin','subProPerAnoFin'];
+    // Preparar los datos
+    let dataExport = [...filteredData]; 
+    // Modificar el campo 'uniInvPer' en los datos
+    dataExport = dataExport.map(item => ({
+        ...item,
+        subProPerMesIni: getMonth(item.subProPerMesIni),
+        subProPerMesFin: getMonth(item.subProPerMesFin),
+    }));
 
     return (
         <>
@@ -75,7 +90,7 @@ const Objective = () => {
                     }
                     {/* Menú de exportación con opciones condicionales basadas en los permisos */}
                     <ExportMenu
-                        filteredData={filteredData}
+                        filteredData={dataExport}
                         headers={headers}
                         title={'OBJETIVOS_GENERALES'}
                         properties={properties}

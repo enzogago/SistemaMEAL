@@ -8,10 +8,10 @@ export const expectedHeaders = [
     { display: 'TIPO DE DATO', dbKey: 'tipValCod', entity: 'Indicador', validation: 'nombre' },
     { display: 'CODIGO_RE', dbKey: 'resNum', entity: 'Resultado', validation: 'numeroResultado' },
     { display: 'RESULTADO', dbKey: 'resNom', entity: 'Resultado', validation: 'nombreResultado' },
-    { display: 'CODIGO_OE', dbKey: 'objEspNum', entity: 'ObjetivoEspecifico', validation: 'numero' },
-    { display: 'OBJETIVO ESPECIFICO', dbKey: 'objEspNom', entity: 'ObjetivoEspecifico', validation: 'nombre' },
-    { display: 'CODIGO_OB', dbKey: 'objNum', entity: 'Objetivo', validation: 'numero' },
-    { display: 'OBJETIVO', dbKey: 'objNom', entity: 'Objetivo', validation: 'nombre' },
+    { display: 'CODIGO_OE', dbKey: 'objEspNum', entity: 'ObjetivoEspecifico', validation: 'numeroResultado' },
+    { display: 'OBJETIVO ESPECIFICO', dbKey: 'objEspNom', entity: 'ObjetivoEspecifico', validation: 'nombreResultado' },
+    { display: 'CODIGO_OB', dbKey: 'objNum', entity: 'Objetivo', validation: 'numeroResultado' },
+    { display: 'OBJETIVO', dbKey: 'objNom', entity: 'Objetivo', validation: 'nombreResultado' },
     { display: 'CODIGO_FINANCIACION', dbKey: 'subProSap', entity: 'Subproyecto', validation: 'numero' },
     { display: 'NOMBRE SUBPROYECTO', dbKey: 'subProNom', entity: 'Subproyecto', validation: 'nombre' },
     { display: 'RESPONSABLE-COORDINADOR', dbKey: 'subProRes', entity: 'Subproyecto', validation: 'nombre' },
@@ -50,21 +50,21 @@ const validateCell = (value, validationRules) => {
 const validationRules = {
     'nombreResultado': {
         required: false,
-        maxLength: 300,
+        maxLength: 400,
         minLength: 5,
         pattern: /^[0-9A-Za-zñÑáéíóúÁÉÍÓÚº()%/.,;üÜ\s-_]+$/,
         patternMessage: 'Por favor, introduce solo letras y espacios',
     },
     'nombre': {
         required: true,
-        maxLength: 300,
+        maxLength: 400,
         minLength: 2,
         pattern: /^[0-9A-Za-zñÑáéíóúÁÉÍÓÚº():%/.,;üÜ\s-_]+$/,
         patternMessage: 'Por favor, introduce solo letras y espacios',
     },
     'descripcion': {
         required: false,
-        maxLength: 300,
+        maxLength: 400,
         minLength: 0,
         pattern: /^[0-9A-Za-zñÑáéíóúÁÉÍÓÚº()%/.,;üÜ\s-_]+$/,
         patternMessage: 'Por favor, introduce solo letras y espacios',
@@ -84,14 +84,14 @@ const validationRules = {
     'numero': {
         required: true,
         minLength: 2,
-        maxLength: 300,
+        maxLength: 10,
         pattern: /^[A-Za-z0-9ñÑ\s\.]+$/,
         patternMessage: 'Por favor, introduce solo letras, números, puntos y espacios',
     },
     'numeroResultado': {
         required: false,
         minLength: 2,
-        maxLength: 300,
+        maxLength: 10,
         pattern: /^[A-Za-z0-9ñÑ\s\.]+$/,
         patternMessage: 'Por favor, introduce solo letras, números, puntos y espacios',
     },
@@ -336,6 +336,7 @@ export const handleUpload = async (file, setTableData, setPostData, setIsValid, 
         }));
         setTableData(tableData);
         setPostData(projectsArray);
+        console.log(projectsArray);
         setErrorCells(newErrorCells);
         navigate('/guardar-proyecto');
     };

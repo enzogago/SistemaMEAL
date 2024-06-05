@@ -57,7 +57,7 @@ const Objective = lazy(() => import('./components/objective/Objective'));
 const ObjectiveSpecific = lazy(() => import('./components/objective-specific/ObjectiveSpecific'));
 const Result = lazy(() => import('./components/result/Result'));
 const Indicator = lazy(() => import('./components/indicator/Indicator'));
-const Activity = lazy(() => import('./components/activity/Activity'));
+const Activity = lazy(() => import('./components/indicator/Activity'));
 const FormSubProject = lazy(() => import('./components/subproject/FormSubProject'));
 
 const App = () => {

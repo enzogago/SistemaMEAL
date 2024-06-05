@@ -9,6 +9,7 @@ const tipoIndicadorMapping = {
     'IOB': 'Indicador de Objetivo',
     'IOE': 'Indicador de Objetivo Específico',
     'ISA': 'Indicador de Sub Actividad',
+    'IIN': 'Indicador Institucional',
 };
 
 export const getColumns = (actions, controller, openModal, setRefresh) => {
@@ -48,7 +49,7 @@ export const getColumns = (actions, controller, openModal, setRefresh) => {
             header: "Resultado",
             accessorKey: "resNum",
             cell: ({row}) => {
-                if (row.original.resNum == 'NA') {
+                if (row.original.resNum == 'NA' && row.original.resNom == 'NA' ) {
                     return '';
                 } else {
                     return renderCellWithTooltip([row.original.resNum, row.original.resNom]);
@@ -59,7 +60,7 @@ export const getColumns = (actions, controller, openModal, setRefresh) => {
             header: "Objetivo Específico",
             accessorKey: "objEspNum",
             cell: ({row}) => {
-                if (row.original.objEspNum == 'NA') {
+                if (row.original.objEspNum == 'NA' && row.original.objEspNom == 'NA') {
                     return '';
                 } else {
                     return renderCellWithTooltip([row.original.objEspNum, row.original.objEspNom]);
@@ -69,17 +70,33 @@ export const getColumns = (actions, controller, openModal, setRefresh) => {
         {
             header: "Objetivo",
             accessorKey: "objNum",
-            cell: ({row}) => renderCellWithTooltip([row.original.objNum, row.original.objNom])
+            cell: ({row}) => {
+                if (row.original.objNum == 'NA' && row.original.objNom == 'NA') {
+                    return '';
+                } else {
+                    return renderCellWithTooltip([row.original.objNum, row.original.objNom]);
+                }
+            }
         },
         {
             header: "Sub Proyecto",
             accessorKey: "subProNom",
-            cell: ({row}) => renderCellWithTooltip([row.original.subProNom])
+            cell: ({row}) => renderCellWithTooltip([row.original.subProSap, row.original.subProNom])
         },
         {
             header: "Proyecto",
             accessorKey: "proNom",
             cell: ({row}) => renderCellWithTooltip([row.original.proNom])
+        },
+        {
+            header: "Código",
+            accessorKey: "proIde",
+            cell: ({row}) => renderCellWithTooltip([row.original.proIde])
+        },
+        {
+            header: "Línea de Intervención",
+            accessorKey: "proLinInt",
+            cell: ({row}) => renderCellWithTooltip([row.original.proLinInt])
         },
         {
             header: "Responsable",

@@ -6,14 +6,29 @@ import { handleDelete } from "../reusable/fetchs";
 export const getColumns = (actions, controller, openModal, setRefresh, handleEditNavigate) => {
     let baseColumns = [
         {
+            header: "Financiador Principal",
+            accessorKey: "subProSap",
+            cell: ({row}) => renderCellWithTooltip([row.original.subProSap])
+        },
+        {
             header: "Sub Proyecto",
             accessorKey: "subProNom",
-            cell: ({row}) => renderCellWithTooltip([row.original.subProNom])
+            cell: ({row}) => renderCellWithTooltip([row.original.subProSap, row.original.subProNom])
         },
         {
             header: "Proyecto",
             accessorKey: "proNom",
             cell: ({row}) => renderCellWithTooltip([row.original.proNom])
+        },
+        {
+            header: "Código",
+            accessorKey: "proIde",
+            cell: ({row}) => renderCellWithTooltip([row.original.proIde])
+        },
+        {
+            header: "Línea de Intervención",
+            accessorKey: "proLinInt",
+            cell: ({row}) => renderCellWithTooltip([row.original.proLinInt])
         },
         {
             header: "Responsable",
@@ -56,7 +71,7 @@ export const getColumns = (actions, controller, openModal, setRefresh, handleEdi
                             style={{padding: '0.25rem 0.75rem'}}
                             onClick={() => openModal(row.original)}
                         >
-                            Documentación Formulacion
+                            Documentación Formulación
                         </button>
                     </div>
                 );

@@ -16,3 +16,7 @@ export const getMonthYearText = (monthNum, year) => {
     const monthName = new Date(2024, monthNum - 1).toLocaleString('es-ES', { month: 'long' }).toUpperCase();
     return `${monthName} - ${year}`;
 };
+
+export const getMonth = (monthNum) => {
+    return new Date(2024, monthNum - 1).toLocaleString('es-ES', { month: 'long' }).toUpperCase();
+}

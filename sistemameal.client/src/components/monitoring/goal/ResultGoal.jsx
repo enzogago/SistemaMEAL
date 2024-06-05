@@ -3,8 +3,7 @@ import Excel_Icon from '../../../img/PowerMas_Excel_Icon.svg';
 import { fetchData } from '../../reusable/helper';
 import { useForm } from 'react-hook-form';
 import Notiflix from 'notiflix';
-import Modal from 'react-modal';
-import { formatter, getUbicacionName, meses } from './helper';
+import { formatter, meses } from './helper';
 import Expand from '../../../icons/Expand';
 import { fetchDataReturn } from '../../reusable/fetchs';
 import ExcelJS from 'exceljs';
@@ -14,9 +13,6 @@ import { logoBase64 } from "../../../img/Powermas_Logo_Ayuda_En_Accion";
 const ResultGoal = () => {
     // Estados relacionados con la interfaz de usuario
     const [dropdownOpen, setDropdownOpen] = useState(false);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingRow, setEditingRow] = useState(null);
-    const [loadginSelect, setLoadingSelect] = useState(false);
 
     // Estados relacionados con los datos de la aplicación
     const [subproyectos, setSubProyectos] = useState([]);
@@ -25,9 +21,7 @@ const ResultGoal = () => {
     const [usersTecnicos, setUsersTecnicos] = useState([]);
     const [implementadoresSelect, setImplementadoresSelect] = useState([]);
     const [ubicacionesSelect, setUbicacionesSelect] = useState([]); // Options de paises
-    const [allUbicaciones, setAllUbicaciones] = useState([]);
     const [initialMetas, setInitialMetas] = useState([]);
-    const [selects, setSelects] = useState([]); 
 
     // Estados relacionados con las filas de la tabla
     const [additionalRows, setAdditionalRows] = useState([]);
@@ -55,29 +49,6 @@ const ResultGoal = () => {
         getValues
     } = 
     useForm({ mode: "onChange"});
-
-    // Configuracion del formulario 2
-    const { 
-        register: register2, 
-        watch: watch2, 
-        handleSubmit: handleSubmit2, 
-        formState: { errors: errors2, dirtyFields:dirtyFields2, isSubmitted:isSubmitted2 }, 
-        setValue:setValue2,
-    } = 
-    useForm({ mode: "onChange"});
-
-    useEffect(() => {
-        const pais = watch2('pais');
-
-        if (pais) {
-            if (pais === '0') {
-                setSelects([]);
-                return;
-            }
-
-            handleCountryChange(pais);
-        }
-    }, [watch2('pais')]);
 
     useEffect(() => {
         fetchData('SubProyecto',setSubProyectos);
@@ -159,16 +130,13 @@ const ResultGoal = () => {
 
                 setImplementadoresSelect(implementadorData);
 
-                setUbicacionesSelect([]);
-                ubicacionData.map(ubi => {
-                    fetchSelect(ubi.ubiAno, ubi.ubiCod);
-                })
+                setUbicacionesSelect(ubicacionData);
 
                 // Obtén todos los nombres de los campos registrados
                 const fieldNames = Object.keys(getValues());
 
                 // Define los patrones de los campos que deseas desregistrar
-                const patterns = ['financiador_', 'implementador_', 'ubicacion_', 'mes_', 'nombreUbicacion_', 'meta_', 'metMetTec_'];
+                const patterns = ['financiador_', 'implementador_', 'ubicacion_', 'mes_', 'meta_', 'metMetTec_'];
 
                 // Filtra los nombres de los campos que coincidan con alguno de los patrones
                 const fieldsToUnregister = fieldNames.filter(fieldName =>
@@ -187,6 +155,7 @@ const ResultGoal = () => {
                 metaData.forEach(meta => {
                     // Usa meta.impCod, la ubicación y el indicador para crear una clave única para cada fila
                     const rowKey = `${meta.impCod}_${JSON.stringify({ ubiAno: meta.ubiAno, ubiCod: meta.ubiCod })}_${meta.indAno}_${meta.indCod}`;
+                    console.log(rowKey)
                     if (!rows[rowKey]) {
                         counter++;
                     }
@@ -203,9 +172,7 @@ const ResultGoal = () => {
                     setValue(`implementador_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.implementador);
                     setValue(`ubicacion_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.ubicacion);
                     setValue(`mes_${meta.metMesPlaTec}_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.mes);
-                    setValue(`nombreUbicacion_${meta.indAno}_${meta.indCod}_${counter}`, meta.ubiNom.toLowerCase());
                     setValue(`meta_${meta.metMesPlaTec}_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.meta);
-                    
                     setValue(`metMetPre_${meta.metMesPlaTec}_${meta.indAno}_${meta.indCod}_${counter}`, meta.metMetPre);
                     // Calcula los totales aquí
                     const key = `${meta.indAno}_${meta.indCod}_${counter}_${meta.metMesPlaTec}`;
@@ -236,6 +203,7 @@ const ResultGoal = () => {
                     rows[rowKey].cells.push(inputValues);
                 });
                 const filas = Object.values(rows);
+                console.log(filas)
                 setAdditionalRows(filas);
                 setRowIdCounter(counter+1);
 
@@ -268,6 +236,9 @@ const ResultGoal = () => {
                 setCadenaPeriodoGrouped(groupedPeriodoData);
                 setCadenaUbicacionGrouped(groupedUbicacionData);
                 setCadenaImplementadorGrouped(groupedImplementadorData);
+                console.log(groupedPeriodoData);
+                console.log(groupedUbicacionData);
+                console.log(groupedImplementadorData);
             }).catch(error => {
                 // Maneja los errores
                 console.error('Error:', error);
@@ -426,167 +397,6 @@ const ResultGoal = () => {
         }
     };
     
-    const onSubmit2 = (data) => {
-        let ubiAno, ubiCod;
-        let nombreUbicacion = '';
-        // Si los selects dinamicos son mayor a 1
-        if (selects.length > 1) {
-            const lastSelectElement = document.querySelector(`select[name=select${selects.length - 1}]`);
-            const lastSelect = lastSelectElement.value;
-            if (lastSelect === '0') {
-                const penultimateSelectElement = document.querySelector(`select[name=select${selects.length - 2}]`);
-                const penultimateSelect = JSON.parse(penultimateSelectElement.value);
-                ubiAno = penultimateSelect.ubiAno;
-                ubiCod = penultimateSelect.ubiCod;
-            } else {
-                const ultimo = JSON.parse(lastSelect);
-                ubiAno = ultimo.ubiAno;
-                ubiCod = ultimo.ubiCod;
-            }
-        } else {
-            const lastSelectElement = document.querySelector(`select[name=select${selects.length - 1}]`);
-            const lastSelect = lastSelectElement.value;
-            if(lastSelect === '0'){
-                const { ubiAno: paisUbiAno, ubiCod: paisUbiCod } = JSON.parse(data.pais);
-                ubiAno = paisUbiAno;
-                ubiCod = paisUbiCod;
-                // Buscar en ubicacionesSelect
-                const selectedOption = ubicacionesSelect.find(option => option.ubiAno === ubiAno && option.ubiCod === ubiCod);
-                nombreUbicacion = selectedOption.ubiNom;
-            } else{
-                const ultimo = JSON.parse(lastSelect);
-                ubiAno = ultimo.ubiAno;
-                ubiCod = ultimo.ubiCod;
-            }
-        }
-
-        // Si el usuario seleccionó más que solo el país, construir la cadena de ubicación
-        if (selects.length > 1 || (selects.length === 1 && selects[0].length > 1)) {
-            let currentUbiAno = ubiAno;
-            let currentUbiCod = ubiCod;
-            
-            while (currentUbiAno && currentUbiCod) {
-                const ubicacionName = getUbicacionName(currentUbiAno, currentUbiCod, ubicacionesSelect, selects);
-                if (nombreUbicacion) {
-                    nombreUbicacion = nombreUbicacion + ', ' + ubicacionName;
-                } else {
-                    nombreUbicacion = ubicacionName;
-                }
-                const ubicacion = selects.flat().find(u => u.ubiAno === currentUbiAno && u.ubiCod === currentUbiCod);
-                if (ubicacion) {
-                    currentUbiAno = ubicacion.ubiAnoPad;
-                    currentUbiCod = ubicacion.ubiCodPad;
-                } else {
-                    break;
-                }
-            }
-        }
-        
-        setValue(`ubicacion_${editingRow}`, JSON.stringify({ ubiAno, ubiCod }));
-        trigger(`ubicacion_${editingRow}`);
-        setValue(`nombreUbicacion_${editingRow}`, nombreUbicacion.toLocaleLowerCase());
-        closeModal();
-    };
-
-    const fetchSelect = async (ubiAno,ubiCod) => {
-        try {
-            const token = localStorage.getItem('token');
-            Notiflix.Loading.pulse('Cargando...');
-            
-            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Ubicacion/select/${ubiAno}/${ubiCod}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            const data = await response.json();
-            if (!response.ok) {
-                Notiflix.Notify.failure(data.message);
-                return;
-            }
-            setAllUbicaciones(prevAllUbicaciones => {
-                // Verifica si el arreglo ya contiene un objeto con el mismo ubiAno y ubiCod
-                const isAlreadyIncluded = prevAllUbicaciones.some(ubicacion => ubicacion.ubiAno === data[0].ubiAno && ubicacion.ubiCod === data[0].ubiCod);
-                // Si no está incluido, agrega los nuevos objetos al arreglo
-                if (!isAlreadyIncluded) {
-                    return [...prevAllUbicaciones, ...data];
-                }
-                // Si ya está incluido, devuelve el arreglo sin cambios
-                return prevAllUbicaciones;
-            });
-
-            setUbicacionesSelect(prevUbicaciones => {
-                // Verifica si el arreglo ya contiene un objeto con el mismo ubiAno y ubiCod
-                const isAlreadyIncluded = prevUbicaciones.some(ubicacion => ubicacion.ubiAno === data[0].ubiAno && ubicacion.ubiCod === data[0].ubiCod);
-                // Si no está incluido, agrega el nuevo objeto al arreglo
-                if (!isAlreadyIncluded) {
-                    return [...prevUbicaciones, data[0]];
-                }
-                // Si ya está incluido, devuelve el arreglo sin cambios
-                return prevUbicaciones;
-            });
-        } catch (error) {
-            console.error('Error:', error);
-        } finally {
-            Notiflix.Loading.remove();
-        }
-    };
-
-    const handleCountryChange = async (ubicacion, index) => {
-        const selectedCountry = JSON.parse(ubicacion);
-        if (ubicacion === '0') {
-            setSelects(prevSelects => prevSelects.slice(0, index + 1));  // Reinicia los selects por debajo del nivel actual
-
-            return;
-        }
-
-        try {
-            setLoadingSelect(true);
-            const token = localStorage.getItem('token');
-            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Ubicacion/${selectedCountry.ubiAno}/${selectedCountry.ubiCod}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            if (!response.ok) {
-                if(response.status == 401 || response.status == 403){
-                    const data = await response.json();
-                    Notiflix.Notify.failure(data.message);
-                }
-                return;
-            }
-            const data = await response.json();
-            if (data.success == false) {
-                Notiflix.Notify.failure(data.message);
-                return;
-            }
-
-            if (data.length > 0) {
-                // Filtra los datos devueltos por la API
-                const filteredData = data.filter(d => {
-                    // Verifica si el objeto ya está en allUbicaciones
-                    return allUbicaciones.some(ubicacion => ubicacion.ubiAno === d.ubiAno && ubicacion.ubiCod === d.ubiCod);
-                });
-            
-                // Si filteredData tiene elementos, entonces actualiza el estado
-                if (filteredData.length > 0) {
-                    setSelects(prevSelects => prevSelects.slice(0, index + 1).concat([filteredData]));  // Reinicia los selects por debajo del nivel actual
-                } else {
-                    setSelects(prevSelects => prevSelects.slice(0, index + 1).concat([data]));  // Agrega todos los datos si no se encontró ninguno en allUbicaciones
-                }
-            } else {
-                setSelects(prevSelects => prevSelects.slice(0, index + 1));
-            }
-        } catch (error) {
-            console.error('Error:', error);
-        } finally {
-            setLoadingSelect(false);
-        }
-    };
-
-    const closeModal = () => {
-        setIsModalOpen(false);
-        setValue2('pais','0');
-    }
 
     const exportToExcel = async (indicadores, totales, additionalRows) => {
         const workbook = new ExcelJS.Workbook();
@@ -613,7 +423,7 @@ const ResultGoal = () => {
         }
     
         // Definir los encabezados
-        const headers = ['CODIGO', 'NOMBRE', 'TÉCNICO', 'IMPLEMENTADOR', 'UBICACIONES', ...meses, 'TOTAL'];
+        const headers = ['CODIGO', 'NOMBRE', 'TÉCNICO', 'IMPLEMENTADOR', 'UBICACION', ...meses, 'TOTAL'];
         worksheet.columns = headers.map(header => ({ key: header, width: 15 }));
     
         // Insertar una columna vacía al principio
@@ -678,8 +488,10 @@ const ResultGoal = () => {
             // Agregar las filas adicionales para este indicador
             additionalRows.filter(row => row.indAno === indicador.indAno && row.indCod === indicador.indCod).forEach(additionalRow => {
                 const { usuAno, usuCod } = JSON.parse(getValues(`tecnico_${additionalRow.id}`));
+                const { ubiAno, ubiCod } = JSON.parse(getValues(`ubicacion_${additionalRow.id}`));
                 const userTecnico = usersTecnicos.find(user => user.usuAno === usuAno && user.usuCod === usuCod);
-    
+                const ubicacion = ubicacionesSelect.find(item => item.ubiAno === ubiAno && item.ubiCod === ubiCod);
+                console.log(ubicacion)
                 const impCod = getValues(`implementador_${additionalRow.id}`);
                 const implementador = implementadoresSelect.find(imp => imp.impCod === impCod);
     
@@ -688,7 +500,7 @@ const ResultGoal = () => {
                     'NOMBRE': indicador.indNom,
                     'TÉCNICO': userTecnico ? (userTecnico.usuNom + ' ' + userTecnico.usuApe) : '',
                     'IMPLEMENTADOR': implementador ? implementador.impNom : '',
-                    'UBICACIONES': getValues(`nombreUbicacion_${additionalRow.id}`)?.toUpperCase(),
+                    'UBICACION': ubicacion ? ubicacion.ubiNom : '',
                     ...meses.reduce((obj, mes, i) => {
                         const fieldValue = getValues(`mes_${String(i+1).padStart(2, '0')}_${additionalRow.id}`);
                         obj[mes] = Number(fieldValue) || 0;
@@ -742,11 +554,11 @@ const ResultGoal = () => {
         // Comprueba si el nuevo total excede alguno de los límites máximos
         if (newTotal > maxImplementador || newTotal > maxUbicacion || newTotal > maxPeriodo) {
             // Si es así, muestra un mensaje de error y rechaza el nuevo valor
-            // Notiflix.Report.failure(
-            //     'Error de Validación',
-            //     `El total (${newTotal}) excede el límite máximo para el implementador (${maxImplementador}), la ubicación (${maxUbicacion}) o el periodo (${maxPeriodo}).`,
-            //     'Vale',
-            // );
+            Notiflix.Report.failure(
+                'Error de Validación',
+                `El total (${newTotal}) excede el límite máximo para el implementador (${maxImplementador}), la ubicación (${maxUbicacion}) o el periodo (${maxPeriodo}).`,
+                'Vale',
+            );
             return false;
         }
     
@@ -891,19 +703,30 @@ const ResultGoal = () => {
                                             <button 
                                                 style={{backgroundColor: 'transparent', border: 'none'}} 
                                                 onClick={() => {
-                                                    // Antes de eliminar la fila, actualizamos los totales
-                                                    meses.forEach((mes, i) => {
-                                                        const key = `${row.id}_${String(i+1).padStart(2, '0')}`;
-                                                        const totalKey = `${row.id}_total`;
-                                                        const value = Number(watch(`mes_${String(i+1).padStart(2, '0')}_${row.id}`));
-                                                        setTotals(prevTotals => ({
-                                                            ...prevTotals,
-                                                            [key]: (prevTotals[key] || 0) - value,
-                                                            [totalKey]: (prevTotals[totalKey] || 0) - value
-                                                        }));
-                                                    });
-                                                    // Ahora sí eliminamos la fila
-                                                    setAdditionalRows(prevRows => prevRows.filter((prevRow) => prevRow.id !== row.id));
+                                                    Notiflix.Confirm.show(
+                                                        'Eliminar Fila',
+                                                        '¿Está seguro que quieres eliminar esta fila?',
+                                                        'Sí',
+                                                        'No',
+                                                        async () => {
+                                                            // Antes de eliminar la fila, actualizamos los totales
+                                                            meses.forEach((mes, i) => {
+                                                                const key = `${row.id}_${String(i+1).padStart(2, '0')}`;
+                                                                const totalKey = `${row.id}_total`;
+                                                                const value = Number(watch(`mes_${String(i+1).padStart(2, '0')}_${row.id}`));
+                                                                setTotals(prevTotals => ({
+                                                                    ...prevTotals,
+                                                                    [key]: (prevTotals[key] || 0) - value,
+                                                                    [totalKey]: (prevTotals[totalKey] || 0) - value
+                                                                }));
+                                                            });
+                                                            // Ahora sí eliminamos la fila
+                                                            setAdditionalRows(prevRows => prevRows.filter((prevRow) => prevRow.id !== row.id));
+                                                        },
+                                                        () => {
+                                                            // El usuario ha cancelado la operación de eliminación
+                                                        }
+                                                    );
                                                 }}
                                             > - </button>
                                         </td>
@@ -962,7 +785,7 @@ const ResultGoal = () => {
                                                     }
                                                 })}
                                             >
-                                                <option value="0">--Implementador--</option>
+                                                <option value="0" className='f_75'>--Implementador--</option>
                                                 {implementadoresSelect.map((imp, index) => (
                                                     <option
                                                         className='f_75'
@@ -975,49 +798,49 @@ const ResultGoal = () => {
                                             </select>
                                         </td>
                                         <td>
-                                            <div className='flex gap_3'>
-                                                <input
-                                                    style={{margin: '0', textTransform: 'capitalize'}}
-                                                    className={`PowerMas_Input_Cadena f_75 PowerMas_Modal_Form_${dirtyFields[`ubicacion_${row.id}`] || isSubmitted ? (errors[`ubicacion_${row.id}`] ? 'invalid' : 'valid') : ''}`} 
-                                                    placeholder='Sin ubicación'
-                                                    disabled
-                                                    {...register(`nombreUbicacion_${row.id}`, {
-                                                        required: 'El campo es requerido',
-                                                    })}
-                                                />
-                                                <input
-                                                    type="hidden"
-                                                    {...register(`ubicacion_${row.id}`, { 
-                                                        required: 'El campo es requerido',
-                                                        validate: {
-                                                            unique: value => {
-                                                                const implementadorValue = watch(`implementador_${row.id}`);
-                                                                const duplicate = additionalRows.find(r => 
-                                                                    r.indAno === row.indAno && 
-                                                                    r.indCod === row.indCod && 
-                                                                    r.id !== row.id && 
-                                                                    watch(`implementador_${r.id}`) === implementadorValue && 
-                                                                    watch(`ubicacion_${r.id}`) === value
-                                                                );
-                                                                
-                                                                if (duplicate) {
-                                                                    Notiflix.Report.failure(
-                                                                        'Error de Validación',
-                                                                        '"Verifica que no se repita el implementador y ubicación en más de una fila." <br/><br/><br/><br/>- Indicador '+ row.indNum,
-                                                                        'Vale',
-                                                                    );
-                                                                    return false;
-                                                                }
+                                            <select 
+                                                style={{textTransform: 'capitalize', margin: '0'}}
+                                                id={`ubicacion_${row.id}`}
+                                                className={`PowerMas_Input_Cadena f_75 PowerMas_Modal_Form_${dirtyFields[`ubicacion_${row.id}`] || isSubmitted ? (errors[`ubicacion_${row.id}`] ? 'invalid' : 'valid') : ''}`} 
+                                                {...register(`ubicacion_${row.id}`, {
+                                                    validate: {
+                                                        unique: value => {
+                                                            const implementadorValue = watch(`implementador_${row.id}`);
+                                                            if (value === '0' || implementadorValue === '') {
                                                                 return true;
                                                             }
-                                                        }
-                                                    })}
-                                                />
-                                                <button className='p0' style={{backgroundColor: 'transparent', border: 'none'}} onClick={() => {
-                                                    setIsModalOpen(true);
-                                                    setEditingRow(`${row.id}`);
-                                                }}>+</button>
-                                            </div>
+                                                            const duplicate = additionalRows.find(r => 
+                                                                r.indAno === row.indAno && 
+                                                                r.indCod === row.indCod && 
+                                                                r.id !== row.id && 
+                                                                watch(`ubicacion_${r.id}`) === value && 
+                                                                watch(`implementador_${r.id}`) === ubicacionValue
+                                                            );
+                                                            if (duplicate) {
+                                                                Notiflix.Report.failure(
+                                                                    'Error de Validación',
+                                                                    `Verifica que no se repita implementador y ubicación para el indicador ${row.indNum}`,
+                                                                    'Vale',
+                                                                );
+                                                                return false;
+                                                            }
+                                                            return true;
+                                                        },
+                                                        notZero: value => value !== '0' || 'El cargo es requerido'
+                                                    }
+                                                })}
+                                            >
+                                                <option value="0" className='f_75'>--Ubicación--</option>
+                                                {ubicacionesSelect.map((item, index) => (
+                                                    <option
+                                                        className='f_75'
+                                                        key={index} 
+                                                        value={JSON.stringify({ ubiAno: item.ubiAno, ubiCod: item.ubiCod })}
+                                                    > 
+                                                        {item.ubiNom.toLowerCase()}
+                                                    </option>
+                                                ))}
+                                            </select>
                                         </td>
                                         {meses.map((mes, i) => (
                                             <td key={i+1}>
@@ -1084,110 +907,6 @@ const ResultGoal = () => {
                     Grabar
                 </button>
             </div>
-            <Modal
-                ariaHideApp={false}
-                isOpen={isModalOpen}
-                onRequestClose={closeModal}
-                closeTimeoutMS={200}
-                style={{
-                    content: {
-                        top: '50%',
-                        left: '50%',
-                        right: 'auto',
-                        bottom: 'auto',
-                        minWidth: '40%',
-                        minHeight: '80%',
-                        marginRight: '-50%',
-                        transform: 'translate(-50%, -50%)',
-                        backgroundColor: '#fff',
-                        border: '1px solid #ccc',
-                        display: 'flex',
-                        alignItems: 'center',
-                        flexDirection: 'column',
-                        
-                    },
-                    overlay: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                        zIndex: 30
-                    }
-                }}
-            > 
-            {isModalOpen && 
-                <div className='Large_12 flex flex-column ai-center jc-center flex-grow-1'>
-                    <span className="PowerMas_CloseModal" style={{position: 'absolute',right: 20, top: 10}} onClick={closeModal}>×</span>
-                    <h2 className='Large_12 PowerMas_Title_Modal f1_5 center'>Selecciona una ubicación</h2>
-                    <div className='Phone_12 flex-grow-1'>
-                        <div className="m_75">
-                            <label htmlFor="pais" className="">
-                                Pais:
-                            </label>
-                            <select 
-                                id="pais"
-                                style={{textTransform: 'capitalize'}}
-                                className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields2.pais || isSubmitted2 ? (errors2.pais ? 'invalid' : 'valid') : ''}`} 
-                                {...register2('pais', { 
-                                    validate: {
-                                        required: value => value !== '0' || 'El campo es requerido',
-                                    }
-                                })}
-                            >
-                                <option value="0">--Seleccione País--</option>
-                                {ubicacionesSelect.map(pais => (
-                                    <option 
-                                        key={pais.ubiCod} 
-                                        value={JSON.stringify({ ubiCod: pais.ubiCod, ubiAno: pais.ubiAno })}
-                                    > 
-                                        {pais.ubiNom.toLowerCase()}
-                                    </option>
-                                ))}
-                            </select>
-                            {errors2.pais ? (
-                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors2.pais.message}</p>
-                            ) : (
-                                <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                    Espacio reservado para el mensaje de error
-                                </p>
-                            )}
-                        </div>
-                        {selects.map((options, index) => (
-                            <div className="m_75" key={index}>
-                                <label style={{textTransform: 'capitalize'}} htmlFor={index} className="">
-                                    {options[0].ubiTip.toLowerCase()}
-                                </label>
-                                <select
-                                    id={index}
-                                    key={index} 
-                                    name={`select${index}`} 
-                                    onChange={(event) => {
-                                        handleCountryChange(event.target.value, index);
-                                    }} 
-                                    style={{textTransform: 'capitalize'}}
-                                    className="block Phone_12"
-                                >
-                                    <option style={{textTransform: 'capitalize'}} value="0">--Seleccione {options[0].ubiTip.toLowerCase()}--</option>
-                                    {options.map(option => (
-                                        <option key={option.ubiCod} value={JSON.stringify({ ubiCod: option.ubiCod, ubiAno: option.ubiAno })}>
-                                            {option.ubiNom.toLowerCase()}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        ))}
-                        {
-                            loadginSelect &&
-                            <div id="loading" className="m_75">Cargando...</div>
-                        }
-                    </div>
-                    <br />
-                    <button 
-                        className='PowerMas_Buttom_Primary Large_6'
-                        onClick={handleSubmit2(onSubmit2)}
-                    >
-                        Guardar
-                    </button>
-                </div>
-            }
-            </Modal>
         </div>
     )
 }

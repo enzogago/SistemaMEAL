@@ -14,7 +14,7 @@ import CommonTable from '../reusable/Tables/CommonTable';
 import useEntityActions from '../../hooks/useEntityActions';
 import Plus from '../../icons/Plus';
 import { fetchDataBlock } from '../reusable/fetchs';
-import { getMonthYearText } from '../reusable/columns';
+import { getMonth, getMonthYearText } from '../reusable/columns';
 import { useNavigate } from 'react-router-dom';
 import CryptoJS from 'crypto-js';
 
@@ -67,26 +67,28 @@ const Subproject = () => {
             return (
                 (item.subProNom ? item.subProNom.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
                 (item.subProSap ? item.subProSap.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
+                (item.proLinInt ? item.proLinInt.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
                 (item.proIde ? item.proIde.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
                 (item.proNom ? item.proNom.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
                 (item.usuNom && item.usuApe ? (item.usuNom + ' ' + item.usuApe).toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
-                (item.subProInvSubAct === 'S' && 'PROYECTO CON SUB ACTIVIDADES'.includes(searchFilter.toUpperCase()).trim()) ||
-                (item.subProInvSubAct === 'N' && 'PROYECTO SIN SUB ACTIVIDADES'.includes(searchFilter.toUpperCase()).trim()) ||
+                (item.subProInvSubAct === 'S' && 'PROYECTO CON SUB ACTIVIDADES'.includes(searchFilter.toUpperCase())) ||
+                (item.subProInvSubAct === 'N' && 'PROYECTO SIN SUB ACTIVIDADES'.includes(searchFilter.toUpperCase())) ||
                 (periodoInicio ? periodoInicio.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
                 (periodoFin ? periodoFin.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false)
             );
         }), [data, searchFilter]
     );
 
-    const headers = ['CODIGO_FINANCIACION', 'NOMBRE', 'RESPONSABLE','AÑO_INICIO','MES_INICIO','AÑO_FIN','MES_FIN','INVOLUCRA_SUB_ACTIVIDAD', 'PROYECTO'];  // Tus encabezados
-    const properties = ['subProSap', 'subProNom', ['usuNom','usuApe'], 'subProPerAnoIni', 'subProPerMesIni', 'subProPerAnoFin', 'subProPerMesFin', 'subProInvSubAct', 'proNom'];  // Las propiedades de los objetos de datos que quieres incluir
+    const headers = ['FINANCIADOR_PRINCIPAL', 'NOMBRE', 'RESPONSABLE','MES_INICIO','AÑO_INICIO','MES_FIN','AÑO_FIN','INVOLUCRA_SUB_ACTIVIDAD', 'PROYECTO','CÓDIGO','LINEA_INTERVENCIÓN'];  // Tus encabezados
+    const properties = ['subProSap', 'subProNom', ['usuNom','usuApe'], 'subProPerMesIni', 'subProPerAnoIni', 'subProPerMesFin', 'subProPerAnoFin', 'subProInvSubAct', 'proNom','proIde','proLinInt'];  // Las propiedades de los objetos de datos que quieres incluir
     // Preparar los datos
     let dataExport = [...filteredData]; 
     // Modificar el campo 'uniInvPer' en los datos
     dataExport = dataExport.map(item => ({
         ...item,
         subProInvSubAct: item.subProInvSubAct === 'S' ? 'PROYECTO CON SUB ACTIVIDADES' : 'PROYECTO SIN SUB ACTIVIDADES',
-
+        subProPerMesIni: getMonth(item.subProPerMesIni),
+        subProPerMesFin: getMonth(item.subProPerMesFin),
     }));
 
     const [selectedFiles, setSelectedFiles] = useState([]);
@@ -328,7 +330,7 @@ const Subproject = () => {
                     <ExportMenu
                         filteredData={dataExport}
                         headers={headers}
-                        title={'SUB PROYECTOS'}
+                        title={'SUB_PROYECTOS'}
                         properties={properties}
                         format={[500,250]}
                         actions={actions}
@@ -373,7 +375,7 @@ const Subproject = () => {
                 <div className="flex-grow-1 flex jc-center ai-center overflow-auto">
                     <div className="Large_10">
                         <article className="PowerMas_Article_Upload center">
-                            <p style={{color: '#878280'}}>Solo se puede subir documentos en formato PDF,XLS,XLSM,XLSX,PPTX,JPG,PNG,MP4</p>
+                            <p style={{color: '#878280'}}>Solo se puede subir documentos en formato DOC,PDF,XLS,XLSM,XLSX,PPTX,JPG,PNG,MP4</p>
                             <h3>Subir Archivo</h3>
                         </article>
                         <div

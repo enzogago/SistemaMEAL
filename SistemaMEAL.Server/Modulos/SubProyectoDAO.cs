@@ -459,7 +459,7 @@ namespace SistemaMEAL.Modulos
             return (mensaje, tipoMensaje);
         }
 
-        public (string? message, string? messageType) ModificarSubProyectoImplementadorUbicacion(ClaimsIdentity? identity, SubProyecto subProyecto, List<SubProyectoImplementador> subProyectoImplementadores, List<SubProyectoFinanciador> subProyectoFinanciadores, List<SubProyectoUbicacion> subProyectoUbicaciones)
+        public (string? message, string? messageType) ModificarSubProyectoImplementadorUbicacion(ClaimsIdentity? identity, SubProyecto? subProyecto, List<SubProyectoImplementador> subProyectoImplementadores, List<SubProyectoFinanciador> subProyectoFinanciadores, List<SubProyectoUbicacion> subProyectoUbicaciones)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 
@@ -750,12 +750,12 @@ namespace SistemaMEAL.Modulos
                             message = pDescripcionMensaje.Value.ToString();
                             messageType = pTipoMensaje.Value.ToString();
 
-                            // Inserta el beneficiario
-                            if (messageType != "3")
-                            {
-                                Console.WriteLine(message);
-                                throw new Exception(message);
-                            }
+                            // // Inserta el beneficiario
+                            // if (messageType != "3")
+                            // {
+                            //     Console.WriteLine(message);
+                            //     throw new Exception(message);
+                            // }
                         }
 
                         // LOGICA A MANEJAR DE IMPLEMENTADORES
@@ -1163,6 +1163,126 @@ namespace SistemaMEAL.Modulos
                                     }
                                 }
                             }
+                        } else {
+                            // Buscamos los registros con este SUB_PROYECTO
+                            cmd = new SqlCommand("SP_BUSCAR_SUB_PROYECTO_FINANCIADOR", cn.getcn);
+                            cmd.CommandType = CommandType.StoredProcedure;
+
+                            cmd.Parameters.AddWithValue("@P_SUBPROANO", subProyecto.SubProAno);
+                            cmd.Parameters.AddWithValue("@P_SUBPROCOD", subProyecto.SubProCod);
+                            cmd.Parameters.AddWithValue("@P_FINCOD", (object)DBNull.Value);
+                            cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                            cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                            cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                            cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                            cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                            pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                            pDescripcionMensaje.Direction = ParameterDirection.Output;
+                            cmd.Parameters.Add(pDescripcionMensaje);
+
+                            pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                            pTipoMensaje.Direction = ParameterDirection.Output;
+                            cmd.Parameters.Add(pTipoMensaje);
+
+                            jsonResult = new StringBuilder();
+                            reader = cmd.ExecuteReader();
+                            if (!reader.HasRows)
+                            {
+                                jsonResult.Append("[]");
+                            }
+                            else
+                            {
+                                while (reader.Read())
+                                {
+                                    jsonResult.Append(reader.GetValue(0).ToString());
+                                }
+                            }
+                            // Deserializa la cadena JSON en una lista de objetos Estado    
+                            List<SubProyectoFinanciador>? subProyectoFinanciador = JsonConvert.DeserializeObject<List<SubProyectoFinanciador>>(jsonResult.ToString());
+
+                            if (subProyectoFinanciador.Count > 0){
+                                // Encuentra los implementadores que necesitan ser eliminados
+                                List<string> financiadoresActuales = subProyectoFinanciador.Select(i => i.FinCod).ToList();
+
+                                // Elimina los implementadores que ya no están en la lista de parámetros
+                                foreach (string finCod in financiadoresActuales)
+                                {
+                                    // Aquí debes llamar a tu procedimiento almacenado para eliminar el implementador
+                                    cmd = new SqlCommand("SP_ELIMINAR_SUB_PROYECTO_FINANCIADOR", cn.getcn);
+                                    cmd.CommandType = CommandType.StoredProcedure;
+
+                                    cmd.Parameters.AddWithValue("@P_SUBPROANO", subProyecto.SubProAno);
+                                    cmd.Parameters.AddWithValue("@P_SUBPROCOD", subProyecto.SubProCod);
+                                    cmd.Parameters.AddWithValue("@P_FINCOD", finCod);
+                                    cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
+                                    cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                                    cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                                    cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                                    cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                                    cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                                    pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                                    pDescripcionMensaje.Direction = ParameterDirection.Output;
+                                    cmd.Parameters.Add(pDescripcionMensaje);
+
+                                    pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                                    pTipoMensaje.Direction = ParameterDirection.Output;
+                                    cmd.Parameters.Add(pTipoMensaje);
+
+                                    cmd.ExecuteNonQuery();
+
+                                    message = pDescripcionMensaje.Value.ToString();
+                                    messageType = pTipoMensaje.Value.ToString();
+
+                                    // Inserta el beneficiario
+                                    if (messageType != "3")
+                                    {
+                                        Console.WriteLine(message);
+                                        throw new Exception(message);
+                                    }
+
+                                    if (indicadores.Count > 0)
+                                    {
+                                        foreach (var indicador in indicadores)
+                                        {
+                                            cmd = new SqlCommand("SP_ELIMINAR_CADENA_RESULTADO_FINANCIADOR", cn.getcn);
+                                            cmd.CommandType = CommandType.StoredProcedure;
+
+                                            cmd.Parameters.AddWithValue("@P_FINCOD", finCod);
+                                            cmd.Parameters.AddWithValue("@P_INDANO", indicador.IndAno);
+                                            cmd.Parameters.AddWithValue("@P_INDCOD", indicador.IndCod);
+                                            cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
+                                            cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
+                                            cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
+                                            cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
+                                            cmd.Parameters.AddWithValue("@P_USUNOM_U", userClaims.UsuNom);
+                                            cmd.Parameters.AddWithValue("@P_USUAPE_U", userClaims.UsuApe);
+
+                                            pDescripcionMensaje = new SqlParameter("@P_DESCRIPCION_MENSAJE", SqlDbType.NVarChar, -1);
+                                            pDescripcionMensaje.Direction = ParameterDirection.Output;
+                                            cmd.Parameters.Add(pDescripcionMensaje);
+
+                                            pTipoMensaje = new SqlParameter("@P_TIPO_MENSAJE", SqlDbType.Char, 1);
+                                            pTipoMensaje.Direction = ParameterDirection.Output;
+                                            cmd.Parameters.Add(pTipoMensaje);
+
+                                            cmd.ExecuteNonQuery();
+
+                                            message = pDescripcionMensaje.Value.ToString();
+                                            messageType = pTipoMensaje.Value.ToString();
+
+                                            // Inserta el beneficiario
+                                            if (messageType != "3")
+                                            {
+                                                Console.WriteLine(message);
+                                                throw new Exception(message);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
                         }
 
                         // LOGICA A MANEJAR DE UBICACIONES

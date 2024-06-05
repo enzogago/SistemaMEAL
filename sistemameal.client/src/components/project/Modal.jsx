@@ -60,7 +60,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                             id="proIde"
                             className={`PowerMas_Modal_Form_${dirtyFields['proIde'] || isSubmitted ? (errors['proIde'] ? 'invalid' : 'valid') : ''}`}  
                             type="text" 
-                            placeholder='12345' 
+                            placeholder='022001' 
                             maxLength={10} 
                             name="proIde" 
                             autoComplete='off'

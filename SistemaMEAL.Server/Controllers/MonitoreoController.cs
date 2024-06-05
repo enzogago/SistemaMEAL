@@ -238,22 +238,6 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return rToken;
 
-            dynamic data = rToken.result;
-            Usuario usuarioActual = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (usuarioActual.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para insertar usuarios",
-                    result = ""
-                };
-            }
             var (message, messageType) = _monitoreos.ModificarBeneficiarioMonitoreo(identity, beneficiarioMonitoreo.Beneficiario, beneficiarioMonitoreo.MetaBeneficiario);
             if (messageType == "1")
             {
@@ -278,22 +262,6 @@ namespace SistemaMEAL.Server.Controllers
 
             if (!rToken.success) return rToken;
 
-            dynamic data = rToken.result;
-            Usuario usuarioActual = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-            };
-            if (usuarioActual.RolCod != "01")
-            {
-                return new
-                {
-                    success = false,
-                    message = "No tienes permisos para insertar usuarios",
-                    result = ""
-                };
-            }
             var (message, messageType) = _monitoreos.InsertarMetaMonitoreo(identity, metaIndicadorDto.Meta, metaIndicadorDto.MetaIndicador);
             if (messageType == "1")
             {

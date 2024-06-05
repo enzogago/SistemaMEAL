@@ -48,7 +48,8 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
         if (subProyecto != '0' && subProyecto != '') {
             const {subProAno, subProCod} = JSON.parse(subProyecto);
             fetchData(`Objetivo/subproyecto/${subProAno}/${subProCod}`, (data) => {
-                setObjetivos(data);
+                const filteredData = data.filter(item => item.objNum !== 'NA' && item.objNom !== 'NA');
+                setObjetivos(filteredData);
                 setObjetivosLoaded(true); // Establece objetivosLoaded en true una vez que los datos se hayan cargado
             });
             setObjetivoEnable(true);
@@ -145,7 +146,6 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                         </label>
                         <select 
                             id='objetivo'
-                            
                             disabled={!objetivoEnable}
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.objetivo || isSubmitted ? (errors.objetivo ? 'invalid' : 'valid') : ''}`} 
                             {...register('objetivo', { 
@@ -178,21 +178,20 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                     </div>
                     <div className="">
                         <label className="block" htmlFor='objEspNum'>
-                            Código del Objetivo Especìfico:
+                            Código del Objetivo Específico:
                         </label>
                         <input 
                             id="objEspNum"
                             className={`PowerMas_Modal_Form_${dirtyFields.objEspNum || isSubmitted ? (errors.objEspNum ? 'invalid' : 'valid') : ''}`}  
                             type="text" 
-                            
-                            placeholder='123456' 
-                            maxLength={100} 
+                            placeholder='OE1' 
+                            maxLength={10} 
                             name="objEspNum" 
                             autoComplete='off'
                             {...register(
                                 'objEspNum', { 
                                     required: 'El campo es requerido',
-                                    maxLength: { value: 100, message: 'El campo no puede tener más de 100 caracteres' },
+                                    maxLength: { value: 10, message: 'El campo no puede tener más de 10 caracteres' },
                                     minLength:  { value: 2, message: 'El campo no puede tener menos de 2 caracteres' },
                                     pattern: {
                                         value: /^[A-Za-z0-9.\s]+$/,
@@ -211,14 +210,14 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                     </div>
                     <div className="">
                         <label htmlFor="objEspNom" className="">
-                            Nombre del Objetivo Específico
+                            Nombre del Objetivo Específico:
                         </label>
                         <input type="text"
                             id="objEspNom" 
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.objEspNom || isSubmitted ? (errors.objEspNom ? 'invalid' : 'valid') : ''}`} 
-                            placeholder="Movilidad Humana"
+                            placeholder="Promover la integración económica de la población migrante"
                             autoComplete='off'
-                            maxLength={300}
+                            maxLength={400}
                             {...register('objEspNom', { 
                                 required: 'El campo es requerido',
                                 pattern: {
@@ -226,7 +225,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                                     message: 'Por favor, introduce caracteres válidos.',
                                 },
                                 minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
-                                maxLength: { value: 300, message: 'El campo no puede tener más de 300 caracteres' },
+                                maxLength: { value: 400, message: 'El campo no puede tener más de 400 caracteres' },
                             })} 
                         />
                         {errors.objEspNom ? (

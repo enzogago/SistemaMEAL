@@ -112,8 +112,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                             id="objNum"
                             className={`PowerMas_Modal_Form_${dirtyFields.objNum || isSubmitted ? (errors.objNum ? 'invalid' : 'valid') : ''}`}  
                             type="text" 
-                            
-                            placeholder='123456' 
+                            placeholder='OG' 
                             maxLength={100} 
                             name="objNum" 
                             autoComplete='off'
@@ -144,9 +143,9 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                         <input type="text"
                             id="objNom"
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.objNom || isSubmitted ? (errors.objNom ? 'invalid' : 'valid') : ''}`} 
-                            placeholder="Movilidad Humana"
+                            placeholder="Contribuir al ejercicio de derechos y a la integración socioeconómica"
                             autoComplete='off'
-                            maxLength={300}
+                            maxLength={400}
                             {...register('objNom', { 
                                 required: 'El campo es requerido',
                                 pattern: {
@@ -154,7 +153,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                                     message: 'Por favor, introduce caracteres válidos.',
                                 },
                                 minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
-                                maxLength: { value: 300, message: 'El campo no puede tener más de 300 caracteres' },
+                                maxLength: { value: 400, message: 'El campo no puede tener más de 400 caracteres' },
                             })} 
                         />
                         {errors.objNom ? (

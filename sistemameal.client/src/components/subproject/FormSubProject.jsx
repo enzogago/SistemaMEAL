@@ -466,17 +466,18 @@ const FormSubProject = () => {
             const {proAno, proCod} = JSON.parse(data.proyecto)
             const {usuAno, usuCod} = JSON.parse(data.usuario)
             const SubProyectoImplementadorDto = {
-                SubProyecto: hasSubProjectChanged ? {
+                SubProyecto: {
                     ...data,
                     proAno,
                     proCod,
                     usuAno,
                     usuCod
-                } : null,
+                },
                 SubProyectoFinanciadores: selectValuesFin,
                 SubProyectoImplementadores: selectValues,
                 SubProyectoUbicaciones: ubicaciones
             }
+            console.log(SubProyectoImplementadorDto)
             handleSubmit(SubProyectoImplementadorDto, isEditing, navigate);
         })();
     }
@@ -513,71 +514,102 @@ const FormSubProject = () => {
 
 
     const handleRemoveFinanciador = (index) => {
-        // Recorre todos los selectores que vienen después del que estás eliminando
-        if (selectCountFin > 1) {
-            for (let i = index + 1; i < selectCountFin; i++) {
-                // Obtiene el valor del selector actual
-                const value = watch(`finCod${i}`);
-                // Asigna el valor al selector anterior
-                setValue(`finCod${i - 1}`, value);
+        Notiflix.Confirm.show(
+            'Eliminar Item',
+            '¿Está seguro que quieres eliminar esta Item?',
+            'Sí',
+            'No',
+            async () => {
+                // Recorre todos los selectores que vienen después del que estás eliminando
+                for (let i = index + 1; i < selectCountFin; i++) {
+                    // Obtiene el valor del selector actual
+                    const value = watch(`finCod${i}`);
+                    // Asigna el valor al selector anterior
+                    setValue(`finCod${i - 1}`, value);
+                }
+                // Elimina el último selector
+                setValue(`finCod${selectCountFin - 1}`, '0');
+                setSelectCountFin(prevCount => prevCount - 1);
+            },
+            () => {
+                // El usuario ha cancelado la operación de eliminación
             }
-            // Elimina el último selector
-            setValue(`finCod${selectCountFin - 1}`, '0');
-            setSelectCountFin(prevCount => prevCount - 1);
-        }
+        );
     };
 
     const handleRemoveImplementador = (index) => {
         if (selectCount > 1) {
-            // Recorre todos los selectores que vienen después del que estás eliminando
-            for (let i = index + 1; i < selectCount; i++) {
-                // Obtiene el valor del selector actual
-                const value = watch(`impCod${i}`);
-                // Asigna el valor al selector anterior
-                setValue(`impCod${i - 1}`, value);
-            }
-            // Elimina el último selector
-            setValue(`impCod${selectCount - 1}`, '0');
-            setSelectCount(prevCount => prevCount - 1);
+            Notiflix.Confirm.show(
+                'Eliminar Item',
+                '¿Está seguro que quieres eliminar esta Item?',
+                'Sí',
+                'No',
+                async () => {
+                    // Recorre todos los selectores que vienen después del que estás eliminando
+                    for (let i = index + 1; i < selectCount; i++) {
+                        // Obtiene el valor del selector actual
+                        const value = watch(`impCod${i}`);
+                        // Asigna el valor al selector anterior
+                        setValue(`impCod${i - 1}`, value);
+                    }
+                    // Elimina el último selector
+                    setValue(`impCod${selectCount - 1}`, '0');
+                    setSelectCount(prevCount => prevCount - 1);
+                },
+                () => {
+                    // El usuario ha cancelado la operación de eliminación
+                }
+            );
         }
     };
     
     
     const handleRemoveUbicacion = (index) => {
         if (locationSelects.length > 1) {
-            // Elimina el grupo de selects de ubicación
-            const newLocationSelects = locationSelects.filter((_, i) => i !== index);
-            setLocationSelects(newLocationSelects);
-    
-            // Crea un nuevo objeto para los valores seleccionados
-            const newSelectedCountryValues = {};
-            const newSelectedLocationValues = {};
-    
-            // Recorre los grupos restantes
-            for (let i = 0; i < newLocationSelects.length; i++) {
-                // Actualiza los valores seleccionados para reflejar el nuevo índice
-                // Solo si el valor actual no es '0'
-                if (selectedCountryValues[i < index ? i : i + 1] !== '0') {
-                    newSelectedCountryValues[i] = selectedCountryValues[i < index ? i : i + 1];
-                }
-                newLocationSelects[i].selects.forEach((_, selectIndex) => {
-                    if (selectedLocationValues[`${i < index ? i : i + 1}-${selectIndex}`] !== '0') {
-                        newSelectedLocationValues[`${i}-${selectIndex}`] = selectedLocationValues[`${i < index ? i : i + 1}-${selectIndex}`];
+            Notiflix.Confirm.show(
+                'Eliminar Item',
+                '¿Está seguro que quieres eliminar esta Item?',
+                'Sí',
+                'No',
+                async () => {
+                    // Elimina el grupo de selects de ubicación
+                    const newLocationSelects = locationSelects.filter((_, i) => i !== index);
+                    setLocationSelects(newLocationSelects);
+            
+                    // Crea un nuevo objeto para los valores seleccionados
+                    const newSelectedCountryValues = {};
+                    const newSelectedLocationValues = {};
+            
+                    // Recorre los grupos restantes
+                    for (let i = 0; i < newLocationSelects.length; i++) {
+                        // Actualiza los valores seleccionados para reflejar el nuevo índice
+                        // Solo si el valor actual no es '0'
+                        if (selectedCountryValues[i < index ? i : i + 1] !== '0') {
+                            newSelectedCountryValues[i] = selectedCountryValues[i < index ? i : i + 1];
+                        }
+                        newLocationSelects[i].selects.forEach((_, selectIndex) => {
+                            if (selectedLocationValues[`${i < index ? i : i + 1}-${selectIndex}`] !== '0') {
+                                newSelectedLocationValues[`${i}-${selectIndex}`] = selectedLocationValues[`${i < index ? i : i + 1}-${selectIndex}`];
+                            }
+                        });
                     }
-                });
-            }
-    
-            // Elimina los valores seleccionados del último grupo (que ya no existe)
-            delete newSelectedCountryValues[newLocationSelects.length];
-            Object.keys(newSelectedLocationValues).forEach(key => {
-                if (key.startsWith(`${newLocationSelects.length}-`)) {
-                    delete newSelectedLocationValues[key];
+            
+                    // Elimina los valores seleccionados del último grupo (que ya no existe)
+                    delete newSelectedCountryValues[newLocationSelects.length];
+                    Object.keys(newSelectedLocationValues).forEach(key => {
+                        if (key.startsWith(`${newLocationSelects.length}-`)) {
+                            delete newSelectedLocationValues[key];
+                        }
+                    });
+            
+                    // Actualiza el estado con los nuevos valores seleccionados
+                    setSelectedCountryValues(newSelectedCountryValues);
+                    setSelectedLocationValues(newSelectedLocationValues);
+                },
+                () => {
+                    // El usuario ha cancelado la operación de eliminación
                 }
-            });
-    
-            // Actualiza el estado con los nuevos valores seleccionados
-            setSelectedCountryValues(newSelectedCountryValues);
-            setSelectedLocationValues(newSelectedLocationValues);
+            );
         }
     }
     
@@ -642,7 +674,7 @@ const FormSubProject = () => {
                             id="subProSap"
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.subProSap || isSubmitted ? (errors.subProSap ? 'invalid' : 'valid') : ''}`}  
                             type="text" 
-                            placeholder='Ayuda En Acción España' 
+                            placeholder='234093 - Movilidad Humana' 
                             maxLength={100} 
                             name="subProSap" 
                             autoComplete='off'
@@ -677,7 +709,7 @@ const FormSubProject = () => {
                         <input type="text"
                             id="subProNom"
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.subProNom || isSubmitted ? (errors.subProNom ? 'invalid' : 'valid') : ''}`} 
-                            placeholder="Sub proyecto Movilidad Humana"
+                            placeholder="Reactivación económica de personas en Movilidad Humana"
                             autoComplete='off'
                             {...register('subProNom', { 
                                 pattern: {

@@ -67,7 +67,7 @@ const projects = () => {
                         headers={headers}
                         title={'INDICADORES'}
                         properties={properties}
-                        format={[1000,500]}
+                        format={[500,250]}
                         actions={actions}
                     />
                 </div>

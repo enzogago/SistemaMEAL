@@ -51,6 +51,7 @@ namespace SistemaMEAL.Server.Models
         public String? ProCod { get; set; }
         public String? ProNom { get; set; }
         public String? ProIde { get; set; }
+        public String? ProLinInt { get; set; }
         public String? SubProRes { get; set; }
         public String? SubProPerAnoIni { get; set; }
         public String? SubProPerMesIni { get; set; }
@@ -61,6 +62,8 @@ namespace SistemaMEAL.Server.Models
         public String? MonNom { get; set; }
         public String? MonSim { get; set; }
         public String? MonAbr { get; set; }
+        public String? UsuNom { get; set; }
+        public String? UsuApe { get; set; }
          public List<Meta>? Metas { get; set; }
     }
 }

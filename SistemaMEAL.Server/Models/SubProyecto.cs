@@ -29,6 +29,7 @@ namespace SistemaMEAL.Server.Models
         public String? ProAno { get; set; }
         public String? ProCod { get; set; }
         public String? ProIde { get; set; }
+        public String? ProLinInt { get; set; }
         public String? ProNom { get; set; }
         public String? SubProRes { get; set; }
         public String? SubProPerAnoIni { get; set; }

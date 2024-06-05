@@ -23,7 +23,12 @@ const Result = () => {
   
     // Efecto para cargar los datos de los beneficiarios al montar el componente
     useEffect(() => {
-        fetchDataBlock('Resultado', setData, '.content-block');
+        fetchDataBlock('Resultado', (data) => {
+            // Filtramos los datos para excluir los objetos que no queremos
+            const filteredData = data.filter(item => item.resNum !== 'NA' && item.resNom !== 'NA');
+            // Luego llamamos a setData con los datos filtrados
+            setData(filteredData);
+        }, '.content-block');
     }, [refresh]);
 
 
@@ -41,18 +46,21 @@ const Result = () => {
                 (item.objEspNom ? item.objEspNom.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
                 (item.objNum ? item.objNum.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
                 (item.objNom ? item.objNom.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
+                (item.subProSap ? item.subProSap.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
                 (item.subProNom ? item.subProNom.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
+                (item.proLinInt ? item.proLinInt.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
+                (item.proIde ? item.proIde.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
                 (item.proNom ? item.proNom.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
                 (item.usuNom && item.usuApe ? (item.usuNom + ' ' + item.usuApe).toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
-                (item.subProRes ? item.subProRes.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
+                (item.usuNom && item.usuApe ? (item.usuNom + ' ' + item.usuApe).toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
                 (periodoInicio ? periodoInicio.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false) ||
                 (periodoFin ? periodoFin.toUpperCase().includes(searchFilter.toUpperCase().trim()) : false)
             );
         }), [data, searchFilter]
     );
 
-    const headers = ['CÓDIGO','NOMBRE','OBJETIVO_ESPECIFICO','OBJETIVO','SUBPROYECTO','PROYECTO','RESPONSABLE','MES_INICIO','AÑO_INICIO','MES_FIN','AÑO_FIN'];
-    const properties = ['resNum','resNom',['objEspNum','objEspNom'],['objNum','objNom'],'subProNom','proNom','subProRes','subProPerMesIni','subProPerAnoIni','subProPerMesFin','subProPerAnoFin'];
+    const headers = ['CÓDIGO','NOMBRE','OBJETIVO_ESPECIFICO','OBJETIVO','SUBPROYECTO','PROYECTO','CÓDIGO','LINEA_INTERVENCIÓN','RESPONSABLE','MES_INICIO','AÑO_INICIO','MES_FIN','AÑO_FIN'];
+    const properties = ['resNum','resNom',['objEspNum','objEspNom'],['objNum','objNom'],['subProSap','subProNom'],'proNom','proIde','proLinInt',['usuNom','usuApe'],'subProPerMesIni','subProPerAnoIni','subProPerMesFin','subProPerAnoFin'];
     
     return (
         <>

@@ -1,6 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-// Componentes
-import Modal from './Modal';
 // Fetch Get
 import { fetchData } from '../reusable/helper';
 import SearchInput from '../reusable/Tables/SearchInput';
@@ -12,6 +10,7 @@ import { getMonth, getMonthYearText } from '../reusable/columns';
 import ExportMenu from '../reusable/Tables/ExportMenu';
 import Plus from '../../icons/Plus';
 import useModal from '../../hooks/useModal';
+import ModalActividad from './ModalActividad';
 
 const tipoIndicadorMapping = {
     'IRE': 'Indicador de Resultado',
@@ -41,7 +40,7 @@ const Indicator = () => {
     // Efecto para cargar los datos de los beneficiarios al montar el componente
     useEffect(() => {
         fetchDataBlock('Indicador', (data) => {
-            const filteredData = data.filter(item => item.indTipInd !== 'IAC');
+            const filteredData = data.filter(item => item.indTipInd === 'IAC');
             setData(filteredData)
         }, '.indicator-block');
     }, [refresh]);
@@ -94,7 +93,7 @@ const Indicator = () => {
     return (
         <>
             <div className="flex flex-column p1 gap_25 flex-grow-1 overflow-auto indicator-block">
-                <h3>Listado de Indicadores</h3>
+                <h3>Listado de Actividades</h3>
                 <div className="flex gap_5 p_25">
                     {/* Componente para la entrada de búsqueda con etiquetas */}
                     <SearchInput
@@ -115,7 +114,7 @@ const Indicator = () => {
                     <ExportMenu
                         filteredData={dataExport}
                         headers={headers}
-                        title={'INDICADORES'}
+                        title={'ACTIVIDADES'}
                         properties={properties}
                         format={[1000,500]}
                         actions={actions}
@@ -129,12 +128,12 @@ const Indicator = () => {
                 />
             </div>
             
-            <Modal
+            <ModalActividad
                 modalVisible={modalVisible}
                 estadoEditado={estadoEditado}
                 closeModal={closeModal} 
                 setData={setData}
-                title='Indicador'
+                title='Actividad'
                 unidades={unidades}
                 tiposDeValor={tiposDeValor}
             />  
