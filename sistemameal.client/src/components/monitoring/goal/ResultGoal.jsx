@@ -45,7 +45,6 @@ const ResultGoal = () => {
         formState: { errors, dirtyFields, isSubmitted }, 
         reset, 
         setValue, 
-        trigger,
         getValues
     } = 
     useForm({ mode: "onChange"});
@@ -483,8 +482,6 @@ const ResultGoal = () => {
                 }
             });
     
-            
-    
             // Agregar las filas adicionales para este indicador
             additionalRows.filter(row => row.indAno === indicador.indAno && row.indCod === indicador.indCod).forEach(additionalRow => {
                 const { usuAno, usuCod } = JSON.parse(getValues(`tecnico_${additionalRow.id}`));
@@ -539,9 +536,9 @@ const ResultGoal = () => {
         const {ubiAno, ubiCod} = JSON.parse(ubicacionValue);
     
         // Calcula el total actual para este indicador, implementador y ubicación
-        const currentTotal = Object.entries(totals)
-            .filter(([key]) => key.startsWith(`${row.id}`) && !key.endsWith('_total'))
-            .reduce((sum, [, value]) => sum + value, 0);
+        const currentTotal = additionalRows
+            .filter(r => r.indAno === row.indAno && r.indCod === row.indCod && watch(`implementador_${r.id}`) === implementadorValue && watch(`ubicacion_${r.id}`) === ubicacionValue)
+            .reduce((sum, r) => sum + Number(watch(`mes_${String(monthIndex+1).padStart(2, '0')}_${r.id}`) || 0), 0);
     
         // Calcula el nuevo total con el nuevo valor
         const newTotal = currentTotal - (prevValues[`${row.id}_${String(monthIndex+1).padStart(2, '0')}`] || 0) + Number(newValue);
@@ -565,6 +562,7 @@ const ResultGoal = () => {
         // Si no, acepta el nuevo valor
         return true;
     };
+    
     
     
     return (
