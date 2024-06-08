@@ -854,7 +854,7 @@ const ResultGoal = () => {
                                                     onInput={(e) => {
                                                         e.target.value = e.target.value.replace(/[^0-9]/g, '');
 
-                                                        validateInput(e.target.value, row, i)
+                                                        // validateInput(e.target.value, row, i)
                                                         // Si el nuevo valor es válido, actualiza los totales y los valores previos
                                                         const key = `${row.id}_${String(i+1).padStart(2, '0')}`;
                                                         const totalKey = `${row.id}_total`;

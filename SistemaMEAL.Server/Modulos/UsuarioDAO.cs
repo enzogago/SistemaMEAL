@@ -163,6 +163,7 @@ namespace SistemaMEAL.Server.Modulos
                 cmd.Parameters.AddWithValue("@P_ROLCOD", (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@P_UBIANO", (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@P_UBICOD", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUSES", (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod ?? (object)DBNull.Value);
@@ -360,6 +361,7 @@ namespace SistemaMEAL.Server.Modulos
                 cmd.Parameters.AddWithValue("@P_ROLCOD", usuario.RolCod);
                 cmd.Parameters.AddWithValue("@P_UBIANO", usuario.UbiAno);
                 cmd.Parameters.AddWithValue("@P_UBICOD", usuario.UbiCod);
+                cmd.Parameters.AddWithValue("@P_USUSES", "S");
                 cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                 cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
@@ -563,6 +565,7 @@ namespace SistemaMEAL.Server.Modulos
                 cmd.Parameters.AddWithValue("@P_ROLCOD", string.IsNullOrEmpty(rolCod) ? (object)DBNull.Value : rolCod);
                 cmd.Parameters.AddWithValue("@P_UBIANO", string.IsNullOrEmpty(ubiAno) ? (object)DBNull.Value : ubiAno);
                 cmd.Parameters.AddWithValue("@P_UBICOD", string.IsNullOrEmpty(ubiCod) ? (object)DBNull.Value : ubiCod);
+                cmd.Parameters.AddWithValue("@P_USUSES", string.IsNullOrEmpty(ubiCod) ? (object)DBNull.Value : ubiCod);
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod ?? (object)DBNull.Value);

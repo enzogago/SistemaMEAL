@@ -75,7 +75,23 @@ const Layout = ({ children }) => {
                 showSidebarAndBar ? 
                 <>
                     <Sidebar />
-                    <div className="PowerMas_MainRender Large_10 Medium_9 Small_12">
+                    <div className="PowerMas_MainRender Large_10 Medium_9 Small_12 relative ">
+                        <div
+                            className='Phone_12 flex ai-center jc-center'
+                            style={{
+                                position: 'absolute',
+                            }}
+                        >
+                            <h3
+                                className='p1_25'
+                                style={{
+                                    backgroundColor: 'var(--naranja-ayuda)',
+                                    color: '#FFFFFF'
+                                }}
+                            >
+                                SE ENCUENTRA EN EL SIMULADOR
+                            </h3>
+                        </div>
                         <Bar showSidebarAndBar={true} isOpen={isOpen} setIsOpen={setIsOpen} />
                         <section className="PowerMas_Content Large-m1">
                             {children}
