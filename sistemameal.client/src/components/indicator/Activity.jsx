@@ -3,7 +3,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { fetchData } from '../reusable/helper';
 import SearchInput from '../reusable/Tables/SearchInput';
 import CommonTable from '../reusable/Tables/CommonTable';
-import { getColumns } from './columns';
 import { fetchDataBlock } from '../reusable/fetchs';
 import useEntityActions from '../../hooks/useEntityActions';
 import { getMonth, getMonthYearText } from '../reusable/columns';
@@ -11,6 +10,7 @@ import ExportMenu from '../reusable/Tables/ExportMenu';
 import Plus from '../../icons/Plus';
 import useModal from '../../hooks/useModal';
 import ModalActividad from './ModalActividad';
+import { getColumns } from './columns-activity';
 
 const tipoIndicadorMapping = {
     'IRE': 'Indicador de Resultado',
@@ -39,8 +39,10 @@ const Indicator = () => {
   
     // Efecto para cargar los datos de los beneficiarios al montar el componente
     useEffect(() => {
+        setData([])
         fetchDataBlock('Indicador', (data) => {
-            const filteredData = data.filter(item => item.indTipInd === 'IAC');
+            console.log(data)
+            const filteredData = data.filter(item => item.indTipInd == 'IAC');
             setData(filteredData)
         }, '.indicator-block');
     }, [refresh]);
@@ -77,8 +79,8 @@ const Indicator = () => {
         }), [data, searchFilter]
     );
 
-    const headers = ['CÓDIGO','NOMBRE','TIPO','UNIDAD','TIPO_VALOR','FORMULA','RESULTADO','OBJETIVO_ESPECIFICO','OBJETIVO','SUBPROYECTO','PROYECTO','CÓDIGO','LINEA_INTERVENCIÓN','RESPONSABLE','MES_INICIO','AÑO_INICIO','MES_FIN','AÑO_FIN'];
-    const properties = ['indNum','indNom','indTipInd','uniNom','tipValNom','indFor',['resNum','resNom'],['objEspNum','objEspNom'],['objNum','objNom'],['subProSap','subProNom'],'proNom','proIde','proLinInt',['usuNom','usuApe'],'subProPerMesIni','subProPerAnoIni','subProPerMesFin','subProPerAnoFin'];
+    const headers = ['CÓDIGO','CODIGO_PRESUPUESTO','ACTIVIDAD','TIPO','UNIDAD','TIPO_VALOR','FORMULA','RESULTADO','OBJETIVO_ESPECIFICO','OBJETIVO','SUBPROYECTO','PROYECTO','CÓDIGO','LINEA_INTERVENCIÓN','RESPONSABLE','MES_INICIO','AÑO_INICIO','MES_FIN','AÑO_FIN'];
+    const properties = ['indNum','indNumPre','indNom','indTipInd','uniNom','tipValNom','indFor',['resNum','resNom'],['objEspNum','objEspNom'],['objNum','objNom'],['subProSap','subProNom'],'proNom','proIde','proLinInt',['usuNom','usuApe'],'subProPerMesIni','subProPerAnoIni','subProPerMesFin','subProPerAnoFin'];
     // Preparar los datos
     let dataExport = [...filteredData]; 
     // Modificar el campo 'uniInvPer' en los datos
@@ -132,7 +134,7 @@ const Indicator = () => {
                 modalVisible={modalVisible}
                 estadoEditado={estadoEditado}
                 closeModal={closeModal} 
-                setData={setData}
+                setRefresh={setRefresh}
                 title='Actividad'
                 unidades={unidades}
                 tiposDeValor={tiposDeValor}

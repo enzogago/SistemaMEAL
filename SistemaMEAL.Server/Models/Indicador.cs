@@ -11,6 +11,7 @@ namespace SistemaMEAL.Server.Models
         public String? IndCod { get; set; }
         public String? IndNom { get; set; }
         public String? IndNum { get; set; }
+        public String? IndNumPre { get; set; }
         public String? UniCod { get; set; }
         public String? UniNom { get; set; }
         public String? TipValCod { get; set; }

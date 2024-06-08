@@ -54,6 +54,7 @@ namespace SistemaMEAL.Server.Modulos
                 cmd.Parameters.AddWithValue("@P_ROLCOD", usuario.RolCod);
                 cmd.Parameters.AddWithValue("@P_UBIANO", usuario.UbiAno);
                 cmd.Parameters.AddWithValue("@P_UBICOD", usuario.UbiCod);
+                cmd.Parameters.AddWithValue("@P_USUSES", usuario.UsuSes);
                 cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                 cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
@@ -272,6 +273,7 @@ namespace SistemaMEAL.Server.Modulos
                 cmd.Parameters.AddWithValue("@P_ROLCOD", (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@P_UBIANO", (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@P_UBICOD", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_USUSES", (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod ?? (object)DBNull.Value);

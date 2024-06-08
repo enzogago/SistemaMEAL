@@ -14,7 +14,7 @@ namespace SistemaMEAL.Modulos
     {
         private conexionDAO cn = new conexionDAO();
 
-        public IEnumerable<Indicador> Buscar(ClaimsIdentity? identity, string? actAno = null, string? actCod = null,string? indAno = null, string? indCod = null, string? indNom = null, string? indNum = null, string? indTipInd = null, string? uniCod = null, string? tipValCod = null, string? indTotPre = null, string? monCod = null, string? indLinBas = null, string? indFor = null, string? subProAno = null, string? subProCod = null)
+        public IEnumerable<Indicador> Buscar(ClaimsIdentity? identity, string? actAno = null, string? actCod = null,string? indAno = null, string? indCod = null, string? indNom = null, string? indNum = null, string? indNumPre = null, string? indTipInd = null, string? uniCod = null, string? tipValCod = null, string? indTotPre = null, string? monCod = null, string? indLinBas = null, string? indFor = null, string? subProAno = null, string? subProCod = null)
         {
             List<Indicador>? temporal = new List<Indicador>();
             try
@@ -34,6 +34,7 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_ACTCOD", string.IsNullOrEmpty(actCod) ? (object)DBNull.Value : actCod);
                 cmd.Parameters.AddWithValue("@P_INDNOM", string.IsNullOrEmpty(indNom) ? (object)DBNull.Value : indNom);
                 cmd.Parameters.AddWithValue("@P_INDNUM", string.IsNullOrEmpty(indNum) ? (object)DBNull.Value : indNum);
+                cmd.Parameters.AddWithValue("@P_INDNUMPRE", string.IsNullOrEmpty(indNumPre) ? (object)DBNull.Value : indNumPre);
                 cmd.Parameters.AddWithValue("@P_INDTIPIND", string.IsNullOrEmpty(indTipInd) ? (object)DBNull.Value : indTipInd);
                 cmd.Parameters.AddWithValue("@P_UNICOD", string.IsNullOrEmpty(uniCod) ? (object)DBNull.Value : uniCod);
                 cmd.Parameters.AddWithValue("@P_TIPVALCOD", string.IsNullOrEmpty(tipValCod) ? (object)DBNull.Value : tipValCod);
@@ -103,6 +104,7 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_ACTCOD", (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@P_INDNOM", (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@P_INDNUM", (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@P_INDNUMPRE", (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@P_INDTIPIND", (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@P_UNICOD", (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@P_TIPVALCOD", (object)DBNull.Value);
@@ -357,6 +359,7 @@ namespace SistemaMEAL.Modulos
                             cmd.Parameters.AddWithValue("@P_ACTCOD", (object)DBNull.Value);
                             cmd.Parameters.AddWithValue("@P_INDNOM", (object)DBNull.Value);
                             cmd.Parameters.AddWithValue("@P_INDNUM", (object)DBNull.Value);
+                            cmd.Parameters.AddWithValue("@P_INDNUMPRE", (object)DBNull.Value);
                             cmd.Parameters.AddWithValue("@P_INDTIPIND", "IAC");
                             cmd.Parameters.AddWithValue("@P_UNICOD", (object)DBNull.Value);
                             cmd.Parameters.AddWithValue("@P_TIPVALCOD", (object)DBNull.Value);
@@ -1503,6 +1506,7 @@ namespace SistemaMEAL.Modulos
                         cmd.Parameters.AddWithValue("@P_ACTCOD", indicador.ActCod);
                         cmd.Parameters.AddWithValue("@P_INDNOM", indicador.IndNom);
                         cmd.Parameters.AddWithValue("@P_INDNUM", indicador.IndNum);
+                        cmd.Parameters.AddWithValue("@P_INDNUMPRE", indicador.IndNumPre);
                         cmd.Parameters.AddWithValue("@P_INDTIPIND", indicador.IndTipInd);
                         cmd.Parameters.AddWithValue("@P_UNICOD", indicador.UniCod);
                         cmd.Parameters.AddWithValue("@P_TIPVALCOD", indicador.TipValCod);
@@ -1984,6 +1988,7 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_INDCOD", indicador.IndCod);
                 cmd.Parameters.AddWithValue("@P_INDNOM", indicador.IndNom);
                 cmd.Parameters.AddWithValue("@P_INDNUM", indicador.IndNum);
+                cmd.Parameters.AddWithValue("@P_INDNUMPRE", indicador.IndNumPre);
                 cmd.Parameters.AddWithValue("@P_INDTIPIND", indicador.IndTipInd);
                 cmd.Parameters.AddWithValue("@P_UNICOD", indicador.UniCod);
                 cmd.Parameters.AddWithValue("@P_TIPVALCOD", indicador.TipValCod);

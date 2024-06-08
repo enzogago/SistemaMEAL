@@ -498,6 +498,7 @@ const ModalProfile = ({openModal, closeModal}) => {
                                         className={`Phone_12 PowerMas_Modal_Form_${isTouched ? (!isValid ? 'invalid' : 'valid') : ''}`}
                                         style={{
                                             paddingRight: '6px',
+                                            padding: '4px 6px 4px 52px',
                                             margin: 0,
                                         }}
                                     />

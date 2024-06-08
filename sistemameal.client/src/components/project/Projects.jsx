@@ -38,7 +38,7 @@ const projects = () => {
         }), [data, searchFilter]
     );
 
-    const headers = ['CODIGO', 'LINEA_INTERVENCION', 'NOMBRE', 'DESCRIPCION'];
+    const headers = ['CODIGO', 'LINEA_INTERVENCION', 'PROYECTO', 'DESCRIPCION'];
     const properties = ['proIde', 'proLinInt', 'proNom', 'proDes'];
 
     return (
@@ -65,7 +65,7 @@ const projects = () => {
                     <ExportMenu
                         filteredData={filteredData}
                         headers={headers}
-                        title={'INDICADORES'}
+                        title={'PROYECTOS'}
                         properties={properties}
                         format={[500,250]}
                         actions={actions}

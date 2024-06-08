@@ -1095,7 +1095,7 @@ const FormSubProject = () => {
                     </div>
                     <div className="p1" style={{backgroundColor: '#fff', border: '1px solid #372e2c3d'}}>
                         <div className="flex ai-center jc-space-between">
-                            <h3 className="f1_25 m1">Datos de Ubicación</h3>
+                            <h3 className="f1_25 m1">Ubicación</h3>
                             <span
                                 className='flex pointer' 
                                 onClick={() => setLocationSelects(prevSelects => [...prevSelects, { count: 1, selects: [] }])} 

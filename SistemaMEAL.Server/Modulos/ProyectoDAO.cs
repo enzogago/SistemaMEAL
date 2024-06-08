@@ -1123,6 +1123,7 @@ namespace SistemaMEAL.Modulos
                                                 cmd.Parameters.AddWithValue("@P_ACTCOD", indicador.ActCod);
                                                 cmd.Parameters.AddWithValue("@P_INDNOM", indicador.IndNom);
                                                 cmd.Parameters.AddWithValue("@P_INDNUM", indicador.IndNum);
+                                                cmd.Parameters.AddWithValue("@P_INDNUMPRE", "");
                                                 cmd.Parameters.AddWithValue("@P_INDTIPIND", indicador.IndTipInd);
                                                 cmd.Parameters.AddWithValue("@P_UNICOD", indicador.UniCod);
                                                 cmd.Parameters.AddWithValue("@P_TIPVALCOD", indicador.TipValCod);

@@ -535,13 +535,19 @@ const ResultGoal = () => {
     
         const {ubiAno, ubiCod} = JSON.parse(ubicacionValue);
     
-        // Calcula el total actual para este indicador, implementador y ubicación
-        const currentTotal = additionalRows
-            .filter(r => r.indAno === row.indAno && r.indCod === row.indCod && watch(`implementador_${r.id}`) === implementadorValue && watch(`ubicacion_${r.id}`) === ubicacionValue)
-            .reduce((sum, r) => sum + Number(watch(`mes_${String(monthIndex+1).padStart(2, '0')}_${r.id}`) || 0), 0);
+        // Calcula el total acumulado para este indicador, implementador y ubicación
+        let accumulatedTotal = 0;
+        for (let rowIndex = 0; rowIndex < additionalRows.length; rowIndex++) {
+            const currentRow = additionalRows[rowIndex];
+            if (currentRow.indAno === row.indAno && currentRow.indCod === row.indCod && watch(`implementador_${currentRow.id}`) === implementadorValue && watch(`ubicacion_${currentRow.id}`) === ubicacionValue) {
+                for (let monthIndex = 0; monthIndex < 12; monthIndex++) {
+                    accumulatedTotal += Number(watch(`mes_${String(monthIndex+1).padStart(2, '0')}_${currentRow.id}`) || 0);
+                }
+            }
+        }
     
         // Calcula el nuevo total con el nuevo valor
-        const newTotal = currentTotal - (prevValues[`${row.id}_${String(monthIndex+1).padStart(2, '0')}`] || 0) + Number(newValue);
+        const newTotal = accumulatedTotal - (prevValues[`${row.id}_${String(monthIndex+1).padStart(2, '0')}`] || 0) + Number(newValue);
     
         // Obtén los límites máximos para este indicador, implementador y ubicación
         const maxImplementador = cadenaImplementadorGrouped[`${row.indAno}-${row.indCod}`][implementadorValue];
@@ -562,8 +568,6 @@ const ResultGoal = () => {
         // Si no, acepta el nuevo valor
         return true;
     };
-    
-    
     
     return (
         <div className='p1 flex flex-column flex-grow-1 overflow-auto content-block'>
@@ -812,7 +816,7 @@ const ResultGoal = () => {
                                                                 r.indCod === row.indCod && 
                                                                 r.id !== row.id && 
                                                                 watch(`ubicacion_${r.id}`) === value && 
-                                                                watch(`implementador_${r.id}`) === ubicacionValue
+                                                                watch(`implementador_${r.id}`) === implementadorValue
                                                             );
                                                             if (duplicate) {
                                                                 Notiflix.Report.failure(

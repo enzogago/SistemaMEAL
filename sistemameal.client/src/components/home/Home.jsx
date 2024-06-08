@@ -25,6 +25,7 @@ import Search from '../../icons/Search';
 import IconCalendar from '../../icons/IconCalendar';
 import useDateRange from '../../hooks/useDateRange';
 import { StatusContext } from '../../context/StatusContext';
+import WhatsappIcon from '../../icons/WhatsappIcon';
 
 
 const handleInput = (event) => {
@@ -520,7 +521,19 @@ const Home = () => {
                     </div>
                 </div>
             </div>
-            
+            <a
+                className='flex f3 fa_Chat'
+                style={{
+                    position: 'absolute',
+                    right: '0.75rem',
+                    bottom: '0.75rem',
+                    border: '',
+                }}
+                href="https://wa.me/51966707947" 
+                target="_blank"
+            >
+                <WhatsappIcon />
+            </a>
         </>
     )
 };

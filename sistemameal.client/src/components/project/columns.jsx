@@ -14,7 +14,7 @@ export const getColumns = (actions, controller, openModal, setRefresh) => {
             accessorKey: "proLinInt",
         },
         {
-            header: "Nombre",
+            header: "Proyecto",
             accessorKey: "proNom",
             cell: ({row}) => renderCellWithTooltip([row.original.proNom])
         },

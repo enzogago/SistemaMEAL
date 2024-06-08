@@ -59,7 +59,7 @@ const Result = () => {
         }), [data, searchFilter]
     );
 
-    const headers = ['CÓDIGO','NOMBRE','OBJETIVO_ESPECIFICO','OBJETIVO','SUBPROYECTO','PROYECTO','CÓDIGO','LINEA_INTERVENCIÓN','RESPONSABLE','MES_INICIO','AÑO_INICIO','MES_FIN','AÑO_FIN'];
+    const headers = ['CÓDIGO','RESULTADO','OBJETIVO_ESPECIFICO','OBJETIVO','SUBPROYECTO','PROYECTO','CÓDIGO','LINEA_INTERVENCIÓN','RESPONSABLE','MES_INICIO','AÑO_INICIO','MES_FIN','AÑO_FIN'];
     const properties = ['resNum','resNom',['objEspNum','objEspNom'],['objNum','objNom'],['subProSap','subProNom'],'proNom','proIde','proLinInt',['usuNom','usuApe'],'subProPerMesIni','subProPerAnoIni','subProPerMesFin','subProPerAnoFin'];
     
     return (

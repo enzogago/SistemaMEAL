@@ -88,7 +88,6 @@ const UploadProject = () => {
             });
     }
     
-    
     return (
         <>
             <Bar currentStep={1} type='upload' />

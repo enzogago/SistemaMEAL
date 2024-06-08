@@ -10,7 +10,7 @@ export const getColumns = (actions, controller, openModal, setRefresh) => {
             accessorKey: "objEspNum"
         },
         {
-            header: "Nombre",
+            header: "Objetivo Específico",
             accessorKey: "objEspNom",
             cell: ({row}) => renderCellWithTooltip([row.original.objEspNom])
         },

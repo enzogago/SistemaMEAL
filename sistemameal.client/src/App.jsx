@@ -10,6 +10,7 @@ import { AuthContext } from './context/AuthContext';
 import LoadingComponent from './components/LoadingComponent';
 import ForgotPassword from './components/auth/ForgotPassword';
 import Login from './components/auth/Login';
+import ChangePassord from './components/ChangePassword';
 const Ubication = lazy(() => import('./components/user/Ubication'));
 const ResultChain = lazy(() => import('./components/result-chain/ResultChain'));
 const Tutorial = lazy(() => import('./components/tutorial/Tutorial'));
@@ -67,6 +68,8 @@ const App = () => {
     const { userLogged, menuData  } = authInfo;
 
     const [isDataLoaded, setIsDataLoaded] = useState(false);
+
+    
 
     useEffect(() => {
         const fetchMenuData = async () => {
@@ -205,6 +208,7 @@ const App = () => {
                                                     </>
                                                 )}
                                                 <Route path="tutorial" element={<Tutorial />} />
+                                                <Route path="user-first" element={<ChangePassord />} />
                                                 <Route path="*" element={<NotFound />} />
                                             </Routes>
                                     </Layout>

@@ -82,7 +82,7 @@ const Login = () => {
                 let minutos = fecha.getMinutes();
 
                 localStorage.setItem('timeInit', `${hora}:${minutos}`);
-                setIsLoggedIn(true);
+                navigate('/user-first');
             } else {
                 Notiflix.Notify.failure(data.message);
             }

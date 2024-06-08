@@ -10,7 +10,7 @@ export const getColumns = (actions, controller, openModal, setRefresh) => {
             accessorKey: "resNum"
         },
         {
-            header: "Nombre",
+            header: "Resultado",
             accessorKey: "resNom",
             cell: ({row}) => renderCellWithTooltip([row.original.resNom])
         },

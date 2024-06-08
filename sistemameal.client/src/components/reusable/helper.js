@@ -150,6 +150,47 @@ export const handleSubmit = async (controller, objetoEditado, objeto, setRegistr
     }
 };
 
+export const handleSubmitMantEspecial = async (controller, objetoEditado, objeto, setRefresh, closeModalAndReset) => {
+    const method = objetoEditado ? 'PUT' : 'POST';
+
+    let newData = {};
+    for (let key in objeto) {
+        if (typeof objeto[key] === 'string') {
+            // Convierte cada cadena a minúsculas
+            newData[key] = objeto[key].toUpperCase();
+        } else {
+            // Mantiene los valores no string tal como están
+            newData[key] = objeto[key];
+        }
+    }
+    
+    try {
+        Notiflix.Loading.pulse();
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/${controller}`, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(newData),
+        });
+        const data = await response.json();
+        if (!response.ok) {
+            Notiflix.Notify.failure(data.message);
+            return;
+        }
+        
+        setRefresh(prevRefresh => !prevRefresh);
+        Notiflix.Notify.success(data.message);
+        closeModalAndReset();
+    } catch (error) {
+        console.error('Error:', error);
+    } finally {
+        Notiflix.Loading.remove();
+    }
+};
+
 export const handleSubmitMant = async (controller, objetoEditado, objeto, setRegistros, closeModalAndReset) => {
     const method = objetoEditado ? 'PUT' : 'POST';
 

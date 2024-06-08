@@ -54,7 +54,7 @@ const Objective = () => {
         }), [data, searchFilter]
     );
 
-    const headers = ['CÓDIGO','NOMBRE','SUBPROYECTO','PROYECTO','CÓDIGO','LINEA_INTERVENCIÓN','RESPONSABLE','MES_INICIO','AÑO_INICIO','MES_FIN','AÑO_FIN'];
+    const headers = ['CÓDIGO','OBJETIVO','SUBPROYECTO','PROYECTO','CÓDIGO','LINEA_INTERVENCIÓN','RESPONSABLE','MES_INICIO','AÑO_INICIO','MES_FIN','AÑO_FIN'];
     const properties = ['objNum','objNom',['subProSap','subProNom'],'proNom','proIde','proLinInt',['usuNom','usuApe'],'subProPerMesIni','subProPerAnoIni','subProPerMesFin','subProPerAnoFin'];
     // Preparar los datos
     let dataExport = [...filteredData]; 

@@ -79,7 +79,7 @@ const Subproject = () => {
         }), [data, searchFilter]
     );
 
-    const headers = ['FINANCIADOR_PRINCIPAL', 'NOMBRE', 'RESPONSABLE','MES_INICIO','AÑO_INICIO','MES_FIN','AÑO_FIN','INVOLUCRA_SUB_ACTIVIDAD', 'PROYECTO','CÓDIGO','LINEA_INTERVENCIÓN'];  // Tus encabezados
+    const headers = ['FINANCIADOR_PRINCIPAL', 'SUB PROYECTO', 'RESPONSABLE','MES_INICIO','AÑO_INICIO','MES_FIN','AÑO_FIN','INVOLUCRA_SUB_ACTIVIDAD', 'PROYECTO','CÓDIGO','LINEA_INTERVENCIÓN'];  // Tus encabezados
     const properties = ['subProSap', 'subProNom', ['usuNom','usuApe'], 'subProPerMesIni', 'subProPerAnoIni', 'subProPerMesFin', 'subProPerAnoFin', 'subProInvSubAct', 'proNom','proIde','proLinInt'];  // Las propiedades de los objetos de datos que quieres incluir
     // Preparar los datos
     let dataExport = [...filteredData]; 

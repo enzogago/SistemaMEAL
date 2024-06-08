@@ -1,9 +1,9 @@
 // Importaciones necesarias
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { fetchData, handleSubmitMant } from '../reusable/helper';
+import { fetchData, handleSubmitMantEspecial } from '../reusable/helper';
 
-const ModalActividad = ({ estadoEditado, modalVisible, closeModal, setData, title, unidades, tiposDeValor }) => {
+const ModalActividad = ({ estadoEditado, modalVisible, closeModal, setRefresh, title, unidades, tiposDeValor }) => {
     // Variables de estado
     const [involucraSubActividad, setInvolucraSubActividad] = useState(false);
     const [subProyectos, setSubProyectos] = useState([]);
@@ -64,6 +64,7 @@ const ModalActividad = ({ estadoEditado, modalVisible, closeModal, setData, titl
             resultado: '0',
             indNom: '',
             indNum: '',
+            indNumPre: '',
             uniCod: '0',
             tipValCod: '0',
             indTipInd: '0',
@@ -97,6 +98,7 @@ const ModalActividad = ({ estadoEditado, modalVisible, closeModal, setData, titl
         let dataSubmit = {
             indFor: formula,
             indNum: data.indNum,
+            indNumPre: data.indNumPre,
             indNom: data.indNom,
             indTipInd: data.indTipInd,
             tipValCod: data.tipValCod,
@@ -153,7 +155,7 @@ const ModalActividad = ({ estadoEditado, modalVisible, closeModal, setData, titl
             subProCod
         }
         console.log(dataSubmit)
-        handleSubmitMant('Indicador', !!estadoEditado, dataSubmit, setData, closeModalAndReset)
+        handleSubmitMantEspecial('Indicador', !!estadoEditado, dataSubmit, setRefresh, closeModalAndReset)
     };
 
 
@@ -412,6 +414,38 @@ const ModalActividad = ({ estadoEditado, modalVisible, closeModal, setData, titl
                                 />
                                 {errors.indNum ? (
                                     <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.indNum.message}</p>
+                                ) : (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                        Espacio reservado para el mensaje de error
+                                    </p>
+                                )}
+                            </div>
+                            <div className="flex flex-column">
+                                <label className="" htmlFor='indNumPre'>
+                                    Código de Actividad Presupuesto
+                                </label>
+                                <input 
+                                    id="indNumPre"
+                                    className={`PowerMas_Modal_Form_${dirtyFields.indNumPre || isSubmitted ? (errors.indNumPre ? 'invalid' : 'valid') : ''}`}  
+                                    type="text" 
+                                    disabled={!subProyectoEnable}
+                                    placeholder='A111' 
+                                    maxLength={10} 
+                                    name="indNumPre" 
+                                    autoComplete='off'
+                                    {...register(
+                                        'indNumPre', { 
+                                            maxLength: { value: 10, message: 'El campo no puede tener más de 10 caracteres' },
+                                            minLength:  { value: 2, message: 'El campo no puede tener menos de 2 caracteres' },
+                                            pattern: {
+                                                value: /^[A-Za-z0-9.\s]+$/,
+                                                message: 'Por favor, introduce solo letras, numeros y puntos',
+                                            },
+                                        }
+                                    )}
+                                />
+                                {errors.indNumPre ? (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.indNumPre.message}</p>
                                 ) : (
                                     <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
                                         Espacio reservado para el mensaje de error

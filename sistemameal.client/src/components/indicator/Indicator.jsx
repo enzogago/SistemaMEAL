@@ -40,8 +40,10 @@ const Indicator = () => {
   
     // Efecto para cargar los datos de los beneficiarios al montar el componente
     useEffect(() => {
+        setData([])
         fetchDataBlock('Indicador', (data) => {
-            const filteredData = data.filter(item => item.indTipInd !== 'IAC');
+            console.log(data)
+            const filteredData = data.filter(item => item.indTipInd != 'IAC');
             setData(filteredData)
         }, '.indicator-block');
     }, [refresh]);
@@ -57,6 +59,7 @@ const Indicator = () => {
             return (
                 (item.indNom ? item.indNom.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
                 (item.indNum ? item.indNum.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
+                (item.indNumPre ? item.indNumPre.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
                 (item.uniNom ? item.uniNom.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
                 (item.tipValNom ? item.tipValNom.toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
                 (item.indFor ? item.indFor.replace(/{/g, '').replace(/}/g, '').toUpperCase().includes(searchFilter.toUpperCase()) : false) ||
@@ -78,8 +81,8 @@ const Indicator = () => {
         }), [data, searchFilter]
     );
 
-    const headers = ['CÓDIGO','NOMBRE','TIPO','UNIDAD','TIPO_VALOR','FORMULA','RESULTADO','OBJETIVO_ESPECIFICO','OBJETIVO','SUBPROYECTO','PROYECTO','CÓDIGO','LINEA_INTERVENCIÓN','RESPONSABLE','MES_INICIO','AÑO_INICIO','MES_FIN','AÑO_FIN'];
-    const properties = ['indNum','indNom','indTipInd','uniNom','tipValNom','indFor',['resNum','resNom'],['objEspNum','objEspNom'],['objNum','objNom'],['subProSap','subProNom'],'proNom','proIde','proLinInt',['usuNom','usuApe'],'subProPerMesIni','subProPerAnoIni','subProPerMesFin','subProPerAnoFin'];
+    const headers = ['CÓDIGO','CODIGO_PRESUPUESTO','INDICADOR','TIPO','UNIDAD','TIPO_VALOR','FORMULA','RESULTADO','OBJETIVO_ESPECIFICO','OBJETIVO','SUBPROYECTO','PROYECTO','CÓDIGO','LINEA_INTERVENCIÓN','RESPONSABLE','MES_INICIO','AÑO_INICIO','MES_FIN','AÑO_FIN'];
+    const properties = ['indNum','indNumPre','indNom','indTipInd','uniNom','tipValNom','indFor',['resNum','resNom'],['objEspNum','objEspNom'],['objNum','objNom'],['subProSap','subProNom'],'proNom','proIde','proLinInt',['usuNom','usuApe'],'subProPerMesIni','subProPerAnoIni','subProPerMesFin','subProPerAnoFin'];
     // Preparar los datos
     let dataExport = [...filteredData]; 
     // Modificar el campo 'uniInvPer' en los datos
@@ -133,7 +136,7 @@ const Indicator = () => {
                 modalVisible={modalVisible}
                 estadoEditado={estadoEditado}
                 closeModal={closeModal} 
-                setData={setData}
+                setRefresh={setRefresh}
                 title='Indicador'
                 unidades={unidades}
                 tiposDeValor={tiposDeValor}

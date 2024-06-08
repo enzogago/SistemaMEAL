@@ -1,4 +1,5 @@
 import ExcelJS from 'exceljs';
+import Notiflix from 'notiflix';
 
 export const expectedHeaders = [
     { display: 'CODIGO', dbKey: 'indNum', entity: 'Indicador', validation: 'numero' },
@@ -177,6 +178,16 @@ export const handleUpload = async (file, setTableData, setPostData, setIsValid, 
                 break;
             }
 
+            // Agrega tu lógica de validación aquí
+            const validationValue = row.getCell(2).text.trim(); // Asume que la validación está en la segunda columna
+            if (validationValue !== 'CORRECTO') {
+                Notiflix.Report.failure(
+                    'Error de validación',
+                    `Revisar el excel y verificar que en la columna VALIDACIÓN todas las filas esten en estado CORRECTO.`,
+                    'Ok',
+                );
+                return;
+            }
 
             const tableRowData = new Array(expectedHeaders.length).fill(''); // Inicializa la fila con valores vacíos
             const postRowData = {};

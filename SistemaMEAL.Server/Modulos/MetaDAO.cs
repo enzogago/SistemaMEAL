@@ -171,6 +171,7 @@ namespace SistemaMEAL.Modulos
                                     cmd.Parameters.AddWithValue("@P_ACTCOD", (object)DBNull.Value);
                                     cmd.Parameters.AddWithValue("@P_INDNOM", (object)DBNull.Value);
                                     cmd.Parameters.AddWithValue("@P_INDNUM", (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@P_INDNUMPRE", (object)DBNull.Value);
                                     cmd.Parameters.AddWithValue("@P_INDTIPIND", (object)DBNull.Value);
                                     cmd.Parameters.AddWithValue("@P_UNICOD", (object)DBNull.Value);
                                     cmd.Parameters.AddWithValue("@P_TIPVALCOD", (object)DBNull.Value);

@@ -59,8 +59,14 @@ export const exportToExcel = async (data, headers, title, properties) => {
                 if (values.every(value => value === 'NA')) {
                     return '';
                 }
+                // Si las propiedades 'usuNom' o 'usuApe' están presentes, usar un espacio para la concatenación
+                if (prop.includes('usuNom') || prop.includes('usuApe')) {
+                    return values.join(' ');
+                }
+                // En caso contrario, usar un guión para la concatenación
                 return values.join(' - ');
             }
+            
             // Si 'prop' es un string, usar el valor tal cual
             return item[prop];
         });
@@ -142,8 +148,14 @@ export const exportToPdf = async (data, headers, title, properties, format) => {
                     if (values.every(value => value === 'NA')) {
                         return '';
                     }
+                    // Si las propiedades 'usuNom' o 'usuApe' están presentes, usar un espacio para la concatenación
+                    if (prop.includes('usuNom') || prop.includes('usuApe')) {
+                        return values.join(' ');
+                    }
+                    // En caso contrario, usar un guión para la concatenación
                     return values.join(' - ');
                 }
+                
                 // Si 'prop' es un string, usar el valor tal cual
                 return item[prop];
             });

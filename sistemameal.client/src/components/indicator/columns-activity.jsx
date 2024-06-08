@@ -23,7 +23,7 @@ export const getColumns = (actions, controller, openModal, setRefresh) => {
             accessorKey: "indNumPre"
         },
         {
-            header: "Indicador",
+            header: "Actividad",
             accessorKey: "indNom",
             cell: ({row}) => renderCellWithTooltip([row.original.indNom])
         },

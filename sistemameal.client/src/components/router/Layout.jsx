@@ -1,13 +1,33 @@
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Bar from "../layout/Bar";
 import Sidebar from "../layout/Sidebar";
 import { Tooltip } from 'react-tooltip';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { AuthContext } from '../../context/AuthContext';
 
 const Layout = ({ children }) => {
     const location = useLocation();
+    const navigate = useNavigate();
     
-    const showSidebarAndBar = location.pathname !== '/dashboard';
+    // const showSidebarAndBar = location.pathname !== '/dashboard';
+    const path = location.pathname;
+    // Variables state AuthContext
+    const { authInfo } = useContext(AuthContext);
+    const { userLogged } = authInfo;
+
+    useEffect(() => {
+        if (userLogged) {
+            if (userLogged.usuSes === 'S') {
+                navigate('/user-first')
+            } else {
+                if (location.pathname === '/user-first') {
+                    navigate('/')
+                } else {
+                    navigate(location.pathname)
+                }
+            }
+        }
+    }, [location.pathname])
 
     const handleMouseMove = (e) => {
         // Obtener la hora y minutos guardados en el localStorage
@@ -72,24 +92,26 @@ const Layout = ({ children }) => {
     return(
         <div className="PowerMas_MainHome flex Large-flex-row Medium-flex-row Small-flex-column flex-column" onMouseMove={handleMouseMove} >
             {
-                showSidebarAndBar ? 
+                path !== '/dashboard' && path !== '/user-first' &&
                 <>
                     <Sidebar />
-                    <div className="PowerMas_MainRender Large_10 Medium_9 Small_12 relative ">
+                    <div className="PowerMas_MainRender Large_10 Medium_9 Small_12 relative">
                         <div
-                            className='Phone_12 flex ai-center jc-center'
+                            className='flex ai-center jc-center'
                             style={{
                                 position: 'absolute',
+                                right: '20%',
+                                left: '20%'
                             }}
                         >
                             <h3
-                                className='p1_25'
+                                className='p_5 Medium-f1_5 Small-f1'
                                 style={{
-                                    backgroundColor: 'var(--naranja-ayuda)',
+                                    backgroundColor: '#000000',
                                     color: '#FFFFFF'
                                 }}
                             >
-                                SE ENCUENTRA EN EL SIMULADOR
+                                Modo Simulador
                             </h3>
                         </div>
                         <Bar showSidebarAndBar={true} isOpen={isOpen} setIsOpen={setIsOpen} />
@@ -97,17 +119,26 @@ const Layout = ({ children }) => {
                             {children}
                         </section>
                         <footer 
-                            className='p_25 flex flex-column center Medium-none'
+                            className='p_5 flex flex-column center Medium-none'
                             style={{backgroundColor: '#372E2C', color: '#FFFFFF'}}
                         >
                             <p className='f_75'>Todos los derechos reservados </p>
                             <p className='f_75'>Copyright 2024 © </p>
                         </footer>
+                        
                     </div>
                 </>
-                :
+            }
+            {
+                path === '/dashboard' &&
                 <div className='flex flex-column Large_12'>
-                    <Bar showSidebarAndBar={showSidebarAndBar} isOpen={isOpen} setIsOpen={setIsOpen} />
+                    <Bar showSidebarAndBar={false} isOpen={isOpen} setIsOpen={setIsOpen} />
+                    {children}
+                </div>
+            }
+            {
+                path === '/user-first' &&
+                <div className='flex flex-column Large_12'>
                     {children}
                 </div>
             }
