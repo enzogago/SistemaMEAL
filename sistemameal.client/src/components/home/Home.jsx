@@ -529,7 +529,7 @@ const Home = () => {
                     bottom: '0.75rem',
                     border: '',
                 }}
-                href="https://wa.me/51966707947" 
+                href="https://wa.me/51989685509" 
                 target="_blank"
             >
                 <WhatsappIcon />

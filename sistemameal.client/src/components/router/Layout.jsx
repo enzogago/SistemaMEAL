@@ -96,7 +96,7 @@ const Layout = ({ children }) => {
                 <>
                     <Sidebar />
                     <div className="PowerMas_MainRender Large_10 Medium_9 Small_12 relative">
-                        <div
+                        {/* <div
                             className='flex ai-center jc-center'
                             style={{
                                 position: 'absolute',
@@ -113,7 +113,7 @@ const Layout = ({ children }) => {
                             >
                                 Modo Simulador
                             </h3>
-                        </div>
+                        </div> */}
                         <Bar showSidebarAndBar={true} isOpen={isOpen} setIsOpen={setIsOpen} />
                         <section className="PowerMas_Content Large-m1">
                             {children}

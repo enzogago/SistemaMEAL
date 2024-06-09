@@ -180,7 +180,7 @@ const Monitoring = () => {
     };
 
     const downloadFile = async (fileName) => {
-        const url = `https://meal.ddns.net/uploads/${fileName}`
+        const url = `https://webmeal-aea.ec/uploads/${fileName}`
         try {
             Notiflix.Loading.pulse('Descargando..   .');
             // Obtenemos los datos
