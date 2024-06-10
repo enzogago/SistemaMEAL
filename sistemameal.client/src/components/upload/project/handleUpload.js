@@ -347,7 +347,6 @@ export const handleUpload = async (file, setTableData, setPostData, setIsValid, 
         }));
         setTableData(tableData);
         setPostData(projectsArray);
-        console.log(projectsArray);
         setErrorCells(newErrorCells);
         navigate('/guardar-proyecto');
     };

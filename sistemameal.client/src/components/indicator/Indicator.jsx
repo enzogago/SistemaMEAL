@@ -42,7 +42,6 @@ const Indicator = () => {
     useEffect(() => {
         setData([])
         fetchDataBlock('Indicador', (data) => {
-            console.log(data)
             const filteredData = data.filter(item => item.indTipInd != 'IAC');
             setData(filteredData)
         }, '.indicator-block');

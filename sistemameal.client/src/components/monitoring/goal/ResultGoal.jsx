@@ -154,7 +154,6 @@ const ResultGoal = () => {
                 metaData.forEach(meta => {
                     // Usa meta.impCod, la ubicación y el indicador para crear una clave única para cada fila
                     const rowKey = `${meta.impCod}_${JSON.stringify({ ubiAno: meta.ubiAno, ubiCod: meta.ubiCod })}_${meta.indAno}_${meta.indCod}`;
-                    console.log(rowKey)
                     if (!rows[rowKey]) {
                         counter++;
                     }
@@ -202,7 +201,6 @@ const ResultGoal = () => {
                     rows[rowKey].cells.push(inputValues);
                 });
                 const filas = Object.values(rows);
-                console.log(filas)
                 setAdditionalRows(filas);
                 setRowIdCounter(counter+1);
 
@@ -235,9 +233,6 @@ const ResultGoal = () => {
                 setCadenaPeriodoGrouped(groupedPeriodoData);
                 setCadenaUbicacionGrouped(groupedUbicacionData);
                 setCadenaImplementadorGrouped(groupedImplementadorData);
-                console.log(groupedPeriodoData);
-                console.log(groupedUbicacionData);
-                console.log(groupedImplementadorData);
             }).catch(error => {
                 // Maneja los errores
                 console.error('Error:', error);
@@ -488,7 +483,6 @@ const ResultGoal = () => {
                 const { ubiAno, ubiCod } = JSON.parse(getValues(`ubicacion_${additionalRow.id}`));
                 const userTecnico = usersTecnicos.find(user => user.usuAno === usuAno && user.usuCod === usuCod);
                 const ubicacion = ubicacionesSelect.find(item => item.ubiAno === ubiAno && item.ubiCod === ubiCod);
-                console.log(ubicacion)
                 const impCod = getValues(`implementador_${additionalRow.id}`);
                 const implementador = implementadoresSelect.find(imp => imp.impCod === impCod);
     

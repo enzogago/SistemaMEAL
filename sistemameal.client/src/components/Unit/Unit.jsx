@@ -17,7 +17,7 @@ const Unit = () => {
     const filterProperties = {
         'CODIGO': 'uniCod',
         'NOMBRE': 'uniNom',
-        'INVOLUCRA_PERSONA': 'uniInvPer',
+        'INVOLUCRA_BENEFICIARIO': 'uniInvPer',
     };
     const { codigo, ...restFieldMapping } = fieldMapping;
   

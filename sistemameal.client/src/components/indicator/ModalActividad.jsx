@@ -95,10 +95,11 @@ const ModalActividad = ({ estadoEditado, modalVisible, closeModal, setRefresh, t
     // Función para manejar el envío del formulario
     const onSubmit = (data) => {
         const formula = data.indFor ? replaceIndicatorsWithCodes(data.indFor) : '';
+        const indicadorPre = data.indNumPre ? data.indNumPre  : '';
         let dataSubmit = {
             indFor: formula,
             indNum: data.indNum,
-            indNumPre: data.indNumPre,
+            indNumPre: indicadorPre,
             indNom: data.indNom,
             indTipInd: data.indTipInd,
             tipValCod: data.tipValCod,
@@ -113,7 +114,6 @@ const ModalActividad = ({ estadoEditado, modalVisible, closeModal, setRefresh, t
         }
 
         if (subProMode && !objetivoMode && !objetivoEspMode) {
-            console.log("objetivo")
             const { objAno, objCod } = JSON.parse(data.objetivo);
             dataSubmit = {
                 ...dataSubmit,
@@ -121,7 +121,6 @@ const ModalActividad = ({ estadoEditado, modalVisible, closeModal, setRefresh, t
                 objCod
             }
         } else if (objetivoMode && subProMode && !objetivoEspMode) {
-            console.log("objetivo especifico")
             const { objEspAno, objEspCod } = JSON.parse(data.objetivoEspecifico);
             dataSubmit = {
                 ...dataSubmit,
@@ -129,8 +128,6 @@ const ModalActividad = ({ estadoEditado, modalVisible, closeModal, setRefresh, t
                 objEspCod
             }
         } else {
-            console.log(involucraSubActividad)
-            console.log(data)
             if (involucraSubActividad) {
                 const { actAno, actCod } = JSON.parse(data.actividad);
                 dataSubmit = {
@@ -154,7 +151,6 @@ const ModalActividad = ({ estadoEditado, modalVisible, closeModal, setRefresh, t
             subProAno,
             subProCod
         }
-        console.log(dataSubmit)
         handleSubmitMantEspecial('Indicador', !!estadoEditado, dataSubmit, setRefresh, closeModalAndReset)
     };
 

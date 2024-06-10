@@ -269,11 +269,11 @@ const FormUser = () => {
                                 className={`p1 PowerMas_Modal_Form_${dirtyFields.usuNumDoc || isSubmitted ? (errors.usuNumDoc ? 'invalid' : 'valid') : ''}`} 
                                 type="text" 
                                 placeholder="Ejm: 74301932"
-                                maxLength={10}
+                                maxLength={12}
                                 autoComplete='off'
                                 onInput={(event) => {
                                     // Reemplaza cualquier carácter que no sea un número por una cadena vacía
-                                    event.target.value = event.target.value.replace(/[^0-9]/g, '');
+                                    event.target.value = event.target.value.replace(/[^0-9-]/g, '');
                                 }}
                                 {...register('usuNumDoc', { 
                                     required: 'El número de documento es requerido',
@@ -282,12 +282,12 @@ const FormUser = () => {
                                         message: 'El número de documento debe tener al menos 6 dígitos'
                                     },
                                     maxLength: {
-                                        value: 10,
-                                        message: 'El número de documento no debe tener más de 10 dígitos'
+                                        value: 12,
+                                        message: 'El número de documento no debe tener más de 12 dígitos'
                                     },
                                     pattern: {
-                                        value: /^[0-9]*$/,
-                                        message: 'El número de documento solo debe contener números'
+                                        value: /^[0-9-]*$/,
+                                        message: 'El número de documento solo debe contener números y guiones'
                                     }
                                 })}
                             />

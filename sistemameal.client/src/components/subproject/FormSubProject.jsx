@@ -477,7 +477,6 @@ const FormSubProject = () => {
                 SubProyectoImplementadores: selectValues,
                 SubProyectoUbicaciones: ubicaciones
             }
-            console.log(SubProyectoImplementadorDto)
             handleSubmit(SubProyectoImplementadorDto, isEditing, navigate);
         })();
     }

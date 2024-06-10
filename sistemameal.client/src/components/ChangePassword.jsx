@@ -60,7 +60,6 @@ const ChangePassord = () => {
 
     const handleSkip = async() => {
         userLogged.usuSes = 'N';
-        console.log(userLogged)
         try {
             Notiflix.Loading.pulse();
             const token = localStorage.getItem('token');
