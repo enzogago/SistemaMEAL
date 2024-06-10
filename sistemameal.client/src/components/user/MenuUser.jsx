@@ -166,10 +166,13 @@ const MenuUser = () => {
         // Convertir los Sets a arreglos para poder trabajar con ellos
         const currentKeys = Array.from(checkedKeys);
         const initialKeys = Array.from(initialCheckedKeys);
-    
+        console.log(currentKeys)
+        console.log(initialKeys)
         // Determinar las claves añadidas y eliminadas
         const keysAñadidas = currentKeys.filter(key => !initialKeys.includes(key));
         const keysEliminadas = initialKeys.filter(key => !currentKeys.includes(key));
+        console.log(keysAñadidas)
+        console.log(keysEliminadas)
     
         // Extraer menAno y menCod de las claves añadidas y eliminadas
         const permisosInsertar = keysAñadidas.map(key => {
@@ -190,7 +193,7 @@ const MenuUser = () => {
                 usuCod
             }
         };
-
+        console.log(MenuUsuarioDto)
         try {
             Notiflix.Loading.pulse();
             const token = localStorage.getItem('token');
