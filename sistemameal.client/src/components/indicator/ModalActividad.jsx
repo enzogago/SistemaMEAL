@@ -95,10 +95,11 @@ const ModalActividad = ({ estadoEditado, modalVisible, closeModal, setRefresh, t
     // Función para manejar el envío del formulario
     const onSubmit = (data) => {
         const formula = data.indFor ? replaceIndicatorsWithCodes(data.indFor) : '';
+        const indicadorPre = data.indNumPre ? data.indNumPre  : '';
         let dataSubmit = {
             indFor: formula,
             indNum: data.indNum,
-            indNumPre: data.indNumPre,
+            indNumPre: indicadorPre,
             indNom: data.indNom,
             indTipInd: data.indTipInd,
             tipValCod: data.tipValCod,
@@ -466,7 +467,7 @@ const ModalActividad = ({ estadoEditado, modalVisible, closeModal, setRefresh, t
                                     {...register('indNom', { 
                                         required: 'El campo es requerido',
                                         pattern: {
-                                            value: /^[A-Za-zñÑáéíóúÁÉÍÓÚ0-9().,;üÜ/\s-%_]+$/,
+                                            value: /^[A-Za-zñÑáéíóúÁÉÍÓÚ0-9().,;üÜ/\s-:%_]+$/,
                                             message: 'Por favor, introduce caracteres válidos.',
                                         },
                                         minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
