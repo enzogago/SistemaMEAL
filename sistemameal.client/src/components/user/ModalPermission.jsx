@@ -72,8 +72,14 @@ const ModalPermission = ({modalVisible, estadoEditado, closeModal, user}) => {
     }
 
     const handleSubmit = async() => {
-        const permisosInsertar = [...permisosActuales].filter(perCod => !permisosIniciales.has(perCod));
-        const permisosAEliminar = [...permisosIniciales].filter(perCod => !permisosActuales.has(perCod));
+        // Obtiene los permisos disponibles para el menú actual
+    const permisosDisponibles = permisos.map(permiso => permiso.perCod);
+
+    // Filtra los permisos a insertar como aquellos que están en permisosActuales y también en permisosDisponibles
+    const permisosInsertar = [...permisosActuales].filter(perCod => !permisosIniciales.has(perCod) && permisosDisponibles.includes(perCod));
+
+    // Filtra los permisos a eliminar como aquellos que están en permisosIniciales pero no en permisosActuales y están en permisosDisponibles
+    const permisosAEliminar = [...permisosIniciales].filter(perCod => !permisosActuales.has(perCod) && permisosDisponibles.includes(perCod));
         
         const PermisoUsuarioDto = {
             PermisoUsuarioInsertar: permisosInsertar.map(perCod => ({ perCod })),
