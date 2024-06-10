@@ -114,6 +114,7 @@ const ModalActividad = ({ estadoEditado, modalVisible, closeModal, setRefresh, t
         }
 
         if (subProMode && !objetivoMode && !objetivoEspMode) {
+            console.log("objetivo")
             const { objAno, objCod } = JSON.parse(data.objetivo);
             dataSubmit = {
                 ...dataSubmit,
@@ -121,6 +122,7 @@ const ModalActividad = ({ estadoEditado, modalVisible, closeModal, setRefresh, t
                 objCod
             }
         } else if (objetivoMode && subProMode && !objetivoEspMode) {
+            console.log("objetivo especifico")
             const { objEspAno, objEspCod } = JSON.parse(data.objetivoEspecifico);
             dataSubmit = {
                 ...dataSubmit,
@@ -128,6 +130,8 @@ const ModalActividad = ({ estadoEditado, modalVisible, closeModal, setRefresh, t
                 objEspCod
             }
         } else {
+            console.log(involucraSubActividad)
+            console.log(data)
             if (involucraSubActividad) {
                 const { actAno, actCod } = JSON.parse(data.actividad);
                 dataSubmit = {
@@ -151,6 +155,7 @@ const ModalActividad = ({ estadoEditado, modalVisible, closeModal, setRefresh, t
             subProAno,
             subProCod
         }
+        console.log(dataSubmit)
         handleSubmitMantEspecial('Indicador', !!estadoEditado, dataSubmit, setRefresh, closeModalAndReset)
     };
 
@@ -462,7 +467,7 @@ const ModalActividad = ({ estadoEditado, modalVisible, closeModal, setRefresh, t
                                     {...register('indNom', { 
                                         required: 'El campo es requerido',
                                         pattern: {
-                                            value: /^[A-Za-zñÑáéíóúÁÉÍÓÚ0-9().,;üÜ/\s-%_]+$/,
+                                            value: /^[A-Za-zñÑáéíóúÁÉÍÓÚ0-9().,;üÜ/\s-:%_]+$/,
                                             message: 'Por favor, introduce caracteres válidos.',
                                         },
                                         minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
