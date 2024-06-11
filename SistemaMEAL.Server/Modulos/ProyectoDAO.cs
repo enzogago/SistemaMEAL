@@ -1238,8 +1238,8 @@ namespace SistemaMEAL.Modulos
                                                     cmd.CommandType = CommandType.StoredProcedure;
 
                                                     cmd.Parameters.AddWithValue("@P_IMPCOD", (object)DBNull.Value);
-                                                    cmd.Parameters.AddWithValue("@P_SUBPROANO", subproyecto.SubProAno);
-                                                    cmd.Parameters.AddWithValue("@P_SUBPROCOD", subproyecto.SubProCod);
+                                                    cmd.Parameters.AddWithValue("@P_SUBPROANO", subProAnoOut);
+                                                    cmd.Parameters.AddWithValue("@P_SUBPROCOD", subProCodOut);
                                                     cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                                                     cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
                                                     cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
@@ -1313,8 +1313,8 @@ namespace SistemaMEAL.Modulos
                                                     cmd.CommandType = CommandType.StoredProcedure;
 
                                                     cmd.Parameters.AddWithValue("@P_FINCOD", (object)DBNull.Value);
-                                                    cmd.Parameters.AddWithValue("@P_SUBPROANO", subproyecto.SubProAno);
-                                                    cmd.Parameters.AddWithValue("@P_SUBPROCOD", subproyecto.SubProCod);
+                                                    cmd.Parameters.AddWithValue("@P_SUBPROANO", subProAnoOut);
+                                                    cmd.Parameters.AddWithValue("@P_SUBPROCOD", subProCodOut);
                                                     cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                                                     cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
                                                     cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
@@ -1388,8 +1388,8 @@ namespace SistemaMEAL.Modulos
 
                                                     cmd.Parameters.AddWithValue("@P_UBIANO", (object)DBNull.Value);
                                                     cmd.Parameters.AddWithValue("@P_UBICOD", (object)DBNull.Value);
-                                                    cmd.Parameters.AddWithValue("@P_SUBPROANO", subproyecto.SubProAno);
-                                                    cmd.Parameters.AddWithValue("@P_SUBPROCOD", subproyecto.SubProCod);
+                                                    cmd.Parameters.AddWithValue("@P_SUBPROANO", subProAnoOut);
+                                                    cmd.Parameters.AddWithValue("@P_SUBPROCOD", subProCodOut);
                                                     cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                                                     cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
                                                     cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
