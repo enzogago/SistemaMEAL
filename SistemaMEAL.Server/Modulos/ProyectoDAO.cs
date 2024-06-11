@@ -548,7 +548,7 @@ namespace SistemaMEAL.Modulos
 
                         if (messageType != "3") // Si hay un error o el proyecto ya existe, retorna el mensaje
                         {
-                            if (messageType == "2")
+                            if (messageType == "1")
                             {
                                 return (subProAnoOut, subProCodOut, message, messageType, errorCells);
                             }
