@@ -470,7 +470,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setRefresh, title, uni
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.indNom || isSubmitted ? (errors.indNom ? 'invalid' : 'valid') : ''}`} 
                                     placeholder="Número de personas que se benefician..."
                                     autoComplete='off'
-                                    maxLength={400}
+                                    maxLength={500}
                                     {...register('indNom', { 
                                         required: 'El campo es requerido',
                                         pattern: {
@@ -478,7 +478,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setRefresh, title, uni
                                             message: 'Por favor, introduce caracteres válidos.',
                                         },
                                         minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
-                                        maxLength: { value: 400, message: 'El campo no puede tener más de 400 caracteres' },
+                                        maxLength: { value: 500, message: 'El campo no puede tener más de 500 caracteres' },
                                     })} 
                                 />
                                 {errors.indNom ? (
@@ -496,12 +496,10 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setRefresh, title, uni
                                 </label>
                                 <select 
                                     id='uniCod'
-                                    disabled={!subProyectoEnable}
+                                    // disabled={!subProyectoEnable}
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.uniCod || isSubmitted ? (errors.uniCod ? 'invalid' : 'valid') : ''}`} 
                                     {...register('uniCod', { 
-                                        validate: {
-                                            required: value => value !== '0' || 'El campo es requerido',
-                                        }
+                                        validate: value => value !== '0' || 'El cargo es requerido' 
                                     })}
                                 >
                                     <option value="0">--Seleccione Unidad--</option>
@@ -528,7 +526,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setRefresh, title, uni
                                 </label>
                                 <select 
                                     id='tipValCod'
-                                    disabled={!subProyectoEnable}
+                                    // disabled={!subProyectoEnable}
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.tipValCod || isSubmitted ? (errors.tipValCod ? 'invalid' : 'valid') : ''}`} 
                                     {...register('tipValCod', { 
                                         validate: {
