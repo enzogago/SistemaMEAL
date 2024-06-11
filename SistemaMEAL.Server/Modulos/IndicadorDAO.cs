@@ -675,7 +675,11 @@ namespace SistemaMEAL.Modulos
                                 }
                                 // Deserializa la cadena JSON en una lista de objetos Estado
                                 List<SubProyecto>? temporalObj = JsonConvert.DeserializeObject<List<SubProyecto>>(jsonResult.ToString());
-                                SubProyecto consultaObj = temporalObj[0];
+                                SubProyecto consultaObj = new SubProyecto();
+
+                                if (temporalObj.Count > 0) {
+                                    consultaObj = temporalObj[0];
+                                }
 
                                 var accPadObj = "PROYECTO-" + consultaObj.ProAno + "-" + consultaObj.ProCod + "-SUB_PROYECTO-" + consultaObj.SubProAno + "-" + consultaObj.SubProCod + "-OBJETIVO-" + objAno + "-" + objCod;
 
@@ -837,7 +841,11 @@ namespace SistemaMEAL.Modulos
                                 }
                                 // Deserializa la cadena JSON en una lista de objetos Estado
                                 List<Objetivo>? temporalObjEsp = JsonConvert.DeserializeObject<List<Objetivo>>(jsonResult.ToString());
-                                Objetivo consultaObjEsp = temporalObjEsp[0];
+                                Objetivo consultaObjEsp = new Objetivo();
+
+                                if (temporalObjEsp.Count > 0) {
+                                    consultaObjEsp = temporalObjEsp[0];
+                                }
 
                                 var accPadObjEsp = "PROYECTO-" + consultaObjEsp.ProAno + "-" + consultaObjEsp.ProCod + "-SUB_PROYECTO-" + consultaObjEsp.SubProAno + "-" + consultaObjEsp.SubProCod + "-OBJETIVO-" + consultaObjEsp.ObjAno + "-" + consultaObjEsp.ObjCod + "-OBJETIVO_ESPECIFICO-" + objEspAno + "-" + objEspCod;
 
@@ -1168,7 +1176,11 @@ namespace SistemaMEAL.Modulos
                                 }
                                 // Deserializa la cadena JSON en una lista de objetos Estado
                                 List<Resultado>? temporalRes = JsonConvert.DeserializeObject<List<Resultado>>(jsonResult.ToString());
-                                Resultado consultaRes = temporalRes[0];
+                                Resultado consultaRes = new Resultado();
+
+                                if (temporalRes.Count > 0) {
+                                    consultaRes = temporalRes[0];
+                                }
 
                                 var accPadRes = "PROYECTO-" + consultaRes.ProAno + "-" + consultaRes.ProCod + "-SUB_PROYECTO-" + consultaRes.SubProAno + "-" + consultaRes.SubProCod + "-OBJETIVO-" + consultaRes.ObjAno + "-" + consultaRes.ObjCod + "-OBJETIVO_ESPECIFICO-" + consultaRes.ObjEspAno + "-" + consultaRes.ObjEspCod + "-RESULTADO-" + consultaRes.ResAno + "-" + consultaRes.ResCod + "-ACTIVIDAD-" + actAno + "-" + actCod;
 
@@ -1334,7 +1346,12 @@ namespace SistemaMEAL.Modulos
                                 }
                                 // Deserializa la cadena JSON en una lista de objetos Estado
                                 List<Objetivo>? temporalObjEsp = JsonConvert.DeserializeObject<List<Objetivo>>(jsonResult.ToString());
-                                Objetivo consultaObjEsp = temporalObjEsp[0];
+                                Objetivo consultaObjEsp = new Objetivo();
+
+                                if (temporalObjEsp.Count > 0)
+                                {
+                                    consultaObjEsp = temporalObjEsp[0];
+                                }
 
                                 var accPadObjEsp = "PROYECTO-" + consultaObjEsp.ProAno + "-" + consultaObjEsp.ProCod + "-SUB_PROYECTO-" + consultaObjEsp.SubProAno + "-" + consultaObjEsp.SubProCod + "-OBJETIVO-" + consultaObjEsp.ObjAno + "-" + consultaObjEsp.ObjCod + "-OBJETIVO_ESPECIFICO-" + objEspAno + "-" + objEspCod;
 
@@ -1665,7 +1682,12 @@ namespace SistemaMEAL.Modulos
                                 }
                                 // Deserializa la cadena JSON en una lista de objetos Estado
                                 List<Resultado>? temporalRes = JsonConvert.DeserializeObject<List<Resultado>>(jsonResult.ToString());
-                                Resultado consultaRes = temporalRes[0];
+                                Resultado consultaRes = new Resultado();
+
+                                if (temporalRes.Count > 0)
+                                {
+                                    consultaRes = temporalRes[0];
+                                }
 
                                 var accPadRes = "PROYECTO-" + consultaRes.ProAno + "-" + consultaRes.ProCod + "-SUB_PROYECTO-" + consultaRes.SubProAno + "-" + consultaRes.SubProCod + "-OBJETIVO-" + consultaRes.ObjAno + "-" + consultaRes.ObjCod + "-OBJETIVO_ESPECIFICO-" + consultaRes.ObjEspAno + "-" + consultaRes.ObjEspCod + "-RESULTADO-" + consultaRes.ResAno + "-" + consultaRes.ResCod + "-ACTIVIDAD-" + actAno + "-" + actCod;
 
@@ -2000,7 +2022,11 @@ namespace SistemaMEAL.Modulos
                                 }
                                 // Deserializa la cadena JSON en una lista de objetos Estado
                                 List<Resultado>? temporalRes = JsonConvert.DeserializeObject<List<Resultado>>(jsonResult.ToString());
-                                Resultado consultaRes = temporalRes[0];
+                                Resultado consultaRes = new Resultado();
+
+                                if (temporalRes.Count > 0) {
+                                    consultaRes = temporalRes[0];
+                                }
 
                                 var accPadRes = "PROYECTO-" + consultaRes.ProAno + "-" + consultaRes.ProCod + "-SUB_PROYECTO-" + consultaRes.SubProAno + "-" + consultaRes.SubProCod + "-OBJETIVO-" + consultaRes.ObjAno + "-" + consultaRes.ObjCod + "-OBJETIVO_ESPECIFICO-" + consultaRes.ObjEspAno + "-" + consultaRes.ObjEspCod + "-RESULTADO-" + consultaRes.ResAno + "-" + consultaRes.ResCod + "-ACTIVIDAD-" + actAno + "-" + actCod;
 

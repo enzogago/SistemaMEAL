@@ -1,5 +1,46 @@
 import Notiflix from "notiflix";
 
+export const handleSubmitRefresh = async (data, isEditing, setRefresh, closeModalAndReset) => {
+    const method = isEditing ? 'PUT' : 'POST';
+    let newData = {};
+    for (let key in data) {
+        if (typeof data[key] === 'string') {
+            // Convierte cada cadena a minúsculas
+            newData[key] = data[key].toUpperCase();
+        } else {
+            // Mantiene los valores no string tal como están
+            newData[key] = data[key];
+        }
+    }
+
+    try {
+        Notiflix.Loading.pulse();
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Proyecto`, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(newData),
+        });
+        
+        const dataResult = await response.json();
+        if (!response.ok) {
+            Notiflix.Notify.failure(dataResult.message)
+            return;
+        }
+
+        setRefresh(prevRefresh => !prevRefresh)
+        closeModalAndReset();
+        Notiflix.Notify.success(dataResult.message)
+    } catch (error) {
+        console.error('Error:', error);
+    } finally {
+        Notiflix.Loading.remove();
+    }
+};
+
 export const handleSubmit = async (data, isEditing, setRegistros, closeModalAndReset) => {
     const method = isEditing ? 'PUT' : 'POST';
     let newData = {};

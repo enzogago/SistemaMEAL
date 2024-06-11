@@ -82,7 +82,7 @@ const projects = () => {
                 modalVisible={modalVisible}
                 estadoEditado={estadoEditado}
                 closeModal={closeModal} 
-                setData={setData}
+                setRefresh={setRefresh}
                 title='Proyecto'
             />  
         </>

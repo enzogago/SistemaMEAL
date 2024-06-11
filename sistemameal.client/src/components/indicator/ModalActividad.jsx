@@ -463,15 +463,15 @@ const ModalActividad = ({ estadoEditado, modalVisible, closeModal, setRefresh, t
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.indNom || isSubmitted ? (errors.indNom ? 'invalid' : 'valid') : ''}`} 
                                     placeholder="Número de personas que se benefician..."
                                     autoComplete='off'
-                                    maxLength={500}
+                                    maxLength={600}
                                     {...register('indNom', { 
                                         required: 'El campo es requerido',
                                         pattern: {
                                             value: /^[A-Za-zñÑáéíóúÁÉÍÓÚ0-9().,;üÜ/\s-:%_]+$/,
                                             message: 'Por favor, introduce caracteres válidos.',
                                         },
-                                        minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
-                                        maxLength: { value: 500, message: 'El campo no puede tener más de 500 caracteres' },
+                                        minLength: { value: 3, message: 'El campo debe tener minimo 3 caracteres' },
+                                        maxLength: { value: 600, message: 'El campo no puede tener más de 600 caracteres' },
                                     })} 
                                 />
                                 {errors.indNom ? (

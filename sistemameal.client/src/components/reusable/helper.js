@@ -152,17 +152,6 @@ export const handleSubmit = async (controller, objetoEditado, objeto, setRegistr
 
 export const handleSubmitMantEspecial = async (controller, objetoEditado, objeto, setRefresh, closeModalAndReset) => {
     const method = objetoEditado ? 'PUT' : 'POST';
-
-    let newData = {};
-    for (let key in objeto) {
-        if (typeof objeto[key] === 'string') {
-            // Convierte cada cadena a minúsculas
-            newData[key] = objeto[key].toUpperCase();
-        } else {
-            // Mantiene los valores no string tal como están
-            newData[key] = objeto[key];
-        }
-    }
     
     try {
         Notiflix.Loading.pulse();
@@ -173,7 +162,7 @@ export const handleSubmitMantEspecial = async (controller, objetoEditado, objeto
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify(newData),
+            body: JSON.stringify(objeto),
         });
         const data = await response.json();
         if (!response.ok) {
