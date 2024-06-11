@@ -1141,8 +1141,8 @@ namespace SistemaMEAL.Modulos
                                 cmd = new SqlCommand("SP_BUSCAR_RESULTADO", cn.getcn);
                                 cmd.CommandType = CommandType.StoredProcedure;
 
-                                cmd.Parameters.AddWithValue("@P_RESANO", actAno);
-                                cmd.Parameters.AddWithValue("@P_RESCOD", actCod);
+                                cmd.Parameters.AddWithValue("@P_RESANO", dataRes.ResAno);
+                                cmd.Parameters.AddWithValue("@P_RESCOD", dataRes.ResCod);
                                 cmd.Parameters.AddWithValue("@P_OBJESPANO", (object)DBNull.Value);
                                 cmd.Parameters.AddWithValue("@P_OBJESPCOD", (object)DBNull.Value);
                                 cmd.Parameters.AddWithValue("@P_RESNOM", (object)DBNull.Value);
@@ -1647,8 +1647,8 @@ namespace SistemaMEAL.Modulos
                                 cmd = new SqlCommand("SP_BUSCAR_RESULTADO", cn.getcn);
                                 cmd.CommandType = CommandType.StoredProcedure;
 
-                                cmd.Parameters.AddWithValue("@P_RESANO", actAno);
-                                cmd.Parameters.AddWithValue("@P_RESCOD", actCod);
+                                cmd.Parameters.AddWithValue("@P_RESANO", dataRes.ResAno);
+                                cmd.Parameters.AddWithValue("@P_RESCOD", dataRes.ResCod);
                                 cmd.Parameters.AddWithValue("@P_OBJESPANO", (object)DBNull.Value);
                                 cmd.Parameters.AddWithValue("@P_OBJESPCOD", (object)DBNull.Value);
                                 cmd.Parameters.AddWithValue("@P_RESNOM", (object)DBNull.Value);
@@ -1987,8 +1987,8 @@ namespace SistemaMEAL.Modulos
                                 cmd = new SqlCommand("SP_BUSCAR_RESULTADO", cn.getcn);
                                 cmd.CommandType = CommandType.StoredProcedure;
 
-                                cmd.Parameters.AddWithValue("@P_RESANO", actAno);
-                                cmd.Parameters.AddWithValue("@P_RESCOD", actCod);
+                                cmd.Parameters.AddWithValue("@P_RESANO", dataRes.ResAno);
+                                cmd.Parameters.AddWithValue("@P_RESCOD", dataRes.ResCod);
                                 cmd.Parameters.AddWithValue("@P_OBJESPANO", (object)DBNull.Value);
                                 cmd.Parameters.AddWithValue("@P_OBJESPCOD", (object)DBNull.Value);
                                 cmd.Parameters.AddWithValue("@P_RESNOM", (object)DBNull.Value);
