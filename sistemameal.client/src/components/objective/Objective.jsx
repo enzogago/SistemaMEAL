@@ -109,7 +109,7 @@ const Objective = () => {
                 modalVisible={modalVisible}
                 estadoEditado={estadoEditado}
                 closeModal={closeModal} 
-                setData={setData}
+                setRefresh={setRefresh}
                 title='Objetivo General'
             />  
         </>

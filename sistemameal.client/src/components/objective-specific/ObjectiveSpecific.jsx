@@ -104,7 +104,7 @@ const ObjectiveSpecific = () => {
                 modalVisible={modalVisible}
                 estadoEditado={estadoEditado}
                 closeModal={closeModal} 
-                setData={setData}
+                setRefresh={setRefresh}
                 title='Objetivo Específico'
             />  
         </>

@@ -477,6 +477,7 @@ const FormSubProject = () => {
                 SubProyectoImplementadores: selectValues,
                 SubProyectoUbicaciones: ubicaciones
             }
+            console.log(SubProyectoImplementadorDto)
             handleSubmit(SubProyectoImplementadorDto, isEditing, navigate);
         })();
     }
@@ -707,6 +708,7 @@ const FormSubProject = () => {
                         </label>
                         <input type="text"
                             id="subProNom"
+                            maxLength={600}
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.subProNom || isSubmitted ? (errors.subProNom ? 'invalid' : 'valid') : ''}`} 
                             placeholder="Reactivación económica de personas en Movilidad Humana"
                             autoComplete='off'
@@ -716,7 +718,8 @@ const FormSubProject = () => {
                                     message: 'Por favor, introduce caracteres válidos.',
                                 },
                                 required: 'El campo es requerido',
-                                minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
+                                minLength: { value: 3, message: 'El campo debe tener minimo 3 caracteres' },
+                                maxLength: { value: 600, message: 'El campo debe tener máximo 600 caracteres' },
                             })} 
                         />
                         {errors.subProNom ? (

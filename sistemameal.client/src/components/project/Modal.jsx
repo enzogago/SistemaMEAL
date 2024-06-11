@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { handleSubmit } from './eventHandlers';
+import { handleSubmitRefresh } from './eventHandlers';
 
-const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
+const Modal = ({ estadoEditado, modalVisible, closeModal, setRefresh, title }) => {
 
     // Configuracion useForm
     const { 
@@ -25,7 +25,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
 
     const onSubmit = (data) => {
 
-        handleSubmit(data,!!estadoEditado, setData, closeModalAndReset)
+        handleSubmitRefresh(data,!!estadoEditado, setRefresh, closeModalAndReset)
     };
 
     // Activar focus en input
@@ -122,6 +122,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                         </label>
                         <input type="text"
                             id="proNom"
+                            maxLength={600}
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.proNom || isSubmitted ? (errors.proNom ? 'invalid' : 'valid') : ''}`} 
                             placeholder="Movilidad Humana"
                             autoComplete='off'
@@ -131,7 +132,8 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                                     message: 'Por favor, introduce caracteres válidos.',
                                 },
                                 required: 'El campo es requerido',
-                                minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
+                                minLength: { value: 3, message: 'El campo debe tener minimo 3 caracteres' },
+                                maxLength: { value: 600, message: 'El campo debe tener máximo 600 caracteres' },
                             })} 
                         />
                         {errors.proNom ? (
@@ -148,6 +150,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                         </label>
                         <textarea
                             id="proDes"
+                            maxLength={600}
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.proDes || isSubmitted ? (errors.proDes ? 'invalid' : 'valid') : ''}`} 
                             placeholder="Descripción del proyecto"
                             autoComplete='off'
@@ -156,6 +159,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                                     value: /^[A-Za-zñÑáéíóúÁÉÍÓÚ0-9().,;üÜ/\s-%_]+$/,
                                     message: 'Por favor, introduce caracteres válidos.',
                                 },
+                                maxLength: { value: 600, message: 'El campo debe tener máximo 600 caracteres' },
                             })} 
                         />
                         {errors.proDes ? (

@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { fetchData, handleSubmitMant } from '../reusable/helper';
+import { fetchData, handleSubmitMantEspecial } from '../reusable/helper';
 // import { handleSubmit } from './eventHandlers';
 
-const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
+const Modal = ({ estadoEditado, modalVisible, closeModal, setRefresh, title }) => {
     const [ subProyectos, setSubProyectos ] = useState([])
     // Configuracion useForm
     const { 
@@ -31,7 +31,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
             subProAno,
             subProCod
         }
-        handleSubmitMant('Objetivo',!!estadoEditado, data, setData, closeModalAndReset)
+        handleSubmitMantEspecial('Objetivo',!!estadoEditado, data, setRefresh, closeModalAndReset)
     };
 
     const [subProyectosLoaded, setSubProyectosLoaded] = useState(false);
@@ -145,15 +145,15 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setData, title }) => {
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.objNom || isSubmitted ? (errors.objNom ? 'invalid' : 'valid') : ''}`} 
                             placeholder="Contribuir al ejercicio de derechos y a la integración socioeconómica"
                             autoComplete='off'
-                            maxLength={400}
+                            maxLength={600}
                             {...register('objNom', { 
                                 required: 'El campo es requerido',
                                 pattern: {
                                     value: /^[A-Za-zñÑáéíóúÁÉÍÓÚ0-9().,;üÜ/\s-%_]+$/,
                                     message: 'Por favor, introduce caracteres válidos.',
                                 },
-                                minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
-                                maxLength: { value: 400, message: 'El campo no puede tener más de 400 caracteres' },
+                                minLength: { value: 3, message: 'El campo debe tener minimo 3 caracteres' },
+                                maxLength: { value: 600, message: 'El campo no puede tener más de 600 caracteres' },
                             })} 
                         />
                         {errors.objNom ? (
