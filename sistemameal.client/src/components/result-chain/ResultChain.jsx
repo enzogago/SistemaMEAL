@@ -1,36 +1,47 @@
-import { useEffect, useState } from 'react'
-import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
-import { Export_Excel_Basic, fetchData } from '../reusable/helper';
+// React y hooks para el estado y el ciclo de vida del componente.
+import { useEffect, useState } from 'react';
+// Herramientas y funciones reutilizables para la lógica de negocio.
+import { Export_Excel_Basic, fetchData, fetchDataReturn } from '../reusable/helper';
+// Gestión de formularios y validaciones.
 import { useForm } from 'react-hook-form';
+// Notificaciones y bloqueos de UI para mejorar la experiencia del usuario.
 import Notiflix from 'notiflix';
+// Iconos personalizados utilizados en el componente.
 import IconCalendar from '../../icons/IconCalendar';
 import User from '../../icons/User';
 import IconLocation from '../../icons/IconLocation';
-import { Tooltip } from 'react-tippy';
 import Expand from '../../icons/Expand';
+// Componentes de UI para tooltips y otros elementos visuales.
+import { Tooltip } from 'react-tippy';
+// Imágenes y estilos específicos del componente.
+import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
 import TableEmpty from '../../img/PowerMas_TableEmpty.svg';
+// Hooks personalizados para acciones específicas del componente.
+import useEntityActions from '../../hooks/useEntityActions';
 
 const ResultChain = () => {
-    const [dropdownOpen, setDropdownOpen] = useState(false);
-    const [subproyectos, setSubProyectos] = useState([]);
-    const [indicadores, setIndicadores] = useState([]);
-    const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
-
-    const [headers, setHeaders] = useState([]);
-    const [renderData, setRenderData] = useState([]);
-    
-    const [totalsPorAnoAll, setTotalsPorAnoAll] = useState({});
-    const [totalsPorImplementador, setTotalsPorImplementador] = useState({});
-    const [totalsPorUbicacion, setTotalsPorUbicacion] = useState({});
-
-    const [numeroColumnasAno, setNumeroColumnasAno] = useState(0)
-    const [numeroColumnasImplementador, setNumeroColumnasImplementador] = useState(0)
-    const [numeroColumnasUbicacion, setNumeroColumnasUbicacion] = useState(0)
-
-    const [unmatchedTotal, setUnmatchedTotal] = useState({ key: '', value: 0, section: '' });
-
-    const [indTotPreState, setIndTotPreState] = useState({});
-    const [totalIndTotPre, setTotalIndTotPre] = useState(0);
+    // Estados relacionados con la interfaz de usuario (UI)
+    const [dropdownOpen, setDropdownOpen] = useState(false); // Controla la visibilidad del menú desplegable de exportación.
+    const [isSubmitDisabled, setIsSubmitDisabled] = useState(true); // Habilita o deshabilita el botón de envío según la validación.
+    // Estados para almacenar datos de la aplicación
+    const [subproyectos, setSubProyectos] = useState([]); // Almacena la lista de subproyectos disponibles.
+    const [indicadores, setIndicadores] = useState([]); // Almacena los indicadores asociados al subproyecto seleccionado.
+    // Estados para la gestión de la tabla de resultados
+    const [headers, setHeaders] = useState([]); // Encabezados de la tabla de resultados.
+    const [renderData, setRenderData] = useState([]); // Datos renderizados en la tabla.
+    // Estados para el cálculo de totales
+    const [totalsPorAnoAll, setTotalsPorAnoAll] = useState({}); // Totales por año.
+    const [totalsPorImplementador, setTotalsPorImplementador] = useState({}); // Totales por implementador.
+    const [totalsPorUbicacion, setTotalsPorUbicacion] = useState({}); // Totales por ubicación.
+    // Estados para el control de columnas en la tabla
+    const [numeroColumnasAno, setNumeroColumnasAno] = useState(0); // Número de columnas para los totales por año.
+    const [numeroColumnasImplementador, setNumeroColumnasImplementador] = useState(0); // Número de columnas para los totales por implementador.
+    const [numeroColumnasUbicacion, setNumeroColumnasUbicacion] = useState(0); // Número de columnas para los totales por ubicación.
+    // Estados para la validación de totales
+    const [unmatchedTotal, setUnmatchedTotal] = useState({ key: '', value: 0, section: '' }); // Controla los totales que no coinciden.
+    const [indTotPreState, setIndTotPreState] = useState({}); // Estado previo de los totales de indicadores para comparaciones.
+    // Acciones disponibles para el usuario según el contexto (por ejemplo, exportar a Excel)
+    const actions = useEntityActions('CADENA RESULTADO');
 
     useEffect(() => {
         const handleKeyDown = (event) => {
@@ -86,37 +97,8 @@ const ResultChain = () => {
             window.removeEventListener('keydown', handleKeyDown);
         };
     }, [headers.length]);
-    
-    
 
-    const fetchDataReturn = async (controller) => {
-        try {
-            // Valores del storage
-            const token = localStorage.getItem('token');
-            // Obtenemos los datos
-            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/${controller}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            if (!response.ok) {
-                if(response.status === 401 || response.status === 403){
-                    const data = await response.json();
-                    Notiflix.Notify.failure(data.message);
-                }
-                return;
-            }
-            const data = await response.json();
-            if (data.success === false) {
-                Notiflix.Notify.failure(data.message);
-                return;
-            }
-            return (data);
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    };
-
+    // Hook para manejar formularios con validación y registro de campos.
     const { 
         register,
         unregister,
@@ -128,6 +110,7 @@ const ResultChain = () => {
     } = 
     useForm({ mode: "onChange"});
 
+    // Efecto para cargar los subproyectos al iniciar el componente.
     useEffect(() => {
         fetchData('SubProyecto',setSubProyectos)
     }, []);
@@ -202,7 +185,6 @@ const ResultChain = () => {
                 });
     
                 setIndTotPreState(initialIndTotPreState);
-                setTotalIndTotPre(initialTotalIndTotPre);
     
                 // Calcula los totales por año, implementador y ubicación
                 const totalsPorAno = calculateTotalsAll(dataPorAno, 'cadResPerAno', 'cadResPerMetTec', 'porAno');
@@ -251,7 +233,7 @@ const ResultChain = () => {
             setRenderData([]);
             setHeaders([]);
         }
-    }, [watch('subproyecto')]); // Dependencias del useEffect
+    }, [watch('subproyecto')]);
     
     
     function combineRenderData(renderDataPorAno, renderDataPorImplementador, renderDataPorUbicacion) {
@@ -274,7 +256,6 @@ const ResultChain = () => {
     
         return combinedRenderData;
     }
-    
     
     function generateHeaders(data, headerNameProp, headerKeyProp, headerKeyProp2 = null) {
         const headers = data.reduce((acc, item) => {
@@ -300,7 +281,6 @@ const ResultChain = () => {
         }, {});
         return renderData;
     }
-    
     
     const toggleDropdown = () => {  
         setDropdownOpen(!dropdownOpen);
@@ -423,11 +403,11 @@ const ResultChain = () => {
             .reduce((total, [key, value]) => total + Number(value), 0);
     }
     
+    // Función para manejar la exportación a Excel.
     const Export_Excel = () => {
         let data = indicadores.map((item, index) => {
             const rowData = {
                 '#': index+1,
-                'SUB_PROYECTO': item.subProNom.toLowerCase(),
                 'CÓDIGO': item.indNum,
                 'NOMBRE': item.indNom.charAt(0).toUpperCase() + item.indNom.slice(1).toLowerCase(),
             };
@@ -456,13 +436,27 @@ const ResultChain = () => {
         });
     
         // Definir los encabezados
-        let headersExcel = ['#', 'SUB_PROYECTO', 'CÓDIGO', 'NOMBRE','LINEA_BASE', ...headers.map(header => header.name)];
+        let headersExcel = ['#', 'CÓDIGO', 'NOMBRE','LINEA_BASE', ...headers.map(header => header.name)];
+
+        // Obtener el valor seleccionado del subproyecto con getValues
+        const selectedSubprojectValue = getValues('subproyecto');
+        const selectedSubproject = selectedSubprojectValue !== '0' ? JSON.parse(selectedSubprojectValue) : null;
+
+        // Buscar el subproyecto en el estado para obtener el texto a mostrar
+        const subprojectText = selectedSubproject ? subproyectos.find(subproyecto => 
+            subproyecto.subProAno === selectedSubproject.subProAno && 
+            subproyecto.subProCod === selectedSubproject.subProCod
+        ) : null;
+
+        // Construir el título con los datos del subproyecto seleccionado
+        const title = subprojectText ? `${subprojectText.subProSap} - ${subprojectText.subProNom} | ${subprojectText.proNom}` : '';
+
     
-        Export_Excel_Basic(data, headersExcel, 'GENERAL', false);
+        Export_Excel_Basic(data, headersExcel, 'GENERAL', false, title);
     };
     
     return (
-        <div className='p1 flex flex-column flex-grow-1 overflow-auto'>
+        <div className='p1 flex flex-column flex-grow-1 overflow-auto gap_25'>
             <h1 className="Large-f1_5"> Cadena de resultado | Metas técnicas programáticas </h1>
             <div className='flex ai-center jc-space-between p_25 gap-1'>
                 <div className="flex-grow-1">
@@ -487,15 +481,18 @@ const ResultChain = () => {
                         ))}
                     </select>
                 </div>
-                <div className={`PowerMas_Dropdown_Export Large_3 ${dropdownOpen ? 'open' : ''}`}>
-                    <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>Exportar <Expand /></button>
-                    <div className="PowerMas_Dropdown_Export_Content Phone_12">
-                        <a onClick={() => {
-                            Export_Excel();
-                            setDropdownOpen(false);
-                        }} className='flex jc-space-between p_5'>Excel <img className='Large_1' src={Excel_Icon} alt="" /> </a>
+                {
+                    actions.excel &&
+                    <div className={`PowerMas_Dropdown_Export Large_3 ${dropdownOpen ? 'open' : ''}`}>
+                        <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>Exportar <Expand /></button>
+                        <div className="PowerMas_Dropdown_Export_Content Phone_12">
+                            <a onClick={() => {
+                                Export_Excel();
+                                setDropdownOpen(false);
+                            }} className='flex jc-space-between p_5'>Excel <img className='Large_1' src={Excel_Icon} alt="" /> </a>
+                        </div>
                     </div>
-                </div>
+                }
             </div>
             <div className="PowerMas_TableContainer flex-column overflow-auto result-chain-block flex">
                 {
@@ -573,6 +570,7 @@ const ResultChain = () => {
                                                 ${false && 'PowerMas_Tooltip_Active'}
                                                 `} 
                                                 type="text"
+                                                disabled={!actions.add}
                                                 onInput={(e) => {
                                                     e.target.value = e.target.value.replace(/[^0-9]/g, '');
                                                     
@@ -679,10 +677,11 @@ const ResultChain = () => {
                                                         data-tooltip-id="info-tooltip" 
                                                         data-tooltip-content={preValue && `Presupuesto: ${preValue}`} 
                                                         className={`
-                                                        PowerMas_Input_Cadena Large_12 f_75 
-                                                        PowerMas_Cadena_Form_${dirtyFields[`${item.indAno}_${item.indCod}_${header.key}`] || isSubmitted ? (errors[`${item.indAno}_${item.indCod}_${header.key}`] ? 'invalid' : 'valid') : ''}
-                                                        ${preValue && 'PowerMas_Tooltip_Active'}
-                                                        `} 
+                                                            PowerMas_Input_Cadena Large_12 f_75 
+                                                            PowerMas_Cadena_Form_${dirtyFields[`${item.indAno}_${item.indCod}_${header.key}`] || isSubmitted ? (errors[`${item.indAno}_${item.indCod}_${header.key}`] ? 'invalid' : 'valid') : ''}
+                                                            ${preValue && 'PowerMas_Tooltip_Active'}
+                                                        `}
+                                                        disabled={!actions.add}
                                                         onInput={(e) => {
                                                             e.target.value = e.target.value.replace(/[^0-9]/g, '');
 
@@ -780,15 +779,18 @@ const ResultChain = () => {
                     </div>
                 }
             </div>
-            <div className='PowerMas_Footer_Box flex flex-column jc-center ai-center p_5 gap_5'>    
-                <button 
-                    className='PowerMas_Buttom_Primary Large_3 p_5'
-                    onClick={handleSubmit(onSubmit)}
-                    disabled={isSubmitDisabled}
-                >
-                    Grabar
-                </button>
-            </div>
+            {
+                actions.add &&
+                <div className='PowerMas_Footer_Box flex flex-column jc-center ai-center p_5 gap_5'>    
+                    <button 
+                        className='PowerMas_Buttom_Primary Large_3 p_5'
+                        onClick={handleSubmit(onSubmit)}
+                        disabled={isSubmitDisabled}
+                    >
+                        Grabar
+                    </button>
+                </div>
+            }
         </div>
     )
 }

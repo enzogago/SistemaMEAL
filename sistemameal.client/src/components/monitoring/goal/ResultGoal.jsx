@@ -9,6 +9,8 @@ import { fetchDataReturn } from '../../reusable/fetchs';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { logoBase64 } from "../../../img/Powermas_Logo_Ayuda_En_Accion";
+import useEntityActions from '../../../hooks/useEntityActions';
+import TableEmpty from '../../../img/PowerMas_TableEmpty.svg';
 
 const ResultGoal = () => {
     // Estados relacionados con la interfaz de usuario
@@ -37,6 +39,8 @@ const ResultGoal = () => {
     const [cadenaImplementadorGrouped, setCadenaImplementadorGrouped] = useState(null);
     const [cadenaUbicacionGrouped, setCadenaUbicacionGrouped] = useState(null);
 
+    const actions = useEntityActions('METAS MENSUALES');
+
     const { 
         register,
         unregister,
@@ -51,40 +55,8 @@ const ResultGoal = () => {
 
     useEffect(() => {
         fetchData('SubProyecto',setSubProyectos);
-        fetchUsuariosTecnico();
+        fetchData('Usuario/tecnico',setUsersTecnicos);
     }, []);
-
-    const fetchUsuariosTecnico = async () => {
-        try {
-            Notiflix.Loading.pulse('Cargando...');
-            // Valores del storage
-            const token = localStorage.getItem('token');
-            
-            // Obtenemos los datos
-            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Usuario/tecnico`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            if (!response.ok) {
-                if(response.status === 401 || response.status === 403){
-                    const data = await response.json();
-                    Notiflix.Notify.failure(data.message);
-                }
-                return;
-            }
-            const data = await response.json();
-            if (data.success === false) {
-                Notiflix.Notify.failure(data.message);
-                return;
-            }
-            setUsersTecnicos(data);
-        } catch (error) {
-            console.error('Error:', error);
-        } finally {
-            Notiflix.Loading.remove();
-        }
-    };
     
     useEffect(() => {
         const subproyecto = watch('subproyecto');
@@ -154,6 +126,7 @@ const ResultGoal = () => {
                 metaData.forEach(meta => {
                     // Usa meta.impCod, la ubicación y el indicador para crear una clave única para cada fila
                     const rowKey = `${meta.impCod}_${JSON.stringify({ ubiAno: meta.ubiAno, ubiCod: meta.ubiCod })}_${meta.indAno}_${meta.indCod}`;
+                    console.log(rowKey)
                     if (!rows[rowKey]) {
                         counter++;
                     }
@@ -201,6 +174,7 @@ const ResultGoal = () => {
                     rows[rowKey].cells.push(inputValues);
                 });
                 const filas = Object.values(rows);
+                console.log(filas)
                 setAdditionalRows(filas);
                 setRowIdCounter(counter+1);
 
@@ -233,6 +207,9 @@ const ResultGoal = () => {
                 setCadenaPeriodoGrouped(groupedPeriodoData);
                 setCadenaUbicacionGrouped(groupedUbicacionData);
                 setCadenaImplementadorGrouped(groupedImplementadorData);
+                console.log(groupedPeriodoData);
+                console.log(groupedUbicacionData);
+                console.log(groupedImplementadorData);
             }).catch(error => {
                 // Maneja los errores
                 console.error('Error:', error);
@@ -391,7 +368,6 @@ const ResultGoal = () => {
         }
     };
     
-
     const exportToExcel = async (indicadores, totales, additionalRows) => {
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet('METAS');
@@ -402,17 +378,39 @@ const ResultGoal = () => {
             tl: { col: 0, row: 1 },
             ext: { width: 200, height: 50 }
         });
-    
+
+        // Obtener el valor seleccionado del subproyecto con getValues
+        const selectedSubprojectValue = getValues('subproyecto');
+        const selectedSubproject = selectedSubprojectValue !== '0' ? JSON.parse(selectedSubprojectValue) : null;
+
+        // Buscar el subproyecto en el estado para obtener el texto a mostrar
+        const subprojectText = selectedSubproject ? subproyectos.find(subproyecto => 
+            subproyecto.subProAno === selectedSubproject.subProAno && 
+            subproyecto.subProCod === selectedSubproject.subProCod
+        ) : null;
+
+        // Construir el título con los datos del subproyecto seleccionado
+        const title = subprojectText ? `${subprojectText.subProSap} - ${subprojectText.subProNom} | ${subprojectText.proNom}` : '';
+
         // Añadir un título
         let titleRow = worksheet.addRow([]);
         let titleCell = titleRow.getCell(5);
-        titleCell.value = `CADENA DE RESULTADO | METAS TÉCNICAS PROGRAMÁTICAS`;
+        titleCell.value = `METAS TÉCNICAS PROGRAMÁTICAS`;
         titleCell.font = { bold: true, size: 16 };
         titleCell.alignment = { horizontal: 'center' };
         worksheet.mergeCells('F3:R3');
-    
+
+        worksheet.addRow([]);
+        // Añadir un segundo título
+        let secondTitleRow = worksheet.addRow([]);
+        let secondTitleCell = secondTitleRow.getCell(5);
+        secondTitleCell.value = title || ''; // Aquí iría el valor seleccionado del subproyecto
+        secondTitleCell.font = { bold: true, size: 14 };
+        secondTitleCell.alignment = { horizontal: 'center' };
+        worksheet.mergeCells('F5:R5');
+        
         // Agregar 5 filas vacías al inicio
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < 2; i++) {
             worksheet.addRow([]);
         }
     
@@ -423,7 +421,7 @@ const ResultGoal = () => {
         // Insertar una columna vacía al principio
         worksheet.spliceColumns(1, 0, []);
         // Agregar los encabezados en la sexta fila
-        const headerRow = worksheet.getRow(6);
+        const headerRow = worksheet.getRow(7);
         headers.forEach((header, index) => {
             const cell = headerRow.getCell(index + 2);
             cell.value = header;
@@ -606,303 +604,327 @@ const ResultGoal = () => {
                         ))}
                     </select>
                 </div>
-                <div className={`PowerMas_Dropdown_Export Large_3 ${dropdownOpen ? 'open' : ''}`}>
-                    <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>
-                        Exportar 
-                        <span className="flex">
-                            <Expand />
-                        </span>
-                        </button>
-                    <div className="PowerMas_Dropdown_Export_Content Phone_12">
-                        <a onClick={() => {
-                            exportToExcel(indicadores, totals, additionalRows);
-                            setDropdownOpen(false);
-                        }} className='flex jc-space-between p_5'>Excel <img className='Large_1' src={Excel_Icon} alt="" /> </a>
+                {
+                    actions.excel &&
+                    <div className={`PowerMas_Dropdown_Export Large_3 ${dropdownOpen ? 'open' : ''}`}>
+                        <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>
+                            Exportar 
+                            <span className="flex">
+                                <Expand />
+                            </span>
+                            </button>
+                        <div className="PowerMas_Dropdown_Export_Content Phone_12">
+                            <a onClick={() => {
+                                exportToExcel(indicadores, totals, additionalRows);
+                                setDropdownOpen(false);
+                            }} className='flex jc-space-between p_5'>Excel <img className='Large_1' src={Excel_Icon} alt="" /> </a>
+                        </div>
                     </div>
-                </div>
+                }
             </div>
-            <div className="PowerMas_TableContainer flex-column overflow-auto">
-                <table className="PowerMas_TableStatus ">
-                    <thead>
-                        <tr style={{zIndex: '1'}}>
-                            <th className='center' colSpan={2}></th>
-                            <th style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}>Código</th>
-                            <th colSpan={3}>Nombre</th>
-                            {meses.map((mes, i) => (
-                                <th className='center' style={{textTransform: 'capitalize'}} key={i+1}>{mes.toLowerCase()}</th>
-                            ))}
-                            <th style={{position: 'sticky', right: '0', backgroundColor: '#fff'}}>Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {
-                        indicadores.map((item, index) => {
-                            const text = item.indNom.charAt(0).toUpperCase() + item.indNom.slice(1).toLowerCase();
-                            const shortText = text.length > 60 ? text.substring(0, 60) + '...' : text;
-                            
-                            return (
-                                <Fragment  key={index}>
-                                <tr>
-                                    <td>
-                                        <div 
-                                            className={`pointer bold round p_25 PowerMas_MenuIcon ${expandedIndicators.includes(`${item.indAno}_${item.indCod}`) ? 'PowerMas_MenuIcon--rotated' : ''}`} 
-                                            onClick={() => {
-                                                if (expandedIndicators.includes(`${item.indAno}_${item.indCod}`)) {
-                                                    setExpandedIndicators(expandedIndicators.filter(indicator => indicator !== `${item.indAno}_${item.indCod}`));
-                                                } else {
-                                                    setExpandedIndicators([...expandedIndicators, `${item.indAno}_${item.indCod}`]);
-                                                }
-                                            }}
-                                        > &gt; </div>
-                                    </td>
-                                    <td>
-                                        <button 
-                                            className='p_25' 
-                                            style={{backgroundColor: 'transparent', border: 'none'}} 
-                                            onClick={() => {
-                                                setRowIdCounter(rowIdCounter + 1);
-                                                setAdditionalRows([...additionalRows, { id: `${item.indAno}_${item.indCod}_${rowIdCounter}`, indAno: item.indAno, indCod: item.indCod, indNum: item.indNum }]);
-                                                if (!expandedIndicators.includes(`${item.indAno}_${item.indCod}`)) {
-                                                    setExpandedIndicators([...expandedIndicators, `${item.indAno}_${item.indCod}`]);
-                                                }
-                                            }}
-                                        > + </button>
-                                    </td>
-                                    <td style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}>{item.indNum}</td>
-                                    {
-                                        text.length > 60 ?
-                                        <td
-                                        colSpan={3}
-                                            data-tooltip-id="info-tooltip" 
-                                            data-tooltip-content={text} 
-                                        >{shortText}</td>
-                                        :
-                                        <td colSpan={3}>{text}</td>
-                                    }
-                                    {meses.map((mes, i) => (
-                                        <td key={i+1} className='center'>
-                                            {formatter.format(Object.entries(totals)
-                                                .filter(([key]) => key.startsWith(`${item.indAno}_${item.indCod}`) && key.endsWith(String(i+1).padStart(2, '0')))
-                                                .reduce((sum, [, value]) => sum + value, 0))}
-                                        </td>
-                                    ))}
-                                    <td  className='bold center' style={{position: 'sticky', right: '0', backgroundColor: '#fff'}}>
-                                        {formatter.format(Object.entries(totals)
-                                            .filter(([key]) => key.startsWith(`${item.indAno}_${item.indCod}`) && key.endsWith('_total'))
-                                            .reduce((sum, [, value]) => sum + value, 0))}
-                                    </td>
-                                </tr>
-                                {additionalRows.filter(row => row.indAno === item.indAno && row.indCod === item.indCod).map((row, rowIndex) => (
-                                    <tr key={`${row.indAno}_${row.indCod}_${row.id}`} style={{visibility: expandedIndicators.includes(`${item.indAno}_${item.indCod}`) ? 'visible' : 'collapse'}}>
-                                        <td ></td>
+            <div className="PowerMas_TableContainer flex-column overflow-auto flex">
+                {
+                    indicadores.length > 0 ?
+                    <table className="PowerMas_TableStatus ">
+                        <thead>
+                            <tr style={{zIndex: '1'}}>
+                                <th className='center' colSpan={2}></th>
+                                <th style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}>Código</th>
+                                <th colSpan={3}>Nombre</th>
+                                {meses.map((mes, i) => (
+                                    <th className='center' style={{textTransform: 'capitalize'}} key={i+1}>{mes.toLowerCase()}</th>
+                                ))}
+                                <th style={{position: 'sticky', right: '0', backgroundColor: '#fff'}}>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                            indicadores.map((item, index) => {
+                                const text = item.indNom.charAt(0).toUpperCase() + item.indNom.slice(1).toLowerCase();
+                                const shortText = text.length > 60 ? text.substring(0, 60) + '...' : text;
+                                
+                                return (
+                                    <Fragment  key={index}>
+                                    <tr>
                                         <td>
-                                            <button 
-                                                style={{backgroundColor: 'transparent', border: 'none'}} 
+                                            <div 
+                                                className={`pointer bold round p_25 PowerMas_MenuIcon ${expandedIndicators.includes(`${item.indAno}_${item.indCod}`) ? 'PowerMas_MenuIcon--rotated' : ''}`} 
                                                 onClick={() => {
-                                                    Notiflix.Confirm.show(
-                                                        'Eliminar Fila',
-                                                        '¿Está seguro que quieres eliminar esta fila?',
-                                                        'Sí',
-                                                        'No',
-                                                        async () => {
-                                                            // Antes de eliminar la fila, actualizamos los totales
-                                                            meses.forEach((mes, i) => {
-                                                                const key = `${row.id}_${String(i+1).padStart(2, '0')}`;
-                                                                const totalKey = `${row.id}_total`;
-                                                                const value = Number(watch(`mes_${String(i+1).padStart(2, '0')}_${row.id}`));
-                                                                setTotals(prevTotals => ({
-                                                                    ...prevTotals,
-                                                                    [key]: (prevTotals[key] || 0) - value,
-                                                                    [totalKey]: (prevTotals[totalKey] || 0) - value
-                                                                }));
-                                                            });
-                                                            // Ahora sí eliminamos la fila
-                                                            setAdditionalRows(prevRows => prevRows.filter((prevRow) => prevRow.id !== row.id));
-                                                        },
-                                                        () => {
-                                                            // El usuario ha cancelado la operación de eliminación
-                                                        }
-                                                    );
+                                                    if (expandedIndicators.includes(`${item.indAno}_${item.indCod}`)) {
+                                                        setExpandedIndicators(expandedIndicators.filter(indicator => indicator !== `${item.indAno}_${item.indCod}`));
+                                                    } else {
+                                                        setExpandedIndicators([...expandedIndicators, `${item.indAno}_${item.indCod}`]);
+                                                    }
                                                 }}
-                                            > - </button>
-                                        </td>
-                                        <td style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}></td>
-                                        <td>
-                                            <select 
-                                                style={{textTransform: 'capitalize', margin: '0'}}
-                                                id={`tecnico_${row.id}`}
-                                                className={`PowerMas_Input_Cadena f_75 PowerMas_Modal_Form_${dirtyFields[`tecnico_${row.id}`] || isSubmitted ? (errors[`tecnico_${row.id}`] ? 'invalid' : 'valid') : ''}`} 
-                                                {...register(`tecnico_${row.id}`, {
-                                                    validate: value => value !== '0' || 'El campo es requerido'
-                                                })}
-                                            >
-                                                <option className='f_75' value="0">--Técnico--</option>
-                                                {usersTecnicos.map((tecnico, index) => (
-                                                    <option
-                                                        className='f_75'
-                                                        key={index} 
-                                                        value={JSON.stringify({ usuAno: tecnico.usuAno, usuCod: tecnico.usuCod })}
-                                                    > 
-                                                        {tecnico.usuNom.toLowerCase() + ' ' + tecnico.usuApe.toLowerCase() }
-                                                    </option>
-                                                ))}
-                                            </select>
+                                            > &gt; </div>
                                         </td>
                                         <td>
-                                            <select 
-                                                style={{textTransform: 'capitalize', margin: '0'}}
-                                                id={`implementador_${row.id}`}
-                                                className={`PowerMas_Input_Cadena f_75 PowerMas_Modal_Form_${dirtyFields[`implementador_${row.id}`] || isSubmitted ? (errors[`implementador_${row.id}`] ? 'invalid' : 'valid') : ''}`} 
-                                                {...register(`implementador_${row.id}`, {
-                                                    validate: {
-                                                        unique: value => {
-                                                            const ubicacionValue = watch(`ubicacion_${row.id}`);
-                                                            if (value === '0' || ubicacionValue === '') {
-                                                                return true;
-                                                            }
-                                                            const duplicate = additionalRows.find(r => 
-                                                                r.indAno === row.indAno && 
-                                                                r.indCod === row.indCod && 
-                                                                r.id !== row.id && 
-                                                                watch(`implementador_${r.id}`) === value && 
-                                                                watch(`ubicacion_${r.id}`) === ubicacionValue
-                                                            );
-                                                            if (duplicate) {
-                                                                Notiflix.Report.failure(
-                                                                    'Error de Validación',
-                                                                    `Verifica que no se repita implementador y ubicación para el indicador ${row.indNum}`,
-                                                                    'Vale',
-                                                                );
-                                                                return false;
-                                                            }
-                                                            return true;
-                                                        },
-                                                        notZero: value => value !== '0' || 'El cargo es requerido'
-                                                    }
-                                                })}
-                                            >
-                                                <option value="0" className='f_75'>--Implementador--</option>
-                                                {implementadoresSelect.map((imp, index) => (
-                                                    <option
-                                                        className='f_75'
-                                                        key={index} 
-                                                        value={imp.impCod}
-                                                    > 
-                                                        {imp.impNom.toLowerCase()}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <select 
-                                                style={{textTransform: 'capitalize', margin: '0'}}
-                                                id={`ubicacion_${row.id}`}
-                                                className={`PowerMas_Input_Cadena f_75 PowerMas_Modal_Form_${dirtyFields[`ubicacion_${row.id}`] || isSubmitted ? (errors[`ubicacion_${row.id}`] ? 'invalid' : 'valid') : ''}`} 
-                                                {...register(`ubicacion_${row.id}`, {
-                                                    validate: {
-                                                        unique: value => {
-                                                            const implementadorValue = watch(`implementador_${row.id}`);
-                                                            if (value === '0' || implementadorValue === '') {
-                                                                return true;
-                                                            }
-                                                            const duplicate = additionalRows.find(r => 
-                                                                r.indAno === row.indAno && 
-                                                                r.indCod === row.indCod && 
-                                                                r.id !== row.id && 
-                                                                watch(`ubicacion_${r.id}`) === value && 
-                                                                watch(`implementador_${r.id}`) === implementadorValue
-                                                            );
-                                                            if (duplicate) {
-                                                                Notiflix.Report.failure(
-                                                                    'Error de Validación',
-                                                                    `Verifica que no se repita implementador y ubicación para el indicador ${row.indNum}`,
-                                                                    'Vale',
-                                                                );
-                                                                return false;
-                                                            }
-                                                            return true;
-                                                        },
-                                                        notZero: value => value !== '0' || 'El cargo es requerido'
-                                                    }
-                                                })}
-                                            >
-                                                <option value="0" className='f_75'>--Ubicación--</option>
-                                                {ubicacionesSelect.map((item, index) => (
-                                                    <option
-                                                        className='f_75'
-                                                        key={index} 
-                                                        value={JSON.stringify({ ubiAno: item.ubiAno, ubiCod: item.ubiCod })}
-                                                    > 
-                                                        {item.ubiNom.toLowerCase()}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </td>
-                                        {meses.map((mes, i) => (
-                                            <td key={i+1}>
-                                                <input
-                                                    data-tooltip-id="info-tooltip" 
-                                                    data-tooltip-content={getValues(`meta_${String(i+1).padStart(2, '0')}_${row.id}`) && `Meta presupuesto: ${getValues(`metMetPre_${String(i+1).padStart(2, '0')}_${row.id}`)? getValues(`metMetPre_${String(i+1).padStart(2, '0')}_${row.id}`): '0'} $`} 
-                                                    className={`
-                                                        PowerMas_Input_Cadena Large_12 f_75 
-                                                        PowerMas_Cadena_Form_${dirtyFields[`mes_${String(i+1).padStart(2, '0')}_${row.id}`] || isSubmitted ? (errors[`mes_${String(i+1).padStart(2, '0')}_${row.id}`] ? 'invalid' : 'valid') : ''}
-                                                        ${getValues(`meta_${String(i+1).padStart(2, '0')}_${row.id}`) && 'PowerMas_Tooltip_Active'}
-                                                    `} 
-                                                    style={{margin: '0'}}
-                                                    onInput={(e) => {
-                                                        e.target.value = e.target.value.replace(/[^0-9]/g, '');
-
-                                                        // validateInput(e.target.value, row, i)
-                                                        // Si el nuevo valor es válido, actualiza los totales y los valores previos
-                                                        const key = `${row.id}_${String(i+1).padStart(2, '0')}`;
-                                                        const totalKey = `${row.id}_total`;
-                                                        const prevValue = prevValues[key] || 0;
-                                                        const newValue = Number(e.target.value);
-                                                        setTotals(prevTotals => ({
-                                                            ...prevTotals,
-                                                            [key]: (prevTotals[key] || 0) - prevValue + newValue,
-                                                            [totalKey]: (prevTotals[totalKey] || 0) - prevValue + newValue
-                                                        }));
-                                                        setPrevValues(prevValues => ({
-                                                            ...prevValues,
-                                                            [key]: newValue
-                                                        }));
-                                                    }}
-                                                    maxLength={10}
-                                                    autoComplete='off'
-                                                    {...register(`mes_${String(i+1).padStart(2, '0')}_${row.id}`, { 
-                                                        pattern: {
-                                                            value: /^(?:[1-9]\d*|)$/,
-                                                            message: 'Valor no válido',
-                                                        },
-                                                        maxLength: {
-                                                            value: 10,
-                                                            message: ''
+                                            {
+                                                actions.add &&
+                                                <button 
+                                                    className='p_25' 
+                                                    style={{backgroundColor: 'transparent', border: 'none'}} 
+                                                    onClick={() => {
+                                                        setRowIdCounter(rowIdCounter + 1);
+                                                        setAdditionalRows([...additionalRows, { id: `${item.indAno}_${item.indCod}_${rowIdCounter}`, indAno: item.indAno, indCod: item.indCod, indNum: item.indNum }]);
+                                                        if (!expandedIndicators.includes(`${item.indAno}_${item.indCod}`)) {
+                                                            setExpandedIndicators([...expandedIndicators, `${item.indAno}_${item.indCod}`]);
                                                         }
-                                                    })}
-                                                />
+                                                    }}
+                                                > + </button>
+                                            }
+                                        </td>
+                                        <td style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}>{item.indNum}</td>
+                                        {
+                                            text.length > 60 ?
+                                            <td
+                                            colSpan={3}
+                                                data-tooltip-id="info-tooltip" 
+                                                data-tooltip-content={text} 
+                                            >{shortText}</td>
+                                            :
+                                            <td colSpan={3}>{text}</td>
+                                        }
+                                        {meses.map((mes, i) => (
+                                            <td key={i+1} className='center'>
+                                                {formatter.format(Object.entries(totals)
+                                                    .filter(([key]) => key.startsWith(`${item.indAno}_${item.indCod}`) && key.endsWith(String(i+1).padStart(2, '0')))
+                                                    .reduce((sum, [, value]) => sum + value, 0))}
                                             </td>
                                         ))}
-                                        <td className='bold center' style={{position: 'sticky', right: '0', backgroundColor: '#fff'}}>
-                                            {formatter.format(totals[`${row.id}_total`] || 0) }
+                                        <td  className='bold center' style={{position: 'sticky', right: '0', backgroundColor: '#fff'}}>
+                                            {formatter.format(Object.entries(totals)
+                                                .filter(([key]) => key.startsWith(`${item.indAno}_${item.indCod}`) && key.endsWith('_total'))
+                                                .reduce((sum, [, value]) => sum + value, 0))}
                                         </td>
                                     </tr>
-                                ))}
-                            </Fragment>
-                            )
-                        })
-                        }
-                    </tbody>
-                </table>
+                                    {additionalRows.filter(row => row.indAno === item.indAno && row.indCod === item.indCod).map((row, rowIndex) => (
+                                        <tr key={`${row.indAno}_${row.indCod}_${row.id}`} style={{visibility: expandedIndicators.includes(`${item.indAno}_${item.indCod}`) ? 'visible' : 'collapse'}}>
+                                            <td ></td>
+                                            <td>
+                                                {
+                                                    actions.add &&
+                                                    <button 
+                                                        style={{backgroundColor: 'transparent', border: 'none'}} 
+                                                        onClick={() => {
+                                                            Notiflix.Confirm.show(
+                                                                'Eliminar Fila',
+                                                                '¿Está seguro que quieres eliminar esta fila?',
+                                                                'Sí',
+                                                                'No',
+                                                                async () => {
+                                                                    // Antes de eliminar la fila, actualizamos los totales
+                                                                    meses.forEach((mes, i) => {
+                                                                        const key = `${row.id}_${String(i+1).padStart(2, '0')}`;
+                                                                        const totalKey = `${row.id}_total`;
+                                                                        const value = Number(watch(`mes_${String(i+1).padStart(2, '0')}_${row.id}`));
+                                                                        setTotals(prevTotals => ({
+                                                                            ...prevTotals,
+                                                                            [key]: (prevTotals[key] || 0) - value,
+                                                                            [totalKey]: (prevTotals[totalKey] || 0) - value
+                                                                        }));
+                                                                    });
+                                                                    // Ahora sí eliminamos la fila
+                                                                    setAdditionalRows(prevRows => prevRows.filter((prevRow) => prevRow.id !== row.id));
+                                                                },
+                                                                () => {
+                                                                    // El usuario ha cancelado la operación de eliminación
+                                                                }
+                                                            );
+                                                        }}
+                                                    > - </button>
+                                                }
+                                            </td>
+                                            <td style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}></td>
+                                            <td>
+                                                <select 
+                                                    style={{textTransform: 'capitalize', margin: '0'}}
+                                                    id={`tecnico_${row.id}`}
+                                                    disabled={!actions.add}
+                                                    className={`PowerMas_Input_Cadena f_75 PowerMas_Modal_Form_${dirtyFields[`tecnico_${row.id}`] || isSubmitted ? (errors[`tecnico_${row.id}`] ? 'invalid' : 'valid') : ''}`} 
+                                                    {...register(`tecnico_${row.id}`, {
+                                                        validate: value => value !== '0' || 'El campo es requerido'
+                                                    })}
+                                                >
+                                                    <option className='f_75' value="0">--Técnico--</option>
+                                                    {usersTecnicos.map((tecnico, index) => (
+                                                        <option
+                                                            className='f_75'
+                                                            key={index} 
+                                                            value={JSON.stringify({ usuAno: tecnico.usuAno, usuCod: tecnico.usuCod })}
+                                                        > 
+                                                            {tecnico.usuNom.toLowerCase() + ' ' + tecnico.usuApe.toLowerCase() }
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select 
+                                                    style={{textTransform: 'capitalize', margin: '0'}}
+                                                    id={`implementador_${row.id}`}
+                                                    disabled={!actions.add}
+                                                    className={`PowerMas_Input_Cadena f_75 PowerMas_Modal_Form_${dirtyFields[`implementador_${row.id}`] || isSubmitted ? (errors[`implementador_${row.id}`] ? 'invalid' : 'valid') : ''}`} 
+                                                    {...register(`implementador_${row.id}`, {
+                                                        validate: {
+                                                            unique: value => {
+                                                                const ubicacionValue = watch(`ubicacion_${row.id}`);
+                                                                if (value === '0' || ubicacionValue === '') {
+                                                                    return true;
+                                                                }
+                                                                const duplicate = additionalRows.find(r => 
+                                                                    r.indAno === row.indAno && 
+                                                                    r.indCod === row.indCod && 
+                                                                    r.id !== row.id && 
+                                                                    watch(`implementador_${r.id}`) === value && 
+                                                                    watch(`ubicacion_${r.id}`) === ubicacionValue
+                                                                );
+                                                                if (duplicate) {
+                                                                    Notiflix.Report.failure(
+                                                                        'Error de Validación',
+                                                                        `Verifica que no se repita implementador y ubicación para el indicador ${row.indNum}`,
+                                                                        'Vale',
+                                                                    );
+                                                                    return false;
+                                                                }
+                                                                return true;
+                                                            },
+                                                            notZero: value => value !== '0' || 'El cargo es requerido'
+                                                        }
+                                                    })}
+                                                >
+                                                    <option value="0" className='f_75'>--Implementador--</option>
+                                                    {implementadoresSelect.map((imp, index) => (
+                                                        <option
+                                                            className='f_75'
+                                                            key={index} 
+                                                            value={imp.impCod}
+                                                        > 
+                                                            {imp.impNom.toLowerCase()}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select 
+                                                    style={{textTransform: 'capitalize', margin: '0'}}
+                                                    id={`ubicacion_${row.id}`}
+                                                    disabled={!actions.add}
+                                                    className={`PowerMas_Input_Cadena f_75 PowerMas_Modal_Form_${dirtyFields[`ubicacion_${row.id}`] || isSubmitted ? (errors[`ubicacion_${row.id}`] ? 'invalid' : 'valid') : ''}`} 
+                                                    {...register(`ubicacion_${row.id}`, {
+                                                        validate: {
+                                                            unique: value => {
+                                                                const implementadorValue = watch(`implementador_${row.id}`);
+                                                                if (value === '0' || implementadorValue === '') {
+                                                                    return true;
+                                                                }
+                                                                const duplicate = additionalRows.find(r => 
+                                                                    r.indAno === row.indAno && 
+                                                                    r.indCod === row.indCod && 
+                                                                    r.id !== row.id && 
+                                                                    watch(`ubicacion_${r.id}`) === value && 
+                                                                    watch(`implementador_${r.id}`) === implementadorValue
+                                                                );
+                                                                if (duplicate) {
+                                                                    Notiflix.Report.failure(
+                                                                        'Error de Validación',
+                                                                        `Verifica que no se repita implementador y ubicación para el indicador ${row.indNum}`,
+                                                                        'Vale',
+                                                                    );
+                                                                    return false;
+                                                                }
+                                                                return true;
+                                                            },
+                                                            notZero: value => value !== '0' || 'El cargo es requerido'
+                                                        }
+                                                    })}
+                                                >
+                                                    <option value="0" className='f_75'>--Ubicación--</option>
+                                                    {ubicacionesSelect.map((item, index) => (
+                                                        <option
+                                                            className='f_75'
+                                                            key={index} 
+                                                            value={JSON.stringify({ ubiAno: item.ubiAno, ubiCod: item.ubiCod })}
+                                                        > 
+                                                            {item.ubiNom.toLowerCase()}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </td>
+                                            {meses.map((mes, i) => (
+                                                <td key={i+1}>
+                                                    <input
+                                                        data-tooltip-id="info-tooltip" 
+                                                        data-tooltip-content={getValues(`meta_${String(i+1).padStart(2, '0')}_${row.id}`) && `Meta presupuesto: ${getValues(`metMetPre_${String(i+1).padStart(2, '0')}_${row.id}`)? getValues(`metMetPre_${String(i+1).padStart(2, '0')}_${row.id}`): '0'} $`} 
+                                                        className={`
+                                                            PowerMas_Input_Cadena Large_12 f_75 
+                                                            PowerMas_Cadena_Form_${dirtyFields[`mes_${String(i+1).padStart(2, '0')}_${row.id}`] || isSubmitted ? (errors[`mes_${String(i+1).padStart(2, '0')}_${row.id}`] ? 'invalid' : 'valid') : ''}
+                                                            ${getValues(`meta_${String(i+1).padStart(2, '0')}_${row.id}`) && 'PowerMas_Tooltip_Active'}
+                                                        `} 
+                                                        style={{margin: '0'}}
+                                                        disabled={!actions.add}
+                                                        onInput={(e) => {
+                                                            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+
+                                                            // validateInput(e.target.value, row, i)
+                                                            // Si el nuevo valor es válido, actualiza los totales y los valores previos
+                                                            const key = `${row.id}_${String(i+1).padStart(2, '0')}`;
+                                                            const totalKey = `${row.id}_total`;
+                                                            const prevValue = prevValues[key] || 0;
+                                                            const newValue = Number(e.target.value);
+                                                            setTotals(prevTotals => ({
+                                                                ...prevTotals,
+                                                                [key]: (prevTotals[key] || 0) - prevValue + newValue,
+                                                                [totalKey]: (prevTotals[totalKey] || 0) - prevValue + newValue
+                                                            }));
+                                                            setPrevValues(prevValues => ({
+                                                                ...prevValues,
+                                                                [key]: newValue
+                                                            }));
+                                                        }}
+                                                        maxLength={10}
+                                                        autoComplete='off'
+                                                        {...register(`mes_${String(i+1).padStart(2, '0')}_${row.id}`, { 
+                                                            pattern: {
+                                                                value: /^(?:[1-9]\d*|)$/,
+                                                                message: 'Valor no válido',
+                                                            },
+                                                            maxLength: {
+                                                                value: 10,
+                                                                message: ''
+                                                            }
+                                                        })}
+                                                    />
+                                                </td>
+                                            ))}
+                                            <td className='bold center' style={{position: 'sticky', right: '0', backgroundColor: '#fff'}}>
+                                                {formatter.format(totals[`${row.id}_total`] || 0) }
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </Fragment>
+                                )
+                            })
+                            }
+                        </tbody>
+                    </table>
+                    :
+                    <div className='Phone_12 flex flex-grow-1 flex-column ai-center jc-center p1'>
+                        <img src={TableEmpty} alt="TableEmpty" className='w-auto' style={{height: '100%'}} />
+                        <p className='PowerMas_Text_Empty'>No se encontraron datos.</p>
+                    </div>
+                }
             </div>
-            <div className='PowerMas_Footer_Box flex flex-column jc-center ai-center p_5 gap_5'>    
-                <button 
-                    className='PowerMas_Buttom_Primary Large_3 p_5'
-                    onClick={handleSubmit(onSubmit)}
-                >
-                    Grabar
-                </button>
-            </div>
+            {
+                actions.add &&
+                <div className='PowerMas_Footer_Box flex flex-column jc-center ai-center p_5 gap_5'>    
+                    <button 
+                        className='PowerMas_Buttom_Primary Large_3 p_5'
+                        onClick={handleSubmit(onSubmit)}
+                    >
+                        Grabar
+                    </button>
+                </div>
+            }
         </div>
     )
 }

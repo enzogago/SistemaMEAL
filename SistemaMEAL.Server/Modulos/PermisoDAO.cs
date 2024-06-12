@@ -291,7 +291,7 @@ namespace SistemaMEAL.Modulos
             return (mensaje, tipoMensaje);
         }
 
-        public IEnumerable<Permiso> ListadoPermisoPorUsuario(ClaimsIdentity? identity, string? perCod = null, string? usuAno = null, string? usuCod = null)
+        public IEnumerable<Permiso> ListadoPermisoPorUsuario(ClaimsIdentity? identity, string? perCod = null, string? perRef = null, string? usuAno = null, string? usuCod = null)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 
@@ -303,6 +303,7 @@ namespace SistemaMEAL.Modulos
                 SqlCommand cmd = new SqlCommand("SP_BUSCAR_PERMISO_USUARIO", cn.getcn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@P_PERCOD", string.IsNullOrEmpty(perCod) ? (object)DBNull.Value : perCod);
+                cmd.Parameters.AddWithValue("@P_PERREF", string.IsNullOrEmpty(perRef) ? (object)DBNull.Value : perRef);
                 cmd.Parameters.AddWithValue("@P_USUANO", string.IsNullOrEmpty(usuAno) ? (object)DBNull.Value : usuAno);
                 cmd.Parameters.AddWithValue("@P_USUCOD", string.IsNullOrEmpty(usuCod) ? (object)DBNull.Value : usuCod);
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);

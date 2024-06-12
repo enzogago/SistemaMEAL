@@ -318,7 +318,7 @@ export const Export_Excel_Basic2 = async (data, headersExcel, active, isPresupue
     saveAs(blob, `CADENA_DE_RESULTADOS_${active.toUpperCase()}_${Date.now()}.xlsx`);
 };
 
-export const Export_Excel_Basic = async (data, headersExcel, active, isPresupuesto) => {
+export const Export_Excel_Basic = async (data, headersExcel, active, isPresupuesto, selectedSubproject) => {
     let workbook = new ExcelJS.Workbook();
     let worksheet = workbook.addWorksheet(`CADENA DE ${isPresupuesto ? 'PRESUPUESTO' : 'RESULTADO'} ${active.toUpperCase()}`);
 
@@ -328,7 +328,6 @@ export const Export_Excel_Basic = async (data, headersExcel, active, isPresupues
         tl: { col: 0, row: 1 },
         ext: { width: 200, height: 50 }
     });
-
     
     // Añadir un título
     let titleRow = worksheet.addRow([]);
@@ -338,8 +337,17 @@ export const Export_Excel_Basic = async (data, headersExcel, active, isPresupues
     titleCell.alignment = { horizontal: 'center' };
     worksheet.mergeCells('D3:K3');
     
+    worksheet.addRow([]);
+    // Añadir un segundo título
+    let secondTitleRow = worksheet.addRow([]);
+    let secondTitleCell = secondTitleRow.getCell(3);
+    secondTitleCell.value = selectedSubproject || ''; // Aquí iría el valor seleccionado del subproyecto
+    secondTitleCell.font = { bold: true, size: 14 };
+    secondTitleCell.alignment = { horizontal: 'center' };
+    worksheet.mergeCells('D5:K5');
+
     // Añadir filas vacías
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 4; i++) {
         worksheet.addRow([]);
     }
     // Crear la fila para los encabezados
@@ -349,7 +357,7 @@ export const Export_Excel_Basic = async (data, headersExcel, active, isPresupues
     headersExcel.forEach((header, index) => {
         let cell = headerRow.getCell(index + 1);
         cell.value = header.toUpperCase();
-        if (index < 4) {
+        if (index < 3) {
             cell.font = { color: { argb: '000000'}, bold: true }; 
             cell.fill = {
                 type: 'pattern',
