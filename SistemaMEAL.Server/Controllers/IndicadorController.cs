@@ -20,6 +20,30 @@ namespace SistemaMEAL.Server.Controllers
             _usuarios = usuarios;
         }
 
+        [HttpGet("sin-actividad")]
+        public dynamic BuscarSinActividad()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var data = _indicadores.BuscarSinActividad(identity);
+            return Ok(data);
+        }
+
+        [HttpGet("tipo-actividad")]
+        public dynamic BuscarSoloActividad()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var data = _indicadores.Buscar(identity, indTipInd: "IAC");
+            return Ok(data);
+        }
+
         [HttpGet]
         public dynamic Buscar()
         {

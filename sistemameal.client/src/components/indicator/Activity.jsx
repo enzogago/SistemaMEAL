@@ -40,11 +40,7 @@ const Indicator = () => {
     // Efecto para cargar los datos de los beneficiarios al montar el componente
     useEffect(() => {
         setData([])
-        fetchDataBlock('Indicador', (data) => {
-            console.log(data)
-            const filteredData = data.filter(item => item.indTipInd == 'IAC');
-            setData(filteredData)
-        }, '.indicator-block');
+        fetchDataBlock('Indicador/tipo-actividad', setData, '.indicator-block');
     }, [refresh]);
 
 

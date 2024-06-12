@@ -39,6 +39,8 @@ const ResultGoal = () => {
     const [cadenaImplementadorGrouped, setCadenaImplementadorGrouped] = useState(null);
     const [cadenaUbicacionGrouped, setCadenaUbicacionGrouped] = useState(null);
 
+    const [isFormValid, setIsFormValid] = useState(false);
+
     const actions = useEntityActions('METAS MENSUALES');
 
     const { 
@@ -525,41 +527,63 @@ const ResultGoal = () => {
             return true;
         }
     
-        const {ubiAno, ubiCod} = JSON.parse(ubicacionValue);
+        const { ubiAno, ubiCod } = JSON.parse(ubicacionValue);
     
-        // Calcula el total acumulado para este indicador, implementador y ubicación
-        let accumulatedTotal = 0;
-        for (let rowIndex = 0; rowIndex < additionalRows.length; rowIndex++) {
-            const currentRow = additionalRows[rowIndex];
-            if (currentRow.indAno === row.indAno && currentRow.indCod === row.indCod && watch(`implementador_${currentRow.id}`) === implementadorValue && watch(`ubicacion_${currentRow.id}`) === ubicacionValue) {
-                for (let monthIndex = 0; monthIndex < 12; monthIndex++) {
-                    accumulatedTotal += Number(watch(`mes_${String(monthIndex+1).padStart(2, '0')}_${currentRow.id}`) || 0);
+        // Inicializa los totales acumulados para implementador y ubicación
+        let totalPorImplementador = 0;
+        let totalPorUbicacion = 0;
+        let totalPorPeriodo = 0;
+    
+        // Itera sobre todas las filas adicionales para acumular los valores
+        additionalRows.forEach(currentRow => {
+            if (currentRow.indAno === row.indAno && currentRow.indCod === row.indCod) {
+                const currentImplementadorValue = watch(`implementador_${currentRow.id}`);
+                const currentUbicacionValue = watch(`ubicacion_${currentRow.id}`);
+                if (currentImplementadorValue === implementadorValue) {
+                    for (let i = 0; i < 12; i++) {
+                        totalPorImplementador += Number(watch(`mes_${String(i+1).padStart(2, '0')}_${currentRow.id}`) || 0);
+                    }
+                }
+                if (currentUbicacionValue === ubicacionValue) {
+                    for (let i = 0; i < 12; i++) {
+                        totalPorUbicacion += Number(watch(`mes_${String(i+1).padStart(2, '0')}_${currentRow.id}`) || 0);
+                    }
+                }
+                for (let i = 0; i < 12; i++) {
+                    totalPorPeriodo += Number(watch(`mes_${String(i+1).padStart(2, '0')}_${currentRow.id}`) || 0);
                 }
             }
-        }
+        });
     
-        // Calcula el nuevo total con el nuevo valor
-        const newTotal = accumulatedTotal - (prevValues[`${row.id}_${String(monthIndex+1).padStart(2, '0')}`] || 0) + Number(newValue);
+        // Resta el valor previo y suma el nuevo valor para obtener los nuevos totales
+        const prevValue = prevValues[`${row.id}_${String(monthIndex+1).padStart(2, '0')}`] || 0;
+        totalPorImplementador = totalPorImplementador - prevValue + Number(newValue);
+        totalPorUbicacion = totalPorUbicacion - prevValue + Number(newValue);
+        totalPorPeriodo = totalPorPeriodo - prevValue + Number(newValue);
     
-        // Obtén los límites máximos para este indicador, implementador y ubicación
+        // Obtén los límites máximos específicos para implementador y ubicación
         const maxImplementador = cadenaImplementadorGrouped[`${row.indAno}-${row.indCod}`][implementadorValue];
         const maxUbicacion = cadenaUbicacionGrouped[`${row.indAno}-${row.indCod}`][`${ubiAno}-${ubiCod}`];
         const maxPeriodo = cadenaPeriodoGrouped[`${row.indAno}-${row.indCod}`];
     
-        // Comprueba si el nuevo total excede alguno de los límites máximos
-        if (newTotal > maxImplementador || newTotal > maxUbicacion || newTotal > maxPeriodo) {
-            // Si es así, muestra un mensaje de error y rechaza el nuevo valor
-            Notiflix.Report.failure(
-                'Error de Validación',
-                `El total (${newTotal}) excede el límite máximo para el implementador (${maxImplementador}), la ubicación (${maxUbicacion}) o el periodo (${maxPeriodo}).`,
-                'Vale',
-            );
+        // Valida contra los máximos específicos
+        if (totalPorImplementador > maxImplementador) {
+            Notiflix.Report.failure('Error de Validación', `El total por implementador (${totalPorImplementador}) excede el límite máximo (${maxImplementador}).`, 'Vale');
+            return false;
+        }
+        if (totalPorUbicacion > maxUbicacion) {
+            Notiflix.Report.failure('Error de Validación', `El total por ubicación (${totalPorUbicacion}) excede el límite máximo (${maxUbicacion}).`, 'Vale');
+            return false;
+        }
+        if (totalPorPeriodo > maxPeriodo) {
+            Notiflix.Report.failure('Error de Validación', `El total por período (${totalPorPeriodo}) excede el límite máximo (${maxPeriodo}).`, 'Vale');
             return false;
         }
     
-        // Si no, acepta el nuevo valor
+        // Si pasa todas las validaciones, el valor es aceptado
         return true;
     };
+    
     
     return (
         <div className='p1 flex flex-column flex-grow-1 overflow-auto content-block'>
@@ -863,9 +887,11 @@ const ResultGoal = () => {
                                                         style={{margin: '0'}}
                                                         disabled={!actions.add}
                                                         onInput={(e) => {
-                                                            e.target.value = e.target.value.replace(/[^0-9]/g, '');
-
-                                                            // validateInput(e.target.value, row, i)
+                                                            const inputVal = e.target.value.replace(/[^0-9]/g, '');
+                                                            e.target.value = inputVal;
+                                                            // const isValid = validateInput(inputVal, row, i);
+                                                            // setIsFormValid(isValid);
+                                                            
                                                             // Si el nuevo valor es válido, actualiza los totales y los valores previos
                                                             const key = `${row.id}_${String(i+1).padStart(2, '0')}`;
                                                             const totalKey = `${row.id}_total`;
@@ -918,6 +944,7 @@ const ResultGoal = () => {
                 actions.add &&
                 <div className='PowerMas_Footer_Box flex flex-column jc-center ai-center p_5 gap_5'>    
                     <button 
+                        disabled={!isFormValid}
                         className='PowerMas_Buttom_Primary Large_3 p_5'
                         onClick={handleSubmit(onSubmit)}
                     >
