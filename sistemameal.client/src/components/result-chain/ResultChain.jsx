@@ -22,7 +22,7 @@ import useEntityActions from '../../hooks/useEntityActions';
 const ResultChain = () => {
     // Estados relacionados con la interfaz de usuario (UI)
     const [dropdownOpen, setDropdownOpen] = useState(false); // Controla la visibilidad del menú desplegable de exportación.
-    const [isSubmitDisabled, setIsSubmitDisabled] = useState(true); // Habilita o deshabilita el botón de envío según la validación.
+    const [isSubmitDisabled, setIsSubmitDisabled] = useState(false); // Habilita o deshabilita el botón de envío según la validación.
     // Estados para almacenar datos de la aplicación
     const [subproyectos, setSubProyectos] = useState([]); // Almacena la lista de subproyectos disponibles.
     const [indicadores, setIndicadores] = useState([]); // Almacena los indicadores asociados al subproyecto seleccionado.
@@ -42,6 +42,8 @@ const ResultChain = () => {
     const [indTotPreState, setIndTotPreState] = useState({}); // Estado previo de los totales de indicadores para comparaciones.
     // Acciones disponibles para el usuario según el contexto (por ejemplo, exportar a Excel)
     const actions = useEntityActions('CADENA RESULTADO');
+
+    const [refresh, setRefresh] = useState(false)
 
     useEffect(() => {
         const handleKeyDown = (event) => {
@@ -146,7 +148,6 @@ const ResultChain = () => {
     
             // Reinicia los estados antes de realizar las peticiones
             setHeaders([]);
-            setIsSubmitDisabled(true);
             setIndicadores([]);
             setRenderData([]);
             setHeaders([]);
@@ -183,7 +184,7 @@ const ResultChain = () => {
                     initialIndTotPreState[key] = item.indLinBas;
                     initialTotalIndTotPre += Number(item.indLinBas);
                 });
-    
+
                 setIndTotPreState(initialIndTotPreState);
     
                 // Calcula los totales por año, implementador y ubicación
@@ -233,7 +234,7 @@ const ResultChain = () => {
             setRenderData([]);
             setHeaders([]);
         }
-    }, [watch('subproyecto')]);
+    }, [watch('subproyecto'), refresh]);
     
     
     function combineRenderData(renderDataPorAno, renderDataPorImplementador, renderDataPorUbicacion) {
@@ -365,7 +366,6 @@ const ResultChain = () => {
             CadenaUbicaciones: cambiosPorUbicacion,
             Indicadores: cambiosPorIndicador
         }
-        
         handleInsert(CadenaIndicadorDto);
     };
 
@@ -389,7 +389,7 @@ const ResultChain = () => {
                 return;
             }
             Notiflix.Notify.success(data.message);
-            reset();
+            setRefresh(prevRefresh => !prevRefresh)
         } catch (error) {
             console.error('Error:', error);
         } finally {
@@ -573,49 +573,11 @@ const ResultChain = () => {
                                                 disabled={!actions.add}
                                                 onInput={(e) => {
                                                     e.target.value = e.target.value.replace(/[^0-9]/g, '');
-                                                    
-                                                    // const newValue = Number(e.target.value);
-                                                    // const oldValue = Number(indTotPreState[`total_${item.indAno}_${item.indCod}`] || 0);
-                                                
-                                                    // setIndTotPreState(prevState => ({
-                                                    //     ...prevState,
-                                                    //     [`total_${item.indAno}_${item.indCod}`]: newValue
-                                                    // }));
-                                                
-                                                    // // Aquí es donde actualizas totalIndTotPre
-                                                    // setTotalIndTotPre(prevTotal => prevTotal - oldValue + newValue);
-                                                
-                                                    // // Validaciones de los totales
-                                                    // // const newTotalsAll = totalIndTotPre - oldValue + newValue;
-                                                    // const newTotalPorImplementador = calculateTotal(item.indAno, item.indCod, 'porImplementador', totalsPorImplementador);
-                                                    // const newTotalPorUbicacion = calculateTotal(item.indAno, item.indCod, 'porUbicacion', totalsPorUbicacion);
-                                                    // const newTotalPorAno = calculateTotal(item.indAno, item.indCod, 'porAno', totalsPorAnoAll);
-                                                
-                                                    // if (newValue !== newTotalPorImplementador) {
-                                                    //     setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorImplementador, section: 'totalPorImplementador' });
-                                                    //     setIsSubmitDisabled(true);
-                                                    // } else if (newValue !== newTotalPorUbicacion) {
-                                                    //     setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorUbicacion, section: 'totalPorUbicacion' });
-                                                    //     setIsSubmitDisabled(true);
-                                                    //  } else if (newTotalPorAno <= 0) {
-                                                    //     setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorAno, section: 'totalPorAno' });
-                                                    //     setIsSubmitDisabled(true);
-                                                    //  } else {
-                                                    //     setUnmatchedTotal({ key: '', value: 0, section: '' });
-                                                    //     setIsSubmitDisabled(false);
-                                                    // }
-                                                
-                                                    // // Validación de campo vacío
-                                                    // if (e.target.value === '') {
-                                                    //     setUnmatchedTotal({ key: `total_${item.indAno}_${item.indCod}`, value: 0, section: 'totalPorIndicador' });
-                                                    //     setIsSubmitDisabled(true);
-                                                    // }
                                                 }}
                                                 
-                                                defaultValue={indTotPreState[`total_${item.indAno}_${item.indCod}`]} 
                                                 {...register(`total_${item.indAno}_${item.indCod}`, {
                                                     pattern: {
-                                                        value: /^(?:[1-9]\d*|)$/,
+                                                        value: /^(?:[0-9]\d*|)$/,
                                                         message: 'Valor no válido',
                                                     },
                                                     maxLength: {
@@ -623,6 +585,7 @@ const ResultChain = () => {
                                                         message: ''
                                                     }
                                                 })}
+                                                defaultValue={indTotPreState[`total_${item.indAno}_${item.indCod}`]} 
                                             />
                                         </td>
                                         {/* Data dinamica */}
