@@ -39,6 +39,8 @@ const FormSubProject = () => {
 
     const [initialSubProject, setInitialSubProject] = useState({});
     
+    const [refresh, setRefresh] = useState(false);
+
     const handleSelectChange = async (ubicacion, countryIndex, selectIndex) => {
         const selectedCountry = JSON.parse(ubicacion);
         
@@ -201,6 +203,9 @@ const FormSubProject = () => {
     } = useForm({ mode: "onChange"});
     
     useEffect(() => {
+        setImplementadoresEdit([])
+        setFinanciadoresEdit([])
+        setUbicacionesEdit([])
         const fetchOptions = async () => {
             await Promise.all([
                 fetchData('Implementador',setImplementadores),
@@ -254,7 +259,7 @@ const FormSubProject = () => {
                 });
             }
         });
-    }, [isEditing]);
+    }, [isEditing, refresh]);
 
     useEffect(() => {
         if (implementadoresEdit.length > 0) {
@@ -478,11 +483,11 @@ const FormSubProject = () => {
                 SubProyectoUbicaciones: ubicaciones
             }
             console.log(SubProyectoImplementadorDto)
-            handleSubmit(SubProyectoImplementadorDto, isEditing, navigate);
+            handleSubmit(SubProyectoImplementadorDto, isEditing, navigate, setRefresh);
         })();
     }
 
-    const handleSubmit = async (data, isEditing, navigate) => {
+    const handleSubmit = async (data, isEditing, navigate, setRefresh) => {
         const method = isEditing ? 'PUT' : 'POST';
 
         try {
@@ -499,6 +504,7 @@ const FormSubProject = () => {
             const dataResult = await response.json();
             if (!response.ok) {
                 Notiflix.Notify.failure(dataResult.message)
+                setRefresh(prevRefresh => !prevRefresh);
                 return;
             }
     
