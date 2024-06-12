@@ -28,7 +28,7 @@ const ModalPermission = ({modalVisible, estadoEditado, closeModal, user}) => {
 
             Promise.all([
                 fetchDataReturn(`Permiso/${estadoEditado.menRef}`),
-                fetchDataReturn(`Permiso/${user.usuAno}/${user.usuCod}`),
+                fetchDataReturn(`Permiso/${user.usuAno}/${user.usuCod}/${estadoEditado.menRef}`),
             ]).then(([menuData, permissionAccessData]) => {
                 setPermisos(menuData)
                 const permisosInicialesSet = new Set(permissionAccessData.map(permiso => permiso.perCod));

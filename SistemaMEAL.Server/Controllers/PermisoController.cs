@@ -55,15 +55,15 @@ namespace SistemaMEAL.Server.Controllers
             return Ok(permisos);
         }
 
-        [HttpGet("{usuAno}/{usuCod}")]
-        public IActionResult ListadoPermisoPorUsuario(string usuAno, string usuCod)
+        [HttpGet("{usuAno}/{usuCod}/{perRef}")]
+        public IActionResult ListadoPermisoPorUsuario(string usuAno, string usuCod, string perRef)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var permiso = _permisos.ListadoPermisoPorUsuario(identity, usuAno:usuAno, usuCod:usuCod);
+            var permiso = _permisos.ListadoPermisoPorUsuario(identity, usuAno:usuAno, usuCod:usuCod, perRef:perRef);
             return Ok(permiso);
         }
 
