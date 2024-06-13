@@ -335,16 +335,16 @@ export const Export_Excel_Basic = async (data, headersExcel, active, isPresupues
     titleCell.value = `CADENA DE RESULTADO | METAS ${isPresupuesto ? 'PRESUPUESTO' : 'PROGRAMÁTICAS'}`;
     titleCell.font = { bold: true, size: 16 };
     titleCell.alignment = { horizontal: 'center' };
-    worksheet.mergeCells('D3:K3');
+    worksheet.mergeCells('D3:M3');
     
     worksheet.addRow([]);
     // Añadir un segundo título
     let secondTitleRow = worksheet.addRow([]);
     let secondTitleCell = secondTitleRow.getCell(3);
-    secondTitleCell.value = selectedSubproject || ''; // Aquí iría el valor seleccionado del subproyecto
+    secondTitleCell.value = selectedSubproject || '';
     secondTitleCell.font = { bold: true, size: 14 };
     secondTitleCell.alignment = { horizontal: 'center' };
-    worksheet.mergeCells('D5:K5');
+    worksheet.mergeCells('D5:M5');
 
     // Añadir filas vacías
     for (let i = 0; i < 4; i++) {
@@ -357,7 +357,7 @@ export const Export_Excel_Basic = async (data, headersExcel, active, isPresupues
     headersExcel.forEach((header, index) => {
         let cell = headerRow.getCell(index + 1);
         cell.value = header.toUpperCase();
-        if (index < 3) {
+        if (index < 5) {
             cell.font = { color: { argb: '000000'}, bold: true }; 
             cell.fill = {
                 type: 'pattern',
@@ -384,16 +384,16 @@ export const Export_Excel_Basic = async (data, headersExcel, active, isPresupues
             let cell = dataRow.getCell(index + 1);
             let value = item[header];
             // Si isPresupuesto es true y la columna es la 5 o posterior, formatear como euros
-            if (isPresupuesto && index >= 4) {
+            if (isPresupuesto && index >= 6) {
                 // Convertir el valor a un número antes de asignarlo a la celda
                 cell.value = typeof value === 'string' ? parseFloat(value) : value;
                 cell.numFmt = '#,##0.00 $';
-            } else if( index >= 4){
+            } else if( index >= 5){
                 cell.value = typeof value === 'string' ? parseFloat(value) : value;
             } else {
                 cell.value = typeof value === 'string' ? value.toUpperCase() : value;
             }
-            if (index === 0 || index >= 4) {
+            if (index === 0 || index >= 5) {
                 cell.alignment = { horizontal: 'center' };
             }
         });

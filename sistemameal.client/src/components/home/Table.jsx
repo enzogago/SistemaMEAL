@@ -188,7 +188,7 @@ const Table = ({data}) => {
             <div className='PowerMas_TableContainer'>
                 {
                     currentRecords.length > 0 ?
-                    <table className='PowerMas_Table_Monitoring'>
+                    <table className='PowerMas_Table_Monitoring Phone_12'>
                         <thead>
                             <tr>
                                 <th> Estado </th>
