@@ -6,11 +6,9 @@ import Notiflix from 'notiflix';
 import { formatter, meses } from './helper';
 import Expand from '../../../icons/Expand';
 import { fetchDataReturn } from '../../reusable/fetchs';
-import ExcelJS from 'exceljs';
-import { saveAs } from 'file-saver';
-import { logoBase64 } from "../../../img/Powermas_Logo_Ayuda_En_Accion";
 import useEntityActions from '../../../hooks/useEntityActions';
 import TableEmpty from '../../../img/PowerMas_TableEmpty.svg';
+import { exportToExcel } from '../../../helpers/goals';
 
 const ResultGoal = () => {
     // Estados relacionados con la interfaz de usuario
@@ -369,154 +367,6 @@ const ResultGoal = () => {
             Notiflix.Loading.remove();
         }
     };
-    
-    const exportToExcel = async (indicadores, totales, additionalRows) => {
-        const workbook = new ExcelJS.Workbook();
-        const worksheet = workbook.addWorksheet('METAS');
-    
-        // Añadir una imagen (opcional)
-        const imageId = workbook.addImage({base64: logoBase64, extension: 'png' });
-        worksheet.addImage(imageId, {
-            tl: { col: 0, row: 1 },
-            ext: { width: 200, height: 50 }
-        });
-
-        // Obtener el valor seleccionado del subproyecto con getValues
-        const selectedSubprojectValue = getValues('subproyecto');
-        const selectedSubproject = selectedSubprojectValue !== '0' ? JSON.parse(selectedSubprojectValue) : null;
-
-        // Buscar el subproyecto en el estado para obtener el texto a mostrar
-        const subprojectText = selectedSubproject ? subproyectos.find(subproyecto => 
-            subproyecto.subProAno === selectedSubproject.subProAno && 
-            subproyecto.subProCod === selectedSubproject.subProCod
-        ) : null;
-
-        // Construir el título con los datos del subproyecto seleccionado
-        const title = subprojectText ? `${subprojectText.subProSap} - ${subprojectText.subProNom} | ${subprojectText.proNom}` : '';
-
-        // Añadir un título
-        let titleRow = worksheet.addRow([]);
-        let titleCell = titleRow.getCell(5);
-        titleCell.value = `METAS TÉCNICAS PROGRAMÁTICAS`;
-        titleCell.font = { bold: true, size: 16 };
-        titleCell.alignment = { horizontal: 'center' };
-        worksheet.mergeCells('F3:R3');
-
-        worksheet.addRow([]);
-        // Añadir un segundo título
-        let secondTitleRow = worksheet.addRow([]);
-        let secondTitleCell = secondTitleRow.getCell(5);
-        secondTitleCell.value = title || ''; // Aquí iría el valor seleccionado del subproyecto
-        secondTitleCell.font = { bold: true, size: 14 };
-        secondTitleCell.alignment = { horizontal: 'center' };
-        worksheet.mergeCells('F5:R5');
-        
-        // Agregar 5 filas vacías al inicio
-        for (let i = 0; i < 2; i++) {
-            worksheet.addRow([]);
-        }
-    
-        // Definir los encabezados
-        const headers = ['CODIGO', 'NOMBRE', 'TÉCNICO', 'IMPLEMENTADOR', 'UBICACION', ...meses, 'TOTAL'];
-        worksheet.columns = headers.map(header => ({ key: header, width: 15 }));
-    
-        // Insertar una columna vacía al principio
-        worksheet.spliceColumns(1, 0, []);
-        // Agregar los encabezados en la sexta fila
-        const headerRow = worksheet.getRow(7);
-        headers.forEach((header, index) => {
-            const cell = headerRow.getCell(index + 2);
-            cell.value = header;
-        
-            // Establecer el color de fondo y el color del texto para los dos primeros encabezados
-            if (index < 5) {
-                cell.fill = {
-                    type: 'pattern',
-                    pattern: 'solid',
-                    fgColor: { argb: 'FFCA53' }
-                };
-                cell.font = {
-                    color: { argb: '000000' },
-                    bold: true
-                };
-            } else {
-                // Establecer otro color de fondo y de texto para los demás encabezados
-                cell.fill = {
-                    type: 'pattern',
-                    pattern: 'solid',
-                    fgColor: { argb: '25848F' }
-                };
-                cell.font = {
-                    color: { argb: 'FFFFFF' },
-                    bold: true
-                };
-            }
-        });
-    
-        indicadores.forEach(indicador => {
-            const row = {
-                'CODIGO': indicador.indNum,
-                'NOMBRE': indicador.indNom,
-                ...meses.reduce((obj, mes, i) => {
-                    obj[mes] = Object.entries(totales)
-                        .filter(([key]) => key.startsWith(`${indicador.indAno}_${indicador.indCod}`) && key.endsWith(String(i+1).padStart(2, '0')))
-                        .reduce((sum, [, value]) => sum + value, 0);
-                    return obj;
-                }, {}),
-                'TOTAL': Object.entries(totales)
-                    .filter(([key]) => key.startsWith(`${indicador.indAno}_${indicador.indCod}`) && key.endsWith('_total'))
-                    .reduce((sum, [, value]) => sum + (Number(value) || 0), 0)
-            };
-            const rowIndex = worksheet.addRow(row).number;
-    
-            // Aplicar el formato de número a las celdas numéricas (columna 3 en adelante)
-            const rowExcel = worksheet.getRow(rowIndex);
-            rowExcel.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-                if (colNumber >= 4) {
-                    cell.numFmt = '#,##0';
-                }
-            });
-    
-            // Agregar las filas adicionales para este indicador
-            additionalRows.filter(row => row.indAno === indicador.indAno && row.indCod === indicador.indCod).forEach(additionalRow => {
-                const { usuAno, usuCod } = JSON.parse(getValues(`tecnico_${additionalRow.id}`));
-                const { ubiAno, ubiCod } = JSON.parse(getValues(`ubicacion_${additionalRow.id}`));
-                const userTecnico = usersTecnicos.find(user => user.usuAno === usuAno && user.usuCod === usuCod);
-                const ubicacion = ubicacionesSelect.find(item => item.ubiAno === ubiAno && item.ubiCod === ubiCod);
-                const impCod = getValues(`implementador_${additionalRow.id}`);
-                const implementador = implementadoresSelect.find(imp => imp.impCod === impCod);
-    
-                const additionalRowData = {
-                    'CODIGO': indicador.indNum,
-                    'NOMBRE': indicador.indNom,
-                    'TÉCNICO': userTecnico ? (userTecnico.usuNom + ' ' + userTecnico.usuApe) : '',
-                    'IMPLEMENTADOR': implementador ? implementador.impNom : '',
-                    'UBICACION': ubicacion ? ubicacion.ubiNom : '',
-                    ...meses.reduce((obj, mes, i) => {
-                        const fieldValue = getValues(`mes_${String(i+1).padStart(2, '0')}_${additionalRow.id}`);
-                        obj[mes] = Number(fieldValue) || 0;
-                        return obj;
-                    }, {}),
-                    'TOTAL': Object.entries(totals)
-                        .filter(([key]) => key.startsWith(`${additionalRow.id}`) && key.endsWith('_total'))
-                        .reduce((sum, [, value]) => sum + value, 0)
-                };
-                const additionalRowExcel = worksheet.addRow(additionalRowData);
-    
-                // Aplicar el formato de número a las celdas numéricas (columna 3 en adelante)
-                additionalRowExcel.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-                    if (colNumber >= 4) {
-                        cell.numFmt = '#,##0';
-                    }
-                });
-            });
-        });
-    
-        // Crear el archivo de Excel y descargarlo
-        const buffer = await workbook.xlsx.writeBuffer();
-        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        saveAs(blob, `METAS_PROGRAMATICAS_${Date.now()}.xlsx`);
-    };
 
     const validateInput = (newValue, row, monthIndex) => {
         // Obtén el valor del implementador y la ubicación para esta fila
@@ -584,7 +434,6 @@ const ResultGoal = () => {
         return true;
     };
     
-    
     return (
         <div className='p1 flex flex-column flex-grow-1 overflow-auto content-block'>
             <h1 className="Large-f1_5"> Metas técnicas programáticas </h1>
@@ -639,7 +488,7 @@ const ResultGoal = () => {
                             </button>
                         <div className="PowerMas_Dropdown_Export_Content Phone_12">
                             <a onClick={() => {
-                                exportToExcel(indicadores, totals, additionalRows);
+                                exportToExcel(indicadores, totals, additionalRows, getValues, subproyectos, usersTecnicos, ubicacionesSelect, implementadoresSelect, meses);
                                 setDropdownOpen(false);
                             }} className='flex jc-space-between p_5'>Excel <img className='Large_1' src={Excel_Icon} alt="" /> </a>
                         </div>
@@ -654,7 +503,9 @@ const ResultGoal = () => {
                             <tr style={{zIndex: '1'}}>
                                 <th className='center' colSpan={2}></th>
                                 <th style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}>Código</th>
-                                <th colSpan={3}>Nombre</th>
+                                <th>Nombre</th>
+                                <th>Unidad</th>
+                                <th>Tipo Valor</th>
                                 {meses.map((mes, i) => (
                                     <th className='center' style={{textTransform: 'capitalize'}} key={i+1}>{mes.toLowerCase()}</th>
                                 ))}
@@ -664,8 +515,11 @@ const ResultGoal = () => {
                         <tbody>
                             {
                             indicadores.map((item, index) => {
-                                const text = item.indNom.charAt(0).toUpperCase() + item.indNom.slice(1).toLowerCase();
-                                const shortText = text.length > 60 ? text.substring(0, 60) + '...' : text;
+                                const text = item.indNom;
+                                const shortText = text.length > 30 ? text.substring(0, 30) + '...' : text;
+
+                                const textUnidad = item.uniNom;
+                                const shortTextUnidad = textUnidad.length > 15 ? textUnidad.substring(0, 15) + '...' : textUnidad;
                                 
                                 return (
                                     <Fragment  key={index}>
@@ -700,15 +554,24 @@ const ResultGoal = () => {
                                         </td>
                                         <td style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}>{item.indNum}</td>
                                         {
-                                            text.length > 60 ?
+                                            text.length > 30 ?
                                             <td
-                                            colSpan={3}
                                                 data-tooltip-id="info-tooltip" 
                                                 data-tooltip-content={text} 
                                             >{shortText}</td>
                                             :
-                                            <td colSpan={3}>{text}</td>
+                                            <td>{text}</td>
                                         }
+                                        {
+                                            textUnidad.length > 15 ?
+                                            <td
+                                                data-tooltip-id="info-tooltip" 
+                                                data-tooltip-content={textUnidad} 
+                                            >{shortTextUnidad}</td>
+                                            :
+                                            <td >{textUnidad}</td>
+                                        }
+                                        <td>{item.tipValNom}</td>
                                         {meses.map((mes, i) => (
                                             <td key={i+1} className='center'>
                                                 {formatter.format(Object.entries(totals)
@@ -787,6 +650,18 @@ const ResultGoal = () => {
                                                     style={{textTransform: 'capitalize', margin: '0'}}
                                                     id={`implementador_${row.id}`}
                                                     disabled={!actions.add}
+                                                    onInput={(e) => {
+                                                        // Actualiza el valor del implementador
+                                                        const newImplementadorValue = e.target.value;
+                                                        setValue(`implementador_${row.id}`, newImplementadorValue);
+                                                
+                                                        // Ejecuta la validación para todos los campos de entrada de este indicador
+                                                        meses.forEach((mes, i) => {
+                                                            const inputVal = getValues(`mes_${String(i+1).padStart(2, '0')}_${row.id}`);
+                                                            const isValid = validateInput(inputVal, row, i);
+                                                            setIsFormValid(isValid);
+                                                        });
+                                                    }}
                                                     className={`PowerMas_Input_Cadena f_75 PowerMas_Modal_Form_${dirtyFields[`implementador_${row.id}`] || isSubmitted ? (errors[`implementador_${row.id}`] ? 'invalid' : 'valid') : ''}`} 
                                                     {...register(`implementador_${row.id}`, {
                                                         validate: {
@@ -833,6 +708,18 @@ const ResultGoal = () => {
                                                     style={{textTransform: 'capitalize', margin: '0'}}
                                                     id={`ubicacion_${row.id}`}
                                                     disabled={!actions.add}
+                                                    onInput={(e) => {
+                                                        // Actualiza el valor de la ubicación
+                                                        const newUbicacionValue = e.target.value;
+                                                        setValue(`ubicacion_${row.id}`, newUbicacionValue);
+                                                
+                                                        // Ejecuta la validación para todos los campos de entrada de este indicador
+                                                        meses.forEach((mes, i) => {
+                                                            const inputVal = getValues(`mes_${String(i+1).padStart(2, '0')}_${row.id}`);
+                                                            const isValid = validateInput(inputVal, row, i);
+                                                            setIsFormValid(isValid);
+                                                        });
+                                                    }}
                                                     className={`PowerMas_Input_Cadena f_75 PowerMas_Modal_Form_${dirtyFields[`ubicacion_${row.id}`] || isSubmitted ? (errors[`ubicacion_${row.id}`] ? 'invalid' : 'valid') : ''}`} 
                                                     {...register(`ubicacion_${row.id}`, {
                                                         validate: {
@@ -889,8 +776,8 @@ const ResultGoal = () => {
                                                         onInput={(e) => {
                                                             const inputVal = e.target.value.replace(/[^0-9]/g, '');
                                                             e.target.value = inputVal;
-                                                            // const isValid = validateInput(inputVal, row, i);
-                                                            // setIsFormValid(isValid);
+                                                            const isValid = validateInput(inputVal, row, i);
+                                                            setIsFormValid(isValid);
                                                             
                                                             // Si el nuevo valor es válido, actualiza los totales y los valores previos
                                                             const key = `${row.id}_${String(i+1).padStart(2, '0')}`;

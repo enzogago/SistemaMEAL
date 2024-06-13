@@ -406,10 +406,13 @@ const ResultChain = () => {
     // Función para manejar la exportación a Excel.
     const Export_Excel = () => {
         let data = indicadores.map((item, index) => {
+            console.log(item)
             const rowData = {
                 '#': index+1,
                 'CÓDIGO': item.indNum,
                 'NOMBRE': item.indNom.charAt(0).toUpperCase() + item.indNom.slice(1).toLowerCase(),
+                'UNIDAD': item.uniNom.charAt(0).toUpperCase() + item.uniNom.slice(1).toLowerCase(),
+                'TIPO_VALOR': item.tipValNom.charAt(0).toUpperCase() + item.tipValNom.slice(1).toLowerCase(),
             };
             let inputLineaBase = document.querySelector(`input[name="total_${item.indAno}_${item.indCod}"]`);
             if (inputLineaBase){
@@ -436,7 +439,7 @@ const ResultChain = () => {
         });
     
         // Definir los encabezados
-        let headersExcel = ['#', 'CÓDIGO', 'NOMBRE','LINEA_BASE', ...headers.map(header => header.name)];
+        let headersExcel = ['#', 'CÓDIGO', 'NOMBRE', 'UNIDAD', 'TIPO_VALOR','LINEA_BASE', ...headers.map(header => header.name)];
 
         // Obtener el valor seleccionado del subproyecto con getValues
         const selectedSubprojectValue = getValues('subproyecto');
@@ -502,7 +505,9 @@ const ResultChain = () => {
                             <tr>
                                 <th className='center' rowSpan={2}>#</th>
                                 <th className='center' rowSpan={2}>Código</th>
-                                <th className='center PowerMas_Borde_Total' rowSpan={2}>Nombre</th>
+                                <th className='center' rowSpan={2}>Nombre</th>
+                                <th className='center' rowSpan={2}>Unidad</th>
+                                <th className='center PowerMas_Borde_Total' rowSpan={2}>Tipo Valor</th>
                                 <th className='center PowerMas_Borde_Total' style={{color: '#F87C56', whiteSpace: 'normal'}} rowSpan={2}>Linea Base</th>
                                 <th className='center PowerMas_Borde_Total PowerMas_Borde_Total2 PowerMas_Combine_Header' colSpan={numeroColumnasAno}>
                                     <span className='flex ai-center jc-center gap-1'>
@@ -540,8 +545,11 @@ const ResultChain = () => {
                             {
                             indicadores.map((item, index) => {
                                 const rowKey = `${item.indAno}_${item.indCod}`;
-                                const text = item.indNom.charAt(0).toUpperCase() + item.indNom.slice(1).toLowerCase();
-                                const shortText = text.length > 30 ? text.substring(0, 30) + '...' : text;
+                                const text = item.indNom;
+                                const shortText = text.length > 25 ? text.substring(0, 25) + '...' : text;
+                                
+                                const textUnidad = item.uniNom;
+                                const shortTextUnidad = textUnidad.length > 15 ? textUnidad.substring(0, 15) + '...' : text;
 
                                 return (
                                     <tr key={index}>
@@ -549,13 +557,27 @@ const ResultChain = () => {
                                         <td>{item.indNum}</td>
                                         {
                                             text.length > 30 ?
-                                            <td className='PowerMas_Borde_Total' 
-                                                data-tooltip-id="info-tooltip" 
-                                                data-tooltip-content={text} 
+                                            <td className='' 
+                                            data-tooltip-id="info-tooltip" 
+                                            data-tooltip-content={text} 
                                             >{shortText}</td>
                                             :
-                                            <td className='PowerMas_Borde_Total'>{text}</td>
+                                            <td className=''>{text}</td>
                                         }
+                                        {
+                                            textUnidad.length > 30 ?
+                                            <td className='' 
+                                            data-tooltip-id="info-tooltip" 
+                                            data-tooltip-content={textUnidad} 
+                                            >{shortTextUnidad}</td>
+                                            :
+                                            <td className=''>{textUnidad}</td>
+                                        }
+                                        <td
+                                            className='PowerMas_Borde_Total'
+                                        >
+                                            {item.tipValNom}
+                                        </td>
                                         <td className='PowerMas_Borde_Total'>
                                             <Tooltip
                                                 title="Los totales no coinciden."

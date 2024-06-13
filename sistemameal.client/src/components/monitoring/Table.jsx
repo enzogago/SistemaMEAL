@@ -364,7 +364,7 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
             <div className='PowerMas_TableContainer'>
                 {
                     currentRecords.length > 0 ?
-                    <table className='PowerMas_Table_Monitoring'>
+                    <table className='PowerMas_Table_Monitoring Phone_12'>
                         <thead>
                             <tr className='center'>
                                 <th></th>
