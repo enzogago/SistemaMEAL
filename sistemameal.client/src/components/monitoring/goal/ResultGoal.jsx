@@ -415,18 +415,28 @@ const ResultGoal = () => {
         const maxImplementador = cadenaImplementadorGrouped[`${row.indAno}-${row.indCod}`][implementadorValue];
         const maxUbicacion = cadenaUbicacionGrouped[`${row.indAno}-${row.indCod}`][`${ubiAno}-${ubiCod}`];
         const maxPeriodo = cadenaPeriodoGrouped[`${row.indAno}-${row.indCod}`];
-    
+
+        
+        
         // Valida contra los máximos específicos
         if (totalPorImplementador > maxImplementador) {
-            Notiflix.Report.failure('Error de Validación', `El total por implementador (${totalPorImplementador}) excede el límite máximo (${maxImplementador}).`, 'Vale');
+            const implementador = implementadoresSelect.find(imp => imp.impCod === implementadorValue);
+            const implementadorNom = implementador.impNom.charAt(0) + implementador.impNom.slice(1).toLowerCase();
+
+            Notiflix.Report.warning('Advertencia', `La meta del implementador ${implementadorNom} es ${totalPorImplementador}, pero en la cadena de resultado se estableció en ${maxImplementador}. Por favor ajuste la distribución correctamente.`, 'Aceptar');
             return false;
         }
         if (totalPorUbicacion > maxUbicacion) {
-            Notiflix.Report.failure('Error de Validación', `El total por ubicación (${totalPorUbicacion}) excede el límite máximo (${maxUbicacion}).`, 'Vale');
+            const ubicacion = ubicacionesSelect.find(item => item.ubiAno === ubiAno && item.ubiCod === ubiCod);
+            const ubicacionNom = ubicacion.ubiNom.charAt(0) + ubicacion.ubiNom.slice(1).toLowerCase();
+
+            Notiflix.Report.warning('Advertencia', `La meta de la ubicación ${ubicacionNom} es ${totalPorUbicacion}, pero en la cadena de resultado se estableció en ${maxUbicacion}. Por favor ajuste la distribución correctamente.`, 'Aceptar');
             return false;
         }
         if (totalPorPeriodo > maxPeriodo) {
-            Notiflix.Report.failure('Error de Validación', `El total por período (${totalPorPeriodo}) excede el límite máximo (${maxPeriodo}).`, 'Vale');
+            const ano = watch('metAnoPlaTec');
+
+            Notiflix.Report.warning('Advertencia', `La meta del periodo ${ano} es ${totalPorPeriodo}, pero en la cadena de resultado se estableció en ${maxPeriodo}. Por favor ajuste la distribución correctamente.`, 'Aceptar');
             return false;
         }
     
