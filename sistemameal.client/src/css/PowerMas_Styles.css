@@ -1338,6 +1338,7 @@ textarea {
 	transition: color 0.3s ease;
 	position: absolute;
 	right: 30px;
+	border: 1px solid black;
 }
 
 .PowerMas_CloseModal:hover,
@@ -2154,7 +2155,7 @@ textarea {
 }
 
 .PowerMas_Input_Cadena{
-	min-width: 4rem;
+	min-width: 7rem;
 }
 
 .PowerMas_Error_Message{
@@ -2351,4 +2352,12 @@ textarea {
 	background: #fff url("../Img/PowerMas_Correcto.svg") no-repeat 98% center;
 	background-size: 24px 24px;
 	background-position: 96%;
+}
+
+.PowerMas_Popup_Cadena{
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	background-color: #FFFFFF;
+	border: 1px solid black;
 }

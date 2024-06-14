@@ -116,6 +116,7 @@ const ViewExecution = () => {
                     finNom: meta.finNom,
                     impNom: meta.impNom,
                     ubiNom: meta.ubiNom,
+                    uniNom: meta.uniNom,
                     cells: {},
                     originalValues: {}
                 };
@@ -145,7 +146,8 @@ const ViewExecution = () => {
     // Hook useForm de react-hook-form para manejar formularios
     const { 
         register, 
-        watch, 
+        watch,
+        getValues,
         formState: { errors, dirtyFields, isSubmitted }, 
         setValue, 
     } = 
@@ -194,17 +196,21 @@ const ViewExecution = () => {
             Promise.all([
                 fetchDataReturn(`Indicador/subproyecto-actividad/${subProAno}/${subProCod}`),
                 fetchDataReturn(`Meta/${subProAno}/${subProCod}/${ano}`),
-            ]).then(([dataIndicadores, dataMetas]) => {
+                fetchDataReturn(`Indicador/financiador-actividad/${subProAno}/${subProCod}`),
+            ]).then(([dataIndicadores, dataMetas, dataPorFinanciador]) => {
                 // Determina la moneda para las metas
-                const allMonCod = dataIndicadores.map(ind => ind.monCod);
-                const uniqueMonCod = new Set(allMonCod);
-                if (uniqueMonCod.size === 1) {
-                    // Todos los monCod son iguales, actualiza el estado con el objeto correspondiente
-                    const moneda = monedas.find(m => m.monCod === allMonCod[0]);
-                    setCurrencyMeta(moneda ? { monCod: moneda.monCod, monSim: moneda.monSim, monAbr: moneda.monAbr } : { monCod: '02', monSim: '€', monAbr: 'EUR'  });
-                } else {
-                    // Los monCod son diferentes, usa el valor por defecto (Euro)
-                    setCurrencyMeta({ monCod: '02', monSim: '€', monAbr: 'EUR' });
+                if (dataPorFinanciador.length > 0) {
+                    // Obtén el valor de monCod del primer registro
+                    const firstMonCod = dataPorFinanciador[0].monCod;
+                
+                    // Verifica si todos los registros tienen el mismo valor de monCod
+                    const allSameMonCod = dataPorFinanciador.every(record => record.monCod === firstMonCod);
+                
+                    // Si todos los registros tienen el mismo valor de monCod, establece currencyMeta en ese valor
+                    // Si no, establece currencyMeta en { monCod: '02', monSim: '€', monAbr: 'EUR' }
+                    setCurrencyMeta(allSameMonCod 
+                        ? { monCod: dataPorFinanciador[0].monCod, monSim: dataPorFinanciador[0].monSim, monAbr: dataPorFinanciador[0].monAbr } 
+                        : { monCod: '02', monSim: '€', monAbr: 'EUR' });
                 }
                 
                 setIndicadores(dataIndicadores);
@@ -275,13 +281,13 @@ const ViewExecution = () => {
                     </button>
                     <div className="PowerMas_Dropdown_Export_Content Phone_12">
                         <a onClick={() => {
-                            exportToExcel(additionalRows);
+                            exportToExcel(additionalRows, getValues, subproyectos, watch('metAnoPlaTec'));
                             setDropdownOpen(false);
                         }} className='flex jc-space-between p_5'>Excel <img className='Large_1' src={Excel_Icon} alt="" /> </a>
                     </div>
                 </div>
             </div>
-            <div className='flex jc-center gap-1'>
+            <div className='flex gap-1 p_5'>
                 <select 
                     id='monCod'
                     style={{margin: '0'}}
@@ -337,6 +343,9 @@ const ViewExecution = () => {
                                         <Fragment key={monthKey}>
                                             <th className='center'>
                                                 <input
+                                                    style={{
+                                                        minWidth: '4rem'
+                                                    }}
                                                     type="text"
                                                     className='Large_12 f_75'
                                                     placeholder="Tasa"
@@ -354,6 +363,9 @@ const ViewExecution = () => {
                                             </th>
                                             <th className='center'>
                                                 <input
+                                                    style={{
+                                                        minWidth: '4rem'
+                                                    }}
                                                     type="text"
                                                     className='Large_12 f_75'
                                                     placeholder="Tasa"
