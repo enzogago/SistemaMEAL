@@ -1,8 +1,10 @@
+
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
-import { logoBase64 } from "../img/Powermas_Logo_Ayuda_En_Accion";
+import { logoBase64 } from "../../img/Powermas_Logo_Ayuda_En_Accion";
+import { meses } from '../../helpers/simple';
 
-export const exportToExcel = async (indicadores, totales, additionalRows, getValues, subproyectos, usersTecnicos, ubicacionesSelect, implementadoresSelect, meses, ano) => {
+export const exportToExcel = async (indicadores, totales, additionalRows, getValues, subproyectos, financiadoresSelect, ano) => {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('METAS');
 
@@ -29,7 +31,7 @@ export const exportToExcel = async (indicadores, totales, additionalRows, getVal
     // Añadir un título
     let titleRow = worksheet.addRow([]);
     let titleCell = titleRow.getCell(3);
-    titleCell.value = `METAS TÉCNICAS PROGRAMÁTICAS`;
+    titleCell.value = `METAS PRESUPUESTO`;
     titleCell.font = { bold: true, size: 16 };
     titleCell.alignment = { horizontal: 'center' };
     worksheet.mergeCells('D3:O3');
@@ -49,14 +51,14 @@ export const exportToExcel = async (indicadores, totales, additionalRows, getVal
     tercerTitleCell.font = { bold: true, size: 14 };
     tercerTitleCell.alignment = { horizontal: 'center' };
     worksheet.mergeCells('D5:O5');
-    
+
     // Agregar 5 filas vacías al inicio
     for (let i = 0; i < 2; i++) {
         worksheet.addRow([]);
     }
 
     // Definir los encabezados
-    const headers = ['CODIGO', 'NOMBRE', 'UNIDAD', 'TIPO_VALOR', 'TÉCNICO', 'IMPLEMENTADOR', 'UBICACION', ...meses, 'TOTAL'];
+    const headers = ['CODIGO', 'NOMBRE', 'UNIDAD', 'FINANCIADOR', 'IMPLEMENTADOR', 'UBICACION', ...meses, 'TOTAL'];
     worksheet.columns = headers.map(header => ({ key: header, width: 15 }));
 
     // Insertar una columna vacía al principio
@@ -68,7 +70,7 @@ export const exportToExcel = async (indicadores, totales, additionalRows, getVal
         cell.value = header;
     
         // Establecer el color de fondo y el color del texto para los dos primeros encabezados
-        if (index < 7) {
+        if (index < 6) {
             cell.fill = {
                 type: 'pattern',
                 pattern: 'solid',
@@ -99,7 +101,7 @@ export const exportToExcel = async (indicadores, totales, additionalRows, getVal
             ...meses.reduce((obj, mes, i) => {
                 obj[mes] = Object.entries(totales)
                     .filter(([key]) => key.startsWith(`${indicador.indAno}_${indicador.indCod}`) && key.endsWith(String(i+1).padStart(2, '0')))
-                    .reduce((sum, [, value]) => sum + value, 0);
+                    .reduce((sum, [, value]) => sum + (Number(value) || 0), 0)
                 return obj;
             }, {}),
             'TOTAL': Object.entries(totales)
@@ -107,10 +109,6 @@ export const exportToExcel = async (indicadores, totales, additionalRows, getVal
                 .reduce((sum, [, value]) => sum + (Number(value) || 0), 0)
         };
         const rowIndex = worksheet.addRow(row).number;
-
-        // Obtén la celda combinada y aplica el estilo de alineación centrado
-        const mergedCell = worksheet.getCell(`H${rowIndex}`);
-        mergedCell.value = 'TOTALES:'; // Establece el valor de la celda combinada
 
         // Aplicar el formato de número a las celdas numéricas (columna 3 en adelante)
         const rowExcel = worksheet.getRow(rowIndex);
@@ -123,37 +121,43 @@ export const exportToExcel = async (indicadores, totales, additionalRows, getVal
                 };
                 cell.font = { bold: true }; 
             }
-            if (colNumber >= 9) {
-                cell.numFmt = '#,##0';
+            if (colNumber >= 8) {
+                cell.numFmt = '#,##0.00 $';
                 cell.alignment = { horizontal: 'center', vertical: 'middle' };
             }
         });
 
+        // Combinar las celdas horizontalmente para el nombre del indicador principal
+        worksheet.mergeCells(`C${rowIndex}:E${rowIndex}`);
+
         // Agregar las filas adicionales para este indicador
         additionalRows.filter(row => row.indAno === indicador.indAno && row.indCod === indicador.indCod).forEach(additionalRow => {
-            const { usuAno, usuCod } = JSON.parse(getValues(`tecnico_${additionalRow.id}`));
-            const { ubiAno, ubiCod } = JSON.parse(getValues(`ubicacion_${additionalRow.id}`));
-            const userTecnico = usersTecnicos.find(user => user.usuAno === usuAno && user.usuCod === usuCod);
-            const ubicacion = ubicacionesSelect.find(item => item.ubiAno === ubiAno && item.ubiCod === ubiCod);
-            const impCod = getValues(`implementador_${additionalRow.id}`);
-            const implementador = implementadoresSelect.find(imp => imp.impCod === impCod);
+            const finCod = getValues(`financiador_${additionalRow.id}`);
+            const financiador = finCod ? financiadoresSelect.find(fin => fin.finCod === finCod) : '';
+            const implementador = getValues(`implementador_${additionalRow.id}`)?.toUpperCase()
+            const ubicacion = getValues(`nombreUbicacion_${additionalRow.id}`)?.toUpperCase()
 
             const additionalRowData = {
                 'CODIGO': indicador.indNum,
                 'NOMBRE': indicador.indNom,
                 'UNIDAD': indicador.uniNom,
-                'TIPO_VALOR': indicador.tipValNom,
-                'TÉCNICO': userTecnico ? (userTecnico.usuNom + ' ' + userTecnico.usuApe) : '',
-                'IMPLEMENTADOR': implementador ? implementador.impNom : '',
-                'UBICACION': ubicacion ? ubicacion.ubiNom : '',
+                'FINANCIADOR': financiador ? financiador.finNom : '',
+                'IMPLEMENTADOR': implementador,
+                'UBICACION': ubicacion,
                 ...meses.reduce((obj, mes, i) => {
                     const fieldValue = getValues(`mes_${String(i+1).padStart(2, '0')}_${additionalRow.id}`);
-                    obj[mes] = Number(fieldValue) || 0;
+                    const metaValue = getValues(`meta_${String(i+1).padStart(2, '0')}_${additionalRow.id}`);
+                    // Solo agregar el valor a la celda si está asociado a una meta
+                    if (metaValue) {
+                        obj[mes] = Number(fieldValue) || 0;
+                    } else {
+                        obj[mes] = '';
+                    }
                     return obj;
                 }, {}),
                 'TOTAL': Object.entries(totales)
                     .filter(([key]) => key.startsWith(`${additionalRow.id}`) && key.endsWith('_total'))
-                    .reduce((sum, [, value]) => sum + value, 0)
+                    .reduce((sum, [, value]) => sum + (Number(value) || 0), 0)
             };
             const additionalRowExcel = worksheet.addRow(additionalRowData);
 
@@ -166,8 +170,8 @@ export const exportToExcel = async (indicadores, totales, additionalRows, getVal
                         fgColor: { argb: 'F3F3F3' }
                     };
                 }
-                if (colNumber >= 9) {
-                    cell.numFmt = '#,##0';
+                if (colNumber >= 8) {
+                    cell.numFmt = '#,##0.00 $';
                     cell.alignment = { horizontal: 'center', vertical: 'middle' };
                 }
             });
@@ -177,5 +181,5 @@ export const exportToExcel = async (indicadores, totales, additionalRows, getVal
     // Crear el archivo de Excel y descargarlo
     const buffer = await workbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    saveAs(blob, `METAS_PROGRAMATICAS_${Date.now()}.xlsx`);
+    saveAs(blob, `METAS_PRESUPUESTO_${Date.now()}.xlsx`);
 };

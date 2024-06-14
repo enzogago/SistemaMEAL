@@ -337,17 +337,16 @@ export const Export_Excel_Basic = async (data, headersExcel, active, isPresupues
     titleCell.alignment = { horizontal: 'center' };
     worksheet.mergeCells('D3:M3');
     
-    worksheet.addRow([]);
     // Añadir un segundo título
     let secondTitleRow = worksheet.addRow([]);
     let secondTitleCell = secondTitleRow.getCell(3);
     secondTitleCell.value = selectedSubproject || '';
     secondTitleCell.font = { bold: true, size: 14 };
     secondTitleCell.alignment = { horizontal: 'center' };
-    worksheet.mergeCells('D5:M5');
+    worksheet.mergeCells('D4:M4');
 
     // Añadir filas vacías
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 2; i++) {
         worksheet.addRow([]);
     }
     // Crear la fila para los encabezados

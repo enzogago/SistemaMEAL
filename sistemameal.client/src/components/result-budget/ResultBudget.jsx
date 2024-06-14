@@ -173,8 +173,6 @@ const ResultChain = () => {
                 fetchDataReturn(`Indicador/ubicacion-actividad/${subProAno}/${subProCod}`),
                 fetchDataReturn(`Indicador/subproyecto-actividad/${subProAno}/${subProCod}`)
             ]).then(([dataPorAno, dataPorImplementador, dataPorFinanciador, dataPorUbicacion, dataSubproyecto]) => {
-                // Procesa los datos recibidos de cada petición
-    
                 // Establece los indicadores con los datos de la última petición
                 setIndicadores(dataSubproyecto);
         
@@ -191,14 +189,12 @@ const ResultChain = () => {
                 setIndTotPreState(initialIndTotPreState);
                 setTotalIndTotPre(initialTotalIndTotPre);
 
-
                 if (dataPorFinanciador.length > 0) {
                     // Obtén el valor de monSim del primer registro
                     const firstMonSim = dataPorFinanciador[0].monSim;
             
                     // Verifica si todos los registros tienen el mismo valor de monSim
                     const allSameMonSim = dataPorFinanciador.every(record => record.monSim === firstMonSim);
-            
                     // Si todos los registros tienen el mismo valor de monSim, establece currency en ese valor
                     // Si no, establece currency en '€'
                     setCurrency(allSameMonSim ? firstMonSim : '€');
@@ -446,6 +442,7 @@ const ResultChain = () => {
                 '#': index+1,
                 'CÓDIGO': item.indNum,
                 'NOMBRE': item.indNom.charAt(0).toUpperCase() + item.indNom.slice(1).toLowerCase(),
+                'UNIDAD': item.uniNom.charAt(0).toUpperCase() + item.uniNom.slice(1).toLowerCase(),
             };
             let inputLineaBase = document.querySelector(`input[name="total_${item.indAno}_${item.indCod}"]`);
             if (inputLineaBase){
@@ -473,7 +470,7 @@ const ResultChain = () => {
         });
     
         // Definir los encabezados
-        let headersExcel = ['#', 'CÓDIGO', 'NOMBRE','TOTAL_PRESUPUESTO', ...headers.map(header => header.name)];
+        let headersExcel = ['#', 'CÓDIGO', 'NOMBRE', 'UNIDAD','TOTAL_PRESUPUESTO', ...headers.map(header => header.name)];
 
         // Obtener el valor seleccionado del subproyecto con getValues
         const selectedSubprojectValue = getValues('subproyecto');
@@ -519,7 +516,7 @@ const ResultChain = () => {
                 </div>
                 {
                     actions.excel &&
-                    <div className={`PowerMas_Dropdown_Export Large_3 ${dropdownOpen ? 'open' : ''}`}>
+                    <div className={`PowerMas_Dropdown_Export Phone_2 ${dropdownOpen ? 'open' : ''}`}>
                         <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>Exportar <Expand className='Large_1' /></button>
                         <div className="PowerMas_Dropdown_Export_Content Phone_12">
                             <a onClick={() => {

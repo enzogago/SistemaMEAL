@@ -9,6 +9,7 @@ import { fetchDataReturn } from '../../reusable/fetchs';
 import useEntityActions from '../../../hooks/useEntityActions';
 import TableEmpty from '../../../img/PowerMas_TableEmpty.svg';
 import { exportToExcel } from '../../../helpers/goals';
+import Info from '../../../icons/Info';
 
 const ResultGoal = () => {
     // Estados relacionados con la interfaz de usuario
@@ -40,6 +41,11 @@ const ResultGoal = () => {
     const [isFormValid, setIsFormValid] = useState(false);
 
     const actions = useEntityActions('METAS MENSUALES');
+
+    const [popupInfo, setPopupInfo] = useState({ visible: false, data: null });
+    const handleClickInside = (e) => {
+        e.stopPropagation();
+    };
 
     const { 
         register,
@@ -74,6 +80,8 @@ const ResultGoal = () => {
     }, [watch('subproyecto')]);
     
     useEffect(() => {
+        setPopupInfo({ visible: false, data: null })
+
         const subproyecto = watch('subproyecto');
         const ano = watch('metAnoPlaTec');
 
@@ -126,7 +134,6 @@ const ResultGoal = () => {
                 metaData.forEach(meta => {
                     // Usa meta.impCod, la ubicación y el indicador para crear una clave única para cada fila
                     const rowKey = `${meta.impCod}_${JSON.stringify({ ubiAno: meta.ubiAno, ubiCod: meta.ubiCod })}_${meta.indAno}_${meta.indCod}`;
-                    console.log(rowKey)
                     if (!rows[rowKey]) {
                         counter++;
                     }
@@ -166,6 +173,7 @@ const ResultGoal = () => {
                             indAno: meta.indAno,
                             indCod: meta.indCod,
                             indNum: meta.indNum,
+                            uniNom: meta.uniNom,
                             cells: [],
                         };
                     }
@@ -174,7 +182,6 @@ const ResultGoal = () => {
                     rows[rowKey].cells.push(inputValues);
                 });
                 const filas = Object.values(rows);
-                console.log(filas)
                 setAdditionalRows(filas);
                 setRowIdCounter(counter+1);
 
@@ -186,30 +193,27 @@ const ResultGoal = () => {
                         groupedImplementadorData[key] = {};
                     }
 
-                    groupedImplementadorData[key][item.impCod] = item.cadResImpMetTec;
+                    groupedImplementadorData[key][item.impCod] = { name: item.impNom, value: item.cadResImpMetTec ? item.cadResImpMetTec : 0 }
                 });
 
                 let groupedUbicacionData = {};
                 cadenaUbicacionData.forEach(item => {
                     let key = `${item.indAno}-${item.indCod}`;
                     if (!groupedUbicacionData[key]) {
-                        groupedUbicacionData[key] = {};
+                        groupedUbicacionData[key] = [];
                     }
-                    groupedUbicacionData[key][`${item.ubiAno}-${item.ubiCod}`] = item.cadResUbiMetTec;
+                    groupedUbicacionData[key][`${item.ubiAno}-${item.ubiCod}`] = { name: item.ubiNom, value: item.cadResUbiMetTec ? item.cadResUbiMetTec : 0 }
                 });
 
                 let groupedPeriodoData = {};
                 cadenaPeriodoData.forEach(item => {
                     let key = `${item.indAno}-${item.indCod}`;
-                    groupedPeriodoData[key]  = item.cadResPerMetTec;
+                    groupedPeriodoData[key]  = item.cadResPerMetTec ? item.cadResPerMetTec : 0;
                 });
 
                 setCadenaPeriodoGrouped(groupedPeriodoData);
                 setCadenaUbicacionGrouped(groupedUbicacionData);
                 setCadenaImplementadorGrouped(groupedImplementadorData);
-                console.log(groupedPeriodoData);
-                console.log(groupedUbicacionData);
-                console.log(groupedImplementadorData);
             }).catch(error => {
                 // Maneja los errores
                 console.error('Error:', error);
@@ -373,7 +377,7 @@ const ResultGoal = () => {
         const implementadorValue = watch(`implementador_${row.id}`);
         const ubicacionValue = watch(`ubicacion_${row.id}`);
     
-        if (implementadorValue === '0' || ubicacionValue === '') {
+        if (implementadorValue === '0' || ubicacionValue === '0') {
             return true;
         }
     
@@ -412,31 +416,30 @@ const ResultGoal = () => {
         totalPorPeriodo = totalPorPeriodo - prevValue + Number(newValue);
     
         // Obtén los límites máximos específicos para implementador y ubicación
-        const maxImplementador = cadenaImplementadorGrouped[`${row.indAno}-${row.indCod}`][implementadorValue];
-        const maxUbicacion = cadenaUbicacionGrouped[`${row.indAno}-${row.indCod}`][`${ubiAno}-${ubiCod}`];
+        const maxImplementador = cadenaImplementadorGrouped[`${row.indAno}-${row.indCod}`][implementadorValue].value;
+        const maxUbicacion = cadenaUbicacionGrouped[`${row.indAno}-${row.indCod}`][`${ubiAno}-${ubiCod}`].value;
         const maxPeriodo = cadenaPeriodoGrouped[`${row.indAno}-${row.indCod}`];
-
-        
         
         // Valida contra los máximos específicos
         if (totalPorImplementador > maxImplementador) {
             const implementador = implementadoresSelect.find(imp => imp.impCod === implementadorValue);
             const implementadorNom = implementador.impNom.charAt(0) + implementador.impNom.slice(1).toLowerCase();
+            const unidadNom = row.uniNom.charAt(0) + row.uniNom.slice(1).toLowerCase();
 
-            Notiflix.Report.warning('Advertencia', `La meta del implementador ${implementadorNom} es ${totalPorImplementador}, pero en la cadena de resultado se estableció en ${maxImplementador}. Por favor ajuste la distribución correctamente.`, 'Aceptar');
+            Notiflix.Report.warning('Advertencia', `La meta del implementador ${implementadorNom} es ${totalPorImplementador} ${unidadNom}, pero en la cadena de resultado se estableció en ${maxImplementador} ${unidadNom}. Por favor ajuste la distribución correctamente.`, 'Aceptar');
             return false;
         }
         if (totalPorUbicacion > maxUbicacion) {
             const ubicacion = ubicacionesSelect.find(item => item.ubiAno === ubiAno && item.ubiCod === ubiCod);
             const ubicacionNom = ubicacion.ubiNom.charAt(0) + ubicacion.ubiNom.slice(1).toLowerCase();
 
-            Notiflix.Report.warning('Advertencia', `La meta de la ubicación ${ubicacionNom} es ${totalPorUbicacion}, pero en la cadena de resultado se estableció en ${maxUbicacion}. Por favor ajuste la distribución correctamente.`, 'Aceptar');
+            Notiflix.Report.warning('Advertencia', `La meta de la ubicación ${ubicacionNom} es ${totalPorUbicacion} ${unidadNom}, pero en la cadena de resultado se estableció en ${maxUbicacion} ${unidadNom}. Por favor ajuste la distribución correctamente.`, 'Aceptar');
             return false;
         }
         if (totalPorPeriodo > maxPeriodo) {
             const ano = watch('metAnoPlaTec');
 
-            Notiflix.Report.warning('Advertencia', `La meta del periodo ${ano} es ${totalPorPeriodo}, pero en la cadena de resultado se estableció en ${maxPeriodo}. Por favor ajuste la distribución correctamente.`, 'Aceptar');
+            Notiflix.Report.warning('Advertencia', `La meta del periodo ${ano} es ${totalPorPeriodo} ${unidadNom}, pero en la cadena de resultado se estableció en ${maxPeriodo} ${unidadNom}. Por favor ajuste la distribución correctamente.`, 'Aceptar');
             return false;
         }
     
@@ -445,7 +448,7 @@ const ResultGoal = () => {
     };
     
     return (
-        <div className='p1 flex flex-column flex-grow-1 overflow-auto content-block'>
+        <div className='p1 flex flex-column flex-grow-1 overflow-auto content-block relative'>
             <h1 className="Large-f1_5"> Metas técnicas programáticas </h1>
             <div className='flex jc-space-between gap-1 p_5'>
                 <div className="flex-grow-1">
@@ -470,7 +473,7 @@ const ResultGoal = () => {
                         ))}
                     </select>
                 </div>
-                <div>
+                <div className='Phone_2'>
                     <select 
                         id='metAnoPlaTec'
                         style={{margin: '0'}}
@@ -489,7 +492,7 @@ const ResultGoal = () => {
                 </div>
                 {
                     actions.excel &&
-                    <div className={`PowerMas_Dropdown_Export Large_3 ${dropdownOpen ? 'open' : ''}`}>
+                    <div className={`PowerMas_Dropdown_Export Phone_2 ${dropdownOpen ? 'open' : ''}`}>
                         <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>
                             Exportar 
                             <span className="flex">
@@ -498,7 +501,7 @@ const ResultGoal = () => {
                             </button>
                         <div className="PowerMas_Dropdown_Export_Content Phone_12">
                             <a onClick={() => {
-                                exportToExcel(indicadores, totals, additionalRows, getValues, subproyectos, usersTecnicos, ubicacionesSelect, implementadoresSelect, meses);
+                                exportToExcel(indicadores, totals, additionalRows, getValues, subproyectos, usersTecnicos, ubicacionesSelect, implementadoresSelect, meses, watch('metAnoPlaTec'));
                                 setDropdownOpen(false);
                             }} className='flex jc-space-between p_5'>Excel <img className='Large_1' src={Excel_Icon} alt="" /> </a>
                         </div>
@@ -511,7 +514,7 @@ const ResultGoal = () => {
                     <table className="PowerMas_TableStatus ">
                         <thead>
                             <tr style={{zIndex: '1'}}>
-                                <th className='center' colSpan={2}></th>
+                                <th className='center' colSpan={3}></th>
                                 <th style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}>Código</th>
                                 <th>Nombre</th>
                                 <th>Unidad</th>
@@ -562,6 +565,23 @@ const ResultGoal = () => {
                                                 > + </button>
                                             }
                                         </td>
+                                        <td>
+                                            <span 
+                                                className="f1_25 pointer flex"
+                                                style={{minWidth: '20px'}}
+                                                onClick={() => {
+                                                    const data = {
+                                                        periodo: cadenaPeriodoGrouped[`${item.indAno}-${item.indCod}`],
+                                                        implementador: cadenaImplementadorGrouped[`${item.indAno}-${item.indCod}`],
+                                                        ubicacion: cadenaUbicacionGrouped[`${item.indAno}-${item.indCod}`],
+                                                        indNum: item.indNum,
+                                                    };
+                                                    setPopupInfo({ visible: true, data });
+                                                }}
+                                            >
+                                                <Info />
+                                            </span>
+                                        </td>
                                         <td style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}>{item.indNum}</td>
                                         {
                                             text.length > 30 ?
@@ -597,8 +617,8 @@ const ResultGoal = () => {
                                     </tr>
                                     {additionalRows.filter(row => row.indAno === item.indAno && row.indCod === item.indCod).map((row, rowIndex) => (
                                         <tr key={`${row.indAno}_${row.indCod}_${row.id}`} style={{visibility: expandedIndicators.includes(`${item.indAno}_${item.indCod}`) ? 'visible' : 'collapse'}}>
-                                            <td ></td>
-                                            <td>
+                                            <td></td>
+                                            <td colSpan={2} className='center'>
                                                 {
                                                     actions.add &&
                                                     <button 
@@ -633,7 +653,7 @@ const ResultGoal = () => {
                                                 }
                                             </td>
                                             <td style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}></td>
-                                            <td>
+                                            <td className='center'>
                                                 <select 
                                                     style={{textTransform: 'capitalize', margin: '0'}}
                                                     id={`tecnico_${row.id}`}
@@ -655,7 +675,7 @@ const ResultGoal = () => {
                                                     ))}
                                                 </select>
                                             </td>
-                                            <td>
+                                            <td className='center'>
                                                 <select 
                                                     style={{textTransform: 'capitalize', margin: '0'}}
                                                     id={`implementador_${row.id}`}
@@ -713,7 +733,7 @@ const ResultGoal = () => {
                                                     ))}
                                                 </select>
                                             </td>
-                                            <td>
+                                            <td className='center'>
                                                 <select 
                                                     style={{textTransform: 'capitalize', margin: '0'}}
                                                     id={`ubicacion_${row.id}`}
@@ -849,6 +869,45 @@ const ResultGoal = () => {
                     </button>
                 </div>
             }
+            {popupInfo.visible && popupInfo.data && (
+                <div
+                    className='PowerMas_Popup_Cadena p1_25 flex flex-column gap_25' 
+                    onClick={handleClickInside}
+                >
+                    <span 
+                        className="bold f1_5 pointer"
+                        style={{
+                            color: '#AAAAAA',
+                            position: 'absolute',
+                            top: 0,
+                            right: '0.5rem',
+                        }}
+                        onClick={() => setPopupInfo({ visible: false, data: null })}
+                    >
+                        ×
+                    </span>
+                    <div>
+                        <h5 className='center' style={{textDecoration: 'underline'}}>CADENA DE RESULTADO PARA</h5>
+                        <h5 className='center' style={{textDecoration: 'underline'}}>EL INDICADOR: {popupInfo.data.indNum}</h5>
+                    </div>
+                    <div>
+                        <h4 className='f1'>IMPLEMENTADORES:</h4>
+                        {Object.values(popupInfo.data.implementador).map((item, index) => (
+                            <p className='f1' key={index}>{item.name}: {item.value}</p>
+                        ))}
+                    </div>
+                    <div>
+                        <h4 className='f1'>UBICACIONES:</h4>
+                        {Object.values(popupInfo.data.ubicacion).map((item, index) => (
+                            <p className='f1' key={index}>{item.name}: {item.value}</p>
+                        ))}
+                    </div>
+                    <div>
+                        <h4 className='f1'>PERIODO:</h4>
+                        <p className='f1'>{watch('metAnoPlaTec')} : {popupInfo.data.periodo}</p>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

@@ -397,16 +397,40 @@ const ResultChain = () => {
         }
     };
 
-    const calculateTotal = (indAno, indCod, activeButton, totals) => {
-        return Object.entries(totals)
-            .filter(([key]) => key.startsWith(`${indAno}_${indCod}_`) && key.endsWith(`_${activeButton}`))
-            .reduce((total, [key, value]) => total + Number(value), 0);
+    const calculateTotal = (indAno, indCod, section, totals, tipValCod) => {
+        const values = Object.entries(totals)
+            .filter(([key]) => key.startsWith(`${indAno}_${indCod}_`) && key.endsWith(`_${section}`))
+            .map(([, value]) => Number(value));
+    
+        if (tipValCod === '01') {
+            // Si el código es '01', calcula la suma de los valores
+            return values.reduce((total, value) => total + value, 0);
+        } else if (tipValCod === '02') {
+            // Si el código es '02', calcula el promedio de los valores
+            const sum = values.reduce((total, value) => total + value, 0);
+            return values.length > 0 ? sum / values.length : 0;
+        }
     }
+
+    // const calculateTotal = (indAno, indCod, section, totals, tipValCod) => {
+    //     const values = Object.entries(totals)
+    //         .filter(([key]) => key.startsWith(`${indAno}_${indCod}_`) && key.endsWith(`_${section}`))
+    //         .map(([, value]) => Number(value));
+    
+    //     if (tipValCod === '01') {
+    //         // Si el código es '01', calcula la suma de los valores
+    //         return values.reduce((total, value) => total + value, 0);
+    //     } else if (tipValCod === '02') {
+    //         // Si el código es '02', calcula el promedio de los valores que no son cero
+    //         const nonZeroValues = values.filter(value => value !== 0);
+    //         const sum = nonZeroValues.reduce((total, value) => total + value, 0);
+    //         return nonZeroValues.length > 0 ? sum / nonZeroValues.length : 0;
+    //     }
+    // }
     
     // Función para manejar la exportación a Excel.
     const Export_Excel = () => {
         let data = indicadores.map((item, index) => {
-            console.log(item)
             const rowData = {
                 '#': index+1,
                 'CÓDIGO': item.indNum,
@@ -422,11 +446,11 @@ const ResultChain = () => {
             headers.forEach(header => {
                 let inputValue;
                 if (header.key === 'totalPorAno') {
-                    inputValue = calculateTotal(item.indAno, item.indCod, 'porAno', totalsPorAnoAll);
+                    inputValue = calculateTotal(item.indAno, item.indCod, 'porAno', totalsPorAnoAll, item.tipValCod);
                 } else if (header.key === 'totalPorImplementador') {
-                    inputValue = calculateTotal(item.indAno, item.indCod, 'porImplementador', totalsPorImplementador);
+                    inputValue = calculateTotal(item.indAno, item.indCod, 'porImplementador', totalsPorImplementador, item.tipValCod);
                 } else if (header.key === 'totalPorUbicacion') {
-                    inputValue = calculateTotal(item.indAno, item.indCod, 'porUbicacion', totalsPorUbicacion);
+                    inputValue = calculateTotal(item.indAno, item.indCod, 'porUbicacion', totalsPorUbicacion, item.tipValCod);
                 } else {
                     inputValue = document.querySelector(`input[name="${item.indAno}_${item.indCod}_${header.key}"]`);
                     if (inputValue){
@@ -486,7 +510,7 @@ const ResultChain = () => {
                 </div>
                 {
                     actions.excel &&
-                    <div className={`PowerMas_Dropdown_Export Large_3 ${dropdownOpen ? 'open' : ''}`}>
+                    <div className={`PowerMas_Dropdown_Export Phone_2 ${dropdownOpen ? 'open' : ''}`}>
                         <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={toggleDropdown}>Exportar <Expand /></button>
                         <div className="PowerMas_Dropdown_Export_Content Phone_12">
                             <a onClick={() => {
@@ -619,7 +643,7 @@ const ResultChain = () => {
                                             if (header.key === 'totalPorAno') {
                                                 return (
                                                     <td className='center PowerMas_Borde_Total' style={{color: '#F87C56'}} key={i}>
-                                                        {calculateTotal(item.indAno, item.indCod, 'porAno', totalsPorAnoAll)}
+                                                        {calculateTotal(item.indAno, item.indCod, 'porAno', totalsPorAnoAll, item.tipValCod)}
                                                         <Tooltip
                                                             title="Los totales no coinciden."
                                                             open={`${item.indAno}_${item.indCod}` === unmatchedTotal.key && header.key.startsWith(unmatchedTotal.section)}
@@ -632,7 +656,7 @@ const ResultChain = () => {
                                             } else if (header.key === 'totalPorImplementador') {
                                                 return (
                                                     <td className='center PowerMas_Borde_Total' style={{color: '#F87C56'}} key={i}>
-                                                        {calculateTotal(item.indAno, item.indCod, 'porImplementador', totalsPorImplementador)}
+                                                        {calculateTotal(item.indAno, item.indCod, 'porImplementador', totalsPorImplementador, item.tipValCod)}
                                                         <Tooltip
                                                             title="Los totales no coinciden."
                                                             open={`${item.indAno}_${item.indCod}` === unmatchedTotal.key && header.key.startsWith(unmatchedTotal.section)}
@@ -645,7 +669,7 @@ const ResultChain = () => {
                                             } else if (header.key === 'totalPorUbicacion') {
                                                 return (
                                                     <td className='center PowerMas_Borde_Total' style={{color: '#F87C56'}} key={i}>
-                                                        {calculateTotal(item.indAno, item.indCod, 'porUbicacion', totalsPorUbicacion)}
+                                                        {calculateTotal(item.indAno, item.indCod, 'porUbicacion', totalsPorUbicacion, item.tipValCod)}
                                                         <Tooltip
                                                             title="Los totales no coinciden."
                                                             open={`${item.indAno}_${item.indCod}` === unmatchedTotal.key && header.key.startsWith(unmatchedTotal.section)}
@@ -700,9 +724,9 @@ const ResultChain = () => {
                                                             }
 
                                                             // Después de actualizar los totales, calcula los nuevos totales para cada sección
-                                                            const newTotalPorAno = calculateTotal(item.indAno, item.indCod, 'porAno', newTotalsPorAnoAll);
-                                                            const newTotalPorImplementador = calculateTotal(item.indAno, item.indCod, 'porImplementador', newTotalsPorImplementador);
-                                                            const newTotalPorUbicacion = calculateTotal(item.indAno, item.indCod, 'porUbicacion', newTotalsPorUbicacion);
+                                                            const newTotalPorAno = calculateTotal(item.indAno, item.indCod, 'porAno', newTotalsPorAnoAll, item.tipValCod);
+                                                            const newTotalPorImplementador = calculateTotal(item.indAno, item.indCod, 'porImplementador', newTotalsPorImplementador, item.tipValCod);
+                                                            const newTotalPorUbicacion = calculateTotal(item.indAno, item.indCod, 'porUbicacion', newTotalsPorUbicacion, item.tipValCod);
                                                             
                                                             // Comprueba si los totales de las cuatro secciones son iguales
                                                             if (newTotalPorAno === newTotalPorImplementador && newTotalPorAno === newTotalPorUbicacion) {
