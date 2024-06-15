@@ -1338,7 +1338,6 @@ textarea {
 	transition: color 0.3s ease;
 	position: absolute;
 	right: 30px;
-	border: 1px solid black;
 }
 
 .PowerMas_CloseModal:hover,

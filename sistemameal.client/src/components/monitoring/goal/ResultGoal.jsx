@@ -132,6 +132,7 @@ const ResultGoal = () => {
                 const rows = {};
                 let counter = rowIdCounter;
                 metaData.forEach(meta => {
+                    console.log(meta)
                     // Usa meta.impCod, la ubicación y el indicador para crear una clave única para cada fila
                     const rowKey = `${meta.impCod}_${JSON.stringify({ ubiAno: meta.ubiAno, ubiCod: meta.ubiCod })}_${meta.indAno}_${meta.indCod}`;
                     if (!rows[rowKey]) {
@@ -419,7 +420,7 @@ const ResultGoal = () => {
         const maxImplementador = cadenaImplementadorGrouped[`${row.indAno}-${row.indCod}`][implementadorValue].value;
         const maxUbicacion = cadenaUbicacionGrouped[`${row.indAno}-${row.indCod}`][`${ubiAno}-${ubiCod}`].value;
         const maxPeriodo = cadenaPeriodoGrouped[`${row.indAno}-${row.indCod}`];
-        
+        console.log(row)
         // Valida contra los máximos específicos
         if (totalPorImplementador > maxImplementador) {
             const implementador = implementadoresSelect.find(imp => imp.impCod === implementadorValue);
@@ -557,7 +558,7 @@ const ResultGoal = () => {
                                                     style={{backgroundColor: 'transparent', border: 'none'}} 
                                                     onClick={() => {
                                                         setRowIdCounter(rowIdCounter + 1);
-                                                        setAdditionalRows([...additionalRows, { id: `${item.indAno}_${item.indCod}_${rowIdCounter}`, indAno: item.indAno, indCod: item.indCod, indNum: item.indNum }]);
+                                                        setAdditionalRows([...additionalRows, { id: `${item.indAno}_${item.indCod}_${rowIdCounter}`, indAno: item.indAno, indCod: item.indCod, indNum: item.indNum, uniNom: item.uniNom }]);
                                                         if (!expandedIndicators.includes(`${item.indAno}_${item.indCod}`)) {
                                                             setExpandedIndicators([...expandedIndicators, `${item.indAno}_${item.indCod}`]);
                                                         }

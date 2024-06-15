@@ -406,27 +406,12 @@ const ResultChain = () => {
             // Si el código es '01', calcula la suma de los valores
             return values.reduce((total, value) => total + value, 0);
         } else if (tipValCod === '02') {
-            // Si el código es '02', calcula el promedio de los valores
-            const sum = values.reduce((total, value) => total + value, 0);
-            return values.length > 0 ? sum / values.length : 0;
+            // Si el código es '02', calcula el promedio de los valores que no son cero
+            const nonZeroValues = values.filter(value => value !== 0);
+            const sum = nonZeroValues.reduce((total, value) => total + value, 0);
+            return nonZeroValues.length > 0 ? sum / nonZeroValues.length : 0;
         }
     }
-
-    // const calculateTotal = (indAno, indCod, section, totals, tipValCod) => {
-    //     const values = Object.entries(totals)
-    //         .filter(([key]) => key.startsWith(`${indAno}_${indCod}_`) && key.endsWith(`_${section}`))
-    //         .map(([, value]) => Number(value));
-    
-    //     if (tipValCod === '01') {
-    //         // Si el código es '01', calcula la suma de los valores
-    //         return values.reduce((total, value) => total + value, 0);
-    //     } else if (tipValCod === '02') {
-    //         // Si el código es '02', calcula el promedio de los valores que no son cero
-    //         const nonZeroValues = values.filter(value => value !== 0);
-    //         const sum = nonZeroValues.reduce((total, value) => total + value, 0);
-    //         return nonZeroValues.length > 0 ? sum / nonZeroValues.length : 0;
-    //     }
-    // }
     
     // Función para manejar la exportación a Excel.
     const Export_Excel = () => {
@@ -481,6 +466,19 @@ const ResultChain = () => {
     
         Export_Excel_Basic(data, headersExcel, 'GENERAL', false, title);
     };
+
+    function calcularTotalIndicador(valores, tipValCod) {
+        if (tipValCod === '02') {
+            // Calcular el promedio para el indicador, solo con valores no cero
+            const sumaValores = valores.reduce((a, b) => a + b, 0);
+            const cantidadValores = valores.length;
+            return cantidadValores > 0 ? sumaValores / cantidadValores : 0;
+        } else {
+            // Sumar los valores para el indicador
+            return valores.reduce((a, b) => a + b, 0);
+        }
+    }
+    
     
     return (
         <div className='p1 flex flex-column flex-grow-1 overflow-auto gap_25'>
@@ -580,7 +578,7 @@ const ResultChain = () => {
                                         <td>{index+1}</td>
                                         <td>{item.indNum}</td>
                                         {
-                                            text.length > 30 ?
+                                            text.length > 25 ?
                                             <td className='' 
                                             data-tooltip-id="info-tooltip" 
                                             data-tooltip-content={text} 
@@ -589,7 +587,7 @@ const ResultChain = () => {
                                             <td className=''>{text}</td>
                                         }
                                         {
-                                            textUnidad.length > 30 ?
+                                            textUnidad.length > 15 ?
                                             <td className='' 
                                             data-tooltip-id="info-tooltip" 
                                             data-tooltip-content={textUnidad} 
@@ -730,11 +728,32 @@ const ResultChain = () => {
                                                             
                                                             // Comprueba si los totales de las cuatro secciones son iguales
                                                             if (newTotalPorAno === newTotalPorImplementador && newTotalPorAno === newTotalPorUbicacion) {
-                                                                // Si los totales de la fila actual son iguales, comprueba si los totales de todas las filas son iguales
-                                                                const totalPorAnoAll = Object.values(newTotalsPorAnoAll).reduce((a, b) => a + Number(b), 0);
-                                                                const totalPorImplementadorAll = Object.values(newTotalsPorImplementador).reduce((a, b) => a + Number(b), 0);
-                                                                const totalPorUbicacionAll = Object.values(newTotalsPorUbicacion).reduce((a, b) => a + Number(b), 0);
+                                                                let totalPorAnoAll = 0;
+                                                                let totalPorImplementadorAll = 0;
+                                                                let totalPorUbicacionAll = 0;
 
+                                                                indicadores.forEach(indicador => {
+                                                                    // Procesar los totales por año
+                                                                    const valoresAno = Object.entries(newTotalsPorAnoAll)
+                                                                        .filter(([key, _]) => key.startsWith(`${indicador.indAno}_${indicador.indCod}_`))
+                                                                        .map(([_, value]) => Number(value))
+                                                                        .filter(value => value !== 0);
+                                                                    totalPorAnoAll += calcularTotalIndicador(valoresAno, indicador.tipValCod);
+                                                                
+                                                                    // Procesar los totales por implementador
+                                                                    const valoresImplementador = Object.entries(newTotalsPorImplementador)
+                                                                        .filter(([key, _]) => key.startsWith(`${indicador.indAno}_${indicador.indCod}_`))
+                                                                        .map(([_, value]) => Number(value))
+                                                                        .filter(value => value !== 0);
+                                                                    totalPorImplementadorAll += calcularTotalIndicador(valoresImplementador, indicador.tipValCod);
+                                                                
+                                                                    // Procesar los totales por ubicación
+                                                                    const valoresUbicacion = Object.entries(newTotalsPorUbicacion)
+                                                                        .filter(([key, _]) => key.startsWith(`${indicador.indAno}_${indicador.indCod}_`))
+                                                                        .map(([_, value]) => Number(value))
+                                                                        .filter(value => value !== 0);
+                                                                    totalPorUbicacionAll += calcularTotalIndicador(valoresUbicacion, indicador.tipValCod);
+                                                                });
 
                                                                 if (totalPorAnoAll === totalPorImplementadorAll && totalPorAnoAll === totalPorUbicacionAll) {
                                                                     setIsSubmitDisabled(false);
