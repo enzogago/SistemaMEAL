@@ -18,6 +18,7 @@ import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
 import TableEmpty from '../../img/PowerMas_TableEmpty.svg';
 // Hooks personalizados para acciones específicas del componente.
 import useEntityActions from '../../hooks/useEntityActions';
+import { formatterBudget } from '../monitoring/goal/helper';
 
 const ResultChain = () => {
     // Estados relacionados con la interfaz de usuario (UI)
@@ -44,6 +45,7 @@ const ResultChain = () => {
     const actions = useEntityActions('CADENA RESULTADO');
 
     const [refresh, setRefresh] = useState(false)
+    const [currency, setCurrency] = useState('');
 
     useEffect(() => {
         const handleKeyDown = (event) => {
@@ -165,13 +167,22 @@ const ResultChain = () => {
     
             // Realiza todas las peticiones en paralelo
             Promise.all([
+                fetchDataReturn(`Financiador/subproyecto/${subProAno}/${subProCod}`),
                 fetchDataReturn(`Indicador/cadena/${subProAno}/${subProCod}`),
                 fetchDataReturn(`Indicador/implementador/${subProAno}/${subProCod}`),
                 fetchDataReturn(`Indicador/ubicacion/${subProAno}/${subProCod}`),
                 fetchDataReturn(`Indicador/subproyecto/${subProAno}/${subProCod}`)
-            ]).then(([dataPorAno, dataPorImplementador, dataPorUbicacion, dataSubproyecto]) => {
-                // Procesa los datos recibidos de cada petición
-    
+            ]).then(([dataPorFinanciador, dataPorAno, dataPorImplementador, dataPorUbicacion, dataSubproyecto]) => {
+                if (dataPorFinanciador.length > 0) {
+                    // Obtén el valor de monSim del primer registro
+                    const firstMonSim = dataPorFinanciador[0].monSim;
+            
+                    // Verifica si todos los registros tienen el mismo valor de monSim
+                    const allSameMonSim = dataPorFinanciador.every(record => record.monSim === firstMonSim);
+                    // Si todos los registros tienen el mismo valor de monSim, establece currency en ese valor
+                    // Si no, establece currency en '€'
+                    setCurrency(allSameMonSim ? firstMonSim : '€');
+                }
                 // Establece los indicadores con los datos de la última petición
                 setIndicadores(dataSubproyecto);
     
@@ -479,9 +490,8 @@ const ResultChain = () => {
         }
     }
     
-    
     return (
-        <div className='p1 flex flex-column flex-grow-1 overflow-auto gap_25'>
+        <div className='p_75 flex flex-column flex-grow-1 overflow-auto gap_25'>
             <h1 className="Large-f1_5"> Cadena de resultado | Metas técnicas programáticas </h1>
             <div className='flex ai-center jc-space-between p_25 gap-1'>
                 <div className="flex-grow-1">
@@ -496,14 +506,24 @@ const ResultChain = () => {
                         })}
                     >
                         <option value="0">--Seleccione Sub Proyecto--</option>
-                        {subproyectos.map((item, index) => (
-                            <option 
-                                key={index} 
-                                value={JSON.stringify({ subProAno: item.subProAno, subProCod: item.subProCod })}
-                            > 
-                                {item.subProSap + ' - ' + item.subProNom + ' | ' + item.proNom}
-                            </option>
-                        ))}
+                        {subproyectos.map((item, index) => {
+                            // Limita la longitud del texto a 50 caracteres
+                            const maxLength = 100;
+                            let displayText = item.subProSap + ' - ' + item.subProNom + ' | ' + item.proNom;
+                            if (displayText.length > maxLength) {
+                                displayText = displayText.substring(0, maxLength) + '...';
+                            }
+
+                            return (
+                                <option 
+                                    key={index} 
+                                    value={JSON.stringify({ subProAno: item.subProAno, subProCod: item.subProCod })}
+                                    title={item.subProSap + ' - ' + item.subProNom + ' | ' + item.proNom} 
+                                > 
+                                    {displayText}
+                                </option>
+                            )
+                        })}
                     </select>
                 </div>
                 {
@@ -566,7 +586,6 @@ const ResultChain = () => {
                         <tbody>
                             {
                             indicadores.map((item, index) => {
-                                const rowKey = `${item.indAno}_${item.indCod}`;
                                 const text = item.indNom;
                                 const shortText = text.length > 25 ? text.substring(0, 25) + '...' : text;
                                 
@@ -609,9 +628,8 @@ const ResultChain = () => {
                                             />
                                             <input
                                                 className={`
-                                                PowerMas_Input_Cadena Large_12 f_75 
-                                                PowerMas_Cadena_Form_${dirtyFields[`total_${item.indAno}_${item.indCod}`] || isSubmitted ? (errors[`total_${item.indAno}_${item.indCod}`] ? 'invalid' : 'valid') : ''}
-                                                ${false && 'PowerMas_Tooltip_Active'}
+                                                    PowerMas_Input_Cadena Large_12 f_75 
+                                                    PowerMas_Cadena_Form_${dirtyFields[`total_${item.indAno}_${item.indCod}`] || isSubmitted ? (errors[`total_${item.indAno}_${item.indCod}`] ? 'invalid' : 'valid') : ''}
                                                 `} 
                                                 type="text"
                                                 disabled={!actions.add}
@@ -636,7 +654,7 @@ const ResultChain = () => {
                                         {headers.map((header, i) => {
                                             const cellData = renderData[`${item.indAno}_${item.indCod}_${header.key}`];
                                             const defaultValue = cellData ? cellData.value : '';
-                                            const preValue = cellData ? cellData.preValue : null;
+                                            const preValue = cellData && cellData.preValue ? `${formatterBudget.format(cellData.preValue)} ${currency}` : null;
 
                                             if (header.key === 'totalPorAno') {
                                                 return (
@@ -682,7 +700,7 @@ const ResultChain = () => {
                                                 <td key={i}>
                                                     <input
                                                         data-tooltip-id="info-tooltip" 
-                                                        data-tooltip-content={preValue && `Presupuesto: ${preValue}`} 
+                                                        data-tooltip-content={preValue && `PRESUPUESTO: ${preValue}`} 
                                                         className={`
                                                             PowerMas_Input_Cadena Large_12 f_75 
                                                             PowerMas_Cadena_Form_${dirtyFields[`${item.indAno}_${item.indCod}_${header.key}`] || isSubmitted ? (errors[`${item.indAno}_${item.indCod}_${header.key}`] ? 'invalid' : 'valid') : ''}
@@ -809,7 +827,7 @@ const ResultChain = () => {
             </div>
             {
                 actions.add &&
-                <div className='PowerMas_Footer_Box flex flex-column jc-center ai-center p_5 gap_5'>    
+                <div className='PowerMas_Footer_Box flex jc-center ai-center p_25'>    
                     <button 
                         className='PowerMas_Buttom_Primary Large_3 p_5'
                         onClick={handleSubmit(onSubmit)}

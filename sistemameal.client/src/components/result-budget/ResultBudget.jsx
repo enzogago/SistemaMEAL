@@ -18,6 +18,7 @@ import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
 import TableEmpty from '../../img/PowerMas_TableEmpty.svg';
 // Hooks personalizados para acciones específicas del componente.
 import useEntityActions from '../../hooks/useEntityActions';
+import { formatter } from '../monitoring/goal/helper';
 
 const ResultChain = () => {
     const [currency, setCurrency] = useState('');
@@ -205,7 +206,6 @@ const ResultChain = () => {
                 const totalsPorUbicacion = calculateTotalsAll(dataPorUbicacion, 'ubiAno', 'cadResUbiMetPre', 'porUbicacion', 'ubiCod', 'ubi_');
                 const totalsPorFinanciador = calculateTotalsAll(dataPorFinanciador, 'finCod', 'cadResFinMetPre', 'porFinanciador', null, 'fin_');
 
-
                 setTotalsPorAnoAll(totalsPorAno)
                 setTotalsPorImplementador(totalsPorImplementador)
                 setTotalsPorFinanciador(totalsPorFinanciador)
@@ -382,7 +382,6 @@ const ResultChain = () => {
                     cambiosPorIndicador.push(cambio);
                 }
             }
-
         }
 
         if (cambiosPorAno.length === 0 && cambiosPorImplementador.length === 0 && cambiosPorFinanciador.length === 0 && cambiosPorUbicacion.length === 0 && cambiosPorIndicador.length === 0) {
@@ -485,11 +484,11 @@ const ResultChain = () => {
         // Construir el título con los datos del subproyecto seleccionado
         const title = subprojectText ? `${subprojectText.subProSap} - ${subprojectText.subProNom} | ${subprojectText.proNom}` : '';
     
-        Export_Excel_Basic(data, headersExcel, 'GENERAL', false, title);
+        Export_Excel_Basic(data, headersExcel, 'GENERAL', true, title, currency);
     };
     
     return (
-        <div className='p1 flex flex-column flex-grow-1 overflow-auto gap_25'>
+        <div className='p_75 flex flex-column flex-grow-1 overflow-auto gap_25'>
             <h1 className="Large-f1_5"> Cadena de resultado | Metas Presupuesto </h1>
             <div className='flex jc-space-between gap-1 p_5'>
                 <div className="flex-grow-1">
@@ -504,14 +503,24 @@ const ResultChain = () => {
                         })}
                     >
                         <option value="0">--Seleccione Sub Proyecto--</option>
-                        {subproyectos.map((item, index) => (
-                            <option 
-                                key={index} 
-                                value={JSON.stringify({ subProAno: item.subProAno, subProCod: item.subProCod })}
-                            > 
-                                {item.subProSap + ' - ' + item.subProNom.toLowerCase() + ' | ' + item.proNom.toLowerCase()}
-                            </option>
-                        ))}
+                        {subproyectos.map((item, index) => {
+                            // Limita la longitud del texto a 50 caracteres
+                            const maxLength = 100;
+                            let displayText = item.subProSap + ' - ' + item.subProNom + ' | ' + item.proNom;
+                            if (displayText.length > maxLength) {
+                                displayText = displayText.substring(0, maxLength) + '...';
+                            }
+                            
+                            return (
+                                <option 
+                                    key={index} 
+                                    value={JSON.stringify({ subProAno: item.subProAno, subProCod: item.subProCod })}
+                                    title={item.subProSap + ' - ' + item.subProNom + ' | ' + item.proNom} 
+                                > 
+                                    {displayText}
+                                </option>
+                            )
+                        })}
                     </select>
                 </div>
                 {
@@ -536,6 +545,7 @@ const ResultChain = () => {
                                 <th className='center' rowSpan={2}>#</th>
                                 <th className='center' rowSpan={2}>Código</th>
                                 <th className='center' rowSpan={2}>Nombre</th>
+                                <th className='center' rowSpan={2}>Unidad</th>
                                 <th className='center PowerMas_Borde_Total' style={{color: '#F87C56', whiteSpace: 'normal'}} rowSpan={2}>Total Presupuesto</th>
                                 <th className='center PowerMas_Borde_Total PowerMas_Borde_Total2 PowerMas_Combine_Header' colSpan={numeroColumnasAno-1}>
                                     <span className='flex ai-center jc-center gap-1'>
@@ -578,22 +588,33 @@ const ResultChain = () => {
                         <tbody>
                             {
                             indicadores.map((item, index) => {
-                                const rowKey = `${item.indAno}_${item.indCod}`;
-                                const text = item.indNom.charAt(0).toUpperCase() + item.indNom.slice(1).toLowerCase();
+                                const text = item.indNom;
                                 const shortText = text.length > 30 ? text.substring(0, 30) + '...' : text;
+
+                                const textUnidad = item.uniNom;
+                                const shortTextUnidad = textUnidad.length > 15 ? textUnidad.substring(0, 15) + '...' : text;
 
                                 return (
                                     <tr key={index}>
                                         <td>{index+1}</td>
                                         <td>{item.indNum}</td>
                                         {
-                                            text.length > 30 ?
+                                            text.length > 25 ?
                                             <td className='' 
                                             data-tooltip-id="info-tooltip" 
                                             data-tooltip-content={text} 
                                             >{shortText}</td>
                                             :
                                             <td className=''>{text}</td>
+                                        }
+                                        {
+                                            textUnidad.length > 15 ?
+                                            <td className='' 
+                                            data-tooltip-id="info-tooltip" 
+                                            data-tooltip-content={textUnidad} 
+                                            >{shortTextUnidad}</td>
+                                            :
+                                            <td className=''>{textUnidad}</td>
                                         }
                                         <td className='PowerMas_Borde_Total'>
                                             <Tooltip
@@ -674,25 +695,8 @@ const ResultChain = () => {
                                         {headers.map((header, i) => {
                                             const cellData = renderData[`${item.indAno}_${item.indCod}_${header.key}`];
                                             const defaultValue = cellData ? cellData.value : '';
-                                            const tecValue = cellData ? cellData.tecValue : null;
-                                            // if (header.key === 'totalPorAno') {
-                                            //     return (
-                                            //         <td 
-                                            //             className={`center PowerMas_Borde_Total ${`${item.indAno}_${item.indCod}` === unmatchedTotal.key && header.key.startsWith(unmatchedTotal.section) ? 'unmatched' : ''}`} 
-                                            //             style={{color: '#F87C56'}} 
-                                            //             key={i}
-                                            //         >
-                                            //             {calculateTotal(item.indAno, item.indCod, 'porAno', totalsPorAnoAll) + ' ' + currency}
-                                            //             <Tooltip
-                                            //                 title="Los totales no coinciden."
-                                            //                 open={`${item.indAno}_${item.indCod}` === unmatchedTotal.key && header.key.startsWith(unmatchedTotal.section)}
-                                            //                 arrow={true}
-                                            //                 position="bottom"
-                                            //                 key={i}
-                                            //             />
-                                            //         </td>
-                                            //     );
-                                            // } else 
+                                            const tecValue = cellData && cellData.tecValue ? `${formatter.format(cellData.tecValue)} ${textUnidad}` : null;
+
                                             if (header.key === 'totalPorImplementador') {
                                                 return (
                                                     <td className={`center PowerMas_Borde_Total ${`${item.indAno}_${item.indCod}` === unmatchedTotal.key && header.key.startsWith(unmatchedTotal.section) ? 'unmatched' : ''}`} style={{color: '#F87C56'}} key={i}>
@@ -737,7 +741,7 @@ const ResultChain = () => {
                                                     <td key={i}>
                                                     <input
                                                         data-tooltip-id="info-tooltip" 
-                                                        data-tooltip-content={tecValue && `Meta: ${tecValue}`} 
+                                                        data-tooltip-content={tecValue && `META: ${tecValue}`} 
                                                         className={`
                                                         PowerMas_Input_Cadena Large_12 f_75 
                                                         PowerMas_Cadena_Form_${dirtyFields[`${item.indAno}_${item.indCod}_${header.key}`] || isSubmitted ? (errors[`${item.indAno}_${item.indCod}_${header.key}`] ? 'invalid' : 'valid') : ''}
@@ -854,7 +858,7 @@ const ResultChain = () => {
             </div>
             {
                 actions.add &&
-                <div className='PowerMas_Footer_Box flex flex-column jc-center ai-center p_5 gap_5'>    
+                <div className='PowerMas_Footer_Box flex jc-center ai-center p_25'>    
                     <button 
                         className='PowerMas_Buttom_Primary Large_3 p_5'
                         onClick={handleSubmit(onSubmit)}

@@ -39,7 +39,6 @@ export const exportToExcel = async (indicadores, totales, additionalRows, getVal
     let secondTitleCell = secondTitleRow.getCell(3);
     secondTitleCell.value = title || ''; // Aquí iría el valor seleccionado del subproyecto
     secondTitleCell.font = { bold: true, size: 14 };
-    secondTitleCell.alignment = { horizontal: 'center' };
     worksheet.mergeCells('D4:O4');
 
     // Añadir un segundo título

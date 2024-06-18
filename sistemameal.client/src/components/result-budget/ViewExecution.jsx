@@ -233,13 +233,13 @@ const ViewExecution = () => {
     }, [watch('metAnoPlaTec')]);
 
     return (
-        <div className='p1 flex flex-column flex-grow-1 overflow-auto'>
+        <div className='p_75 flex flex-column flex-grow-1 overflow-auto'>
             <h1 className="Large-f1_5"> Reporte de Gasto vs Presupuesto </h1>
-            <div className='flex jc-space-between gap-1 p_5'>
+            <div className='flex jc-space-between gap_5 p_25'>
                 <select 
                     id='subproyecto'
                     style={{textTransform: 'capitalize', margin: '0'}}
-                    className={`p_5 block Phone_12 PowerMas_Modal_Form_${dirtyFields.subproyecto || isSubmitted ? (errors.subproyecto ? 'invalid' : 'valid') : ''}`} 
+                    className={`p_5 Phone_8 PowerMas_Modal_Form_${dirtyFields.subproyecto || isSubmitted ? (errors.subproyecto ? 'invalid' : 'valid') : ''}`} 
                     {...register('subproyecto', { 
                         validate: {
                             required: value => value !== '0' || 'El campo es requerido',
@@ -247,19 +247,29 @@ const ViewExecution = () => {
                     })}
                 >
                     <option value="0">--Seleccione Sub Proyecto--</option>
-                    {subproyectos.map((item, index) => (
-                        <option 
-                            key={index} 
-                            value={JSON.stringify({ subProAno: item.subProAno, subProCod: item.subProCod })}
-                        > 
-                            {item.subProSap + ' - ' + item.subProNom.toLowerCase() + ' | ' + item.proNom.toLowerCase()}
-                        </option>
-                    ))}
+                    {subproyectos.map((item, index) => {
+                        // Limita la longitud del texto a 50 caracteres
+                        const maxLength = 100;
+                        let displayText = item.subProSap + ' - ' + item.subProNom + ' | ' + item.proNom;
+                        if (displayText.length > maxLength) {
+                            displayText = displayText.substring(0, maxLength) + '...';
+                        }
+
+                        return (
+                            <option 
+                                key={index} 
+                                value={JSON.stringify({ subProAno: item.subProAno, subProCod: item.subProCod })}
+                                title={item.subProSap + ' - ' + item.subProNom + ' | ' + item.proNom} 
+                            > 
+                                {displayText}
+                            </option>
+                        )
+                    })}
                 </select>
                 <select 
                     id='metAnoPlaTec'
                     style={{margin: '0'}}
-                    className={`p_5 block Phone_3 PowerMas_Modal_Form_${dirtyFields.metAnoPlaTec || isSubmitted ? (errors.metAnoPlaTec ? 'invalid' : 'valid') : ''}`} 
+                    className={`p_5 Phone_2 PowerMas_Modal_Form_${dirtyFields.metAnoPlaTec || isSubmitted ? (errors.metAnoPlaTec ? 'invalid' : 'valid') : ''}`} 
                     {...register('metAnoPlaTec', { 
                         validate: {
                             required: value => value !== '0' || 'El campo es requerido',
@@ -272,7 +282,7 @@ const ViewExecution = () => {
                     ))}
                 </select>
                 
-                <div className={`PowerMas_Dropdown_Export Large_3 ${dropdownOpen ? 'open' : ''}`}>
+                <div className={`PowerMas_Dropdown_Export Phone_2 ${dropdownOpen ? 'open' : ''}`}>
                     <button className="Large_12 Large-p_5 flex ai-center jc-space-between" onClick={handleToggleDropdown}>
                         Exportar
                         <span className='flex'>
@@ -281,7 +291,7 @@ const ViewExecution = () => {
                     </button>
                     <div className="PowerMas_Dropdown_Export_Content Phone_12">
                         <a onClick={() => {
-                            exportToExcel(additionalRows, getValues, subproyectos, watch('metAnoPlaTec'));
+                            exportToExcel(indicadores, additionalRows, getValues, subproyectos, watch('metAnoPlaTec'));
                             setDropdownOpen(false);
                         }} className='flex jc-space-between p_5'>Excel <img className='Large_1' src={Excel_Icon} alt="" /> </a>
                     </div>
@@ -323,9 +333,8 @@ const ViewExecution = () => {
                             <tr className='center' style={{ position: 'sticky', top: '2rem', backgroundColor: '#fff', zIndex: '3'  }}>
                                 <th></th>
                                 <th style={{ position: 'sticky', left: '0', backgroundColor: '#fff' }}>Código</th>
-                                <th>Financiador</th>
-                                <th>Implementador</th>
-                                <th>Ubicación</th>
+                                <th colSpan={2}>Nombre</th>
+                                <th>Unidad</th>
                                 {meses.map((mes) => (
                                     <Fragment key={mes}>
                                         <th className='center'>Meta</th>
@@ -391,7 +400,10 @@ const ViewExecution = () => {
                         {
                             indicadores.map((item, index) => {
                                 const text = item.indNom;
-                                const shortText = text.length > 80 ? text.substring(0, 80) + '...' : text;
+                                const shortText = text.length > 30 ? text.substring(0, 30) + '...' : text;
+
+                                const textUnidad = item.uniNom;
+                                const shortTextUnidad = textUnidad.length > 15 ? textUnidad.substring(0, 15) + '...' : text;
 
                                 return (
                                     <Fragment key={index}>
@@ -410,14 +422,23 @@ const ViewExecution = () => {
                                             </td>
                                             <td style={{position: 'sticky', left: '0', backgroundColor: '#fff',zIndex: '1'}}>{item.indNum}</td>
                                             {
-                                                text.length > 60 ?
+                                                text.length > 30 ?
                                                 <td
                                                 colSpan={3}
                                                     data-tooltip-id="info-tooltip" 
                                                     data-tooltip-content={text} 
                                                 >{shortText}</td>
                                                 :
-                                                <td colSpan={3}>{text}</td>
+                                                <td colSpan={2}>{text}</td>
+                                            }
+                                            {
+                                                textUnidad.length > 15 ?
+                                                <td className='' 
+                                                data-tooltip-id="info-tooltip" 
+                                                data-tooltip-content={textUnidad} 
+                                                >{shortTextUnidad}</td>
+                                                :
+                                                <td className=''>{textUnidad}</td>
                                             }
                                             <td colSpan={24}></td>
                                         </tr>
