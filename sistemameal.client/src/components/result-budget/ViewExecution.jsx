@@ -424,7 +424,7 @@ const ViewExecution = () => {
                                             {
                                                 text.length > 30 ?
                                                 <td
-                                                colSpan={3}
+                                                colSpan={2}
                                                     data-tooltip-id="info-tooltip" 
                                                     data-tooltip-content={text} 
                                                 >{shortText}</td>
