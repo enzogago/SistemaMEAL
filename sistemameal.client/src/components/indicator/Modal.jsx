@@ -247,7 +247,7 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setRefresh, title, uni
             } else {
                 setInvolucraSubActividad(false);
             }
-            fetchData(`Indicador/subproyecto-actividad/${subProAno}/${subProCod}`, (data) => {
+            fetchData(`Indicador/subproyecto/${subProAno}/${subProCod}`, (data) => {
                 setIndicadoresSelect(data);
                 if (estadoEditado) {
                     const newIndFor = replaceCodesWithIndicators(estadoEditado.indFor, data);

@@ -104,6 +104,18 @@ namespace SistemaMEAL.Server.Controllers
             return Ok(data);
         }
 
+        [HttpGet("cadena-actividad/{subProAno}/{subProCod}/{carResPerAno}")]
+        public dynamic BuscarCadenaPorPeriodoAnoActividad(string subProAno, string subProCod, string carResPerAno)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.validarToken(identity, _usuarios);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var data = _indicadores.BuscarCadenaPorPeriodo(identity, subProAno:subProAno, subProCod:subProCod, carResPerAno:carResPerAno, indTipInd: "IAC");
+            return Ok(data);
+        }
+
         [HttpGet("implementador/{subProAno}/{subProCod}")]
         public dynamic BuscarCadenaPorImplementador(string subProAno, string subProCod)
         {
