@@ -231,15 +231,15 @@ namespace SistemaMEAL.Server.Controllers
         }
 
         [HttpGet]
-        [Route("tecnico")]
-        public dynamic BuscarUsuariosTecnico()
+        [Route("tecnico/{usuAccAno}/{usuAccCod}")]
+        public dynamic BuscarUsuariosTecnico(string usuAccAno, string usuAccCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             var rToken = Jwt.validarToken(identity, _usuarios);
 
             if (!rToken.success) return Unauthorized(rToken);
 
-            var usuarios = _usuarios.Listado(identity, rolCod: "04");
+            var usuarios = _usuarios.BuscarUsuariosMeta(identity, rolCod: "04", usuAccAno:usuAccAno, usuAccCod:usuAccCod, usuAccTip: "SUB_PROYECTO");
             return Ok(usuarios);
         }
 

@@ -61,7 +61,6 @@ const ResultGoal = () => {
 
     useEffect(() => {
         fetchData('SubProyecto',setSubProyectos);
-        fetchData('Usuario/tecnico',setUsersTecnicos);
     }, []);
     
     useEffect(() => {
@@ -97,6 +96,7 @@ const ResultGoal = () => {
             const { subProAno, subProCod } = JSON.parse(subproyecto);
             // Realiza todas las peticiones en paralelo
             Promise.all([
+                fetchDataReturn(`Usuario/tecnico/${subProAno}/${subProCod}`),
                 fetchDataReturn(`Indicador/subproyecto/${subProAno}/${subProCod}`),
                 fetchDataReturn(`Implementador/subproyecto/${subProAno}/${subProCod}`),
                 fetchDataReturn(`Ubicacion/subproyecto/${subProAno}/${subProCod}`),
@@ -104,7 +104,10 @@ const ResultGoal = () => {
                 fetchDataReturn(`Indicador/cadena/${subProAno}/${subProCod}/${ano}`),
                 fetchDataReturn(`Indicador/implementador/${subProAno}/${subProCod}`),
                 fetchDataReturn(`Indicador/ubicacion/${subProAno}/${subProCod}`),
-            ]).then(([indicatorData, implementadorData, ubicacionData, metaData, cadenaPeriodoData, cadenaImplementadorData, cadenaUbicacionData]) => {
+            ]).then(([tecnicosData, indicatorData, implementadorData, ubicacionData, metaData, cadenaPeriodoData, cadenaImplementadorData, cadenaUbicacionData]) => {
+                console.log(tecnicosData);
+                setUsersTecnicos(tecnicosData);
+
                 setIndicadores(indicatorData);
 
                 setImplementadoresSelect(implementadorData);
@@ -420,12 +423,11 @@ const ResultGoal = () => {
         const maxImplementador = cadenaImplementadorGrouped[`${row.indAno}-${row.indCod}`][implementadorValue].value;
         const maxUbicacion = cadenaUbicacionGrouped[`${row.indAno}-${row.indCod}`][`${ubiAno}-${ubiCod}`].value;
         const maxPeriodo = cadenaPeriodoGrouped[`${row.indAno}-${row.indCod}`];
-        console.log(row)
+        const unidadNom = row.uniNom.charAt(0) + row.uniNom.slice(1).toLowerCase();
         // Valida contra los máximos específicos
         if (totalPorImplementador > maxImplementador) {
             const implementador = implementadoresSelect.find(imp => imp.impCod === implementadorValue);
             const implementadorNom = implementador.impNom.charAt(0) + implementador.impNom.slice(1).toLowerCase();
-            const unidadNom = row.uniNom.charAt(0) + row.uniNom.slice(1).toLowerCase();
 
             Notiflix.Report.warning('Advertencia', `La meta del implementador ${implementadorNom} es ${totalPorImplementador} ${unidadNom}, pero en la cadena de resultado se estableció en ${maxImplementador} ${unidadNom}. Por favor ajuste la distribución correctamente.`, 'Aceptar');
             return false;
