@@ -318,7 +318,7 @@ export const Export_Excel_Basic2 = async (data, headersExcel, active, isPresupue
     saveAs(blob, `CADENA_DE_RESULTADOS_${active.toUpperCase()}_${Date.now()}.xlsx`);
 };
 
-export const Export_Excel_Basic = async (data, headersExcel, active, isPresupuesto, selectedSubproject) => {
+export const Export_Excel_Basic = async (data, headersExcel, active, isPresupuesto, selectedSubproject, currency = '') => {
     let workbook = new ExcelJS.Workbook();
     let worksheet = workbook.addWorksheet(`CADENA DE ${isPresupuesto ? 'PRESUPUESTO' : 'RESULTADO'} ${active.toUpperCase()}`);
 
@@ -342,7 +342,6 @@ export const Export_Excel_Basic = async (data, headersExcel, active, isPresupues
     let secondTitleCell = secondTitleRow.getCell(3);
     secondTitleCell.value = selectedSubproject || '';
     secondTitleCell.font = { bold: true, size: 14 };
-    secondTitleCell.alignment = { horizontal: 'center' };
     worksheet.mergeCells('D4:M4');
 
     // Añadir filas vacías
@@ -383,16 +382,16 @@ export const Export_Excel_Basic = async (data, headersExcel, active, isPresupues
             let cell = dataRow.getCell(index + 1);
             let value = item[header];
             // Si isPresupuesto es true y la columna es la 5 o posterior, formatear como euros
-            if (isPresupuesto && index >= 6) {
+            if (isPresupuesto && index >= 4) {
                 // Convertir el valor a un número antes de asignarlo a la celda
                 cell.value = typeof value === 'string' ? parseFloat(value) : value;
-                cell.numFmt = '#,##0.00 $';
+                cell.numFmt = `#,##0.00 ${currency}`;
             } else if( index >= 5){
                 cell.value = typeof value === 'string' ? parseFloat(value) : value;
             } else {
                 cell.value = typeof value === 'string' ? value.toUpperCase() : value;
             }
-            if (index === 0 || index >= 5) {
+            if (index === 0 || index >= 4) {
                 cell.alignment = { horizontal: 'center' };
             }
         });

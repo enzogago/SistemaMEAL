@@ -3,7 +3,7 @@ import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
 import { fetchData } from '../reusable/helper';
 import { useForm } from 'react-hook-form';
 import Notiflix from 'notiflix';
-import { formatter } from '../monitoring/goal/helper';
+import { formatter, formatterBudget } from '../monitoring/goal/helper';
 import Expand from '../../icons/Expand';
 import useEntityActions from '../../hooks/useEntityActions';
 import TableEmpty from '../../img/PowerMas_TableEmpty.svg';
@@ -12,32 +12,36 @@ import { exportToExcel } from './export';
 import { fetchDataReturn } from '../reusable/fetchs';
 
 const ExecutionBudget = () => {
+    // Estados para el manejo de la interfaz de usuario
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [isFormValid, setIsFormValid] = useState(false);
 
+    // Estados para el manejo de los datos de la aplicación
     const [subproyectos, setSubProyectos] = useState([]);
     const [selectedSubProyecto, setSelectedSubProyecto] = useState(null);
     const [indicadores, setIndicadores] = useState([]);
-    
     const [financiadoresSelect, setFinanciadoresSelect] = useState([]);
     const [additionalRows, setAdditionalRows] = useState([]);
     const [expandedIndicators, setExpandedIndicators] = useState([]);
-    
-    const [totals, setTotals] = useState({});
-    const [prevValues, setPrevValues] = useState({});
-    
-    const [rowIdCounter, setRowIdCounter] = useState(0);
-
     const [initialMetas, setInitialMetas] = useState([]);
 
+    // Estados para el manejo de los totales y valores previos
+    const [totals, setTotals] = useState({});
+    const [prevValues, setPrevValues] = useState({});
+
+    // Estado para el manejo del contador de ID de fila
+    const [rowIdCounter, setRowIdCounter] = useState(0);
+
+    // Acciones permitidas para 'METAS MENSUALES PRESUPUESTO'
     const actions = useEntityActions('METAS MENSUALES PRESUPUESTO');
 
-    const [isFormValid, setIsFormValid] = useState(false);
-
-    // Estados relacionados con los datos agrupados
+    // Estados para el manejo de los datos agrupados
     const [cadenaPeriodoGrouped, setCadenaPeriodoGrouped] = useState(null);
     const [cadenaImplementadorGrouped, setCadenaImplementadorGrouped] = useState(null);
     const [cadenaUbicacionGrouped, setCadenaUbicacionGrouped] = useState(null);
     const [cadenaFinanciadorGrouped, setCadenaFinanciadorGrouped] = useState(null);
+
+    const [currency, setCurrency] = useState('');
 
     const { 
         register,
@@ -55,7 +59,6 @@ const ExecutionBudget = () => {
         fetchData('SubProyecto',setSubProyectos);
     }, []);
 
-    
     useEffect(() => {
         const subproyecto = watch('subproyecto');
         if (subproyecto && subproyecto !== '0') {
@@ -101,9 +104,19 @@ const ExecutionBudget = () => {
                 cadenaUbicacionData,
                 cadenaFinanciadorData,
             ]) => {
-
                 setIndicadores(indicadorData);
                 setFinanciadoresSelect(financiadorData);
+
+                if (financiadorData.length > 0) {
+                    // Obtén el valor de monSim del primer registro
+                    const firstMonSim = financiadorData[0].monSim;
+            
+                    // Verifica si todos los registros tienen el mismo valor de monSim
+                    const allSameMonSim = financiadorData.every(record => record.monSim === firstMonSim);
+                    // Si todos los registros tienen el mismo valor de monSim, establece currency en ese valor
+                    // Si no, establece currency en '€'
+                    setCurrency(allSameMonSim ? firstMonSim : '€');
+                }
 
                 const fieldNames = Object.keys(getValues());
 
@@ -220,11 +233,10 @@ const ExecutionBudget = () => {
 
                 let groupedPeriodoData = {};
                 cadenaPeriodoData.forEach(item => {
-                    console.log(groupedPeriodoData)
                     let key = `${item.indAno}-${item.indCod}`;
                     groupedPeriodoData[key]  = item.cadResPerMetPre ? item.cadResPerMetPre : 0;
                 });
-                console.log(groupedPeriodoData)
+
                 setCadenaPeriodoGrouped(groupedPeriodoData);
                 setCadenaUbicacionGrouped(groupedUbicacionData);
                 setCadenaImplementadorGrouped(groupedImplementadorData);
@@ -358,7 +370,7 @@ const ExecutionBudget = () => {
         }
     };
 
-    const validateInput = (newValue, row, monthIndex) => {
+    const validateInput = (newValue, row, monthIndex, currency) => {
         const financiadorValue = watch(`financiador_${row.id}`);
     
         if (financiadorValue === '0') {
@@ -392,19 +404,18 @@ const ExecutionBudget = () => {
         // Obtén los límites máximos específicos para implementador y ubicación
         const maxFinanciador = cadenaFinanciadorGrouped[`${row.indAno}-${row.indCod}`][financiadorValue].value;
         const maxPeriodo = cadenaPeriodoGrouped[`${row.indAno}-${row.indCod}`];
-        const unidadNom = row.uniNom.charAt(0) + row.uniNom.slice(1).toLowerCase();
 
         // Valida contra los máximos específicos
         if (totalPorFinanciador > maxFinanciador) {
             const financiador = financiadoresSelect.find(item => item.finCod === financiadorValue);
             const financiadorNom = financiador.finNom.charAt(0) + financiador.finNom.slice(1).toLowerCase();
 
-            Notiflix.Report.warning('Advertencia', `La meta del financiador ${financiadorNom} es ${totalPorFinanciador} ${unidadNom}, pero en la cadena de resultado se estableció en ${maxFinanciador} ${unidadNom}. Por favor ajuste la distribución correctamente.`, 'Aceptar');
+            Notiflix.Report.warning('Advertencia', `La meta presupuesto del financiador ${financiadorNom} es ${formatterBudget.format(totalPorFinanciador)} ${currency}, pero en la cadena de resultado presupuesto se estableció en ${formatterBudget.format(maxFinanciador)} ${currency}. Por favor ajuste la distribución correctamente.`, 'Aceptar');
             return false;
         }
         if (totalPorPeriodo > maxPeriodo) {
             const ano = watch('metAnoPlaTec');
-            Notiflix.Report.warning('Advertencia', `La meta del periodo ${ano} es ${totalPorPeriodo} ${unidadNom}, pero en la cadena de resultado se estableció en ${maxPeriodo} ${unidadNom}. Por favor ajuste la distribución correctamente.`, 'Aceptar');
+            Notiflix.Report.warning('Advertencia', `La meta presupuesto del periodo ${ano} es ${formatterBudget.format(totalPorPeriodo)} ${currency}, pero en la cadena de resultado presupuesto se estableció en ${formatterBudget.format(maxPeriodo)} ${currency}. Por favor ajuste la distribución correctamente.`, 'Aceptar');
             return false;
         }
     
@@ -413,10 +424,10 @@ const ExecutionBudget = () => {
     };
      
     return (
-        <div className='p1 flex flex-column flex-grow-1 overflow-auto content-block relative'>
+        <div className='p_75 flex flex-column flex-grow-1 overflow-auto content-block relative'>
             <h1 className="Large-f1_5"> Metas Presupuesto </h1>
-            <div className='flex jc-space-between gap-1 p_5'>
-                <div className="flex-grow-1">
+            <div className='flex jc-space-between gap_5 p_5'>
+                <div className="Phone_8 flex-grow-1">
                     <select 
                         id='subproyecto'
                         style={{textTransform: 'capitalize', margin: '0'}}
@@ -428,14 +439,24 @@ const ExecutionBudget = () => {
                         })}
                     >
                         <option value="0">--Seleccione Sub Proyecto--</option>
-                        {subproyectos.map((item, index) => (
-                            <option 
-                                key={index} 
-                                value={JSON.stringify({ subProAno: item.subProAno, subProCod: item.subProCod })}
-                            > 
-                                {item.subProSap + ' - ' + item.subProNom.toLowerCase() + ' | ' + item.proNom.toLowerCase()}
-                            </option>
-                        ))}
+                        {subproyectos.map((item, index) => {
+                            // Limita la longitud del texto a 50 caracteres
+                            const maxLength = 100;
+                            let displayText = item.subProSap + ' - ' + item.subProNom + ' | ' + item.proNom;
+                            if (displayText.length > maxLength) {
+                                displayText = displayText.substring(0, maxLength) + '...';
+                            }
+                            
+                            return (
+                                <option 
+                                    key={index} 
+                                    value={JSON.stringify({ subProAno: item.subProAno, subProCod: item.subProCod })}
+                                    title={item.subProSap + ' - ' + item.subProNom + ' | ' + item.proNom} 
+                                > 
+                                    {displayText}
+                                </option>
+                            )
+                        })}
                     </select>
                 </div>
                 <div className='Phone_2'>
@@ -481,18 +502,22 @@ const ExecutionBudget = () => {
                             <tr style={{zIndex: '1'}}>
                                 <th className='center'></th>
                                 <th style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}>Código</th>
-                                <th colSpan={3}>Nombre</th>
+                                <th colSpan={2}>Nombre</th>
+                                <th>Unidad</th>
                                 {meses.map((mes, i) => (
-                                    <th className='center' style={{textTransform: 'capitalize'}} key={i+1}>{mes.toLowerCase()} (€)</th>
+                                    <th className='center' style={{textTransform: 'capitalize'}} key={i+1}>{mes.toLowerCase()} ({currency})</th>
                                 ))}
-                                <th style={{position: 'sticky', right: '0', backgroundColor: '#fff'}}>Total (€)</th>
+                                <th style={{position: 'sticky', right: '0', backgroundColor: '#fff'}}>Total ({currency})</th>
                             </tr>
                         </thead>
                         <tbody>
                             {
                             indicadores.map((item, index) => {
                                 const text = item.indNom.charAt(0).toUpperCase() + item.indNom.slice(1).toLowerCase();
-                                const shortText = text.length > 60 ? text.substring(0, 60) + '...' : text;
+                                const shortText = text.length > 30 ? text.substring(0, 30) + '...' : text;
+
+                                const textUnidad = item.uniNom;
+                                const shortTextUnidad = textUnidad.length > 15 ? textUnidad.substring(0, 15) + '...' : textUnidad;
                                 
                                 return (
                                     <Fragment  key={index}>
@@ -511,26 +536,35 @@ const ExecutionBudget = () => {
                                         </td>
                                         <td style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}>{item.indNum}</td>
                                         {
-                                            text.length > 60 ?
+                                            text.length > 30 ?
                                             <td
-                                            colSpan={3}
+                                            colSpan={2}
                                                 data-tooltip-id="info-tooltip" 
                                                 data-tooltip-content={text} 
                                             >{shortText}</td>
                                             :
-                                            <td colSpan={3}>{text}</td>
+                                            <td colSpan={2}>{text}</td>
+                                        }
+                                        {
+                                            textUnidad.length > 15 ?
+                                            <td
+                                                data-tooltip-id="info-tooltip" 
+                                                data-tooltip-content={textUnidad} 
+                                            >{shortTextUnidad}</td>
+                                            :
+                                            <td >{textUnidad}</td>
                                         }
                                         {meses.map((mes, i) => (
                                             <td key={i+1} className='center'>
                                                 {formatter.format(Object.entries(totals)
                                                     .filter(([key]) => key.startsWith(`${item.indAno}_${item.indCod}`) && key.endsWith(String(i+1).padStart(2, '0')))
-                                                    .reduce((sum, [, value]) => sum + value, 0))} €
+                                                    .reduce((sum, [, value]) => sum + value, 0))} {currency}
                                             </td>
                                         ))}
                                         <td className='bold center' style={{position: 'sticky', right: '0', backgroundColor: '#fff'}}>
                                             {formatter.format(Object.entries(totals)
                                                 .filter(([key]) => key.startsWith(`${item.indAno}_${item.indCod}`) && key.endsWith('_total'))
-                                                .reduce((sum, [, value]) => sum + value, 0))} €
+                                                .reduce((sum, [, value]) => sum + value, 0))} {currency}
                                         </td>
                                     </tr>
                                     {additionalRows.filter(row => row.indAno === item.indAno && row.indCod === item.indCod).map((row, rowIndex) => (
@@ -550,14 +584,18 @@ const ExecutionBudget = () => {
                                                         // Ejecuta la validación para todos los campos de entrada de este indicador
                                                         meses.forEach((mes, i) => {
                                                             const inputVal = getValues(`mes_${String(i+1).padStart(2, '0')}_${row.id}`);
-                                                            const isValid = validateInput(inputVal, row, i);
+                                                            const isValid = validateInput(inputVal, row, i, currency);
                                                             setIsFormValid(isValid);
                                                         });
                                                     }}
                                                     className={`PowerMas_Input_Cadena f_75 PowerMas_Modal_Form_${dirtyFields[`financiador_${row.id}`] || isSubmitted ? (errors[`financiador_${row.id}`] ? 'invalid' : 'valid') : ''}`} 
                                                     {...register(`financiador_${row.id}`, {
+                                                        validate: {
+                                                            notZero: value => value !== '0' || 'El campo es requerido'
+                                                        }
                                                     })}
                                                 >
+                                                    <option value="0" className='f_75'>--Financiador--</option>
                                                     {financiadoresSelect.map((item, index) => (
                                                         <option
                                                             className='f_75'
@@ -579,15 +617,16 @@ const ExecutionBudget = () => {
                                             return(
                                                 <td key={i+1}>
                                                     <input
-                                                        data-tooltip-id="info-tooltip" 
-                                                        data-tooltip-content={getValues(`meta_${String(i+1).padStart(2, '0')}_${row.id}`) && `Meta técnica: ${getValues(`metMetTec_${String(i+1).padStart(2, '0')}_${row.id}`) || 0 }`} 
+                                                        autoComplete="off"
                                                         className={`
                                                             PowerMas_Input_Cadena Large_12 f_75 
                                                             PowerMas_Cadena_Form_${dirtyFields[`mes_${String(i+1).padStart(2, '0')}_${row.id}`] || isSubmitted ? (errors[`mes_${String(i+1).padStart(2, '0')}_${row.id}`] ? 'invalid' : 'valid') : ''}
                                                             ${getValues(`meta_${String(i+1).padStart(2, '0')}_${row.id}`) && 'PowerMas_Tooltip_Active'}
-                                                        `} 
-                                                        style={{margin: '0'}}
+                                                        `}
+                                                        data-tooltip-content={getValues(`meta_${String(i+1).padStart(2, '0')}_${row.id}`) && `META TÉCNICA: ${formatter.format(getValues(`metMetTec_${String(i+1).padStart(2, '0')}_${row.id}`) || 0)} ${item.uniNom}`}
+                                                        data-tooltip-id="info-tooltip"
                                                         disabled={!actions.add}
+                                                        maxLength={10}
                                                         onInput={(e) => {
                                                             const value = e.target.value;
                                                             if (value === '' || (/^\d*\.?\d*$/.test(value))) {
@@ -596,7 +635,7 @@ const ExecutionBudget = () => {
                                                                 e.target.value = value.slice(0, -1);
                                                             }
 
-                                                            const isValid = validateInput(value, row, i);
+                                                            const isValid = validateInput(value, row, i, currency);
                                                             setIsFormValid(isValid);
 
                                                             if (row.id !== undefined) {
@@ -615,7 +654,7 @@ const ExecutionBudget = () => {
                                                                 }));
                                                             }
                                                         }}
-                                                        maxLength={10}
+                                                        style={{margin: '0'}}
                                                         {...register(`mes_${String(i+1).padStart(2, '0')}_${row.id}`, { 
                                                             pattern: {
                                                                 value: /^(?:\d+\.?\d*|\.\d+)$/,
@@ -630,7 +669,7 @@ const ExecutionBudget = () => {
                                                 </td>
                                             )})}
                                             <td className='bold center' style={{position: 'sticky', right: '0', backgroundColor: '#fff'}}>
-                                                {formatter.format(totals[`${row.id}_total`] || 0) } €
+                                                {formatter.format(totals[`${row.id}_total`] || 0) } {currency}
                                             </td>
                                         </tr>
                                     ))}
@@ -649,10 +688,11 @@ const ExecutionBudget = () => {
             </div>
             {
                 actions.add &&
-                <div className='PowerMas_Footer_Box flex flex-column jc-center ai-center p_5 gap_5'>    
+                <div className='PowerMas_Footer_Box flex flex-column jc-center ai-center p_25'>    
                     <button 
                         className='PowerMas_Buttom_Primary Large_3 p_5'
                         onClick={handleSubmit(onSubmit)}
+                        disabled={!isFormValid}
                     >
                         Grabar
                     </button>

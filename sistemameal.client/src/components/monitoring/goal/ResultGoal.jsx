@@ -3,7 +3,7 @@ import Excel_Icon from '../../../img/PowerMas_Excel_Icon.svg';
 import { fetchData } from '../../reusable/helper';
 import { useForm } from 'react-hook-form';
 import Notiflix from 'notiflix';
-import { formatter, meses } from './helper';
+import { formatter, formatterBudget, meses } from './helper';
 import Expand from '../../../icons/Expand';
 import { fetchDataReturn } from '../../reusable/fetchs';
 import useEntityActions from '../../../hooks/useEntityActions';
@@ -105,7 +105,6 @@ const ResultGoal = () => {
                 fetchDataReturn(`Indicador/implementador/${subProAno}/${subProCod}`),
                 fetchDataReturn(`Indicador/ubicacion/${subProAno}/${subProCod}`),
             ]).then(([tecnicosData, indicatorData, implementadorData, ubicacionData, metaData, cadenaPeriodoData, cadenaImplementadorData, cadenaUbicacionData]) => {
-                console.log(tecnicosData);
                 setUsersTecnicos(tecnicosData);
 
                 setIndicadores(indicatorData);
@@ -135,7 +134,6 @@ const ResultGoal = () => {
                 const rows = {};
                 let counter = rowIdCounter;
                 metaData.forEach(meta => {
-                    console.log(meta)
                     // Usa meta.impCod, la ubicación y el indicador para crear una clave única para cada fila
                     const rowKey = `${meta.impCod}_${JSON.stringify({ ubiAno: meta.ubiAno, ubiCod: meta.ubiCod })}_${meta.indAno}_${meta.indCod}`;
                     if (!rows[rowKey]) {
@@ -429,20 +427,20 @@ const ResultGoal = () => {
             const implementador = implementadoresSelect.find(imp => imp.impCod === implementadorValue);
             const implementadorNom = implementador.impNom.charAt(0) + implementador.impNom.slice(1).toLowerCase();
 
-            Notiflix.Report.warning('Advertencia', `La meta del implementador ${implementadorNom} es ${totalPorImplementador} ${unidadNom}, pero en la cadena de resultado se estableció en ${maxImplementador} ${unidadNom}. Por favor ajuste la distribución correctamente.`, 'Aceptar');
+            Notiflix.Report.warning('Advertencia', `La meta del implementador ${implementadorNom} es ${formatter.format(totalPorImplementador)} ${unidadNom}, pero en la cadena de resultado se estableció en ${formatter.format(maxImplementador)} ${unidadNom}. Por favor ajuste la distribución correctamente.`, 'Aceptar');
             return false;
         }
         if (totalPorUbicacion > maxUbicacion) {
             const ubicacion = ubicacionesSelect.find(item => item.ubiAno === ubiAno && item.ubiCod === ubiCod);
             const ubicacionNom = ubicacion.ubiNom.charAt(0) + ubicacion.ubiNom.slice(1).toLowerCase();
 
-            Notiflix.Report.warning('Advertencia', `La meta de la ubicación ${ubicacionNom} es ${totalPorUbicacion} ${unidadNom}, pero en la cadena de resultado se estableció en ${maxUbicacion} ${unidadNom}. Por favor ajuste la distribución correctamente.`, 'Aceptar');
+            Notiflix.Report.warning('Advertencia', `La meta de la ubicación ${ubicacionNom} es ${formatter.format(totalPorUbicacion)} ${unidadNom}, pero en la cadena de resultado se estableció en ${formatter.format(maxUbicacion)} ${unidadNom}. Por favor ajuste la distribución correctamente.`, 'Aceptar');
             return false;
         }
         if (totalPorPeriodo > maxPeriodo) {
             const ano = watch('metAnoPlaTec');
 
-            Notiflix.Report.warning('Advertencia', `La meta del periodo ${ano} es ${totalPorPeriodo} ${unidadNom}, pero en la cadena de resultado se estableció en ${maxPeriodo} ${unidadNom}. Por favor ajuste la distribución correctamente.`, 'Aceptar');
+            Notiflix.Report.warning('Advertencia', `La meta del periodo ${ano} es ${formatter.format(totalPorPeriodo)} ${unidadNom}, pero en la cadena de resultado se estableció en ${formatter.format(maxPeriodo)} ${unidadNom}. Por favor ajuste la distribución correctamente.`, 'Aceptar');
             return false;
         }
     
@@ -451,10 +449,10 @@ const ResultGoal = () => {
     };
     
     return (
-        <div className='p1 flex flex-column flex-grow-1 overflow-auto content-block relative'>
+        <div className='p_75 flex flex-column flex-grow-1 overflow-auto content-block relative'>
             <h1 className="Large-f1_5"> Metas técnicas programáticas </h1>
-            <div className='flex jc-space-between gap-1 p_5'>
-                <div className="flex-grow-1">
+            <div className='flex jc-space-between gap_5 p_5'>
+                <div className="Phone_8 flex-grow-1">
                     <select 
                         id='subproyecto'
                         style={{textTransform: 'capitalize', margin: '0'}}
@@ -466,14 +464,24 @@ const ResultGoal = () => {
                         })}
                     >
                         <option value="0">--Seleccione Sub Proyecto--</option>
-                        {subproyectos.map((item, index) => (
-                            <option 
-                                key={index} 
-                                value={JSON.stringify({ subProAno: item.subProAno, subProCod: item.subProCod })}
-                            > 
-                                {item.subProSap + ' - ' + item.subProNom.toLowerCase() + ' | ' + item.proNom.toLowerCase()}
-                            </option>
-                        ))}
+                        {subproyectos.map((item, index) => {
+                            // Limita la longitud del texto a 50 caracteres
+                            const maxLength = 100;
+                            let displayText = item.subProSap + ' - ' + item.subProNom + ' | ' + item.proNom;
+                            if (displayText.length > maxLength) {
+                                displayText = displayText.substring(0, maxLength) + '...';
+                            }
+
+                            return (
+                                <option 
+                                    key={index} 
+                                    value={JSON.stringify({ subProAno: item.subProAno, subProCod: item.subProCod })}
+                                    title={item.subProSap + ' - ' + item.subProNom + ' | ' + item.proNom} 
+                                > 
+                                    {displayText}
+                                </option>
+                            )
+                        })}
                     </select>
                 </div>
                 <div className='Phone_2'>
@@ -720,7 +728,7 @@ const ResultGoal = () => {
                                                                 }
                                                                 return true;
                                                             },
-                                                            notZero: value => value !== '0' || 'El cargo es requerido'
+                                                            notZero: value => value !== '0' || 'El campo es requerido'
                                                         }
                                                     })}
                                                 >
@@ -797,15 +805,16 @@ const ResultGoal = () => {
                                             {meses.map((mes, i) => (
                                                 <td key={i+1}>
                                                     <input
-                                                        data-tooltip-id="info-tooltip" 
-                                                        data-tooltip-content={getValues(`meta_${String(i+1).padStart(2, '0')}_${row.id}`) && `Meta presupuesto: ${getValues(`metMetPre_${String(i+1).padStart(2, '0')}_${row.id}`)? getValues(`metMetPre_${String(i+1).padStart(2, '0')}_${row.id}`): '0'} $`} 
+                                                        autoComplete='off'
                                                         className={`
                                                             PowerMas_Input_Cadena Large_12 f_75 
                                                             PowerMas_Cadena_Form_${dirtyFields[`mes_${String(i+1).padStart(2, '0')}_${row.id}`] || isSubmitted ? (errors[`mes_${String(i+1).padStart(2, '0')}_${row.id}`] ? 'invalid' : 'valid') : ''}
                                                             ${getValues(`meta_${String(i+1).padStart(2, '0')}_${row.id}`) && 'PowerMas_Tooltip_Active'}
                                                         `} 
-                                                        style={{margin: '0'}}
+                                                        data-tooltip-id="info-tooltip" 
+                                                        data-tooltip-content={getValues(`meta_${String(i+1).padStart(2, '0')}_${row.id}`) && `META PRESUPUESTO: ${formatterBudget.format(getValues(`metMetPre_${String(i+1).padStart(2, '0')}_${row.id}`) || 0)} $`} 
                                                         disabled={!actions.add}
+                                                        maxLength={10}
                                                         onInput={(e) => {
                                                             const inputVal = e.target.value.replace(/[^0-9]/g, '');
                                                             e.target.value = inputVal;
@@ -821,14 +830,13 @@ const ResultGoal = () => {
                                                                 ...prevTotals,
                                                                 [key]: (prevTotals[key] || 0) - prevValue + newValue,
                                                                 [totalKey]: (prevTotals[totalKey] || 0) - prevValue + newValue
-                                                            }));
-                                                            setPrevValues(prevValues => ({
-                                                                ...prevValues,
-                                                                [key]: newValue
-                                                            }));
-                                                        }}
-                                                        maxLength={10}
-                                                        autoComplete='off'
+                                                                }));
+                                                                setPrevValues(prevValues => ({
+                                                                    ...prevValues,
+                                                                    [key]: newValue
+                                                                }));
+                                                            }}
+                                                        style={{margin: '0'}}
                                                         {...register(`mes_${String(i+1).padStart(2, '0')}_${row.id}`, { 
                                                             pattern: {
                                                                 value: /^(?:[1-9]\d*|)$/,
@@ -862,7 +870,7 @@ const ResultGoal = () => {
             </div>
             {
                 actions.add &&
-                <div className='PowerMas_Footer_Box flex flex-column jc-center ai-center p_5 gap_5'>    
+                <div className='PowerMas_Footer_Box flex flex-column jc-center ai-center p_25'>    
                     <button 
                         disabled={!isFormValid}
                         className='PowerMas_Buttom_Primary Large_3 p_5'

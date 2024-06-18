@@ -8,7 +8,7 @@ export const formatMonthKey = (index) => {
 
 export const meses = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
 
-export const exportToExcel = async (additionalRows, getValues, subproyectos, ano) => {
+export const exportToExcel = async (indicadores, additionalRows, getValues, subproyectos, ano) => {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('PRESUPUESTO EJECUTADO');
 
@@ -46,7 +46,6 @@ export const exportToExcel = async (additionalRows, getValues, subproyectos, ano
     let secondTitleCell = secondTitleRow.getCell(4);
     secondTitleCell.value = title || ''; // Aquí iría el valor seleccionado del subproyecto
     secondTitleCell.font = { bold: true, size: 14 };
-    secondTitleCell.alignment = { horizontal: 'center' };
     worksheet.mergeCells('D4:O4');
 
     // Añadir un segundo título
@@ -65,7 +64,6 @@ export const exportToExcel = async (additionalRows, getValues, subproyectos, ano
     // Definir los encabezados de las primeras columnas y los meses
     const firstHeaders = ['CÓDIGO', 'NOMBRE', 'UNIDAD', 'FINANCIADOR', 'IMPLEMENTADOR', 'UBICACIÓN'];
     firstHeaders.forEach((header, index) => {
-        console.log(index)
         worksheet.mergeCells(7, index + 2, 8, index + 2);
         const cell = worksheet.getCell(7, index + 2);
         cell.value = header;
@@ -100,6 +98,30 @@ export const exportToExcel = async (additionalRows, getValues, subproyectos, ano
         // Subencabezados 'Meta' y 'Ejecución'
         worksheet.getCell(8, startColumn).value = 'Meta';
         worksheet.getCell(8, startColumn + 1).value = 'Ejecución';
+
+        const cellMeta = worksheet.getCell(8, startColumn);
+        const cellEjecucion = worksheet.getCell(8, startColumn + 1);
+
+        cellMeta.alignment = { vertical: 'middle', horizontal: 'center' };
+        cellMeta.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: '25848F' }
+        };
+        cellMeta.font = {
+            color: { argb: 'FFFFFF' },
+            bold: true
+        };
+        cellEjecucion.alignment = { vertical: 'middle', horizontal: 'center' };
+        cellEjecucion.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: '25848F' }
+        };
+        cellEjecucion.font = {
+            color: { argb: 'FFFFFF' },
+            bold: true
+        };
     });
 
     const columns = [
@@ -121,27 +143,76 @@ export const exportToExcel = async (additionalRows, getValues, subproyectos, ano
     // Asignar el arreglo de columnas a worksheet.columns
     worksheet.columns = columns;
 
-    // Agregar los datos de los indicadores y las filas adicionales
-    Object.values(additionalRows).forEach((row, rowIndex) => {
-        const rowValues = {
-            'EMPTY': '',
-            'CÓDIGO': row.indNum,
-            'NOMBRE': row.indNom,
-            'UNIDAD': row.uniNom,
-            'FINANCIADOR': row.finNom,
-            'IMPLEMENTADOR': row.impNom,
-            'UBICACIÓN': row.ubiNom,
+    indicadores.forEach(indicador => {
+        // Agregar la fila del indicador principal
+        const indicadorRow = {
+            'CÓDIGO': indicador.indNum,
+            'NOMBRE': indicador.indNom,
+            'UNIDAD': '',
+            'FINANCIADOR': '',
+            'IMPLEMENTADOR': '',
+            'UBICACIÓN': '',
+            ...meses.reduce((obj, mes) => ({ ...obj, [`Meta ${mes}`]: '' }), {}),
+            ...meses.reduce((obj, mes) => ({ ...obj, [`Ejecución ${mes}`]: '' }), {})
         };
 
-        meses.forEach((mes, indexMes) => {
-            const monthKey = formatMonthKey(indexMes);
-            const valoresMes = row.cells[monthKey];
-            rowValues[`Meta ${mes}`] = valoresMes ? valoresMes.map(v => v.metPre ? v.metPre : 0).join(', ') : '';
-            rowValues[`Ejecución ${mes}`] = valoresMes ? valoresMes.map(v => v.ejePre ? v.ejePre : 0).join(', ') : '';
+        const rowIndex = worksheet.addRow(indicadorRow).number;
+
+        // Aplicar el formato de número a las celdas numéricas (columna 3 en adelante)
+        const rowExcel = worksheet.getRow(rowIndex);
+        rowExcel.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+            if (colNumber >= 2) {
+                cell.fill = {
+                    type: 'pattern',
+                    pattern: 'solid',
+                    fgColor: { argb: 'D3D3D3' }
+                };
+                cell.font = { bold: true }; 
+            }
+            if (colNumber >= 8) {
+                cell.numFmt = '#,##0.00 $';
+                cell.alignment = { horizontal: 'center', vertical: 'middle' };
+            }
         });
 
-        worksheet.addRow(rowValues);
-    });
+        // Agregar los datos de los indicadores y las filas adicionales
+        Object.values(additionalRows).filter(adRow => adRow.indAno === indicador.indAno && adRow.indCod === indicador.indCod)
+        .forEach((row, rowIndex) => {
+            const rowValues = {
+                'EMPTY': '',
+                'CÓDIGO': row.indNum,
+                'NOMBRE': row.indNom,
+                'UNIDAD': row.uniNom,
+                'FINANCIADOR': row.finNom,
+                'IMPLEMENTADOR': row.impNom,
+                'UBICACIÓN': row.ubiNom,
+            };
+
+            meses.forEach((mes, indexMes) => {
+                const monthKey = formatMonthKey(indexMes);
+                const valoresMes = row.cells[monthKey];
+                rowValues[`Meta ${mes}`] = valoresMes ? Number(valoresMes.map(v => v.metPre ? v.metPre : 0).join(', ')) : '';
+                rowValues[`Ejecución ${mes}`] = valoresMes ? Number(valoresMes.map(v => v.ejePre ? v.ejePre : 0).join(', ')) : '';
+            });
+            const additionalRowExcel = worksheet.addRow(rowValues);
+
+            // Aplicar el formato de número a las celdas numéricas (columna 3 en adelante)
+            additionalRowExcel.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+                if (colNumber >= 2) {
+                    cell.fill = {
+                        type: 'pattern',
+                        pattern: 'solid',
+                        fgColor: { argb: 'F3F3F3' }
+                    };
+                }
+                if (colNumber >= 8) {
+                    cell.numFmt = '#,##0.00 $';
+                    cell.alignment = { horizontal: 'center', vertical: 'middle' };
+                }
+            });
+        });
+    })
+
 
     // Crear el archivo de Excel y descargarlo
     const buffer = await workbook.xlsx.writeBuffer();
