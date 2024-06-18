@@ -233,7 +233,7 @@ const Subproject = () => {
     };
 
     const downloadFile = async (fileName) => {
-        const url = `https://webmeal-aea.ec/fuentes/sub-proyecto/${fileName}`
+        const url = `https://meal.ddns.net/fuentes/sub-proyecto/${fileName}`
         try {
             Notiflix.Loading.pulse('Descargando...');
             // Obtenemos los datos
