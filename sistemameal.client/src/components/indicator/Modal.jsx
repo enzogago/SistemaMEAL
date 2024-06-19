@@ -564,14 +564,24 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setRefresh, title, uni
                                     })}
                                 >
                                     <option value="0">--Seleccione Sub Proyecto--</option>
-                                    {subProyectos.map((item, index) => (
-                                        <option 
-                                            key={index} 
-                                            value={JSON.stringify({ subProAno: item.subProAno, subProCod: item.subProCod, subProInvSubAct: item.subProInvSubAct.trim() })}
-                                        > 
-                                            {item.subProSap + ' - ' + item.subProNom + ' | ' + item.proNom}
-                                        </option>
-                                    ))}
+                                    {subProyectos.map((item, index) => {
+                                        // Limita la longitud del texto a 50 caracteres
+                                        const maxLength = 40;
+                                        let displayText = item.subProSap + ' - ' + item.subProNom + ' | ' + item.proNom;
+                                        if (displayText.length > maxLength) {
+                                            displayText = displayText.substring(0, maxLength) + '...';
+                                        }
+
+                                        return (
+                                            <option 
+                                                key={index} 
+                                                value={JSON.stringify({ subProAno: item.subProAno, subProCod: item.subProCod, subProInvSubAct: item.subProInvSubAct.trim() })}
+                                                title={item.subProSap + ' - ' + item.subProNom + ' | ' + item.proNom} 
+                                            > 
+                                                {displayText}
+                                            </option>
+                                        )
+                                    })}
                                 </select>
                                 {errors.subProyecto ? (
                                     <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.subProyecto.message}</p>
@@ -600,14 +610,20 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setRefresh, title, uni
                                         >
                                             <option value="0">--Seleccione Objetivo--</option>
                                             {objetivos.map((item, index) => {
-                                                const text = item.objNom;
-                                                const shortText = text.length > 50 ? text.substring(0, 50) + '...' : text;
+                                                // Limita la longitud del texto a 50 caracteres
+                                                const maxLength = 40;
+                                                let displayText = item.objNum + ' - ' + item.objNom;
+                                                if (displayText.length > maxLength) {
+                                                    displayText = displayText.substring(0, maxLength) + '...';
+                                                }
+
                                                 return(
                                                     <option 
                                                         key={index} 
                                                         value={JSON.stringify({ objAno: item.objAno, objCod: item.objCod })}
+                                                        title={item.objNum + ' - ' + item.objNom} 
                                                     > 
-                                                        {item.objNum + ' - ' + shortText}
+                                                        {displayText}
                                                     </option>
                                                 )
                                             })}
@@ -639,14 +655,19 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setRefresh, title, uni
                                                 >
                                                     <option value="0">--Seleccione Objetivo Específico--</option>
                                                     {objetivosEspecificos.map((item, index) => {
-                                                        const text = item.objEspNom;
-                                                        const shortText = text.length > 40 ? text.substring(0, 40) + '...' : text;
+                                                        const maxLength = 40;
+                                                        let displayText = item.objEspNum + ' - ' + item.objEspNom;
+                                                        if (displayText.length > maxLength) {
+                                                            displayText = displayText.substring(0, maxLength) + '...';
+                                                        }
+
                                                         return(
                                                             <option 
                                                                 key={index} 
                                                                 value={JSON.stringify({ objEspAno: item.objEspAno, objEspCod: item.objEspCod })}
+                                                                title={item.objEspNum + ' - ' + item.objEspNom} 
                                                             > 
-                                                                {item.objEspNum + ' - ' + shortText}
+                                                                {displayText}
                                                             </option>
                                                         )
                                                     })}
@@ -678,14 +699,19 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setRefresh, title, uni
                                                         >
                                                             <option value="0">--Seleccione Resultado--</option>
                                                             {resultados.map((item, index) => {
-                                                                const text = item.resNom;
-                                                                const shortText = text.length > 40 ? text.substring(0, 40) + '...' : text;
+                                                                const maxLength = 40;
+                                                                let displayText = item.resNum + ' - ' + item.resNom;
+                                                                if (displayText.length > maxLength) {
+                                                                    displayText = displayText.substring(0, maxLength) + '...';
+                                                                }
+
                                                                 return(
                                                                     <option 
                                                                         key={index} 
                                                                         value={JSON.stringify({ resAno: item.resAno, resCod: item.resCod })}
+                                                                        title={item.resNum + ' - ' + item.resNom} 
                                                                     > 
-                                                                        {item.resNum + ' - ' + shortText}
+                                                                        {displayText}
                                                                     </option>
                                                                 )
                                                             })}
@@ -766,14 +792,23 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setRefresh, title, uni
                             }}
                         >
                             <option value="0">--Lista de Indicadores--</option>
-                            {indicadoresSelect.map((item, index) => (
-                                <option 
-                                    key={index} 
-                                    value={item.indNum}
-                                > 
-                                    {item.indNum}
-                                </option>
-                            ))}
+                            {indicadoresSelect.map((item, index) => {
+                                const maxLength = 80;
+                                let displayText = item.indNum + ' - ' + item.indNom;
+                                if (displayText.length > maxLength) {
+                                    displayText = displayText.substring(0, maxLength) + '...';
+                                }
+
+                                return (
+                                    <option 
+                                        key={index} 
+                                        value={item.indNum}
+                                        title={item.indNum + ' - ' + item.indNom} 
+                                    > 
+                                        {displayText}
+                                    </option>
+                                )
+                            })}
                         </select>
                         <textarea
                             rows="4" cols="50"

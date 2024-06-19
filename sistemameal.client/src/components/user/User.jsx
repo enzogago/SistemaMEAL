@@ -60,7 +60,6 @@ const User = () => {
                 item.carNom.includes(tag.toUpperCase()) ||
                 item.rolNom.includes(tag.toUpperCase()) ||
                 item.usuEst.includes(tag.toUpperCase()) ||
-                item.ubiNom.includes(tag.toUpperCase()) ||
                 (item.usuEst === 'A' && 'ACTIVO'.includes(tag.toUpperCase())) ||
                 (item.usuEst === 'I' && 'INACTIVO'.includes(tag.toUpperCase()))
             )

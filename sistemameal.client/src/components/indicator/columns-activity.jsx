@@ -104,7 +104,10 @@ export const getColumns = (actions, controller, openModal, setRefresh) => {
         },
         {
             header: "Responsable",
-            accessorKey: "subProRes"
+            accessorKey: "usuNom",
+            cell: ({row}) => (
+                `${row.original.usuNom} ${row.original.usuApe}`
+            )
         },
         {
             header: "Periodo Inicio",

@@ -674,7 +674,7 @@ const ResultGoal = () => {
                                                         validate: value => value !== '0' || 'El campo es requerido'
                                                     })}
                                                 >
-                                                    <option className='f_75' value="0">--Técnico--</option>
+                                                    <option className='f_75' value="0">--Usuario--</option>
                                                     {usersTecnicos.map((tecnico, index) => (
                                                         <option
                                                             className='f_75'
