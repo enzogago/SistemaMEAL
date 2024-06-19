@@ -183,7 +183,7 @@ export const exportToExcel = async (indicadores, additionalRows, getValues, subp
                 'CÓDIGO': row.indNum,
                 'NOMBRE': row.indNom,
                 'UNIDAD': row.uniNom,
-                'FINANCIADOR': row.finNom,
+                'FINANCIADOR': row.finSap,
                 'IMPLEMENTADOR': row.impNom,
                 'UBICACIÓN': row.ubiNom,
             };

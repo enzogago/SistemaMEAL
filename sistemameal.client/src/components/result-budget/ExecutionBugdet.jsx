@@ -10,6 +10,7 @@ import TableEmpty from '../../img/PowerMas_TableEmpty.svg';
 import { meses } from '../../helpers/simple';
 import { exportToExcel } from './export';
 import { fetchDataReturn } from '../reusable/fetchs';
+import Info from '../../icons/Info';
 
 const ExecutionBudget = () => {
     // Estados para el manejo de la interfaz de usuario
@@ -43,6 +44,11 @@ const ExecutionBudget = () => {
 
     const [currency, setCurrency] = useState('');
 
+    const [popupInfo, setPopupInfo] = useState({ visible: false, data: null });
+    const handleClickInside = (e) => {
+        e.stopPropagation();
+    };
+
     const { 
         register,
         unregister,
@@ -67,9 +73,9 @@ const ExecutionBudget = () => {
             setSelectedSubProyecto(selected);
         } else {
             setIndicadores([]);
-            setValue('metAnoPlaTec','0');
             setSelectedSubProyecto(null);
         }
+        setValue('metAnoPlaTec','0');
     }, [watch('subproyecto')]);
     
     useEffect(() => {
@@ -223,7 +229,7 @@ const ExecutionBudget = () => {
                         groupedFinanciadorData[key] = {};
                     }
 
-                    groupedFinanciadorData[key][item.finCod] = { name: item.finNom, value: item.cadResFinMetPre ? item.cadResFinMetPre : 0 }
+                    groupedFinanciadorData[key][item.finCod] = { name: item.finSap, value: item.cadResFinMetPre ? item.cadResFinMetPre : 0 }
                 });
 
                 let groupedUbicacionData = {};
@@ -504,7 +510,7 @@ const ExecutionBudget = () => {
                     <table className="PowerMas_TableStatus ">
                         <thead>
                             <tr style={{zIndex: '1'}}>
-                                <th className='center'></th>
+                                <th colSpan={2} className='center'></th>
                                 <th style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}>Código</th>
                                 <th colSpan={2}>Nombre</th>
                                 <th>Unidad</th>
@@ -538,6 +544,24 @@ const ExecutionBudget = () => {
                                                     console.log(expandedIndicators)
                                                 }}
                                             > &gt; </div>
+                                        </td>
+                                        <td>
+                                            <span 
+                                                className="f1_25 pointer flex"
+                                                style={{minWidth: '20px'}}
+                                                onClick={() => {
+                                                    const data = {
+                                                        periodo: cadenaPeriodoGrouped[`${item.indAno}-${item.indCod}`],
+                                                        financiador: cadenaFinanciadorGrouped[`${item.indAno}-${item.indCod}`],
+                                                        implementador: cadenaImplementadorGrouped[`${item.indAno}-${item.indCod}`],
+                                                        ubicacion: cadenaUbicacionGrouped[`${item.indAno}-${item.indCod}`],
+                                                        indNum: item.indNum,
+                                                    };
+                                                    setPopupInfo({ visible: true, data });
+                                                }}
+                                            >
+                                                <Info />
+                                            </span>
                                         </td>
                                         <td style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}>{item.indNum}</td>
                                         {
@@ -574,7 +598,7 @@ const ExecutionBudget = () => {
                                     </tr>
                                     {additionalRows.filter(row => row.indAno === item.indAno && row.indCod === item.indCod).map((row, rowIndex) => (
                                         <tr key={`${row.indAno}_${row.indCod}_${row.id}`} style={{visibility: expandedIndicators.includes(`${item.indAno}_${item.indCod}`) ? 'visible' : 'collapse'}}>
-                                            <td ></td>
+                                            <td colSpan={2}></td>
                                             <td style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}></td>
                                             <td>
                                                 <select 
@@ -713,6 +737,55 @@ const ExecutionBudget = () => {
                     </button>
                 </div>
             }
+            {popupInfo.visible && popupInfo.data && (
+                <div className="PowerMas_BubbleChain flex flex-column gap_25 p1">
+                        <span 
+                            className="bold f1_5 pointer"
+                            style={{
+                                color: '#FFFFFF',
+                                position: 'absolute',
+                                top: 0,
+                                right: '0.5rem',
+                                zIndex: '4'
+                            }}
+                            onClick={() => setPopupInfo({ visible: false, data: null })}
+                        >
+                            ×
+                        </span>
+                        <div className='m_25' style={{color: '#FFFFFF'}}>
+                            <h5 className='center'>Cadena de Resultado</h5>
+                            <h5 className='center'>{popupInfo.data.indNum}</h5>
+                        </div>
+                        <div className='flex flex-column'>
+                            <h4 className='f_75' style={{color: '#FFC658'}}>FINANCIADORES:</h4>
+                            {Object.values(popupInfo.data.financiador).map((item, index) => (
+                                <span key={index}>
+                                    <span className='f_75' style={{color: '#FFFFFF'}} >{item.name}: </span> <span className='f_75' style={{color: '#FFC658'}}>{item.value}</span>
+                                </span>
+                            ))}
+                        </div>
+                        <div className='flex flex-column'>
+                            <h4 className='f_75' style={{color: '#FFC658'}}>IMPLEMENTADORES:</h4>
+                            {Object.values(popupInfo.data.implementador).map((item, index) => (
+                                <span key={index}>
+                                    <span className='f_75' style={{color: '#FFFFFF'}} >{item.name}: </span> <span className='f_75' style={{color: '#FFC658'}}>{item.value}</span>
+                                </span>
+                            ))}
+                        </div>
+                        <div className='flex flex-column'>
+                            <h4 className='f_75' style={{color: '#FFC658'}}>UBICACIONES:</h4>
+                            {Object.values(popupInfo.data.ubicacion).map((item, index) => (
+                                <span key={index}>
+                                    <span className='f_75' style={{color: '#FFFFFF'}}>{item.name}: </span> <span className='f_75' style={{color: '#FFC658'}}>{item.value}</span>
+                                </span>
+                            ))}
+                        </div>
+                        <div className=''>
+                            <h4 className='f_75' style={{color: '#FFC658'}}>PERIODO:</h4>
+                            <span className='f_75' style={{color: '#FFFFFF'}}>{watch('metAnoPlaTec')} : </span> <span className='f_75' style={{color: '#FFC658'}}> {popupInfo.data.periodo} </span>
+                        </div>
+                </div>
+            )}
         </div>
     )
 }

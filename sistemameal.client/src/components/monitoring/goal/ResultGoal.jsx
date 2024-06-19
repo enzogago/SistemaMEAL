@@ -74,9 +74,9 @@ const ResultGoal = () => {
             setSelectedSubProyecto(selected);
         } else {
             setIndicadores([]);
-            setValue('metAnoPlaTec','0');
             setSelectedSubProyecto(null);
         }
+        setValue('metAnoPlaTec','0');
     }, [watch('subproyecto')]);
     
     useEffect(() => {
@@ -899,43 +899,45 @@ const ResultGoal = () => {
                 </div>
             }
             {popupInfo.visible && popupInfo.data && (
-                <div
-                    className='PowerMas_Popup_Cadena p1_25 flex flex-column gap_25' 
-                    onClick={handleClickInside}
-                >
+            <div className="PowerMas_BubbleChain flex flex-column gap_25 p1">
                     <span 
                         className="bold f1_5 pointer"
                         style={{
-                            color: '#AAAAAA',
+                            color: '#FFFFFF',
                             position: 'absolute',
                             top: 0,
                             right: '0.5rem',
+                            zIndex: '4'
                         }}
                         onClick={() => setPopupInfo({ visible: false, data: null })}
                     >
                         ×
                     </span>
-                    <div>
-                        <h5 className='center' style={{textDecoration: 'underline'}}>CADENA DE RESULTADO PARA</h5>
-                        <h5 className='center' style={{textDecoration: 'underline'}}>EL INDICADOR: {popupInfo.data.indNum}</h5>
+                    <div className='m_25' style={{color: '#FFFFFF'}}>
+                        <h5 className='center'>Cadena de Resultado</h5>
+                        <h5 className='center'>{popupInfo.data.indNum}</h5>
                     </div>
-                    <div>
-                        <h4 className='f1'>IMPLEMENTADORES:</h4>
+                    <div className='flex flex-column'>
+                        <h4 className='f_75' style={{color: '#FFC658'}}>IMPLEMENTADORES:</h4>
                         {Object.values(popupInfo.data.implementador).map((item, index) => (
-                            <p className='f1' key={index}>{item.name}: {item.value}</p>
+                            <span key={index}>
+                                <span className='f_75' style={{color: '#FFFFFF'}} >{item.name}: </span> <span className='f_75' style={{color: '#FFC658'}}>{item.value}</span>
+                            </span>
                         ))}
                     </div>
-                    <div>
-                        <h4 className='f1'>UBICACIONES:</h4>
+                    <div className='flex flex-column'>
+                        <h4 className='f_75' style={{color: '#FFC658'}}>UBICACIONES:</h4>
                         {Object.values(popupInfo.data.ubicacion).map((item, index) => (
-                            <p className='f1' key={index}>{item.name}: {item.value}</p>
+                            <span key={index}>
+                                <span className='f_75' style={{color: '#FFFFFF'}}>{item.name}: </span> <span className='f_75' style={{color: '#FFC658'}}>{item.value}</span>
+                            </span>
                         ))}
                     </div>
-                    <div>
-                        <h4 className='f1'>PERIODO:</h4>
-                        <p className='f1'>{watch('metAnoPlaTec')} : {popupInfo.data.periodo}</p>
+                    <div className=''>
+                        <h4 className='f_75' style={{color: '#FFC658'}}>PERIODO:</h4>
+                        <span className='f_75' style={{color: '#FFFFFF'}}>{watch('metAnoPlaTec')} : </span> <span className='f_75' style={{color: '#FFC658'}}> {popupInfo.data.periodo} </span>
                     </div>
-                </div>
+            </div>
             )}
         </div>
     )

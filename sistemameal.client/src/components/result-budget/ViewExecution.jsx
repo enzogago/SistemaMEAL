@@ -114,6 +114,7 @@ const ViewExecution = () => {
                     indNum: meta.indNum,
                     indNom: meta.indNom,
                     finNom: meta.finNom,
+                    finSap: meta.finSap,
                     impNom: meta.impNom,
                     ubiNom: meta.ubiNom,
                     uniNom: meta.uniNom,
