@@ -741,7 +741,7 @@ const ResultChain = () => {
                                                     <td key={i}>
                                                     <input
                                                         data-tooltip-id="info-tooltip" 
-                                                        data-tooltip-content={tecValue && `META: ${tecValue}`} 
+                                                        data-tooltip-content={tecValue && `META TÉCNICA: ${tecValue}`} 
                                                         className={`
                                                         PowerMas_Input_Cadena Large_12 f_75 
                                                         PowerMas_Cadena_Form_${dirtyFields[`${item.indAno}_${item.indCod}_${header.key}`] || isSubmitted ? (errors[`${item.indAno}_${item.indCod}_${header.key}`] ? 'invalid' : 'valid') : ''}

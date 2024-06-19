@@ -23,7 +23,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic Listado()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -35,7 +35,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic Insertar(Moneda moneda)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return rToken;
 
@@ -58,7 +58,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic Modificar(Moneda moneda)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return rToken;
 
@@ -82,7 +82,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic Eliminar(Moneda moneda)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return rToken;
 

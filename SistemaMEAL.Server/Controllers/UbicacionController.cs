@@ -23,7 +23,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic Buscar()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -35,7 +35,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic BuscarUbicacionesActivo()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -47,7 +47,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic BuscarPaises()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -59,7 +59,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic BuscarUbicacionesSubProyecto(string subProAno, string subProCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
             
@@ -72,7 +72,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic ListadoJerarquiaUbicacion(string ubiAno, string ubiCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -84,7 +84,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic ListadoUbicacioSelect(string ubiAno, string ubiCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -97,7 +97,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic AccesoUbicaciones(UbicacionDto ubicacionDto)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 

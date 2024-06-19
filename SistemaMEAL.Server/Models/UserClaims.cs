@@ -27,14 +27,7 @@ namespace SistemaMEAL.Server.Models
             }
             else
             {
-                return new UserClaims
-                {
-                    UsuIp = "0.0.0.0",
-                    UsuAno = "0000",
-                    UsuCod = "000000",
-                    UsuNom = "SYSTEM",
-                    UsuApe = "SYSTEM"
-                };
+                return new UserClaims();
             }
         }
     }

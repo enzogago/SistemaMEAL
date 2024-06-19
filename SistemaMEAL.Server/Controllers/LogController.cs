@@ -23,7 +23,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic ActividadesRecientes()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
             if (!rToken.success) return Unauthorized(rToken);
 
             // Pasa los parámetros al método Listado

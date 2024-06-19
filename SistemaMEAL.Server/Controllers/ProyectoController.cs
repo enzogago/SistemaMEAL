@@ -24,8 +24,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic Listado()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
-
+            var rToken = Jwt.ValidateToken(identity);
             if (!rToken.success) return Unauthorized(rToken);
 
             var data = _proyectos.Listado(identity);
@@ -37,7 +36,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic BuscarProyecto(string proAno, string proCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -50,7 +49,7 @@ namespace SistemaMEAL.Server.Controllers
         public IActionResult AgregarExclusiones([FromBody] ModificarExclusionesRequest request, string usuAno, string usuCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -63,7 +62,7 @@ namespace SistemaMEAL.Server.Controllers
         public IActionResult EliminarExclusiones([FromBody] ModificarExclusionesRequest request, string usuAno, string usuCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -79,8 +78,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic ListadoAccesibles(string usuAno, string usuCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
-
+            var rToken = Jwt.ValidateToken(identity);
             if (!rToken.success) return Unauthorized(rToken);
 
             var proyectos = _proyectos.ListadoAccesibles(usuAno, usuCod);
@@ -92,7 +90,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic ListarProyectosSubproyectos()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -105,7 +103,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic ObtenerDetallesProyectoUsuario(string usuAno, string usucod, string proAno, string proCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -117,7 +115,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic Insertar(Proyecto proyecto)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return rToken;
 
@@ -140,7 +138,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic Modificar(Proyecto proyecto)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return rToken;
 
@@ -164,7 +162,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic Eliminar(Proyecto proyecto)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return rToken;
 
@@ -189,7 +187,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic InsertarEstadosMasivo(List<Proyecto> proyectos)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return rToken;
 

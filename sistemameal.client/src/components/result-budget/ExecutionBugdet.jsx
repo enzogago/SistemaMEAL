@@ -157,7 +157,7 @@ const ExecutionBudget = () => {
                     setValue(`implementador_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.implementador);
                     setValue(`ubicacion_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.ubicacion);
                     setValue(`mes_${meta.metMesPlaTec}_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.mes);
-                    setValue(`nombreUbicacion_${meta.indAno}_${meta.indCod}_${counter}`, meta.ubiNom.toLowerCase());
+                    setValue(`nombreUbicacion_${meta.indAno}_${meta.indCod}_${counter}`, meta.ubiNom);
                     setValue(`meta_${meta.metMesPlaTec}_${meta.indAno}_${meta.indCod}_${counter}`, inputValues.meta);
                     setValue(`metMetTec_${meta.metMesPlaTec}_${meta.indAno}_${meta.indCod}_${counter}`, meta.metMetTec);
                     
@@ -199,6 +199,10 @@ const ExecutionBudget = () => {
                 const filas = Object.values(rows);
                 setAdditionalRows(filas);
                 setRowIdCounter(counter+1);
+
+                // Expande todos los indicadores
+                const allExpandedIndicators = indicadorData.map(ind => `${ind.indAno}_${ind.indCod}`);
+                setExpandedIndicators(allExpandedIndicators);
 
                 let groupedImplementadorData = {};
                 cadenaImplementadorData.forEach(item => {
@@ -513,8 +517,8 @@ const ExecutionBudget = () => {
                         <tbody>
                             {
                             indicadores.map((item, index) => {
-                                const text = item.indNom.charAt(0).toUpperCase() + item.indNom.slice(1).toLowerCase();
-                                const shortText = text.length > 30 ? text.substring(0, 30) + '...' : text;
+                                const text = item.indNom;
+                                const shortText = text.length > 45 ? text.substring(0, 45) + '...' : text;
 
                                 const textUnidad = item.uniNom;
                                 const shortTextUnidad = textUnidad.length > 15 ? textUnidad.substring(0, 15) + '...' : textUnidad;
@@ -531,12 +535,13 @@ const ExecutionBudget = () => {
                                                     } else {
                                                         setExpandedIndicators([...expandedIndicators, `${item.indAno}_${item.indCod}`]);
                                                     }
+                                                    console.log(expandedIndicators)
                                                 }}
                                             > &gt; </div>
                                         </td>
                                         <td style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}>{item.indNum}</td>
                                         {
-                                            text.length > 30 ?
+                                            text.length > 45 ?
                                             <td
                                             colSpan={2}
                                                 data-tooltip-id="info-tooltip" 
@@ -573,7 +578,7 @@ const ExecutionBudget = () => {
                                             <td style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}></td>
                                             <td>
                                                 <select 
-                                                    style={{textTransform: 'capitalize', margin: '0'}}
+                                                    style={{textTransform: 'capitalize', margin: '0', paddingRight: '0'}}
                                                     id={`financiador_${row.id}`}
                                                     disabled={!actions.add}
                                                     onInput={(e) => {
@@ -591,27 +596,37 @@ const ExecutionBudget = () => {
                                                     className={`PowerMas_Input_Cadena f_75 PowerMas_Modal_Form_${dirtyFields[`financiador_${row.id}`] || isSubmitted ? (errors[`financiador_${row.id}`] ? 'invalid' : 'valid') : ''}`} 
                                                     {...register(`financiador_${row.id}`, {
                                                         validate: {
-                                                            notZero: value => value !== '0' || 'El campo es requerido'
+                                                            notZero: value => value !== '00' || 'El campo es requerido'
                                                         }
                                                     })}
                                                 >
-                                                    <option value="0" className='f_75'>--Financiador--</option>
-                                                    {financiadoresSelect.map((item, index) => (
-                                                        <option
-                                                            className='f_75'
-                                                            key={index} 
-                                                            value={item.finCod}
-                                                        > 
-                                                            {item.finIde + ' - ' + item.finNom.toLowerCase()}
-                                                        </option>
-                                                    ))}
+                                                    <option value="00" className='f_75'>--Financiador--</option>
+                                                    {financiadoresSelect.map((item, index) => {
+                                                        // Limita la longitud del texto a 50 caracteres
+                                                        const maxLength = 15;
+                                                        let displayText = item.finIde + ' - ' + item.finNom.toLowerCase();
+                                                        if (displayText.length > maxLength) {
+                                                            displayText = displayText.substring(0, maxLength) + '...';
+                                                    }
+
+                                                        return (
+                                                            <option
+                                                                className='f_75'
+                                                                key={index} 
+                                                                value={item.finCod}
+                                                                title={item.finIde + ' - ' + item.finNom}
+                                                            > 
+                                                                {displayText}
+                                                            </option>
+                                                        )
+                                                    })}
                                                 </select>
                                             </td>
                                             <td className='' style={{textTransform: 'capitalize'}}>
-                                                {getValues(`implementador_${row.id}`)}
+                                                <span className='bold'>IMPLEMENTADOR:</span> {getValues(`implementador_${row.id}`)}
                                             </td>
                                             <td className='' style={{textTransform: 'capitalize'}}>
-                                                {getValues(`nombreUbicacion_${row.id}`)}
+                                                <span className='bold'>UBICACIÓN:</span> {getValues(`nombreUbicacion_${row.id}`)}
                                             </td>
                                             {meses.map((mes, i) =>{
                                             return(

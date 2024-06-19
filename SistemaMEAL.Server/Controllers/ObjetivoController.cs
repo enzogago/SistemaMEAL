@@ -24,7 +24,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic Buscar()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -36,7 +36,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic BuscarObjetivosPorSubproyecto(string subProAno, string subProCod )
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -48,7 +48,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic Insertar(Objetivo objetivo)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return rToken;
 
@@ -72,7 +72,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic Modificar(Objetivo objetivo)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return rToken;
 
@@ -96,7 +96,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic Eliminar(Objetivo objetivo)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return rToken;
 

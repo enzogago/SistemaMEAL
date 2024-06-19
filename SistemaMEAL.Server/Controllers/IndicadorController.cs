@@ -24,7 +24,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic BuscarSinActividad()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -36,7 +36,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic BuscarSoloActividad()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -48,7 +48,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic Buscar()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -60,7 +60,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic BuscarIndicador(string indAno, string indCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -72,7 +72,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic BuscarIndicadorPorSubproyecto(string subProAno, string subProCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -84,7 +84,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic BuscarCadenaPorPeriodo(string subProAno, string subProCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -96,7 +96,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic BuscarCadenaPorPeriodoAno(string subProAno, string subProCod, string carResPerAno)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -108,7 +108,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic BuscarCadenaPorPeriodoAnoActividad(string subProAno, string subProCod, string carResPerAno)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -120,7 +120,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic BuscarCadenaPorImplementador(string subProAno, string subProCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -131,7 +131,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic BuscarCadenaPorUbicacion(string subProAno, string subProCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -144,7 +144,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic BuscarIndicadorPorSubproyectoActividad(string subProAno, string subProCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -156,7 +156,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic BuscarCadenaPorPeriodoActividad(string subProAno, string subProCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -168,7 +168,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic BuscarCadenaPorImplementadorActividad(string subProAno, string subProCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -179,7 +179,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic BuscarCadenaPorFinanciadorActividad(string subProAno, string subProCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -190,7 +190,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic BuscarCadenaPorUbicacionActividad(string subProAno, string subProCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -202,7 +202,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic Insertar(Indicador indicador)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return rToken;
 
@@ -225,7 +225,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic Modificar(Indicador indicador)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return rToken;
 
@@ -248,7 +248,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic Eliminar(Indicador indicador)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return rToken;
 
@@ -271,7 +271,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic ModificarCadenaIndicadorPresupuesto(CadenaIndicadorDto cadenaIndicadorDto)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return rToken;
 
@@ -294,7 +294,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic ModificarCadenaIndicadorTecnico(CadenaIndicadorDto cadenaIndicadorDto)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return rToken;
 

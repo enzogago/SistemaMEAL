@@ -1,10 +1,9 @@
 const Info = () => {
     return (
         <svg style={{width: 'auto'}} height="1em"  viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="24" height="24" fill="white"/>
-        <circle cx="12" cy="12" r="9" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M12 11V17" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M11.75 8V7H12.25V8H11.75Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
+        <g id="Warning / Info">
+            <path id="Vector" d="M12 11V16M12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21ZM12.0498 8V8.1L11.9502 8.1002V8H12.0498Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </g>
         </svg>
     )
 }
