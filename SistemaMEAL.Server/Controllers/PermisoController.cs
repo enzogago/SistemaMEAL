@@ -23,7 +23,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic InsertarPermisoUsuario(PermisoUsuarioDto permisoUsuarioDto)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return rToken;
 
@@ -47,7 +47,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic Listado()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -59,7 +59,7 @@ namespace SistemaMEAL.Server.Controllers
         public IActionResult ListadoPermisoPorUsuario(string usuAno, string usuCod, string perRef)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -71,7 +71,7 @@ namespace SistemaMEAL.Server.Controllers
         public IActionResult BuscarPermisoPorReferencia(string perRef)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -83,7 +83,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic Insertar(Permiso permiso)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return rToken;
 
@@ -106,7 +106,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic Modificar(string perCod, Permiso permiso)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return rToken;
 
@@ -131,7 +131,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic Eliminar(string perCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return rToken;
 

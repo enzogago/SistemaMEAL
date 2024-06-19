@@ -27,7 +27,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic Listado()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
            
@@ -41,7 +41,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic Buscar(string benAno, string benCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -73,7 +73,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic BuscarMetaBeneficiario(string metAno, string metCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
             var resultado = _beneficiarios.BuscarMetaBeneficiario(identity, metAno:metAno, metCod:metCod);
@@ -84,7 +84,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic Insertar(DocumentoBeneficiarioDto? documentoBeneficiarioDto)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return rToken;
 
@@ -108,7 +108,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic InsertarMasivo(MetaBeneficiarioDto metaBeneficiarioDto)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return rToken;
 
@@ -132,7 +132,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic Modificar(Beneficiario? beneficiario)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return rToken;
 
@@ -156,7 +156,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic BuscarBeneficiarioPorDocumento(string docIdeCod, string docIdeBenNum)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
            
@@ -170,7 +170,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic BuscarBeneficiarioPorNombre(string nombres)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
            
@@ -183,7 +183,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic ContarBeneficiariosHome(string? tags = null, string? periodoInicio = null, string? periodoFin = null)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -196,7 +196,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic BuscarBeneficiariosHome(string? tags = null, string? periodoInicio = null, string? periodoFin = null)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -208,7 +208,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic BuscarBeneficiariosEcuadorHome(string? tags = null, string? periodoInicio = null, string? periodoFin = null)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -220,7 +220,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic BuscarBeneficiariosPerurHome(string? tags = null, string? periodoInicio = null, string? periodoFin = null)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -232,7 +232,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic BuscarBeneficiariosColombiaHome(string? tags = null, string? periodoInicio = null, string? periodoFin = null)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -245,7 +245,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic BuscarSexoHome(string? tags = null, string? periodoInicio = null, string? periodoFin = null)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -257,7 +257,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic BuscarRangoHome(string? tags = null, string? periodoInicio = null, string? periodoFin = null)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 

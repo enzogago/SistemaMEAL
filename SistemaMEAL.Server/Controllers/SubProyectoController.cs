@@ -27,7 +27,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic BuscarPorProyecto(string proAno, string proCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -39,7 +39,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic Buscar()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -52,7 +52,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic BuscarSubproyecto(string subProAno, string subProCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
@@ -65,7 +65,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic InsertarMasivo(SubProyectoImplementadorUbicacionDto subProyectoImplementadorUbicacionDto)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return rToken;
 
@@ -88,7 +88,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic Eliminar(SubProyecto subProyecto)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return rToken;
 
@@ -111,7 +111,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic Insertar(SubProyectoImplementadorUbicacionDto subProyectoImplementadorUbicacionDto)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return rToken;
 
@@ -135,7 +135,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic Modificar(SubProyectoImplementadorUbicacionDto subProyectoImplementadorUbicacionDto)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return rToken;
 
@@ -159,7 +159,7 @@ namespace SistemaMEAL.Server.Controllers
         public async Task<IActionResult> SubirArchivo(SubProyectoFuenteDto subProyectoFuenteDto)
         {
             // var identity = HttpContext.User.Identity as ClaimsIdentity;
-            // var rToken = Jwt.validarToken(identity, _usuarios);
+            // var rToken = Jwt.ValidateToken(identity);
             // if (!rToken.success) 
             // {
             //     return Unauthorized(new { success = false, message = rToken.message });
@@ -196,7 +196,7 @@ namespace SistemaMEAL.Server.Controllers
         public async Task<IActionResult> EliminarArchivo(SubProyectoFuenteDto subProyectoFuenteDto)
         {
             // var identity = HttpContext.User.Identity as ClaimsIdentity;
-            // var rToken = Jwt.validarToken(identity, _usuarios);
+            // var rToken = Jwt.ValidateToken(identity);
             // if (!rToken.success) 
             // {
             //     return Unauthorized(new { success = false, message = rToken.message });
@@ -233,7 +233,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic BuscarArchivos(string subProAno, string subProCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 

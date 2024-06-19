@@ -10,6 +10,7 @@ import useEntityActions from '../../../hooks/useEntityActions';
 import TableEmpty from '../../../img/PowerMas_TableEmpty.svg';
 import { exportToExcel } from '../../../helpers/goals';
 import Info from '../../../icons/Info';
+import Plus from '../../../icons/Plus';
 
 const ResultGoal = () => {
     // Estados relacionados con la interfaz de usuario
@@ -186,6 +187,10 @@ const ResultGoal = () => {
                 const filas = Object.values(rows);
                 setAdditionalRows(filas);
                 setRowIdCounter(counter+1);
+
+                // Expande todos los indicadores
+                const allExpandedIndicators = indicatorData.map(ind => `${ind.indAno}_${ind.indCod}`);
+                setExpandedIndicators(allExpandedIndicators);
 
                 let groupedImplementadorData = {};
                 cadenaImplementadorData.forEach(item => {
@@ -563,9 +568,10 @@ const ResultGoal = () => {
                                         <td>
                                             {
                                                 actions.add &&
-                                                <button 
-                                                    className='p_25' 
-                                                    style={{backgroundColor: 'transparent', border: 'none'}} 
+                                                <span
+                                                    className="f1_25 pointer flex"
+                                                    style={{minWidth: '20px'}}
+                                                    // style={{backgroundColor: 'transparent', border: 'none'}} 
                                                     onClick={() => {
                                                         setRowIdCounter(rowIdCounter + 1);
                                                         setAdditionalRows([...additionalRows, { id: `${item.indAno}_${item.indCod}_${rowIdCounter}`, indAno: item.indAno, indCod: item.indCod, indNum: item.indNum, uniNom: item.uniNom }]);
@@ -573,7 +579,9 @@ const ResultGoal = () => {
                                                             setExpandedIndicators([...expandedIndicators, `${item.indAno}_${item.indCod}`]);
                                                         }
                                                     }}
-                                                > + </button>
+                                                >
+                                                    <Plus />
+                                                </span>
                                             }
                                         </td>
                                         <td>
@@ -674,7 +682,7 @@ const ResultGoal = () => {
                                                         validate: value => value !== '0' || 'El campo es requerido'
                                                     })}
                                                 >
-                                                    <option className='f_75' value="0">--Usuario--</option>
+                                                    <option className='f_75' value="0">--Responsable--</option>
                                                     {usersTecnicos.map((tecnico, index) => (
                                                         <option
                                                             className='f_75'
@@ -719,10 +727,10 @@ const ResultGoal = () => {
                                                                     watch(`ubicacion_${r.id}`) === ubicacionValue
                                                                 );
                                                                 if (duplicate) {
-                                                                    Notiflix.Report.failure(
+                                                                    Notiflix.Report.warning(
                                                                         'Error de Validación',
-                                                                        `Verifica que no se repita implementador y ubicación para el indicador ${row.indNum}`,
-                                                                        'Vale',
+                                                                        `Verifica que no se repita el implementador y la ubicación para el indicador ${row.indNum}`,
+                                                                        'Aceptar',
                                                                     );
                                                                     return false;
                                                                 }
@@ -746,7 +754,7 @@ const ResultGoal = () => {
                                             </td>
                                             <td className='center'>
                                                 <select 
-                                                    style={{textTransform: 'capitalize', margin: '0'}}
+                                                    style={{textTransform: 'capitalize', margin: '0', paddingRight: '0'}}
                                                     id={`ubicacion_${row.id}`}
                                                     disabled={!actions.add}
                                                     onInput={(e) => {
@@ -777,10 +785,10 @@ const ResultGoal = () => {
                                                                     watch(`implementador_${r.id}`) === implementadorValue
                                                                 );
                                                                 if (duplicate) {
-                                                                    Notiflix.Report.failure(
+                                                                    Notiflix.Report.warning(
                                                                         'Error de Validación',
-                                                                        `Verifica que no se repita implementador y ubicación para el indicador ${row.indNum}`,
-                                                                        'Vale',
+                                                                        `Verifica que no se repita el implementador y la ubicación para el indicador ${row.indNum}`,
+                                                                        'Aceptar',
                                                                     );
                                                                     return false;
                                                                 }
@@ -791,15 +799,25 @@ const ResultGoal = () => {
                                                     })}
                                                 >
                                                     <option value="0" className='f_75'>--Ubicación--</option>
-                                                    {ubicacionesSelect.map((item, index) => (
-                                                        <option
-                                                            className='f_75'
-                                                            key={index} 
-                                                            value={JSON.stringify({ ubiAno: item.ubiAno, ubiCod: item.ubiCod })}
-                                                        > 
-                                                            {item.ubiNom.toLowerCase()}
-                                                        </option>
-                                                    ))}
+                                                    {ubicacionesSelect.map((item, index) => {
+                                                        // Limita la longitud del texto a 50 caracteres
+                                                        const maxLength = 15;
+                                                        let displayText = item.ubiNom.toLowerCase();
+                                                        if (displayText.length > maxLength) {
+                                                            displayText = displayText.substring(0, maxLength) + '...';
+                                                        }
+                            
+                                                        return (
+                                                            <option
+                                                                className='f_75'
+                                                                key={index} 
+                                                                value={JSON.stringify({ ubiAno: item.ubiAno, ubiCod: item.ubiCod })}
+                                                                title={item.ubiNom}
+                                                            > 
+                                                                {displayText}
+                                                            </option>
+                                                        )
+                                                    })}
                                                 </select>
                                             </td>
                                             {meses.map((mes, i) => (

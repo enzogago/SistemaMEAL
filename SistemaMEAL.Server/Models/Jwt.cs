@@ -55,8 +55,18 @@ namespace SistemaMEAL.Server.Models
             }
         }
 
-        private static dynamic ValidateToken(ClaimsIdentity identity)
+        public static dynamic ValidateToken(ClaimsIdentity? identity)
         {
+            if (identity == null)
+            {
+                return new
+                {
+                    success = false,
+                    message = "No se pudo obtener la identidad del usuario",
+                    result = ""
+                };
+            }
+
             var expClaim = identity.Claims.FirstOrDefault(x => x.Type == "exp");
             if (expClaim != null)
             {
@@ -86,9 +96,9 @@ namespace SistemaMEAL.Server.Models
         {
             var ano = identity.Claims.FirstOrDefault(x => x.Type == "USUANO")?.Value;
             var cod = identity.Claims.FirstOrDefault(x => x.Type == "USUCOD")?.Value;
-
+            
             // Buscar usuario
-            var usuario = usuarios.Listado(usuAno: ano, usuCod: cod).FirstOrDefault();
+            var usuario = usuarios.Listado(identity, usuAno: ano, usuCod: cod).FirstOrDefault();
             if (usuario == null)
             {
                 return new

@@ -24,7 +24,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic InsertarMenuUsuario(MenuUsuarioDto menuUsuarioDto)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return rToken;
 
@@ -47,7 +47,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic Buscar()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
             var result = _menus.Buscar(identity);
@@ -58,7 +58,7 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic BuscarRecursivo()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
             var result = _menus.BuscarRecursivo(identity);
@@ -69,7 +69,7 @@ namespace SistemaMEAL.Server.Controllers
         public IActionResult ListadoMenuPorUsuario(string usuAno, string usuCod)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.validarToken(identity, _usuarios);
+            var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
 
