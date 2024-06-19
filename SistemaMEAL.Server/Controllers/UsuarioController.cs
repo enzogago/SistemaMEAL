@@ -207,24 +207,6 @@ namespace SistemaMEAL.Server.Controllers
             var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
-
-            dynamic data = rToken.result;
-            Usuario usuario = new Usuario
-            {
-                UsuAno = data.UsuAno,
-                UsuCod = data.UsuCod,
-                RolCod = data.RolCod
-
-            };
-            if (usuario.RolCod != "01")
-            {
-                return StatusCode(403, new
-                {
-                    success = false,
-                    message = "No tienes permisos para realizar esta acción",
-                    result = ""
-                });
-            }
            
             var usuarios = _usuarios.Listado(identity);
             return Ok(usuarios);
