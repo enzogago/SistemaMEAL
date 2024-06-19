@@ -207,6 +207,7 @@ namespace SistemaMEAL.Server.Controllers
             var rToken = Jwt.ValidateToken(identity);
 
             if (!rToken.success) return Unauthorized(rToken);
+
            
             var usuarios = _usuarios.Listado(identity);
             return Ok(usuarios);

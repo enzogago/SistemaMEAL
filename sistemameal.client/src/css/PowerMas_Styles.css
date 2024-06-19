@@ -2360,3 +2360,16 @@ textarea {
 	background-color: #FFFFFF;
 	border: 1px solid black;
 }
+
+
+
+.PowerMas_BubbleChain{
+    border-radius: 10px;
+    background: #006776;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    box-shadow: 0px 2px 10px 0px #000;
+    z-index: 3;
+	transition: all 0.2s ease;
+}
