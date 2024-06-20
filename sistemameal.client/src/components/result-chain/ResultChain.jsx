@@ -44,7 +44,7 @@ const ResultChain = () => {
     // Acciones disponibles para el usuario según el contexto (por ejemplo, exportar a Excel)
     const actions = useEntityActions('CADENA RESULTADO');
 
-    const [refresh, setRefresh] = useState(false)
+    const [refresh, setRefresh] = useState(false);
     const [currency, setCurrency] = useState('');
 
     useEffect(() => {
@@ -708,7 +708,16 @@ const ResultChain = () => {
                                                         `}
                                                         disabled={!actions.add}
                                                         onInput={(e) => {
-                                                            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                                                            if (item.tipValCod === '02') {
+                                                                const value = e.target.value;
+                                                                if (value === '' || (/^\d*\.?\d*$/.test(value))) {
+                                                                    e.target.value = value;
+                                                                } else {
+                                                                    e.target.value = value.slice(0, -1);
+                                                                }
+                                                            } else {
+                                                                e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                                                            }
 
                                                             const newValue = e.target.value;
                                                             
@@ -799,7 +808,7 @@ const ResultChain = () => {
                                                         autoComplete='off'
                                                         {...register(`${item.indAno}_${item.indCod}_${header.key}`, {
                                                             pattern: {
-                                                                value: /^(?:[1-9]\d*|)$/,
+                                                                value: /^(?:\d+\.?\d*|\.\d+)$/,
                                                                 message: 'Valor no válido',
                                                             },
                                                             maxLength: {

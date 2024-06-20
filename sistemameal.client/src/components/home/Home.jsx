@@ -13,7 +13,7 @@ import { useSearchTags } from '../../hooks/useSearchTags';
 
 // Helpers y formateadores
 import { fetchDataBlock, fetchDataBlockHome } from '../reusable/helper';
-import { formatter } from '../monitoring/goal/helper';
+import { formatter, formatterBudget } from '../monitoring/goal/helper';
 
 // Imágenes y iconos
 import masculino from '../../img/PowerMas_Avatar_Masculino.svg';
@@ -84,6 +84,12 @@ const Home = () => {
     const [rangeData, setRangeData] = useState([]);
     const [mapData, setMapData] = useState([]);
     const [beneficiariosData, setBeneficiariosData] = useState([]);
+    const  [totals, setTotals ] = useState({
+        totalMetTec: 0,
+        totalEjeTec: 0,
+        totalMetPre: 0,
+        totalEjePre: 0,
+    });
 
     // Efecto para cargar datos iniciales
     useEffect(() => {
@@ -109,6 +115,13 @@ const Home = () => {
             const totalAtenciones = data.reduce((sum, item) => sum + Number(item.metEjeTec), 0);
             const totalMetaPre = data.reduce((sum, item) => sum + Number(item.metMetPre), 0);
             const totalAtencionesPre = data.reduce((sum, item) => sum + Number(item.metEjePre), 0);
+
+            setTotals({
+                totalMetTec: totalMeta,
+                totalEjeTec: totalAtenciones,
+                totalMetPre: totalMetaPre,
+                totalEjePre: totalAtencionesPre,
+            })
     
             // Establece el total de atenciones
             setTotalAtenciones(totalAtenciones);
@@ -294,13 +307,33 @@ const Home = () => {
                             <p className="f1_25">Beneficiarios duplicados</p>
                             <span className='Medium_f2 Small-f1_5'>{formatter.format(Number(0))}</span>
                         </div>
-                        <div className="PowerMas_KPIRow Large_3 Medium_6 Small_12 gap_3 flex-column Large-f1_25 table-home-block">
+                        <div className="PowerMas_KPIRow Large_3 Medium_6 Small_12 gap_3 flex-column Large-f1_25 table-home-block relative">
                             <p className="f1_25">Avance técnico</p>
                             <DonutChart percentage={avanceTecnico} wh={140} rad={20} newId={'Dona_Tecnico'} colorText={'#000'} colorPc={'#F87C56'} colorSpc={'#F7775A20'} />
+                            <div
+                                className='Phone_12 flex p_25 jc-space-between f1' 
+                                style={{
+                                    position: 'absolute',
+                                    bottom: 0
+                                }} 
+                            >
+                                <span>Meta: {formatter.format(totals.totalMetTec)}</span>
+                                <span>Ejecución {formatter.format(totals.totalEjeTec)}</span>
+                            </div>
                         </div>
-                        <div className="PowerMas_KPIRow Large_3 Medium_6 Small_12 gap_3 flex-column Large-f1_25 table-home-block">
+                        <div className="PowerMas_KPIRow Large_3 Medium_6 Small_12 gap_3 flex-column Large-f1_25 table-home-block relative">
                             <p className="f1_25" style={{whiteSpace: 'nowrap'}}>Avance presupuesto</p>
                             <DonutChart percentage={avancePresupuesto} wh={140} rad={20} newId={'Dona_Presupuesto'} colorText={'#000'} colorPc={'#F87C56'} colorSpc={'#F7775A20'} />
+                            <div
+                                className='Phone_12 flex p_25 jc-space-between f1' 
+                                style={{
+                                    position: 'absolute',
+                                    bottom: 0
+                                }} 
+                            >
+                                <span>Meta: {formatterBudget.format(totals.totalMetPre)}</span>
+                                <span>Ejecución {formatterBudget.format(totals.totalEjePre)}</span>
+                            </div>
                         </div>
                     </div>
                     <div 

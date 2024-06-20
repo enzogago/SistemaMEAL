@@ -47,6 +47,7 @@ const ResultChain = () => {
     const [totalIndTotPre, setTotalIndTotPre] = useState(0); // Total acumulado de los indicadores para comparaciones.
     // Acciones disponibles para el usuario según el contexto (por ejemplo, exportar a Excel)
     const actions = useEntityActions('CADENA RESULTADO PRESUPUESTO');
+    const [refresh, setRefresh] = useState(false)
 
     useEffect(() => {
         const handleKeyDown = (event) => {
@@ -107,7 +108,6 @@ const ResultChain = () => {
     const { 
         register,
         unregister,
-        reset,
         watch, 
         handleSubmit,
         getValues,
@@ -253,7 +253,7 @@ const ResultChain = () => {
             setRenderData([]);
             setHeaders([]);
         }
-    }, [watch('subproyecto')]);
+    }, [watch('subproyecto'), refresh]);
     
     function combineRenderData(renderDataPorAno, renderDataPorImplementador, renderDataPorFinanciador, renderDataPorUbicacion) {
         const combinedRenderData = {};
@@ -420,7 +420,7 @@ const ResultChain = () => {
                 return;
             }
             Notiflix.Notify.success(data.message);
-            reset();
+            setRefresh(prevRefresh => !prevRefresh)
         } catch (error) {
             console.error('Error:', error);
         } finally {
