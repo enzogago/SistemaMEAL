@@ -138,9 +138,30 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
         const paginatedData = metas.slice(startIndex, endIndex);
     
         const grouped = paginatedData.reduce((grouped, meta) => {
-            const key = `res_${meta.resAno}_${meta.resCod}`
-            if (!grouped[key]) {
-                grouped[key] = { metas: [], resNom: meta.resNom, resNum: meta.resNum, totalMetTec: 0 , totalEjeTec: 0, totalMetPre: 0 , totalEjePre: 0 }
+            const resKey = `res_${meta.resAno}_${meta.resCod}`
+
+            let name, number;
+
+            switch(meta.indTipInd) {
+                case 'IIN':
+                    name = meta.subProNom;
+                    number = meta.subProSap;
+                    break;
+                case 'IOB':
+                    name = meta.objNom;
+                    number = meta.objNum;
+                    break;
+                case 'IOE':
+                    name = meta.objEspNom;
+                    number = meta.objEspNum;
+                    break;
+                default:
+                    name = meta.resNom;
+                    number = meta.resNum;
+            }
+
+            if (!grouped[resKey]) {
+                grouped[resKey] = { metas: [], ...meta,  name, number, totalMetTec: 0 , totalEjeTec: 0, totalMetPre: 0 , totalEjePre: 0 }
             }
             // Evalúa metMetTec y metEjeTec como operaciones, si es posible
             let metMetTec = Number(meta.metMetTec);
@@ -161,11 +182,11 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                 metEjePre = eval(meta.metEjePre);
             }
             // Agrega la meta al array, pero con metMetTec y metEjeTec evaluados como operaciones
-            grouped[key].metas.push({...meta, metMetTec, metEjeTec, metMetPre, metEjePre})
-            grouped[key].totalMetTec += metMetTec;
-            grouped[key].totalEjeTec += metEjeTec;
-            grouped[key].totalMetPre += metMetPre;
-            grouped[key].totalEjePre += metEjePre;
+            grouped[resKey].metas.push({...meta, metMetTec, metEjeTec, metMetPre, metEjePre})
+            grouped[resKey].totalMetTec += metMetTec;
+            grouped[resKey].totalEjeTec += metEjeTec;
+            grouped[resKey].totalMetPre += metMetPre;
+            grouped[resKey].totalEjePre += metEjePre;
         
             // Actualiza los totales
             setTotals(totals => ({
@@ -384,10 +405,10 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {currentRecords.map(([key, { metas, resNom, resNum, totalMetTec, totalEjeTec, totalMetPre, totalEjePre }]) => {
+                            {currentRecords.map(([key, { metas, name, number, totalMetTec, totalEjeTec, totalMetPre, totalEjePre }]) => {
                                 const totalPorAvaTec = totalMetTec ? (totalEjeTec / totalMetTec) * 100 : 0
                                 const totalPorAvaPre = totalMetPre ? (totalEjePre / totalMetPre) * 100 : 0
-                                const text = resNum + ' - ' + resNom;
+                                const text = number + ' - ' + name;
                                 const shortText = text.length > 80 ? text.substring(0, 80) + '...' : text;
 
                                 const {statusName, statusColor} = getIndicatorStatus(metas);

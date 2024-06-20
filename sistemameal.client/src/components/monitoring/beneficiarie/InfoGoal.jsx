@@ -62,11 +62,11 @@ const InfoGoal = ({metaData, openModal, is = true}) => {
                         </article>
                         <article>
                             <h3 className="Large-f1 m_5"> Subproyecto </h3>
-                            <p className="m_5">{metaData && metaData.subProNom}</p>
+                            <p className="m_5">{metaData && metaData.subProSap  + ' - ' + metaData.subProNom.charAt(0) + metaData.subProNom.slice(1).toLowerCase() }</p>
                         </article>
                         <article>
                             <h3 className="Large-f1 m_5">Proyecto</h3>
-                            <p className="m_5">{metaData && metaData.proNom}</p>
+                            <p className="m_5">{metaData && metaData.proIde + ' - ' + metaData.proLinInt  + ' - ' + metaData.proNom.charAt(0) + metaData.proNom.slice(1).toLowerCase() }</p>
                         </article>
                     </div>
                 </div>

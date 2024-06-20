@@ -15,7 +15,6 @@ import Plus from '../../../icons/Plus';
 const ResultGoal = () => {
     // Estados relacionados con la interfaz de usuario
     const [dropdownOpen, setDropdownOpen] = useState(false);
-
     // Estados relacionados con los datos de la aplicación
     const [subproyectos, setSubProyectos] = useState([]);
     const [selectedSubProyecto, setSelectedSubProyecto] = useState(null);
@@ -24,16 +23,13 @@ const ResultGoal = () => {
     const [implementadoresSelect, setImplementadoresSelect] = useState([]);
     const [ubicacionesSelect, setUbicacionesSelect] = useState([]); // Options de paises
     const [initialMetas, setInitialMetas] = useState([]);
-
     // Estados relacionados con las filas de la tabla
     const [additionalRows, setAdditionalRows] = useState([]);
     const [expandedIndicators, setExpandedIndicators] = useState([]);
     const [rowIdCounter, setRowIdCounter] = useState(0);
-
     // Estados relacionados con los totales y valores previos
     const [totals, setTotals] = useState({});
     const [prevValues, setPrevValues] = useState({});
-
     // Estados relacionados con los datos agrupados
     const [cadenaPeriodoGrouped, setCadenaPeriodoGrouped] = useState(null);
     const [cadenaImplementadorGrouped, setCadenaImplementadorGrouped] = useState(null);
@@ -42,6 +38,7 @@ const ResultGoal = () => {
     const [isFormValid, setIsFormValid] = useState(false);
 
     const actions = useEntityActions('METAS MENSUALES');
+    const [refresh, setRefresh] = useState(false)
 
     const [popupInfo, setPopupInfo] = useState({ visible: false, data: null });
     const handleClickInside = (e) => {
@@ -54,7 +51,6 @@ const ResultGoal = () => {
         watch, 
         handleSubmit, 
         formState: { errors, dirtyFields, isSubmitted }, 
-        reset, 
         setValue, 
         getValues
     } = 
@@ -106,9 +102,21 @@ const ResultGoal = () => {
                 fetchDataReturn(`Indicador/implementador/${subProAno}/${subProCod}`),
                 fetchDataReturn(`Indicador/ubicacion/${subProAno}/${subProCod}`),
             ]).then(([tecnicosData, indicatorData, implementadorData, ubicacionData, metaData, cadenaPeriodoData, cadenaImplementadorData, cadenaUbicacionData]) => {
-                setUsersTecnicos(tecnicosData);
+                let groupedPeriodoData = {};
+                cadenaPeriodoData.forEach(item => {
+                    let key = `${item.indAno}-${item.indCod}`;
+                    groupedPeriodoData[key]  = Number(item.cadResPerMetTec) || 0;
+                });
 
-                setIndicadores(indicatorData);
+                // Filtra los indicadores que tienen un valor mayor a 0 en groupedPeriodoData
+                const filteredIndicatorData = indicatorData.filter(indicator => 
+                    groupedPeriodoData[`${indicator.indAno}-${indicator.indCod}`] > 0
+                );
+
+                // Establece los indicadores filtrados
+                setIndicadores(filteredIndicatorData);
+
+                setUsersTecnicos(tecnicosData);
 
                 setImplementadoresSelect(implementadorData);
 
@@ -212,11 +220,7 @@ const ResultGoal = () => {
                     groupedUbicacionData[key][`${item.ubiAno}-${item.ubiCod}`] = { name: item.ubiNom, value: item.cadResUbiMetTec ? item.cadResUbiMetTec : 0 }
                 });
 
-                let groupedPeriodoData = {};
-                cadenaPeriodoData.forEach(item => {
-                    let key = `${item.indAno}-${item.indCod}`;
-                    groupedPeriodoData[key]  = item.cadResPerMetTec ? item.cadResPerMetTec : 0;
-                });
+                
 
                 setCadenaPeriodoGrouped(groupedPeriodoData);
                 setCadenaUbicacionGrouped(groupedUbicacionData);
@@ -232,7 +236,7 @@ const ResultGoal = () => {
         } else {
             setIndicadores([])
         }
-    }, [watch('metAnoPlaTec')]);
+    }, [watch('metAnoPlaTec'), refresh]);
     
     const toggleDropdown = () => {
         setDropdownOpen(!dropdownOpen);
@@ -348,7 +352,6 @@ const ResultGoal = () => {
             metasEliminar
         }
         handleUpdate(Metas);
-        
     };
 
     const handleUpdate = async (cadena) => {
@@ -370,7 +373,8 @@ const ResultGoal = () => {
                 Notiflix.Notify.failure(data.message);
                 return;
             }
-            reset();
+            
+            setRefresh(prevRefresh => !prevRefresh)
             Notiflix.Notify.success(data.message);
         } catch (error) {
             console.error('Error:', error);
@@ -899,7 +903,10 @@ const ResultGoal = () => {
                 </div>
             }
             {popupInfo.visible && popupInfo.data && (
-            <div className="PowerMas_BubbleChain flex flex-column gap_25 p1">
+                <div 
+                    className="PowerMas_BubbleChain flex flex-column gap_25 p1"
+                    onClick={handleClickInside}
+                >
                     <span 
                         className="bold f1_5 pointer"
                         style={{
@@ -937,7 +944,7 @@ const ResultGoal = () => {
                         <h4 className='f_75' style={{color: '#FFC658'}}>PERIODO:</h4>
                         <span className='f_75' style={{color: '#FFFFFF'}}>{watch('metAnoPlaTec')} : </span> <span className='f_75' style={{color: '#FFC658'}}> {popupInfo.data.periodo} </span>
                     </div>
-            </div>
+                </div>
             )}
         </div>
     )

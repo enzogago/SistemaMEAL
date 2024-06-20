@@ -91,7 +91,9 @@ const getResultStatus = (indicadores) => {
 
 
 const Table = ({data}) => {
-    
+    const [ expandedRes, setExpandedRes ] = useState([]);
+    const [ expandedSubPro, setExpandedSubPro ] = useState([]);
+
     const  [totals, setTotals ] = useState({
         totalMetTec: 0,
         totalEjeTec: 0,
@@ -103,7 +105,7 @@ const Table = ({data}) => {
         return metas.reduce((grouped, meta) => {
             const key = `ind_${meta.indAno}_${meta.indCod}`
             if (!grouped[key]) {
-                grouped[key] = { metas: [], indNom: meta.indNom, indNum: meta.indNum, totalMetTec: 0 , totalEjeTec: 0, totalMetPre: 0 , totalEjePre: 0, resAno: meta.resAno, resCod: meta.resCod, resNom: meta.resNom, resNum: meta.resNum  }
+                grouped[key] = { metas: [], ...meta, totalMetTec: 0 , totalEjeTec: 0, totalMetPre: 0 , totalEjePre: 0 }
             }
 
             let metMetTec = Number(meta.metMetTec);
@@ -150,10 +152,30 @@ const Table = ({data}) => {
         // Primero, agrupamos las metas en indicadores
         const groupedIndicators = groupMetasIntoIndicators(data);
     
-        return Object.entries(groupedIndicators).reduce((grouped, [key, indicador]) => {
+        const groupedResults =  Object.entries(groupedIndicators).reduce((grouped, [key, indicador]) => {
             const resKey = `res_${indicador.resAno}_${indicador.resCod}`
+            let name, number;
+
+            switch(indicador.indTipInd) {
+                case 'IIN':
+                    name = indicador.subProNom;
+                    number = indicador.subProSap;
+                    break;
+                case 'IOB':
+                    name = indicador.objNom;
+                    number = indicador.objNum;
+                    break;
+                case 'IOE':
+                    name = indicador.objEspNom;
+                    number = indicador.objEspNum;
+                    break;
+                default:
+                    name = indicador.resNom;
+                    number = indicador.resNum;
+            }
+
             if (!grouped[resKey]) {
-                grouped[resKey] = { indicadores: [], resNom: indicador.resNom, resNum: indicador.resNum, totalMetTec: 0, totalEjeTec: 0, totalMetPre: 0, totalEjePre: 0 }
+                grouped[resKey] = { resKey, indicadores: [], ...indicador, name, number, totalMetTec: 0, totalEjeTec: 0, totalMetPre: 0, totalEjePre: 0 }
             }
     
             grouped[resKey].indicadores.push(indicador);
@@ -162,24 +184,51 @@ const Table = ({data}) => {
             grouped[resKey].totalMetPre += Number(indicador.totalMetPre)
             grouped[resKey].totalEjePre += Number(indicador.totalEjePre)
     
-            // Actualiza los totales
-            setTotals(totals => ({
-                totalMetTec: totals.totalMetTec + Number(indicador.totalMetTec),
-                totalEjeTec: totals.totalEjeTec + Number(indicador.totalEjeTec),
-                totalMetPre: totals.totalMetPre + Number(indicador.totalMetPre),
-                totalEjePre: totals.totalEjePre + Number(indicador.totalEjePre),
-            }));
-    
             const { statusName, statusColor } = getResultStatus(grouped[resKey].indicadores);
             // Asignamos el estado al resultado
             grouped[resKey].estNom = statusName;
             grouped[resKey].estCol = statusColor;
     
             return grouped
+        }, {});
+
+        const allResultKeys = Object.values(groupedResults).flatMap(result => result.resKey);
+        setExpandedRes(allResultKeys);
+
+        // Finalmente, agrupamos los resultados en subproyectos
+        const groupedSubProjects = Object.entries(groupedResults).reduce((grouped, [key, resultado]) => {
+            const subProKey = `subPro_${resultado.subProAno}_${resultado.subProCod}`
+            if (!grouped[subProKey]) {
+                grouped[subProKey] = { subProKey, resultados: [], subProNom: resultado.subProNom, subProSap: resultado.subProSap, totalMetTec: 0, totalEjeTec: 0, totalMetPre: 0, totalEjePre: 0 }
+            }
+
+            grouped[subProKey].resultados.push(resultado);
+            grouped[subProKey].totalMetTec += Number(resultado.totalMetTec)
+            grouped[subProKey].totalEjeTec += Number(resultado.totalEjeTec)
+            grouped[subProKey].totalMetPre += Number(resultado.totalMetPre)
+            grouped[subProKey].totalEjePre += Number(resultado.totalEjePre)
+
+            // Actualiza los totales
+            setTotals(totals => ({
+                totalMetTec: totals.totalMetTec + Number(resultado.totalMetTec),
+                totalEjeTec: totals.totalEjeTec + Number(resultado.totalEjeTec),
+                totalMetPre: totals.totalMetPre + Number(resultado.totalMetPre),
+                totalEjePre: totals.totalEjePre + Number(resultado.totalEjePre),
+            }));
+
+            const { statusName, statusColor } = getResultStatus(grouped[subProKey].resultados);
+            // Asignamos el estado al subproyecto
+            grouped[subProKey].estNom = statusName;
+            grouped[subProKey].estCol = statusColor;
+
+            return grouped
         }, {})
+
+        const allSubproKeys = Object.values(groupedSubProjects).flatMap(subpro => subpro.subProKey);
+        setExpandedSubPro(allSubproKeys);
+
+        return groupedSubProjects;
     }, [data]);
-    
-    const [ expandedRes, setExpandedRes ] = useState(Object.keys(groupedMetas));
 
     const currentRecords = Object.entries(groupedMetas);
 
@@ -191,6 +240,7 @@ const Table = ({data}) => {
                     <table className='PowerMas_Table_Monitoring Phone_12'>
                         <thead>
                             <tr>
+                                <th></th>
                                 <th> Estado </th>
                                 <th colSpan={7}> Actividades e Indicadores </th>
                                 <th className='center' style={{color: 'var(--naranja-ayuda)'}}>Meta Programática</th>
@@ -202,26 +252,28 @@ const Table = ({data}) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {currentRecords.map(([key, { indicadores, resNom, resNum, totalMetTec, totalEjeTec, totalMetPre, totalEjePre, estNom, estCol }]) => {
+                            {currentRecords.map(([key, { subProKey, resultados, subProNom, subProSap, totalMetTec, totalEjeTec, totalMetPre, totalEjePre, estNom, estCol }]) => {
                                 const totalPorAvaTec = totalMetTec ? (totalEjeTec / totalMetTec) * 100 : 0
                                 const totalPorAvaPre = totalMetPre ? (totalEjePre / totalMetPre) * 100 : 0
-                                const text = resNum + ' - ' + resNom;
+                                const text = subProSap + ' - ' + subProNom;
                                 const shortText = text.length > 50 ? text.substring(0, 50) + '...' : text;
                                 return (
-                                <Fragment key={key}>
-                                    <tr className='' style={{backgroundColor: '#F3F3F3'}}>
+                                <Fragment key={subProKey}>
+                                    <tr className='' style={{backgroundColor: '#FFC65860'}}>
                                         <td>
                                             <div 
-                                                className={`pointer bold round p_25 PowerMas_MenuIcon ${expandedRes.includes(key) ? 'PowerMas_MenuIcon--rotated' : ''}`} 
+                                                className={`pointer bold round p_25 PowerMas_MenuIcon ${expandedSubPro.includes(subProKey) ? 'PowerMas_MenuIcon--rotated' : ''}`} 
                                                 onClick={() => {
-                                                    if (expandedRes.includes(key)) {
-                                                        setExpandedRes(expandedRes.filter(indicator => indicator !== key));
+                                                    if (expandedSubPro.includes(subProKey)) {
+                                                        console.log(subProKey)
+                                                        setExpandedSubPro(expandedSubPro.filter(subpro => subpro !== subProKey));
                                                     } else {
-                                                        setExpandedRes([...expandedRes, key]);
+                                                        setExpandedSubPro([...expandedSubPro, subProKey]);
                                                     }
                                                 }}
                                             > &gt; </div>
                                         </td>
+                                        <td></td>
                                         <td className='bold' style={{color: estCol}}>
                                             {estNom}
                                         </td>
@@ -268,17 +320,32 @@ const Table = ({data}) => {
                                             </div>
                                         </td>
                                     </tr>
-                                    {expandedRes.includes(key) && Object.entries(indicadores).map(([key, { metas, indNom, indNum, totalMetTec, totalEjeTec, totalMetPre, totalEjePre, estNom, estCol }]) => {
+                                    {expandedSubPro.includes(subProKey) && Object.entries(resultados).map(([key, { resKey, indicadores, name, number, totalMetTec, totalEjeTec, totalMetPre, totalEjePre, estNom, estCol }]) => {
                                         const totalPorAvaTec = totalMetTec ? (totalEjeTec / totalMetTec) * 100 : 0
                                         const totalPorAvaPre = totalMetPre ? (totalEjePre / totalMetPre) * 100 : 0
-                                        const text = indNum + ' - ' + indNom;
+                                        const text = number + ' - ' + name;
                                         const shortText = text.length > 50 ? text.substring(0, 50) + '...' : text;
-
                                         return (
-                                            <tr className='' key={key} style={{color: '#69625F'}}>
+                                        <Fragment key={resKey}>
+                                            <tr className='' style={{backgroundColor: '#F3F3F3'}}>
                                                 <td></td>
-                                                <td className='bold' style={{color: estCol}}>{estNom}</td>
-                                                <td className='' colSpan={7}>
+                                                <td>
+                                                    <div 
+                                                        className={`pointer bold round p_25 PowerMas_MenuIcon ${expandedRes.includes(resKey) ? 'PowerMas_MenuIcon--rotated' : ''}`} 
+                                                        onClick={() => {
+                                                            if (expandedRes.includes(resKey)) {
+                                                                console.log(expandedRes)
+                                                                setExpandedRes(expandedRes.filter(indicator => indicator !== resKey));
+                                                            } else {
+                                                                setExpandedRes([...expandedRes, resKey]);
+                                                            }
+                                                        }}
+                                                    > &gt; </div>
+                                                </td>
+                                                <td className='bold' style={{color: estCol}}>
+                                                    {estNom}
+                                                </td>
+                                                <td colSpan={7}>
                                                     <span 
                                                         data-tooltip-id="info-tooltip" 
                                                         data-tooltip-content={text} 
@@ -321,19 +388,75 @@ const Table = ({data}) => {
                                                     </div>
                                                 </td>
                                             </tr>
+                                            {expandedRes.includes(resKey) && Object.entries(indicadores).map(([indKey, { metas, indNom, indNum, totalMetTec, totalEjeTec, totalMetPre, totalEjePre, estNom, estCol }]) => {
+                                                const totalPorAvaTec = totalMetTec ? (totalEjeTec / totalMetTec) * 100 : 0
+                                                const totalPorAvaPre = totalMetPre ? (totalEjePre / totalMetPre) * 100 : 0
+                                                const text = indNum + ' - ' + indNom;
+                                                const shortText = text.length > 50 ? text.substring(0, 50) + '...' : text;
+
+                                                return (
+                                                    <tr className='' key={indKey} style={{color: '#69625F'}}>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td className='bold' style={{color: estCol}}>{estNom}</td>
+                                                        <td className='' colSpan={7}>
+                                                            <span 
+                                                                data-tooltip-id="info-tooltip" 
+                                                                data-tooltip-content={text} 
+                                                            >{shortText}</span>
+                                                        </td>
+                                                        <td className='center'>{formatter.format(totalMetTec)}</td>
+                                                        <td className='center'>{formatter.format(totalEjeTec)}</td>
+                                                        <td>
+                                                            <div className="flex flex-column">
+                                                                <div className="bold center" style={{color: estCol}}>
+                                                                    {formatterBudget.format(totalPorAvaTec)}%
+                                                                </div>
+                                                                <div 
+                                                                    className="progress-bar"
+                                                                    style={{backgroundColor: '#d3d3d3', border: `0px solid ${estCol}`}}
+                                                                >
+                                                                    <div 
+                                                                        className="progress-bar-fill" 
+                                                                        style={{width: `${totalPorAvaTec > 100 ? 100 : totalPorAvaTec}%`, backgroundColor: estCol}}
+                                                                    ></div>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td className='center'>{formatterBudget.format(totalMetPre)}</td>
+                                                        <td className='center'>{formatterBudget.format(totalEjePre)}</td>
+                                                        <td>
+                                                            <div className="flex flex-column">
+                                                                <div className="bold center" style={{color: estCol}}>
+                                                                    {formatterBudget.format(totalPorAvaPre)}%
+                                                                </div>
+                                                                <div 
+                                                                    className="progress-bar"
+                                                                    style={{backgroundColor: '#d3d3d3', border: `0px solid ${estCol}`}}
+                                                                >
+                                                                    <div 
+                                                                        className="progress-bar-fill" 
+                                                                        style={{width: `${totalPorAvaPre > 100 ? 100 : totalPorAvaPre}%`, backgroundColor: estCol}}
+                                                                    ></div>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                            )})}
+                                        </Fragment>
                                     )})}
                                 </Fragment>
-                            )})}
-                                <tr className='PowerMas_Totales_Monitoreo bold'>
-                                    <td colSpan={8} ></td>
-                                    <td style={{textAlign: 'right'}}>Totales:</td>
-                                    <td>{formatter.format(totals.totalMetTec)}</td>
-                                    <td>{formatter.format(totals.totalEjeTec)}</td>
-                                    <td>{(totals.totalEjeTec !== 0 ? (formatterBudget.format((totals.totalEjeTec/totals.totalMetTec)*100)) : 0)}%</td>
-                                    <td>{formatterBudget.format(totals.totalMetPre)} €</td>
-                                    <td>{formatterBudget.format(totals.totalEjePre)} €</td>
-                                    <td>{(totals.totalMetPre !== 0 ? (formatterBudget.format((totals.totalEjePre/totals.totalMetPre)*100)) : 0)}%</td>
-                                </tr>
+                                )})}
+                            <tr className='PowerMas_Totales_Monitoreo bold'>
+                                <td colSpan={9} ></td>
+                                <td style={{textAlign: 'right'}}>Totales:</td>
+                                <td>{formatter.format(totals.totalMetTec)}</td>
+                                <td>{formatter.format(totals.totalEjeTec)}</td>
+                                <td>{(totals.totalEjeTec !== 0 ? (formatterBudget.format((totals.totalEjeTec/totals.totalMetTec)*100)) : 0)}%</td>
+                                <td>{formatterBudget.format(totals.totalMetPre)} </td>
+                                <td>{formatterBudget.format(totals.totalEjePre)} </td>
+                                <td>{(totals.totalMetPre !== 0 ? (formatterBudget.format((totals.totalEjePre/totals.totalMetPre)*100)) : 0)}%</td>
+                            </tr>
                         </tbody>
                     </table>
                     :

@@ -114,7 +114,6 @@ const ModalActividad = ({ estadoEditado, modalVisible, closeModal, setRefresh, t
         }
 
         if (subProMode && !objetivoMode && !objetivoEspMode) {
-            console.log("objetivo")
             const { objAno, objCod } = JSON.parse(data.objetivo);
             dataSubmit = {
                 ...dataSubmit,
@@ -122,7 +121,6 @@ const ModalActividad = ({ estadoEditado, modalVisible, closeModal, setRefresh, t
                 objCod
             }
         } else if (objetivoMode && subProMode && !objetivoEspMode) {
-            console.log("objetivo especifico")
             const { objEspAno, objEspCod } = JSON.parse(data.objetivoEspecifico);
             dataSubmit = {
                 ...dataSubmit,
@@ -130,8 +128,6 @@ const ModalActividad = ({ estadoEditado, modalVisible, closeModal, setRefresh, t
                 objEspCod
             }
         } else {
-            console.log(involucraSubActividad)
-            console.log(data)
             if (involucraSubActividad) {
                 const { actAno, actCod } = JSON.parse(data.actividad);
                 dataSubmit = {
@@ -155,7 +151,6 @@ const ModalActividad = ({ estadoEditado, modalVisible, closeModal, setRefresh, t
             subProAno,
             subProCod
         }
-        console.log(dataSubmit)
         handleSubmitMantEspecial('Indicador', !!estadoEditado, dataSubmit, setRefresh, closeModalAndReset)
     };
 

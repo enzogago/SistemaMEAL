@@ -42,17 +42,13 @@ const Layout = ({ children }) => {
     
         // Obtener la fecha y hora actuales
         let fechaActual = new Date();
-        // console.log(fechaGuardada)
-        // console.log(fechaActual)
         // Comparar si la fecha guardada más 2 horas es menor que la fecha actual
         if (fechaGuardada < fechaActual) {
             // Aquí va tu código si la condición es verdadera
-            // console.log("Han pasado más de 2 horas desde la última actividad.");
 
 
         } else {
             // Aquí va tu código si la condición es falsa
-            // console.log("No han pasado más de 2 horas desde la última actividad.");
             // Notiflix.Confirm.show(
             //     'Notiflix Confirm',
             //     'Do you agree with me?',

@@ -43,6 +43,7 @@ const ExecutionBudget = () => {
     const [cadenaFinanciadorGrouped, setCadenaFinanciadorGrouped] = useState(null);
 
     const [currency, setCurrency] = useState('');
+    const [refresh, setRefresh] = useState(false)
 
     const [popupInfo, setPopupInfo] = useState({ visible: false, data: null });
     const handleClickInside = (e) => {
@@ -55,7 +56,6 @@ const ExecutionBudget = () => {
         watch, 
         handleSubmit, 
         formState: { errors, dirtyFields, isSubmitted }, 
-        reset, 
         setValue, 
         getValues
     } = 
@@ -262,7 +262,7 @@ const ExecutionBudget = () => {
         } else {
             setIndicadores([]);
         }
-    }, [watch('metAnoPlaTec')]);
+    }, [watch('metAnoPlaTec'), refresh]);
     
     
     const toggleDropdown = () => {
@@ -371,7 +371,7 @@ const ExecutionBudget = () => {
                 Notiflix.Notify.failure(data.message);
                 return;
             }
-            reset();
+            setRefresh(prevRefresh => !prevRefresh)
             Notiflix.Notify.success(data.message);
         } catch (error) {
             console.error('Error:', error);
@@ -541,7 +541,6 @@ const ExecutionBudget = () => {
                                                     } else {
                                                         setExpandedIndicators([...expandedIndicators, `${item.indAno}_${item.indCod}`]);
                                                     }
-                                                    console.log(expandedIndicators)
                                                 }}
                                             > &gt; </div>
                                         </td>
@@ -738,52 +737,55 @@ const ExecutionBudget = () => {
                 </div>
             }
             {popupInfo.visible && popupInfo.data && (
-                <div className="PowerMas_BubbleChain flex flex-column gap_25 p1">
-                        <span 
-                            className="bold f1_5 pointer"
-                            style={{
-                                color: '#FFFFFF',
-                                position: 'absolute',
-                                top: 0,
-                                right: '0.5rem',
-                                zIndex: '4'
-                            }}
-                            onClick={() => setPopupInfo({ visible: false, data: null })}
-                        >
-                            ×
-                        </span>
-                        <div className='m_25' style={{color: '#FFFFFF'}}>
-                            <h5 className='center'>Cadena de Resultado</h5>
-                            <h5 className='center'>{popupInfo.data.indNum}</h5>
-                        </div>
-                        <div className='flex flex-column'>
-                            <h4 className='f_75' style={{color: '#FFC658'}}>FINANCIADORES:</h4>
-                            {Object.values(popupInfo.data.financiador).map((item, index) => (
-                                <span key={index}>
-                                    <span className='f_75' style={{color: '#FFFFFF'}} >{item.name}: </span> <span className='f_75' style={{color: '#FFC658'}}>{item.value}</span>
-                                </span>
-                            ))}
-                        </div>
-                        <div className='flex flex-column'>
-                            <h4 className='f_75' style={{color: '#FFC658'}}>IMPLEMENTADORES:</h4>
-                            {Object.values(popupInfo.data.implementador).map((item, index) => (
-                                <span key={index}>
-                                    <span className='f_75' style={{color: '#FFFFFF'}} >{item.name}: </span> <span className='f_75' style={{color: '#FFC658'}}>{item.value}</span>
-                                </span>
-                            ))}
-                        </div>
-                        <div className='flex flex-column'>
-                            <h4 className='f_75' style={{color: '#FFC658'}}>UBICACIONES:</h4>
-                            {Object.values(popupInfo.data.ubicacion).map((item, index) => (
-                                <span key={index}>
-                                    <span className='f_75' style={{color: '#FFFFFF'}}>{item.name}: </span> <span className='f_75' style={{color: '#FFC658'}}>{item.value}</span>
-                                </span>
-                            ))}
-                        </div>
-                        <div className=''>
-                            <h4 className='f_75' style={{color: '#FFC658'}}>PERIODO:</h4>
-                            <span className='f_75' style={{color: '#FFFFFF'}}>{watch('metAnoPlaTec')} : </span> <span className='f_75' style={{color: '#FFC658'}}> {popupInfo.data.periodo} </span>
-                        </div>
+                <div 
+                    className="PowerMas_BubbleChain flex flex-column gap_25 p1"
+                    onClick={handleClickInside}
+                >
+                    <span 
+                        className="bold f1_5 pointer"
+                        style={{
+                            color: '#FFFFFF',
+                            position: 'absolute',
+                            top: 0,
+                            right: '0.5rem',
+                            zIndex: '4'
+                        }}
+                        onClick={() => setPopupInfo({ visible: false, data: null })}
+                    >
+                        ×
+                    </span>
+                    <div className='m_25' style={{color: '#FFFFFF'}}>
+                        <h5 className='center'>Cadena de Resultado</h5>
+                        <h5 className='center'>{popupInfo.data.indNum}</h5>
+                    </div>
+                    <div className='flex flex-column'>
+                        <h4 className='f_75' style={{color: '#FFC658'}}>FINANCIADORES:</h4>
+                        {Object.values(popupInfo.data.financiador).map((item, index) => (
+                            <span key={index}>
+                                <span className='f_75' style={{color: '#FFFFFF'}} >{item.name}: </span> <span className='f_75' style={{color: '#FFC658'}}>{item.value}</span>
+                            </span>
+                        ))}
+                    </div>
+                    <div className='flex flex-column'>
+                        <h4 className='f_75' style={{color: '#FFC658'}}>IMPLEMENTADORES:</h4>
+                        {Object.values(popupInfo.data.implementador).map((item, index) => (
+                            <span key={index}>
+                                <span className='f_75' style={{color: '#FFFFFF'}} >{item.name}: </span> <span className='f_75' style={{color: '#FFC658'}}>{item.value}</span>
+                            </span>
+                        ))}
+                    </div>
+                    <div className='flex flex-column'>
+                        <h4 className='f_75' style={{color: '#FFC658'}}>UBICACIONES:</h4>
+                        {Object.values(popupInfo.data.ubicacion).map((item, index) => (
+                            <span key={index}>
+                                <span className='f_75' style={{color: '#FFFFFF'}}>{item.name}: </span> <span className='f_75' style={{color: '#FFC658'}}>{item.value}</span>
+                            </span>
+                        ))}
+                    </div>
+                    <div className=''>
+                        <h4 className='f_75' style={{color: '#FFC658'}}>PERIODO:</h4>
+                        <span className='f_75' style={{color: '#FFFFFF'}}>{watch('metAnoPlaTec')} : </span> <span className='f_75' style={{color: '#FFC658'}}> {popupInfo.data.periodo} </span>
+                    </div>
                 </div>
             )}
         </div>
