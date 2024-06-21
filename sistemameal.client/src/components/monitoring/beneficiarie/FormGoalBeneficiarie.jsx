@@ -721,7 +721,7 @@ const FormGoalBeneficiarie = () => {
                             <h2 className="f1_25">Datos de Ubicación</h2>
                             <div className="m_75">
                                 <label htmlFor="pais" className="">
-                                    Pais:
+                                    País:
                                 </label>
                                 <select 
                                     id="pais"
@@ -931,7 +931,7 @@ const FormGoalBeneficiarie = () => {
                                         </div>
                                         <div className="m_75">
                                             <label htmlFor="docIdeBenNum" className="">
-                                                Numero de documento:
+                                                Número de documento:
                                             </label>
                                             <input
                                                 id="docIdeBenNum"

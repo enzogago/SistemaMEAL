@@ -270,7 +270,7 @@ const FormGoalExecution = () => {
                 <span className='flex f1_25 pointer' onClick={() => navigate('/monitoring')}>
                     <Return />
                 </span>
-                <h1 className="f1_75">Nuevo Ejecucion</h1>
+                <h1 className="f1_75">Nueva Ejecución</h1>
             </div>
             
             <div className="PowerMas_Content_Form_Beneficiarie overflow-auto flex-grow-1 flex">
@@ -279,7 +279,7 @@ const FormGoalExecution = () => {
                             <h2 className="f1_25">Datos de Ubicación</h2>
                             <div className="m_75">
                                 <label htmlFor="pais" className="">
-                                    Pais:
+                                    País:
                                 </label>
                                 <select 
                                     id="pais"
@@ -431,7 +431,7 @@ const FormGoalExecution = () => {
                             </div>
                         </div>
                         <div className="PowerMas_Content_Form_Beneficiarie_Card Large-p_75">
-                            <h2 className="f1_25">Datos de Ejecucion</h2>
+                            <h2 className="f1_25">Datos de Ejecución</h2>
                             <div className="m_75">
                                 <label htmlFor="metEjeVal" className="">
                                     Cantidad de {metaData && metaData.uniNom.toLowerCase()}:
@@ -440,7 +440,7 @@ const FormGoalExecution = () => {
                                     id="metEjeVal"
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.metEjeVal || isSubmitted ? (errors.metEjeVal ? 'invalid' : 'valid') : ''}`} 
                                     type="text" 
-                                    placeholder="Emj: 10"
+                                    placeholder="Ejm: 10"
                                     autoComplete='off'
                                     maxLength={10}
                                     onInput={(event) => {
