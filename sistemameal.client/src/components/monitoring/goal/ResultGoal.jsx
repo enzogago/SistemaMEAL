@@ -838,8 +838,19 @@ const ResultGoal = () => {
                                                         disabled={!actions.add}
                                                         maxLength={10}
                                                         onInput={(e) => {
-                                                            const inputVal = e.target.value.replace(/[^0-9]/g, '');
-                                                            e.target.value = inputVal;
+                                                            if (item.tipValCod === '02') {
+                                                                const value = e.target.value;
+                                                                if (value === '' || (/^\d*\.?\d*$/.test(value))) {
+                                                                    e.target.value = value;
+                                                                } else {
+                                                                    e.target.value = value.slice(0, -1);
+                                                                }
+                                                            } else {
+                                                                e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                                                            }
+
+                                                            const inputVal = e.target.value;
+
                                                             const isValid = validateInput(inputVal, row, i);
                                                             setIsFormValid(isValid);
                                                             
@@ -861,7 +872,7 @@ const ResultGoal = () => {
                                                         style={{margin: '0'}}
                                                         {...register(`mes_${String(i+1).padStart(2, '0')}_${row.id}`, { 
                                                             pattern: {
-                                                                value: /^(?:[1-9]\d*|)$/,
+                                                                value: /^(?:\d+\.?\d*|\.\d+)$/,
                                                                 message: 'Valor no válido',
                                                             },
                                                             maxLength: {

@@ -112,18 +112,6 @@ const Table = ({data}) => {
             let metEjeTec = Number(meta.metEjeTec);
             let metMetPre = Number(meta.metMetPre);
             let metEjePre = Number(meta.metEjePre);
-            if (isNaN(metMetTec)) {
-                metMetTec = eval(meta.metMetTec);
-            }
-            if (isNaN(metEjeTec)) {
-                metEjeTec = eval(meta.metEjeTec);
-            }
-            if (isNaN(metMetPre)) {
-                metMetPre = eval(meta.metMetPre);
-            }
-            if (isNaN(metEjePre)) {
-                metEjePre = eval(meta.metEjePre);
-            }
 
             grouped[key].metas.push({...meta, metMetTec, metEjeTec, metMetPre, metEjePre})
             grouped[key].totalMetTec += metMetTec;
@@ -278,7 +266,8 @@ const Table = ({data}) => {
                                             {estNom}
                                         </td>
                                         <td colSpan={7}>
-                                            <span 
+                                            <span
+                                                className='bold'
                                                 data-tooltip-id="info-tooltip" 
                                                 data-tooltip-content={text} 
                                             >{shortText}</span>
@@ -346,7 +335,8 @@ const Table = ({data}) => {
                                                     {estNom}
                                                 </td>
                                                 <td colSpan={7}>
-                                                    <span 
+                                                    <span
+                                                        className=''
                                                         data-tooltip-id="info-tooltip" 
                                                         data-tooltip-content={text} 
                                                     >{shortText}</span>
@@ -391,14 +381,14 @@ const Table = ({data}) => {
                                             {expandedRes.includes(resKey) && Object.entries(indicadores).map(([indKey, { metas, indNom, indNum, totalMetTec, totalEjeTec, totalMetPre, totalEjePre, estNom, estCol }]) => {
                                                 const totalPorAvaTec = totalMetTec ? (totalEjeTec / totalMetTec) * 100 : 0
                                                 const totalPorAvaPre = totalMetPre ? (totalEjePre / totalMetPre) * 100 : 0
-                                                const text = indNum + ' - ' + indNom;
+                                                const text = indNum + ' - ' + indNom.charAt(0) + indNom.slice(1).toLowerCase();
                                                 const shortText = text.length > 50 ? text.substring(0, 50) + '...' : text;
 
                                                 return (
                                                     <tr className='' key={indKey} style={{color: '#69625F'}}>
                                                         <td></td>
                                                         <td></td>
-                                                        <td className='bold' style={{color: estCol}}>{estNom}</td>
+                                                        <td style={{color: estCol}}>{estNom.charAt(0) + estNom.slice(1).toLowerCase()}</td>
                                                         <td className='' colSpan={7}>
                                                             <span 
                                                                 data-tooltip-id="info-tooltip" 

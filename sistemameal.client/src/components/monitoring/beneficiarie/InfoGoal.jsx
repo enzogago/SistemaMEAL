@@ -5,7 +5,7 @@ import { formatterBudget } from '../goal/helper';
 const InfoGoal = ({metaData, openModal, is = true}) => {
     
     const indTipIndMap = {
-        'IAC': 'Indicador Actividad',
+        'IAC': 'Actividad',
         'IRE': 'Indicador Resultado',
         'IOB': 'Indicador Objetivo',
         'IOE': 'Indicador Objetivo Especifico',

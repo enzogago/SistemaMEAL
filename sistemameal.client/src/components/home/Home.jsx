@@ -307,32 +307,32 @@ const Home = () => {
                             <p className="f1_25">Beneficiarios duplicados</p>
                             <span className='Medium_f2 Small-f1_5'>{formatter.format(Number(0))}</span>
                         </div>
-                        <div className="PowerMas_KPIRow Large_3 Medium_6 Small_12 gap_3 flex-column Large-f1_25 table-home-block relative">
+                        <div className="PowerMas_KPIRow Large_3 Medium_6 Small_12 gap_25 flex-column Large-f1_25 table-home-block relative">
                             <p className="f1_25">Avance técnico</p>
-                            <DonutChart percentage={avanceTecnico} wh={140} rad={20} newId={'Dona_Tecnico'} colorText={'#000'} colorPc={'#F87C56'} colorSpc={'#F7775A20'} />
+                            <DonutChart percentage={avanceTecnico} wh={150} rad={20} newId={'Dona_Tecnico'} colorText={'#000'} colorPc={'#F87C56'} colorSpc={'#F7775A20'} />
                             <div
-                                className='Phone_12 flex p_25 jc-space-between f1' 
-                                style={{
-                                    position: 'absolute',
-                                    bottom: 0
-                                }} 
+                                className='Phone_12 flex jc-center gap-1 f_75' 
                             >
-                                <span>Meta: {formatter.format(totals.totalMetTec)}</span>
-                                <span>Ejecución {formatter.format(totals.totalEjeTec)}</span>
+                                <div>
+                                    <span className='bold'>META: </span> <span>{formatter.format(totals.totalMetTec)}</span>
+                                </div>
+                                <div>
+                                    <span className='bold'>EJECUCIÓN: </span> <span>{formatter.format(totals.totalEjeTec)}</span>
+                                </div>
                             </div>
                         </div>
-                        <div className="PowerMas_KPIRow Large_3 Medium_6 Small_12 gap_3 flex-column Large-f1_25 table-home-block relative">
+                        <div className="PowerMas_KPIRow Large_3 Medium_6 Small_12 gap_25 flex-column Large-f1_25 table-home-block relative">
                             <p className="f1_25" style={{whiteSpace: 'nowrap'}}>Avance presupuesto</p>
-                            <DonutChart percentage={avancePresupuesto} wh={140} rad={20} newId={'Dona_Presupuesto'} colorText={'#000'} colorPc={'#F87C56'} colorSpc={'#F7775A20'} />
+                            <DonutChart percentage={avancePresupuesto} wh={150} rad={20} newId={'Dona_Presupuesto'} colorText={'#000'} colorPc={'#F87C56'} colorSpc={'#F7775A20'} />
                             <div
-                                className='Phone_12 flex p_25 jc-space-between f1' 
-                                style={{
-                                    position: 'absolute',
-                                    bottom: 0
-                                }} 
+                                className='Phone_12 flex jc-center gap-1 f_75' 
                             >
-                                <span>Meta: {formatterBudget.format(totals.totalMetPre)}</span>
-                                <span>Ejecución {formatterBudget.format(totals.totalEjePre)}</span>
+                                <div>
+                                    <span className='bold'>META: </span> <span>{formatterBudget.format(totals.totalMetPre)}</span>
+                                </div>
+                                <div>
+                                    <span className='bold'>EJECUCIÓN: </span> <span>{formatterBudget.format(totals.totalEjePre)}</span>
+                                </div>
                             </div>
                         </div>
                     </div>

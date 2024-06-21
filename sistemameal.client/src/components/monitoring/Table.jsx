@@ -63,6 +63,7 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
     const navigate = useNavigate();
 
     const [ metas, setMetas ] = useState([])
+    const [ expandedSubPro, setExpandedSubPro ] = useState([]);
     const [ expandedRes, setExpandedRes ] = useState([])
     const [ expandedInd, setExpandedInd ] = useState([])
     const  [totals, setTotals ] = useState({
@@ -137,7 +138,7 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
         });
         const paginatedData = metas.slice(startIndex, endIndex);
     
-        const grouped = paginatedData.reduce((grouped, meta) => {
+        const groupedResults = paginatedData.reduce((grouped, meta) => {
             const resKey = `res_${meta.resAno}_${meta.resCod}`
 
             let name, number;
@@ -161,7 +162,7 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
             }
 
             if (!grouped[resKey]) {
-                grouped[resKey] = { metas: [], ...meta,  name, number, totalMetTec: 0 , totalEjeTec: 0, totalMetPre: 0 , totalEjePre: 0 }
+                grouped[resKey] = { metas: [], resKey, ...meta,  name, number, totalMetTec: 0 , totalEjeTec: 0, totalMetPre: 0 , totalEjePre: 0 }
             }
             // Evalúa metMetTec y metEjeTec como operaciones, si es posible
             let metMetTec = Number(meta.metMetTec);
@@ -169,18 +170,6 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
             let metMetPre = Number(meta.metMetPre);
             let metEjePre = Number(meta.metEjePre);
             
-            if (isNaN(metMetTec)) {
-                metMetTec = eval(meta.metMetTec);
-            }
-            if (isNaN(metEjeTec)) {
-                metEjeTec = eval(meta.metEjeTec);
-            }
-            if (isNaN(metMetPre)) {
-                metMetPre = eval(meta.metMetPre);
-            }
-            if (isNaN(metEjePre)) {
-                metEjePre = eval(meta.metEjePre);
-            }
             // Agrega la meta al array, pero con metMetTec y metEjeTec evaluados como operaciones
             grouped[resKey].metas.push({...meta, metMetTec, metEjeTec, metMetPre, metEjePre})
             grouped[resKey].totalMetTec += metMetTec;
@@ -199,13 +188,34 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
             return grouped;
         }, {});
     
-        // Obtenemos todas las claves de los resultados
-        const allKeys = Object.keys(grouped);
+        const allResultKeys = Object.values(groupedResults).flatMap(result => result.resKey);
+        setExpandedRes(allResultKeys);
+
+        // Finalmente, agrupamos los resultados en subproyectos
+        const groupedSubProjects = Object.entries(groupedResults).reduce((grouped, [key, resultado]) => {
+            const subProKey = `subPro_${resultado.subProAno}_${resultado.subProCod}`
+            if (!grouped[subProKey]) {
+                grouped[subProKey] = { subProKey, resultados: [], subProNom: resultado.subProNom, subProSap: resultado.subProSap, totalMetTec: 0, totalEjeTec: 0, totalMetPre: 0, totalEjePre: 0 }
+            }
+
+            grouped[subProKey].resultados.push(resultado);
+            grouped[subProKey].totalMetTec += Number(resultado.totalMetTec)
+            grouped[subProKey].totalEjeTec += Number(resultado.totalEjeTec)
+            grouped[subProKey].totalMetPre += Number(resultado.totalMetPre)
+            grouped[subProKey].totalEjePre += Number(resultado.totalEjePre)
+
+            const { statusName, statusColor } = getIndicatorStatus(grouped[subProKey].resultados);
+            // Asignamos el estado al subproyecto
+            grouped[subProKey].estNom = statusName;
+            grouped[subProKey].estCol = statusColor;
+
+            return grouped
+        }, {})
+
+        const allSubproKeys = Object.values(groupedSubProjects).flatMap(subpro => subpro.subProKey);
+        setExpandedSubPro(allSubproKeys);
     
-        // Asignamos todas las claves a expandedRes
-        setExpandedRes(allKeys);
-    
-        return grouped;
+        return groupedSubProjects;
     }, [metas, startIndex, endIndex]);
     
 
@@ -388,11 +398,11 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                     <table className='PowerMas_Table_Monitoring Phone_12'>
                         <thead>
                             <tr className='center'>
-                                <th></th>
                                 <th>Estado</th>
+                                <th></th>
                                 <th>FFVV</th>
                                 <th>Añadir</th>
-                                <th>Técnico</th>
+                                <th>Responsable</th>
                                 <th>Implementador</th>
                                 <th>Ubicación</th>
                                 <th>Periodo</th>
@@ -405,36 +415,105 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {currentRecords.map(([key, { metas, name, number, totalMetTec, totalEjeTec, totalMetPre, totalEjePre }]) => {
+                            {currentRecords.map(([key, { subProKey, resultados, subProNom, subProSap, totalMetTec, totalEjeTec, totalMetPre, totalEjePre, estNom, estCol }]) => {
                                 const totalPorAvaTec = totalMetTec ? (totalEjeTec / totalMetTec) * 100 : 0
                                 const totalPorAvaPre = totalMetPre ? (totalEjePre / totalMetPre) * 100 : 0
-                                const text = number + ' - ' + name;
-                                const shortText = text.length > 80 ? text.substring(0, 80) + '...' : text;
-
-                                const {statusName, statusColor} = getIndicatorStatus(metas);
+                                const text = subProSap + ' - ' + subProNom;
+                                const shortText = text.length > 110 ? text.substring(0, 110) + '...' : text;
                                 return (
-                                <Fragment key={key}>
-                                    <tr className='' style={{backgroundColor: '#F3F3F3'}}>
+                                <Fragment key={subProKey}>
+                                    <tr className='' style={{backgroundColor: '#FFC65860'}}>
                                         <td>
                                             <div 
-                                                className={`pointer bold round p_25 PowerMas_MenuIcon ${expandedRes.includes(key) ? 'PowerMas_MenuIcon--rotated' : ''}`} 
+                                                className={`pointer bold round p_25 PowerMas_MenuIcon ${expandedSubPro.includes(subProKey) ? 'PowerMas_MenuIcon--rotated' : ''}`} 
                                                 onClick={() => {
-                                                    if (expandedRes.includes(key)) {
-                                                        setExpandedRes(expandedRes.filter(indicator => indicator !== key));
+                                                    if (expandedSubPro.includes(subProKey)) {
+                                                        console.log(subProKey)
+                                                        setExpandedSubPro(expandedSubPro.filter(subpro => subpro !== subProKey));
                                                     } else {
-                                                        setExpandedRes([...expandedRes, key]);
+                                                        setExpandedSubPro([...expandedSubPro, subProKey]);
                                                     }
                                                 }}
                                             > &gt; </div>
                                         </td>
-                                        <td></td>
+                                        <td className='bold' style={{color: estCol}}>
+                                            {estNom}
+                                        </td>
+                                        <td colSpan={7}>
+                                            <span
+                                                className='bold'
+                                                data-tooltip-id="info-tooltip" 
+                                                data-tooltip-content={text} 
+                                            >{shortText}</span>
+                                        </td>
+                                        <td className='center'>{formatter.format(totalMetTec)}</td>
+                                        <td className='center'>{formatter.format(totalEjeTec)}</td>
+                                        <td>
+                                            <div className="flex flex-column">
+                                                <div className="bold center" style={{color: estCol}}>
+                                                    {formatterBudget.format(totalPorAvaTec)}%
+                                                </div>
+                                                <div 
+                                                    className="progress-bar"
+                                                    style={{backgroundColor: '#d3d3d3', border: `0px solid ${estCol}`}}
+                                                >
+                                                    <div 
+                                                        className="progress-bar-fill" 
+                                                        style={{width: `${totalPorAvaTec > 100 ? 100 : totalPorAvaTec}%`, backgroundColor: estCol}}
+                                                    ></div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className='center'>{formatterBudget.format(totalMetPre)}</td>
+                                        <td className='center'>{formatterBudget.format(totalEjePre)}</td>
+                                        <td>
+                                            <div className="flex flex-column">
+                                                <div className="bold center" style={{color: estCol}}>
+                                                    {formatterBudget.format(totalPorAvaPre)}%
+                                                </div>
+                                                <div 
+                                                    className="progress-bar"
+                                                    style={{backgroundColor: '#d3d3d3', border: `0px solid ${estCol}`}}
+                                                >
+                                                    <div 
+                                                        className="progress-bar-fill" 
+                                                        style={{width: `${totalPorAvaPre > 100 ? 100 : totalPorAvaPre}%`, backgroundColor: estCol}}
+                                                    ></div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                            {expandedSubPro.includes(subProKey) && Object.entries(resultados).map(([key, { resKey, metas, name, number, totalMetTec, totalEjeTec, totalMetPre, totalEjePre }]) => {
+                                const totalPorAvaTec = totalMetTec ? (totalEjeTec / totalMetTec) * 100 : 0
+                                const totalPorAvaPre = totalMetPre ? (totalEjePre / totalMetPre) * 100 : 0
+                                const text = number + ' - ' + name;
+                                const shortText = text.length > 110 ? text.substring(0, 110) + '...' : text;
+
+                                const {statusName, statusColor} = getIndicatorStatus(metas);
+                                return (
+                                <Fragment key={resKey}>
+                                    <tr className='' style={{backgroundColor: '#e1e1e1'}}>
+                                        <td>
+                                            <div 
+                                                className={`pointer bold round p_25 PowerMas_MenuIcon ${expandedRes.includes(resKey) ? 'PowerMas_MenuIcon--rotated' : ''}`} 
+                                                onClick={() => {
+                                                    if (expandedRes.includes(resKey)) {
+                                                        setExpandedRes(expandedRes.filter(indicator => indicator !== resKey));
+                                                    } else {
+                                                        setExpandedRes([...expandedRes, resKey]);
+                                                    }
+                                                }}
+                                            > &gt; </div>
+                                        </td>
                                         <td>
                                             <div className="bold" style={{ color: statusColor, whiteSpace: 'nowrap' }}>
                                                 {statusName}
                                             </div>
                                         </td>
-                                        <td colSpan={6}>
-                                            <span 
+                                        <td colSpan={7}>
+                                            <span
+                                                className=''
                                                 data-tooltip-id="info-tooltip" 
                                                 data-tooltip-content={text} 
                                             >{shortText}</span>
@@ -477,7 +556,7 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                                         </td>
                                         <td className='center' colSpan={2}></td>
                                     </tr>
-                                    {expandedRes.includes(key) && Object.entries(metas.reduce((grouped, meta) => {
+                                    {expandedRes.includes(resKey) && Object.entries(metas.reduce((grouped, meta) => {
                                         const key = `ind_${meta.indAno}_${meta.indCod}`
                                         if (!grouped[key]) {
                                             grouped[key] = { metas: [], indNom: meta.indNom, indNum: meta.indNum, totalMetTec: 0 , totalEjeTec: 0, totalMetPre: 0 , totalEjePre: 0 }
@@ -491,14 +570,13 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                                     }, {})).map(([key, { metas: subMetas, indNom, indNum, totalMetTec, totalEjeTec, totalMetPre, totalEjePre }]) => {
                                         const totalPorAvaTec = totalMetTec ? (totalEjeTec / totalMetTec) * 100 : 0
                                         const totalPorAvaPre = totalMetPre ? (totalEjePre / totalMetPre) * 100 : 0
-                                        const text = indNum + ' - ' + indNom;
-                                        const shortText = text.length > 80 ? text.substring(0, 80) + '...' : text;
+                                        const text = indNum + ' - ' + indNom?.charAt(0) + indNom?.slice(1).toLowerCase();
+                                        const shortText = text.length > 110 ? text.substring(0, 110) + '...' : text;
 
                                         const {statusName, statusColor} = getIndicatorStatus(subMetas);
                                         return (
                                         <Fragment key={key}>
-                                            <tr className='' style={{color: '#69625F'}}>
-                                                <td></td>
+                                            <tr className='' style={{backgroundColor: '#efeeee'}}>
                                                 <td>
                                                     <div 
                                                         className={`pointer bold round p_25 PowerMas_MenuIcon ${expandedInd.includes(key) ? 'PowerMas_MenuIcon--rotated' : ''}`} 
@@ -512,11 +590,11 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                                                     > &gt; </div>
                                                 </td>
                                                 <td>
-                                                    <div className="bold" style={{ color: statusColor, whiteSpace: 'nowrap' }}>
-                                                        {statusName}
+                                                    <div className="bold" style={{ color: statusColor, whiteSpace: 'nowrap', textTransform: 'capitalize' }}>
+                                                        {statusName?.toLowerCase()}
                                                     </div>
                                                 </td>
-                                                <td className='' colSpan={6}>
+                                                <td className='' colSpan={7}>
                                                     <span 
                                                         data-tooltip-id="info-tooltip" 
                                                         data-tooltip-content={text} 
@@ -563,16 +641,17 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                                             {expandedInd.includes(key) && subMetas.map((meta, index) => {
                                                 const mesPeriodo = meta.metMesPlaTec ? (new Date(2024, meta.metMesPlaTec - 1).toLocaleString('es-ES', { month: 'short' })) : '';
                                                 
-                                                
                                                 return (
                                                 <tr key={index} style={{color: '#372e2ca6', visibility: expandedInd.includes(key) ? 'visible' : 'collapse'}}>
                                                     <td></td>
-                                                    <td></td>
-                                                            <td>
-                                                                <div className="bold" style={{ color: meta.estCol, whiteSpace: 'nowrap' }}>
-                                                                    {meta.estNom}
-                                                                </div>
-                                                            </td>
+                                                    <td
+                                                        className='center'
+                                                        colSpan={2}
+                                                    >
+                                                        <div style={{ color: meta.estCol, whiteSpace: 'nowrap', textTransform: 'capitalize' }}>
+                                                            {meta.estNom?.toLowerCase()}
+                                                        </div>
+                                                    </td>
                                                     <td>
                                                         <div className="flex jc-center ai-center" >
                                                             <button  
@@ -603,10 +682,10 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                                                         }
                                                         </div>
                                                     </td>
-                                                    <td>{meta.usuNom + ' ' + meta.usuApe}</td>
-                                                    <td>{meta.impNom}</td>
-                                                    <td>{meta.ubiNom}</td>
-                                                    <td>{mesPeriodo.toUpperCase() + ' - ' + meta.metAnoPlaTec}</td>
+                                                    <td style={{textTransform: 'capitalize'}}> <span className='bold'>Resp.</span> {meta.usuNom?.toLowerCase() + ' ' + meta.usuApe?.toLowerCase()}</td>
+                                                    <td style={{ textTransform: 'capitalize'}}><span className='bold'>Impl.</span> {meta.impNom?.toLowerCase()}</td>
+                                                    <td style={{textTransform: 'capitalize'}}><span className='bold'>Ubic.</span> {meta.ubiNom?.toLowerCase()}</td>
+                                                    <td><span className='bold'>Mes</span> {mesPeriodo?.charAt(0).toUpperCase()+mesPeriodo?.slice(1) + '-' + meta.metAnoPlaTec}</td>
                                                     <td className='center'>{formatter.format(meta.metMetTec)}</td>
                                                     <td className='center'>{formatter.format(meta.metEjeTec)}</td>
                                                     <td>
@@ -650,8 +729,10 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                                     )})}
                                 </Fragment>
                             )})}
+                            </Fragment>
+                            )})}
                                 <tr className='PowerMas_Totales_Monitoreo bold'>
-                                    <td colSpan={8} ></td>
+                                    <td colSpan={10} ></td>
                                     <td style={{textAlign: 'right'}}>Totales:</td>
                                     <td>{formatter.format(totals.totalMetTec)}</td>
                                     <td>{formatter.format(totals.totalEjeTec)}</td>

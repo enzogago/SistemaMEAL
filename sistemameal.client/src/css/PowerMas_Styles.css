@@ -1185,7 +1185,7 @@ textarea {
 	width: auto;
 	border-bottom: 1px solid #d3d3d3;
 	white-space: nowrap;
-	padding: 0 0.5rem;
+	padding: 0 0 0 0.5rem;
 }
 
 .PowerMas_Table_Monitoring tbody tr{
