@@ -107,6 +107,7 @@ export const handleDelete = async (controller, obj, setRefresh) => {
             const url = `${import.meta.env.VITE_APP_API_URL}/api/${controller}`;
 
             try {
+                console.log(obj)
                 Notiflix.Loading.pulse();
                 const token = localStorage.getItem('token');
                 const response = await fetch(url, {
@@ -117,7 +118,9 @@ export const handleDelete = async (controller, obj, setRefresh) => {
                     },
                     body: JSON.stringify(obj),
                 });
+                console.log(response)
                 const data = await response.json();
+                console.log(data)
                 if (!response.ok) {
                     Notiflix.Notify.failure(data.message);
                     return;

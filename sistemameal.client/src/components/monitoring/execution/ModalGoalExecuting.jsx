@@ -1,36 +1,35 @@
-import  { useEffect, useMemo, useState } from 'react'
 import Modal from 'react-modal';
+import { useEffect, useMemo, useState } from 'react';
 import SearchTagsInput from '../../reusable/Tables/SearchTagsInput';
 import ExportMenu from '../../reusable/Tables/ExportMenu';
-import CommonTable from '../../reusable/Tables/CommonTable';
-import { useSearchTags } from '../../../hooks/useSearchTags';
-import { getColumns } from './columns';
-import useEntityActions from '../../../hooks/useEntityActions';
-import { fetchDataBlock } from '../../reusable/fetchs';
-import ModalEditBeneficiarie from './ModalEditBeneficiarie';
 import useModal from '../../../hooks/useModal';
+import { getColumnsExecuting } from '../beneficiarie/columns';
+import { useSearchTags } from '../../../hooks/useSearchTags';
+import useEntityActions from '../../../hooks/useEntityActions';
+import CommonTable from '../../reusable/Tables/CommonTable';
 import { getMonth, getMonthYearText } from '../../reusable/columns';
+import ModalEditExecution from './ModalEditExecution';
+import { fetchDataBlock } from '../../reusable/fetchs';
 
-const ModalBeneficiariesAssociated = ({openModal, closeModal, metaData, update, setUpdate, initialSelectCount}) => {
+const ModalGoalExecuting = ({openModalGoalExecuting, closeModalExecuting, metaData, refresh, setRefresh}) => {
     // Estados locales para manejar los datos y el refresco de la tabla
    const [ data, setData ] = useState([]);
 
    // Obtener las acciones permitidas para la entidad 'BENEFICIARIO'
    const actions = useEntityActions('BENEFICIARIO');
 
-   const { modalVisible, estadoEditado, openModal: openModalForm, closeModal: closeModalForm } = useModal();
+   const { modalVisible, estadoEditado, openModal, closeModal } = useModal();
 
-    // Efecto para cargar los datos de los beneficiarios al montar el componente
     useEffect(() => {
-        if (openModal) {
-            fetchDataBlock(`Beneficiario/meta/${metaData.metAno}/${metaData.metCod}`, setData, '.table-beneficiarie-block');
+        if (openModalGoalExecuting) {
+            fetchDataBlock(`Meta/executing/${metaData.metAno}/${metaData.metCod}`, setData, '.table-execution-block')
         } else {
-            setData([])
+            setData([]);
         }
-    }, [openModal, update]);
+    }, [openModalGoalExecuting, refresh])
 
     // Columnas de la tabla definidas en un hook personalizado
-    const columns = useMemo(() => getColumns(actions, openModalForm, setUpdate), [actions, openModalForm, setUpdate]);
+    const columns = useMemo(() => getColumnsExecuting(actions, openModal, setRefresh), [actions, openModal, setRefresh]);
 
     // Hook personalizado para manejar las etiquetas de búsqueda
     const {
@@ -44,23 +43,10 @@ const ModalBeneficiariesAssociated = ({openModal, closeModal, metaData, update, 
     // Datos filtrados basados en las etiquetas de búsqueda
     const filteredData = useMemo(() => {
         return data.filter(item => {
-            const periodoEjecucion = getMonthYearText(item.metBenMesEjeTec, item.metBenAnoEjeTec);
+            const periodoEjecucion = getMonthYearText(item.metEjeMesEjeTec, item.metEjeAnoEjeTec);
             return searchTags.every(tag => 
-                item.benAno.toUpperCase().includes(tag.toUpperCase()) ||
-                item.benCod.toUpperCase().includes(tag.toUpperCase()) ||
-                item.benNom.toUpperCase().includes(tag.toUpperCase()) ||
-                item.benApe.toUpperCase().includes(tag.toUpperCase()) ||
-                item.benCorEle.toUpperCase().includes(tag.toUpperCase()) ||
-                item.benTel.toUpperCase().includes(tag.toUpperCase()) ||
-                item.benTelCon.toUpperCase().includes(tag.toUpperCase()) ||
-                item.benCodUni.toUpperCase().includes(tag.toUpperCase()) ||
-                item.benDir.toUpperCase().includes(tag.toUpperCase()) ||
-                item.benNomApo.toUpperCase().includes(tag.toUpperCase()) ||
-                item.benApeApo.toUpperCase().includes(tag.toUpperCase()) ||
-                item.genNom.toUpperCase().includes(tag.toUpperCase()) ||
-                item.nacNom.toUpperCase().includes(tag.toUpperCase()) ||
-                (item.benSex === 'M' && 'MASCULINO'.includes(tag.toUpperCase())) ||
-                (item.benSex === 'F' && 'FEMENINO'.includes(tag.toUpperCase())) ||
+                item.ubiNom.toUpperCase().includes(tag.toUpperCase()) ||
+                item.metEjeVal.toUpperCase().includes(tag.toUpperCase()) ||
                 item.indNom.toUpperCase().includes(tag.toUpperCase()) ||
                 item.indNum.toUpperCase().includes(tag.toUpperCase()) ||
                 item.resNum.toUpperCase().includes(tag.toUpperCase()) ||
@@ -77,22 +63,22 @@ const ModalBeneficiariesAssociated = ({openModal, closeModal, metaData, update, 
             );
         });
     }, [data, searchTags]);
-
-    const headers = ['CUB','NOMBRE','APELLIDO','EMAIL','TELÉFONO','TELÉFONO CONTACTO','DIRECCIÓN','NOMBRE APODERADO','APELLIDO APODERADO','GÉNERO','NACIONALIDAD','AÑO EJECUTADO','MES EJECUTADO','UBICACIÓN EJECUTADA','INDICADOR','RESULTADO','OBJETIVO ESPECIFICO','OBJETIVO','SUBPROYECTO','PROYECTO'];
-    const properties = ['benCodUni','benNom','benApe','benCorEle','benTel','benTelCon','benDir','benNomApo','benApeApo','genNom','nacNom','metBenAnoEjeTec','metBenMesEjeTec','ubiNom',['indNum','indNom'],['resNum','resNom'],['objEspNum','objEspNom'],['objNum','objNom'],['subProSap','subProNom'],['proIde','proNom']];
+    
+    const headers = ['AÑO EJECUTADO','MES EJECUTADO','UBICACIÓN EJECUTADA','EJECUCION','INDICADOR','RESULTADO','OBJETIVO ESPECIFICO','OBJETIVO','SUBPROYECTO','PROYECTO'];
+    const properties = ['metEjeAnoEjeTec','metEjeMesEjeTec','ubiNom','metEjeVal',['indNum','indNom'],['resNum','resNom'],['objEspNum','objEspNom'],['objNum','objNom'],['subProSap','subProNom'],['proIde','proNom']];
     // Preparar los datos
     let dataExport = [...filteredData]; 
     // Modificar el campo 'uniInvPer' en los datos
     dataExport = dataExport.map(item => ({
         ...item,
-        metBenMesEjeTec: getMonth(item.metBenMesEjeTec),
+        metEjeMesEjeTec: getMonth(item.metEjeMesEjeTec),
     }));
 
     return (
         <Modal
             ariaHideApp={false}
-            isOpen={openModal}
-            onRequestClose={closeModal}
+            isOpen={openModalGoalExecuting}
+            onRequestClose={closeModalExecuting}
             closeTimeoutMS={200}
             className='PowerMas_React_Modal_Content Large_10 Medium_10 Phone_11'
             overlayClassName='PowerMas_React_Modal_Overlay'
@@ -104,10 +90,11 @@ const ModalBeneficiariesAssociated = ({openModal, closeModal, metaData, update, 
                     zIndex: 30
                 }
             }}
-        >
-            <div className="flex flex-column gap_25 flex-grow-1 overflow-auto table-beneficiarie-block">
-                <span className="PowerMas_CloseModal" style={{position: 'absolute',right: 20, top: 10}} onClick={closeModal}>×</span>
-                <h2 className='PowerMas_Title_Modal f1_5 center'>Beneficiarios asociados a la meta</h2>
+        >   
+            <div className="flex flex-column gap_25 flex-grow-1 overflow-auto table-execution-block">
+                <span className="PowerMas_CloseModal" style={{position: 'absolute',right: 20, top: 10}} onClick={closeModalExecuting}>×</span>
+                <h2 className='PowerMas_Title_Modal f1_5 center'>Ejecuciones asociados a la meta</h2>
+
                 <div className="flex gap_5 p_25">
                     {/* Componente para la entrada de búsqueda con etiquetas */}
                     <SearchTagsInput 
@@ -121,9 +108,9 @@ const ModalBeneficiariesAssociated = ({openModal, closeModal, metaData, update, 
                     <ExportMenu
                         filteredData={dataExport}
                         headers={headers}
-                        title={'BENEFICIARIOS'}
+                        title={'EJECUCIONES'}
                         properties={properties}
-                        format={[500,250]}
+                        format={[1200,500]}
                         actions={actions}
                     />
                 </div>
@@ -134,16 +121,16 @@ const ModalBeneficiariesAssociated = ({openModal, closeModal, metaData, update, 
                     isLargePagination={true}
                 />
             </div>
-            <ModalEditBeneficiarie 
+            <ModalEditExecution 
                 modalVisible={modalVisible}
-                closeModalEdit={closeModalForm} 
+                closeModal={closeModal}
                 record={estadoEditado}
-                setUpdate={setUpdate}
+                initialSelectCount={metaData?.initialSelectCount}
+                setRefresh={setRefresh}
                 metaData={metaData}
-                initialSelectCount={initialSelectCount}
             />
         </Modal>
     )
 }
 
-export default ModalBeneficiariesAssociated
+export default ModalGoalExecuting

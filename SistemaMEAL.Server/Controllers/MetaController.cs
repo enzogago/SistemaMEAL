@@ -237,9 +237,59 @@ namespace SistemaMEAL.Server.Controllers
         public dynamic InsertarMetaUsuario(MetaUsuarioDto metaUsuarioDto)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = Jwt.ValidateToken(identity);
+             var rToken = Jwt.ValidateToken(identity);
+
+            if (!rToken.success) return Unauthorized(rToken);
 
             var (message, messageType) = _metas.InsertarMetaUsuario(identity, metaUsuarioDto.MetasInsertar, metaUsuarioDto.MetasEliminar);
+            if (messageType == "1")
+            {
+                return new BadRequestObjectResult(new { success = false, message });
+            }
+            else if (messageType == "2")
+            {
+                return new ConflictObjectResult(new { success = false, message });
+            }
+            else
+            {
+                return new OkObjectResult(new { success = true, message });
+            }
+        }
+
+        [HttpPut]
+        [Route("goal-execution")]
+        public dynamic ModificarMetaEjecucion(MetaEjecucion metaEjecucion)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+             var rToken = Jwt.ValidateToken(identity);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var (message, messageType) = _metas.ModificarMetaEjecucion(identity, metaEjecucion);
+            if (messageType == "1")
+            {
+                return new BadRequestObjectResult(new { success = false, message });
+            }
+            else if (messageType == "2")
+            {
+                return new ConflictObjectResult(new { success = false, message });
+            }
+            else
+            {
+                return new OkObjectResult(new { success = true, message });
+            }
+        }
+
+        [HttpDelete]
+        [Route("goal-execution")]
+        public dynamic EliminarMetaEjecucion(MetaEjecucion metaEjecucion)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.ValidateToken(identity);
+
+            if (!rToken.success) return rToken;
+
+            var (message, messageType) = _metas.EliminarMetaEjecucion(identity, metaEjecucion);
             if (messageType == "1")
             {
                 return new BadRequestObjectResult(new { success = false, message });

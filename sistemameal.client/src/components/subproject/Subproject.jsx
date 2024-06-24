@@ -221,6 +221,7 @@ const Subproject = () => {
             'application/vnd.openxmlformats-officedocument.presentationml.presentation',
             'application/msword',
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            
         ].includes(event.target.files[0].type)) {
             handleFileUpload(event.target.files[0]); // Aquí se sube el archivo
         } else {
@@ -373,7 +374,7 @@ const Subproject = () => {
                 <span className="PowerMas_CloseModal" style={{position: 'absolute',right: 20, top: 10}} onClick={closeModal}>×</span>
                 <h2 className='PowerMas_Title_Modal f1_5 center'>Documentación de Formulación</h2>
                 <div className="flex-grow-1 flex jc-center ai-center overflow-auto">
-                    <div className="Large_10">
+                    <div className="Large_10 flex flex-column gap-1">
                         <article className="PowerMas_Article_Upload center">
                             <p style={{color: '#878280'}}>Solo se puede subir documentos en formato DOC,PDF,XLS,XLSM,XLSX,PPTX,JPG,PNG,MP4</p>
                             <h3>Subir Archivo</h3>

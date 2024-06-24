@@ -2,10 +2,10 @@ import Delete from "../../../icons/Delete";
 import Edit from "../../../icons/Edit";
 import masculino from '../../../img/PowerMas_Avatar_Masculino.svg';
 import femenino from '../../../img/PowerMas_Avatar_Femenino.svg';
-import { getMonthYearText } from "../../reusable/columns";
+import { getMonthYearText, renderCellWithTooltip } from "../../reusable/columns";
 import { handleDelete } from "../../reusable/fetchs";
 
-export const getColumns = (actions, openModalForm, setUpdate) => {
+export const getColumns = (actions, openModalForm, setRefresh) => {
     let baseColumns = [
         {
             header: "",
@@ -86,13 +86,61 @@ export const getColumns = (actions, openModalForm, setUpdate) => {
             accessorKey: "nacNom"
         },
         {
-            header: "Ubicación",
+            header: "Periodo Ejecutado",
+            accessorKey: "metBenAnoEjeTec",
+            cell: ({row}) => getMonthYearText(row.original.metBenMesEjeTec, row.original.metBenAnoEjeTec)
+        },
+        {
+            header: "Ubicación Ejecutada",
             accessorKey: "ubiNom",
         },
         {
-            header: "Ejecución",
-            accessorKey: "metBenAnoEjeTec",
-            cell: ({row}) => getMonthYearText(row.original.metBenMesEjeTec, row.original.metBenAnoEjeTec)
+            header: "Indicador",
+            accessorKey: "indNom",
+            cell: ({row}) => renderCellWithTooltip([row.original.indNum, row.original.indNom])
+        },
+        {
+            header: "Resultado",
+            accessorKey: "resNum",
+            cell: ({row}) => {
+                if (row.original.resNum == 'NA' && row.original.resNom == 'NA' ) {
+                    return '';
+                } else {
+                    return renderCellWithTooltip([row.original.resNum, row.original.resNom]);
+                }
+            }
+        },
+        {
+            header: "Objetivo Específico",
+            accessorKey: "objEspNum",
+            cell: ({row}) => {
+                if (row.original.objEspNum == 'NA' && row.original.objEspNom == 'NA') {
+                    return '';
+                } else {
+                    return renderCellWithTooltip([row.original.objEspNum, row.original.objEspNom]);
+                }
+            }
+        },
+        {
+            header: "Objetivo",
+            accessorKey: "objNum",
+            cell: ({row}) => {
+                if (row.original.objNum == 'NA' && row.original.objNom == 'NA') {
+                    return '';
+                } else {
+                    return renderCellWithTooltip([row.original.objNum, row.original.objNom]);
+                }
+            }
+        },
+        {
+            header: "Sub Proyecto",
+            accessorKey: "subProNom",
+            cell: ({row}) => renderCellWithTooltip([row.original.subProSap, row.original.subProNom])
+        },
+        {
+            header: "Proyecto",
+            accessorKey: "proNom",
+            cell: ({row}) => renderCellWithTooltip([row.original.proIde, row.original.proNom])
         },
     ];
 
@@ -118,7 +166,108 @@ export const getColumns = (actions, openModalForm, setUpdate) => {
                             data-tooltip-id="delete-tooltip" 
                             data-tooltip-content="Eliminar" 
                             className='flex f1_25 p_25'
-                            onClick={() => handleDelete('Monitoreo/eliminar-beneficiario', row.original, setUpdate)} 
+                            onClick={() => handleDelete('Monitoreo/eliminar-beneficiario', row.original, setRefresh)} 
+                        >
+                            <Delete />
+                        </span>
+                    }
+                </div>
+            ),
+        });
+    }
+
+    return baseColumns;
+};
+
+export const getColumnsExecuting = (actions, openModalForm, setRefresh) => {
+    let baseColumns = [
+        {
+            header: "Periodo Ejecutado",
+            accessorKey: "metEjeAnoEjeTec",
+            cell: ({row}) => getMonthYearText(row.original.metEjeMesEjeTec, row.original.metEjeAnoEjeTec)
+        },
+        {
+            header: "Ubicación Ejecutada",
+            accessorKey: "ubiNom",
+        },
+        {
+            header: "Ejecución",
+            accessorKey: "metEjeVal",
+            cell: ({row}) => <span className="flex jc-center">{row.original.metEjeVal}</span>
+        },
+        {
+            header: "Indicador",
+            accessorKey: "indNom",
+            cell: ({row}) => renderCellWithTooltip([row.original.indNum, row.original.indNom])
+        },
+        {
+            header: "Resultado",
+            accessorKey: "resNum",
+            cell: ({row}) => {
+                if (row.original.resNum == 'NA' && row.original.resNom == 'NA' ) {
+                    return '';
+                } else {
+                    return renderCellWithTooltip([row.original.resNum, row.original.resNom]);
+                }
+            }
+        },
+        {
+            header: "Objetivo Específico",
+            accessorKey: "objEspNum",
+            cell: ({row}) => {
+                if (row.original.objEspNum == 'NA' && row.original.objEspNom == 'NA') {
+                    return '';
+                } else {
+                    return renderCellWithTooltip([row.original.objEspNum, row.original.objEspNom]);
+                }
+            }
+        },
+        {
+            header: "Objetivo",
+            accessorKey: "objNum",
+            cell: ({row}) => {
+                if (row.original.objNum == 'NA' && row.original.objNom == 'NA') {
+                    return '';
+                } else {
+                    return renderCellWithTooltip([row.original.objNum, row.original.objNom]);
+                }
+            }
+        },
+        {
+            header: "Sub Proyecto",
+            accessorKey: "subProNom",
+            cell: ({row}) => renderCellWithTooltip([row.original.subProSap, row.original.subProNom])
+        },
+        {
+            header: "Proyecto",
+            accessorKey: "proNom",
+            cell: ({row}) => renderCellWithTooltip([row.original.proIde, row.original.proNom])
+        },
+    ];
+
+    if (actions.delete || actions.edit) {
+        baseColumns.push({
+            header: () => <div style={{textAlign: 'center', flexGrow: '1'}}>Acciones</div>,
+            accessorKey: "actions",
+            disableSorting: true,
+            cell: ({row}) => (
+                <div className='PowerMas_IconsTable flex jc-center ai-center'>
+                    {actions.edit &&
+                        <span
+                            data-tooltip-id="edit-tooltip" 
+                            data-tooltip-content="Editar" 
+                            className='flex f1_25 p_25' 
+                            onClick={() => openModalForm(row.original)} 
+                        >
+                            <Edit />
+                        </span>
+                    }
+                    {actions.delete &&
+                        <span
+                            data-tooltip-id="delete-tooltip" 
+                            data-tooltip-content="Eliminar" 
+                            className='flex f1_25 p_25'
+                            onClick={() => handleDelete('Meta/goal-execution', row.original, setRefresh)} 
                         >
                             <Delete />
                         </span>

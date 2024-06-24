@@ -209,6 +209,9 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
             grouped[subProKey].estNom = statusName;
             grouped[subProKey].estCol = statusColor;
 
+            const metaKeys = resultado.metas.map(meta => `ind_${meta.indAno}_${meta.indCod}`);
+            setExpandedInd(prevExpandedInd => [...new Set([...prevExpandedInd, ...metaKeys])]);
+
             return grouped
         }, {})
 
@@ -428,7 +431,6 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                                                 className={`pointer bold round p_25 PowerMas_MenuIcon ${expandedSubPro.includes(subProKey) ? 'PowerMas_MenuIcon--rotated' : ''}`} 
                                                 onClick={() => {
                                                     if (expandedSubPro.includes(subProKey)) {
-                                                        console.log(subProKey)
                                                         setExpandedSubPro(expandedSubPro.filter(subpro => subpro !== subProKey));
                                                     } else {
                                                         setExpandedSubPro([...expandedSubPro, subProKey]);
@@ -640,7 +642,6 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                                             </tr>
                                             {expandedInd.includes(key) && subMetas.map((meta, index) => {
                                                 const mesPeriodo = meta.metMesPlaTec ? (new Date(2024, meta.metMesPlaTec - 1).toLocaleString('es-ES', { month: 'short' })) : '';
-                                                
                                                 return (
                                                 <tr key={index} style={{color: '#372e2ca6', visibility: expandedInd.includes(key) ? 'visible' : 'collapse'}}>
                                                     <td></td>
@@ -732,7 +733,7 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                             </Fragment>
                             )})}
                                 <tr className='PowerMas_Totales_Monitoreo bold'>
-                                    <td colSpan={10} ></td>
+                                    <td colSpan={8} ></td>
                                     <td style={{textAlign: 'right'}}>Totales:</td>
                                     <td>{formatter.format(totals.totalMetTec)}</td>
                                     <td>{formatter.format(totals.totalEjeTec)}</td>
