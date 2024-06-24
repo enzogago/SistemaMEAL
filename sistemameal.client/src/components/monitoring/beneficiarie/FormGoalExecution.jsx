@@ -6,8 +6,8 @@ import { useForm } from 'react-hook-form';
 import { fetchData } from "../../reusable/helper";
 import { handleSubmitMetaEjecucion } from "./eventHandlers";
 import InfoGoal from "./InfoGoal";
-import ModalGoalExecuting from "./ModalGoalExecuting";
 import Return from "../../../icons/Return";
+import ModalGoalExecuting from "../execution/ModalGoalExecuting";
 
 const FormGoalExecution = () => {
     // Navegación y parámetros de la ruta
@@ -32,6 +32,7 @@ const FormGoalExecution = () => {
     const [ openModalGoalExecuting, setOpenModalGoalExecuting ] = useState(false);
     const [ firstEdit, setFirstEdit ] = useState(false);
     const [ initialSelectCount, setInitialSelectCount ] = useState(0);
+    const [ refresh, setRefresh ] = useState(false);
 
     // Carga de datos de la meta
     const fetchMetaDetails = async () => {
@@ -69,7 +70,7 @@ const FormGoalExecution = () => {
         if (id.length === 10 && isDataLoaded) {
             fetchMetaDetails();
         }
-    }, [id, isDataLoaded]);
+    }, [id, isDataLoaded, refresh]);
 
     // Efecto para cargar los datos de ubicación
     useEffect(() => {
@@ -171,8 +172,9 @@ const FormGoalExecution = () => {
                 setValue('pais', JSON.stringify({ ubiCod: data[0].ubiCod, ubiAno: data[0].ubiAno }));
                 await handleCountryChange(JSON.stringify({ ubiCod: data[0].ubiCod, ubiAno: data[0].ubiAno }));
                 const newSelectedValues = data.slice(1).map(location => JSON.stringify({ubiCod:location.ubiCod,ubiAno:location.ubiAno}));
-                setSelectedValues(newSelectedValues);   
+                setSelectedValues(newSelectedValues);
                 setInitialSelectCount(data.length);
+                setMetaData(prevMetaData => ({...prevMetaData, initialSelectCount: data.length}))
                 for (const [index, location] of data.slice(1).entries()) {
                     // Espera a que handleCountryChange termine antes de continuar con la siguiente iteración
                     await handleCountryChange(JSON.stringify({ubiCod: location.ubiCod,ubiAno: location.ubiAno}), index);
@@ -483,6 +485,8 @@ const FormGoalExecution = () => {
                 openModalGoalExecuting={openModalGoalExecuting}
                 closeModalExecuting={closeModalExecuting}
                 metaData={metaData}
+                refresh={refresh}
+                setRefresh={setRefresh}
             />
         </>
     )

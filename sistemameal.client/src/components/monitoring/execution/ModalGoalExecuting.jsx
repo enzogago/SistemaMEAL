@@ -1,5 +1,5 @@
 import Modal from 'react-modal';
-import TableExecuting from './TableExecuting';
+import TableExecuting from '../beneficiarie/TableExecuting';
 import { useEffect, useState } from 'react';
 import { fetchData } from '../../reusable/helper';
 

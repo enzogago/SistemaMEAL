@@ -142,7 +142,9 @@ const Monitoring = () => {
                 'video/mp4', 
                 'video/quicktime', 
                 'video/x-msvideo',
-                'application/vnd.openxmlformats-officedocument.presentationml.presentation' // Aquí se agrega el tipo MIME para .pptx
+                'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
             ].includes(fileType)) {
                 fileInputRef.current.files = e.dataTransfer.files;
                 handleFileUpload(e.dataTransfer.files[0]); // Aquí se sube el archivo
@@ -166,7 +168,9 @@ const Monitoring = () => {
             'video/mp4', 
             'video/quicktime', 
             'video/x-msvideo',
-            'application/vnd.openxmlformats-officedocument.presentationml.presentation' // Aquí se agrega el tipo MIME para .pptx
+            'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
         ].includes(event.target.files[0].type)) {
             handleFileUpload(event.target.files[0]); // Aquí se sube el archivo
         } else {
@@ -180,7 +184,7 @@ const Monitoring = () => {
     };
 
     const downloadFile = async (fileName) => {
-        const url = `https://webmeal-aea.ec/uploads/${fileName}`
+        const url = `https://meal.ddns.net/uploads/${fileName}`
         try {
             Notiflix.Loading.pulse('Descargando..   .');
             // Obtenemos los datos
@@ -316,7 +320,7 @@ const Monitoring = () => {
                         right: 'auto',
                         bottom: 'auto',
                         width: '50%',
-                        maxHeight: '100vh',
+                        height: '90%',
                         marginRight: '-50%',
                         transform: 'translate(-50%, -50%)',
                         backgroundColor: '#fff',
@@ -338,15 +342,14 @@ const Monitoring = () => {
             >
                 <span className="PowerMas_CloseModal" style={{position: 'absolute',right: 20, top: 10}} onClick={closeModal}>×</span>
                 <h2 className='PowerMas_Title_Modal f1_5 center'>Fuentes de Verificación</h2>
-                <div className="flex-grow-1 flex jc-center ai-center">
-                    <div className="Large_10">
+                <div className="flex-grow-1 flex jc-center ai-center overflow-auto">
+                    <div className="Large_10 flex flex-column gap-1">
                         <article className="PowerMas_Article_Upload center">
-                            <p style={{color: '#878280'}}>Solo se puede subir documentos en formato PDF,XLS,XLSM,XLSX,PPTX,JPG,PNG,MP4</p>
+                            <p style={{color: '#878280'}}>Solo se puede subir documentos en formato DOC,PDF,XLS,XLSM,XLSX,PPTX,JPG,PNG,MP4</p>
                             <h3>Subir Archivo</h3>
                         </article>
-                        <br />
                         <div
-                            className="PowerMas_Input_Upload center p2 pointer"
+                            className="PowerMas_Input_Upload center p1 pointer"
                             ref={dropRef}
                             onClick={handleDivClick}
                             onDragEnter={handleDragIn}
@@ -361,7 +364,7 @@ const Monitoring = () => {
                                 onChange={handleFileChange} 
                                 accept="*/*"
                             />
-                            <span className="Large-f5 flex ai-center jc-center" >
+                            <span className="Large-f4 flex ai-center jc-center" >
                                 <FileExcel />
                             </span>
                             {

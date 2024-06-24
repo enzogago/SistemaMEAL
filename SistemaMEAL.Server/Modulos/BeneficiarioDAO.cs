@@ -594,11 +594,11 @@ namespace SistemaMEAL.Server.Modulos
             return temporal?? new List<Beneficiario>();
         }
 
-        public IEnumerable<Beneficiario> BuscarMetaBeneficiario(ClaimsIdentity? identity, string? metAno = null, string? metCod = null, string? benAno = null, string? benCod = null, string? ubiAno = null, string? ubiCod = null, string? metBenEda = null, string? metBenAnoEjeTec = null, string? metBenMesEjeTec = null)
+        public IEnumerable<MetaBeneficiario> BuscarMetaBeneficiario(ClaimsIdentity? identity, string? metAno = null, string? metCod = null, string? benAno = null, string? benCod = null, string? ubiAno = null, string? ubiCod = null, string? metBenEda = null, string? metBenAnoEjeTec = null, string? metBenMesEjeTec = null)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 
-            List<Beneficiario>? temporal = new List<Beneficiario>();
+            List<MetaBeneficiario>? temporal = new List<MetaBeneficiario>();
             try
             {
                 cn.getcn.Open();
@@ -645,7 +645,7 @@ namespace SistemaMEAL.Server.Modulos
                     }
                 }
                 // Deserializa la cadena JSON en una lista de objetos Usuario
-                temporal = JsonConvert.DeserializeObject<List<Beneficiario>>(jsonResult.ToString());
+                temporal = JsonConvert.DeserializeObject<List<MetaBeneficiario>>(jsonResult.ToString());
             }
             catch (SqlException ex)
             {
@@ -655,7 +655,7 @@ namespace SistemaMEAL.Server.Modulos
             {
                 cn.getcn.Close();
             }
-            return temporal?? new List<Beneficiario>();
+            return temporal?? new List<MetaBeneficiario>();
         }
 
         public IEnumerable<Beneficiario> ContarBeneficiariosHome(ClaimsIdentity? identity, string? tags = null, string? periodoInicio = null, string? periodoFin = null)
