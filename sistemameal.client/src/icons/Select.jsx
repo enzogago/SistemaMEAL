@@ -1,8 +1,8 @@
 const Select = () => {
     return (
-        <svg fill="currentColor" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+        <svg fill="currentColor" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" 
             className="w-auto" height="1em" viewBox="0 0 895.401 895.4"
-            xml:space="preserve">
+            xmlSpace="preserve">
         <g>
             <g>
                 <path d="M328.177,875.4c0,11,9,20,20,20h295.599c11,0,20-9,20-20V829.6H328.177V875.4z"/>

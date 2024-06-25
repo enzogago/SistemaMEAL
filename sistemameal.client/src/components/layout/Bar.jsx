@@ -12,6 +12,7 @@ import About from '../../icons/About';
 import User from '../../icons/User';
 import Chain from '../../icons/Chain';
 import Play from '../../icons/Play';
+import TriangleIcon from '../../icons/TriangleIcon';
 
 const Bar = ({showSidebarAndBar, isOpen, setIsOpen}) => {
     const navigate = useNavigate();
@@ -121,10 +122,10 @@ const Bar = ({showSidebarAndBar, isOpen, setIsOpen}) => {
                         </div>
                     }
                     <div 
-                        className={`pointer round p_25 PowerMas_MenuIcon ${isOpen ? 'PowerMas_MenuIcon--rotated' : ''}`} 
+                        className={`pointer flex f1_25 PowerMas_MenuIcon ${isOpen ? 'PowerMas_MenuIcon--rotated' : ''}`} 
                         onClick={handleIconClick}
                     >
-                        &gt;
+                        <TriangleIcon />
                     </div>
                     {isOpen && (
                         <div className={`PowerMas_DropdownMenu ${isOpen ? 'PowerMas_DropdownMenu--open' : ''}`}>

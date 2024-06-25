@@ -20,3 +20,11 @@ export const getMonthYearText = (monthNum, year) => {
 export const getMonth = (monthNum) => {
     return new Date(2024, monthNum - 1).toLocaleString('es-ES', { month: 'long' }).toUpperCase();
 }
+
+export const tipoIndicadorMapping = {
+    'IRE': 'Indicador de Resultado',
+    'IAC': 'Actividad',
+    'IIN': 'Indicador Institucional',
+    'IOB': 'Indicador de Objetivo',
+    'IOE': 'Indicador de Objetivo Específico',
+};

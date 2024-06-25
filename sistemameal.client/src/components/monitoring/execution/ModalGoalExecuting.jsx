@@ -7,7 +7,7 @@ import { getColumnsExecuting } from '../beneficiarie/columns';
 import { useSearchTags } from '../../../hooks/useSearchTags';
 import useEntityActions from '../../../hooks/useEntityActions';
 import CommonTable from '../../reusable/Tables/CommonTable';
-import { getMonth, getMonthYearText } from '../../reusable/columns';
+import { getMonth, getMonthYearText, tipoIndicadorMapping } from '../../reusable/columns';
 import ModalEditExecution from './ModalEditExecution';
 import { fetchDataBlock } from '../../reusable/fetchs';
 
@@ -47,30 +47,19 @@ const ModalGoalExecuting = ({openModalGoalExecuting, closeModalExecuting, metaDa
             return searchTags.every(tag => 
                 item.ubiNom.toUpperCase().includes(tag.toUpperCase()) ||
                 item.metEjeVal.toUpperCase().includes(tag.toUpperCase()) ||
-                item.indNom.toUpperCase().includes(tag.toUpperCase()) ||
-                item.indNum.toUpperCase().includes(tag.toUpperCase()) ||
-                item.resNum.toUpperCase().includes(tag.toUpperCase()) ||
-                item.resNom.toUpperCase().includes(tag.toUpperCase()) ||
-                item.objEspNum.toUpperCase().includes(tag.toUpperCase()) ||
-                item.objEspNom.toUpperCase().includes(tag.toUpperCase()) ||
-                item.objNum.toUpperCase().includes(tag.toUpperCase()) ||
-                item.objNom.toUpperCase().includes(tag.toUpperCase()) ||
-                item.subProSap.toUpperCase().includes(tag.toUpperCase()) ||
-                item.subProNom.toUpperCase().includes(tag.toUpperCase()) ||
-                item.proIde.toUpperCase().includes(tag.toUpperCase()) ||
-                item.proNom.toUpperCase().includes(tag.toUpperCase()) ||
                 (periodoEjecucion ? periodoEjecucion.toUpperCase().includes(tag.toUpperCase()) : false)
             );
         });
     }, [data, searchTags]);
     
-    const headers = ['AÑO EJECUTADO','MES EJECUTADO','UBICACIÓN EJECUTADA','EJECUCION','INDICADOR','RESULTADO','OBJETIVO ESPECIFICO','OBJETIVO','SUBPROYECTO','PROYECTO'];
-    const properties = ['metEjeAnoEjeTec','metEjeMesEjeTec','ubiNom','metEjeVal',['indNum','indNom'],['resNum','resNom'],['objEspNum','objEspNom'],['objNum','objNom'],['subProSap','subProNom'],['proIde','proNom']];
+    const headers = ['AÑO EJECUTADO','MES EJECUTADO','UBICACIÓN EJECUTADA','EJECUCION','INDICADOR','TIPO','RESULTADO','OBJETIVO ESPECIFICO','OBJETIVO','SUBPROYECTO','PROYECTO'];
+    const properties = ['metEjeAnoEjeTec','metEjeMesEjeTec','ubiNom','metEjeVal',['indNum','indNom'],'indTipInd',['resNum','resNom'],['objEspNum','objEspNom'],['objNum','objNom'],['subProSap','subProNom'],['proIde','proNom']];
     // Preparar los datos
     let dataExport = [...filteredData]; 
     // Modificar el campo 'uniInvPer' en los datos
     dataExport = dataExport.map(item => ({
         ...item,
+        indTipInd: tipoIndicadorMapping[item.indTipInd].toUpperCase(),
         metEjeMesEjeTec: getMonth(item.metEjeMesEjeTec),
     }));
 

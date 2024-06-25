@@ -344,6 +344,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                 return;
             }
     
+            console.log(data);
             reset(data);
             setInitialData(data)
             
@@ -537,13 +538,6 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                                 </option>
                             ))}
                         </select>
-                        {errors.pais ? (
-                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.pais.message}</p>
-                        ) : (
-                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                Espacio reservado para el mensaje de error
-                            </p>
-                        )}
                     </div>
                     {selects.map((options, index) => (
                         <div className="m_75" key={index}>
@@ -763,8 +757,8 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                                     type="radio" 
                                     id="masculino" 
                                     name="benSex" 
-                                    disabled={fieldsDisabled && benSex !== 'm'}
-                                    value="m" 
+                                    disabled={fieldsDisabled && benSex !== 'M'}
+                                    value="M" 
                                     {...register('benSex', { required: 'Por favor, selecciona una opción' })}
                                 />
                                 <label htmlFor="masculino" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} >Masculino</label>
@@ -774,8 +768,8 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                                     type="radio" 
                                     id="femenino" 
                                     name="benSex" 
-                                    disabled={fieldsDisabled && benSex !== 'f'}
-                                    value="f" 
+                                    disabled={fieldsDisabled && benSex !== 'F'}
+                                    value="F" 
                                     {...register('benSex', { required: 'Por favor, selecciona una opción' })}
                                 />
                                 <label style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} htmlFor="femenino">Femenino</label>

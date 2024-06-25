@@ -13,11 +13,10 @@ import CustomTable from "../../reusable/Table/CustomTable";
 import { Export_Excel_Helper, Export_PDF_Helper } from "../../reusable/helper";
 import masculino from '../../../img/PowerMas_Avatar_Masculino.svg';
 import femenino from '../../../img/PowerMas_Avatar_Femenino.svg';
-import Select from "../../../icons/Select";
+import EyeIcon from "../../../icons/EyeIcon";
 
 const ModalBeneficiariesName = ({data, modalBeneficiariesName, closeBeneficiariesName,buscarDataMetas }) => {
 
-    if(!modalBeneficiariesName) return;
     // Variables State AuthContext 
     const { authInfo } = useContext(AuthContext);
     const { userPermissions } = authInfo;
@@ -212,13 +211,13 @@ const ModalBeneficiariesName = ({data, modalBeneficiariesName, closeBeneficiarie
                 <div className='PowerMas_IconsTable flex jc-center ai-center'>
                     <span
                         data-tooltip-id="select-tooltip" 
-                        data-tooltip-content="Seleccionar" 
+                        data-tooltip-content="Ver" 
                         className='flex f1_5' 
                         onClick={() => {
                             buscarDataMetas(row.original);
                         }} 
                     >
-                        <Select />
+                        <EyeIcon />
                     </span>
                 </div>
             )},
@@ -274,23 +273,14 @@ const ModalBeneficiariesName = ({data, modalBeneficiariesName, closeBeneficiarie
             isOpen={modalBeneficiariesName}
             onRequestClose={closeBeneficiariesName}
             closeTimeoutMS={200}
+            className='PowerMas_React_Modal_Content Large_11 Medium_10 Phone_11'
+            overlayClassName='PowerMas_React_Modal_Overlay'
             style={{
                 content: {
-                    top: '50%',
-                    left: '50%',
-                    right: 'auto',
-                    bottom: 'auto',
-                    width: '90%',
                     height: '90%',
-                    marginRight: '-50%',
-                    transform: 'translate(-50%, -50%)',
-                    backgroundColor: '#fff',
-                    border: '1px solid #ccc',
-                    display: 'flex',
-                    flexDirection: 'column'
                 },
                 overlay: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.5)'
+                    zIndex: 20
                 }
             }}
         >

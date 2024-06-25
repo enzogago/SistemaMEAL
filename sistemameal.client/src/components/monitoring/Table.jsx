@@ -10,6 +10,7 @@ import Search from '../../icons/Search';
 import Expand from '../../icons/Expand';
 import IconCalendar from '../../icons/IconCalendar';
 import useDateRange from '../../hooks/useDateRange';
+import TriangleIcon from '../../icons/TriangleIcon';
 
 const smallPageSizes = [10, 20, 30, 50];
 const largePageSizes = [100, 200, 300, 500];
@@ -401,6 +402,10 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                     <table className='PowerMas_Table_Monitoring Phone_12'>
                         <thead>
                             <tr className='center'>
+                                <span 
+                                    className='flex'
+                                    style={{minWidth: '1.25rem'}}
+                                ></span>
                                 <th>Estado</th>
                                 <th></th>
                                 <th>FFVV</th>
@@ -413,8 +418,8 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                                 <th style={{color: 'var(--naranja-ayuda)'}}>Ejecución Programática</th>
                                 <th style={{color: 'var(--naranja-ayuda)'}}>% Avance Programático</th>
                                 <th style={{color: 'var(--turquesa)'}}>Meta Presupuesto</th>
-                                <th style={{color: 'var(--turquesa)'}}>% Avance Presupuesto</th>
                                 <th style={{color: 'var(--turquesa)'}}>Ejecución Presupuesto</th>
+                                <th style={{color: 'var(--turquesa)'}}>% Avance Presupuesto</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -426,9 +431,9 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                                 return (
                                 <Fragment key={subProKey}>
                                     <tr className='' style={{backgroundColor: '#FFC65860'}}>
-                                        <td>
-                                            <div 
-                                                className={`pointer bold round p_25 PowerMas_MenuIcon ${expandedSubPro.includes(subProKey) ? 'PowerMas_MenuIcon--rotated' : ''}`} 
+                                        <td className='p0'>
+                                            <span
+                                                className={`pointer bold flex ai-center f1_25 PowerMas_MenuIcon ${expandedSubPro.includes(subProKey) ? 'PowerMas_MenuIcon--rotated' : ''}`} 
                                                 onClick={() => {
                                                     if (expandedSubPro.includes(subProKey)) {
                                                         setExpandedSubPro(expandedSubPro.filter(subpro => subpro !== subProKey));
@@ -436,7 +441,9 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                                                         setExpandedSubPro([...expandedSubPro, subProKey]);
                                                     }
                                                 }}
-                                            > &gt; </div>
+                                            > 
+                                                <TriangleIcon />
+                                            </span>
                                         </td>
                                         <td className='bold' style={{color: estCol}}>
                                             {estNom}
@@ -485,7 +492,6 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                                             </div>
                                         </td>
                                     </tr>
-
                             {expandedSubPro.includes(subProKey) && Object.entries(resultados).map(([key, { resKey, metas, name, number, totalMetTec, totalEjeTec, totalMetPre, totalEjePre }]) => {
                                 const totalPorAvaTec = totalMetTec ? (totalEjeTec / totalMetTec) * 100 : 0
                                 const totalPorAvaPre = totalMetPre ? (totalEjePre / totalMetPre) * 100 : 0
@@ -496,9 +502,10 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                                 return (
                                 <Fragment key={resKey}>
                                     <tr className='' style={{backgroundColor: '#e1e1e1'}}>
-                                        <td>
-                                            <div 
-                                                className={`pointer bold round p_25 PowerMas_MenuIcon ${expandedRes.includes(resKey) ? 'PowerMas_MenuIcon--rotated' : ''}`} 
+                                        <td className='p0'>
+                                            <span
+                                                style={{minWidth: '1rem'}}
+                                                className={`pointer bold flex ai-center f1_25 PowerMas_MenuIcon ${expandedRes.includes(resKey) ? 'PowerMas_MenuIcon--rotated' : ''}`} 
                                                 onClick={() => {
                                                     if (expandedRes.includes(resKey)) {
                                                         setExpandedRes(expandedRes.filter(indicator => indicator !== resKey));
@@ -506,7 +513,9 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                                                         setExpandedRes([...expandedRes, resKey]);
                                                     }
                                                 }}
-                                            > &gt; </div>
+                                            > 
+                                                <TriangleIcon />
+                                            </span>
                                         </td>
                                         <td>
                                             <div className="bold" style={{ color: statusColor, whiteSpace: 'nowrap' }}>
@@ -579,9 +588,10 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                                         return (
                                         <Fragment key={key}>
                                             <tr className='' style={{backgroundColor: '#efeeee'}}>
-                                                <td>
-                                                    <div 
-                                                        className={`pointer bold round p_25 PowerMas_MenuIcon ${expandedInd.includes(key) ? 'PowerMas_MenuIcon--rotated' : ''}`} 
+                                                <td className='p0'>
+                                                    <span 
+                                                        style={{minWidth: '1rem'}}
+                                                        className={`pointer bold flex ai-center f1_25 PowerMas_MenuIcon ${expandedInd.includes(key) ? 'PowerMas_MenuIcon--rotated' : ''}`} 
                                                         onClick={() => {
                                                             if (expandedInd.includes(key)) {
                                                                 setExpandedInd(expandedInd.filter(indicator => indicator !== key));
@@ -589,7 +599,9 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                                                                 setExpandedInd([...expandedInd, key]);
                                                             }
                                                         }}
-                                                    > &gt; </div>
+                                                    > 
+                                                        <TriangleIcon />
+                                                    </span>
                                                 </td>
                                                 <td>
                                                     <div className="bold" style={{ color: statusColor, whiteSpace: 'nowrap', textTransform: 'capitalize' }}>
