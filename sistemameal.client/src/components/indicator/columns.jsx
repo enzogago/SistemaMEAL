@@ -1,16 +1,8 @@
 import Delete from "../../icons/Delete";
 import Edit from "../../icons/Edit";
-import { getMonthYearText, renderCellWithTooltip } from "../reusable/columns";
+import { getMonthYearText, renderCellWithTooltip, tipoIndicadorMapping } from "../reusable/columns";
 import { handleDelete } from "../reusable/fetchs";
 
-const tipoIndicadorMapping = {
-    'IRE': 'Indicador de Resultado',
-    'IAC': 'Actividad',
-    'IOB': 'Indicador de Objetivo',
-    'IOE': 'Indicador de Objetivo Específico',
-    'ISA': 'Indicador de Sub Actividad',
-    'IIN': 'Indicador Institucional',
-};
 
 export const getColumns = (actions, controller, openModal, setRefresh) => {
     let baseColumns = [

@@ -5,13 +5,13 @@ const UserInfo = ({user}) => {
     return (
         <div className="PowerMas_Info_User PowerMas_Form_Card p1 overflow-auto" style={{backgroundColor: '#f7f7f7'}}>
             <div className="flex flex-column jc-center ai-center gap_5">
-            <div className="PowerMas_ProfilePicture2" style={{width: 125, height: 125}}>
-                <img src={user && (user.usuAva ? `data:image/jpeg;base64,${user.usuAva}` : (user.usuSex == 'M' ? masculino : femenino ))} alt="Descripción de la imagen" />
-            </div>
-            <div className="center">
-                <p className="f1_25 bold" style={{textTransform: 'capitalize'}}>{user && user.usuNom.toLowerCase() + ' ' + user.usuApe.toLowerCase() }</p>
-                <p className="color-gray" style={{textTransform: 'capitalize'}}>{user && user.carNom.toLowerCase() }</p>
-            </div>
+                <div className="PowerMas_ProfilePicture2" style={{width: 125, height: 125}}>
+                    <img src={user && (user.usuAva ? `data:image/jpeg;base64,${user.usuAva}` : (user.usuSex == 'M' ? masculino : femenino ))} alt="Descripción de la imagen" />
+                </div>
+                <div className="center">
+                    <p className="f1_25 bold" style={{textTransform: 'capitalize'}}>{user && user.usuNom.toLowerCase() + ' ' + user.usuApe.toLowerCase() }</p>
+                    <p className="color-gray" style={{textTransform: 'capitalize'}}>{user && user.carNom.toLowerCase() }</p>
+                </div>
             </div>
             <br />
             <article className="p_25">

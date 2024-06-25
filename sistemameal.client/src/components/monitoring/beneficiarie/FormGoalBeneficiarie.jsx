@@ -50,7 +50,7 @@ const FormGoalBeneficiarie = () => {
     const [ isOptionOneSelected, setIsOptionOneSelected] = useState(true);
 
     const [ modalGoalBeneficiarie, setModalGoalBeneficiarie ] = useState(false);
-    const [ dataGoalBeneficiarie, setDataGoalBeneficiarie ] = useState({});
+    const [ dataGoalBeneficiarie, setDataGoalBeneficiarie ] = useState(null);
     const [ dataBeneficiariesName, setDataBeneficiariesName ] = useState([]);
     
     const [ verificarPais, setVerificarPais ] = useState(null);
@@ -195,17 +195,12 @@ const FormGoalBeneficiarie = () => {
     = useForm({ mode: "onChange"});
 
     const buscarDataMetas = (data) => {
-
         setDataGoalBeneficiarie(data)
-        reset(data);
         setExisteBeneficiario(true);
         fetchDataTable(data.benAno, data.benCod)
         setModalGoalBeneficiarie(true);
-        setValue('metBenMesEjeTec', metaData.metMesPlaTec)
-        setValue('metBenAnoEjeTec', metaData.metAnoPlaTec)
-        setValue('pais', JSON.stringify(verificarPais));
     }
-    
+
     // Actualiza la acción actual antes de enviar el formulario
     const buscarBeneficiarioDocumento = async (info) => {
         if (isOptionOneSelected) {
@@ -343,7 +338,7 @@ const FormGoalBeneficiarie = () => {
             const token = localStorage.getItem('token');
             Notiflix.Loading.pulse('Cargando...');
             
-            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Monitoreo/beneficiario/${benAno}/${benCod}`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/Meta/beneficiarie/${benAno}/${benCod}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -1428,61 +1423,55 @@ const FormGoalBeneficiarie = () => {
                 onRequestClose={cerrarModal}
                 contentLabel="Documentos agregados"
                 closeTimeoutMS={200}
+                className='PowerMas_React_Modal_Content Large_8 Medium_8 Phone_10 gap-1'
+                overlayClassName='PowerMas_React_Modal_Overlay'
                 style={{
                     content: {
-                        top: '50%',
-                        left: '50%',
-                        right: 'auto',
-                        bottom: 'auto',
-                        width: '50%',
-                        marginRight: '-50%',
-                        transform: 'translate(-50%, -50%)',
-                        backgroundColor: '#fff',
-                        border: '1px solid #ccc',
-                        padding: '20px'
+                        
                     },
                     overlay: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
                         zIndex: 30
                     }
-                }}
+            }}
             >
                 <span className="PowerMas_CloseModal" style={{position: 'absolute',right: 20, top: 10}} onClick={cerrarModal}>×</span>
                 <h2 className='PowerMas_Title_Modal f1_5 center'>Documentos Agregados</h2>
-                <table className="PowerMas_Modal_Documentos Large_12">
-                    <thead className="">
-                        <tr>
-                            <th>Tipo de documento</th>
-                            <th>Número de documento</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {documentosAgregados.map((documento, index) => (
-                            <tr key={index}>
-                                <td style={{textTransform: 'capitalize', textWrap: 'nowrap'}}>{documento.docIdeAbr} - {documento.docIdeNom.toLowerCase()}</td>
-                                <td className="center">{documento.docIdeBenNum}</td>
-                                <td className="PowerMas_IconsTable"> 
-                                    <span
-                                        data-tooltip-id="delete-tooltip" 
-                                        data-tooltip-content="Eliminar" 
-                                        className='flex f1_5 p_25'
-                                        onClick={() => eliminarDocumento(index)}
-                                    >
-                                        <Delete />
-                                    </span>
+                <div className="flex flex-grow-1 overflow-auto">
+                    <table className="PowerMas_Modal_Documentos Large_12">
+                        <thead className="">
+                            <tr>
+                                <th>Tipo de documento</th>
+                                <th>Número de documento</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {documentosAgregados.map((documento, index) => (
+                                <tr key={index}>
+                                    <td style={{textTransform: 'capitalize', textWrap: 'nowrap'}}>{documento.docIdeAbr} - {documento.docIdeNom.toLowerCase()}</td>
+                                    <td className="center">{documento.docIdeBenNum}</td>
+                                    <td className="PowerMas_IconsTable"> 
+                                        <span
+                                            data-tooltip-id="delete-tooltip" 
+                                            data-tooltip-content="Eliminar" 
+                                            className='flex f1_5 p_25'
+                                            onClick={() => eliminarDocumento(index)}
+                                        >
+                                            <Delete />
+                                        </span>
 
-                                </td>
-                            </tr>
-                        ))}
-                        {
-                            documentosAgregados.length == 0 &&
-                            <tr className="center">
-                                <td colSpan={3} className="p1"> No se registraron documentos</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+                                    </td>
+                                </tr>
+                            ))}
+                            {
+                                documentosAgregados.length == 0 &&
+                                <tr className="center">
+                                    <td colSpan={3} className="p1"> No se registraron documentos</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
                 <div className=" center">
                     <button className="PowerMas_Buttom_Primary center p_5 m_25" onClick={cerrarModal}>Cerrar</button>
                 </div>
@@ -1500,10 +1489,12 @@ const FormGoalBeneficiarie = () => {
 
             {/* Intervenciones del beneficiario */}
             <ModalGoalBeneficiarie 
-                modalGoalBeneficiarie={modalGoalBeneficiarie} 
+                modalGoalBeneficiarie={modalGoalBeneficiarie}
                 closeModal={closeGoalBeneficiarie}
+                closeModalNames={closeBeneficiariesName}
                 dataGoalBeneficiarie={dataGoalBeneficiarie}
                 dataGoals={dataGoals}
+                setValue={setValue}
             />
 
             {/* Resultados de beneficiarios con coincidencia de nombre y/o apellido */}

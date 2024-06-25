@@ -8,6 +8,7 @@ import TableEmpty from '../../img/PowerMas_TableEmpty.svg';
 import { formatterBudget } from '../monitoring/goal/helper';
 import { exportToExcel, formatMonthKey, meses } from '../../helpers/budget';
 import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
+import TriangleIcon from '../../icons/TriangleIcon';
 
 const ViewExecution = () => {
     // Estado para controlar la visibilidad del menú desplegable.
@@ -409,9 +410,10 @@ const ViewExecution = () => {
                                 return (
                                     <Fragment key={index}>
                                         <tr>
-                                            <td>
-                                                <div 
-                                                    className={`pointer bold round p_25 PowerMas_MenuIcon ${expandedIndicators.includes(`${item.indAno}_${item.indCod}`) ? 'PowerMas_MenuIcon--rotated' : ''}`} 
+                                            <td className='p0'>
+                                                <div
+                                                    style={{minWidth: '1.5rem'}}
+                                                    className={`f1_25 pointer bold flex ai-center PowerMas_MenuIcon ${expandedIndicators.includes(`${item.indAno}_${item.indCod}`) ? 'PowerMas_MenuIcon--rotated' : ''}`} 
                                                     onClick={() => {
                                                         if (expandedIndicators.includes(`${item.indAno}_${item.indCod}`)) {
                                                             setExpandedIndicators(expandedIndicators.filter(indicator => indicator !== `${item.indAno}_${item.indCod}`));
@@ -419,7 +421,9 @@ const ViewExecution = () => {
                                                             setExpandedIndicators([...expandedIndicators, `${item.indAno}_${item.indCod}`]);
                                                         }
                                                     }}
-                                                > &gt; </div>
+                                                > 
+                                                    <TriangleIcon />
+                                                </div>
                                             </td>
                                             <td style={{position: 'sticky', left: '0', backgroundColor: '#fff',zIndex: '1'}}>{item.indNum}</td>
                                             {

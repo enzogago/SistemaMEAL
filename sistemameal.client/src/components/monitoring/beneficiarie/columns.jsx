@@ -2,8 +2,9 @@ import Delete from "../../../icons/Delete";
 import Edit from "../../../icons/Edit";
 import masculino from '../../../img/PowerMas_Avatar_Masculino.svg';
 import femenino from '../../../img/PowerMas_Avatar_Femenino.svg';
-import { getMonthYearText, renderCellWithTooltip } from "../../reusable/columns";
+import { getMonthYearText, renderCellWithTooltip, tipoIndicadorMapping } from "../../reusable/columns";
 import { handleDelete } from "../../reusable/fetchs";
+
 
 export const getColumns = (actions, openModalForm, setRefresh) => {
     let baseColumns = [
@@ -25,11 +26,15 @@ export const getColumns = (actions, openModalForm, setRefresh) => {
             accessorKey: "benCodUni"
         },
         {
-            header: "Nombre",
+            header: "Tipo de Documento",
+            accessorKey: "docIdeNom"
+        },
+        {
+            header: "Nombres",
             accessorKey: "benNom"
         },
         {
-            header: "Apellido",
+            header: "Apellidos",
             accessorKey: "benApe"
         },
         {
@@ -95,9 +100,14 @@ export const getColumns = (actions, openModalForm, setRefresh) => {
             accessorKey: "ubiNom",
         },
         {
-            header: "Indicador",
+            header: "Actividad o Indicador",
             accessorKey: "indNom",
             cell: ({row}) => renderCellWithTooltip([row.original.indNum, row.original.indNom])
+        },
+        {
+            header: "Tipo",
+            accessorKey: "indTipInd",
+            cell: ({row}) => tipoIndicadorMapping[row.original.indTipInd].toUpperCase()
         },
         {
             header: "Resultado",
@@ -196,9 +206,14 @@ export const getColumnsExecuting = (actions, openModalForm, setRefresh) => {
             cell: ({row}) => <span className="flex jc-center">{row.original.metEjeVal}</span>
         },
         {
-            header: "Indicador",
+            header: "Actividad o Indicador",
             accessorKey: "indNom",
             cell: ({row}) => renderCellWithTooltip([row.original.indNum, row.original.indNom])
+        },
+        {
+            header: "Tipo",
+            accessorKey: "indTipInd",
+            cell: ({row}) => tipoIndicadorMapping[row.original.indTipInd].toUpperCase()
         },
         {
             header: "Resultado",

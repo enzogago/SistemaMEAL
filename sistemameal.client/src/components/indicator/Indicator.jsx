@@ -8,19 +8,10 @@ import CommonTable from '../reusable/Tables/CommonTable';
 import { getColumns } from './columns';
 import { fetchDataBlock } from '../reusable/fetchs';
 import useEntityActions from '../../hooks/useEntityActions';
-import { getMonth, getMonthYearText } from '../reusable/columns';
+import { getMonth, getMonthYearText, tipoIndicadorMapping } from '../reusable/columns';
 import ExportMenu from '../reusable/Tables/ExportMenu';
 import Plus from '../../icons/Plus';
 import useModal from '../../hooks/useModal';
-
-const tipoIndicadorMapping = {
-    'IRE': 'Indicador de Resultado',
-    'IAC': 'Actividad',
-    'IIN': 'Indicador Institucional',
-    'IOB': 'Indicador de Objetivo',
-    'IOE': 'Indicador de Objetivo Específico',
-    'ISA': 'Indicador de Sub Actividad',
-};
 
 const Indicator = () => {
     // States locales

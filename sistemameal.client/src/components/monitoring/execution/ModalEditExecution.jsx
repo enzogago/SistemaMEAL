@@ -145,6 +145,7 @@ const ModalEditExecution = ({ modalVisible, closeModal, record, initialSelectCou
     const handleReset = () => {
         setSelects([]);
         reset({
+            pais: '',
             metEjeVal: '',
             metEjeAnoEjeTec: '',
             metEjeMesEjeTec: '',

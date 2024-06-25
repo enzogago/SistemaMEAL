@@ -48,6 +48,10 @@ export const getColumns = (actions, controller, openModal, setRefresh, handleEdi
             accessorKey: "usuCorEle",
         },
         {
+            header: "País",
+            accessorKey: "ubiNom",
+        },
+        {
             header: "Teléfono",
             accessorKey: "usuTel",
         },

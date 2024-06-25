@@ -1,6 +1,7 @@
 import React, { useState, Fragment, useMemo } from 'react'
 import { formatter, formatterBudget } from '../../components/monitoring/goal/helper'
 import TableEmpty from '../../img/PowerMas_TableEmpty.svg';
+import TriangleIcon from '../../icons/TriangleIcon';
 
 // Esta función recibe un array de metas y devuelve el estado del indicador
 const getIndicatorStatus = (metas) => {
@@ -248,9 +249,10 @@ const Table = ({data}) => {
                                 return (
                                 <Fragment key={subProKey}>
                                     <tr className='' style={{backgroundColor: '#FFC65860'}}>
-                                        <td>
-                                            <div 
-                                                className={`pointer bold round p_25 PowerMas_MenuIcon ${expandedSubPro.includes(subProKey) ? 'PowerMas_MenuIcon--rotated' : ''}`} 
+                                        <td className='p0'>
+                                            <span
+                                                style={{minWidth: '1rem'}}
+                                                className={`pointer bold flex ai-center f1_25 PowerMas_MenuIcon ${expandedSubPro.includes(subProKey) ? 'PowerMas_MenuIcon--rotated' : ''}`} 
                                                 onClick={() => {
                                                     if (expandedSubPro.includes(subProKey)) {
                                                         console.log(subProKey)
@@ -259,7 +261,9 @@ const Table = ({data}) => {
                                                         setExpandedSubPro([...expandedSubPro, subProKey]);
                                                     }
                                                 }}
-                                            > &gt; </div>
+                                            > 
+                                                <TriangleIcon />
+                                            </span>
                                         </td>
                                         <td></td>
                                         <td className='bold' style={{color: estCol}}>
@@ -318,9 +322,10 @@ const Table = ({data}) => {
                                         <Fragment key={resKey}>
                                             <tr className='' style={{backgroundColor: '#F3F3F3'}}>
                                                 <td></td>
-                                                <td>
-                                                    <div 
-                                                        className={`pointer bold round p_25 PowerMas_MenuIcon ${expandedRes.includes(resKey) ? 'PowerMas_MenuIcon--rotated' : ''}`} 
+                                                <td className='p0'>
+                                                    <div
+                                                        style={{minWidth: '1rem'}}
+                                                        className={`pointer bold flex ai-center f1_25 PowerMas_MenuIcon ${expandedRes.includes(resKey) ? 'PowerMas_MenuIcon--rotated' : ''}`} 
                                                         onClick={() => {
                                                             if (expandedRes.includes(resKey)) {
                                                                 console.log(expandedRes)
@@ -329,7 +334,9 @@ const Table = ({data}) => {
                                                                 setExpandedRes([...expandedRes, resKey]);
                                                             }
                                                         }}
-                                                    > &gt; </div>
+                                                    > 
+                                                        <TriangleIcon />
+                                                    </div>
                                                 </td>
                                                 <td className='bold' style={{color: estCol}}>
                                                     {estNom}

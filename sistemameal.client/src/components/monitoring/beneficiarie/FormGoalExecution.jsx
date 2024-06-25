@@ -253,6 +253,9 @@ const FormGoalExecution = () => {
         reset({
             metEjeVal: ''
         })
+        setValue('metEjeMesEjeTec', metaData.metMesPlaTec)
+        setValue('metEjeAnoEjeTec', metaData.metAnoPlaTec)
+        setValue('pais', JSON.stringify(verificarPais));
     };
 
     // Observación de cambios en los campos registrados

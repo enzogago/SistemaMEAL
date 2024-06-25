@@ -304,5 +304,19 @@ namespace SistemaMEAL.Server.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("beneficiarie/{benAno}/{benCod}")]
+        public dynamic BuscarMetaPorBeneficiario(string benAno, string benCod)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = Jwt.ValidateToken(identity);
+
+            if (!rToken.success) return Unauthorized(rToken);
+
+            var result = _metas.BuscarMetaBeneficiario(identity, benAno: benAno, benCod: benCod);
+            return Ok(result);
+        }
+
+
     }
 }

@@ -11,6 +11,7 @@ import TableEmpty from '../../../img/PowerMas_TableEmpty.svg';
 import { exportToExcel } from '../../../helpers/goals';
 import Info from '../../../icons/Info';
 import Plus from '../../../icons/Plus';
+import TriangleIcon from '../../../icons/TriangleIcon';
 
 const ResultGoal = () => {
     // Estados relacionados con la interfaz de usuario
@@ -557,9 +558,10 @@ const ResultGoal = () => {
                                 return (
                                     <Fragment  key={index}>
                                     <tr>
-                                        <td>
-                                            <div 
-                                                className={`pointer bold round p_25 PowerMas_MenuIcon ${expandedIndicators.includes(`${item.indAno}_${item.indCod}`) ? 'PowerMas_MenuIcon--rotated' : ''}`} 
+                                        <td className='p0'>
+                                            <span
+                                                style={{minWidth: '1.5rem'}}
+                                                className={`pointer bold flex ai-center f1_25 PowerMas_MenuIcon ${expandedIndicators.includes(`${item.indAno}_${item.indCod}`) ? 'PowerMas_MenuIcon--rotated' : ''}`} 
                                                 onClick={() => {
                                                     if (expandedIndicators.includes(`${item.indAno}_${item.indCod}`)) {
                                                         setExpandedIndicators(expandedIndicators.filter(indicator => indicator !== `${item.indAno}_${item.indCod}`));
@@ -567,14 +569,16 @@ const ResultGoal = () => {
                                                         setExpandedIndicators([...expandedIndicators, `${item.indAno}_${item.indCod}`]);
                                                     }
                                                 }}
-                                            > &gt; </div>
+                                            > 
+                                                <TriangleIcon />
+                                            </span>
                                         </td>
                                         <td>
                                             {
                                                 actions.add &&
                                                 <span
-                                                    className="f1_25 pointer flex"
-                                                    style={{minWidth: '20px'}}
+                                                    className="bold f1_25 pointer flex"
+                                                    style={{minWidth: '1.5rem'}}
                                                     // style={{backgroundColor: 'transparent', border: 'none'}} 
                                                     onClick={() => {
                                                         setRowIdCounter(rowIdCounter + 1);
@@ -588,10 +592,10 @@ const ResultGoal = () => {
                                                 </span>
                                             }
                                         </td>
-                                        <td>
+                                        <td className='p0'>
                                             <span 
-                                                className="f1_25 pointer flex"
-                                                style={{minWidth: '20px'}}
+                                                className="bold f1_25 pointer flex"
+                                                style={{minWidth: '1.5rem'}}
                                                 onClick={() => {
                                                     const data = {
                                                         periodo: cadenaPeriodoGrouped[`${item.indAno}-${item.indCod}`],

@@ -9,7 +9,7 @@ import useEntityActions from '../../../hooks/useEntityActions';
 import { fetchDataBlock } from '../../reusable/fetchs';
 import ModalEditBeneficiarie from './ModalEditBeneficiarie';
 import useModal from '../../../hooks/useModal';
-import { getMonth, getMonthYearText } from '../../reusable/columns';
+import { getMonth, getMonthYearText, tipoIndicadorMapping } from '../../reusable/columns';
 
 const ModalBeneficiariesAssociated = ({openModal, closeModal, metaData, update, setUpdate, initialSelectCount}) => {
     // Estados locales para manejar los datos y el refresco de la tabla
@@ -54,6 +54,7 @@ const ModalBeneficiariesAssociated = ({openModal, closeModal, metaData, update, 
                 item.benTel.toUpperCase().includes(tag.toUpperCase()) ||
                 item.benTelCon.toUpperCase().includes(tag.toUpperCase()) ||
                 item.benCodUni.toUpperCase().includes(tag.toUpperCase()) ||
+                item.docIdeNom.toUpperCase().includes(tag.toUpperCase()) ||
                 item.benDir.toUpperCase().includes(tag.toUpperCase()) ||
                 item.benNomApo.toUpperCase().includes(tag.toUpperCase()) ||
                 item.benApeApo.toUpperCase().includes(tag.toUpperCase()) ||
@@ -61,30 +62,19 @@ const ModalBeneficiariesAssociated = ({openModal, closeModal, metaData, update, 
                 item.nacNom.toUpperCase().includes(tag.toUpperCase()) ||
                 (item.benSex === 'M' && 'MASCULINO'.includes(tag.toUpperCase())) ||
                 (item.benSex === 'F' && 'FEMENINO'.includes(tag.toUpperCase())) ||
-                item.indNom.toUpperCase().includes(tag.toUpperCase()) ||
-                item.indNum.toUpperCase().includes(tag.toUpperCase()) ||
-                item.resNum.toUpperCase().includes(tag.toUpperCase()) ||
-                item.resNom.toUpperCase().includes(tag.toUpperCase()) ||
-                item.objEspNum.toUpperCase().includes(tag.toUpperCase()) ||
-                item.objEspNom.toUpperCase().includes(tag.toUpperCase()) ||
-                item.objNum.toUpperCase().includes(tag.toUpperCase()) ||
-                item.objNom.toUpperCase().includes(tag.toUpperCase()) ||
-                item.subProSap.toUpperCase().includes(tag.toUpperCase()) ||
-                item.subProNom.toUpperCase().includes(tag.toUpperCase()) ||
-                item.proIde.toUpperCase().includes(tag.toUpperCase()) ||
-                item.proNom.toUpperCase().includes(tag.toUpperCase()) ||
                 (periodoEjecucion ? periodoEjecucion.toUpperCase().includes(tag.toUpperCase()) : false)
             );
         });
     }, [data, searchTags]);
 
-    const headers = ['CUB','NOMBRE','APELLIDO','EMAIL','TELÉFONO','TELÉFONO CONTACTO','DIRECCIÓN','NOMBRE APODERADO','APELLIDO APODERADO','GÉNERO','NACIONALIDAD','AÑO EJECUTADO','MES EJECUTADO','UBICACIÓN EJECUTADA','INDICADOR','RESULTADO','OBJETIVO ESPECIFICO','OBJETIVO','SUBPROYECTO','PROYECTO'];
-    const properties = ['benCodUni','benNom','benApe','benCorEle','benTel','benTelCon','benDir','benNomApo','benApeApo','genNom','nacNom','metBenAnoEjeTec','metBenMesEjeTec','ubiNom',['indNum','indNom'],['resNum','resNom'],['objEspNum','objEspNom'],['objNum','objNom'],['subProSap','subProNom'],['proIde','proNom']];
+    const headers = ['CUB','TIPO DOCUMENTO','NOMBRE','APELLIDO','EMAIL','TELÉFONO','TELÉFONO CONTACTO','DIRECCIÓN','NOMBRE APODERADO','APELLIDO APODERADO','GÉNERO','NACIONALIDAD','AÑO EJECUTADO','MES EJECUTADO','UBICACIÓN EJECUTADA','INDICADOR','TIPO','RESULTADO','OBJETIVO ESPECIFICO','OBJETIVO','SUBPROYECTO','PROYECTO'];
+    const properties = ['benCodUni','docIdeNom','benNom','benApe','benCorEle','benTel','benTelCon','benDir','benNomApo','benApeApo','genNom','nacNom','metBenAnoEjeTec','metBenMesEjeTec','ubiNom',['indNum','indNom'],'indTipInd',['resNum','resNom'],['objEspNum','objEspNom'],['objNum','objNom'],['subProSap','subProNom'],['proIde','proNom']];
     // Preparar los datos
     let dataExport = [...filteredData]; 
     // Modificar el campo 'uniInvPer' en los datos
     dataExport = dataExport.map(item => ({
         ...item,
+        indTipInd: tipoIndicadorMapping[item.indTipInd].toUpperCase(),
         metBenMesEjeTec: getMonth(item.metBenMesEjeTec),
     }));
 
@@ -123,7 +113,7 @@ const ModalBeneficiariesAssociated = ({openModal, closeModal, metaData, update, 
                         headers={headers}
                         title={'BENEFICIARIOS'}
                         properties={properties}
-                        format={[500,250]}
+                        format={[1600,800]}
                         actions={actions}
                     />
                 </div>

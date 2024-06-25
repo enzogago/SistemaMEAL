@@ -11,6 +11,7 @@ import { meses } from '../../helpers/simple';
 import { exportToExcel } from './export';
 import { fetchDataReturn } from '../reusable/fetchs';
 import Info from '../../icons/Info';
+import TriangleIcon from '../../icons/TriangleIcon';
 
 const ExecutionBudget = () => {
     // Estados para el manejo de la interfaz de usuario
@@ -510,7 +511,7 @@ const ExecutionBudget = () => {
                     <table className="PowerMas_TableStatus ">
                         <thead>
                             <tr style={{zIndex: '1'}}>
-                                <th colSpan={2} className='center'></th>
+                                <th colSpan={2}></th>
                                 <th style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}>Código</th>
                                 <th colSpan={2}>Nombre</th>
                                 <th>Unidad</th>
@@ -532,9 +533,10 @@ const ExecutionBudget = () => {
                                 return (
                                     <Fragment  key={index}>
                                     <tr>
-                                        <td>
-                                            <div 
-                                                className={`pointer bold round p_25 PowerMas_MenuIcon ${expandedIndicators.includes(`${item.indAno}_${item.indCod}`) ? 'PowerMas_MenuIcon--rotated' : ''}`} 
+                                        <td className='p0'>
+                                            <span
+                                                style={{minWidth: '1.5rem'}}
+                                                className={`f1_25 pointer bold flex ai-center PowerMas_MenuIcon ${expandedIndicators.includes(`${item.indAno}_${item.indCod}`) ? 'PowerMas_MenuIcon--rotated' : ''}`} 
                                                 onClick={() => {
                                                     if (expandedIndicators.includes(`${item.indAno}_${item.indCod}`)) {
                                                         setExpandedIndicators(expandedIndicators.filter(indicator => indicator !== `${item.indAno}_${item.indCod}`));
@@ -542,12 +544,14 @@ const ExecutionBudget = () => {
                                                         setExpandedIndicators([...expandedIndicators, `${item.indAno}_${item.indCod}`]);
                                                     }
                                                 }}
-                                            > &gt; </div>
+                                            > 
+                                                <TriangleIcon />
+                                            </span>
                                         </td>
-                                        <td>
+                                        <td className='p0'>
                                             <span 
-                                                className="f1_25 pointer flex"
-                                                style={{minWidth: '20px'}}
+                                                className="f1_25 pointer flex ai-center"
+                                                style={{minWidth: '1.5rem'}}
                                                 onClick={() => {
                                                     const data = {
                                                         periodo: cadenaPeriodoGrouped[`${item.indAno}-${item.indCod}`],
