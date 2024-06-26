@@ -62,7 +62,7 @@ const ModalGoalBeneficiarie = ({modalGoalBeneficiarie, closeModal, closeModalNam
             overlayClassName='PowerMas_React_Modal_Overlay'
             style={{
                 content: {
-                    height: '80%',
+                    height: '85%',
                 },
                 overlay: {
                     zIndex: 30
@@ -76,7 +76,7 @@ const ModalGoalBeneficiarie = ({modalGoalBeneficiarie, closeModal, closeModalNam
                     dataGoalBeneficiarie &&
                     <div className="PowerMas_Info_User PowerMas_Form_Card p1 Large_6 Phone_6 gap_25 overflow-auto" style={{backgroundColor: '#f7f7f7'}}>
                         <div className="flex flex-column jc-center ai-center gap_5">
-                            <div className="PowerMas_ProfilePicture2" style={{width: 150, height: 150}}>
+                            <div className="PowerMas_ProfilePicture2" style={{width: 125, height: 125}}>
                                 <img src={dataGoalBeneficiarie.benSex == 'M' ? masculino : femenino } alt="Descripción de la imagen" />
                             </div>
                             <div className="center">
@@ -85,73 +85,64 @@ const ModalGoalBeneficiarie = ({modalGoalBeneficiarie, closeModal, closeModalNam
                                 <p className="color-gray" style={{textTransform: 'capitalize'}}>{ dataGoalBeneficiarie.benCodUni }</p>
                             </div>
                         </div>
-                        <br />
-                        <article className="">
-                            <p className="bold">Nacimiento:</p>
-                            <p className="color-gray">{ dataGoalBeneficiarie.benFecNac }</p>
-                        </article>
-                        <article className="">
-                            <p className="bold">Edad Actual:</p>
-                            <p className="color-gray">{ dataGoalBeneficiarie.edad }</p>
-                        </article>
-                        <article className="">
-                            <p className="bold">Sexo:</p>
-                            <p className="color-gray">{ dataGoalBeneficiarie.benSex === 'M' ? 'Masculíno' : 'Femenino' }</p>
-                        </article>
-                        <article className="">
-                            <p className="bold">Genero:</p>
-                            <p className="color-gray" style={{textTransform: 'capitalize'}}>{ dataGoalBeneficiarie.genNom.toLowerCase() }</p>
-                        </article>
-                        <article className="">
-                            <p className="bold">Nacionalidad:</p>
-                            <p className="color-gray" style={{textTransform: 'capitalize'}}>{ dataGoalBeneficiarie.nacNom.toLowerCase() }</p>
-                        </article>
-                        {
-                            dataGoalBeneficiarie.benTel &&
-                            <article className="">
+                        <div className='flex'>
+                            <article className="Phone_6 flex gap-1">
+                                <p className="bold">Nacimiento:</p>
+                                <p className="color-gray">{ dataGoalBeneficiarie.benFecNac }</p>
+                            </article>
+                            <article className="Phone_6 flex gap-1">
+                                <p className="bold">Edad Actual:</p>
+                                <p className="color-gray">{ dataGoalBeneficiarie.edad }</p>
+                            </article>
+                        </div>
+                        <div className='flex'>
+                            <article className="Phone_6 flex gap-1">
+                                <p className="bold">Sexo:</p>
+                                <p className="color-gray">{ dataGoalBeneficiarie.benSex === 'M' ? 'Masculíno' : 'Femenino' }</p>
+                            </article>
+                            <article className="Phone_6 flex gap-1">
+                                <p className="bold">Género:</p>
+                                <p className="color-gray" style={{textTransform: 'capitalize'}}>{ dataGoalBeneficiarie.genNom.toLowerCase() }</p>
+                            </article>
+                        </div>
+                        <div className='flex'>
+                            <article className="Phone_6 flex gap-1">
+                                <p className="bold">Nacionalidad:</p>
+                                <p className="color-gray" style={{textTransform: 'capitalize'}}>{ dataGoalBeneficiarie.nacNom.toLowerCase() }</p>
+                            </article>
+                            <article className="Phone_6 flex gap-1">
                                 <p className="bold">Teléfono:</p>
                                 <p className="color-gray">{ dataGoalBeneficiarie.benTel }</p>
                             </article>
-                        }
-                        {
-                            dataGoalBeneficiarie.benCorEle &&
-                            <article className="">
-                                <p className="bold">Correo:</p>
-                                <p className="color-gray">{ dataGoalBeneficiarie.benCorEle.toLowerCase()}</p>
-                            </article>
-                        }
-                        {
-                            dataGoalBeneficiarie.benDir &&
-                            <article className="">
-                                <p className="bold">Dirección:</p>
-                                <p className="color-gray" style={{textTransform: 'capitalize'}}>{ dataGoalBeneficiarie.benDir.toLowerCase()}</p>
-                            </article>
-                        }
-                        {
-                            dataGoalBeneficiarie.benNomApo &&
-                            <article className="">
-                                <p className="bold">Nombre de Contacto:</p>
-                                <p className="color-gray" style={{textTransform: 'capitalize'}}>{ dataGoalBeneficiarie.benNomApo.toLowerCase() + ' ' + dataGoalBeneficiarie.benApeApo.toLowerCase() }</p>
-                            </article>
-                        }
-                        {
-                            dataGoalBeneficiarie.benTelCon &&
-                            <article className="">
-                                <p className="bold">Teléfono de Contacto:</p>
-                                <p className="color-gray">{ dataGoalBeneficiarie.benTelCon }</p>
-                            </article>
-                        }
+                        </div>
+                        <div className="flex gap-1">
+                            <p className="bold">Correo:</p>
+                            <p className="color-gray">{ dataGoalBeneficiarie.benCorEle.toLowerCase()}</p>
+                        </div>
+                        <div className="flex gap-1">
+                            <p className="bold">Dirección:</p>
+                            <p className="color-gray" style={{textTransform: 'capitalize'}}>{ dataGoalBeneficiarie.benDir.toLowerCase()}</p>
+                        </div>
+                        <div className="flex gap-1">
+                            <p className="bold">Nombre de Contacto:</p>
+                            <p className="color-gray" style={{textTransform: 'capitalize'}}>{ dataGoalBeneficiarie.benNomApo.toLowerCase() + ' ' + dataGoalBeneficiarie.benApeApo.toLowerCase() }</p>
+                        </div>
+                        <div className="flex gap-1">
+                            <p className="bold">Teléfono de Contacto:</p>
+                            <p className="color-gray">{ dataGoalBeneficiarie.benTelCon }</p>
+                        </div>
                     </div>
                 }
                 <div className='PowerMas_Form_Card Large_6 gap_5 overflow-auto'>
+                    <h4>Listado de Intervenciones</h4>
                     {
                         dataGoals && dataGoals.map((item, index) => {
-                            const { ubiNom, indTipInd, indNum, indNom, resNum, resNom, objEspNum, objEspNom, objNom, objNum, subProSap, subProNom, proIde, proLinInt, proNom, metBenMesEjeTec, metBenAnoEjeTec } = item;
-                            console.log(item)
+                            const { ubiNom, indTipInd, indNum, indNom, resNum, resNom, objEspNum, objEspNom, objNom, objNum, subProSap, subProNom, proIde, proLinInt, proNom, metBenMesEjeTec, metBenAnoEjeTec, usuNom, usuApe } = item;
                             return (                                           
                                 <div className='PowerMas_Form_Card ' key={index} 
                                     style={{backgroundColor: '#f7f7f7'}}
                                 >
+                                    <h5>Intervencion {index+1}</h5>
                                     <div className='flex ai-center p_25 gap_5' >
                                         <p className='flex-grow-1'>
                                             En el <span className='bold'>periodo:</span> <span style={{textTransform: 'capitalize'}}> {getMonthYearText(metBenMesEjeTec,metBenAnoEjeTec).toLowerCase()}, </span> {''}
@@ -202,6 +193,10 @@ const ModalGoalBeneficiarie = ({modalGoalBeneficiarie, closeModal, closeModalNam
                                                 <h3 className="Large-f1 ">Proyecto</h3>
                                                 <p className="">{proIde + ' - ' + proLinInt  + ' - ' + proNom.charAt(0) + proNom.slice(1).toLowerCase() }</p>
                                             </article>
+                                            <div className='flex gap-1'>
+                                                <h3 className="Large-f1 ">Responsable</h3>
+                                                <p style={{textTransform: 'capitalize'}}>{usuNom.toLowerCase() + ' ' + usuApe.toLowerCase() }</p>
+                                            </div>
                                         </article>
                                     </div>
                                 </div>

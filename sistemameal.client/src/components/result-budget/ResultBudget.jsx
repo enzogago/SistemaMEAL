@@ -541,9 +541,15 @@ const ResultChain = () => {
                     indicadores.length > 0 ?
                     <table className="PowerMas_TableStatus">
                         <thead>
-                            <tr className=''>
+                            <tr  style={{zIndex: '1'}}>
                                 <th className='center' rowSpan={2}>#</th>
-                                <th className='center' rowSpan={2}>Código</th>
+                                <th 
+                                    className='center' 
+                                    rowSpan={2} 
+                                    style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}
+                                >
+                                    Código
+                                </th>
                                 <th className='center' rowSpan={2}>Nombre</th>
                                 <th className='center' rowSpan={2}>Unidad</th>
                                 <th className='center PowerMas_Borde_Total' style={{color: '#F87C56', whiteSpace: 'normal'}} rowSpan={2}>Total Presupuesto</th>
@@ -597,7 +603,9 @@ const ResultChain = () => {
                                 return (
                                     <tr key={index}>
                                         <td>{index+1}</td>
-                                        <td>{item.indNum}</td>
+                                        <td
+                                            style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}
+                                        >{item.indNum}</td>
                                         {
                                             text.length > 25 ?
                                             <td className='' 

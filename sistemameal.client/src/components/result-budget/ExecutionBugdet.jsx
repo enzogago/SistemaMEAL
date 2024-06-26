@@ -511,8 +511,8 @@ const ExecutionBudget = () => {
                     <table className="PowerMas_TableStatus ">
                         <thead>
                             <tr style={{zIndex: '1'}}>
-                                <th colSpan={2}></th>
-                                <th style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}>Código</th>
+                                <th colSpan={2} style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}></th>
+                                <th style={{position: 'sticky', left: '3rem', backgroundColor: '#fff'}}>Código</th>
                                 <th colSpan={2}>Nombre</th>
                                 <th>Unidad</th>
                                 {meses.map((mes, i) => (
@@ -533,9 +533,9 @@ const ExecutionBudget = () => {
                                 return (
                                     <Fragment  key={index}>
                                     <tr>
-                                        <td className='p0'>
+                                        <td className='p0' style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}>
                                             <span
-                                                style={{minWidth: '1.5rem'}}
+                                                style={{width: '1.5rem'}}
                                                 className={`f1_25 pointer bold flex ai-center PowerMas_MenuIcon ${expandedIndicators.includes(`${item.indAno}_${item.indCod}`) ? 'PowerMas_MenuIcon--rotated' : ''}`} 
                                                 onClick={() => {
                                                     if (expandedIndicators.includes(`${item.indAno}_${item.indCod}`)) {
@@ -548,10 +548,10 @@ const ExecutionBudget = () => {
                                                 <TriangleIcon />
                                             </span>
                                         </td>
-                                        <td className='p0'>
+                                        <td className='p0' style={{position: 'sticky', left: '1.5rem', backgroundColor: '#fff'}}>
                                             <span 
                                                 className="f1_25 pointer flex ai-center"
-                                                style={{minWidth: '1.5rem'}}
+                                                style={{width: '1.5rem'}}
                                                 onClick={() => {
                                                     const data = {
                                                         periodo: cadenaPeriodoGrouped[`${item.indAno}-${item.indCod}`],
@@ -566,7 +566,7 @@ const ExecutionBudget = () => {
                                                 <Info />
                                             </span>
                                         </td>
-                                        <td style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}>{item.indNum}</td>
+                                        <td style={{position: 'sticky', left: '3rem', backgroundColor: '#fff'}}>{item.indNum}</td>
                                         {
                                             text.length > 45 ?
                                             <td
@@ -601,8 +601,8 @@ const ExecutionBudget = () => {
                                     </tr>
                                     {additionalRows.filter(row => row.indAno === item.indAno && row.indCod === item.indCod).map((row, rowIndex) => (
                                         <tr key={`${row.indAno}_${row.indCod}_${row.id}`} style={{visibility: expandedIndicators.includes(`${item.indAno}_${item.indCod}`) ? 'visible' : 'collapse'}}>
-                                            <td colSpan={2}></td>
-                                            <td style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}></td>
+                                            <td colSpan={2} style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}></td>
+                                            <td style={{position: 'sticky', left: '3rem', backgroundColor: '#fff'}}></td>
                                             <td>
                                                 <select 
                                                     style={{textTransform: 'capitalize', margin: '0', paddingRight: '0'}}

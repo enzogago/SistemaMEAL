@@ -1731,7 +1731,7 @@ textarea {
 }
 .menu.active {
     transition: max-height 0.2s ease-in;
-    max-height: 100vh;
+    max-height: 200vh;
 }
 
 .PowerMas_Button_Permissions{
