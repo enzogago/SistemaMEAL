@@ -13,11 +13,13 @@ const Unit = () => {
 
     // Definir controller y fieldMapping como variables
     const controller = 'Unidad';
-    const fieldMapping = { codigo: 'uniCod', nombre: 'uniNom', '¿involucra beneficiario?': 'uniInvPer' };
+    const fieldMapping = { codigo: 'uniCod', nombre: 'uniNom', '¿involucra beneficiario?': 'uniInvPer', label: 'uniDetLab', placeholder: 'uniDetPla' };
     const filterProperties = {
         'CODIGO': 'uniCod',
         'NOMBRE': 'uniNom',
         'INVOLUCRA_BENEFICIARIO': 'uniInvPer',
+        'LABEL': 'uniDetLab',
+        'PLACEHOLDER': 'uniDetPla',
     };
     const { codigo, ...restFieldMapping } = fieldMapping;
   

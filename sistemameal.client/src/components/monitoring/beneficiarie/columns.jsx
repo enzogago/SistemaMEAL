@@ -38,18 +38,6 @@ export const getColumns = (actions, openModalForm, setRefresh) => {
             accessorKey: "benApe"
         },
         {
-            header: "Correo",
-            accessorKey: "benCorEle",
-        },
-        {
-            header: "Teléfono",
-            accessorKey: "benTel",
-        },
-        {
-            header: "Contacto",
-            accessorKey: "benTelCon"
-        },
-        {
             header: "Sexo",
             accessorKey: "benSex",
             cell: ({row}) => {
@@ -62,13 +50,28 @@ export const getColumns = (actions, openModalForm, setRefresh) => {
             },
         },
         {
-            header: "Edad Ejecutada",
-            accessorKey: "metBenEda",
-            cell: ({row}) => (
-                <span className="flex jc-center">
-                    {row.original.metBenEda}
-                </span>
-            )
+            header: "Género",
+            accessorKey: "genNom"
+        },
+        {
+            header: "Fecha Nacimiento",
+            accessorKey: "benFecNac",
+        },
+        {
+            header: "Nacionalidad",
+            accessorKey: "nacNom"
+        },
+        {
+            header: "Correo",
+            accessorKey: "benCorEle",
+        },
+        {
+            header: "Teléfono",
+            accessorKey: "benTel",
+        },
+        {
+            header: "Contacto",
+            accessorKey: "benTelCon"
         },
         {
             header: "Dirección",
@@ -83,12 +86,13 @@ export const getColumns = (actions, openModalForm, setRefresh) => {
             accessorKey: "benApeApo"
         },
         {
-            header: "Género",
-            accessorKey: "genNom"
-        },
-        {
-            header: "Nacionalidad",
-            accessorKey: "nacNom"
+            header: "Edad Ejecutada",
+            accessorKey: "metBenEda",
+            cell: ({row}) => (
+                <span className="flex jc-center">
+                    {row.original.metBenEda}
+                </span>
+            )
         },
         {
             header: "Periodo Ejecutado",
@@ -204,6 +208,10 @@ export const getColumnsExecuting = (actions, openModalForm, setRefresh) => {
             header: "Ejecución",
             accessorKey: "metEjeVal",
             cell: ({row}) => <span className="flex jc-center">{row.original.metEjeVal}</span>
+        },
+        {
+            header: "Detalle",
+            accessorKey: "metEjeDet",
         },
         {
             header: "Actividad o Indicador",

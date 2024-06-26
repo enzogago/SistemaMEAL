@@ -19,6 +19,7 @@ namespace SistemaMEAL.Server.Models
         public String? MetEjeMesEjeTec { get; set; }
         public String? MetEjeAnoEjeTec { get; set; }
         public String? MetEjeVal { get; set; }
+        public String? MetEjeDet { get; set; }
         // TM_META
         public String? MetMetTec { get; set; }
         public String? MetEjeTec { get; set; }
@@ -71,6 +72,8 @@ namespace SistemaMEAL.Server.Models
         public String? UsuNom { get; set; }
         public String? UsuApe { get; set; }
         public String? UniNom { get; set; }
+        public String? UniDetLab { get; set; }
+        public String? UniDetPla { get; set; }
         // AUDITORIA
         public String? UsuIng { get; set; }
         public DateTime? FecIng { get; set; }

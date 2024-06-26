@@ -47,6 +47,8 @@ namespace SistemaMEAL.Server.Models
         public String? UsuApe { get; set; }
         public String? UniNom { get; set; }
         public String? UniInvPer { get; set; }
+        public String? UniDetLab { get; set; }
+        public String? UniDetPla { get; set; }
 
         public String? ProAno { get; set; }
         public String? ProCod { get; set; }

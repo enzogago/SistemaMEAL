@@ -8,6 +8,8 @@ namespace SistemaMEAL.Server.Models
         public String? UniCod { get; set; }
         public String? UniNom{ get; set; }
         public String? UniInvPer{ get; set; }
+        public String? UniDetLab{ get; set; }
+        public String? UniDetPla{ get; set; }
         public String? UsuIng { get; set; }
         public DateTime? FecIng { get; set; }
         public String? UsuMod { get; set; }
