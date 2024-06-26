@@ -271,7 +271,8 @@ namespace SistemaMEAL.Modulos
 
                                     mensaje = pDescripcionMensaje.Value.ToString();
                                     tipoMensaje = pTipoMensaje.Value.ToString();
-                                } else {
+                                } 
+                                else {
                                     // Update
                                     cmd = new SqlCommand("SP_MODIFICAR_META_CADENA", cn.getcn);
                                     cmd.CommandType = CommandType.StoredProcedure;

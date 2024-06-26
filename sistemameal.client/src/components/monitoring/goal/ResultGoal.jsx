@@ -46,6 +46,8 @@ const ResultGoal = () => {
         e.stopPropagation();
     };
 
+    const [indicatorsValidity, setIndicatorsValidity] = useState({});
+
     const { 
         register,
         unregister,
@@ -145,7 +147,7 @@ const ResultGoal = () => {
                 let counter = rowIdCounter;
                 metaData.forEach(meta => {
                     // Usa meta.impCod, la ubicación y el indicador para crear una clave única para cada fila
-                    const rowKey = `${meta.impCod}_${JSON.stringify({ ubiAno: meta.ubiAno, ubiCod: meta.ubiCod })}_${meta.indAno}_${meta.indCod}`;
+                    const rowKey = `${JSON.stringify({ usuAno: meta.usuAno, usuCod: meta.usuCod })}_${meta.impCod}_${JSON.stringify({ ubiAno: meta.ubiAno, ubiCod: meta.ubiCod })}_${meta.indAno}_${meta.indCod}`;
                     if (!rows[rowKey]) {
                         counter++;
                     }
@@ -221,8 +223,6 @@ const ResultGoal = () => {
                     groupedUbicacionData[key][`${item.ubiAno}-${item.ubiCod}`] = { name: item.ubiNom, value: item.cadResUbiMetTec ? item.cadResUbiMetTec : 0 }
                 });
 
-                
-
                 setCadenaPeriodoGrouped(groupedPeriodoData);
                 setCadenaUbicacionGrouped(groupedUbicacionData);
                 setCadenaImplementadorGrouped(groupedImplementadorData);
@@ -242,6 +242,9 @@ const ResultGoal = () => {
     const toggleDropdown = () => {
         setDropdownOpen(!dropdownOpen);
     }
+
+    
+      
 
     const onSubmit = (data) => {
         let metas = [];
@@ -352,7 +355,8 @@ const ResultGoal = () => {
             metas,
             metasEliminar
         }
-        handleUpdate(Metas);
+        console.log(Metas)
+        // handleUpdate(Metas);
     };
 
     const handleUpdate = async (cadena) => {
@@ -384,13 +388,14 @@ const ResultGoal = () => {
         }
     };
 
-    const validateInput = (newValue, row, monthIndex) => {
+    const validateInput = (newValue, row, monthIndex, additionalRows) => {
+        let isValid = true;
         // Obtén el valor del implementador y la ubicación para esta fila
         const implementadorValue = watch(`implementador_${row.id}`);
         const ubicacionValue = watch(`ubicacion_${row.id}`);
     
         if (implementadorValue === '0' || ubicacionValue === '0') {
-            return true;
+            return;
         }
     
         const { ubiAno, ubiCod } = JSON.parse(ubicacionValue);
@@ -438,26 +443,33 @@ const ResultGoal = () => {
             const implementadorNom = implementador.impNom.charAt(0) + implementador.impNom.slice(1).toLowerCase();
 
             Notiflix.Report.warning('Advertencia', `La meta del implementador ${implementadorNom} es ${formatter.format(totalPorImplementador)} ${unidadNom}, pero en la cadena de resultado se estableció en ${formatter.format(maxImplementador)} ${unidadNom}. Por favor ajuste la distribución correctamente.`, 'Aceptar');
-            return false;
+            isValid = false;
         }
         if (totalPorUbicacion > maxUbicacion) {
             const ubicacion = ubicacionesSelect.find(item => item.ubiAno === ubiAno && item.ubiCod === ubiCod);
             const ubicacionNom = ubicacion.ubiNom.charAt(0) + ubicacion.ubiNom.slice(1).toLowerCase();
 
             Notiflix.Report.warning('Advertencia', `La meta de la ubicación ${ubicacionNom} es ${formatter.format(totalPorUbicacion)} ${unidadNom}, pero en la cadena de resultado se estableció en ${formatter.format(maxUbicacion)} ${unidadNom}. Por favor ajuste la distribución correctamente.`, 'Aceptar');
-            return false;
+            isValid = false;
         }
         if (totalPorPeriodo > maxPeriodo) {
             const ano = watch('metAnoPlaTec');
 
             Notiflix.Report.warning('Advertencia', `La meta del periodo ${ano} es ${formatter.format(totalPorPeriodo)} ${unidadNom}, pero en la cadena de resultado se estableció en ${formatter.format(maxPeriodo)} ${unidadNom}. Por favor ajuste la distribución correctamente.`, 'Aceptar');
-            return false;
+            isValid = false;
         }
     
-        // Si pasa todas las validaciones, el valor es aceptado
-        return true;
+        setIndicatorsValidity(prevValidity => ({
+            ...prevValidity,
+            [`${row.indAno}_${row.indCod}`]: isValid
+        }));
     };
-    
+
+    useEffect(() => {
+        const allValid = Object.values(indicatorsValidity).every(isValid => isValid);
+        setIsFormValid(allValid);
+    }, [indicatorsValidity]);
+
     return (
         <div className='p_75 flex flex-column flex-grow-1 overflow-auto content-block relative'>
             <h1 className="Large-f1_5"> Metas técnicas programáticas </h1>
@@ -535,8 +547,8 @@ const ResultGoal = () => {
                     <table className="PowerMas_TableStatus ">
                         <thead>
                             <tr style={{zIndex: '1'}}>
-                                <th className='center' colSpan={3}></th>
-                                <th style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}>Código</th>
+                                <th style={{position: 'sticky', left: '0', backgroundColor: '#fff'}} className='center' colSpan={3}></th>
+                                <th style={{position: 'sticky', left: '4.5rem', backgroundColor: '#fff'}}>Código</th>
                                 <th>Nombre</th>
                                 <th>Unidad</th>
                                 <th>Tipo Valor</th>
@@ -558,9 +570,9 @@ const ResultGoal = () => {
                                 return (
                                     <Fragment  key={index}>
                                     <tr>
-                                        <td className='p0'>
+                                        <td className='p0' style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}>
                                             <span
-                                                style={{minWidth: '1.5rem'}}
+                                                style={{width: '1.5rem'}}
                                                 className={`pointer bold flex ai-center f1_25 PowerMas_MenuIcon ${expandedIndicators.includes(`${item.indAno}_${item.indCod}`) ? 'PowerMas_MenuIcon--rotated' : ''}`} 
                                                 onClick={() => {
                                                     if (expandedIndicators.includes(`${item.indAno}_${item.indCod}`)) {
@@ -573,12 +585,12 @@ const ResultGoal = () => {
                                                 <TriangleIcon />
                                             </span>
                                         </td>
-                                        <td>
+                                        <td className='p0' style={{position: 'sticky', left: '1.5rem', backgroundColor: '#fff'}}>
                                             {
                                                 actions.add &&
                                                 <span
                                                     className="bold f1_25 pointer flex"
-                                                    style={{minWidth: '1.5rem'}}
+                                                    style={{width: '1.5rem'}}
                                                     // style={{backgroundColor: 'transparent', border: 'none'}} 
                                                     onClick={() => {
                                                         setRowIdCounter(rowIdCounter + 1);
@@ -592,10 +604,10 @@ const ResultGoal = () => {
                                                 </span>
                                             }
                                         </td>
-                                        <td className='p0'>
+                                        <td className='p0' style={{position: 'sticky', left: '3rem', backgroundColor: '#fff'}}>
                                             <span 
                                                 className="bold f1_25 pointer flex"
-                                                style={{minWidth: '1.5rem'}}
+                                                style={{width: '1.5rem'}}
                                                 onClick={() => {
                                                     const data = {
                                                         periodo: cadenaPeriodoGrouped[`${item.indAno}-${item.indCod}`],
@@ -609,7 +621,7 @@ const ResultGoal = () => {
                                                 <Info />
                                             </span>
                                         </td>
-                                        <td style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}>{item.indNum}</td>
+                                        <td style={{position: 'sticky', left: '4.5rem', backgroundColor: '#fff'}}>{item.indNum}</td>
                                         {
                                             text.length > 30 ?
                                             <td
@@ -644,8 +656,8 @@ const ResultGoal = () => {
                                     </tr>
                                     {additionalRows.filter(row => row.indAno === item.indAno && row.indCod === item.indCod).map((row, rowIndex) => (
                                         <tr key={`${row.indAno}_${row.indCod}_${row.id}`} style={{visibility: expandedIndicators.includes(`${item.indAno}_${item.indCod}`) ? 'visible' : 'collapse'}}>
-                                            <td></td>
-                                            <td colSpan={2} className='center'>
+                                            <td style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}></td>
+                                            <td colSpan={2} className='center' style={{position: 'sticky', left: '1.5rem', backgroundColor: '#fff'}}>
                                                 {
                                                     actions.add &&
                                                     <button 
@@ -669,7 +681,16 @@ const ResultGoal = () => {
                                                                         }));
                                                                     });
                                                                     // Ahora sí eliminamos la fila
-                                                                    setAdditionalRows(prevRows => prevRows.filter((prevRow) => prevRow.id !== row.id));
+                                                                    setAdditionalRows(prevRows => {
+                                                                        const newRows = prevRows.filter((prevRow) => prevRow.id !== row.id);
+                                                                  
+                                                                        meses.forEach((mes, i) => {
+                                                                            const inputVal = getValues(`mes_${String(i+1).padStart(2, '0')}_${row.id}`);
+                                                                            validateInput(inputVal, row, i, newRows);
+                                                                        });
+                                                                  
+                                                                        return newRows; // Retorna el nuevo estado
+                                                                    });
                                                                 },
                                                                 () => {
                                                                     // El usuario ha cancelado la operación de eliminación
@@ -679,7 +700,7 @@ const ResultGoal = () => {
                                                     > - </button>
                                                 }
                                             </td>
-                                            <td style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}></td>
+                                            <td style={{position: 'sticky', left: '4.5rem', backgroundColor: '#fff'}}></td>
                                             <td className='center'>
                                                 <select 
                                                     style={{textTransform: 'capitalize', margin: '0'}}
@@ -687,7 +708,35 @@ const ResultGoal = () => {
                                                     disabled={!actions.add}
                                                     className={`PowerMas_Input_Cadena f_75 PowerMas_Modal_Form_${dirtyFields[`tecnico_${row.id}`] || isSubmitted ? (errors[`tecnico_${row.id}`] ? 'invalid' : 'valid') : ''}`} 
                                                     {...register(`tecnico_${row.id}`, {
-                                                        validate: value => value !== '0' || 'El campo es requerido'
+                                                        validate: {
+                                                            unique: value => {
+                                                                const implementadorValue = watch(`implementador_${row.id}`);
+                                                                const ubicacionValue = watch(`ubicacion_${row.id}`);
+
+                                                                if (value === '0' || implementadorValue === '0' || ubicacionValue === '0' ) {
+                                                                    return true;
+                                                                }
+                                                                const duplicate = additionalRows.find(r => 
+                                                                    r.indAno === row.indAno && 
+                                                                    r.indCod === row.indCod && 
+                                                                    r.id !== row.id && 
+                                                                    watch(`tecnico_${r.id}`) === value && 
+                                                                    watch(`implementador_${r.id}`) === implementadorValue &&
+                                                                    watch(`ubicacion_${r.id}`) === ubicacionValue
+
+                                                                );
+                                                                if (duplicate) {
+                                                                    Notiflix.Report.warning(
+                                                                        'Error de Validación',
+                                                                        `Verifica que no se repita técnico, implementador y ubicación para el indicador ${row.indNum}`,
+                                                                        'Aceptar',
+                                                                    );
+                                                                    return false;
+                                                                }
+                                                                return true;
+                                                            },
+                                                            notZero: value => value !== '0' || 'El cargo es requerido'
+                                                        }
                                                     })}
                                                 >
                                                     <option className='f_75' value="0">--Responsable--</option>
@@ -715,8 +764,7 @@ const ResultGoal = () => {
                                                         // Ejecuta la validación para todos los campos de entrada de este indicador
                                                         meses.forEach((mes, i) => {
                                                             const inputVal = getValues(`mes_${String(i+1).padStart(2, '0')}_${row.id}`);
-                                                            const isValid = validateInput(inputVal, row, i);
-                                                            setIsFormValid(isValid);
+                                                            validateInput(inputVal, row, i, additionalRows);
                                                         });
                                                     }}
                                                     className={`PowerMas_Input_Cadena f_75 PowerMas_Modal_Form_${dirtyFields[`implementador_${row.id}`] || isSubmitted ? (errors[`implementador_${row.id}`] ? 'invalid' : 'valid') : ''}`} 
@@ -724,7 +772,8 @@ const ResultGoal = () => {
                                                         validate: {
                                                             unique: value => {
                                                                 const ubicacionValue = watch(`ubicacion_${row.id}`);
-                                                                if (value === '0' || ubicacionValue === '') {
+                                                                const tecnicoValue = watch(`tecnico_${row.id}`);
+                                                                if (value === '0' || ubicacionValue === '0' || tecnicoValue === '0') {
                                                                     return true;
                                                                 }
                                                                 const duplicate = additionalRows.find(r => 
@@ -732,12 +781,14 @@ const ResultGoal = () => {
                                                                     r.indCod === row.indCod && 
                                                                     r.id !== row.id && 
                                                                     watch(`implementador_${r.id}`) === value && 
-                                                                    watch(`ubicacion_${r.id}`) === ubicacionValue
+                                                                    watch(`ubicacion_${r.id}`) === ubicacionValue &&
+                                                                    watch(`tecnico_${r.id}`) === tecnicoValue
+
                                                                 );
                                                                 if (duplicate) {
                                                                     Notiflix.Report.warning(
                                                                         'Error de Validación',
-                                                                        `Verifica que no se repita el implementador y la ubicación para el indicador ${row.indNum}`,
+                                                                        `Verifica que no se repita técnico, implementador y ubicación para el indicador ${row.indNum}`,
                                                                         'Aceptar',
                                                                     );
                                                                     return false;
@@ -773,8 +824,7 @@ const ResultGoal = () => {
                                                         // Ejecuta la validación para todos los campos de entrada de este indicador
                                                         meses.forEach((mes, i) => {
                                                             const inputVal = getValues(`mes_${String(i+1).padStart(2, '0')}_${row.id}`);
-                                                            const isValid = validateInput(inputVal, row, i);
-                                                            setIsFormValid(isValid);
+                                                            validateInput(inputVal, row, i, additionalRows);
                                                         });
                                                     }}
                                                     className={`PowerMas_Input_Cadena f_75 PowerMas_Modal_Form_${dirtyFields[`ubicacion_${row.id}`] || isSubmitted ? (errors[`ubicacion_${row.id}`] ? 'invalid' : 'valid') : ''}`} 
@@ -782,7 +832,8 @@ const ResultGoal = () => {
                                                         validate: {
                                                             unique: value => {
                                                                 const implementadorValue = watch(`implementador_${row.id}`);
-                                                                if (value === '0' || implementadorValue === '') {
+                                                                const tecnicoValue = watch(`tecnico_${row.id}`);
+                                                                if (value === '0' || implementadorValue === '0' || tecnicoValue === '0' ) {
                                                                     return true;
                                                                 }
                                                                 const duplicate = additionalRows.find(r => 
@@ -790,12 +841,14 @@ const ResultGoal = () => {
                                                                     r.indCod === row.indCod && 
                                                                     r.id !== row.id && 
                                                                     watch(`ubicacion_${r.id}`) === value && 
-                                                                    watch(`implementador_${r.id}`) === implementadorValue
+                                                                    watch(`implementador_${r.id}`) === implementadorValue &&
+                                                                    watch(`tecnico_${r.id}`) === tecnicoValue
+
                                                                 );
                                                                 if (duplicate) {
                                                                     Notiflix.Report.warning(
                                                                         'Error de Validación',
-                                                                        `Verifica que no se repita el implementador y la ubicación para el indicador ${row.indNum}`,
+                                                                        `Verifica que no se repita técnico, implementador y ubicación para el indicador ${row.indNum}`,
                                                                         'Aceptar',
                                                                     );
                                                                     return false;
@@ -855,8 +908,7 @@ const ResultGoal = () => {
 
                                                             const inputVal = e.target.value;
 
-                                                            const isValid = validateInput(inputVal, row, i);
-                                                            setIsFormValid(isValid);
+                                                            validateInput(inputVal, row, i, additionalRows);
                                                             
                                                             // Si el nuevo valor es válido, actualiza los totales y los valores previos
                                                             const key = `${row.id}_${String(i+1).padStart(2, '0')}`;
