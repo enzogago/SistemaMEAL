@@ -155,7 +155,7 @@ const PermissionUser = () => {
                                                                             <span className="bold">
                                                                                 Meta:{' '}
                                                                             </span>
-                                                                            {`Técnico: ${tecnico} | Implementador: ${implementador} | Ubicación: ${ubicacion} | Periodo: ${periodo} | Meta: ${metItem.metMetTec}`}
+                                                                            {`Responsable: ${tecnico} | Implementador: ${implementador} | Ubicación: ${ubicacion} | Periodo: ${periodo} | Meta: ${metItem.metMetTec}`}
                                                                         </div>,
                                                                         key: `PROYECTO-${item.proAno}-${item.proCod}-SUB_PROYECTO-${subItem.subProAno}-${subItem.subProCod}-OBJETIVO-${objItem.objAno}-${objItem.objCod}-OBJETIVO_ESPECIFICO-${objEspItem.objEspAno}-${objEspItem.objEspCod}-RESULTADO-${resItem.resAno}-${resItem.resCod}-ACTIVIDAD-${actItem.actAno}-${actItem.actCod}-INDICADOR-${indItem.indAno}-${indItem.indCod}-META-${metItem.metAno}-${metItem.metCod}`
                                                                     };
@@ -260,27 +260,37 @@ const PermissionUser = () => {
 
     const onCheck = (checkedKeysValue, e) => {
         let newCheckedKeys = [...checkedKeysValue.checked];
+        const keyParts = e.node.key.split('-');
+    
         if (e.checked) {
-            let keyParts = e.node.key.split('-');
-            // Comprueba si el nodo marcado es un nodo de primer nivel (nodo principal)
-            if (keyParts.length === 3) {
-                // Si es un nodo principal, añade todas las claves de sus descendientes
-                let nodeAndAllDescendants = getAllDescendants(e.node);
-                newCheckedKeys = [...newCheckedKeys, ...nodeAndAllDescendants];
-            } else {
-                // Si no es un nodo principal, solo añade las claves de los nodos padres
-                for (let i = 0; i < keyParts.length; i += 3) {
-                    let parentKey = keyParts.slice(0, i+3).join('-');
-                    if (!newCheckedKeys.includes(parentKey)) {
-                        newCheckedKeys.push(parentKey);
-                    }
-                }
+            // Añade la clave del nodo actual si no está presente
+            if (!newCheckedKeys.includes(e.node.key)) {
+                newCheckedKeys.push(e.node.key);
             }
+            // Añade todas las claves de los descendientes del nodo actual
+            const nodeAndAllDescendants = getAllDescendants(e.node);
+            newCheckedKeys = [...new Set([...newCheckedKeys, ...nodeAndAllDescendants])];
+    
+            // Añade todas las claves de los nodos padres del nodo actual
+            const nodeAndAllAncestors = getAllAncestors(e.node.key, proyectos);
+            newCheckedKeys = [...new Set([...newCheckedKeys, ...nodeAndAllAncestors])];
         } else {
-            let nodeAndAllDescendants = getAllDescendants(e.node);
+            // Elimina la clave del nodo actual y todas las claves de sus descendientes
+            const nodeAndAllDescendants = getAllDescendants(e.node);
             newCheckedKeys = newCheckedKeys.filter(key => !nodeAndAllDescendants.includes(key));
         }
+    
         setCheckedKeys(newCheckedKeys);
+    };
+
+    const getAllAncestors = (key, nodes) => {
+        const keyParts = key.split('-');
+        let ancestors = [];
+        for (let i = keyParts.length; i > 0; i -= 3) {
+            const ancestorKey = keyParts.slice(0, i).join('-');
+            ancestors.push(ancestorKey);
+        }
+        return ancestors;
     };
     
     const getAllDescendants = (node) => {
