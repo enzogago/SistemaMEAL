@@ -356,7 +356,7 @@ const ResultGoal = () => {
             metasEliminar
         }
         console.log(Metas)
-        // handleUpdate(Metas);
+        handleUpdate(Metas);
     };
 
     const handleUpdate = async (cadena) => {
