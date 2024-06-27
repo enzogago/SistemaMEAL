@@ -147,6 +147,7 @@ const ModalEditExecution = ({ modalVisible, closeModal, record, initialSelectCou
         reset({
             pais: '',
             metEjeVal: '',
+            metEjeDet: '',
             metEjeAnoEjeTec: '',
             metEjeMesEjeTec: '',
         });
@@ -241,6 +242,8 @@ const ModalEditExecution = ({ modalVisible, closeModal, record, initialSelectCou
             setCargando(false);
         }
     };
+
+    const currentYear = new Date().getFullYear();
 
     return (
         <Modal
@@ -357,7 +360,14 @@ const ModalEditExecution = ({ modalVisible, closeModal, record, initialSelectCou
                                         value: /^[0-9]*$/,
                                         message: 'Solo se aceptan numeros'
                                     },
-                                    validate: value => parseInt(value) >= metaData.metAnoPlaTec || 'El año debe ser mayor o igual al año planificado'
+                                    validate: value => {
+                                        if (Number(value) < metaData.metAnoPlaTec){
+                                            return 'El año debe ser mayor o igual a ' + metaData.metAnoPlaTec;
+                                        }
+                                        if (Number(value) > Number(metaData.metAnoPlaTec) + 1) {
+                                            return 'El año debe ser menor o igual a ' + (Number(metaData.metAnoPlaTec) + 1);
+                                        }
+                                    }
                                 })} 
                             />
                             {errors.metEjeAnoEjeTec ? (
@@ -425,7 +435,8 @@ const ModalEditExecution = ({ modalVisible, closeModal, record, initialSelectCou
                             maxLength={10}
                             onInput={(event) => {
                                 // Reemplaza cualquier carácter que no sea un número por una cadena vacía
-                                event.target.value = event.target.value.replace(/[^0-9]/g, '');
+                                const sanitizedValue = event.target.value.replace(/^0+|[^0-9]/g, '');
+                                event.target.value = sanitizedValue;
                             }}
                             {...register('metEjeVal', { 
                                 required: 'El campo es requerido',
@@ -436,6 +447,10 @@ const ModalEditExecution = ({ modalVisible, closeModal, record, initialSelectCou
                                 pattern: {
                                     value: /^[0-9]*$/,
                                     message: 'El campo solo debe contener números'
+                                },
+                                validate: {
+                                    positive: value => parseInt(value, 10) > 0 || 'El valor debe ser mayor a cero',
+                                    notZeroPadded: value => /^[1-9][0-9]*$/.test(value) || 'El valor no debe tener ceros a la izquierda'
                                 }
                             })}
                         />
@@ -444,6 +459,33 @@ const ModalEditExecution = ({ modalVisible, closeModal, record, initialSelectCou
                         ) : (
                             <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
                             Espacio reservado para el mensaje de error
+                            </p>
+                        )}
+                    </div>
+                    <div className="m_75">
+                        <label htmlFor="metEjeDet" style={{textTransform: "capitalize"}}>
+                            {metaData && (metaData.uniDetLab ? metaData.uniDetLab.toLowerCase() : 'Alternativa')}
+                        </label>
+                        <textarea
+                            rows="4" cols="50"
+                            id="metEjeDet"
+                            autoComplete='off'
+                            placeholder={metaData && (metaData.uniDetPla ? metaData.uniDetPla.toLowerCase() : 'Alternativa')}
+                            className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.metEjeDet   || isSubmitted ? (errors.metEjeDet   ? 'invalid' : 'valid') : ''}`} 
+                            {...register('metEjeDet', { 
+                                required: 'El campo es requerido',
+                                maxLength: {
+                                    value: 600,
+                                    message: 'El campo no debe tener más de 600 dígitos'
+                                },
+                            })}
+                        >
+                        </textarea>
+                        {errors.metEjeDet ? (
+                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.metEjeDet.message}</p>
+                        ) : (
+                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                Espacio reservado para el mensaje de error
                             </p>
                         )}
                     </div>

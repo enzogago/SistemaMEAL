@@ -188,7 +188,6 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
         
             return grouped;
         }, {});
-    
         const allResultKeys = Object.values(groupedResults).flatMap(result => result.resKey);
         setExpandedRes(allResultKeys);
 
@@ -242,7 +241,6 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
         const safeCiphertext = btoa(ciphertext).replace('+', '-').replace('/', '_').replace(/=+$/, '');
         navigate(`/form-goal-execution/${safeCiphertext}`);
     }
-
 
     // Añade una nueva etiqueta al presionar Enter
     const handleKeyDown = (e) => {

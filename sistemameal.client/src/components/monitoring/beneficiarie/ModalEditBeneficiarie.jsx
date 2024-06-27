@@ -479,6 +479,8 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
     const benAut = watch('benAut');
     const metBenAnoEjeTec = watch('metBenAnoEjeTec');
 
+    const currentYear = new Date().getFullYear();
+
     return (
         <Modal
             ariaHideApp={false}
@@ -604,7 +606,14 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                                         value: /^[0-9]*$/,
                                         message: 'Solo se aceptan numeros'
                                     },
-                                    validate: value => parseInt(value) >= metaData.metAnoPlaTec || 'El año debe ser mayor o igual al año planificado'
+                                    validate: value => {
+                                        if (Number(value) < metaData.metAnoPlaTec){
+                                            return 'El año debe ser mayor o igual a ' + metaData.metAnoPlaTec;
+                                        }
+                                        if (Number(value) > Number(metaData.metAnoPlaTec) + 1) {
+                                            return 'El año debe ser menor o igual a ' + (Number(metaData.metAnoPlaTec) + 1);
+                                        }
+                                    }
                                 })} 
                             />
                             {errors.metBenAnoEjeTec ? (

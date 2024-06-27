@@ -38,18 +38,6 @@ export const getColumns = (actions, openModalForm, setRefresh) => {
             accessorKey: "benApe"
         },
         {
-            header: "Correo",
-            accessorKey: "benCorEle",
-        },
-        {
-            header: "Teléfono",
-            accessorKey: "benTel",
-        },
-        {
-            header: "Contacto",
-            accessorKey: "benTelCon"
-        },
-        {
             header: "Sexo",
             accessorKey: "benSex",
             cell: ({row}) => {
@@ -62,6 +50,14 @@ export const getColumns = (actions, openModalForm, setRefresh) => {
             },
         },
         {
+            header: "Género",
+            accessorKey: "genNom"
+        },
+        {
+            header: "Fecha Nacimiento",
+            accessorKey: "benFecNac",
+        },
+        {
             header: "Edad Ejecutada",
             accessorKey: "metBenEda",
             cell: ({row}) => (
@@ -69,6 +65,18 @@ export const getColumns = (actions, openModalForm, setRefresh) => {
                     {row.original.metBenEda}
                 </span>
             )
+        },
+        {
+            header: "Nacionalidad",
+            accessorKey: "nacNom"
+        },
+        {
+            header: "Correo",
+            accessorKey: "benCorEle",
+        },
+        {
+            header: "Teléfono",
+            accessorKey: "benTel",
         },
         {
             header: "Dirección",
@@ -83,12 +91,8 @@ export const getColumns = (actions, openModalForm, setRefresh) => {
             accessorKey: "benApeApo"
         },
         {
-            header: "Género",
-            accessorKey: "genNom"
-        },
-        {
-            header: "Nacionalidad",
-            accessorKey: "nacNom"
+            header: "Teléfono Contacto",
+            accessorKey: "benTelCon"
         },
         {
             header: "Periodo Ejecutado",
@@ -204,6 +208,10 @@ export const getColumnsExecuting = (actions, openModalForm, setRefresh) => {
             header: "Ejecución",
             accessorKey: "metEjeVal",
             cell: ({row}) => <span className="flex jc-center">{row.original.metEjeVal}</span>
+        },
+        {
+            header: "Detalle",
+            accessorKey: "metEjeDet",
         },
         {
             header: "Actividad o Indicador",

@@ -600,6 +600,7 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_UBIANO", metaEjecucion.UbiAno);
                 cmd.Parameters.AddWithValue("@P_UBICOD", metaEjecucion.UbiCod);
                 cmd.Parameters.AddWithValue("@P_METEJEVAL", metaEjecucion.MetEjeVal);
+                cmd.Parameters.AddWithValue("@P_METEJEDET", metaEjecucion.MetEjeDet);
                 cmd.Parameters.AddWithValue("@P_METEJEMESEJETEC", metaEjecucion.MetEjeMesEjeTec);
                 cmd.Parameters.AddWithValue("@P_METEJEANOEJETEC", metaEjecucion.MetEjeAnoEjeTec);
                 cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);

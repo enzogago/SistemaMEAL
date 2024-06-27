@@ -1207,7 +1207,7 @@ namespace SistemaMEAL.Modulos
         }
 
 
-        public IEnumerable<MetaEjecucion> BuscarMetaEjecucion(ClaimsIdentity? identity, string? metAno = null, string? metCod = null, string? metEjeVal = null, string? ubiAno = null, string? ubiCod = null, string? metEjeAnoEjeTec = null, string? metEjeMesEjeTec = null)
+        public IEnumerable<MetaEjecucion> BuscarMetaEjecucion(ClaimsIdentity? identity, string? metAno = null, string? metCod = null, string? metEjeVal = null, string? metEjeDet = null, string? ubiAno = null, string? ubiCod = null, string? metEjeAnoEjeTec = null, string? metEjeMesEjeTec = null)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 
@@ -1224,6 +1224,7 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_UBIANO", string.IsNullOrEmpty(ubiAno) ? (object)DBNull.Value : ubiAno);
                 cmd.Parameters.AddWithValue("@P_UBICOD", string.IsNullOrEmpty(ubiCod) ? (object)DBNull.Value : ubiCod);
                 cmd.Parameters.AddWithValue("@P_METEJEVAL", string.IsNullOrEmpty(metEjeVal) ? (object)DBNull.Value : metEjeVal);
+                cmd.Parameters.AddWithValue("@P_METEJEDET", string.IsNullOrEmpty(metEjeDet) ? (object)DBNull.Value : metEjeDet);
                 cmd.Parameters.AddWithValue("@P_METEJEMESEJETEC", string.IsNullOrEmpty(metEjeAnoEjeTec) ? (object)DBNull.Value : metEjeAnoEjeTec);
                 cmd.Parameters.AddWithValue("@P_METEJEANOEJETEC", string.IsNullOrEmpty(metEjeMesEjeTec) ? (object)DBNull.Value : metEjeMesEjeTec);
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
@@ -1293,6 +1294,7 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_METEJEMESEJETEC", metaEjecucion.MetEjeMesEjeTec);
                 cmd.Parameters.AddWithValue("@P_METEJEANOEJETEC", metaEjecucion.MetEjeAnoEjeTec);
                 cmd.Parameters.AddWithValue("@P_METEJEVAL", metaEjecucion.MetEjeVal);
+                cmd.Parameters.AddWithValue("@P_METEJEDET", metaEjecucion.MetEjeDet);
                 cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                 cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);

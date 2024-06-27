@@ -47,13 +47,14 @@ const ModalGoalExecuting = ({openModalGoalExecuting, closeModalExecuting, metaDa
             return searchTags.every(tag => 
                 item.ubiNom.toUpperCase().includes(tag.toUpperCase()) ||
                 item.metEjeVal.toUpperCase().includes(tag.toUpperCase()) ||
+                item.metEjeDet.toUpperCase().includes(tag.toUpperCase()) ||
                 (periodoEjecucion ? periodoEjecucion.toUpperCase().includes(tag.toUpperCase()) : false)
             );
         });
     }, [data, searchTags]);
     
-    const headers = ['AÑO EJECUTADO','MES EJECUTADO','UBICACIÓN EJECUTADA','EJECUCION','INDICADOR','TIPO','RESULTADO','OBJETIVO ESPECIFICO','OBJETIVO','SUBPROYECTO','PROYECTO'];
-    const properties = ['metEjeAnoEjeTec','metEjeMesEjeTec','ubiNom','metEjeVal',['indNum','indNom'],'indTipInd',['resNum','resNom'],['objEspNum','objEspNom'],['objNum','objNom'],['subProSap','subProNom'],['proIde','proNom']];
+    const headers = ['AÑO EJECUTADO','MES EJECUTADO','UBICACIÓN EJECUTADA','EJECUCION','DETALLE','INDICADOR','TIPO','RESULTADO','OBJETIVO ESPECIFICO','OBJETIVO','SUBPROYECTO','PROYECTO'];
+    const properties = ['metEjeAnoEjeTec','metEjeMesEjeTec','ubiNom','metEjeVal','metEjeDet',['indNum','indNom'],'indTipInd',['resNum','resNom'],['objEspNum','objEspNom'],['objNum','objNom'],['subProSap','subProNom'],['proIde','proNom']];
     // Preparar los datos
     let dataExport = [...filteredData]; 
     // Modificar el campo 'uniInvPer' en los datos

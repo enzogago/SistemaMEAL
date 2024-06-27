@@ -155,7 +155,11 @@ const Modal = ({ estadoEditado, modalVisible, setModalVisible, closeModal, setDa
                             case 'codigo':
                                 return <InputIdentificador key={field} register={register} errors={errors} dirtyFields={dirtyFields} isSubmitted={isSubmitted} />;
                             case 'nombre':
-                                return <InputNombre key={field} register={register} errors={errors} dirtyFields={dirtyFields} isSubmitted={isSubmitted} />;
+                                return <InputNombre key={field} register={register} errors={errors} dirtyFields={dirtyFields} isSubmitted={isSubmitted} maxLength={300} nameRegister='nombre' />;
+                            case 'label':
+                                return <InputNombre key={field} register={register} errors={errors} dirtyFields={dirtyFields} isSubmitted={isSubmitted} maxLength={100} nameRegister='label' />;
+                            case 'placeholder':
+                                return <InputNombre key={field} register={register} errors={errors} dirtyFields={dirtyFields} isSubmitted={isSubmitted} maxLength={100} nameRegister='placeholder' />;
                             case 'abreviatura':
                                 return <InputAbreviatura key={field} register={register} errors={errors} dirtyFields={dirtyFields} isSubmitted={isSubmitted} />;
                             case '¿involucra beneficiario?':

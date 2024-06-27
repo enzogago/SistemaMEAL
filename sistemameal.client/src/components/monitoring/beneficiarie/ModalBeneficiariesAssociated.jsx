@@ -60,6 +60,8 @@ const ModalBeneficiariesAssociated = ({openModal, closeModal, metaData, update, 
                 item.benApeApo.toUpperCase().includes(tag.toUpperCase()) ||
                 item.genNom.toUpperCase().includes(tag.toUpperCase()) ||
                 item.nacNom.toUpperCase().includes(tag.toUpperCase()) ||
+                item.metBenEda.toUpperCase().includes(tag.toUpperCase()) ||
+                item.benFecNac.toUpperCase().includes(tag.toUpperCase()) ||
                 (item.benSex === 'M' && 'MASCULINO'.includes(tag.toUpperCase())) ||
                 (item.benSex === 'F' && 'FEMENINO'.includes(tag.toUpperCase())) ||
                 (periodoEjecucion ? periodoEjecucion.toUpperCase().includes(tag.toUpperCase()) : false)
@@ -67,8 +69,8 @@ const ModalBeneficiariesAssociated = ({openModal, closeModal, metaData, update, 
         });
     }, [data, searchTags]);
 
-    const headers = ['CUB','TIPO DOCUMENTO','NOMBRE','APELLIDO','EMAIL','TELÉFONO','TELÉFONO CONTACTO','DIRECCIÓN','NOMBRE APODERADO','APELLIDO APODERADO','GÉNERO','NACIONALIDAD','AÑO EJECUTADO','MES EJECUTADO','UBICACIÓN EJECUTADA','INDICADOR','TIPO','RESULTADO','OBJETIVO ESPECIFICO','OBJETIVO','SUBPROYECTO','PROYECTO'];
-    const properties = ['benCodUni','docIdeNom','benNom','benApe','benCorEle','benTel','benTelCon','benDir','benNomApo','benApeApo','genNom','nacNom','metBenAnoEjeTec','metBenMesEjeTec','ubiNom',['indNum','indNom'],'indTipInd',['resNum','resNom'],['objEspNum','objEspNom'],['objNum','objNom'],['subProSap','subProNom'],['proIde','proNom']];
+    const headers = ['CUB','TIPO DOCUMENTO','NOMBRE','APELLIDO','SEXO','GÉNERO','FECHA NACIMIENTO','EDAD EJECUTADO','NACIONALIDAD','EMAIL','TELÉFONO','TELÉFONO CONTACTO','DIRECCIÓN','NOMBRE APODERADO','APELLIDO APODERADO','AÑO EJECUTADO','MES EJECUTADO','UBICACIÓN EJECUTADA','INDICADOR','TIPO','RESULTADO','OBJETIVO ESPECIFICO','OBJETIVO','SUBPROYECTO','PROYECTO'];
+    const properties = ['benCodUni','docIdeNom','benNom','benApe','benSex','genNom','benFecNac','metBenEda','nacNom','benCorEle','benTel','benTelCon','benDir','benNomApo','benApeApo','metBenAnoEjeTec','metBenMesEjeTec','ubiNom',['indNum','indNom'],'indTipInd',['resNum','resNom'],['objEspNum','objEspNom'],['objNum','objNom'],['subProSap','subProNom'],['proIde','proNom']];
     // Preparar los datos
     let dataExport = [...filteredData]; 
     // Modificar el campo 'uniInvPer' en los datos

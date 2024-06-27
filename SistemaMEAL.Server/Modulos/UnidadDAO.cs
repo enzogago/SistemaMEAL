@@ -12,7 +12,7 @@ namespace SistemaMEAL.Modulos
     {
         private conexionDAO cn = new conexionDAO();
 
-        public IEnumerable<Unidad> Listado(ClaimsIdentity? identity, string? uniCod = null, string? uniNom = null, string? uniInvPer = null)
+        public IEnumerable<Unidad> Listado(ClaimsIdentity? identity, string? uniCod = null, string? uniNom = null, string? uniInvPer = null, string? uniDetLab = null, string? uniDetPla = null)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 
@@ -27,6 +27,8 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_UNICOD", string.IsNullOrEmpty(uniCod) ? (object)DBNull.Value : uniCod);
                 cmd.Parameters.AddWithValue("@P_UNINOM", string.IsNullOrEmpty(uniNom) ? (object)DBNull.Value : uniNom);
                 cmd.Parameters.AddWithValue("@P_UNIINVPER", string.IsNullOrEmpty(uniInvPer) ? (object)DBNull.Value : uniInvPer);
+                cmd.Parameters.AddWithValue("@P_UNIDETLAB", string.IsNullOrEmpty(uniDetLab) ? (object)DBNull.Value : uniDetLab);
+                cmd.Parameters.AddWithValue("@P_UNIDETPLA", string.IsNullOrEmpty(uniDetPla) ? (object)DBNull.Value : uniDetPla);
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                 cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
                 cmd.Parameters.AddWithValue("@P_USUCOD_U", userClaims.UsuCod);
@@ -83,6 +85,8 @@ namespace SistemaMEAL.Modulos
 
                 cmd.Parameters.AddWithValue("@P_UNINOM", unidad.UniNom);
                 cmd.Parameters.AddWithValue("@P_UNIINVPER", unidad.UniInvPer);
+                cmd.Parameters.AddWithValue("@P_UNIDETLAB", unidad.UniDetLab);
+                cmd.Parameters.AddWithValue("@P_UNIDETPLA", unidad.UniDetPla);
                 cmd.Parameters.AddWithValue("@P_USUING", userClaims.UsuNomUsu);
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                 cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
@@ -130,6 +134,8 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_UNICOD", unidad.UniCod);
                 cmd.Parameters.AddWithValue("@P_UNINOM", unidad.UniNom);
                 cmd.Parameters.AddWithValue("@P_UNIINVPER", unidad.UniInvPer);
+                cmd.Parameters.AddWithValue("@P_UNIDETLAB", unidad.UniDetLab);
+                cmd.Parameters.AddWithValue("@P_UNIDETPLA", unidad.UniDetPla);
                 cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                 cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
