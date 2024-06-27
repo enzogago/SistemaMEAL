@@ -86,13 +86,13 @@ const FormGoalBeneficiarie = () => {
     // Estados Numero de Telefono
     const phoneInputRef = useRef();
     const [phoneNumber, setPhoneNumber] = useState('');
-    const [isValid, setIsValid] = useState(false);
+    const [isValid, setIsValid] = useState(true);
     const [errorMessage, setErrorMessage] = useState('');
     const [isTouched, setIsTouched] = useState(false);
     // Estados Telefono de contacto
     const phoneContactInputRef = useRef();
     const [phoneContactNumber, setPhoneContactNumber] = useState('');
-    const [contactIsValid, setContactIsValid] = useState(false);
+    const [contactIsValid, setContactIsValid] = useState(true);
     const [errorContactMessage, setErrorContactMessage] = useState('');
     const [contactIsTouched, setContactIsTouched] = useState(false);
 
@@ -474,7 +474,11 @@ const FormGoalBeneficiarie = () => {
                     if (m < 0 || (m === 0 && hoy.getDate() < fecha.getDate())) {
                         edad--;
                     }
-                    setEsMenorDeEdad(edad < 18);
+
+                    if (edad < 18) {    
+                        await setEsMenorDeEdad(true);
+                        initPhoneInput(phoneContactInputRef, setContactIsValid, setPhoneContactNumber, setErrorContactMessage,'','', setContactIsTouched);
+                    }
                 } else{
                     setEsMenorDeEdad(false);
                     setValue('benNomApo', '');
@@ -587,7 +591,7 @@ const FormGoalBeneficiarie = () => {
             }
             setVerificarPais({ ubiCod: data[0].ubiCod, ubiAno: data[0].ubiAno });
             initPhoneInput(phoneInputRef, setIsValid, setPhoneNumber, setErrorMessage,'',data[0].ubiNom, setIsTouched);
-            initPhoneInput(phoneContactInputRef, setContactIsValid, setPhoneContactNumber, setErrorContactMessage,'',data[0].ubiNom, setContactIsTouched);
+            
         } catch (error) {
             console.error('Error:', error);
         } finally {
@@ -937,7 +941,7 @@ const FormGoalBeneficiarie = () => {
                                         </label>
                                         <label className="Large_6 flex gap_5 ai-center">
                                             <input
-                                            className="m0"
+                                                className="m0"
                                                 type="radio"
                                                 checked={!isOptionOneSelected}
                                                 onChange={() => setIsOptionOneSelected(false)}
@@ -958,6 +962,7 @@ const FormGoalBeneficiarie = () => {
                                                 id="docIdeCod" 
                                                 className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields2.docIdeCod || isSubmitted2 ? (errors2.docIdeCod ? 'invalid' : 'valid') : ''}`} 
                                                 style={{ color: selectedDocumentValue === '0' ? '#372e2c60' : '#000', textTransform: 'capitalize'}}
+                                                onInput={onDocTypeChange}
                                                 {...register2('docIdeCod', { 
                                                     validate: value => value !== '0' || 'Seleccione el tipo de documento del beneficiario' 
                                                 })}
@@ -1028,6 +1033,11 @@ const FormGoalBeneficiarie = () => {
                                                 type="text" 
                                                 placeholder="Buscar por nombres"
                                                 autoComplete='off'
+                                                onInput={(event) => {
+                                                    // Permite solo letras (incluyendo letras con acentos y la ñ), espacios, guiones y guiones bajos
+                                                    const pattern = /^[A-Za-zñÑáéíóúÁÉÍÓÚüÜ\s-_]+$/;
+                                                    event.target.value = event.target.value.split('').filter(char => pattern.test(char)).join('');
+                                                }}
                                                 {...register2('benNom', { 
                                                     required: 'El campo es requerido',
                                                     pattern: {
@@ -1123,10 +1133,15 @@ const FormGoalBeneficiarie = () => {
                                     placeholder="Ejm: Enzo Fabricio"
                                     autoComplete='off'
                                     disabled={fieldsDisabled}
+                                    onInput={(event) => {
+                                        // Permite solo letras (incluyendo letras con acentos y la ñ), espacios, guiones y guiones bajos
+                                        const pattern = /^[A-Za-zñÑáéíóúÁÉÍÓÚüÜ\s-]+$/;
+                                        event.target.value = event.target.value.split('').filter(char => pattern.test(char)).join('');
+                                    }}
                                     {...register('benNom', { 
                                         required: 'Ingrese el nombre del beneficiario',
                                         pattern: {
-                                            value: /^[A-Za-zñÑáéíóúÁÉÍÓÚüÜ\s]+$/,
+                                            value: /^[A-Za-zñÑáéíóúÁÉÍÓÚüÜ\s-]+$/,
                                             message: 'Por favor, introduce solo letras y espacios',
                                         },
                                         minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
@@ -1152,10 +1167,15 @@ const FormGoalBeneficiarie = () => {
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benApe || isSubmitted ? (errors.benApe ? 'invalid' : 'valid') : ''}`} 
                                     placeholder="Ejm: Gago Aguirre"
                                     disabled={fieldsDisabled}
+                                    onInput={(event) => {
+                                        // Permite solo letras (incluyendo letras con acentos y la ñ), espacios, guiones y guiones bajos
+                                        const pattern = /^[A-Za-zñÑáéíóúÁÉÍÓÚüÜ\s-]+$/;
+                                        event.target.value = event.target.value.split('').filter(char => pattern.test(char)).join('');
+                                    }}
                                     {...register('benApe', { 
                                         required: 'Ingrese el apellido del beneficiario',
                                         pattern: {
-                                            value: /^[A-Za-zñÑáéíóúÁÉÍÓÚüÜ\s]+$/,
+                                            value: /^[A-Za-zñÑáéíóúÁÉÍÓÚüÜ\s-]+$/,
                                             message: 'Por favor, introduce solo letras y espacios',
                                         },
                                         minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
@@ -1219,7 +1239,9 @@ const FormGoalBeneficiarie = () => {
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.genCod || isSubmitted ? (errors.genCod ? 'invalid' : 'valid') : ''}`}
                                     name="genCod"
                                     {...register('genCod', { 
-                                        validate: value => value !== '0' || 'Seleccione el género del beneficiario' 
+                                        validate: {
+                                            required: value => value != '0' || 'Seleccione el género del benficiario',
+                                        }
                                     })}
                                 >
                                     <option value="0">--Seleccione Género--</option>
@@ -1260,21 +1282,29 @@ const FormGoalBeneficiarie = () => {
                                     {...register('benFecNac', { 
                                         required: 'Ingrese la fecha de nacimiento del benficiario',
                                         pattern: {
-                                            value: /^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[012])-\d{4}$/,
-                                            message: 'La fecha debe estar en el formato DD-MM-YYYY',
+                                          value: /^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[012])-\d{4}$/,
+                                          message: 'La fecha debe estar en el formato DD-MM-YYYY',
                                         },
-                                        validate: value => {
-                                            const dateParts = value.split("-");
-                                            const inputDate = new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]);
-                                            const currentDate = new Date();
-                                            currentDate.setHours(0, 0, 0, 0);  // Set the time to 00:00:00
-                                            return inputDate <= currentDate || 'La fecha no puede ser mayor que la fecha actual';
-                                        },
-                                        notZeroYear: (value) => {
-                                            const year = value.split("-")[2];
-                                            return year !== "0000" || 'El año no puede ser 0000';
+                                        validate: {
+                                            currentDate: value => {
+                                                const dateParts = value.split("-");
+                                                const inputDate = new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]);
+                                                const currentDate = new Date();
+                                                currentDate.setHours(0, 0, 0, 0);  // Establece la hora a 00:00:00
+                                                return inputDate <= currentDate || 'La fecha no puede ser mayor que la fecha actual';
+                                            },
+                                            notZeroYear: value => {
+                                                const year = value.split("-")[2];
+                                                return year !== "0000" || 'El año no puede ser 0000';
+                                            },
+                                            minDate: value => {
+                                                const [day, month, year] = value.split("-");
+                                                const inputDate = new Date(+year, month - 1, +day);
+                                                const minDate = new Date(1900, 0, 1); // 01-01-1900
+                                                return inputDate >= minDate || 'La fecha debe ser posterior al 01-01-1900';
+                                            }
                                         }
-                                    })} 
+                                    })}
                                 />
                                 {errors.benFecNac ? (
                                     <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.benFecNac.message}</p>
@@ -1368,31 +1398,6 @@ const FormGoalBeneficiarie = () => {
                                     </p>
                                 )}
                             </div>
-                            <div className='m_75'>
-                                <label htmlFor="phone" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="block">
-                                    Télefono de contacto:
-                                </label>
-                                <div>
-                                    <input
-                                        ref={phoneContactInputRef}
-                                        type="tel"
-                                        disabled={fieldsDisabled}
-                                        className={`Phone_12 PowerMas_Modal_Form_${contactIsTouched ? (!contactIsValid ? 'invalid' : 'valid') : ''}`}
-                                        style={{
-                                            paddingRight: '6px',
-                                            padding: '4px 6px 4px 52px',
-                                            margin: 0,
-                                        }}
-                                    />
-                                </div>
-                                {!contactIsValid ? (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errorContactMessage}</p>
-                                ) : (
-                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                                        Espacio reservado para el mensaje de error
-                                    </p>
-                                )}
-                            </div>
                             <div className="m_75">
                                 <label htmlFor="benDir" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
                                     Dirección
@@ -1432,12 +1437,22 @@ const FormGoalBeneficiarie = () => {
                                             type="text"
                                             style={{textTransform: 'capitalize'}}
                                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benNomApo || isSubmitted ? (errors.benNomApo ? 'invalid' : 'valid') : ''}`} 
-                                            placeholder="Enzo Fabricio"
+                                            placeholder="Ejm: José Carlos"
                                             autoComplete='off'
                                             disabled={fieldsDisabled}
+                                            onInput={(event) => {
+                                                // Permite solo letras (incluyendo letras con acentos y la ñ), espacios, guiones y guiones bajos
+                                                const pattern = /^[A-Za-zñÑáéíóúÁÉÍÓÚüÜ\s-]+$/;
+                                                event.target.value = event.target.value.split('').filter(char => pattern.test(char)).join('');
+                                            }}
                                             {...register('benNomApo', { 
-                                                required: 'El nombre del apoderado es requerido',
-                                                minLength: { value: 3, message: 'El nombre debe tener minimo 3 digitos' },
+                                                required: 'Ingrese el nombre del apoderado del beneficiario',
+                                                pattern: {
+                                                    value: /^[A-Za-zñÑáéíóúÁÉÍÓÚüÜ\s-]+$/,
+                                                    message: 'Por favor, introduce solo letras y espacios',
+                                                },
+                                                minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
+                                                maxLength: { value: 50, message: 'El campo debe tener máximo 50 digitos' },
                                             })} 
                                         />
                                         {errors.benNomApo ? (
@@ -1457,12 +1472,22 @@ const FormGoalBeneficiarie = () => {
                                             type="text"
                                             style={{textTransform: 'capitalize'}}
                                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benApeApo || isSubmitted ? (errors.benApeApo ? 'invalid' : 'valid') : ''}`} 
-                                            placeholder="Gago Aguirre"
+                                            placeholder="Ejm: Gonzales Pinedo"
                                             autoComplete='off'
                                             disabled={fieldsDisabled}
+                                            onInput={(event) => {
+                                                // Permite solo letras (incluyendo letras con acentos y la ñ), espacios, guiones y guiones bajos
+                                                const pattern = /^[A-Za-zñÑáéíóúÁÉÍÓÚüÜ\s-]+$/;
+                                                event.target.value = event.target.value.split('').filter(char => pattern.test(char)).join('');
+                                            }}
                                             {...register('benApeApo', { 
-                                                required: 'El nombre del apoderado es requerido',
-                                                minLength: { value: 3, message: 'El nombre debe tener minimo 3 digitos' },
+                                                required: 'Ingrese el apellido del apoderado del beneficiario',
+                                                pattern: {
+                                                    value: /^[A-Za-zñÑáéíóúÁÉÍÓÚüÜ\s-]+$/,
+                                                    message: 'Por favor, introduce solo letras y espacios',
+                                                },
+                                                minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
+                                                maxLength: { value: 50, message: 'El campo debe tener máximo 50 digitos' },
                                             })} 
                                         />
                                         {errors.benApeApo ? (
@@ -1470,6 +1495,31 @@ const FormGoalBeneficiarie = () => {
                                         ) : (
                                             <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
                                             Espacio reservado para el mensaje de error
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className='m_75'>
+                                        <label htmlFor="phone" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="block">
+                                            Télefono de contacto:
+                                        </label>
+                                        <div>
+                                            <input
+                                                ref={phoneContactInputRef}
+                                                type="tel"
+                                                disabled={fieldsDisabled}
+                                                className={`Phone_12 PowerMas_Modal_Form_${contactIsTouched ? (!contactIsValid ? 'invalid' : 'valid') : ''}`}
+                                                style={{
+                                                    paddingRight: '6px',
+                                                    padding: '4px 6px 4px 52px',
+                                                    margin: 0,
+                                                }}
+                                            />
+                                        </div>
+                                        {!contactIsValid ? (
+                                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errorContactMessage}</p>
+                                        ) : (
+                                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                                Espacio reservado para el mensaje de error
                                             </p>
                                         )}
                                     </div>

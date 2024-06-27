@@ -1,5 +1,5 @@
 // Importaciones de React y hooks para manejar el estado y el ciclo de vida del componente.
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 // Herramientas y funciones reutilizables para la lógica de negocio y exportación a Excel.
 import { Export_Excel_Basic, fetchData, fetchDataReturn } from '../reusable/helper';
 // Gestión de formularios y validaciones con react-hook-form.
@@ -48,6 +48,12 @@ const ResultChain = () => {
     // Acciones disponibles para el usuario según el contexto (por ejemplo, exportar a Excel)
     const actions = useEntityActions('CADENA RESULTADO PRESUPUESTO');
     const [refresh, setRefresh] = useState(false)
+
+    const headerRef1 = useRef();
+    const headerRef2 = useRef();
+    const headerRef3 = useRef();
+    
+    const [columnWidths, setColumnWidths] = useState({ width1: 0, width2: 0, width3: 0 });
 
     useEffect(() => {
         const handleKeyDown = (event) => {
@@ -486,6 +492,18 @@ const ResultChain = () => {
     
         Export_Excel_Basic(data, headersExcel, 'GENERAL', true, title, currency);
     };
+
+    useEffect(() => {
+        const subproyecto = watch('subproyecto');
+        if (subproyecto && subproyecto !== '0') {
+            const width1 = headerRef1.current.getBoundingClientRect().width;
+            const width2 = headerRef2.current.getBoundingClientRect().width;
+            const width3 = headerRef3.current.getBoundingClientRect().width;
+    
+            setColumnWidths({ width1, width2, width3 });
+        }
+    }, [indicadores]);
+      
     
     return (
         <div className='p_75 flex flex-column flex-grow-1 overflow-auto gap_25'>
@@ -542,13 +560,27 @@ const ResultChain = () => {
                     <table className="PowerMas_TableStatus">
                         <thead>
                             <tr  style={{zIndex: '1'}}>
-                                <th className='center' rowSpan={2}>#</th>
                                 <th 
+                                ref={headerRef1} 
                                     className='center' 
+                                    style={{position: 'sticky', left: '0', backgroundColor: '#fff'}} 
+                                    rowSpan={2}
+                                >#</th>
+                                <th 
+                                    ref={headerRef2} 
+                                    className='center' 
+                                    style={{position: 'sticky', left: columnWidths.width1, backgroundColor: '#fff'}}
                                     rowSpan={2} 
-                                    style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}
                                 >
                                     Código
+                                </th>
+                                <th 
+                                    ref={headerRef3} 
+                                    className='center' 
+                                    style={{position: 'sticky', left: (columnWidths.width2 + columnWidths.width1), backgroundColor: '#fff'}}
+                                    rowSpan={2} 
+                                >
+                                    Código Presupuesto
                                 </th>
                                 <th className='center' rowSpan={2}>Nombre</th>
                                 <th className='center' rowSpan={2}>Unidad</th>
@@ -602,10 +634,23 @@ const ResultChain = () => {
 
                                 return (
                                     <tr key={index}>
-                                        <td>{index+1}</td>
+                                        <td 
+                                            style={{position: 'sticky', left: '0', backgroundColor: '#fff'}} 
+                                        >
+                                            {index+1}
+                                        </td>
                                         <td
-                                            style={{position: 'sticky', left: '0', backgroundColor: '#fff'}}
-                                        >{item.indNum}</td>
+                                            className='center'
+                                            style={{position: 'sticky', left: columnWidths.width1, backgroundColor: '#fff'}}
+                                        >
+                                            {item.indNum}
+                                        </td>
+                                        <td
+                                            className='center'
+                                            style={{position: 'sticky', left: (columnWidths.width1 + columnWidths.width2), backgroundColor: '#fff'}}
+                                        >
+                                            {item.indNumPre}
+                                        </td>
                                         {
                                             text.length > 25 ?
                                             <td className='' 

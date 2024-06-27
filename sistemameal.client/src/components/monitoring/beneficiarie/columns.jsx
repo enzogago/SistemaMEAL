@@ -58,6 +58,15 @@ export const getColumns = (actions, openModalForm, setRefresh) => {
             accessorKey: "benFecNac",
         },
         {
+            header: "Edad Ejecutada",
+            accessorKey: "metBenEda",
+            cell: ({row}) => (
+                <span className="flex jc-center">
+                    {row.original.metBenEda}
+                </span>
+            )
+        },
+        {
             header: "Nacionalidad",
             accessorKey: "nacNom"
         },
@@ -68,10 +77,6 @@ export const getColumns = (actions, openModalForm, setRefresh) => {
         {
             header: "Teléfono",
             accessorKey: "benTel",
-        },
-        {
-            header: "Contacto",
-            accessorKey: "benTelCon"
         },
         {
             header: "Dirección",
@@ -86,13 +91,8 @@ export const getColumns = (actions, openModalForm, setRefresh) => {
             accessorKey: "benApeApo"
         },
         {
-            header: "Edad Ejecutada",
-            accessorKey: "metBenEda",
-            cell: ({row}) => (
-                <span className="flex jc-center">
-                    {row.original.metBenEda}
-                </span>
-            )
+            header: "Teléfono Contacto",
+            accessorKey: "benTelCon"
         },
         {
             header: "Periodo Ejecutado",
