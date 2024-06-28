@@ -18,7 +18,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
 
     const [ initialData, setInitialData ] = useState(null);
     const [ fieldsDisabled, setFieldsDisabled ] = useState(true);
-    const [ esMenorDeEdad, setEsMenorDeEdad ] = useState(true);
+    const [ esMenorDeEdad, setEsMenorDeEdad ] = useState(false);
 
     // Estados Numero de Telefono
     const phoneInputRef = useRef();
@@ -29,18 +29,20 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
     // Estados Telefono de contacto
     const phoneContactInputRef = useRef();
     const [phoneContactNumber, setPhoneContactNumber] = useState('');
-    const [contactIsValid, setContactIsValid] = useState(false);
+    const [contactIsValid, setContactIsValid] = useState(true);
     const [errorContactMessage, setErrorContactMessage] = useState('');
-    const [contactIsTouched, setContactIsTouched] = useState(false);
+    const [contactIsTouched, setContactIsTouched] = useState(true);
 
     const [selectedValues, setSelectedValues] = useState([]);
     const [firstEdit, setFirstEdit] = useState(false);
     const [ verificarPais, setVerificarPais ] = useState(null);
+    const [ nombrePais, setNombrePais ] = useState(null);
 
     // Luego puedes llamar a esta función para cada input de teléfono en tu función afterOpenModal
     const afterOpenModal = () => {
-        initPhoneInput(phoneInputRef, setIsValid, setPhoneNumber, setErrorMessage, record.benTel, metaData.ubiNom, setIsTouched);
-        initPhoneInput(phoneContactInputRef, setContactIsValid, setPhoneContactNumber, setErrorContactMessage, record.benTelCon, metaData.ubiNom, setContactIsTouched);
+        console.log(record)
+        initPhoneInput(phoneInputRef, setIsValid, setPhoneNumber, setErrorMessage, record.benTel, nombrePais, setIsTouched);
+        initPhoneInput(phoneContactInputRef, setContactIsValid, setPhoneContactNumber, setErrorContactMessage, record.benTelCon, nombrePais, setContactIsTouched);
     };
 
     const { 
@@ -93,7 +95,12 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                     if (m < 0 || (m === 0 && hoy.getDate() < fecha.getDate())) {
                         edad--;
                     }
-                    setEsMenorDeEdad(edad < 18);
+
+                    if (edad < 18) {
+                        await setEsMenorDeEdad(true);
+                        initPhoneInput(phoneContactInputRef, setContactIsValid, setPhoneContactNumber, setErrorContactMessage,'',nombrePais, setContactIsTouched);
+                        
+                    }
                 } else{
                     setEsMenorDeEdad(false);
                     setValue('benNomApo', '');
@@ -117,21 +124,39 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
 
     const handleEdit = () => {
         validateForm((data) => {
-            const lastSelectElement = document.querySelector(`select[name=select-form${selects.length - 1}]`);
-            const lastSelect = JSON.parse(lastSelectElement.value);
-            const ubiAno = lastSelect.ubiAno;
-            const ubiCod = lastSelect.ubiCod;
-            // Verifica que todos los selects tengan una opción válida seleccionada
-            for (let i = 0; i < selects.length; i++) {
-                const selectElement = document.querySelector(`select[name=select-form${i}]`);
-                if (selectElement && selectElement.value === '0') {
-                    selectElement.classList.remove('PowerMas_Modal_Form_valid');
-                    selectElement.classList.add('PowerMas_Modal_Form_invalid');
-                    selectElement.focus();
-                    return;
+            let ubiAno, ubiCod;
+            // Si los selects dinamicos son mayor a 1
+            if (selects.length > 1) {
+                // Obtiene el ubiAno y ubiCod del último select
+                const lastSelectElement = document.querySelector(`select[name=select-form${selects.length - 1}]`);
+                const lastSelect = lastSelectElement.value;
+                if (lastSelect === '0') {
+                    // Si el último select tiene un valor de '0', obtén el ubiAno y ubiCod del penúltimo select
+                    const penultimateSelectElement = document.querySelector(`select[name=select-form${selects.length - 2}]`);
+                    const penultimateSelect = JSON.parse(penultimateSelectElement.value);
+                    ubiAno = penultimateSelect.ubiAno;
+                    ubiCod = penultimateSelect.ubiCod;
                 } else {
-                    selectElement.classList.remove('PowerMas_Modal_Form_invalid');
-                    selectElement.classList.add('PowerMas_Modal_Form_valid');
+                    // Si el último select tiene un valor distinto de '0', usa ese
+                    const ultimo = JSON.parse(lastSelect);
+                    ubiAno = ultimo.ubiAno;
+                    ubiCod = ultimo.ubiCod;
+                }
+            } else {
+                const lastSelectElement = document.querySelector(`select[name=select-form${selects.length - 1}]`);
+                const lastSelect = lastSelectElement.value;
+
+                // Si luego del siguiente nivel de Pais no se selecciona nada
+                if(lastSelect === '0'){
+                    // Se toman los valores pasados del select pais
+                    const { ubiAno: paisUbiAno, ubiCod: paisUbiCod } = JSON.parse(data.pais);
+                    ubiAno = paisUbiAno;
+                    ubiCod = paisUbiCod;
+                } else{
+                    // Caso contrario se toma el unico valor que tiene ese select ya que no tiene más niveles por debajo
+                    const ultimo = JSON.parse(lastSelect);
+                    ubiAno = ultimo.ubiAno;
+                    ubiCod = ultimo.ubiCod;
                 }
             }
 
@@ -140,7 +165,6 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
             }
 
             const hasChanged = ['metAno', 'metCod', 'benAno', 'benCod', 'metBenMesEjeTec', 'metBenAnoEjeTec'].some(key => data[key] !== initialData[key]) || ubiAno !== initialData.ubiAno || ubiCod !== initialData.ubiCod;
-
             const { metAno, metCod, benAno, benCod, metBenEda, metBenMesEjeTec, metBenAnoEjeTec} = data;
             const dataMetaBeneficiario ={
                 metAnoOri: initialData.metAno,
@@ -181,10 +205,10 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
 
             if (!hasChanged && !fieldsDisabled) { // No cambió y los campos habilitados
                 // UPDATE BENEFICIARIO
-                handleSubmitBeneficiarie(data, closeModalEdit, setUpdate);
+                handleSubmitBeneficiarie(data, closeModalAndReset, setUpdate);
             } else if(fieldsDisabled){ // Cambió y los campos deshabilitados
                 // Update META_BENEFICIARIO
-                handleSubmiMetaBeneficiario(dataMetaBeneficiario, closeModalEdit);
+                handleSubmiMetaBeneficiario(dataMetaBeneficiario, closeModalAndReset);
             } else if(!fieldsDisabled){
                 if(hasChanged && hasChangedBeneficiarie){ // Si cambian los datos de Meta_Beneficiario y Beneficiario
                     // UPDATE META_BENEFICAIRIO y BENEFICIARIO
@@ -192,16 +216,16 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                         Beneficiario: { ...data },
                         MetaBeneficiario: { ...dataMetaBeneficiario},
                     }
-                    handleSubmiBeneficiarioMetaBeneficiario(dataBeneficiarioMetaBeneficiario, closeModalEdit, setUpdate);
+                    handleSubmiBeneficiarioMetaBeneficiario(dataBeneficiarioMetaBeneficiario, closeModalAndReset, setUpdate);
                 } else { // Solo cambia los datos de Meta_Beneficiario
                     // Update META_BENEFICIARIO
-                    handleSubmiMetaBeneficiario(dataMetaBeneficiario, closeModalEdit);
+                    handleSubmiMetaBeneficiario(dataMetaBeneficiario, closeModalAndReset);
                 }
             }
         })();
     }
 
-    const handleSubmitBeneficiarie = async (data, closeModalEdit, setUpdate) => {
+    const handleSubmitBeneficiarie = async (data, closeModalAndReset, setUpdate) => {
         let newData = {};
                 
         for (let key in data) {
@@ -232,7 +256,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
             }
     
             Notiflix.Notify.success(data.message);
-            closeModalEdit();
+            closeModalAndReset();
             setUpdate(prevUpdate => !prevUpdate);
         } catch (error) {
             console.error('Error:', error);
@@ -241,7 +265,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
         }
     };
 
-    const handleSubmiBeneficiarioMetaBeneficiario = async (dataForm, closeModalEdit, updateData, setUpdateData) => {
+    const handleSubmiBeneficiarioMetaBeneficiario = async (dataForm, closeModalAndReset, updateData, setUpdateData) => {
         let newDataBeneficiario = {};
                 
         for (let key in dataForm.Beneficiario) {
@@ -275,7 +299,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
             }
 
             Notiflix.Notify.success(data.message);
-            closeModalEdit();
+            closeModalAndReset();
             setUpdate(prevUpdate => !prevUpdate);
         } catch (error) {
             console.error('Error:', error);
@@ -283,7 +307,8 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
             Notiflix.Loading.remove();
         }
     };
-    const handleSubmiMetaBeneficiario = async (newData, closeModalEdit) => {
+
+    const handleSubmiMetaBeneficiario = async (newData, closeModalAndReset) => {
         try {
             Notiflix.Loading.pulse('Cargando...');
             const token = localStorage.getItem('token');
@@ -303,7 +328,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
             }
 
             Notiflix.Notify.success(data.message);
-            closeModalEdit();
+            closeModalAndReset();
             setUpdate(prevUpdate => !prevUpdate);
         } catch (error) {
             console.error('Error:', error);
@@ -344,7 +369,6 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                 return;
             }
     
-            console.log(data);
             reset(data);
             setInitialData(data)
             
@@ -414,8 +438,8 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                 setFirstEdit(true);
             }
             setVerificarPais({ ubiCod: data[0].ubiCod, ubiAno: data[0].ubiAno });
+            setNombrePais(data[0].ubiNom);
             initPhoneInput(phoneInputRef, setIsValid, setPhoneNumber, setErrorMessage,'',data[0].ubiNom, setIsTouched);
-            initPhoneInput(phoneContactInputRef, setContactIsValid, setPhoneContactNumber, setErrorContactMessage,'',data[0].ubiNom, setContactIsTouched);
         } catch (error) {
             console.error('Error:', error);
         } finally {
@@ -423,7 +447,6 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
         }
     }
     
-
     const handleCountryChange = async (ubicacion, index) => {
         const selectedCountry = JSON.parse(ubicacion);
         if (ubicacion == '0') {
@@ -473,13 +496,13 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
     };
 
     // Observar Cambios de campos registrados
-    const selectedValue = watch('genCod', '0');
-    const selectedValue2 = watch('nacCod', '0');
     const benSex = watch('benSex');
     const benAut = watch('benAut');
-    const metBenAnoEjeTec = watch('metBenAnoEjeTec');
 
-    const currentYear = new Date().getFullYear();
+    const closeModalAndReset = () => {
+        closeModalEdit();
+        setEsMenorDeEdad(false)
+    }
 
     return (
         <Modal
@@ -509,11 +532,11 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                 }
             }}
         >  
-            <span className="PowerMas_CloseModal" style={{position: 'absolute',right: 20, top: 10}} onClick={closeModalEdit}>×</span>
+            <span className="PowerMas_CloseModal" style={{position: 'absolute',right: 20, top: 10}} onClick={closeModalAndReset}>×</span>
             <h2 className='PowerMas_Title_Modal f1_5 center'>Editar Meta Beneficiario</h2>
             <div className='flex flex-column gap-1 overflow-auto flex-grow-1'>
                 <div className="PowerMas_Content_Form_Beneficiarie_Card Large-p_75 Large_12">
-                    <h2 className="f1_25">Datos de Ubicación</h2>
+                    <h2 className="f1_25">Datos de Ubicación Ejecutada</h2>
                     <div className="m_75">
                         <label htmlFor="pais" className="">
                             Pais:
@@ -667,9 +690,12 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                     </div>
 
 
+                </div>
+                <div className="PowerMas_Content_Form_Beneficiarie_Card Large-p_75">
+                    <h2 style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="f1_25 Large_12"> Datos del Beneficiario Ejecutado</h2>
                     <div className="m_75">
                         <label htmlFor="si" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
-                            Autoriza el uso de datos:
+                            Autoriza el uso de datos <span className="bold" style={{color: '#E5554F'}}>*</span>
                         </label>
                         <div className="flex  jc-space-between">
                             <div className="flex gap-1 ">
@@ -698,7 +724,6 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                                     <label style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} htmlFor="no">No</label>
                                 </div>
                             </div>
-                            
                         </div>
                         {errors.benAut ? (
                             <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.benAut.message}</p>
@@ -710,17 +735,27 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                     </div>
                     <div className="m_75">
                         <label htmlFor="benNom" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
-                            Nombre
+                            Nombre <span className="bold" style={{color: '#E5554F'}}>*</span>
                         </label>
                         <input type="text"
                             id="benNom"
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benNom || isSubmitted ? (errors.benNom ? 'invalid' : 'valid') : ''}`} 
-                            placeholder="Enzo Fabricio"
+                            placeholder="Ejm: Enzo Fabricio"
                             autoComplete='off'
                             disabled={fieldsDisabled}
+                            onInput={(event) => {
+                                // Permite solo letras (incluyendo letras con acentos y la ñ), espacios, guiones y guiones bajos
+                                const pattern = /^[A-Za-zñÑáéíóúÁÉÍÓÚüÜ\s-]+$/;
+                                event.target.value = event.target.value.split('').filter(char => pattern.test(char)).join('');
+                            }}
                             {...register('benNom', { 
-                                required: 'El nombre es requerido',
-                                minLength: { value: 3, message: 'El nombre debe tener minimo 3 digitos' },
+                                required: 'Ingrese el nombre del beneficiario',
+                                pattern: {
+                                    value: /^[A-Za-zñÑáéíóúÁÉÍÓÚüÜ\s-]+$/,
+                                    message: 'Por favor, introduce solo letras y espacios',
+                                },
+                                minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
+                                maxLength: { value: 50, message: 'El campo debe tener máximo 50 digitos' },
                             })} 
                         />
                         {errors.benNom ? (
@@ -733,18 +768,28 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                     </div>
                     <div className="m_75">
                         <label htmlFor="benApe" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
-                            Apellido
+                            Apellido <span className="bold" style={{color: '#E5554F'}}>*</span>
                         </label>
                         <input 
                             type="text" 
                             id="benApe"
                             autoComplete='off'
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benApe || isSubmitted ? (errors.benApe ? 'invalid' : 'valid') : ''}`} 
-                            placeholder="Gago Aguirre"
+                            placeholder="Ejm: Gago Aguirre"
                             disabled={fieldsDisabled}
+                            onInput={(event) => {
+                                // Permite solo letras (incluyendo letras con acentos y la ñ), espacios, guiones y guiones bajos
+                                const pattern = /^[A-Za-zñÑáéíóúÁÉÍÓÚüÜ\s-]+$/;
+                                event.target.value = event.target.value.split('').filter(char => pattern.test(char)).join('');
+                            }}
                             {...register('benApe', { 
-                                required: 'El apellido es requerido',
-                                    minLength: { value: 3, message: 'El apellido debe tener minimo 3 digitos' },
+                                required: 'Ingrese el apellido del beneficiario',
+                                pattern: {
+                                    value: /^[A-Za-zñÑáéíóúÁÉÍÓÚüÜ\s-]+$/,
+                                    message: 'Por favor, introduce solo letras y espacios',
+                                },
+                                minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
+                                maxLength: { value: 50, message: 'El campo debe tener máximo 50 digitos' },
                             })} 
                         />
                         {errors.benApe ? (
@@ -755,10 +800,9 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                             </p>
                         )}
                     </div>
-                    
                     <div className="m_75">
                         <label htmlFor="masculino" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
-                            Sexo:
+                            Sexo <span className="bold" style={{color: '#E5554F'}}>*</span>
                         </label>
                         <div className="flex gap-1">
                             <div className="flex gap_5">
@@ -768,7 +812,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                                     name="benSex" 
                                     disabled={fieldsDisabled && benSex !== 'M'}
                                     value="M" 
-                                    {...register('benSex', { required: 'Por favor, selecciona una opción' })}
+                                    {...register('benSex', { required: 'Selecciona el sexo del beneficiario' })}
                                 />
                                 <label htmlFor="masculino" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} >Masculino</label>
                             </div>
@@ -779,7 +823,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                                     name="benSex" 
                                     disabled={fieldsDisabled && benSex !== 'F'}
                                     value="F" 
-                                    {...register('benSex', { required: 'Por favor, selecciona una opción' })}
+                                    {...register('benSex', { required: 'Selecciona el sexo del beneficiario' })}
                                 />
                                 <label style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} htmlFor="femenino">Femenino</label>
                             </div>
@@ -792,19 +836,20 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                             </p>
                         )}
                     </div>
-                    
                     <div className="m_75">
                         <label htmlFor="genCod" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
-                            Género:
+                            Género <span className="bold" style={{color: '#E5554F'}}>*</span>
                         </label>
                         <select 
                             id="genCod" 
                             disabled={fieldsDisabled}
-                            style={{ color: selectedValue == '0' ? '#372e2c60' : '#000000'}}
+                            style={{ color: fieldsDisabled ? '#372e2c60' : '#000000', textTransform: "capitalize"}}
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.genCod || isSubmitted ? (errors.genCod ? 'invalid' : 'valid') : ''}`}
                             name="genCod"
                             {...register('genCod', { 
-                                validate: value => value !== '0' || 'El campo es requerido' 
+                                validate: {
+                                    required: value => value != '0' || 'Seleccione el género del benficiario',
+                                }
                             })}
                         >
                             <option value="0">--Seleccione Género--</option>
@@ -812,8 +857,9 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                                 <option 
                                     key={genero.genCod} 
                                     value={genero.genCod}
+                                    style={{textTransform: "capitalize"}}
                                 > 
-                                    {genero.genNom}
+                                    {genero.genNom.toLowerCase()}
                                 </option>
                             ))}
                         </select>
@@ -821,13 +867,13 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                             <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.genCod.message}</p>
                         ) : (
                             <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                            Espacio reservado para el mensaje de error
+                                Espacio reservado para el mensaje de error
                             </p>
                         )}
                     </div>
                     <div className="m_75">
-                        <label style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}}htmlFor="benFecNac" className="">
-                            Fecha de nacimiento:
+                        <label style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} htmlFor="benFecNac" className="">
+                            Fecha de nacimiento <span className="bold" style={{color: '#E5554F'}}>*</span>
                         </label>
                         <input 
                             type="text" 
@@ -842,32 +888,51 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                                 event.target.value = event.target.value.replace(/[^0-9]/g, '');
                             }}
                             {...register('benFecNac', { 
-                                required: 'La Fecha de nacimiento es requerido',
+                                required: 'Ingrese la fecha de nacimiento del benficiario',
                                 pattern: {
-                                    value: /^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[012])-\d{4}$/,
-                                    message: 'La fecha debe estar en el formato DD-MM-YYYY',
+                                  value: /^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[012])-\d{4}$/,
+                                  message: 'La fecha debe estar en el formato DD-MM-YYYY',
                                 },
-                            })} 
+                                validate: {
+                                    currentDate: value => {
+                                        const dateParts = value.split("-");
+                                        const inputDate = new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]);
+                                        const currentDate = new Date();
+                                        currentDate.setHours(0, 0, 0, 0);  // Establece la hora a 00:00:00
+                                        return inputDate <= currentDate || 'La fecha no puede ser mayor que la fecha actual';
+                                    },
+                                    notZeroYear: value => {
+                                        const year = value.split("-")[2];
+                                        return year !== "0000" || 'El año no puede ser 0000';
+                                    },
+                                    minDate: value => {
+                                        const [day, month, year] = value.split("-");
+                                        const inputDate = new Date(+year, month - 1, +day);
+                                        const minDate = new Date(1900, 0, 1); // 01-01-1900
+                                        return inputDate >= minDate || 'La fecha debe ser posterior al 01-01-1900';
+                                    }
+                                }
+                            })}
                         />
                         {errors.benFecNac ? (
                             <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.benFecNac.message}</p>
                         ) : (
                             <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                            Espacio reservado para el mensaje de error
+                                Espacio reservado para el mensaje de error
                             </p>
                         )}
                     </div>
                     <div className="m_75">
                         <label htmlFor="nacCod" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
-                            Nacionalidad:
+                            Nacionalidad <span className="bold" style={{color: '#E5554F'}}>*</span>
                         </label>
                         <select 
                             id="nacCod" 
                             disabled={fieldsDisabled}
-                            style={{ color: selectedValue == '0' ? '#372e2c60' : '#000000'}}
+                            style={{ color: fieldsDisabled ? '#372e2c60' : '#000000', textTransform: 'capitalize'}}
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.nacCod || isSubmitted ? (errors.nacCod ? 'invalid' : 'valid') : ''}`} 
                             {...register('nacCod', { 
-                                validate: value => value !== '0' || 'El campo es requerido' 
+                                validate: value => value !== '0' || 'Seleccione la nacionalidad del beneficiario' 
                             })}
                         >
                             <option value="0">--Seleccione Nacionalidad--</option>
@@ -875,8 +940,9 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                                 <option 
                                     key={nacionalidad.nacCod} 
                                     value={nacionalidad.nacCod}
+                                    style={{textTransform: 'capitalize'}}
                                 > 
-                                    {nacionalidad.nacNom}
+                                    {nacionalidad.nacNom.toLowerCase()}
                                 </option>
                             ))}
                         </select>
@@ -884,11 +950,10 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                             <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.nacCod.message}</p>
                         ) : (
                             <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                            Espacio reservado para el mensaje de error
+                                Espacio reservado para el mensaje de error
                             </p>
                         )}
                     </div>
-                    
                     <div className="m_75">
                         <label htmlFor="benCorEle" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
                             Email
@@ -897,7 +962,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                             type="text" 
                             id="benCorEle"
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benCorEle || isSubmitted ? (errors.benCorEle ? 'invalid' : 'valid') : ''}`} 
-                            placeholder="correo@correo.com"
+                            placeholder="Ejm: correo@correo.com"
                             disabled={fieldsDisabled}
                             autoComplete='off'
                             {...register('benCorEle', { 
@@ -911,7 +976,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                             <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.benCorEle.message}</p>
                         ) : (
                             <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                            Espacio reservado para el mensaje de error
+                                Espacio reservado para el mensaje de error
                             </p>
                         )}
                     </div>
@@ -940,31 +1005,6 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                             </p>
                         )}
                     </div>
-                    <div className='m_75'>
-                        <label htmlFor="phone" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="block">
-                            Telefono Contacto:
-                        </label>
-                        <div>
-                            <input
-                                ref={phoneContactInputRef}
-                                type="tel"
-                                disabled={fieldsDisabled}
-                                className={`Phone_12 PowerMas_Modal_Form_${contactIsTouched ? (!contactIsValid ? 'invalid' : 'valid') : ''}`}
-                                style={{
-                                    paddingRight: '6px',
-                                    padding: '4px 6px 4px 52px',
-                                    margin: 0,
-                                }}
-                            />
-                        </div>
-                        {!contactIsValid ? (
-                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errorContactMessage}</p>
-                        ) : (
-                            <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                            Espacio reservado para el mensaje de error
-                            </p>
-                        )}
-                    </div>
                     <div className="m_75">
                         <label htmlFor="benDir" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
                             Dirección
@@ -974,7 +1014,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                             id="benDir"
                             autoComplete='off'
                             className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benDir || isSubmitted ? (errors.benDir ? 'invalid' : 'valid') : ''}`} 
-                            placeholder="Dirección del beneficiario"
+                            placeholder="Ejm: Av. Atahualpa OE1-109, Quito, Ecuador"
                             disabled={fieldsDisabled}
                             {...register('benDir', { 
                                     minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
@@ -984,7 +1024,7 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                             <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.benDir.message}</p>
                         ) : (
                             <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
-                            Espacio reservado para el mensaje de error
+                                Espacio reservado para el mensaje de error
                             </p>
                         )}
                     </div>
@@ -1004,12 +1044,22 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                                     type="text"
                                     style={{textTransform: 'capitalize'}}
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benNomApo || isSubmitted ? (errors.benNomApo ? 'invalid' : 'valid') : ''}`} 
-                                    placeholder="Enzo Fabricio"
+                                    placeholder="Ejm: José Carlos"
                                     autoComplete='off'
                                     disabled={fieldsDisabled}
+                                    onInput={(event) => {
+                                        // Permite solo letras (incluyendo letras con acentos y la ñ), espacios, guiones y guiones bajos
+                                        const pattern = /^[A-Za-zñÑáéíóúÁÉÍÓÚüÜ\s-]+$/;
+                                        event.target.value = event.target.value.split('').filter(char => pattern.test(char)).join('');
+                                    }}
                                     {...register('benNomApo', { 
-                                        required: 'El nombre del apoderado es requerido',
-                                        minLength: { value: 3, message: 'El nombre debe tener minimo 3 digitos' },
+                                        required: 'Ingrese el nombre del apoderado del beneficiario',
+                                        pattern: {
+                                            value: /^[A-Za-zñÑáéíóúÁÉÍÓÚüÜ\s-]+$/,
+                                            message: 'Por favor, introduce solo letras y espacios',
+                                        },
+                                        minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
+                                        maxLength: { value: 50, message: 'El campo debe tener máximo 50 digitos' },
                                     })} 
                                 />
                                 {errors.benNomApo ? (
@@ -1029,16 +1079,51 @@ const ModalEditBeneficiarie = ({modalVisible, closeModalEdit, record, setUpdate,
                                     type="text"
                                     style={{textTransform: 'capitalize'}}
                                     className={`block Phone_12 PowerMas_Modal_Form_${dirtyFields.benApeApo || isSubmitted ? (errors.benApeApo ? 'invalid' : 'valid') : ''}`} 
-                                    placeholder="Gago Aguirre"
+                                    placeholder="Ejm: Gonzales Pinedo"
                                     autoComplete='off'
                                     disabled={fieldsDisabled}
+                                    onInput={(event) => {
+                                        // Permite solo letras (incluyendo letras con acentos y la ñ), espacios, guiones y guiones bajos
+                                        const pattern = /^[A-Za-zñÑáéíóúÁÉÍÓÚüÜ\s-]+$/;
+                                        event.target.value = event.target.value.split('').filter(char => pattern.test(char)).join('');
+                                    }}
                                     {...register('benApeApo', { 
-                                        required: 'El nombre del apoderado es requerido',
-                                        minLength: { value: 3, message: 'El nombre debe tener minimo 3 digitos' },
+                                        required: 'Ingrese el apellido del apoderado del beneficiario',
+                                        pattern: {
+                                            value: /^[A-Za-zñÑáéíóúÁÉÍÓÚüÜ\s-]+$/,
+                                            message: 'Por favor, introduce solo letras y espacios',
+                                        },
+                                        minLength: { value: 3, message: 'El campo debe tener minimo 3 digitos' },
+                                        maxLength: { value: 50, message: 'El campo debe tener máximo 50 digitos' },
                                     })} 
                                 />
                                 {errors.benApeApo ? (
                                     <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors.benApeApo.message}</p>
+                                ) : (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
+                                    Espacio reservado para el mensaje de error
+                                    </p>
+                                )}
+                            </div>
+                            <div className='m_75'>
+                                <label htmlFor="phone" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="block">
+                                    Telefono Contacto:
+                                </label>
+                                <div>
+                                    <input
+                                        ref={phoneContactInputRef}
+                                        type="tel"
+                                        disabled={fieldsDisabled}
+                                        className={`Phone_12 PowerMas_Modal_Form_${contactIsTouched ? (!contactIsValid ? 'invalid' : 'valid') : ''}`}
+                                        style={{
+                                            paddingRight: '6px',
+                                            padding: '4px 6px 4px 52px',
+                                            margin: 0,
+                                        }}
+                                    />
+                                </div>
+                                {!contactIsValid ? (
+                                    <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errorContactMessage}</p>
                                 ) : (
                                     <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid" style={{ visibility: "hidden" }}>
                                     Espacio reservado para el mensaje de error

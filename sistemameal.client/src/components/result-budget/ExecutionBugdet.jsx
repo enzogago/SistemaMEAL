@@ -146,7 +146,7 @@ const ExecutionBudget = () => {
                 let counter = rowIdCounter;
                 metaData.forEach(meta => {
                     // Usa meta.impCod, la ubicación y el indicador para crear una clave única para cada fila
-                    const rowKey = `${meta.finCod}_${meta.impCod}_${JSON.stringify({ ubiAno: meta.ubiAno, ubiCod: meta.ubiCod })}_${meta.indAno}_${meta.indCod}`;
+                    const rowKey = `${JSON.stringify({ usuAno: meta.usuAno, usuCod: meta.usuCod })}_${meta.finCod}_${meta.impCod}_${JSON.stringify({ ubiAno: meta.ubiAno, ubiCod: meta.ubiCod })}_${meta.indAno}_${meta.indCod}`;
 
                     if (!rows[rowKey]) {
                         counter++;
@@ -623,7 +623,6 @@ const ExecutionBudget = () => {
                                                     className={`PowerMas_Input_Cadena f_75 PowerMas_Modal_Form_${dirtyFields[`financiador_${row.id}`] || isSubmitted ? (errors[`financiador_${row.id}`] ? 'invalid' : 'valid') : ''}`} 
                                                     {...register(`financiador_${row.id}`, {
                                                         validate: {
-                                                            notZero: value => value !== '00' || 'El campo es requerido'
                                                         }
                                                     })}
                                                 >
@@ -671,7 +670,7 @@ const ExecutionBudget = () => {
                                                         maxLength={10}
                                                         onInput={(e) => {
                                                             const value = e.target.value;
-                                                            if (value === '' || (/^\d*\.?\d*$/.test(value))) {
+                                                            if (value === '' || (/^\d*\.?\d{0,2}$/.test(value))) {
                                                                 e.target.value = value;
                                                             } else {
                                                                 e.target.value = value.slice(0, -1);

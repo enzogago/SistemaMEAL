@@ -18,7 +18,7 @@ import Excel_Icon from '../../img/PowerMas_Excel_Icon.svg';
 import TableEmpty from '../../img/PowerMas_TableEmpty.svg';
 // Hooks personalizados para acciones específicas del componente.
 import useEntityActions from '../../hooks/useEntityActions';
-import { formatter } from '../monitoring/goal/helper';
+import { formatter, formatterBudget } from '../monitoring/goal/helper';
 
 const ResultChain = () => {
     const [currency, setCurrency] = useState('');
@@ -98,8 +98,9 @@ const ResultChain = () => {
     
             // Si se ha enfocado un nuevo input, haz scroll hasta él
             if (newIndex !== undefined) {
-                inputs[newIndex].focus();
-                inputs[newIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                const newInput = inputs[newIndex];
+                newInput.focus();
+                newInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         };
     
@@ -686,7 +687,7 @@ const ResultChain = () => {
                                                 disabled={!actions.add}
                                                 onInput={(e) => {
                                                     const value = e.target.value;
-                                                    if (value === '' || (/^\d*\.?\d*$/.test(value))) {
+                                                    if (value === '' || (/^\d*\.?\d{0,2}$/.test(value))) {
                                                         e.target.value = value;
                                                     } else {
                                                         e.target.value = value.slice(0, -1);
@@ -753,7 +754,7 @@ const ResultChain = () => {
                                             if (header.key === 'totalPorImplementador') {
                                                 return (
                                                     <td className={`center PowerMas_Borde_Total ${`${item.indAno}_${item.indCod}` === unmatchedTotal.key && header.key.startsWith(unmatchedTotal.section) ? 'unmatched' : ''}`} style={{color: '#F87C56'}} key={i}>
-                                                        {calculateTotal(item.indAno, item.indCod, 'porImplementador', totalsPorImplementador) + ' ' + currency} 
+                                                        {formatterBudget.format(calculateTotal(item.indAno, item.indCod, 'porImplementador', totalsPorImplementador)) + ' ' + currency} 
                                                         <Tooltip
                                                             title="Los totales no coinciden."
                                                             open={`${item.indAno}_${item.indCod}` === unmatchedTotal.key && header.key.startsWith(unmatchedTotal.section)}
@@ -766,7 +767,7 @@ const ResultChain = () => {
                                             } else if (header.key === 'totalPorFinanciador') {
                                                 return (
                                                     <td className={`center PowerMas_Borde_Total ${`${item.indAno}_${item.indCod}` === unmatchedTotal.key && header.key.startsWith(unmatchedTotal.section) ? 'unmatched' : ''}`} style={{color: '#F87C56'}} key={i}>
-                                                        {calculateTotal(item.indAno, item.indCod, 'porFinanciador', totalsPorFinanciador) + ' ' + currency}
+                                                        {formatterBudget.format(calculateTotal(item.indAno, item.indCod, 'porFinanciador', totalsPorFinanciador)) + ' ' + currency}
                                                         <Tooltip
                                                             title="Los totales no coinciden."
                                                             open={`${item.indAno}_${item.indCod}` === unmatchedTotal.key && header.key.startsWith(unmatchedTotal.section)}
@@ -779,7 +780,7 @@ const ResultChain = () => {
                                             } else if (header.key === 'totalPorUbicacion') {
                                                 return (
                                                     <td className={`center PowerMas_Borde_Total ${`${item.indAno}_${item.indCod}` === unmatchedTotal.key && header.key.startsWith(unmatchedTotal.section) ? 'unmatched' : ''}`} style={{color: '#F87C56'}} key={i}>
-                                                        {calculateTotal(item.indAno, item.indCod, 'porUbicacion', totalsPorUbicacion) + ' ' + currency}
+                                                        {formatterBudget.format(calculateTotal(item.indAno, item.indCod, 'porUbicacion', totalsPorUbicacion)) + ' ' + currency}
                                                         <Tooltip
                                                             title="Los totales no coinciden."
                                                             open={`${item.indAno}_${item.indCod}` === unmatchedTotal.key && header.key.startsWith(unmatchedTotal.section)}
@@ -803,7 +804,7 @@ const ResultChain = () => {
                                                         disabled={!actions.add}
                                                         onInput={(e) => {
                                                             const value = e.target.value;
-                                                            if (value === '' || (/^\d*\.?\d*$/.test(value))) {
+                                                            if (value === '' || (/^\d*\.?\d{0,2}$/.test(value))) {
                                                                 e.target.value = value;
                                                             } else {
                                                                 e.target.value = value.slice(0, -1);

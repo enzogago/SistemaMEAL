@@ -1,6 +1,6 @@
 import React, { useEffect, useState, Fragment, useMemo } from 'react'
-import { Export_Excel_Helper, Export_PDF_Helper, fetchDataBlock } from '../../components/reusable/helper'
-import { formatter, formatterBudget } from '../../components/monitoring/goal/helper'
+import { Export_Excel_Helper, Export_PDF_Helper, fetchDataBlock } from '../reusable/helper'
+import { formatter, formatterBudget } from './goal/helper'
 import CryptoJS from 'crypto-js';
 import { useNavigate } from 'react-router-dom';
 import TableEmpty from '../../img/PowerMas_TableEmpty.svg';
@@ -57,8 +57,6 @@ const getIndicatorStatus = (metas) => {
     }
     return { statusName, statusColor, statusCode };
 };
-
-
 
 const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
     const navigate = useNavigate();
@@ -118,6 +116,7 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
         const tagsParam = searchTags.length > 0 ? searchTags.join(',') : null;
         const periodoInicioParam = periodoInicio ? periodoInicio : null;
         const periodoFinParam = periodoFin ? periodoFin : null;
+
         const url = `Monitoreo/Filter/${tagsParam}/${periodoInicioParam}/${periodoFinParam}`;
         fetchDataBlock(url, (data) => {
             setMetas(data);
@@ -400,10 +399,6 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                     <table className='PowerMas_Table_Monitoring Phone_12'>
                         <thead>
                             <tr className='center'>
-                                <span 
-                                    className='flex'
-                                    style={{minWidth: '1.25rem'}}
-                                ></span>
                                 <th>Estado</th>
                                 <th></th>
                                 <th>FFVV</th>

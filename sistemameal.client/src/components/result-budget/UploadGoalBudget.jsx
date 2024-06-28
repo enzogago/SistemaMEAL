@@ -96,7 +96,7 @@ const UploadGoalBudget = () => {
                 
                 <div className="Large_8">
                 <div className="flex jc-center p_5">
-                <button className="PowerMas_Buttom_Secondary flex ai-center jc-space-between p_5 Phone_3" onClick={handleDownload}> 
+                <button className="PowerMas_Buttom_Secondary flex ai-center jc-space-between p_5 gap-1" onClick={handleDownload}> 
                     Descargar formato 
                     <span className="flex Large-f1_5">
                         <Download /> 
@@ -104,8 +104,8 @@ const UploadGoalBudget = () => {
                 </button>
                 </div>
                     <article className="PowerMas_Article_Upload center">
-                        <p style={{color: '#878280'}}>Solo se puede subir documentos en formato Excel</p>
-                        <h3>Subir Gasto Presupuestal</h3>
+                        <p style={{color: '#878280'}}>Solo se puede subir la macro de gastos mensuales</p>
+                        <h3>Subir Gastos Mensuales</h3>
                     </article>
                     <br />
                     <div

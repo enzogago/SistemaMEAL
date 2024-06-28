@@ -19,20 +19,22 @@ import Delete from "../../../icons/Delete";
 import Info from "../../../icons/Info";
 
 const validationRules = {
-    '01': { maxLength: 8, pattern: /^[0-9]{8}$/, errorMessage: 'Debe tener 8 dígitos numéricos.' },
-    '02': { maxLength: 12, pattern: /^[A-Z0-9]{12}$/, errorMessage: 'Debe tener 12 caracteres alfanuméricos.' },
-    // ... otros tipos de documentos
+    '01': { maxLength: 8, minLength: 8, pattern: /^[0-9]{8}$/, errorMessage: 'El número de documento debe ser de 8 dígitos numéricos.' }, // DNI PERUANO
+    '02': { maxLength: 10, minLength: 10, pattern: /^[0-9]{10}$/, errorMessage: 'El número de documento debe ser de 10 dígitos numéricos.' }, // CÉDULA ECUATORIANA
+    '03': { maxLength: 10, minLength: 8, pattern: /^[0-9]{8,10}$/, errorMessage: 'El número de documento debe tener entre 8 a 10 dígitos numéricos.' }, // CÉDULA COLOMBIANA
+    '04': { maxLength: 9, minLength: 6, pattern: /^[VE][0-9]{5,8}$/i, errorMessage: 'El número de documento debe tener entre 6 a 9 dígitos numericos y empezar con V o E.' }, // CÉDULA VENEZOLANA
+    '05': { maxLength: 14, minLength: 6, pattern: /^[A-Z0-9]{6,14}$/i, errorMessage: 'El número de documento debe tener entre 6 a 14 dígitos alfanuméricos.' }, // PASAPORTE
 };
 
 const updateValidationRules = (selectedDocType) => {
     const rules = validationRules[selectedDocType] || {};
     return {
-      maxLength: rules.maxLength,
-      pattern: {
-        value: rules.pattern,
-        message: rules.errorMessage,
-      },
-      // ... otras reglas de validación que puedan ser necesarias
+        maxLength: rules.maxLength,
+        minLength: rules.minLength,
+        pattern: {
+            value: rules.pattern,
+            message: rules.errorMessage,
+        },
     };
   };
 
@@ -72,6 +74,7 @@ const FormGoalBeneficiarie = () => {
     const [ dataBeneficiariesName, setDataBeneficiariesName ] = useState([]);
     
     const [ verificarPais, setVerificarPais ] = useState(null);
+    const [ nombrePais, setNombrePais ] = useState('');
     
     const [ dataGoals, setDataGoals ] = useState([])
 
@@ -477,7 +480,7 @@ const FormGoalBeneficiarie = () => {
 
                     if (edad < 18) {    
                         await setEsMenorDeEdad(true);
-                        initPhoneInput(phoneContactInputRef, setContactIsValid, setPhoneContactNumber, setErrorContactMessage,'','', setContactIsTouched);
+                        initPhoneInput(phoneContactInputRef, setContactIsValid, setPhoneContactNumber, setErrorContactMessage,'',nombrePais, setContactIsTouched);
                     }
                 } else{
                     setEsMenorDeEdad(false);
@@ -590,8 +593,8 @@ const FormGoalBeneficiarie = () => {
                 setFirstEdit(true);
             }
             setVerificarPais({ ubiCod: data[0].ubiCod, ubiAno: data[0].ubiAno });
+            setNombrePais(data[0].ubiNom);
             initPhoneInput(phoneInputRef, setIsValid, setPhoneNumber, setErrorMessage,'',data[0].ubiNom, setIsTouched);
-            
         } catch (error) {
             console.error('Error:', error);
         } finally {
@@ -721,6 +724,7 @@ const FormGoalBeneficiarie = () => {
         setDocumentosAgregados([]);
         setFieldsDisabled(true);
         setMostrarAgregarDocumento(false);
+        setEsMenorDeEdad(false);
         setAccionActual('buscar');
         setValue('metBenMesEjeTec', metaData.metMesPlaTec)
         setValue('metBenAnoEjeTec', metaData.metAnoPlaTec)
@@ -736,8 +740,6 @@ const FormGoalBeneficiarie = () => {
     };
 
     // Observar Cambios de campos registrados
-    const selectedValue = watch('genCod', '01');
-    const selectedValue2 = watch('nacCod', '0');
     const benSex = watch('benSex');
     const benAut = watch('benAut');
     const metBenAnoEjeTec = watch('metBenAnoEjeTec');
@@ -748,8 +750,6 @@ const FormGoalBeneficiarie = () => {
         nuevosDocumentos.splice(index, 1);
         setDocumentosAgregados(nuevosDocumentos);
     }
-
-    const currentYear = new Date().getFullYear();
 
     return (
         <>
@@ -763,7 +763,7 @@ const FormGoalBeneficiarie = () => {
             <div className="PowerMas_Content_Form_Beneficiarie overflow-auto flex-grow-1 flex">
                     <div className="Large_6 m1 overflow-auto flex flex-column gap-1">
                         <div className="PowerMas_Content_Form_Beneficiarie_Card Large-p_75">
-                            <h2 className="f1_25">Datos de Ubicación</h2>
+                            <h2 className="f1_25">Datos de Ubicación Ejecutada</h2>
                             <div className="m_75">
                                 <label htmlFor="pais" className="">
                                     País:
@@ -995,22 +995,20 @@ const FormGoalBeneficiarie = () => {
                                                 autoComplete='off'
                                                 maxLength={docNumValidationRules.maxLength}
                                                 disabled={mostrarAgregarDocumento}
-                                                onInput={(event) => {
-                                                    // Reemplaza cualquier carácter que no sea un número por una cadena vacía
-                                                    event.target.value = event.target.value.replace(/[^0-9]/g, '');
-                                                }}
                                                 {...register2('docIdeBenNum', { 
                                                     required: 'Ingrese el número de documento del beneficiario',
-                                                    minLength: {
-                                                        value: 6,
-                                                        message: 'El número de documento debe tener al menos 6 dígitos'
-                                                    },
-                                                    maxLength: {
+                                                    pattern: docNumValidationRules.pattern,
+                                                    ...(docNumValidationRules.minLength !== docNumValidationRules.maxLength && {
+                                                      minLength: {
+                                                        value: docNumValidationRules.minLength,
+                                                        message: `El número de documento debe tener como mínimo ${docNumValidationRules.minLength} dígitos`
+                                                      },
+                                                      maxLength: {
                                                         value: docNumValidationRules.maxLength,
-                                                        message: `El número de documento no debe tener más de ${docNumValidationRules.maxLength} dígitos`
-                                                    },
-                                                    pattern: docNumValidationRules.pattern
-                                                })}
+                                                        message: `El número de documento debe tener como máximo ${docNumValidationRules.maxLength} dígitos`
+                                                      }
+                                                    })
+                                                  })}
                                             />
                                             {errors2.docIdeBenNum ? (
                                                 <p className="Large-f_75 Medium-f1 f_75 PowerMas_Message_Invalid">{errors2.docIdeBenNum.message}</p>
@@ -1190,7 +1188,6 @@ const FormGoalBeneficiarie = () => {
                                     </p>
                                 )}
                             </div>
-                            
                             <div className="m_75">
                                 <label htmlFor="masculino" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
                                     Sexo <span className="bold" style={{color: '#E5554F'}}>*</span>
@@ -1227,7 +1224,6 @@ const FormGoalBeneficiarie = () => {
                                     </p>
                                 )}
                             </div>
-                           
                             <div className="m_75">
                                 <label htmlFor="genCod" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
                                     Género <span className="bold" style={{color: '#E5554F'}}>*</span>
@@ -1346,7 +1342,6 @@ const FormGoalBeneficiarie = () => {
                                     </p>
                                 )}
                             </div>
-                           
                             <div className="m_75">
                                 <label htmlFor="benCorEle" style={{color: `${fieldsDisabled ? '#372e2c60': '#000'}`}} className="">
                                     Email
