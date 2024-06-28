@@ -5,6 +5,20 @@ import femenino from '../../../img/PowerMas_Avatar_Femenino.svg';
 import TriangleIcon from '../../../icons/TriangleIcon';
 import { getMonthYearText, tipoIndicadorMapping } from '../../reusable/columns';
 
+function calcularEdad(fechaNacimiento) {
+    const fechaNacArr = fechaNacimiento.split('-');
+    const fechaNac = new Date(parseInt(fechaNacArr[2]), parseInt(fechaNacArr[1]) - 1, parseInt(fechaNacArr[0]));
+    const fechaActual = new Date();
+    let edad = fechaActual.getFullYear() - fechaNac.getFullYear();
+    const m = fechaActual.getMonth() - fechaNac.getMonth();
+  
+    if (m < 0 || (m === 0 && fechaActual.getDate() < fechaNac.getDate())) {
+      edad--;
+    }
+  
+    return edad;
+}
+
 
 const ModalGoalBeneficiarie = ({modalGoalBeneficiarie, closeModal, closeModalNames, dataGoalBeneficiarie, dataGoals, setValue}) => {
 
@@ -96,7 +110,7 @@ const ModalGoalBeneficiarie = ({modalGoalBeneficiarie, closeModal, closeModalNam
                             </article>
                             <article className="Phone_6 flex gap-1">
                                 <p className="bold">Edad Actual:</p>
-                                <p className="color-gray">{ dataGoalBeneficiarie.edad }</p>
+                                <p className="color-gray">{ calcularEdad(dataGoalBeneficiarie.benFecNac) }</p>
                             </article>
                         </div>
                         <div className='flex'>
