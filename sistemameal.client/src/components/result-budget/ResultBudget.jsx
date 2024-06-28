@@ -708,12 +708,16 @@ const ResultChain = () => {
                                                     // const newTotalsAll = totalIndTotPre - oldValue + newValue;
                                                     const newTotalPorImplementador = calculateTotal(item.indAno, item.indCod, 'porImplementador', totalsPorImplementador);
                                                     const newTotalPorFinanciador = calculateTotal(item.indAno, item.indCod, 'porFinanciador', totalsPorFinanciador);
+                                                    const newTotalPorAno = calculateTotal(item.indAno, item.indCod, 'porAno', totalsPorAnoAll);
                                                 
                                                     if (newValue !== newTotalPorImplementador) {
                                                         setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorImplementador, section: 'totalPorImplementador' });
                                                         setIsSubmitDisabled(true);
                                                     } else if (newValue !== newTotalPorFinanciador) {
                                                         setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorFinanciador, section: 'totalPorFinanciador' });
+                                                        setIsSubmitDisabled(true);
+                                                    } else if (newTotalPorAno <= 0) {
+                                                        setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorAno, section: 'totalPorAno' });
                                                         setIsSubmitDisabled(true);
                                                     } else {
                                                         setUnmatchedTotal({ key: '', value: 0, section: '' });
@@ -849,7 +853,7 @@ const ResultChain = () => {
                                                             const newTotalPorAno= calculateTotal(item.indAno, item.indCod, 'porAno', newTotalsPorAno);
 
                                                             // Comprueba si los totales de las cuatro secciones son iguales
-                                                            if (newTotalsAll === newTotalPorImplementador && newTotalsAll === newTotalPorFinanciador && newTotalPorAno <= newTotalsAll && newTotalPorAno > 0) {
+                                                            if (newTotalsAll === newTotalPorImplementador && newTotalsAll === newTotalPorFinanciador && newTotalPorAno <= newTotalsAll) {
                                                                 
                                                                 // Si los totales de la fila actual son iguales, comprueba si los totales de todas las filas son iguales
                                                                 const totalPorImplementadorAll = Object.values(newTotalsPorImplementador).reduce((a, b) => a + Number(b), 0);
