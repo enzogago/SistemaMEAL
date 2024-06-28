@@ -39,6 +39,7 @@ const ResultChain = () => {
     const [numeroColumnasImplementador, setNumeroColumnasImplementador] = useState(0); // Número de columnas para los totales por implementador.
     const [numeroColumnasUbicacion, setNumeroColumnasUbicacion] = useState(0); // Número de columnas para los totales por ubicación.
     // Estados para la validación de totales
+    const [unmatchedTotals, setUnmatchedTotals] = useState([]);
     const [unmatchedTotal, setUnmatchedTotal] = useState({ key: '', value: 0, section: '' }); // Controla los totales que no coinciden.
     const [indTotPreState, setIndTotPreState] = useState({}); // Estado previo de los totales de indicadores para comparaciones.
     // Acciones disponibles para el usuario según el contexto (por ejemplo, exportar a Excel)
@@ -489,6 +490,28 @@ const ResultChain = () => {
             return valores.reduce((a, b) => a + b, 0);
         }
     }
+
+    const updateUnmatchedTotals = (indAno, indCod, value, section, shouldAdd = false) => {
+        setUnmatchedTotals(currentUnmatchedTotals => {
+            // Filtrar cualquier total previo que coincida con el indicador actual
+            const filteredTotals = currentUnmatchedTotals.filter(unmatched => unmatched.indAno !== indAno || unmatched.indCod !== indCod);
+            
+            // Si el valor no es 0, agregar el nuevo total no coincidente a la lista filtrada
+            if (shouldAdd || value !== 0) {
+                const newUnmatchedTotal = { indAno, indCod, value, section };
+                return [...filteredTotals, newUnmatchedTotal];
+            }
+            
+            // Si el valor es 0, simplemente retornar la lista filtrada
+            return filteredTotals;
+        });
+    };
+
+    const isTotalUnmatched = (indAno, indCod, section) => {
+        return unmatchedTotals.some(unmatched => unmatched.indAno === indAno && unmatched.indCod === indCod && unmatched.section === section);
+    };
+    
+    
     
     return (
         <div className='p_75 flex flex-column flex-grow-1 overflow-auto gap_25'>
@@ -670,7 +693,7 @@ const ResultChain = () => {
                                                         {formatter.format(calculateTotal(item.indAno, item.indCod, 'porAno', totalsPorAnoAll, item.tipValCod))}
                                                         <Tooltip
                                                             title="Los totales no coinciden."
-                                                            open={`${item.indAno}_${item.indCod}` === unmatchedTotal.key && header.key.startsWith(unmatchedTotal.section)}
+                                                            open={isTotalUnmatched(item.indAno, item.indCod, 'totalPorAno')}
                                                             arrow={true}
                                                             position="bottom"
                                                             key={i}
@@ -683,7 +706,7 @@ const ResultChain = () => {
                                                         {formatter.format(calculateTotal(item.indAno, item.indCod, 'porImplementador', totalsPorImplementador, item.tipValCod))}
                                                         <Tooltip
                                                             title="Los totales no coinciden."
-                                                            open={`${item.indAno}_${item.indCod}` === unmatchedTotal.key && header.key.startsWith(unmatchedTotal.section)}
+                                                            open={isTotalUnmatched(item.indAno, item.indCod, 'totalPorImplementador')}
                                                             arrow={true}
                                                             position="bottom"
                                                             key={i}
@@ -696,7 +719,7 @@ const ResultChain = () => {
                                                         {formatter.format(calculateTotal(item.indAno, item.indCod, 'porUbicacion', totalsPorUbicacion, item.tipValCod))}
                                                         <Tooltip
                                                             title="Los totales no coinciden."
-                                                            open={`${item.indAno}_${item.indCod}` === unmatchedTotal.key && header.key.startsWith(unmatchedTotal.section)}
+                                                            open={isTotalUnmatched(item.indAno, item.indCod, 'totalPorUbicacion')}
                                                             arrow={true}
                                                             position="bottom"
                                                             key={i}
@@ -800,14 +823,18 @@ const ResultChain = () => {
                                                             }
 
                                                             if (newTotalPorAno === 0 && (newTotalPorImplementador > 0 || newTotalPorUbicacion > 0)) {
-                                                                setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorAno, section: 'totalPorAno' });
+                                                                updateUnmatchedTotals(item.indAno, item.indCod, newTotalPorAno, 'totalPorAno', true);
                                                             } else if (newTotalPorAno !== newTotalPorImplementador) {
-                                                                setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorImplementador, section: 'totalPorImplementador' });
+                                                                updateUnmatchedTotals(item.indAno, item.indCod, newTotalPorImplementador, 'totalPorImplementador', true);
                                                             } else if (newTotalPorAno !== newTotalPorUbicacion) {
-                                                                setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorUbicacion, section: 'totalPorUbicacion' });
+                                                                updateUnmatchedTotals(item.indAno, item.indCod, newTotalPorUbicacion, 'totalPorUbicacion', true);
                                                             } else {
-                                                                setUnmatchedTotal({ key: '', value: 0, section: '' });
+                                                                // Si no hay errores, asegúrate de eliminar cualquier error previo para este indicador
+                                                                updateUnmatchedTotals(item.indAno, item.indCod, 0, 'totalPorAno');
+                                                                updateUnmatchedTotals(item.indAno, item.indCod, 0, 'totalPorImplementador');
+                                                                updateUnmatchedTotals(item.indAno, item.indCod, 0, 'totalPorUbicacion');
                                                             }
+                                                            
                                                         }}
                                                         
                                                         maxLength={10}

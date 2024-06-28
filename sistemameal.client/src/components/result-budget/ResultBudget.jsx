@@ -708,16 +708,12 @@ const ResultChain = () => {
                                                     // const newTotalsAll = totalIndTotPre - oldValue + newValue;
                                                     const newTotalPorImplementador = calculateTotal(item.indAno, item.indCod, 'porImplementador', totalsPorImplementador);
                                                     const newTotalPorFinanciador = calculateTotal(item.indAno, item.indCod, 'porFinanciador', totalsPorFinanciador);
-                                                    const newTotalPorAno = calculateTotal(item.indAno, item.indCod, 'porAno', totalsPorAnoAll);
                                                 
                                                     if (newValue !== newTotalPorImplementador) {
                                                         setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorImplementador, section: 'totalPorImplementador' });
                                                         setIsSubmitDisabled(true);
                                                     } else if (newValue !== newTotalPorFinanciador) {
                                                         setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorFinanciador, section: 'totalPorFinanciador' });
-                                                        setIsSubmitDisabled(true);
-                                                    } else if (newTotalPorAno <= 0) {
-                                                        setUnmatchedTotal({ key: `${item.indAno}_${item.indCod}`, value: newTotalPorAno, section: 'totalPorAno' });
                                                         setIsSubmitDisabled(true);
                                                     } else {
                                                         setUnmatchedTotal({ key: '', value: 0, section: '' });
