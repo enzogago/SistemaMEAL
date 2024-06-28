@@ -102,8 +102,8 @@ namespace SistemaMEAL.Server.Modulos
                 cmd.Parameters.AddWithValue("@P_BENCOD", beneficiario.BenCod);
                 cmd.Parameters.AddWithValue("@P_BENNOM", beneficiario.BenNom);
                 cmd.Parameters.AddWithValue("@P_BENAPE", beneficiario.BenApe);
-                cmd.Parameters.AddWithValue("@P_BENNOMAPO", beneficiario.BenNom);
-                cmd.Parameters.AddWithValue("@P_BENAPEAPO", beneficiario.BenApe);
+                cmd.Parameters.AddWithValue("@P_BENNOMAPO", beneficiario.BenNomApo);
+                cmd.Parameters.AddWithValue("@P_BENAPEAPO", beneficiario.BenApeApo);
                 cmd.Parameters.AddWithValue("@P_BENFECNAC", beneficiario.BenFecNac);
                 cmd.Parameters.AddWithValue("@P_BENSEX", beneficiario.BenSex);
                 cmd.Parameters.AddWithValue("@P_GENCOD", beneficiario.GenCod);

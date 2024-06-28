@@ -69,13 +69,14 @@ const ModalBeneficiariesAssociated = ({openModal, closeModal, metaData, update, 
         });
     }, [data, searchTags]);
 
-    const headers = ['CUB','TIPO DOCUMENTO','NOMBRE','APELLIDO','SEXO','GÉNERO','FECHA NACIMIENTO','EDAD EJECUTADO','NACIONALIDAD','EMAIL','TELÉFONO','TELÉFONO CONTACTO','DIRECCIÓN','NOMBRE APODERADO','APELLIDO APODERADO','AÑO EJECUTADO','MES EJECUTADO','UBICACIÓN EJECUTADA','INDICADOR','TIPO','RESULTADO','OBJETIVO ESPECIFICO','OBJETIVO','SUBPROYECTO','PROYECTO'];
-    const properties = ['benCodUni','docIdeNom','benNom','benApe','benSex','genNom','benFecNac','metBenEda','nacNom','benCorEle','benTel','benTelCon','benDir','benNomApo','benApeApo','metBenAnoEjeTec','metBenMesEjeTec','ubiNom',['indNum','indNom'],'indTipInd',['resNum','resNom'],['objEspNum','objEspNom'],['objNum','objNom'],['subProSap','subProNom'],['proIde','proNom']];
+    const headers = ['CUB','TIPO DOCUMENTO','NOMBRE','APELLIDO','SEXO','GÉNERO','FECHA NACIMIENTO','EDAD EJECUTADO','NACIONALIDAD','EMAIL','TELÉFONO','DIRECCIÓN','NOMBRE APODERADO','APELLIDO APODERADO','TELÉFONO CONTACTO','AÑO EJECUTADO','MES EJECUTADO','UBICACIÓN EJECUTADA','INDICADOR','TIPO','RESULTADO','OBJETIVO ESPECIFICO','OBJETIVO','SUBPROYECTO','PROYECTO'];
+    const properties = ['benCodUni','docIdeNom','benNom','benApe','benSex','genNom','benFecNac','metBenEda','nacNom','benCorEle','benTel','benDir','benNomApo','benApeApo','benTelCon','metBenAnoEjeTec','metBenMesEjeTec','ubiNom',['indNum','indNom'],'indTipInd',['resNum','resNom'],['objEspNum','objEspNom'],['objNum','objNom'],['subProSap','subProNom'],['proIde','proNom']];
     // Preparar los datos
     let dataExport = [...filteredData]; 
     // Modificar el campo 'uniInvPer' en los datos
     dataExport = dataExport.map(item => ({
         ...item,
+        benSex: item.benSex === 'M' ? 'MASCULINO' : 'FEMENINO',
         indTipInd: tipoIndicadorMapping[item.indTipInd].toUpperCase(),
         metBenMesEjeTec: getMonth(item.metBenMesEjeTec),
     }));

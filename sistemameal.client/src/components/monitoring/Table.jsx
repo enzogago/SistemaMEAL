@@ -1,6 +1,6 @@
 import React, { useEffect, useState, Fragment, useMemo } from 'react'
-import { Export_Excel_Helper, Export_PDF_Helper, fetchDataBlock } from '../../components/reusable/helper'
-import { formatter, formatterBudget } from '../../components/monitoring/goal/helper'
+import { Export_Excel_Helper, Export_PDF_Helper, fetchDataBlock } from '../reusable/helper'
+import { formatter, formatterBudget } from './goal/helper'
 import CryptoJS from 'crypto-js';
 import { useNavigate } from 'react-router-dom';
 import TableEmpty from '../../img/PowerMas_TableEmpty.svg';
@@ -57,8 +57,6 @@ const getIndicatorStatus = (metas) => {
     }
     return { statusName, statusColor, statusCode };
 };
-
-
 
 const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
     const navigate = useNavigate();
@@ -118,6 +116,7 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
         const tagsParam = searchTags.length > 0 ? searchTags.join(',') : null;
         const periodoInicioParam = periodoInicio ? periodoInicio : null;
         const periodoFinParam = periodoFin ? periodoFin : null;
+
         const url = `Monitoreo/Filter/${tagsParam}/${periodoInicioParam}/${periodoFinParam}`;
         fetchDataBlock(url, (data) => {
             setMetas(data);
@@ -400,10 +399,6 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                     <table className='PowerMas_Table_Monitoring Phone_12'>
                         <thead>
                             <tr className='center'>
-                                <span 
-                                    className='flex'
-                                    style={{minWidth: '1.25rem'}}
-                                ></span>
                                 <th>Estado</th>
                                 <th></th>
                                 <th>FFVV</th>
@@ -652,6 +647,12 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                                             </tr>
                                             {expandedInd.includes(key) && subMetas.map((meta, index) => {
                                                 const mesPeriodo = meta.metMesPlaTec ? (new Date(2024, meta.metMesPlaTec - 1).toLocaleString('es-ES', { month: 'short' })) : '';
+
+                                                const textImp = meta.impNom;
+                                                const shortTextImp = textImp.length > 15 ? textImp.substring(0, 15) + '...' : textImp;
+                                                const textUbi = meta.ubiNom;
+                                                const shortTextUbi = textUbi.length > 15 ? textUbi.substring(0, 15) + '...' : textUbi;
+
                                                 return (
                                                 <tr key={index} style={{color: '#372e2ca6', visibility: expandedInd.includes(key) ? 'visible' : 'collapse'}}>
                                                     <td></td>
@@ -693,9 +694,25 @@ const Table = ({setModalIsOpen, setModalConfirmIsOpen}) => {
                                                         }
                                                         </div>
                                                     </td>
-                                                    <td style={{textTransform: 'capitalize'}}> <span className='bold'>Resp.</span> {meta.usuNom?.toLowerCase() + ' ' + meta.usuApe?.toLowerCase()}</td>
-                                                    <td style={{ textTransform: 'capitalize'}}><span className='bold'>Impl.</span> {meta.impNom?.toLowerCase()}</td>
-                                                    <td style={{textTransform: 'capitalize'}}><span className='bold'>Ubic.</span> {meta.ubiNom?.toLowerCase()}</td>
+                                                    <td style={{textTransform: 'capitalize'}}> <span className='bold'>Resp.</span> {meta.usuNom?.split(' ')[0].toLowerCase() + ' ' + meta.usuApe?.split(' ')[0].toLowerCase()}</td>
+                                                    <td 
+                                                        style={{ textTransform: 'capitalize'}}
+                                                        data-tooltip-id="info-tooltip" 
+                                                        data-tooltip-content={textImp} 
+                                                    >
+                                                        <span className='bold'>
+                                                            Impl.
+                                                        </span> {shortTextImp?.toLowerCase()}
+                                                    </td>
+                                                    <td 
+                                                        style={{textTransform: 'capitalize'}}
+                                                        data-tooltip-id="info-tooltip" 
+                                                        data-tooltip-content={textUbi} 
+                                                    >
+                                                        <span className='bold'>
+                                                            Ubic.
+                                                        </span> {shortTextUbi?.toLowerCase()}
+                                                    </td>
                                                     <td><span className='bold'>Mes</span> {mesPeriodo?.charAt(0).toUpperCase()+mesPeriodo?.slice(1) + '-' + meta.metAnoPlaTec}</td>
                                                     <td className='center'>{formatter.format(meta.metMetTec)}</td>
                                                     <td className='center'>{formatter.format(meta.metEjeTec)}</td>

@@ -433,15 +433,15 @@ const Modal = ({ estadoEditado, modalVisible, closeModal, setRefresh, title, uni
                                     type="text" 
                                     disabled={!subProyectoEnable}
                                     placeholder='A111' 
-                                    maxLength={10} 
+                                    maxLength={100} 
                                     name="indNumPre" 
                                     autoComplete='off'
                                     {...register(
                                         'indNumPre', { 
-                                            maxLength: { value: 10, message: 'El campo no puede tener más de 10 caracteres' },
+                                            maxLength: { value: 100, message: 'El campo no puede tener más de 100 caracteres' },
                                             minLength:  { value: 2, message: 'El campo no puede tener menos de 2 caracteres' },
                                             pattern: {
-                                                value: /^[A-Za-z0-9.\s]+$/,
+                                                value: /^[A-Za-z0-9.\s-]+$/,
                                                 message: 'Por favor, introduce solo letras, numeros y puntos',
                                             },
                                         }

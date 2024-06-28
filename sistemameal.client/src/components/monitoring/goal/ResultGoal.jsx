@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react'
+import React, { Fragment, useEffect, useRef, useState } from 'react'
 import Excel_Icon from '../../../img/PowerMas_Excel_Icon.svg';
 import { fetchData } from '../../reusable/helper';
 import { useForm } from 'react-hook-form';
@@ -48,6 +48,9 @@ const ResultGoal = () => {
 
     const [indicatorsValidity, setIndicatorsValidity] = useState({});
 
+    const currentValuesRef = useRef({});
+
+
     const { 
         register,
         unregister,
@@ -77,6 +80,16 @@ const ResultGoal = () => {
         }
         setValue('metAnoPlaTec','0');
     }, [watch('subproyecto')]);
+
+    const calculateAverage = (prevTotals, key, newValue) => {
+        // Asegúrate de que existingValues sea un array
+        const existingValues = Array.isArray(prevTotals[key]) ? prevTotals[key] : [];
+        const newValues = [...existingValues, newValue];
+        const sum = newValues.reduce((total, value) => total + value, 0);
+        return sum / newValues.length;
+      };
+      
+      
     
     useEffect(() => {
         setPopupInfo({ visible: false, data: null })
@@ -170,16 +183,34 @@ const ResultGoal = () => {
                     const key = `${meta.indAno}_${meta.indCod}_${counter}_${meta.metMesPlaTec}`;
                     const totalKey = `${meta.indAno}_${meta.indCod}_${counter}_total`;
                     const newValue = Number(inputValues.mes);
-                    setTotals(prevTotals => ({
-                        ...prevTotals,
-                        [key]: (prevTotals[key] || 0) + newValue,
-                        [totalKey]: (prevTotals[totalKey] || 0) + newValue
-                    }));
+
+                    currentValuesRef.current[key] = newValue;
+
+                    if (meta.tipValCod === '01') {
+                        // Suma el nuevo valor al total mensual y al total general
+                        setTotals(prevTotals => ({
+                            ...prevTotals,
+                            [key]: (prevTotals[key] || 0) + newValue,
+                            [totalKey]: (prevTotals[totalKey] || 0) + newValue
+                        }));
+                    } else if (meta.tipValCod === '02') {
+                        // Calcula el promedio para el total mensual y el total general
+                        // Asumiendo que tienes una función auxiliar para calcular el promedio
+                        setTotals(prevTotals => {
+                            const updatedMonthTotal = calculateAverage(prevTotals, key, newValue);
+                            const updatedGeneralTotal = calculateAverage(prevTotals, totalKey, newValue);
+                            return {
+                                ...prevTotals,
+                                [key]: updatedMonthTotal,
+                                [totalKey]: updatedGeneralTotal
+                            };
+                        });
+                    }
+
                     setPrevValues(prevValues => ({
                         ...prevValues,
                         [key]: newValue
                     }));
-
                     if (!rows[rowKey]) {
                         // Si la fila no existe todavía, crea una nueva
                         rows[rowKey] = {
@@ -188,6 +219,7 @@ const ResultGoal = () => {
                             indCod: meta.indCod,
                             indNum: meta.indNum,
                             uniNom: meta.uniNom,
+                            tipValCod: meta.tipValCod,
                             cells: [],
                         };
                     }
@@ -242,9 +274,6 @@ const ResultGoal = () => {
     const toggleDropdown = () => {
         setDropdownOpen(!dropdownOpen);
     }
-
-    
-      
 
     const onSubmit = (data) => {
         let metas = [];
@@ -355,7 +384,6 @@ const ResultGoal = () => {
             metas,
             metasEliminar
         }
-        console.log(Metas)
         handleUpdate(Metas);
     };
 
@@ -401,9 +429,9 @@ const ResultGoal = () => {
         const { ubiAno, ubiCod } = JSON.parse(ubicacionValue);
     
         // Inicializa los totales acumulados para implementador y ubicación
-        let totalPorImplementador = 0;
-        let totalPorUbicacion = 0;
-        let totalPorPeriodo = 0;
+        let totalPorImplementador = [];
+        let totalPorUbicacion = [];
+        let totalPorPeriodo = [];
     
         // Itera sobre todas las filas adicionales para acumular los valores
         additionalRows.forEach(currentRow => {
@@ -412,51 +440,60 @@ const ResultGoal = () => {
                 const currentUbicacionValue = watch(`ubicacion_${currentRow.id}`);
                 if (currentImplementadorValue === implementadorValue) {
                     for (let i = 0; i < 12; i++) {
-                        totalPorImplementador += Number(watch(`mes_${String(i+1).padStart(2, '0')}_${currentRow.id}`) || 0);
+                        const currentValueKey = `${currentRow.id}_${String(i+1).padStart(2, '0')}`;
+                        const currentValue = currentValuesRef.current[currentValueKey] || 0;
+                        totalPorImplementador.push(currentValue);
                     }
                 }
                 if (currentUbicacionValue === ubicacionValue) {
                     for (let i = 0; i < 12; i++) {
-                        totalPorUbicacion += Number(watch(`mes_${String(i+1).padStart(2, '0')}_${currentRow.id}`) || 0);
+                        const currentValueKey = `${currentRow.id}_${String(i+1).padStart(2, '0')}`;
+                        const currentValue = currentValuesRef.current[currentValueKey] || 0;
+                        totalPorUbicacion.push(currentValue);
                     }
                 }
                 for (let i = 0; i < 12; i++) {
-                    totalPorPeriodo += Number(watch(`mes_${String(i+1).padStart(2, '0')}_${currentRow.id}`) || 0);
+                    const currentValueKey = `${currentRow.id}_${String(i+1).padStart(2, '0')}`;
+                    const currentValue = currentValuesRef.current[currentValueKey] || 0;
+                    totalPorPeriodo.push(currentValue);
                 }
             }
         });
-    
         // Resta el valor previo y suma el nuevo valor para obtener los nuevos totales
         const prevValue = prevValues[`${row.id}_${String(monthIndex+1).padStart(2, '0')}`] || 0;
-        totalPorImplementador = totalPorImplementador - prevValue + Number(newValue);
-        totalPorUbicacion = totalPorUbicacion - prevValue + Number(newValue);
-        totalPorPeriodo = totalPorPeriodo - prevValue + Number(newValue);
-    
+        totalPorImplementador = calculateTotalOrAverage(row.tipValCod, totalPorImplementador);
+        totalPorUbicacion = calculateTotalOrAverage(row.tipValCod, totalPorUbicacion);
+        totalPorPeriodo = calculateTotalOrAverage(row.tipValCod, totalPorPeriodo);
         // Obtén los límites máximos específicos para implementador y ubicación
         const maxImplementador = cadenaImplementadorGrouped[`${row.indAno}-${row.indCod}`][implementadorValue].value;
         const maxUbicacion = cadenaUbicacionGrouped[`${row.indAno}-${row.indCod}`][`${ubiAno}-${ubiCod}`].value;
         const maxPeriodo = cadenaPeriodoGrouped[`${row.indAno}-${row.indCod}`];
         const unidadNom = row.uniNom.charAt(0) + row.uniNom.slice(1).toLowerCase();
         // Valida contra los máximos específicos
-        if (totalPorImplementador > maxImplementador) {
-            const implementador = implementadoresSelect.find(imp => imp.impCod === implementadorValue);
-            const implementadorNom = implementador.impNom.charAt(0) + implementador.impNom.slice(1).toLowerCase();
-
-            Notiflix.Report.warning('Advertencia', `La meta del implementador ${implementadorNom} es ${formatter.format(totalPorImplementador)} ${unidadNom}, pero en la cadena de resultado se estableció en ${formatter.format(maxImplementador)} ${unidadNom}. Por favor ajuste la distribución correctamente.`, 'Aceptar');
+        if (row.tipValCod === '02' && (maxImplementador === 0 || maxUbicacion === 0 || maxPeriodo === 0)) {
+            Notiflix.Report.warning('Advertencia', 'Uno de los valores de la cadena es 0, por lo que no se puede ingresar un valor.', 'Aceptar');
             isValid = false;
-        }
-        if (totalPorUbicacion > maxUbicacion) {
-            const ubicacion = ubicacionesSelect.find(item => item.ubiAno === ubiAno && item.ubiCod === ubiCod);
-            const ubicacionNom = ubicacion.ubiNom.charAt(0) + ubicacion.ubiNom.slice(1).toLowerCase();
-
-            Notiflix.Report.warning('Advertencia', `La meta de la ubicación ${ubicacionNom} es ${formatter.format(totalPorUbicacion)} ${unidadNom}, pero en la cadena de resultado se estableció en ${formatter.format(maxUbicacion)} ${unidadNom}. Por favor ajuste la distribución correctamente.`, 'Aceptar');
-            isValid = false;
-        }
-        if (totalPorPeriodo > maxPeriodo) {
-            const ano = watch('metAnoPlaTec');
-
-            Notiflix.Report.warning('Advertencia', `La meta del periodo ${ano} es ${formatter.format(totalPorPeriodo)} ${unidadNom}, pero en la cadena de resultado se estableció en ${formatter.format(maxPeriodo)} ${unidadNom}. Por favor ajuste la distribución correctamente.`, 'Aceptar');
-            isValid = false;
+        } else {
+            if (totalPorImplementador > maxImplementador) {
+                const implementador = implementadoresSelect.find(imp => imp.impCod === implementadorValue);
+                const implementadorNom = implementador.impNom.charAt(0) + implementador.impNom.slice(1).toLowerCase();
+                
+                Notiflix.Report.warning('Advertencia', `La meta del implementador ${implementadorNom} es ${formatter.format(totalPorImplementador)} ${unidadNom}, pero en la cadena de resultado se estableció en ${formatter.format(maxImplementador)} ${unidadNom}. Por favor ajuste la distribución correctamente.`, 'Aceptar');
+                isValid = false;
+            }
+            if (totalPorUbicacion > maxUbicacion) {
+                const ubicacion = ubicacionesSelect.find(item => item.ubiAno === ubiAno && item.ubiCod === ubiCod);
+                const ubicacionNom = ubicacion.ubiNom.charAt(0) + ubicacion.ubiNom.slice(1).toLowerCase();
+                
+                Notiflix.Report.warning('Advertencia', `La meta de la ubicación ${ubicacionNom} es ${formatter.format(totalPorUbicacion)} ${unidadNom}, pero en la cadena de resultado se estableció en ${formatter.format(maxUbicacion)} ${unidadNom}. Por favor ajuste la distribución correctamente.`, 'Aceptar');
+                isValid = false;
+            }
+            if (totalPorPeriodo > maxPeriodo) {
+                const ano = watch('metAnoPlaTec');
+    
+                Notiflix.Report.warning('Advertencia', `La meta del periodo ${ano} es ${formatter.format(totalPorPeriodo)} ${unidadNom}, pero en la cadena de resultado se estableció en ${formatter.format(maxPeriodo)} ${unidadNom}. Por favor ajuste la distribución correctamente.`, 'Aceptar');
+                isValid = false;
+            }
         }
     
         setIndicatorsValidity(prevValidity => ({
@@ -465,11 +502,42 @@ const ResultGoal = () => {
         }));
     };
 
+    const calculateTotalOrAverage = (tipValCod, values) => {
+        if (tipValCod === '01') {
+          return values.reduce((sum, value) => sum + value, 0);
+        } else if (tipValCod === '02') {
+          const nonZeroValues = values.filter(value => value !== 0);
+          return nonZeroValues.length > 0 ? nonZeroValues.reduce((sum, value) => sum + value, 0) / nonZeroValues.length : 0;
+        }
+      };
+
     useEffect(() => {
         const allValid = Object.values(indicatorsValidity).every(isValid => isValid);
         setIsFormValid(allValid);
     }, [indicatorsValidity]);
 
+    const calculateNewAverage = (prevTotals, key, operation) => {
+        // Extrae todos los valores para el indicador específico, excluyendo el total
+        const values = Object.keys(prevTotals)
+          .filter(k => k.startsWith(key.replace(/_\d+$/, '')) && !k.endsWith('_total'))
+          .map(k => prevTotals[k]);
+      
+        if (operation === 'subtract') {
+          // Elimina el valor correspondiente al mes actual
+          const monthIndex = parseInt(key.match(/_(\d+)$/)[1], 10) - 1;
+          values.splice(monthIndex, 1);
+        }
+      
+        // Calcula el nuevo promedio
+        const nonZeroValues = values.filter(val => val !== 0);
+        const average = nonZeroValues.length > 0
+          ? nonZeroValues.reduce((sum, val) => sum + val, 0) / nonZeroValues.length
+          : 0;
+      
+        return average;
+      };
+
+      
     return (
         <div className='p_75 flex flex-column flex-grow-1 overflow-auto content-block relative'>
             <h1 className="Large-f1_5"> Metas técnicas programáticas </h1>
@@ -594,10 +662,14 @@ const ResultGoal = () => {
                                                     // style={{backgroundColor: 'transparent', border: 'none'}} 
                                                     onClick={() => {
                                                         setRowIdCounter(rowIdCounter + 1);
-                                                        setAdditionalRows([...additionalRows, { id: `${item.indAno}_${item.indCod}_${rowIdCounter}`, indAno: item.indAno, indCod: item.indCod, indNum: item.indNum, uniNom: item.uniNom }]);
+                                                        setAdditionalRows([...additionalRows, { id: `${item.indAno}_${item.indCod}_${rowIdCounter}`, indAno: item.indAno, indCod: item.indCod, indNum: item.indNum, uniNom: item.uniNom, tipValCod: item.tipValCod }]);
                                                         if (!expandedIndicators.includes(`${item.indAno}_${item.indCod}`)) {
                                                             setExpandedIndicators([...expandedIndicators, `${item.indAno}_${item.indCod}`]);
                                                         }
+                                                        meses.forEach((mes, i) => {
+                                                            const newRowId = `${item.indAno}_${item.indCod}_${rowIdCounter}_${String(i+1).padStart(2, '0')}`;
+                                                            currentValuesRef.current[newRowId] = 0;
+                                                        });
                                                     }}
                                                 >
                                                     <Plus />
@@ -641,17 +713,42 @@ const ResultGoal = () => {
                                             <td >{textUnidad}</td>
                                         }
                                         <td>{item.tipValNom}</td>
-                                        {meses.map((mes, i) => (
-                                            <td key={i+1} className='center'>
-                                                {formatter.format(Object.entries(totals)
-                                                    .filter(([key]) => key.startsWith(`${item.indAno}_${item.indCod}`) && key.endsWith(String(i+1).padStart(2, '0')))
-                                                    .reduce((sum, [, value]) => sum + value, 0))}
-                                            </td>
-                                        ))}
-                                        <td  className='bold center' style={{position: 'sticky', right: '0', backgroundColor: '#fff'}}>
-                                            {formatter.format(Object.entries(totals)
-                                                .filter(([key]) => key.startsWith(`${item.indAno}_${item.indCod}`) && key.endsWith('_total'))
-                                                .reduce((sum, [, value]) => sum + value, 0))}
+                                        {meses.map((mes, i) => {
+                                            // Obtiene todos los valores para el mes actual del indicador específico
+                                            const monthValues = Object.entries(totals)
+                                                .filter(([key]) => key.startsWith(`${item.indAno}_${item.indCod}`) && key.endsWith(String(i+1).padStart(2, '0')))
+                                                .map(([, value]) => Number(value));
+
+                                            // Calcula el total o promedio basado en tipValCod
+                                            const totalOrAverage = item.tipValCod === '01'
+                                                ? monthValues.reduce((sum, value) => sum + value, 0) // Suma para tipValCod '01'
+                                                : monthValues.length > 0
+                                                ? monthValues.reduce((sum, value) => sum + (value || 0), 0) / (monthValues.filter(value => value !== 0).length || 1) // Promedio para tipValCod '02', evita dividir por cero
+                                                : 0; // Si no hay valores, el promedio es 0
+
+                                            return (
+                                                <td key={i+1} className='center'>
+                                                {formatter.format(totalOrAverage)}
+                                                </td>
+                                            );
+                                        })}
+                                        <td className='bold center' style={{position: 'sticky', right: '0', backgroundColor: '#fff'}}>
+                                            {formatter.format(
+                                                item.tipValCod === '01'
+                                                ? // Si tipValCod es '01', suma todos los valores para obtener el total
+                                                    Object.entries(totals)
+                                                    .filter(([key]) => key.startsWith(`${item.indAno}_${item.indCod}`) && key.endsWith('_total'))
+                                                    .reduce((sum, [, value]) => sum + value, 0)
+                                                : // Si tipValCod es '02', calcula el promedio de los valores no cero para obtener el total
+                                                    Object.entries(totals)
+                                                    .filter(([key]) => key.startsWith(`${item.indAno}_${item.indCod}`) && key.endsWith('_total'))
+                                                    .reduce((acc, [, value], _, array) => {
+                                                        const nonZeroValues = array.filter(([, val]) => val !== 0);
+                                                        return nonZeroValues.length > 0
+                                                        ? acc + value / nonZeroValues.length
+                                                        : acc;
+                                                    }, 0)
+                                            )}
                                         </td>
                                     </tr>
                                     {additionalRows.filter(row => row.indAno === item.indAno && row.indCod === item.indCod).map((row, rowIndex) => (
@@ -673,13 +770,25 @@ const ResultGoal = () => {
                                                                     meses.forEach((mes, i) => {
                                                                         const key = `${row.id}_${String(i+1).padStart(2, '0')}`;
                                                                         const totalKey = `${row.id}_total`;
-                                                                        const value = Number(watch(`mes_${String(i+1).padStart(2, '0')}_${row.id}`));
-                                                                        setTotals(prevTotals => ({
-                                                                            ...prevTotals,
-                                                                            [key]: (prevTotals[key] || 0) - value,
-                                                                            [totalKey]: (prevTotals[totalKey] || 0) - value
-                                                                        }));
-                                                                    });
+                                                                        const value = currentValuesRef.current[key] || 0;
+                                                                      
+                                                                        setTotals(prevTotals => {
+                                                                          const updatedTotals = { ...prevTotals };
+                                                                          if (item.tipValCod === '01') {
+                                                                            // Para suma, simplemente resta el valor del total
+                                                                            updatedTotals[key] = (updatedTotals[key] || 0) - value;
+                                                                            updatedTotals[totalKey] = (updatedTotals[totalKey] || 0) - value;
+                                                                          } else if (item.tipValCod === '02') {
+                                                                            // Para promedio, recalcula el promedio sin el valor eliminado
+                                                                            updatedTotals[key] = 0; // Establece el valor del mes específico a 0
+                                                                            updatedTotals[totalKey] = calculateNewAverage(updatedTotals, key, 'subtract');
+                                                                          }
+                                                                          return updatedTotals;
+                                                                        });
+                                                                      
+                                                                        // Elimina la referencia al valor eliminado
+                                                                        delete currentValuesRef.current[key];
+                                                                      });
                                                                     // Ahora sí eliminamos la fila
                                                                     setAdditionalRows(prevRows => {
                                                                         const newRows = prevRows.filter((prevRow) => prevRow.id !== row.id);
@@ -894,37 +1003,63 @@ const ResultGoal = () => {
                                                         data-tooltip-content={getValues(`meta_${String(i+1).padStart(2, '0')}_${row.id}`) && `META PRESUPUESTO: ${formatterBudget.format(getValues(`metMetPre_${String(i+1).padStart(2, '0')}_${row.id}`) || 0)} $`} 
                                                         disabled={!actions.add}
                                                         maxLength={10}
-                                                        onInput={(e) => {
+                                                        onInput={ async(e) => {
+                                                            let value = e.target.value;
                                                             if (item.tipValCod === '02') {
-                                                                const value = e.target.value;
-                                                                if (value === '' || (/^\d*\.?\d*$/.test(value))) {
-                                                                    e.target.value = value;
-                                                                } else {
-                                                                    e.target.value = value.slice(0, -1);
+                                                                // Permite hasta dos decimales
+                                                                value = value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');
+                                                                if (value.split('.').length > 2) {
+                                                                    value = value.replace(/\.+$/, '');
+                                                                }
+                                                                if (value.includes('.')) {
+                                                                    const parts = value.split('.');
+                                                                    if (parts[1].length > 2) {
+                                                                        parts[1] = parts[1].substring(0, 2);
+                                                                        value = parts.join('.');
+                                                                    }
                                                                 }
                                                             } else {
-                                                                e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                                                                // Solo permite números enteros
+                                                                value = value.replace(/[^0-9]/g, '');
                                                             }
 
-                                                            const inputVal = e.target.value;
+                                                            e.target.value = value;
+                                                            
+                                                            const inputVal = Number(value);
 
+                                                            const key = `${row.id}_${String(i+1).padStart(2, '0')}`;
+                                                            currentValuesRef.current[key] = inputVal;
                                                             validateInput(inputVal, row, i, additionalRows);
                                                             
-                                                            // Si el nuevo valor es válido, actualiza los totales y los valores previos
-                                                            const key = `${row.id}_${String(i+1).padStart(2, '0')}`;
-                                                            const totalKey = `${row.id}_total`;
+                                                            // Actualiza los totales y los valores previos
                                                             const prevValue = prevValues[key] || 0;
-                                                            const newValue = Number(e.target.value);
-                                                            setTotals(prevTotals => ({
-                                                                ...prevTotals,
-                                                                [key]: (prevTotals[key] || 0) - prevValue + newValue,
-                                                                [totalKey]: (prevTotals[totalKey] || 0) - prevValue + newValue
-                                                                }));
-                                                                setPrevValues(prevValues => ({
-                                                                    ...prevValues,
-                                                                    [key]: newValue
-                                                                }));
-                                                            }}
+                                                            setTotals(prevTotals => {
+                                                                const updatedTotals = { ...prevTotals };
+                                                                const totalKey = `${row.id}_total`;
+                                                                updatedTotals[key] = inputVal; // Establece el valor actual para el mes específico
+                                                            
+                                                                if (item.tipValCod === '01') {
+                                                                  // Caso de suma: simplemente actualiza el total con el nuevo valor
+                                                                  updatedTotals[totalKey] = (updatedTotals[totalKey] || 0) - prevValue + inputVal;
+                                                                } else if (item.tipValCod === '02') {
+                                                                  // Caso de promedio: recalcula el promedio con todos los valores actuales
+                                                                  const allValues = Object.keys(updatedTotals)
+                                                                    .filter(k => k.startsWith(`${row.id}_`) && k !== totalKey)
+                                                                    .map(k => updatedTotals[k]);
+                                                                  const nonZeroValues = allValues.filter(val => val !== 0);
+                                                                  const average = nonZeroValues.length > 0
+                                                                    ? nonZeroValues.reduce((sum, val) => sum + val, 0) / nonZeroValues.length
+                                                                    : 0;
+                                                                  updatedTotals[totalKey] = average;
+                                                                }
+                                                            
+                                                                return updatedTotals;
+                                                              });
+                                                            setPrevValues(prevValues => ({
+                                                                ...prevValues,
+                                                                [key]: inputVal
+                                                            }));
+                                                        }}
                                                         style={{margin: '0'}}
                                                         {...register(`mes_${String(i+1).padStart(2, '0')}_${row.id}`, { 
                                                             pattern: {

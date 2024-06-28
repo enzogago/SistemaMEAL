@@ -179,11 +179,11 @@ const Home = () => {
       
         // Función para obtener datos del mapa y beneficiarios según el país
         const fetchDataForMap = (country) => {
-          // Llamada para obtener datos de ubicación para el mapa
-          fetchDataBlockHome(`Monitoreo/${country}-home/${url}`, setMapData, '.ubication-block', abortController.signal);
-      
-          // Llamada para obtener datos de beneficiarios
-          fetchDataBlockHome(`Beneficiario/${country}-home/${url}`, setBeneficiariosData, '.ubication-block', abortController.signal);
+            // Llamada para obtener datos de ubicación para el mapa
+            fetchDataBlockHome(`Monitoreo/${country}-home/${url}`, setMapData, '.ubication-block', abortController.signal);
+        
+            // Llamada para obtener datos de beneficiarios
+            fetchDataBlockHome(`Beneficiario/${country}-home/${url}`, setBeneficiariosData, '.ubication-block', abortController.signal);
         };
       
         // Ejecuta la función fetchDataForMap con el país actual

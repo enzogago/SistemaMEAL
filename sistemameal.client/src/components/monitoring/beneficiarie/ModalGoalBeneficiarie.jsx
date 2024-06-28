@@ -31,7 +31,9 @@ const ModalGoalBeneficiarie = ({modalGoalBeneficiarie, closeModal, closeModalNam
             benCorEle,
             benTel,
             benTelCon,
-            benDir
+            benDir,
+            benNomApo,
+            benApeApo,
         } = dataGoalBeneficiarie;
 
         setValue('benAno',benAno)
@@ -47,6 +49,8 @@ const ModalGoalBeneficiarie = ({modalGoalBeneficiarie, closeModal, closeModalNam
         setValue('benTel',benTel)
         setValue('benTelCon',benTelCon)
         setValue('benDir',benDir)
+        setValue('benNomApo',benNomApo)
+        setValue('benApeApo',benApeApo)
 
         closeModal();
         closeModalNames();

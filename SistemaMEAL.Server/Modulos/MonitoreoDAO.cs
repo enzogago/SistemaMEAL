@@ -961,7 +961,6 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_UBICOD", metaBeneficiario.UbiCod);
                 cmd.Parameters.AddWithValue("@P_METBENMESEJETEC", metaBeneficiario.MetBenMesEjeTec);
                 cmd.Parameters.AddWithValue("@P_METBENANOEJETEC", metaBeneficiario.MetBenAnoEjeTec);
-                cmd.Parameters.AddWithValue("@P_METBENEDA", metaBeneficiario.MetBenEda);
                 cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                 cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
@@ -1001,8 +1000,8 @@ namespace SistemaMEAL.Modulos
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 
-            string? mensaje = "";
-            string? tipoMensaje = "";
+            string? mensaje;
+            string? tipoMensaje;
             try
             {
 
@@ -1013,8 +1012,8 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_BENCOD", beneficiario.BenCod);
                 cmd.Parameters.AddWithValue("@P_BENNOM", beneficiario.BenNom);
                 cmd.Parameters.AddWithValue("@P_BENAPE", beneficiario.BenApe);
-                cmd.Parameters.AddWithValue("@P_BENNOMAPO", beneficiario.BenNom);
-                cmd.Parameters.AddWithValue("@P_BENAPEAPO", beneficiario.BenApe);
+                cmd.Parameters.AddWithValue("@P_BENNOMAPO", beneficiario.BenNomApo);
+                cmd.Parameters.AddWithValue("@P_BENAPEAPO", beneficiario.BenApeApo);
                 cmd.Parameters.AddWithValue("@P_BENFECNAC", beneficiario.BenFecNac);
                 cmd.Parameters.AddWithValue("@P_BENSEX", beneficiario.BenSex);
                 cmd.Parameters.AddWithValue("@P_GENCOD", beneficiario.GenCod);
@@ -1052,17 +1051,14 @@ namespace SistemaMEAL.Modulos
                 mensaje = ex.Message;
                 tipoMensaje = "1";
             }
-            finally
-            {
-            }
             return (mensaje, tipoMensaje);
         }
         public (string? message, string? messageType) ModificarMetaBeneficiarioTransaction(ClaimsIdentity? identity, MetaBeneficiario metaBeneficiario)
         {
             var userClaims = new UserClaims().GetClaimsFromIdentity(identity);
 
-            string? mensaje = "";
-            string? tipoMensaje = "";
+            string? mensaje;
+            string? tipoMensaje;
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_MODIFICAR_META_BENEFICIARIO", cn.getcn);
@@ -1082,10 +1078,8 @@ namespace SistemaMEAL.Modulos
                 cmd.Parameters.AddWithValue("@P_BENCOD", metaBeneficiario.BenCod);
                 cmd.Parameters.AddWithValue("@P_UBIANO", metaBeneficiario.UbiAno);
                 cmd.Parameters.AddWithValue("@P_UBICOD", metaBeneficiario.UbiCod);
-                cmd.Parameters.AddWithValue("@P_METBENEDA", metaBeneficiario.MetBenEda);
                 cmd.Parameters.AddWithValue("@P_METBENMESEJETEC", metaBeneficiario.MetBenMesEjeTec);
                 cmd.Parameters.AddWithValue("@P_METBENANOEJETEC", metaBeneficiario.MetBenAnoEjeTec);
-                cmd.Parameters.AddWithValue("@P_METBENEDA", metaBeneficiario.MetBenEda);
                 cmd.Parameters.AddWithValue("@P_USUMOD", userClaims.UsuNomUsu);
                 cmd.Parameters.AddWithValue("@P_LOGIPMAQ", userClaims.UsuIp);
                 cmd.Parameters.AddWithValue("@P_USUANO_U", userClaims.UsuAno);
@@ -1110,9 +1104,6 @@ namespace SistemaMEAL.Modulos
             {
                 mensaje = ex.Message;
                 tipoMensaje = "1";
-            }
-            finally
-            {
             }
             return (mensaje, tipoMensaje);
         }

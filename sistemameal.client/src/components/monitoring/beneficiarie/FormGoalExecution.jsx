@@ -285,7 +285,7 @@ const FormGoalExecution = () => {
             <div className="PowerMas_Content_Form_Beneficiarie overflow-auto flex-grow-1 flex">
                     <div className="Large_6 m1 overflow-auto flex flex-column gap-1">
                         <div className="PowerMas_Content_Form_Beneficiarie_Card Large-p_75">
-                            <h2 className="f1_25">Datos de Ubicación</h2>
+                            <h2 className="f1_25">Datos de Ubicación Ejecutada</h2>
                             <div className="m_75">
                                 <label htmlFor="pais" className="">
                                     País:
